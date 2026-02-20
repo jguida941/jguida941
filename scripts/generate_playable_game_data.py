@@ -61,6 +61,7 @@ def generate(
     total_contributions: int,
     featured_repos: list[dict],
     contributions: list[dict],
+    data_scope: dict | None = None,
     output_path: str = "game/data.json",
 ) -> str:
     total_xp = total_commits + total_repos * 5 + total_stars * 10 + prs_merged * 3
@@ -123,6 +124,7 @@ def generate(
             }
             for item in contributions[:10]
         ],
+        "data_scope": data_scope or {"repos_included": "public + owned + non-fork"},
     }
 
     out = Path(output_path)

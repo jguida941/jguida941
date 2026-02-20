@@ -26,7 +26,7 @@
 
 <div align="center">
 
-<a href="https://jguida941.github.io/stats/"><strong>Launch the playable mini-game</strong></a>
+<a href="https://jguida941.github.io/jguida941/"><strong>Launch the playable mini-game</strong></a>
 
 </div>
 

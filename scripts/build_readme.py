@@ -59,7 +59,11 @@ def main():
     print("\n[1/7] Fetching repos...")
     repos = gh.get_repos(include_forks=False)
     all_repos = gh.get_repos(include_forks=True)
-    print(f"  Found {len(repos)} original repos ({len(all_repos)} total)")
+    fork_count = sum(1 for r in all_repos if r.get("fork"))
+    print(
+        f"  Found {len(repos)} public non-fork repos "
+        f"({len(all_repos)} public owned total, {fork_count} forks)"
+    )
 
     print("[2/7] Fetching language data...")
     language_bytes = gh.get_all_languages(repos)
@@ -71,7 +75,7 @@ def main():
     print(f"  {len(events)} recent events")
 
     print("[4/7] Fetching commit count...")
-    total_commits = gh.get_total_commits()
+    total_commits = gh.get_total_commits(repos)
     print(f"  {total_commits} total commits")
 
     print("[5/7] Counting CI/CD pipelines...")
@@ -282,6 +286,12 @@ def main():
         total_contributions=total_contributions,
         featured_repos=spotlight_data,
         contributions=contributions,
+        data_scope={
+            "repos_included": "public + owned + non-fork",
+            "public_owned_repos_total": len(all_repos),
+            "public_owned_forks_total": fork_count,
+            "public_owned_nonfork_repos_total": len(repos),
+        },
     )
     print(f"-> {game_data_path}")
 

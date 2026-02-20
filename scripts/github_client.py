@@ -84,9 +84,23 @@ def paginated_get(endpoint: str, params: dict | None = None, per_page: int = 100
     return results
 
 
-def get_repos(include_forks=False) -> list:
-    """Get all repos for the user."""
-    repos = paginated_get(f"users/{USERNAME}/repos", {"sort": "created", "direction": "desc"})
+def _is_public_owned_repo(repo: dict) -> bool:
+    """True when repo is publicly visible and owned by USERNAME."""
+    owner_login = repo.get("owner", {}).get("login", "")
+    is_owner = owner_login.lower() == USERNAME.lower()
+    visibility = repo.get("visibility")
+    if visibility is None:
+        visibility = "private" if repo.get("private") else "public"
+    return is_owner and visibility == "public"
+
+
+def get_repos(include_forks: bool = False) -> list:
+    """Get public repos owned by USERNAME, optionally including forks."""
+    repos = paginated_get(
+        f"users/{USERNAME}/repos",
+        {"sort": "created", "direction": "desc", "type": "owner"},
+    )
+    repos = [r for r in repos if _is_public_owned_repo(r)]
     if not include_forks:
         repos = [r for r in repos if not r.get("fork")]
     return repos
@@ -219,21 +233,55 @@ def get_repo_commits_last_n_weeks(owner: str, repo: str, weeks: int = 12) -> lis
     return [0] * weeks
 
 
-def get_total_commits() -> int:
-    """Estimate total commits using the search API."""
-    cache_key = "total_commits"
+def get_repo_user_commit_count(owner: str, repo: str) -> int:
+    """Get total commits by USERNAME in a repo via contributors API."""
+    cache_key = f"repo_user_commits_{owner}_{repo}_{USERNAME}"
     cached = _get_cached(cache_key)
     if cached is not None:
         return cached
 
-    url = f"{API}/search/commits"
-    params = {"q": f"author:{USERNAME}", "per_page": 1}
-    resp = _request_with_retry(url, headers=_headers(), params=params)
-    if resp.status_code == 200:
-        count = resp.json().get("total_count", 0)
-        _set_cached(cache_key, count)
-        return count
+    contributors = paginated_get(
+        f"repos/{owner}/{repo}/contributors",
+        {"anon": "false"},
+        per_page=100,
+    )
+    for contributor in contributors:
+        login = contributor.get("login", "")
+        if login.lower() == USERNAME.lower():
+            count = int(contributor.get("contributions", 0))
+            _set_cached(cache_key, count)
+            return count
+
+    _set_cached(cache_key, 0)
     return 0
+
+
+def get_total_commits(repos: list | None = None, max_workers: int = 10) -> int:
+    """Count commits authored by USERNAME across the selected repos."""
+    cache_key = "total_commits_owned_public_nonfork"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        return cached
+
+    if repos is None:
+        repos = get_repos(include_forks=False)
+
+    total = 0
+
+    def fetch_one(repo):
+        return get_repo_user_commit_count(repo["owner"]["login"], repo["name"])
+
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        futures = {pool.submit(fetch_one, r): r for r in repos}
+        for f in as_completed(futures):
+            repo = futures[f]
+            try:
+                total += int(f.result())
+            except Exception as exc:
+                print(f"  Warning: commit count failed for {repo['name']}: {exc}")
+
+    _set_cached(cache_key, total)
+    return total
 
 
 def get_repos_with_ci(repos: list | None = None, max_workers: int = 10) -> int:
