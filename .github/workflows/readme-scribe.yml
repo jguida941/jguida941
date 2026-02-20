@@ -4,8 +4,6 @@ on:
   schedule:
     - cron: "0 */6 * * *"
   workflow_dispatch:
-  push:
-    branches: ["main"]
 
 jobs:
   update-readme:
@@ -15,6 +13,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Pull latest
+        run: git pull --rebase origin main
 
       - uses: muesli/readme-scribe@master
         env:
@@ -27,44 +31,49 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
-          gh api users/jguida941/repos --paginate -q '
-            [.[] | select(.fork == false)]
-            | sort_by(.created_at)
-            | reverse
-            | .[0:5]
-            | .[]
-            | "- [**\(.name)**](\(.html_url))" +
-              (if .description and .description != "" then " — \(.description)" else "" end) +
-              (if .language and .language != "" then " `\(.language)`" else "" end)
+          gh api "users/jguida941/repos?per_page=100&sort=created&direction=desc" -q '
+            [.[] | select(.fork == false)] | .[0:10] | .[] |
+            "| [**\(.name)**](\(.html_url)) | \(.description // "n/a" | gsub("[|]"; ",")) | `\(.language // "n/a")` | \(.created_at[:10]) |"
           ' > /tmp/recent_repos.md
 
-          sed -i '/<!-- RECENT_REPOS -->/r /tmp/recent_repos.md' README.md
+          {
+            echo "| Repository | Description | Language | Created |"
+            echo "|------------|-------------|----------|---------|"
+            cat /tmp/recent_repos.md
+          } > /tmp/recent_repos_table.md
+
+          sed -i '/<!-- RECENT_REPOS -->/r /tmp/recent_repos_table.md' README.md
           sed -i '/<!-- RECENT_REPOS -->/d' README.md
 
-      - name: Generate repo health stats
+      - name: Generate repo health badges
         env:
           GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
-          TOTAL=$(gh api users/jguida941/repos --paginate -q '[.[] | select(.fork == false)] | length')
+          REPOS_JSON=$(gh api "users/jguida941/repos?per_page=100" --paginate)
+          TOTAL=$(echo "$REPOS_JSON" | jq '[.[] | select(.fork == false)] | length')
+          LANG_COUNT=$(echo "$REPOS_JSON" | jq '[.[].language | select(. != null)] | unique | length')
+          STARS=$(echo "$REPOS_JSON" | jq '[.[].stargazers_count] | add')
 
           CI_COUNT=0
-          for repo in $(gh api users/jguida941/repos --paginate -q '[.[] | select(.fork == false)] | .[].name'); do
+          for repo in $(echo "$REPOS_JSON" | jq -r '[.[] | select(.fork == false)] | .[].name'); do
             result=$(gh api "repos/jguida941/$repo/contents/.github/workflows" 2>/dev/null | jq 'if type == "array" then length else 0 end' 2>/dev/null || echo "0")
             if [ "$result" -gt 0 ]; then
               CI_COUNT=$((CI_COUNT + 1))
             fi
           done
 
-          LANG_COUNT=$(gh api users/jguida941/repos --paginate -q '[.[].language | select(. != null)] | unique | length')
-          STARS=$(gh api users/jguida941/repos --paginate -q '[.[].stargazers_count] | add')
+          cat > /tmp/health.md <<'BADGES'
+![Original Repos](https://img.shields.io/badge/Original_Repos-TOTAL_VAL-7AA2F7?style=for-the-badge&labelColor=1a1b27)
+![CI/CD Pipelines](https://img.shields.io/badge/CI%2FCD_Pipelines-CI_VAL-ff9e64?style=for-the-badge&labelColor=1a1b27)
+![Languages](https://img.shields.io/badge/Languages-LANG_VAL-a9b1d6?style=for-the-badge&labelColor=1a1b27)
+![Stars Earned](https://img.shields.io/badge/Stars_Earned-STARS_VAL-e0af68?style=for-the-badge&labelColor=1a1b27)
+![Forked Repos](https://img.shields.io/badge/Forked_Repos-0-565f89?style=for-the-badge&labelColor=1a1b27)
+BADGES
 
-          cat > /tmp/health.md << EOF
-          ![Original Repos](https://img.shields.io/badge/Original_Repos-${TOTAL}-7AA2F7?style=for-the-badge&labelColor=1a1b27)
-          ![CI/CD Pipelines](https://img.shields.io/badge/CI%2FCD_Pipelines-${CI_COUNT}-ff9e64?style=for-the-badge&labelColor=1a1b27)
-          ![Languages](https://img.shields.io/badge/Languages-${LANG_COUNT}-a9b1d6?style=for-the-badge&labelColor=1a1b27)
-          ![Stars Earned](https://img.shields.io/badge/Stars_Earned-${STARS}-e0af68?style=for-the-badge&labelColor=1a1b27)
-          ![Forked Repos](https://img.shields.io/badge/Forked_Repos-0-565f89?style=for-the-badge&labelColor=1a1b27)
-          EOF
+          sed -i "s/TOTAL_VAL/$TOTAL/g" /tmp/health.md
+          sed -i "s/CI_VAL/$CI_COUNT/g" /tmp/health.md
+          sed -i "s/LANG_VAL/$LANG_COUNT/g" /tmp/health.md
+          sed -i "s/STARS_VAL/$STARS/g" /tmp/health.md
 
           sed -i '/<!-- REPO_HEALTH -->/r /tmp/health.md' README.md
           sed -i '/<!-- REPO_HEALTH -->/d' README.md
