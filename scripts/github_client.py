@@ -312,13 +312,25 @@ def get_repo_commits_last_n_weeks(owner: str, repo: str, weeks: int = 12) -> lis
         return cached
 
     url = f"{API}/repos/{owner}/{repo}/stats/participation"
-    resp = _request_with_retry(url)
-    if resp.status_code == 200:
-        data = resp.json()
-        owner_commits = data.get("owner", [])[-weeks:]
-        _set_cached(cache_key, owner_commits)
-        return owner_commits
-    return [0] * weeks
+    try:
+        resp = _request_with_retry(url)
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else "unknown"
+        # This endpoint is not always accessible for every repo/token context.
+        print(f"  Warning: participation stats unavailable for {owner}/{repo} ({status}); using zeros")
+        return [0] * weeks
+
+    if resp.status_code != 200:
+        # GitHub can return 202 while stats are being generated.
+        return [0] * weeks
+
+    data = resp.json()
+    owner_commits = data.get("owner", [])[-weeks:]
+    if not isinstance(owner_commits, list):
+        return [0] * weeks
+
+    _set_cached(cache_key, owner_commits)
+    return owner_commits
 
 
 def get_repo_user_commit_count(owner: str, repo: str) -> int:
@@ -386,7 +398,16 @@ def get_repos_with_ci(repos: list | None = None, max_workers: int = 10) -> int:
 
     def check_ci(repo):
         url = f"{API}/repos/{repo['owner']['login']}/{repo['name']}/contents/.github/workflows"
-        resp = _request_with_retry(url)
+        try:
+            resp = _request_with_retry(url)
+        except requests.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else None
+            # 404 means the folder does not exist (normal for repos without Actions).
+            # 403 can occur for restricted contexts; treat as no detectable CI.
+            if status in {403, 404}:
+                return False
+            raise
+
         if resp.status_code == 200:
             data = resp.json()
             if isinstance(data, list) and len(data) > 0:
