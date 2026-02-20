@@ -30,6 +30,9 @@ jobs:
           ref: main
 
       - uses: actions/configure-pages@v5
+        with:
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
+          enablement: ${{ secrets.PERSONAL_GITHUB_TOKEN != '' && 'true' || 'false' }}
 
       - uses: actions/upload-pages-artifact@v3
         with:
