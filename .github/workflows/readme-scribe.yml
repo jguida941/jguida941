@@ -36,15 +36,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
-          gh api "users/jguida941/repos?per_page=100&sort=created&direction=desc" -q '
-            [.[] | select(.fork == false)] | .[0:10] | .[] |
-            "| [**\(.name)**](\(.html_url)) | \(.description // "n/a" | gsub("[|]"; ",")) | `\(.language // "n/a")` | \(.created_at[:10]) |"
-          ' > /tmp/recent_repos.md
+          gh api "users/jguida941/repos?per_page=100&sort=created&direction=desc" > /tmp/all_repos.json
+
+          jq -r '
+            [.[] | select(.fork == false)] | .[0:10] | .[]
+            | "| [**\(.name)**](\(.html_url)) | \(.description // "n/a" | .[0:80] | gsub("\\|"; ",")) | `\(.language // "n/a")` | \(.created_at[0:10]) |"
+          ' /tmp/all_repos.json > /tmp/recent_rows.md
+
+          echo "Generated $(wc -l < /tmp/recent_rows.md) repo rows"
 
           {
             echo "| Repository | Description | Language | Created |"
             echo "|------------|-------------|----------|---------|"
-            cat /tmp/recent_repos.md
+            cat /tmp/recent_rows.md
           } > /tmp/recent_repos_table.md
 
           sed -i '/<!-- RECENT_REPOS -->/r /tmp/recent_repos_table.md' README.md
@@ -54,18 +58,23 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: |
-          REPOS_JSON=$(gh api "users/jguida941/repos?per_page=100" --paginate)
-          TOTAL=$(echo "$REPOS_JSON" | jq '[.[] | select(.fork == false)] | length')
-          LANG_COUNT=$(echo "$REPOS_JSON" | jq '[.[].language | select(. != null)] | unique | length')
-          STARS=$(echo "$REPOS_JSON" | jq '[.[].stargazers_count] | add')
+          gh api "users/jguida941/repos?per_page=100" > /tmp/repos.json
+
+          TOTAL=$(jq '[.[] | select(.fork == false)] | length' /tmp/repos.json)
+          LANG_COUNT=$(jq '[.[].language | select(. != null)] | unique | length' /tmp/repos.json)
+          STARS=$(jq '[.[].stargazers_count] | add' /tmp/repos.json)
+
+          echo "Stats: total=$TOTAL langs=$LANG_COUNT stars=$STARS"
 
           CI_COUNT=0
-          for repo in $(echo "$REPOS_JSON" | jq -r '[.[] | select(.fork == false)] | .[].name'); do
+          for repo in $(jq -r '[.[] | select(.fork == false)] | .[].name' /tmp/repos.json); do
             result=$(gh api "repos/jguida941/$repo/contents/.github/workflows" 2>/dev/null | jq 'if type == "array" then length else 0 end' 2>/dev/null || echo "0")
             if [ "$result" -gt 0 ]; then
               CI_COUNT=$((CI_COUNT + 1))
             fi
           done
+
+          echo "CI count: $CI_COUNT"
 
           echo "![Original Repos](https://img.shields.io/badge/Original_Repos-${TOTAL}-7AA2F7?style=for-the-badge&labelColor=1a1b27)" > /tmp/health.md
           echo "![CI/CD Pipelines](https://img.shields.io/badge/CI%2FCD_Pipelines-${CI_COUNT}-ff9e64?style=for-the-badge&labelColor=1a1b27)" >> /tmp/health.md
@@ -73,8 +82,18 @@ jobs:
           echo "![Stars Earned](https://img.shields.io/badge/Stars_Earned-${STARS}-e0af68?style=for-the-badge&labelColor=1a1b27)" >> /tmp/health.md
           echo "![Forked Repos](https://img.shields.io/badge/Forked_Repos-0-565f89?style=for-the-badge&labelColor=1a1b27)" >> /tmp/health.md
 
+          echo "Health badges generated:"
+          cat /tmp/health.md
+
           sed -i '/<!-- REPO_HEALTH -->/r /tmp/health.md' README.md
           sed -i '/<!-- REPO_HEALTH -->/d' README.md
+
+      - name: Verify injections
+        run: |
+          echo "=== REPO_HEALTH check ==="
+          grep -c "shields.io" README.md || echo "NO BADGES FOUND"
+          echo "=== RECENT_REPOS check ==="
+          grep -c "Created |" README.md || echo "NO RECENT REPOS TABLE"
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
