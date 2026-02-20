@@ -23,6 +23,23 @@ jobs:
           template: "templates/README.md.tpl"
           writeTo: "README.md"
 
+      - name: Inject repo languages
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          while IFS= read -r line; do
+            if echo "$line" | grep -qE '^\- \[\*\*.*\*\*\]\(https://github.com/'; then
+              repo_full=$(echo "$line" | sed -E 's|.*\(https://github.com/([^)]+)\).*|\1|')
+              lang=$(gh api "repos/$repo_full" -q '.language // empty' 2>/dev/null || true)
+              if [ -n "$lang" ]; then
+                escaped_line=$(echo "$line" | sed 's/[&/\]/\\&/g')
+                new_line="${line} \`${lang}\`"
+                escaped_new=$(echo "$new_line" | sed 's/[&/\]/\\&/g')
+                sed -i "s|${escaped_line}|${escaped_new}|" README.md
+              fi
+            fi
+          done < README.md
+
       - name: Generate repo health stats
         env:
           GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
