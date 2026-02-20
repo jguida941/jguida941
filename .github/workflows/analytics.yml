@@ -46,7 +46,7 @@ jobs:
 
       - name: Build README
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
           GITHUB_USERNAME: jguida941
         run: python scripts/build_readme.py
 
