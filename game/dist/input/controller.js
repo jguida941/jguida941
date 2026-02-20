@@ -1,5 +1,6 @@
 // === Input Controller (Mouse / Touch / Keyboard / UI Commands) ===
 import { distanceSquared } from "../core/math.js";
+import { screenToWorld } from "../core/projection.js";
 function canvasPointFromPointer(canvas, event) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -48,8 +49,9 @@ export function bindInput(bindings, enqueue, getTowerSlots) {
         disposers.push(() => button.removeEventListener("click", handler));
     }
     const onCanvasPointerDown = (event) => {
-        const point = canvasPointFromPointer(bindings.canvas, event);
-        const slotId = findClickedSlot(point, getTowerSlots());
+        const screenPoint = canvasPointFromPointer(bindings.canvas, event);
+        const worldPoint = screenToWorld(screenPoint);
+        const slotId = findClickedSlot(worldPoint, getTowerSlots());
         if (slotId !== null) {
             enqueue({ type: "place_selected", slotId });
         }

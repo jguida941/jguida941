@@ -1,5 +1,6 @@
 // === Canvas Renderer ===
 import { BUILDING_DEFINITIONS, CANVAS, GRID_SIZE, TOWER_DEFINITIONS } from "../core/config.js";
+import { worldToScreen } from "../core/projection.js";
 import { samplePathPosition } from "../systems/pathing.js";
 function drawGrid(ctx) {
     ctx.strokeStyle = "rgba(165, 196, 255, 0.08)";
@@ -18,24 +19,27 @@ function drawGrid(ctx) {
     }
 }
 function drawPath(ctx, path) {
-    ctx.lineWidth = 28;
+    ctx.lineWidth = 24;
     ctx.strokeStyle = "rgba(110, 143, 196, 0.28)";
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
+    const start = worldToScreen(path.waypoints[0]);
     ctx.beginPath();
-    ctx.moveTo(path.waypoints[0].x, path.waypoints[0].y);
+    ctx.moveTo(start.x, start.y);
     for (let i = 1; i < path.waypoints.length; i += 1) {
-        ctx.lineTo(path.waypoints[i].x, path.waypoints[i].y);
+        const point = worldToScreen(path.waypoints[i]);
+        ctx.lineTo(point.x, point.y);
     }
     ctx.stroke();
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 3;
     ctx.strokeStyle = "rgba(192, 220, 255, 0.52)";
     ctx.stroke();
 }
 function drawTowerSlots(ctx, state) {
     for (const slot of state.towerSlots) {
+        const point = worldToScreen(slot.position);
         ctx.beginPath();
-        ctx.arc(slot.position.x, slot.position.y, 16, 0, Math.PI * 2);
+        ctx.ellipse(point.x, point.y, 18, 13, 0, 0, Math.PI * 2);
         if (slot.towerId !== null) {
             ctx.fillStyle = "rgba(121, 239, 173, 0.28)";
         }
@@ -58,8 +62,9 @@ function drawTowers(ctx, state) {
             continue;
         }
         const def = TOWER_DEFINITIONS[tower.kind];
+        const point = worldToScreen(slot.position);
         ctx.beginPath();
-        ctx.arc(slot.position.x, slot.position.y, 14, 0, Math.PI * 2);
+        ctx.ellipse(point.x, point.y + 1, 13, 10, 0, 0, Math.PI * 2);
         ctx.fillStyle = def.color;
         ctx.fill();
         ctx.strokeStyle = "rgba(14, 24, 42, 0.7)";
@@ -74,19 +79,26 @@ function drawBuildings(ctx, state) {
             continue;
         }
         const def = BUILDING_DEFINITIONS[building.kind];
-        const size = 23;
+        const point = worldToScreen(slot.position);
+        const width = 24;
+        const height = 16;
         ctx.fillStyle = def.color;
-        ctx.fillRect(slot.position.x - size / 2, slot.position.y - size / 2, size, size);
+        ctx.fillRect(point.x - width / 2, point.y - height / 2 - 5, width, height);
+        ctx.fillStyle = "rgba(16, 24, 41, 0.28)";
+        ctx.fillRect(point.x - width / 2 + 3, point.y - height / 2 + 10, width - 4, 9);
         ctx.strokeStyle = "rgba(14, 24, 42, 0.75)";
         ctx.lineWidth = 2;
-        ctx.strokeRect(slot.position.x - size / 2, slot.position.y - size / 2, size, size);
+        ctx.strokeRect(point.x - width / 2, point.y - height / 2 - 5, width, height);
     }
 }
 function drawEnemies(ctx, state, path) {
     for (const enemy of state.enemies) {
-        const pos = samplePathPosition(path, enemy.pathProgress);
+        const worldPos = samplePathPosition(path, enemy.pathProgress);
+        const pos = worldToScreen(worldPos);
+        const rx = enemy.radius;
+        const ry = enemy.radius * 0.84;
         ctx.beginPath();
-        ctx.arc(pos.x, pos.y, enemy.radius, 0, Math.PI * 2);
+        ctx.ellipse(pos.x, pos.y, rx, ry, 0, 0, Math.PI * 2);
         ctx.fillStyle = enemy.color;
         ctx.fill();
         const hpRatio = Math.max(0, enemy.hp / enemy.maxHp);
@@ -99,8 +111,9 @@ function drawEnemies(ctx, state, path) {
 }
 function drawProjectiles(ctx, state) {
     for (const projectile of state.projectiles) {
+        const pos = worldToScreen(projectile.position);
         ctx.beginPath();
-        ctx.arc(projectile.position.x, projectile.position.y, projectile.radius, 0, Math.PI * 2);
+        ctx.ellipse(pos.x, pos.y, projectile.radius, projectile.radius * 0.85, 0, 0, Math.PI * 2);
         ctx.fillStyle = "#e8f5ff";
         ctx.fill();
     }
