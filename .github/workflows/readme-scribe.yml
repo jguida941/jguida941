@@ -67,18 +67,11 @@ jobs:
             fi
           done
 
-          cat > /tmp/health.md <<'BADGES'
-![Original Repos](https://img.shields.io/badge/Original_Repos-TOTAL_VAL-7AA2F7?style=for-the-badge&labelColor=1a1b27)
-![CI/CD Pipelines](https://img.shields.io/badge/CI%2FCD_Pipelines-CI_VAL-ff9e64?style=for-the-badge&labelColor=1a1b27)
-![Languages](https://img.shields.io/badge/Languages-LANG_VAL-a9b1d6?style=for-the-badge&labelColor=1a1b27)
-![Stars Earned](https://img.shields.io/badge/Stars_Earned-STARS_VAL-e0af68?style=for-the-badge&labelColor=1a1b27)
-![Forked Repos](https://img.shields.io/badge/Forked_Repos-0-565f89?style=for-the-badge&labelColor=1a1b27)
-BADGES
-
-          sed -i "s/TOTAL_VAL/$TOTAL/g" /tmp/health.md
-          sed -i "s/CI_VAL/$CI_COUNT/g" /tmp/health.md
-          sed -i "s/LANG_VAL/$LANG_COUNT/g" /tmp/health.md
-          sed -i "s/STARS_VAL/$STARS/g" /tmp/health.md
+          echo "![Original Repos](https://img.shields.io/badge/Original_Repos-${TOTAL}-7AA2F7?style=for-the-badge&labelColor=1a1b27)" > /tmp/health.md
+          echo "![CI/CD Pipelines](https://img.shields.io/badge/CI%2FCD_Pipelines-${CI_COUNT}-ff9e64?style=for-the-badge&labelColor=1a1b27)" >> /tmp/health.md
+          echo "![Languages](https://img.shields.io/badge/Languages-${LANG_COUNT}-a9b1d6?style=for-the-badge&labelColor=1a1b27)" >> /tmp/health.md
+          echo "![Stars Earned](https://img.shields.io/badge/Stars_Earned-${STARS}-e0af68?style=for-the-badge&labelColor=1a1b27)" >> /tmp/health.md
+          echo "![Forked Repos](https://img.shields.io/badge/Forked_Repos-0-565f89?style=for-the-badge&labelColor=1a1b27)" >> /tmp/health.md
 
           sed -i '/<!-- REPO_HEALTH -->/r /tmp/health.md' README.md
           sed -i '/<!-- REPO_HEALTH -->/d' README.md
