@@ -14,24 +14,6 @@
 
 </div>
 
-<div align="center">
-
-<img src="assets/game_card.svg" alt="Developer Quest - RPG Game Card" />
-
-</div>
-
----
-
-### Play Developer Quest
-
-<div align="center">
-
-<a href="https://jguida941.github.io/jguida941/"><strong>Launch the playable mini-game</strong></a>
-
-</div>
-
----
-
 ### By The Numbers
 
 <div align="center">

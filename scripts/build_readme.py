@@ -20,8 +20,6 @@ from scripts.generate_language_chart import generate as gen_lang_chart
 from scripts.generate_currently_working import generate as gen_working
 from scripts.generate_activity_heatmap import generate as gen_heatmap
 from scripts.generate_repo_spotlight import generate as gen_spotlight
-from scripts.generate_game_card import generate as gen_game_card
-from scripts.generate_playable_game_data import generate as gen_playable_game_data
 
 
 def _time_ago(iso_str: str) -> str:
@@ -216,19 +214,6 @@ def main():
     gen_spotlight(spotlight_data)
     print("  -> assets/repo_spotlight.svg")
 
-    # 6. Game card
-    gen_game_card(
-        total_commits=total_commits,
-        total_repos=len(repos),
-        total_stars=total_stars,
-        language_data=language_bytes,
-        prs_merged=prs_merged,
-        releases=releases,
-        ci_pipelines=ci_count,
-        streak_days=streak_days,
-    )
-    print("  -> assets/game_card.svg")
-
     # ── Render README ───────────────────────────────────────
     print("\nRendering README.md...")
 
@@ -353,33 +338,6 @@ def main():
         if len(pr_list) >= 5:
             break
 
-    # Playable game data
-    game_data_path = gen_playable_game_data(
-        username=USERNAME,
-        total_commits=total_commits,
-        total_repos=len(repos),
-        total_stars=total_stars,
-        language_data=language_bytes,
-        prs_merged=prs_merged,
-        releases=releases,
-        ci_pipelines=ci_count,
-        streak_days=streak_days,
-        total_contributions=total_contributions,
-        featured_repos=spotlight_data,
-        contributions=contributions,
-        data_scope=data_scope,
-    )
-    print(f"-> {game_data_path}")
-
-    # Resolve game URL (project page by default)
-    repo_slug = os.environ.get("GITHUB_REPOSITORY", f"{USERNAME}/stats")
-    repo_name = repo_slug.split("/")[-1]
-    if repo_name.lower() == f"{USERNAME.lower()}.github.io":
-        default_game_url = f"https://{USERNAME}.github.io/"
-    else:
-        default_game_url = f"https://{USERNAME}.github.io/{repo_name}/"
-    game_url = os.environ.get("GAME_URL", default_game_url)
-
     # Load and render Jinja2 template
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader("templates"),
@@ -389,7 +347,6 @@ def main():
 
     readme = template.render(
         username=USERNAME,
-        game_url=game_url,
         recent_created=recent_created,
         contributions=contributions,
         releases=release_list,

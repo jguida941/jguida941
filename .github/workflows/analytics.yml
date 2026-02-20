@@ -9,7 +9,6 @@ on:
     paths:
       - "scripts/**"
       - "templates/**"
-      - "game/**"
       - ".github/workflows/analytics.yml"
 
 concurrency:
@@ -50,16 +49,8 @@ jobs:
           GITHUB_USERNAME: jguida941
         run: python scripts/build_readme.py
 
-      - name: Validate game artifacts
-        run: |
-          npm --prefix game ci
-          npm --prefix game run build
-          node --check game/app.js
-          node --check game/dist/main.js
-          python -m json.tool game/data.json > /dev/null
-
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "update analytics & readme [skip ci]"
           branch: main
-          file_pattern: "README.md assets/*.svg game/data.json"
+          file_pattern: "README.md assets/*.svg"
