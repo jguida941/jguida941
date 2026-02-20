@@ -16,7 +16,17 @@
 
 <div align="center">
 
-<img src="metrics.languages.svg" width="49%" alt="Top Languages" />
+<img src="assets/game_card.svg" alt="Developer Quest - RPG Game Card" />
+
+</div>
+
+---
+
+### Play Developer Quest
+
+<div align="center">
+
+<a href="https://jguida941.github.io/stats/"><strong>Launch the playable mini-game</strong></a>
 
 </div>
 
@@ -26,11 +36,33 @@
 
 <div align="center">
 
-
+<img src="assets/badges.svg" alt="Profile Badges" />
 
 </div>
 
 ---
+
+### Currently Working On
+
+<div align="center">
+
+<img src="assets/currently_working.svg" alt="Currently Working On" />
+
+</div>
+
+---
+
+### Language Breakdown
+
+<div align="center">
+
+<img src="assets/lang_breakdown.svg" alt="Language Breakdown" />
+
+</div>
+
+---
+
+### Contribution Calendar
 
 <div align="center">
 
@@ -38,9 +70,23 @@
 
 </div>
 
+---
+
+### When I Code
+
 <div align="center">
 
-<img src="metrics.habits.svg" alt="Coding Habits" />
+<img src="assets/activity_heatmap.svg" alt="Activity Heatmap" />
+
+</div>
+
+---
+
+### Featured Projects
+
+<div align="center">
+
+<img src="assets/repo_spotlight.svg" alt="Featured Projects" />
 
 </div>
 

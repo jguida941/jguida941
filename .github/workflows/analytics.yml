@@ -1,0 +1,62 @@
+name: Build Analytics & README
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "scripts/**"
+      - "templates/**"
+      - "game/**"
+      - ".github/workflows/analytics.yml"
+
+concurrency:
+  group: readme-update
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Pull latest
+        run: git pull --rebase origin main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build README
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          GITHUB_USERNAME: jguida941
+        run: python scripts/build_readme.py
+
+      - name: Validate game artifacts
+        run: |
+          node --check game/app.js
+          python -m json.tool game/data.json > /dev/null
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "update analytics & readme [skip ci]"
+          branch: main
+          file_pattern: "README.md assets/*.svg game/data.json"

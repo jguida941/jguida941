@@ -1,0 +1,31 @@
+name: Validate Arcade Game
+
+on:
+  pull_request:
+    paths:
+      - "game/**"
+      - ".github/workflows/validate-game.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "game/**"
+      - ".github/workflows/validate-game.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JavaScript syntax
+        run: node --check game/app.js
+
+      - name: Validate game data JSON
+        run: python -m json.tool game/data.json > /dev/null
+
+      - name: Validate static page references
+        run: |
+          test -f game/index.html
+          test -f game/styles.css
+          test -f game/app.js
