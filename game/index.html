@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Developer Quest - Asteroid Run</title>
+    <title>Tower Forge Defense</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -13,168 +13,101 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="layout">
-      <section class="card hero">
-        <p class="eyebrow">Arcade Mode</p>
-        <h1>Developer Quest: Asteroid Run</h1>
-        <p class="subtitle">
-          Old-school shooter with real progression. Your GitHub activity powers core ship stats,
-          then you level up wave by wave with upgrades and survive boss rounds.
+    <main class="shell">
+      <header class="hero card">
+        <p class="eyebrow">Clash-Inspired Arcade Defense</p>
+        <h1>Tower Forge Defense</h1>
+        <p>
+          Pick a class, build towers and support structures, cast spells in combat, and survive
+          escalating enemy waves.
         </p>
-        <div class="profile-grid">
-          <div>
-            <p class="label">Handle</p>
-            <p id="playerHandle" class="value">-</p>
-          </div>
-          <div>
-            <p class="label">Class</p>
-            <p id="playerClass" class="value">-</p>
-          </div>
-          <div>
-            <p class="label">Level</p>
-            <p id="playerLevel" class="value">-</p>
-          </div>
-        </div>
-        <a id="profileLink" class="pill" href="#" target="_blank" rel="noreferrer noopener"
-          >Open GitHub Profile</a
-        >
-      </section>
+      </header>
 
-      <section class="card arena">
-        <div class="scorebar">
-          <div>
-            <p class="label">Score</p>
-            <p id="scoreValue" class="value">0</p>
-          </div>
-          <div>
-            <p class="label">Wave</p>
-            <p id="waveValue" class="value">1</p>
-          </div>
-          <div>
-            <p class="label">Lives</p>
-            <p id="livesValue" class="value">0</p>
-          </div>
-          <div>
-            <p class="label">Shield</p>
-            <p id="shieldValue" class="value">0%</p>
-          </div>
-          <div>
-            <p class="label">Scrap</p>
-            <p id="scrapValue" class="value">0</p>
-          </div>
-          <div>
-            <p class="label">Best</p>
-            <p id="bestValue" class="value">0</p>
-          </div>
-        </div>
+      <section class="layout">
+        <section class="card board">
+          <canvas id="gameCanvas" width="960" height="540" aria-label="Tower defense map"></canvas>
 
-        <div class="canvas-wrap">
-          <canvas id="gameCanvas" width="960" height="540" aria-label="Asteroid shooter game"></canvas>
-
-          <div id="overlay" class="overlay">
-            <section id="menuPanel" class="overlay-panel">
-              <h2>Ready to Launch</h2>
-              <p>
-                Desktop: Arrow keys or A/D + Space. Mobile: hold LEFT or RIGHT and tap FIRE.
-              </p>
-              <p class="tiny">Pick a difficulty preset before starting.</p>
-              <div id="presetWrap" class="preset-wrap">
-                <button class="preset-btn active" data-preset="rookie" type="button">Rookie</button>
-                <button class="preset-btn" data-preset="standard" type="button">Standard</button>
-                <button class="preset-btn" data-preset="elite" type="button">Elite</button>
-              </div>
-              <button id="startBtn" class="main-btn" type="button">Start Run</button>
-            </section>
-
-            <section id="shopPanel" class="overlay-panel hidden">
-              <h2>Upgrade Hangar</h2>
-              <p id="shopText">Spend scrap before the next wave.</p>
-              <div id="shopOptions" class="shop-options"></div>
-              <div class="shop-footer">
-                <p>
-                  Scrap: <strong id="shopScrapValue">0</strong>
-                </p>
-                <button id="continueBtn" class="main-btn" type="button">Continue</button>
-              </div>
-            </section>
-
-            <section id="gameOverPanel" class="overlay-panel hidden">
-              <h2>Run Complete</h2>
-              <p id="gameOverText">-</p>
-              <div class="result-grid">
-                <div>
-                  <p class="label">Final Score</p>
-                  <p id="finalScore" class="value">0</p>
-                </div>
-                <div>
-                  <p class="label">Max Wave</p>
-                  <p id="finalWave" class="value">1</p>
-                </div>
-                <div>
-                  <p class="label">Difficulty</p>
-                  <p id="finalPreset" class="value">-</p>
-                </div>
-              </div>
-              <button id="restartBtn" class="main-btn" type="button">Play Again</button>
-            </section>
+          <div class="board-bar">
+            <button id="startWaveBtn" class="main-btn" type="button">Start Wave [Space]</button>
+            <p id="waveGoalValue" class="goal">Prep: select class and build</p>
+            <p id="phaseValue" class="phase">PREP</p>
           </div>
-        </div>
+        </section>
 
-        <p id="statusText" class="status-text">Ship systems online.</p>
+        <aside class="card sidebar">
+          <h2>Run State</h2>
+          <div class="stat-grid">
+            <div>
+              <p class="label">Stage</p>
+              <p id="stageValue" class="value">1</p>
+            </div>
+            <div>
+              <p class="label">Wave</p>
+              <p id="waveValue" class="value">1</p>
+            </div>
+            <div>
+              <p class="label">Base HP</p>
+              <p id="healthValue" class="value">24 / 24</p>
+            </div>
+            <div>
+              <p class="label">Gold</p>
+              <p id="goldValue" class="value">260</p>
+            </div>
+            <div>
+              <p class="label">Level</p>
+              <p id="levelValue" class="value">1</p>
+            </div>
+            <div>
+              <p class="label">XP</p>
+              <p id="xpValue" class="value">0 / 100</p>
+            </div>
+            <div>
+              <p class="label">Skill Points</p>
+              <p id="skillPointsValue" class="value">0</p>
+            </div>
+            <div>
+              <p class="label">Class</p>
+              <p id="classValue" class="value">Warlord</p>
+            </div>
+            <div>
+              <p class="label">Placement Mode</p>
+              <p id="placementModeValue" class="value">tower</p>
+            </div>
+            <div>
+              <p class="label">Selected Tower</p>
+              <p id="selectedTowerValue" class="value">cannon</p>
+            </div>
+            <div>
+              <p class="label">Selected Building</p>
+              <p id="selectedBuildingValue" class="value">gold_mine</p>
+            </div>
+            <div>
+              <p class="label">Spells</p>
+              <p id="spellChargesValue" class="value">Meteor 1/1</p>
+            </div>
+          </div>
 
-        <div class="controls" role="group" aria-label="Touch controls">
-          <button id="leftBtn" class="ctrl" type="button">LEFT</button>
-          <button id="fireBtn" class="ctrl fire" type="button">FIRE</button>
-          <button id="rightBtn" class="ctrl" type="button">RIGHT</button>
-        </div>
-      </section>
+          <h3>Class [A/S/D]</h3>
+          <div id="classButtons" class="button-grid"></div>
 
-      <section class="card sidebar">
-        <h2>Data Buffs</h2>
-        <div class="buff-grid">
-          <div>
-            <p class="label">Laser Base</p>
-            <p id="buffDamage" class="value">-</p>
-          </div>
-          <div>
-            <p class="label">Fire Rate</p>
-            <p id="buffRate" class="value">-</p>
-          </div>
-          <div>
-            <p class="label">Ship Speed</p>
-            <p id="buffSpeed" class="value">-</p>
-          </div>
-          <div>
-            <p class="label">Start Lives</p>
-            <p id="buffLives" class="value">-</p>
-          </div>
-        </div>
+          <h3>Towers [1-4]</h3>
+          <div id="towerButtons" class="button-grid"></div>
 
-        <div class="stats-grid">
-          <div>
-            <p class="label">Commits</p>
-            <p id="signalCommits" class="value">-</p>
-          </div>
-          <div>
-            <p class="label">CI Pipelines</p>
-            <p id="signalCi" class="value">-</p>
-          </div>
-          <div>
-            <p class="label">PRs Merged</p>
-            <p id="signalPrs" class="value">-</p>
-          </div>
-          <div>
-            <p class="label">Streak Days</p>
-            <p id="signalStreak" class="value">-</p>
-          </div>
-        </div>
+          <h3>Buildings [5-7]</h3>
+          <div id="buildingButtons" class="button-grid"></div>
 
-        <h3>Top Languages</h3>
-        <div id="languageChips" class="chips"></div>
+          <h3>Spells [Z/X/C]</h3>
+          <div id="spellButtons" class="button-grid"></div>
 
-        <h3>Leaderboard</h3>
-        <ol id="leaderboardList" class="leaderboard"></ol>
-        <button id="clearLeaderboardBtn" class="clear-btn" type="button">Clear Leaderboard</button>
+          <h3>Upgrades [Q/W/E/R]</h3>
+          <div id="upgradeButtons" class="button-grid"></div>
+
+          <h3>Combat Stats</h3>
+          <p id="combatStatsValue" class="stats-text">kills 0 | leaks 0 | hit 0/0 | spells 0</p>
+
+          <h3>Combat Log</h3>
+          <ul id="logList" class="log-list"></ul>
+        </aside>
       </section>
     </main>
 

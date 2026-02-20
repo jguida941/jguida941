@@ -1,0 +1,2 @@
+// === Core Shared Types ===
+export {};

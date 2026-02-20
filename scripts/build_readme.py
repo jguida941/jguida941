@@ -48,6 +48,18 @@ def _time_ago(iso_str: str) -> str:
     return f"{days // 365} year{'s' if days >= 730 else ''} ago"
 
 
+def _has_ci_workflow(repo: dict) -> bool | None:
+    """Best-effort check for .github/workflows in repo."""
+    try:
+        owner = repo["owner"]["login"]
+        name = repo["name"]
+        url = f"repos/{owner}/{name}/contents/.github/workflows"
+        wf_data = gh.paginated_get(url, per_page=1)
+        return isinstance(wf_data, list) and len(wf_data) > 0
+    except Exception:
+        return None
+
+
 def main():
     print("=== GitHub Profile README Builder ===")
     print(f"User: {USERNAME}")
@@ -89,6 +101,17 @@ def main():
 
     # Derived stats
     total_stars = sum(r.get("stargazers_count", 0) for r in repos)
+    total_language_bytes = sum(b for b in language_bytes.values() if b > 0)
+    top_languages = []
+    for lang, byte_count in sorted(language_bytes.items(), key=lambda x: x[1], reverse=True)[:12]:
+        if byte_count <= 0:
+            continue
+        pct = (byte_count / total_language_bytes * 100) if total_language_bytes else 0
+        top_languages.append({
+            "name": lang,
+            "bytes": byte_count,
+            "percent": round(pct, 2),
+        })
 
     # Count PRs merged (from events)
     prs_merged = sum(
@@ -178,13 +201,7 @@ def main():
         if not repo:
             continue
         weekly = gh.get_repo_commits_last_n_weeks(repo["owner"]["login"], repo["name"])
-        has_ci = False
-        try:
-            url = f"repos/{repo['owner']['login']}/{repo['name']}/contents/.github/workflows"
-            wf_data = gh.paginated_get(url, per_page=1)
-            has_ci = isinstance(wf_data, list) and len(wf_data) > 0
-        except Exception:
-            pass
+        has_ci = _has_ci_workflow(repo)
         spotlight_data.append({
             "name": repo["name"],
             "description": repo.get("description", ""),
@@ -192,6 +209,7 @@ def main():
             "stars": repo.get("stargazers_count", 0),
             "forks": repo.get("forks_count", 0),
             "html_url": repo.get("html_url", ""),
+            "pushed_at": (repo.get("pushed_at") or "")[:10],
             "weekly_commits": weekly,
             "has_ci": has_ci,
         })
@@ -215,6 +233,69 @@ def main():
     print("\nRendering README.md...")
 
     # Prepare template data
+    # Most active projects with explicit language + CI signals
+    active_repos = sorted(repos, key=lambda r: r.get("pushed_at", ""), reverse=True)[:15]
+    repo_language_matrix = []
+    for repo in active_repos:
+        ci_state = _has_ci_workflow(repo)
+        if ci_state is True:
+            ci_text = "yes"
+        elif ci_state is False:
+            ci_text = "no"
+        else:
+            ci_text = "unknown"
+
+        repo_language_matrix.append({
+            "name": repo.get("name", ""),
+            "url": repo.get("html_url", ""),
+            "language": repo.get("language") or "n/a",
+            "stars": repo.get("stargazers_count", 0),
+            "forks": repo.get("forks_count", 0),
+            "pushed_at": (repo.get("pushed_at") or "")[:10],
+            "ci": ci_text,
+        })
+
+    featured_repo_facts = []
+    for repo_name in FEATURED_REPOS:
+        repo = next((r for r in repos if r.get("name") == repo_name), None)
+        if not repo:
+            continue
+        ci_state = _has_ci_workflow(repo)
+        if ci_state is True:
+            ci_text = "yes"
+        elif ci_state is False:
+            ci_text = "no"
+        else:
+            ci_text = "unknown"
+        featured_repo_facts.append({
+            "name": repo.get("name", ""),
+            "url": repo.get("html_url", ""),
+            "language": repo.get("language") or "n/a",
+            "stars": repo.get("stargazers_count", 0),
+            "forks": repo.get("forks_count", 0),
+            "ci": ci_text,
+            "pushed_at": (repo.get("pushed_at") or "")[:10],
+        })
+
+    data_scope = {
+        "repos_included": "public + owned + non-fork",
+        "public_owned_repos_total": len(all_repos),
+        "public_owned_forks_total": fork_count,
+        "public_owned_nonfork_repos_total": len(repos),
+    }
+
+    snapshot = {
+        "total_commits": total_commits,
+        "total_repos": len(repos),
+        "total_stars": total_stars,
+        "languages_count": lang_count,
+        "prs_merged": prs_merged,
+        "releases": releases,
+        "ci_repos": ci_count,
+        "streak_days": streak_days,
+        "total_contributions": total_contributions,
+    }
+
     # Recently created repos (top 10 non-fork by creation date)
     recent_created = sorted(repos, key=lambda r: r.get("created_at", ""), reverse=True)[:10]
 
@@ -286,12 +367,7 @@ def main():
         total_contributions=total_contributions,
         featured_repos=spotlight_data,
         contributions=contributions,
-        data_scope={
-            "repos_included": "public + owned + non-fork",
-            "public_owned_repos_total": len(all_repos),
-            "public_owned_forks_total": fork_count,
-            "public_owned_nonfork_repos_total": len(repos),
-        },
+        data_scope=data_scope,
     )
     print(f"-> {game_data_path}")
 
@@ -318,6 +394,11 @@ def main():
         contributions=contributions,
         releases=release_list,
         pull_requests=pr_list,
+        snapshot=snapshot,
+        data_scope=data_scope,
+        top_languages=top_languages,
+        featured_repo_facts=featured_repo_facts,
+        repo_language_matrix=repo_language_matrix,
     )
 
     Path("README.md").write_text(readme)

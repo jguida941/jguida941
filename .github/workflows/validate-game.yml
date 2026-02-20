@@ -18,8 +18,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install game dependencies
+        run: npm --prefix game ci
+
+      - name: Build TypeScript game
+        run: npm --prefix game run build
+
       - name: Validate JavaScript syntax
-        run: node --check game/app.js
+        run: |
+          node --check game/app.js
+          node --check game/dist/main.js
 
       - name: Validate game data JSON
         run: python -m json.tool game/data.json > /dev/null
@@ -29,3 +37,4 @@ jobs:
           test -f game/index.html
           test -f game/styles.css
           test -f game/app.js
+          test -f game/dist/main.js

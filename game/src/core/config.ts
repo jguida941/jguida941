@@ -1,0 +1,289 @@
+// === Immutable Game Configuration ===
+
+import type {
+  BuildingDefinition,
+  BuildingKind,
+  EnemyDefinition,
+  EnemyKind,
+  HeroClass,
+  HeroClassDefinition,
+  SpellDefinition,
+  SpellKind,
+  TowerDefinition,
+  TowerKind,
+  UpgradeKind,
+  Vec2,
+} from "./types.js";
+
+export const CANVAS = {
+  width: 960,
+  height: 540,
+};
+
+export const GRID_SIZE = 48;
+
+export const STARTING_BASE_HEALTH = 24;
+export const STARTING_GOLD = 260;
+
+export const MAX_STAGE = 5;
+export const WAVES_PER_STAGE = 5;
+
+export const PATH_WAYPOINTS: Vec2[] = [
+  { x: -20, y: 90 },
+  { x: 140, y: 90 },
+  { x: 140, y: 210 },
+  { x: 320, y: 210 },
+  { x: 320, y: 120 },
+  { x: 520, y: 120 },
+  { x: 520, y: 320 },
+  { x: 700, y: 320 },
+  { x: 700, y: 220 },
+  { x: 860, y: 220 },
+  { x: 980, y: 220 },
+];
+
+export const TOWER_SLOT_POSITIONS: Vec2[] = [
+  { x: 78, y: 170 },
+  { x: 212, y: 150 },
+  { x: 252, y: 286 },
+  { x: 388, y: 64 },
+  { x: 428, y: 240 },
+  { x: 574, y: 74 },
+  { x: 612, y: 250 },
+  { x: 750, y: 164 },
+  { x: 778, y: 368 },
+  { x: 870, y: 136 },
+];
+
+export const ENEMY_DEFINITIONS: Record<EnemyKind, EnemyDefinition> = {
+  grunt: {
+    kind: "grunt",
+    label: "Grunt",
+    maxHp: 36,
+    speed: 84,
+    reward: 12,
+    baseDamage: 1,
+    radius: 11,
+    color: "#ff9b80",
+    abilityCooldown: 0,
+  },
+  runner: {
+    kind: "runner",
+    label: "Runner",
+    maxHp: 24,
+    speed: 132,
+    reward: 14,
+    baseDamage: 1,
+    radius: 9,
+    color: "#ffc668",
+    abilityCooldown: 0,
+  },
+  tank: {
+    kind: "tank",
+    label: "Tank",
+    maxHp: 126,
+    speed: 54,
+    reward: 26,
+    baseDamage: 2,
+    radius: 15,
+    color: "#c29bff",
+    abilityCooldown: 0,
+  },
+  splitter: {
+    kind: "splitter",
+    label: "Splitter",
+    maxHp: 76,
+    speed: 76,
+    reward: 18,
+    baseDamage: 1,
+    radius: 13,
+    color: "#8de7ff",
+    abilityCooldown: 0,
+  },
+  bomber: {
+    kind: "bomber",
+    label: "Bomber",
+    maxHp: 58,
+    speed: 92,
+    reward: 22,
+    baseDamage: 1,
+    radius: 12,
+    color: "#ff6b8e",
+    abilityCooldown: 5.8,
+  },
+  shaman: {
+    kind: "shaman",
+    label: "Shaman",
+    maxHp: 64,
+    speed: 70,
+    reward: 24,
+    baseDamage: 1,
+    radius: 12,
+    color: "#8ff2c8",
+    abilityCooldown: 6.5,
+  },
+};
+
+export const TOWER_DEFINITIONS: Record<TowerKind, TowerDefinition> = {
+  cannon: {
+    kind: "cannon",
+    label: "Cannon",
+    cost: 95,
+    range: 148,
+    color: "#7ed0ff",
+    weapon: {
+      projectileSpeed: 360,
+      baseDamage: 24,
+      cooldownSeconds: 0.95,
+      projectileRadius: 4,
+      pierce: 1,
+      splashRadius: 0,
+      slowFactor: 1,
+      slowDuration: 0,
+    },
+  },
+  rapid: {
+    kind: "rapid",
+    label: "Rapid",
+    cost: 110,
+    range: 126,
+    color: "#9cf18f",
+    weapon: {
+      projectileSpeed: 420,
+      baseDamage: 10,
+      cooldownSeconds: 0.24,
+      projectileRadius: 3,
+      pierce: 1,
+      splashRadius: 0,
+      slowFactor: 1,
+      slowDuration: 0,
+    },
+  },
+  sniper: {
+    kind: "sniper",
+    label: "Sniper",
+    cost: 145,
+    range: 230,
+    color: "#ffc77a",
+    weapon: {
+      projectileSpeed: 520,
+      baseDamage: 58,
+      cooldownSeconds: 1.6,
+      projectileRadius: 5,
+      pierce: 2,
+      splashRadius: 0,
+      slowFactor: 1,
+      slowDuration: 0,
+    },
+  },
+  frost: {
+    kind: "frost",
+    label: "Frost",
+    cost: 120,
+    range: 136,
+    color: "#a9b8ff",
+    weapon: {
+      projectileSpeed: 340,
+      baseDamage: 12,
+      cooldownSeconds: 0.75,
+      projectileRadius: 4,
+      pierce: 1,
+      splashRadius: 24,
+      slowFactor: 0.64,
+      slowDuration: 1.6,
+    },
+  },
+};
+
+export const BUILDING_DEFINITIONS: Record<BuildingKind, BuildingDefinition> = {
+  gold_mine: {
+    kind: "gold_mine",
+    label: "Gold Mine",
+    cost: 115,
+    color: "#ffe28c",
+    description: "Generates passive gold every few seconds.",
+  },
+  barracks: {
+    kind: "barracks",
+    label: "Barracks",
+    cost: 145,
+    color: "#f7a4a4",
+    description: "Fortifies the base and slowly repairs health.",
+  },
+  spell_lab: {
+    kind: "spell_lab",
+    label: "Spell Lab",
+    cost: 165,
+    color: "#b7a8ff",
+    description: "Improves spell recharge and charge cap.",
+  },
+};
+
+export const SPELL_DEFINITIONS: Record<SpellKind, SpellDefinition> = {
+  meteor: {
+    kind: "meteor",
+    label: "Meteor",
+    rechargeSeconds: 18,
+    baseMaxCharges: 1,
+    description: "Heavy AOE strike centered on the leading enemy.",
+  },
+  frost_nova: {
+    kind: "frost_nova",
+    label: "Frost Nova",
+    rechargeSeconds: 16,
+    baseMaxCharges: 1,
+    description: "Slows every enemy and chips their HP.",
+  },
+  healing_aura: {
+    kind: "healing_aura",
+    label: "Healing Aura",
+    rechargeSeconds: 14,
+    baseMaxCharges: 1,
+    description: "Restores base HP based on spell power.",
+  },
+};
+
+export const HERO_CLASS_DEFINITIONS: Record<HeroClass, HeroClassDefinition> = {
+  warlord: {
+    kind: "warlord",
+    label: "Warlord",
+    description: "Frontline commander focused on weapon damage.",
+    damageMultiplier: 1.14,
+    rangeMultiplier: 1,
+    fireRateMultiplier: 1.04,
+    economyMultiplier: 1,
+    spellPowerMultiplier: 1,
+    buildCostMultiplier: 1,
+    bonusSpellCharges: 0,
+  },
+  arcanist: {
+    kind: "arcanist",
+    label: "Arcanist",
+    description: "Spell specialist with stronger and more frequent casts.",
+    damageMultiplier: 0.95,
+    rangeMultiplier: 1.05,
+    fireRateMultiplier: 1.05,
+    economyMultiplier: 0.95,
+    spellPowerMultiplier: 1.32,
+    buildCostMultiplier: 1.06,
+    bonusSpellCharges: 1,
+  },
+  architect: {
+    kind: "architect",
+    label: "Architect",
+    description: "Builder class with cheaper structures and stronger economy.",
+    damageMultiplier: 1,
+    rangeMultiplier: 1.03,
+    fireRateMultiplier: 1,
+    economyMultiplier: 1.2,
+    spellPowerMultiplier: 0.95,
+    buildCostMultiplier: 0.86,
+    bonusSpellCharges: 0,
+  },
+};
+
+export const TOWER_ORDER: TowerKind[] = ["cannon", "rapid", "sniper", "frost"];
+export const BUILDING_ORDER: BuildingKind[] = ["gold_mine", "barracks", "spell_lab"];
+export const SPELL_ORDER: SpellKind[] = ["meteor", "frost_nova", "healing_aura"];
+export const HERO_CLASS_ORDER: HeroClass[] = ["warlord", "arcanist", "architect"];
+export const UPGRADE_ORDER: UpgradeKind[] = ["damage", "range", "fire_rate", "economy"];
