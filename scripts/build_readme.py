@@ -66,33 +66,42 @@ def main():
     Path("assets").mkdir(exist_ok=True)
 
     # ── Fetch Data ──────────────────────────────────────────
-    print("\n[1/7] Fetching repos...")
-    repos = gh.get_repos(include_forks=False)
-    all_repos = gh.get_repos(include_forks=True)
-    fork_count = sum(1 for r in all_repos if r.get("fork"))
+    print("\n[1/7] Fetching repo scope counts...")
+    repo_counts = gh.get_owned_repo_scope_counts()
     print(
-        f"  Found {len(repos)} public non-fork repos "
-        f"({len(all_repos)} public owned total, {fork_count} forks)"
+        "  Scope totals:"
+        f" public non-fork={repo_counts['public_owned_nonfork']},"
+        f" public forks={repo_counts['public_owned_forks']},"
+        f" public total={repo_counts['public_owned_total']},"
+        f" private owned={repo_counts['private_owned'] if repo_counts['private_owned'] is not None else 'n/a'}"
     )
 
-    print("[2/7] Fetching language data...")
+    print("[2/7] Fetching repos...")
+    repos = gh.get_repos(include_forks=False)
+    all_repos = gh.get_repos(include_forks=True)
+    print(
+        f"  Found {len(repos)} public non-fork repos "
+        f"({len(all_repos)} public owned total, {repo_counts['public_owned_forks']} forks)"
+    )
+
+    print("[3/7] Fetching language data...")
     language_bytes = gh.get_all_languages(repos)
     lang_count = len([l for l, b in language_bytes.items() if b > 0])
     print(f"  {lang_count} languages across all repos")
 
-    print("[3/7] Fetching events...")
+    print("[4/7] Fetching events...")
     events = gh.get_events()
     print(f"  {len(events)} recent events")
 
-    print("[4/7] Fetching commit count...")
+    print("[5/7] Fetching commit count...")
     total_commits = gh.get_total_commits(repos)
     print(f"  {total_commits} total commits")
 
-    print("[5/7] Counting CI/CD pipelines...")
+    print("[6/7] Counting CI/CD pipelines...")
     ci_count = gh.get_repos_with_ci(repos)
     print(f"  {ci_count} repos with CI/CD")
 
-    print("[6/7] Fetching contribution calendar...")
+    print("[7/7] Fetching contribution calendar...")
     calendar = gh.get_contribution_calendar()
     total_contributions = calendar.get("totalContributions", 0) if calendar else 0
     print(f"  {total_contributions} contributions this year")
@@ -137,14 +146,14 @@ def main():
                 break
 
     # ── Generate SVGs ───────────────────────────────────────
-    print("\n[7/7] Generating SVGs...")
+    print("\n[8/8] Generating SVGs...")
 
     # 1. Badges
     gen_badges(
-        total_repos=len(repos),
+        public_nonfork_repos=repo_counts["public_owned_nonfork"],
+        public_forks=repo_counts["public_owned_forks"],
+        private_owned_repos=repo_counts["private_owned"],
         ci_count=ci_count,
-        lang_count=lang_count,
-        stars=total_stars,
         total_commits=total_commits,
     )
     print("  -> assets/badges.svg")
@@ -264,14 +273,15 @@ def main():
 
     data_scope = {
         "repos_included": "public + owned + non-fork",
-        "public_owned_repos_total": len(all_repos),
-        "public_owned_forks_total": fork_count,
-        "public_owned_nonfork_repos_total": len(repos),
+        "public_owned_repos_total": repo_counts["public_owned_total"],
+        "public_owned_forks_total": repo_counts["public_owned_forks"],
+        "public_owned_nonfork_repos_total": repo_counts["public_owned_nonfork"],
+        "private_owned_repos_total": repo_counts["private_owned"],
     }
 
     snapshot = {
         "total_commits": total_commits,
-        "total_repos": len(repos),
+        "total_repos": repo_counts["public_owned_nonfork"],
         "total_stars": total_stars,
         "languages_count": lang_count,
         "prs_merged": prs_merged,

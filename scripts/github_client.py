@@ -9,6 +9,8 @@ from pathlib import Path
 import requests
 
 CACHE_DIR = Path(os.environ.get("CACHE_DIR", "/tmp/github_cache"))
+CACHE_TTL_SECONDS = int(os.environ.get("CACHE_TTL_SECONDS", "21600"))
+BYPASS_CACHE = os.environ.get("BYPASS_GITHUB_CACHE", "").lower() in {"1", "true", "yes"}
 TOKEN = os.environ.get("GITHUB_TOKEN", "")
 USERNAME = os.environ.get("GITHUB_USERNAME", "jguida941")
 API = "https://api.github.com"
@@ -29,8 +31,15 @@ def _cache_path(key: str) -> Path:
 
 
 def _get_cached(key: str):
+    if BYPASS_CACHE:
+        return None
+
     p = _cache_path(key)
     if p.exists():
+        if CACHE_TTL_SECONDS > 0:
+            age_seconds = time.time() - p.stat().st_mtime
+            if age_seconds > CACHE_TTL_SECONDS:
+                return None
         return json.loads(p.read_text())
     return None
 
@@ -104,6 +113,85 @@ def get_repos(include_forks: bool = False) -> list:
     if not include_forks:
         repos = [r for r in repos if not r.get("fork")]
     return repos
+
+
+def _graphql_query(query: str, variables: dict) -> dict | None:
+    resp = requests.post(
+        GRAPHQL,
+        headers=_headers(),
+        json={"query": query, "variables": variables},
+    )
+    if resp.status_code != 200:
+        return None
+
+    payload = resp.json()
+    if not isinstance(payload, dict):
+        return None
+    if payload.get("errors"):
+        return None
+    return payload.get("data")
+
+
+def get_owned_repo_scope_counts() -> dict:
+    """
+    Return repo counts with explicit scope splits.
+
+    Keys:
+      - public_owned_total
+      - public_owned_forks
+      - public_owned_nonfork
+      - private_owned (None when unavailable)
+    """
+    cache_key = "owned_repo_scope_counts"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        return cached
+
+    # Prefer GraphQL totals when authenticated. This avoids pagination math drift.
+    if TOKEN:
+        query = """
+        query($login: String!) {
+          user(login: $login) {
+            publicOwned: repositories(ownerAffiliations: OWNER, privacy: PUBLIC, first: 1) {
+              totalCount
+            }
+            publicOwnedForks: repositories(ownerAffiliations: OWNER, privacy: PUBLIC, isFork: true, first: 1) {
+              totalCount
+            }
+            publicOwnedNonFork: repositories(ownerAffiliations: OWNER, privacy: PUBLIC, isFork: false, first: 1) {
+              totalCount
+            }
+            privateOwned: repositories(ownerAffiliations: OWNER, privacy: PRIVATE, first: 1) {
+              totalCount
+            }
+          }
+        }
+        """
+        data = _graphql_query(query, {"login": USERNAME})
+        user = (data or {}).get("user")
+        if isinstance(user, dict):
+            counts = {
+                "public_owned_total": int(user["publicOwned"]["totalCount"]),
+                "public_owned_forks": int(user["publicOwnedForks"]["totalCount"]),
+                "public_owned_nonfork": int(user["publicOwnedNonFork"]["totalCount"]),
+                "private_owned": int(user["privateOwned"]["totalCount"]),
+            }
+            _set_cached(cache_key, counts)
+            return counts
+
+    # Fallback: public REST only.
+    all_public = get_repos(include_forks=True)
+    public_nonfork = get_repos(include_forks=False)
+    public_total = len(all_public)
+    public_nonfork_total = len(public_nonfork)
+    counts = {
+        "public_owned_total": public_total,
+        "public_owned_forks": max(0, public_total - public_nonfork_total),
+        "public_owned_nonfork": public_nonfork_total,
+        "private_owned": None,
+    }
+    _set_cached(cache_key, counts)
+    return counts
 
 
 def get_repo_languages(owner: str, repo: str) -> dict:

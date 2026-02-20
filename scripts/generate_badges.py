@@ -1,7 +1,7 @@
 """Generate a self-contained badge strip SVG (no shields.io dependency)."""
 
 from scripts.config import (
-    BG_DARK, BLUE, ORANGE, TEXT, YELLOW, TEXT_DIM, SVG_WIDTH, FONT_SANS,
+    BG_DARK, BLUE, CYAN, ORANGE, TEXT, TEXT_DIM, SVG_WIDTH, FONT_SANS,
 )
 
 
@@ -26,18 +26,20 @@ def _badge(x: int, label: str, value: str, color: str) -> str:
 
 
 def generate(
-    total_repos: int,
+    public_nonfork_repos: int,
+    public_forks: int,
+    private_owned_repos: int | None,
     ci_count: int,
-    lang_count: int,
-    stars: int,
     total_commits: int,
     output_path: str = "assets/badges.svg",
 ):
+    private_value = "n/a" if private_owned_repos is None else str(private_owned_repos)
+
     badges_data = [
-        ("Original Repos", str(total_repos), BLUE),
-        ("CI/CD Pipelines", str(ci_count), ORANGE),
-        ("Languages", str(lang_count), TEXT),
-        ("Stars Earned", str(stars), YELLOW),
+        ("Public Repos", str(public_nonfork_repos), BLUE),
+        ("Public Forks", str(public_forks), CYAN),
+        ("Private Repos", private_value, TEXT),
+        ("CI/CD Repos", str(ci_count), ORANGE),
         ("Total Commits", str(total_commits), TEXT_DIM),
     ]
 
