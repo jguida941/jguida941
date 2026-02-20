@@ -47,9 +47,8 @@
 ---
 
 ### Recently Created
-{{range recentRepos 5}}
-- [**{{.Name}}**]({{.URL}}){{if .Description}} — {{.Description}}{{end}}
-{{- end}}
+
+<!-- RECENT_REPOS -->
 
 ### Latest Activity
 {{range recentContributions 10}}
