@@ -48,7 +48,7 @@
 
 ### Recently Created
 {{range recentRepos 5}}
-- [**{{.Name}}**]({{.URL}}){{if .Description}} — {{.Description}}{{end}}{{if .PrimaryLanguage}} `{{.PrimaryLanguage.Name}}`{{end}}
+- [**{{.Name}}**]({{.URL}}){{if .Description}} — {{.Description}}{{end}}{{if .Language}} `{{.Language}}`{{end}}
 {{- end}}
 
 ### Latest Activity
