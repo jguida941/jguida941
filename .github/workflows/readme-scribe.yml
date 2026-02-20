@@ -23,6 +23,34 @@ jobs:
           template: "templates/README.md.tpl"
           writeTo: "README.md"
 
+      - name: Generate repo health stats
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          TOTAL=$(gh api users/jguida941/repos --paginate -q '[.[] | select(.fork == false)] | length')
+
+          CI_COUNT=0
+          for repo in $(gh api users/jguida941/repos --paginate -q '[.[] | select(.fork == false)] | .[].name'); do
+            result=$(gh api "repos/jguida941/$repo/contents/.github/workflows" 2>/dev/null | jq 'if type == "array" then length else 0 end' 2>/dev/null || echo "0")
+            if [ "$result" -gt 0 ]; then
+              CI_COUNT=$((CI_COUNT + 1))
+            fi
+          done
+
+          LANG_COUNT=$(gh api users/jguida941/repos --paginate -q '[.[].language | select(. != null)] | unique | length')
+          STARS=$(gh api users/jguida941/repos --paginate -q '[.[].stargazers_count] | add')
+
+          cat > /tmp/health.md << EOF
+          ![Original Repos](https://img.shields.io/badge/Original_Repos-${TOTAL}-7AA2F7?style=for-the-badge&labelColor=1a1b27)
+          ![CI/CD Pipelines](https://img.shields.io/badge/CI%2FCD_Pipelines-${CI_COUNT}-ff9e64?style=for-the-badge&labelColor=1a1b27)
+          ![Languages](https://img.shields.io/badge/Languages-${LANG_COUNT}-a9b1d6?style=for-the-badge&labelColor=1a1b27)
+          ![Stars Earned](https://img.shields.io/badge/Stars_Earned-${STARS}-e0af68?style=for-the-badge&labelColor=1a1b27)
+          ![Forked Repos](https://img.shields.io/badge/Forked_Repos-0-565f89?style=for-the-badge&labelColor=1a1b27)
+          EOF
+
+          sed -i '/<!-- REPO_HEALTH -->/r /tmp/health.md' README.md
+          sed -i '/<!-- REPO_HEALTH -->/d' README.md
+
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "update readme"

@@ -22,6 +22,30 @@
 
 ---
 
+### By The Numbers
+
+<div align="center">
+
+<!-- REPO_HEALTH -->
+
+</div>
+
+---
+
+<div align="center">
+
+<img src="metrics.isocalendar.svg" alt="Contribution Calendar" />
+
+</div>
+
+<div align="center">
+
+<img src="metrics.habits.svg" alt="Coding Habits" />
+
+</div>
+
+---
+
 ### Recently Created
 {{range recentRepos 5}}
 - [**{{.Name}}**]({{.URL}}){{if .Description}} — {{.Description}}{{end}}{{if .PrimaryLanguage}} `{{.PrimaryLanguage.Name}}`{{end}}
