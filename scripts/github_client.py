@@ -127,6 +127,25 @@ def _normalize_graphql_repo(node: dict) -> dict:
     if isinstance(workflows_dir, dict):
         entries = workflows_dir.get("entries")
         has_ci_workflows = isinstance(entries, list) and len(entries) > 0
+    language_bytes = {}
+    languages = node.get("languages")
+    if isinstance(languages, dict):
+        edges = languages.get("edges")
+        if isinstance(edges, list):
+            for edge in edges:
+                if not isinstance(edge, dict):
+                    continue
+                lang_node = edge.get("node") or {}
+                lang_name = lang_node.get("name")
+                lang_size = edge.get("size")
+                if not lang_name:
+                    continue
+                try:
+                    size = int(lang_size)
+                except (TypeError, ValueError):
+                    size = 0
+                if size > 0:
+                    language_bytes[lang_name] = language_bytes.get(lang_name, 0) + size
 
     return {
         "name": node.get("name", ""),
@@ -142,6 +161,7 @@ def _normalize_graphql_repo(node: dict) -> dict:
         "language": language_name,
         "owner": {"login": owner_login},
         "has_ci_workflows": has_ci_workflows,
+        "language_bytes": language_bytes,
     }
 
 
@@ -182,6 +202,12 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
                     entries { name }
                   }
                 }
+                languages(first: 20, orderBy: { field: SIZE, direction: DESC }) {
+                  edges {
+                    size
+                    node { name }
+                  }
+                }
               }
             }
           }
@@ -219,6 +245,12 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
                     entries { name }
                   }
                 }
+                languages(first: 20, orderBy: { field: SIZE, direction: DESC }) {
+                  edges {
+                    size
+                    node { name }
+                  }
+                }
               }
             }
           }
@@ -227,13 +259,17 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
 
     repos = []
     cursor = None
+    saw_page = False
 
     while True:
         data = _graphql_query(query, {"login": USERNAME, "cursor": cursor})
         user = (data or {}).get("user")
         repo_conn = (user or {}).get("repositories")
         if not isinstance(repo_conn, dict):
+            if not saw_page:
+                raise RuntimeError("GraphQL repo listing unavailable")
             break
+        saw_page = True
 
         nodes = repo_conn.get("nodes") or []
         repos.extend(_normalize_graphql_repo(node) for node in nodes if isinstance(node, dict))
@@ -252,6 +288,14 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
 
 def get_repos(include_forks: bool = False) -> list:
     """Get public repos owned by USERNAME, optionally including forks."""
+    if TOKEN:
+        try:
+            repos = _graphql_public_owned_repos(include_forks)
+            if repos:
+                return repos
+        except Exception as exc:
+            print(f"  Warning: GraphQL repo listing failed; falling back to REST ({exc})")
+
     try:
         repos = paginated_get(
             f"users/{USERNAME}/repos",
@@ -369,6 +413,24 @@ def get_all_languages(repos: list | None = None, max_workers: int = 10) -> dict:
 
     if repos is None:
         repos = get_repos()
+
+    # Preferred path when repos were fetched from GraphQL:
+    # language bytes are already embedded and require no extra API calls.
+    if repos and all("language_bytes" in repo for repo in repos):
+        totals = {}
+        for repo in repos:
+            language_bytes = repo.get("language_bytes") or {}
+            if not isinstance(language_bytes, dict):
+                continue
+            for lang, bytes_ in language_bytes.items():
+                try:
+                    amount = int(bytes_)
+                except (TypeError, ValueError):
+                    amount = 0
+                if amount > 0:
+                    totals[lang] = totals.get(lang, 0) + amount
+        _set_cached(cache_key, totals)
+        return totals
 
     totals = {}
 

@@ -94,6 +94,21 @@ def main():
     events = gh.get_events()
     print(f"  {len(events)} recent events")
 
+    # Best-effort latest push message per repo for fallback display.
+    latest_push_message_by_repo: dict[str, str] = {}
+    for event in events:
+        if event.get("type") != "PushEvent":
+            continue
+        repo_full_name = event.get("repo", {}).get("name", "")
+        if not repo_full_name or repo_full_name in latest_push_message_by_repo:
+            continue
+        commits = event.get("payload", {}).get("commits", [])
+        if not commits:
+            continue
+        message = commits[-1].get("message", "").split("\n")[0].strip()
+        if message:
+            latest_push_message_by_repo[repo_full_name] = message
+
     print("[5/7] Fetching commit count...")
     total_commits = gh.get_total_commits(repos)
     print(f"  {total_commits} total commits")
@@ -188,6 +203,11 @@ def main():
                     last_msg = commits_data[0].get("commit", {}).get("message", "").split("\n")[0]
             except Exception:
                 pass
+            if not last_msg:
+                full_name = f"{r['owner']['login']}/{r['name']}"
+                last_msg = latest_push_message_by_repo.get(full_name, "")
+            if not last_msg:
+                last_msg = "recent update"
             recent_repos.append({
                 "name": r["name"],
                 "html_url": r.get("html_url", ""),
