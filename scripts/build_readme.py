@@ -48,6 +48,9 @@ def _time_ago(iso_str: str) -> str:
 
 def _has_ci_workflow(repo: dict) -> bool | None:
     """Best-effort check for .github/workflows in repo."""
+    if "has_ci_workflows" in repo:
+        return bool(repo.get("has_ci_workflows"))
+
     try:
         owner = repo["owner"]["login"]
         name = repo["name"]

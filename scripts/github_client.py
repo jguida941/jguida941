@@ -122,6 +122,11 @@ def _normalize_graphql_repo(node: dict) -> dict:
     owner_login = (node.get("owner") or {}).get("login", USERNAME)
     language_name = (node.get("primaryLanguage") or {}).get("name")
     visibility = str(node.get("visibility", "PUBLIC")).lower()
+    workflows_dir = node.get("workflowsDir")
+    has_ci_workflows = False
+    if isinstance(workflows_dir, dict):
+        entries = workflows_dir.get("entries")
+        has_ci_workflows = isinstance(entries, list) and len(entries) > 0
 
     return {
         "name": node.get("name", ""),
@@ -136,6 +141,7 @@ def _normalize_graphql_repo(node: dict) -> dict:
         "forks_count": int(node.get("forkCount", 0)),
         "language": language_name,
         "owner": {"login": owner_login},
+        "has_ci_workflows": has_ci_workflows,
     }
 
 
@@ -170,6 +176,12 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
                 forkCount
                 owner { login }
                 primaryLanguage { name }
+                workflowsDir: object(expression: "HEAD:.github/workflows") {
+                  __typename
+                  ... on Tree {
+                    entries { name }
+                  }
+                }
               }
             }
           }
@@ -201,6 +213,12 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
                 forkCount
                 owner { login }
                 primaryLanguage { name }
+                workflowsDir: object(expression: "HEAD:.github/workflows") {
+                  __typename
+                  ... on Tree {
+                    entries { name }
+                  }
+                }
               }
             }
           }
@@ -386,8 +404,20 @@ def get_events(per_page: int = 100, max_pages: int = 3) -> list:
             resp = _request_with_retry(url, params={"per_page": per_page, "page": page})
         except requests.HTTPError as exc:
             status = exc.response.status_code if exc.response is not None else "unknown"
-            print(f"  Warning: events endpoint unavailable ({status}); using partial/empty event data")
-            break
+            if status in {401, 403}:
+                # Retry public feed without auth in case token scope is restricted.
+                try:
+                    resp = _request_public_with_retry(url, params={"per_page": per_page, "page": page})
+                except requests.HTTPError as public_exc:
+                    public_status = public_exc.response.status_code if public_exc.response is not None else "unknown"
+                    print(
+                        "  Warning: events endpoint unavailable "
+                        f"(auth={status}, public={public_status}); using partial/empty event data"
+                    )
+                    break
+            else:
+                print(f"  Warning: events endpoint unavailable ({status}); using partial/empty event data")
+                break
 
         if resp.status_code != 200:
             break
@@ -533,6 +563,11 @@ def get_repos_with_ci(repos: list | None = None, max_workers: int = 10) -> int:
 
     if repos is None:
         repos = get_repos()
+
+    if repos and all("has_ci_workflows" in repo for repo in repos):
+        count = sum(1 for repo in repos if bool(repo.get("has_ci_workflows")))
+        _set_cached(cache_key, count)
+        return count
 
     count = 0
 
