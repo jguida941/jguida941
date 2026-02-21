@@ -40,7 +40,7 @@ def generate(
         ("Public Forks", str(public_forks), CYAN),
         ("Private Repos", private_value, TEXT),
         ("CI/CD Repos", str(ci_count), ORANGE),
-        ("Total Commits", str(total_commits), TEXT_DIM),
+        ("Commit Contribs", str(total_commits), TEXT_DIM),
     ]
 
     badge_svgs = []

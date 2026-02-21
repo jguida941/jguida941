@@ -49,6 +49,11 @@ jobs:
           GITHUB_USERNAME: jguida941
         run: python scripts/build_readme.py
 
+      - name: Validate generated profile data
+        env:
+          GITHUB_USERNAME: jguida941
+        run: python scripts/validate_generated_profile.py
+
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "update analytics & readme [skip ci]"

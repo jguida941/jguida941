@@ -59,6 +59,22 @@ def _has_ci_workflow(repo: dict) -> bool | None:
         return None
 
 
+def _activity_label(event_type: str) -> str:
+    labels = {
+        "PushEvent": "push",
+        "PullRequestEvent": "pull request",
+        "PullRequestReviewEvent": "pr review",
+        "ReleaseEvent": "release",
+        "IssuesEvent": "issue",
+        "IssueCommentEvent": "issue comment",
+        "CreateEvent": "create",
+        "DeleteEvent": "delete",
+    }
+    if event_type in labels:
+        return labels[event_type]
+    return (event_type or "activity").replace("Event", "").lower() or "activity"
+
+
 def main():
     print("=== GitHub Profile README Builder ===")
     print(f"User: {USERNAME}")
@@ -110,8 +126,14 @@ def main():
             latest_push_message_by_repo[repo_full_name] = message
 
     print("[5/7] Fetching commit count...")
-    total_commits = gh.get_total_commits(repos)
-    print(f"  {total_commits} total commits")
+    public_scope_commits = gh.get_total_commits(repos)
+    print(f"  {public_scope_commits} public-scope commits")
+    all_time_commit_contributions = gh.get_total_commit_contributions_via_graphql()
+    if all_time_commit_contributions is not None:
+        print(f"  {all_time_commit_contributions} all-time commit contributions")
+    else:
+        print("  all-time commit contributions unavailable")
+    display_commit_total = all_time_commit_contributions or public_scope_commits
 
     print("[6/7] Counting CI/CD pipelines...")
     ci_count = gh.get_repos_with_ci(repos)
@@ -170,7 +192,7 @@ def main():
         public_forks=repo_counts["public_owned_forks"],
         private_owned_repos=repo_counts["private_owned"],
         ci_count=ci_count,
-        total_commits=total_commits,
+        total_commits=display_commit_total,
     )
     print("  -> assets/badges.svg")
 
@@ -296,6 +318,7 @@ def main():
 
     data_scope = {
         "repos_included": "public + owned + non-fork",
+        "commit_metric_scope": "all-time commit contributions (GraphQL)" if all_time_commit_contributions is not None else "public + owned + non-fork repos",
         "public_owned_repos_total": repo_counts["public_owned_total"],
         "public_owned_forks_total": repo_counts["public_owned_forks"],
         "public_owned_nonfork_repos_total": repo_counts["public_owned_nonfork"],
@@ -303,7 +326,9 @@ def main():
     }
 
     snapshot = {
-        "total_commits": total_commits,
+        "total_commits": display_commit_total,
+        "public_scope_commits": public_scope_commits,
+        "all_time_commit_contributions": all_time_commit_contributions,
         "total_repos": repo_counts["public_owned_nonfork"],
         "total_stars": total_stars,
         "languages_count": lang_count,
@@ -317,16 +342,32 @@ def main():
     # Recently created repos (top 10 non-fork by creation date)
     recent_created = sorted(repos, key=lambda r: r.get("created_at", ""), reverse=True)[:10]
 
-    # Latest contributions (from events)
+    # Latest owned-repo contribution activity (from events)
+    contribution_event_types = {
+        "PushEvent",
+        "PullRequestEvent",
+        "PullRequestReviewEvent",
+        "ReleaseEvent",
+        "IssuesEvent",
+        "IssueCommentEvent",
+        "CreateEvent",
+        "DeleteEvent",
+    }
+    owned_repo_prefix = f"{USERNAME}/"
     contributions = []
     seen_contrib = set()
     for e in events:
+        if e.get("type") not in contribution_event_types:
+            continue
         repo_name = e.get("repo", {}).get("name", "")
-        if repo_name and repo_name not in seen_contrib:
+        if not repo_name.startswith(owned_repo_prefix):
+            continue
+        if repo_name not in seen_contrib:
             seen_contrib.add(repo_name)
             contributions.append({
                 "repo": repo_name,
                 "url": f"https://github.com/{repo_name}",
+                "activity": _activity_label(e.get("type", "")),
                 "time_ago": _time_ago(e.get("created_at", "")),
             })
         if len(contributions) >= 10:
