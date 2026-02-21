@@ -3,7 +3,6 @@
 
 import os
 import re
-import sys
 from pathlib import Path
 
 
@@ -38,16 +37,22 @@ def main() -> int:
             if "/" in repo and not repo.startswith(f"{USERNAME}/"):
                 errors.append(f"Unexpected external repo in owned-activity section: {repo}")
 
-    all_time_match = re.search(
-        r"\| All-Time Commit Contributions \(GraphQL\) \| `([^`]+)` \|",
+    twelve_month_match = re.search(
+        r"\| Last 12 Months Contributions \| `([^`]+)` \|",
         readme,
     )
-    if all_time_match:
-        value = all_time_match.group(1).strip()
-        if value.lower() in {"0", "n/a"}:
-            warnings.append("All-time commit contribution value is 0 or n/a")
+    if twelve_month_match:
+        value = twelve_month_match.group(1).strip()
+        normalized = value.replace(",", "")
+        try:
+            contribution_value = int(normalized)
+        except ValueError:
+            warnings.append("Last 12 months contribution value is not numeric")
+            contribution_value = 0
+        if contribution_value <= 0:
+            warnings.append("Last 12 months contribution value is 0")
     else:
-        warnings.append("All-time commit contribution row missing")
+        errors.append("Missing row: Last 12 Months Contributions")
 
     if WORKING_SVG_PATH.exists():
         working_svg = WORKING_SVG_PATH.read_text(encoding="utf-8")

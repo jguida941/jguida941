@@ -125,15 +125,9 @@ def main():
         if message:
             latest_push_message_by_repo[repo_full_name] = message
 
-    print("[5/7] Fetching commit count...")
+    print("[5/7] Fetching public repo commit count...")
     public_scope_commits = gh.get_total_commits(repos)
     print(f"  {public_scope_commits} public-scope commits")
-    all_time_commit_contributions = gh.get_total_commit_contributions_via_graphql()
-    if all_time_commit_contributions is not None:
-        print(f"  {all_time_commit_contributions} all-time commit contributions")
-    else:
-        print("  all-time commit contributions unavailable")
-    display_commit_total = all_time_commit_contributions or public_scope_commits
 
     print("[6/7] Counting CI/CD pipelines...")
     ci_count = gh.get_repos_with_ci(repos)
@@ -142,7 +136,7 @@ def main():
     print("[7/7] Fetching contribution calendar...")
     calendar = gh.get_contribution_calendar()
     total_contributions = calendar.get("totalContributions", 0) if calendar else 0
-    print(f"  {total_contributions} contributions this year")
+    print(f"  {total_contributions} contributions in the last 12 months")
 
     # Derived stats
     total_stars = sum(r.get("stargazers_count", 0) for r in repos)
@@ -192,7 +186,7 @@ def main():
         public_forks=repo_counts["public_owned_forks"],
         private_owned_repos=repo_counts["private_owned"],
         ci_count=ci_count,
-        total_commits=display_commit_total,
+        last_year_contributions=total_contributions,
     )
     print("  -> assets/badges.svg")
 
@@ -318,7 +312,7 @@ def main():
 
     data_scope = {
         "repos_included": "public + owned + non-fork",
-        "commit_metric_scope": "all-time commit contributions (GraphQL)" if all_time_commit_contributions is not None else "public + owned + non-fork repos",
+        "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
         "public_owned_repos_total": repo_counts["public_owned_total"],
         "public_owned_forks_total": repo_counts["public_owned_forks"],
         "public_owned_nonfork_repos_total": repo_counts["public_owned_nonfork"],
@@ -326,9 +320,8 @@ def main():
     }
 
     snapshot = {
-        "total_commits": display_commit_total,
+        "last_year_contributions": total_contributions,
         "public_scope_commits": public_scope_commits,
-        "all_time_commit_contributions": all_time_commit_contributions,
         "total_repos": repo_counts["public_owned_nonfork"],
         "total_stars": total_stars,
         "languages_count": lang_count,
@@ -336,7 +329,6 @@ def main():
         "releases": releases,
         "ci_repos": ci_count,
         "streak_days": streak_days,
-        "total_contributions": total_contributions,
     }
 
     # Recently created repos (top 10 non-fork by creation date)

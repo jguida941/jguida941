@@ -30,7 +30,7 @@ def generate(
     public_forks: int,
     private_owned_repos: int | None,
     ci_count: int,
-    total_commits: int,
+    last_year_contributions: int,
     output_path: str = "assets/badges.svg",
 ):
     private_value = "n/a" if private_owned_repos is None else str(private_owned_repos)
@@ -40,7 +40,7 @@ def generate(
         ("Public Forks", str(public_forks), CYAN),
         ("Private Repos", private_value, TEXT),
         ("CI/CD Repos", str(ci_count), ORANGE),
-        ("Commit Contribs", str(total_commits), TEXT_DIM),
+        ("12mo Contribs", str(last_year_contributions), TEXT_DIM),
     ]
 
     badge_svgs = []

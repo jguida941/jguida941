@@ -5,7 +5,7 @@ import os
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
@@ -547,17 +547,20 @@ def get_events(per_page: int = 100, max_pages: int = 3) -> list:
     return results
 
 
-def get_contribution_calendar() -> dict | None:
-    """Fetch contribution calendar via GraphQL."""
-    cache_key = "contribution_calendar"
+def get_contribution_calendar(days: int = 365) -> dict | None:
+    """Fetch contribution calendar via GraphQL for a rolling window."""
+    cache_key = f"contribution_calendar_{days}"
     cached = _get_cached(cache_key)
     if cached is not None:
         return cached
 
+    now = datetime.now(timezone.utc)
+    start = now - timedelta(days=max(1, int(days)))
+
     query = """
-    query($login: String!) {
+    query($login: String!, $from: DateTime!, $to: DateTime!) {
       user(login: $login) {
-        contributionsCollection {
+        contributionsCollection(from: $from, to: $to) {
           contributionCalendar {
             totalContributions
             weeks {
@@ -575,7 +578,14 @@ def get_contribution_calendar() -> dict | None:
     resp = requests.post(
         GRAPHQL,
         headers=_headers(),
-        json={"query": query, "variables": {"login": USERNAME}},
+        json={
+            "query": query,
+            "variables": {
+                "login": USERNAME,
+                "from": start.isoformat().replace("+00:00", "Z"),
+                "to": now.isoformat().replace("+00:00", "Z"),
+            },
+        },
     )
     if resp.status_code != 200:
         return None
@@ -723,9 +733,13 @@ def get_total_commit_contributions_via_graphql() -> int | None:
     return total
 
 
-def get_total_commits(repos: list | None = None, max_workers: int = 4) -> int:
+def get_total_commits(
+    repos: list | None = None,
+    max_workers: int = 4,
+    use_global_fallback: bool = False,
+) -> int:
     """Count commits authored by USERNAME across the selected repos."""
-    cache_key = "total_commits_owned_public_nonfork"
+    cache_key = f"total_commits_owned_public_nonfork_{int(use_global_fallback)}"
     cached = _get_cached(cache_key)
     if cached is not None:
         return cached
@@ -749,14 +763,13 @@ def get_total_commits(repos: list | None = None, max_workers: int = 4) -> int:
                 failures += 1
                 print(f"  Warning: commit count failed for {repo['name']}: {exc}")
 
-    # If REST-based per-repo counting is broadly blocked, use GraphQL fallback.
-    if repos and (total == 0 or failures >= max(1, len(repos) // 2)):
+    # Optional global fallback for contexts that prefer a non-zero broad metric.
+    if use_global_fallback and repos and (total == 0 or failures >= max(1, len(repos) // 2)):
         fallback_total = get_total_commit_contributions_via_graphql()
         if fallback_total is not None:
             print("  Info: using GraphQL commit contribution fallback for total commits")
             total = fallback_total
         elif total == 0:
-            # Last-resort fallback: current-year contributions.
             calendar = get_contribution_calendar()
             if isinstance(calendar, dict):
                 try:
