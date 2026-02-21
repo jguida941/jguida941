@@ -103,16 +103,135 @@ def _is_public_owned_repo(repo: dict) -> bool:
     return is_owner and visibility == "public"
 
 
+def _normalize_graphql_repo(node: dict) -> dict:
+    owner_login = (node.get("owner") or {}).get("login", USERNAME)
+    language_name = (node.get("primaryLanguage") or {}).get("name")
+    visibility = str(node.get("visibility", "PUBLIC")).lower()
+
+    return {
+        "name": node.get("name", ""),
+        "fork": bool(node.get("isFork")),
+        "private": bool(node.get("isPrivate")),
+        "visibility": visibility,
+        "description": node.get("description", ""),
+        "html_url": node.get("url", ""),
+        "pushed_at": node.get("pushedAt", ""),
+        "created_at": node.get("createdAt", ""),
+        "stargazers_count": int(node.get("stargazerCount", 0)),
+        "forks_count": int(node.get("forkCount", 0)),
+        "language": language_name,
+        "owner": {"login": owner_login},
+    }
+
+
+def _graphql_public_owned_repos(include_forks: bool) -> list:
+    cache_key = f"graphql_public_owned_repos_{int(include_forks)}"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        return cached
+
+    if include_forks:
+        query = """
+        query($login: String!, $cursor: String) {
+          user(login: $login) {
+            repositories(
+              ownerAffiliations: OWNER
+              privacy: PUBLIC
+              first: 100
+              after: $cursor
+              orderBy: { field: CREATED_AT, direction: DESC }
+            ) {
+              pageInfo { hasNextPage endCursor }
+              nodes {
+                name
+                isFork
+                isPrivate
+                visibility
+                description
+                url
+                pushedAt
+                createdAt
+                stargazerCount
+                forkCount
+                owner { login }
+                primaryLanguage { name }
+              }
+            }
+          }
+        }
+        """
+    else:
+        query = """
+        query($login: String!, $cursor: String) {
+          user(login: $login) {
+            repositories(
+              ownerAffiliations: OWNER
+              privacy: PUBLIC
+              isFork: false
+              first: 100
+              after: $cursor
+              orderBy: { field: CREATED_AT, direction: DESC }
+            ) {
+              pageInfo { hasNextPage endCursor }
+              nodes {
+                name
+                isFork
+                isPrivate
+                visibility
+                description
+                url
+                pushedAt
+                createdAt
+                stargazerCount
+                forkCount
+                owner { login }
+                primaryLanguage { name }
+              }
+            }
+          }
+        }
+        """
+
+    repos = []
+    cursor = None
+
+    while True:
+        data = _graphql_query(query, {"login": USERNAME, "cursor": cursor})
+        user = (data or {}).get("user")
+        repo_conn = (user or {}).get("repositories")
+        if not isinstance(repo_conn, dict):
+            break
+
+        nodes = repo_conn.get("nodes") or []
+        repos.extend(_normalize_graphql_repo(node) for node in nodes if isinstance(node, dict))
+
+        page_info = repo_conn.get("pageInfo") or {}
+        if not page_info.get("hasNextPage"):
+            break
+
+        cursor = page_info.get("endCursor")
+        if not cursor:
+            break
+
+    _set_cached(cache_key, repos)
+    return repos
+
+
 def get_repos(include_forks: bool = False) -> list:
     """Get public repos owned by USERNAME, optionally including forks."""
-    repos = paginated_get(
-        f"users/{USERNAME}/repos",
-        {"sort": "created", "direction": "desc", "type": "owner"},
-    )
-    repos = [r for r in repos if _is_public_owned_repo(r)]
-    if not include_forks:
-        repos = [r for r in repos if not r.get("fork")]
-    return repos
+    try:
+        repos = paginated_get(
+            f"users/{USERNAME}/repos",
+            {"sort": "created", "direction": "desc", "type": "owner"},
+        )
+        repos = [r for r in repos if _is_public_owned_repo(r)]
+        if not include_forks:
+            repos = [r for r in repos if not r.get("fork")]
+        return repos
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else "unknown"
+        print(f"  Warning: REST repo listing unavailable ({status}); falling back to GraphQL")
+        return _graphql_public_owned_repos(include_forks)
 
 
 def _graphql_query(query: str, variables: dict) -> dict | None:
@@ -248,7 +367,13 @@ def get_events(per_page: int = 100, max_pages: int = 3) -> list:
     results = []
     for page in range(1, max_pages + 1):
         url = f"{API}/users/{USERNAME}/events/public"
-        resp = _request_with_retry(url, params={"per_page": per_page, "page": page})
+        try:
+            resp = _request_with_retry(url, params={"per_page": per_page, "page": page})
+        except requests.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else "unknown"
+            print(f"  Warning: events endpoint unavailable ({status}); using partial/empty event data")
+            break
+
         if resp.status_code != 200:
             break
         data = resp.json()
