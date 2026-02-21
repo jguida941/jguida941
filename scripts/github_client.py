@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -76,6 +77,32 @@ def _request_public_with_retry(url, params=None, max_retries=2):
             continue
         resp.raise_for_status()
     return resp
+
+
+def _count_commits_from_commits_endpoint(owner: str, repo: str, use_public: bool) -> int:
+    """
+    Count commits authored by USERNAME using /commits?author=... with per_page=1.
+
+    Uses the `Link` header's `rel="last"` page number as total count.
+    """
+    url = f"{API}/repos/{owner}/{repo}/commits"
+    params = {"author": USERNAME, "per_page": 1, "page": 1}
+    requester = _request_public_with_retry if use_public else _request_with_retry
+    resp = requester(url, params=params)
+
+    if resp.status_code != 200:
+        return 0
+
+    data = resp.json()
+    if not isinstance(data, list) or len(data) == 0:
+        return 0
+
+    link = resp.headers.get("Link", "")
+    match = re.search(r"[?&]page=(\\d+)>;\\s*rel=\"last\"", link)
+    if match:
+        return int(match.group(1))
+
+    return len(data)
 
 
 def paginated_get(endpoint: str, params: dict | None = None, per_page: int = 100) -> list:
@@ -572,23 +599,81 @@ def get_repo_user_commit_count(owner: str, repo: str) -> int:
     if cached is not None:
         return cached
 
-    contributors = paginated_get(
-        f"repos/{owner}/{repo}/contributors",
-        {"anon": "false"},
-        per_page=100,
-    )
-    for contributor in contributors:
-        login = contributor.get("login", "")
-        if login.lower() == USERNAME.lower():
-            count = int(contributor.get("contributions", 0))
-            _set_cached(cache_key, count)
-            return count
+    # Primary path: contributors endpoint (fast when available).
+    try:
+        contributors = paginated_get(
+            f"repos/{owner}/{repo}/contributors",
+            {"anon": "false"},
+            per_page=100,
+        )
+        for contributor in contributors:
+            login = contributor.get("login", "")
+            if login.lower() == USERNAME.lower():
+                count = int(contributor.get("contributions", 0))
+                _set_cached(cache_key, count)
+                return count
+        _set_cached(cache_key, 0)
+        return 0
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else None
+        if status not in {401, 403, 404}:
+            raise
+
+    # Fallback path for restricted tokens: commits endpoint with author filter.
+    try:
+        count = _count_commits_from_commits_endpoint(owner, repo, use_public=False)
+        _set_cached(cache_key, count)
+        return count
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else None
+        if status in {401, 403}:
+            try:
+                count = _count_commits_from_commits_endpoint(owner, repo, use_public=True)
+                _set_cached(cache_key, count)
+                return count
+            except requests.HTTPError:
+                pass
 
     _set_cached(cache_key, 0)
     return 0
 
 
-def get_total_commits(repos: list | None = None, max_workers: int = 10) -> int:
+def get_total_commit_contributions_via_graphql() -> int | None:
+    """Fallback total commit metric using GraphQL contributionsCollection."""
+    cache_key = "total_commit_contributions_graphql_all_time"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        return int(cached)
+
+    if not TOKEN:
+        return None
+
+    query = """
+    query($login: String!, $from: DateTime!) {
+      user(login: $login) {
+        contributionsCollection(from: $from) {
+          totalCommitContributions
+        }
+      }
+    }
+    """
+    data = _graphql_query(
+        query,
+        {
+            "login": USERNAME,
+            "from": "2008-01-01T00:00:00Z",
+        },
+    )
+    try:
+        total = int(data["user"]["contributionsCollection"]["totalCommitContributions"])
+    except (TypeError, KeyError, ValueError):
+        return None
+
+    _set_cached(cache_key, total)
+    return total
+
+
+def get_total_commits(repos: list | None = None, max_workers: int = 4) -> int:
     """Count commits authored by USERNAME across the selected repos."""
     cache_key = "total_commits_owned_public_nonfork"
     cached = _get_cached(cache_key)
@@ -599,6 +684,7 @@ def get_total_commits(repos: list | None = None, max_workers: int = 10) -> int:
         repos = get_repos(include_forks=False)
 
     total = 0
+    failures = 0
 
     def fetch_one(repo):
         return get_repo_user_commit_count(repo["owner"]["login"], repo["name"])
@@ -610,7 +696,15 @@ def get_total_commits(repos: list | None = None, max_workers: int = 10) -> int:
             try:
                 total += int(f.result())
             except Exception as exc:
+                failures += 1
                 print(f"  Warning: commit count failed for {repo['name']}: {exc}")
+
+    # If REST-based per-repo counting is broadly blocked, use GraphQL fallback.
+    if repos and (total == 0 or failures >= max(1, len(repos) // 2)):
+        fallback_total = get_total_commit_contributions_via_graphql()
+        if fallback_total is not None:
+            print("  Info: using GraphQL commit contribution fallback for total commits")
+            total = fallback_total
 
     _set_cached(cache_key, total)
     return total
