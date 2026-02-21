@@ -63,6 +63,21 @@ def _request_with_retry(url, headers=None, params=None, max_retries=3):
     return resp
 
 
+def _request_public_with_retry(url, params=None, max_retries=2):
+    """GET request without auth, for public fallback checks."""
+    public_headers = {"Accept": "application/vnd.github+json"}
+    for attempt in range(max_retries):
+        resp = requests.get(url, headers=public_headers, params=params)
+        if resp.status_code == 200:
+            return resp
+        if resp.status_code == 429 or resp.status_code >= 500:
+            wait = int(resp.headers.get("Retry-After", 2 ** attempt))
+            time.sleep(wait)
+            continue
+        resp.raise_for_status()
+    return resp
+
+
 def paginated_get(endpoint: str, params: dict | None = None, per_page: int = 100) -> list:
     """Fetch all pages from a REST endpoint."""
     cache_key = f"paginated_{endpoint}_{json.dumps(params or {}, sort_keys=True)}"
@@ -528,10 +543,19 @@ def get_repos_with_ci(repos: list | None = None, max_workers: int = 10) -> int:
         except requests.HTTPError as exc:
             status = exc.response.status_code if exc.response is not None else None
             # 404 means the folder does not exist (normal for repos without Actions).
-            # 403 can occur for restricted contexts; treat as no detectable CI.
-            if status in {403, 404}:
+            if status == 404:
                 return False
-            raise
+            # 401/403 can occur from token scope restrictions. Retry without auth.
+            if status in {401, 403}:
+                try:
+                    resp = _request_public_with_retry(url)
+                except requests.HTTPError as public_exc:
+                    public_status = public_exc.response.status_code if public_exc.response is not None else None
+                    if public_status == 404:
+                        return False
+                    return False
+            else:
+                raise
 
         if resp.status_code == 200:
             data = resp.json()
@@ -558,7 +582,7 @@ def get_repo_ci_state(owner: str, repo: str) -> bool | None:
 
     - True: .github/workflows exists and contains files
     - False: workflows path does not exist or is empty
-    - None: state could not be determined (e.g. 403/401)
+    - None: state could not be determined (e.g. repeated 403/401 failures)
     """
     cache_key = f"repo_ci_state_{owner}_{repo}"
     cached = _get_cached(cache_key)
@@ -573,13 +597,29 @@ def get_repo_ci_state(owner: str, repo: str) -> bool | None:
         if status == 404:
             _set_cached(cache_key, False)
             return False
+
         if status in {401, 403}:
-            _set_cached(cache_key, None)
-            return None
-        raise
+            # Retry unauthenticated for public visibility.
+            try:
+                resp = _request_public_with_retry(url)
+            except requests.HTTPError as public_exc:
+                public_status = public_exc.response.status_code if public_exc.response is not None else None
+                if public_status == 404:
+                    _set_cached(cache_key, False)
+                    return False
+                # Do not cache unknown so next run can retry.
+                return None
+        else:
+            raise
+
+        if resp.status_code == 200:
+            data = resp.json()
+            result = isinstance(data, list) and len(data) > 0
+            _set_cached(cache_key, result)
+            return result
 
     if resp.status_code != 200:
-        _set_cached(cache_key, None)
+        # Do not cache unknown so next run can retry.
         return None
 
     data = resp.json()
