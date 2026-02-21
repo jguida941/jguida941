@@ -550,3 +550,39 @@ def get_repos_with_ci(repos: list | None = None, max_workers: int = 10) -> int:
 
     _set_cached(cache_key, count)
     return count
+
+
+def get_repo_ci_state(owner: str, repo: str) -> bool | None:
+    """
+    Return CI/CD workflow presence for a single repo.
+
+    - True: .github/workflows exists and contains files
+    - False: workflows path does not exist or is empty
+    - None: state could not be determined (e.g. 403/401)
+    """
+    cache_key = f"repo_ci_state_{owner}_{repo}"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        return cached
+
+    url = f"{API}/repos/{owner}/{repo}/contents/.github/workflows"
+    try:
+        resp = _request_with_retry(url)
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else None
+        if status == 404:
+            _set_cached(cache_key, False)
+            return False
+        if status in {401, 403}:
+            _set_cached(cache_key, None)
+            return None
+        raise
+
+    if resp.status_code != 200:
+        _set_cached(cache_key, None)
+        return None
+
+    data = resp.json()
+    result = isinstance(data, list) and len(data) > 0
+    _set_cached(cache_key, result)
+    return result

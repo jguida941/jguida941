@@ -51,9 +51,7 @@ def _has_ci_workflow(repo: dict) -> bool | None:
     try:
         owner = repo["owner"]["login"]
         name = repo["name"]
-        url = f"repos/{owner}/{name}/contents/.github/workflows"
-        wf_data = gh.paginated_get(url, per_page=1)
-        return isinstance(wf_data, list) and len(wf_data) > 0
+        return gh.get_repo_ci_state(owner, name)
     except Exception:
         return None
 
