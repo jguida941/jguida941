@@ -191,23 +191,25 @@ def main():
             break
         if r["name"] not in seen:
             seen.add(r["name"])
-            # Try to get last commit message
-            last_msg = ""
-            try:
-                commits_data = gh.paginated_get(
-                    f"repos/{r['owner']['login']}/{r['name']}/commits",
-                    {"per_page": 1},
-                    per_page=1,
-                )
-                if commits_data:
-                    last_msg = commits_data[0].get("commit", {}).get("message", "").split("\n")[0]
-            except Exception:
-                pass
+            # Prefer latest default-branch commit headline when available in repo payload.
+            last_msg = (r.get("latest_commit_message") or "").split("\n")[0].strip()
+            if not last_msg:
+                # Fallback to REST commit endpoint.
+                try:
+                    commits_data = gh.paginated_get(
+                        f"repos/{r['owner']['login']}/{r['name']}/commits",
+                        {"per_page": 1},
+                        per_page=1,
+                    )
+                    if commits_data:
+                        last_msg = commits_data[0].get("commit", {}).get("message", "").split("\n")[0].strip()
+                except Exception:
+                    pass
             if not last_msg:
                 full_name = f"{r['owner']['login']}/{r['name']}"
                 last_msg = latest_push_message_by_repo.get(full_name, "")
             if not last_msg:
-                last_msg = "recent update"
+                last_msg = "latest commit message unavailable"
             recent_repos.append({
                 "name": r["name"],
                 "html_url": r.get("html_url", ""),

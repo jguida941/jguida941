@@ -45,6 +45,8 @@ def generate(
         grid[wd][hr] += 1
         day_totals[wd] += 1
 
+    total_events = sum(day_totals.values())
+
     max_count = max(
         (grid[d][h] for d in range(7) for h in range(24)),
         default=1,
@@ -75,6 +77,10 @@ def generate(
     parts.append(
         f'<text x="{pad}" y="{title_h}" fill="{TEXT}" font-size="14" '
         f'font-family="{FONT_SANS}" font-weight="700">When I Code</text>'
+    )
+    parts.append(
+        f'<text x="{pad + 110}" y="{title_h}" fill="{TEXT_DIM}" font-size="10" '
+        f'font-family="{FONT_SANS}">(last 300 public events, UTC)</text>'
     )
 
     # Hour labels (top)
@@ -118,6 +124,14 @@ def generate(
         parts.append(
             f'<text x="{bar_section_x + max(w, 2) + 6:.1f}" y="{y + cell - 1}" '
             f'fill="{TEXT_DIM}" font-size="10" font-family="{FONT_SANS}">{total}</text>'
+        )
+
+    if total_events == 0:
+        parts.append(
+            f'<text x="{SVG_WIDTH / 2}" y="{heatmap_y + grid_h + 18}" fill="{TEXT_DIM}" '
+            f'font-size="10" font-family="{FONT_SANS}" text-anchor="middle">'
+            "No recent public events returned by GitHub API"
+            "</text>"
         )
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">

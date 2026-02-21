@@ -5,6 +5,7 @@ import os
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
@@ -173,6 +174,14 @@ def _normalize_graphql_repo(node: dict) -> dict:
                     size = 0
                 if size > 0:
                     language_bytes[lang_name] = language_bytes.get(lang_name, 0) + size
+    latest_commit_message = ""
+    default_branch_ref = node.get("defaultBranchRef")
+    if isinstance(default_branch_ref, dict):
+        target = default_branch_ref.get("target")
+        if isinstance(target, dict):
+            message = target.get("messageHeadline") or target.get("message")
+            if isinstance(message, str):
+                latest_commit_message = message.strip()
 
     return {
         "name": node.get("name", ""),
@@ -189,6 +198,7 @@ def _normalize_graphql_repo(node: dict) -> dict:
         "owner": {"login": owner_login},
         "has_ci_workflows": has_ci_workflows,
         "language_bytes": language_bytes,
+        "latest_commit_message": latest_commit_message,
     }
 
 
@@ -223,6 +233,14 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
                 forkCount
                 owner { login }
                 primaryLanguage { name }
+                defaultBranchRef {
+                  target {
+                    __typename
+                    ... on Commit {
+                      messageHeadline
+                    }
+                  }
+                }
                 workflowsDir: object(expression: "HEAD:.github/workflows") {
                   __typename
                   ... on Tree {
@@ -266,6 +284,14 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
                 forkCount
                 owner { login }
                 primaryLanguage { name }
+                defaultBranchRef {
+                  target {
+                    __typename
+                    ... on Commit {
+                      messageHeadline
+                    }
+                  }
+                }
                 workflowsDir: object(expression: "HEAD:.github/workflows") {
                   __typename
                   ... on Tree {
@@ -648,25 +674,49 @@ def get_total_commit_contributions_via_graphql() -> int | None:
     if not TOKEN:
         return None
 
-    query = """
-    query($login: String!, $from: DateTime!) {
+    created_query = """
+    query($login: String!) {
       user(login: $login) {
-        contributionsCollection(from: $from) {
+        createdAt
+      }
+    }
+    """
+    created_data = _graphql_query(created_query, {"login": USERNAME})
+    try:
+        created_at = created_data["user"]["createdAt"]
+        start_year = datetime.fromisoformat(created_at.replace("Z", "+00:00")).year
+    except (TypeError, KeyError, ValueError, AttributeError):
+        start_year = 2008
+
+    current_year = datetime.now(timezone.utc).year
+    year_query = """
+    query($login: String!, $from: DateTime!, $to: DateTime!) {
+      user(login: $login) {
+        contributionsCollection(from: $from, to: $to) {
           totalCommitContributions
         }
       }
     }
     """
-    data = _graphql_query(
-        query,
-        {
-            "login": USERNAME,
-            "from": "2008-01-01T00:00:00Z",
-        },
-    )
-    try:
-        total = int(data["user"]["contributionsCollection"]["totalCommitContributions"])
-    except (TypeError, KeyError, ValueError):
+    total = 0
+    saw_value = False
+    for year in range(start_year, current_year + 1):
+        data = _graphql_query(
+            year_query,
+            {
+                "login": USERNAME,
+                "from": f"{year}-01-01T00:00:00Z",
+                "to": f"{year}-12-31T23:59:59Z",
+            },
+        )
+        try:
+            year_total = int(data["user"]["contributionsCollection"]["totalCommitContributions"])
+            total += year_total
+            saw_value = True
+        except (TypeError, KeyError, ValueError):
+            continue
+
+    if not saw_value:
         return None
 
     _set_cached(cache_key, total)
@@ -705,6 +755,17 @@ def get_total_commits(repos: list | None = None, max_workers: int = 4) -> int:
         if fallback_total is not None:
             print("  Info: using GraphQL commit contribution fallback for total commits")
             total = fallback_total
+        elif total == 0:
+            # Last-resort fallback: current-year contributions.
+            calendar = get_contribution_calendar()
+            if isinstance(calendar, dict):
+                try:
+                    calendar_total = int(calendar.get("totalContributions", 0))
+                except (TypeError, ValueError):
+                    calendar_total = 0
+                if calendar_total > 0:
+                    print("  Info: using contribution-calendar fallback for total commits")
+                    total = calendar_total
 
     _set_cached(cache_key, total)
     return total
@@ -728,13 +789,21 @@ def get_repos_with_ci(repos: list | None = None, max_workers: int = 10) -> int:
     count = 0
 
     def check_ci(repo):
-        url = f"{API}/repos/{repo['owner']['login']}/{repo['name']}/contents/.github/workflows"
+        owner = repo["owner"]["login"]
+        name = repo["name"]
+        per_repo_cache_key = f"repo_ci_state_{owner}_{name}"
+        cached_state = _get_cached(per_repo_cache_key)
+        if cached_state is not None:
+            return bool(cached_state)
+
+        url = f"{API}/repos/{owner}/{name}/contents/.github/workflows"
         try:
             resp = _request_with_retry(url)
         except requests.HTTPError as exc:
             status = exc.response.status_code if exc.response is not None else None
             # 404 means the folder does not exist (normal for repos without Actions).
             if status == 404:
+                _set_cached(per_repo_cache_key, False)
                 return False
             # 401/403 can occur from token scope restrictions. Retry without auth.
             if status in {401, 403}:
@@ -743,22 +812,27 @@ def get_repos_with_ci(repos: list | None = None, max_workers: int = 10) -> int:
                 except requests.HTTPError as public_exc:
                     public_status = public_exc.response.status_code if public_exc.response is not None else None
                     if public_status == 404:
+                        _set_cached(per_repo_cache_key, False)
                         return False
-                    return False
+                    return None
             else:
                 raise
 
         if resp.status_code == 200:
             data = resp.json()
             if isinstance(data, list) and len(data) > 0:
+                _set_cached(per_repo_cache_key, True)
                 return True
+            _set_cached(per_repo_cache_key, False)
+            return False
         return False
 
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
         futures = [pool.submit(check_ci, r) for r in repos]
         for f in as_completed(futures):
             try:
-                if f.result():
+                result = f.result()
+                if result is True:
                     count += 1
             except Exception as exc:
                 print(f"  Warning: CI check failed: {exc}")
