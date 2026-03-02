@@ -2,7 +2,8 @@ name: Build Analytics & README
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    # Run hourly off the top of the hour to reduce scheduler delay.
+    - cron: "47 * * * *"
   workflow_dispatch:
   push:
     branches: ["main"]
@@ -12,7 +13,7 @@ on:
       - ".github/workflows/analytics.yml"
 
 concurrency:
-  group: readme-update
+  group: analytics-update
   cancel-in-progress: false
 
 jobs:
