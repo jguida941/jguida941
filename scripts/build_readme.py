@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Master orchestrator: fetch data, generate SVGs, render README."""
 
+import json
 import os
 import sys
 from datetime import datetime, timedelta, timezone
@@ -20,6 +21,7 @@ from scripts.generate_language_chart import generate as gen_lang_chart
 from scripts.generate_currently_working import generate as gen_working
 from scripts.generate_activity_heatmap import generate as gen_heatmap
 from scripts.generate_repo_spotlight import generate as gen_spotlight
+from scripts.generate_builder_scorecard import generate as gen_scorecard
 
 
 def _time_ago(iso_str: str) -> str:
@@ -79,8 +81,9 @@ def main():
     print("=== GitHub Profile README Builder ===")
     print(f"User: {USERNAME}")
 
-    # Ensure assets dir exists
+    # Ensure generated-output dirs exist
     Path("assets").mkdir(exist_ok=True)
+    Path("site/data").mkdir(parents=True, exist_ok=True)
 
     # ── Fetch Data ──────────────────────────────────────────
     print("\n[1/7] Fetching repo scope counts...")
@@ -139,6 +142,7 @@ def main():
     print(f"  {total_contributions} contributions in the last 12 months")
 
     # Derived stats
+    now_utc = datetime.now(timezone.utc)
     total_stars = sum(r.get("stargazers_count", 0) for r in repos)
     total_language_bytes = sum(b for b in language_bytes.values() if b > 0)
     top_languages = []
@@ -162,6 +166,42 @@ def main():
 
     # Count releases (from events)
     releases = sum(1 for e in events if e.get("type") == "ReleaseEvent")
+
+    release_event_times = []
+    for event in events:
+        if event.get("type") != "ReleaseEvent":
+            continue
+        created_at = event.get("created_at", "")
+        if not created_at:
+            continue
+        try:
+            release_event_times.append(datetime.fromisoformat(created_at.replace("Z", "+00:00")))
+        except ValueError:
+            continue
+    releases_30d = sum(1 for ts in release_event_times if (now_utc - ts).days < 30)
+    avg_release_gap_days = 0.0
+    if len(release_event_times) >= 2:
+        sorted_times = sorted(release_event_times, reverse=True)
+        gaps = []
+        for idx in range(len(sorted_times) - 1):
+            gaps.append((sorted_times[idx] - sorted_times[idx + 1]).total_seconds() / 86400.0)
+        avg_release_gap_days = sum(gaps) / len(gaps)
+
+    active_repos_7d = 0
+    seven_days_ago = now_utc - timedelta(days=7)
+    for repo in repos:
+        pushed = repo.get("pushed_at", "")
+        if not pushed:
+            continue
+        try:
+            pushed_dt = datetime.fromisoformat(pushed.replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        if pushed_dt >= seven_days_ago:
+            active_repos_7d += 1
+
+    stars_per_public_repo = (total_stars / len(repos)) if repos else 0.0
+    ci_coverage_pct = (ci_count / len(repos) * 100) if repos else 0.0
 
     # Streak days estimate from calendar
     streak_days = 0
@@ -195,7 +235,6 @@ def main():
     print("  -> assets/lang_breakdown.svg")
 
     # 3. Currently working on
-    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
     recent_repos = []
     seen = set()
     for r in sorted(repos, key=lambda x: x.get("pushed_at", ""), reverse=True):
@@ -261,6 +300,17 @@ def main():
         })
     gen_spotlight(spotlight_data)
     print("  -> assets/repo_spotlight.svg")
+
+    scorecard = {
+        "releases_30d": releases_30d,
+        "active_repos_7d": active_repos_7d,
+        "avg_release_gap_days": avg_release_gap_days,
+        "stars_per_public_repo": stars_per_public_repo,
+        "ci_coverage_pct": ci_coverage_pct,
+        "last_year_contributions": total_contributions,
+    }
+    gen_scorecard(scorecard)
+    print("  -> assets/builder_scorecard.svg")
 
     # ── Render README ───────────────────────────────────────
     print("\nRendering README.md...")
@@ -404,6 +454,8 @@ def main():
         pr_url = (pr.get("html_url") or "").strip()
         if not pr_url and repo_name and pr_number:
             pr_url = f"https://github.com/{repo_name}/pull/{pr_number}"
+        if not pr_url and repo_name:
+            pr_url = f"https://github.com/{repo_name}/pulls"
         pr_list.append({
             "title": pr_title,
             "url": pr_url,
@@ -415,6 +467,78 @@ def main():
         if len(pr_list) >= 5:
             break
 
+    # Focus board (Now / Next / Shipped) for fast scan value.
+    focus_now = []
+    for entry in contributions[:3]:
+        repo_short = entry["repo"].split("/")[-1]
+        focus_now.append({
+            "title": repo_short,
+            "detail": f"{entry['activity']} · {entry['time_ago']}",
+            "url": entry["url"],
+        })
+    if not focus_now:
+        focus_now.append({
+            "title": "No recent owned-repo activity found",
+            "detail": "Waiting for next push/PR/release event",
+            "url": f"https://github.com/{USERNAME}",
+        })
+
+    focus_next = []
+    open_prs = [pr for pr in pr_list if pr.get("state") == "OPEN"]
+    for pr in open_prs[:3]:
+        repo_short = pr["repo"].split("/")[-1]
+        focus_next.append({
+            "title": pr["title"],
+            "detail": f"{repo_short} · {pr['state'].lower()}",
+            "url": pr["url"],
+        })
+    if not focus_next:
+        for repo in repo_language_matrix[:2]:
+            focus_next.append({
+                "title": f"Ship next iteration in {repo['name']}",
+                "detail": f"{repo['language']} · last push {repo['pushed_at'] or 'n/a'}",
+                "url": repo["url"],
+            })
+
+    focus_shipped = []
+    for rel in release_list[:4]:
+        repo_short = rel["repo"].split("/")[-1] if rel["repo"] else "repo"
+        focus_shipped.append({
+            "title": rel["tag"],
+            "detail": f"{repo_short} · {rel['time_ago']}",
+            "url": rel["url"] or rel["repo_url"],
+        })
+    if not focus_shipped:
+        focus_shipped.append({
+            "title": "No recent release events captured",
+            "detail": "Release feed is event-driven and may lag",
+            "url": f"https://github.com/{USERNAME}?tab=repositories",
+        })
+
+    dashboard_data = {
+        "generated_at": now_utc.isoformat().replace("+00:00", "Z"),
+        "username": USERNAME,
+        "dashboard_url": f"https://{USERNAME}.github.io/{USERNAME}/",
+        "snapshot": snapshot,
+        "scorecard": scorecard,
+        "data_scope": data_scope,
+        "featured_repo_facts": featured_repo_facts,
+        "top_languages": top_languages,
+        "repo_language_matrix": repo_language_matrix[:10],
+        "focus": {
+            "now": focus_now,
+            "next": focus_next,
+            "shipped": focus_shipped,
+        },
+        "recent_releases": release_list,
+        "recent_pull_requests": pr_list,
+    }
+    Path("site/data/profile_snapshot.json").write_text(
+        json.dumps(dashboard_data, indent=2, ensure_ascii=True) + "\n",
+        encoding="utf-8",
+    )
+    print("  -> site/data/profile_snapshot.json")
+
     # Load and render Jinja2 template
     env = jinja2.Environment(
         loader=jinja2.FileSystemLoader("templates"),
@@ -424,11 +548,16 @@ def main():
 
     readme = template.render(
         username=USERNAME,
+        dashboard_url=f"https://{USERNAME}.github.io/{USERNAME}/",
         recent_created=recent_created,
         contributions=contributions,
         releases=release_list,
         pull_requests=pr_list,
+        focus_now=focus_now,
+        focus_next=focus_next,
+        focus_shipped=focus_shipped,
         snapshot=snapshot,
+        scorecard=scorecard,
         data_scope=data_scope,
         top_languages=top_languages,
         featured_repo_facts=featured_repo_facts,

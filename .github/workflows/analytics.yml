@@ -68,4 +68,4 @@ jobs:
         with:
           commit_message: "update analytics & readme [skip ci]"
           branch: main
-          file_pattern: "README.md assets/*.svg"
+          file_pattern: "README.md assets/*.svg site/data/profile_snapshot.json"

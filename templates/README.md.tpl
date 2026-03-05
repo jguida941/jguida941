@@ -16,6 +16,34 @@
 
 ---
 
+### Builder Scorecard
+
+<div align="center">
+
+<img src="assets/builder_scorecard.svg" alt="Builder Scorecard" />
+
+</div>
+
+---
+
+### Live Dashboard
+
+<div align="center">
+
+[Open the full dashboard]({{ dashboard_url }})
+
+</div>
+
+---
+
+### Now / Next / Shipped
+
+| Now | Next | Shipped |
+|-----|------|---------|
+| {%- for item in focus_now -%}[**{{ item.title }}**]({{ item.url }})<br/>{{ item.detail }}{%- if not loop.last -%}<br/><br/>{%- endif -%}{%- endfor -%} | {%- for item in focus_next -%}[**{{ item.title }}**]({{ item.url }})<br/>{{ item.detail }}{%- if not loop.last -%}<br/><br/>{%- endif -%}{%- endfor -%} | {%- for item in focus_shipped -%}[**{{ item.title }}**]({{ item.url }})<br/>{{ item.detail }}{%- if not loop.last -%}<br/><br/>{%- endif -%}{%- endfor -%} |
+
+---
+
 ### By The Numbers
 
 <div align="center">
@@ -66,7 +94,7 @@
 
 ---
 
-### Featured Projects
+### Flagship Projects
 
 <div align="center">
 

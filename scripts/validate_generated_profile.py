@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Validate generated profile artifacts for obvious data-quality regressions."""
 
+import json
 import os
 import re
 from pathlib import Path
@@ -10,6 +11,7 @@ USERNAME = os.environ.get("GITHUB_USERNAME", "jguida941")
 README_PATH = Path("README.md")
 WORKING_SVG_PATH = Path("assets/currently_working.svg")
 METRICS_SVG_PATH = Path("metrics.general.svg")
+PROFILE_SNAPSHOT_PATH = Path("site/data/profile_snapshot.json")
 
 
 def _section(text: str, heading: str) -> str:
@@ -50,6 +52,54 @@ def main() -> int:
         return 1
 
     readme = README_PATH.read_text(encoding="utf-8")
+
+    if PROFILE_SNAPSHOT_PATH.exists():
+        try:
+            profile_snapshot = json.loads(PROFILE_SNAPSHOT_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            errors.append("site/data/profile_snapshot.json is not valid JSON")
+            profile_snapshot = {}
+        else:
+            required_keys = {
+                "generated_at",
+                "username",
+                "snapshot",
+                "scorecard",
+                "focus",
+                "top_languages",
+                "repo_language_matrix",
+                "recent_releases",
+                "recent_pull_requests",
+            }
+            missing_keys = sorted(key for key in required_keys if key not in profile_snapshot)
+            if missing_keys:
+                errors.append(
+                    "site/data/profile_snapshot.json missing keys: "
+                    + ", ".join(missing_keys)
+                )
+
+            snapshot_username = str(profile_snapshot.get("username", "")).strip()
+            if snapshot_username and snapshot_username != USERNAME:
+                warnings.append(
+                    "site/data/profile_snapshot.json username does not match GITHUB_USERNAME"
+                )
+
+            focus = profile_snapshot.get("focus", {})
+            if not isinstance(focus, dict):
+                errors.append("site/data/profile_snapshot.json focus must be an object")
+            else:
+                for lane in ("now", "next", "shipped"):
+                    if not isinstance(focus.get(lane), list):
+                        errors.append(
+                            f"site/data/profile_snapshot.json focus.{lane} must be an array"
+                        )
+
+            if not isinstance(profile_snapshot.get("scorecard", {}), dict):
+                errors.append("site/data/profile_snapshot.json scorecard must be an object")
+            if not isinstance(profile_snapshot.get("snapshot", {}), dict):
+                errors.append("site/data/profile_snapshot.json snapshot must be an object")
+    else:
+        errors.append("site/data/profile_snapshot.json not found")
 
     activity = _section(readme, "Latest Owned Repo Activity")
     if not activity:

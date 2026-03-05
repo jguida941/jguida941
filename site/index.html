@@ -3,10 +3,32 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>jguida941</title>
+    <meta
+      name="description"
+      content="Live engineering dashboard generated from GitHub profile data."
+    />
+    <title>Builder Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
         color-scheme: dark;
+        --bg-main: #0d1124;
+        --bg-panel: rgba(19, 27, 58, 0.85);
+        --bg-panel-strong: #121a3a;
+        --text-main: #f5f8ff;
+        --text-soft: #b8c3df;
+        --text-dim: #8f9cc5;
+        --line: rgba(135, 156, 215, 0.26);
+        --accent-cyan: #4cdeff;
+        --accent-gold: #ffbc67;
+        --accent-mint: #65e4a8;
+        --accent-pink: #ff7aa6;
+        --shadow: 0 26px 70px rgba(2, 8, 30, 0.5);
       }
 
       * {
@@ -16,44 +38,901 @@
       body {
         margin: 0;
         min-height: 100vh;
-        display: grid;
-        place-items: center;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: radial-gradient(circle at top, #27375f, #121a2f 55%, #0b1020);
-        color: #e6eeff;
+        font-family: "IBM Plex Sans", sans-serif;
+        color: var(--text-main);
+        background:
+          radial-gradient(circle at 8% 12%, rgba(75, 162, 255, 0.18), transparent 40%),
+          radial-gradient(circle at 92% 4%, rgba(255, 122, 166, 0.16), transparent 42%),
+          radial-gradient(circle at 88% 92%, rgba(101, 228, 168, 0.14), transparent 35%),
+          linear-gradient(180deg, #0b1020, #080b17 60%, #070912);
       }
 
-      main {
-        width: min(680px, calc(100% - 2rem));
-        padding: 1.5rem;
-        border: 1px solid #4c66a4;
-        border-radius: 14px;
-        background: rgba(19, 30, 57, 0.88);
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.26;
+        background-image: repeating-linear-gradient(
+          -45deg,
+          rgba(255, 255, 255, 0.06) 0,
+          rgba(255, 255, 255, 0.06) 1px,
+          transparent 1px,
+          transparent 14px
+        );
+      }
+
+      .shell {
+        width: min(1120px, calc(100% - 2rem));
+        margin: 1.1rem auto 2rem;
+        display: grid;
+        gap: 1rem;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--bg-panel);
+        backdrop-filter: blur(8px);
+        box-shadow: var(--shadow);
+      }
+
+      .hero {
+        padding: 1.2rem 1.35rem 1.35rem;
+        background:
+          linear-gradient(
+            120deg,
+            rgba(76, 222, 255, 0.08),
+            rgba(255, 122, 166, 0.08) 55%,
+            rgba(101, 228, 168, 0.08)
+          ),
+          var(--bg-panel-strong);
+      }
+
+      .eyebrow {
+        margin: 0 0 0.45rem;
+        color: var(--accent-cyan);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font: 600 0.73rem "JetBrains Mono", monospace;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        font-family: "Space Grotesk", sans-serif;
+        letter-spacing: -0.02em;
       }
 
       h1 {
-        margin: 0 0 0.5rem;
+        font-size: clamp(1.55rem, 2.2vw, 2.05rem);
       }
 
-      p {
-        margin: 0.5rem 0;
-        color: #b8c8ea;
+      h2 {
+        font-size: clamp(1.1rem, 1.5vw, 1.3rem);
       }
 
-      a {
-        color: #9fd1ff;
+      h3 {
+        font-size: 0.9rem;
+      }
+
+      .hero-subtitle {
+        margin: 0.4rem 0 0;
+        color: var(--text-soft);
+        line-height: 1.45;
+      }
+
+      .hero-meta {
+        margin-top: 0.85rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+      }
+
+      .meta-pill {
+        border: 1px solid var(--line);
+        background: rgba(18, 27, 56, 0.7);
+        color: var(--text-soft);
+        border-radius: 999px;
+        padding: 0.35rem 0.62rem;
+        font-size: 0.78rem;
+      }
+
+      .meta-pill a {
+        color: var(--accent-cyan);
         text-decoration: none;
+      }
+
+      .section {
+        padding: 1rem 1.15rem 1.1rem;
+      }
+
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.8rem;
+        margin-bottom: 0.86rem;
+      }
+
+      .section-note {
+        margin: 0;
+        color: var(--text-dim);
+        font-size: 0.8rem;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .score-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.72rem;
+      }
+
+      .metric-card {
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        padding: 0.76rem 0.82rem 0.78rem;
+        background: rgba(16, 24, 51, 0.82);
+      }
+
+      .metric-label {
+        margin: 0;
+        color: var(--text-dim);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .metric-value {
+        margin: 0.3rem 0 0;
+        font: 700 clamp(1.3rem, 2.2vw, 1.7rem) "Space Grotesk", sans-serif;
+      }
+
+      .metric-detail {
+        margin: 0.15rem 0 0;
+        color: var(--text-soft);
+        font-size: 0.8rem;
+      }
+
+      .snapshot-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.62rem;
+      }
+
+      .snapshot-chip {
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 0.6rem 0.7rem 0.66rem;
+        background: rgba(13, 20, 44, 0.7);
+      }
+
+      .snapshot-k {
+        margin: 0;
+        color: var(--text-dim);
+        font-size: 0.73rem;
+      }
+
+      .snapshot-v {
+        margin: 0.26rem 0 0;
+        font-size: 1.16rem;
+        font-weight: 600;
+      }
+
+      .focus-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.72rem;
+      }
+
+      .focus-column {
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        padding: 0.72rem;
+        background: rgba(15, 23, 49, 0.78);
+      }
+
+      .focus-title {
+        margin: 0 0 0.62rem;
+        font-size: 0.83rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .focus-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.45rem;
+      }
+
+      .focus-item {
+        border: 1px solid rgba(129, 152, 218, 0.26);
+        border-radius: 10px;
+        background: rgba(15, 22, 46, 0.86);
+        padding: 0.52rem 0.55rem;
+      }
+
+      .focus-link {
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .focus-link:hover {
+        color: var(--accent-cyan);
+      }
+
+      .focus-detail {
+        margin: 0.23rem 0 0;
+        color: var(--text-soft);
+        font-size: 0.78rem;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.72rem;
+      }
+
+      .stack-panel {
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        padding: 0.72rem;
+        background: rgba(14, 21, 45, 0.8);
+      }
+
+      .language-list,
+      .list-cards {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .language-item {
+        display: grid;
+        gap: 0.28rem;
+      }
+
+      .language-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.7rem;
+        font-size: 0.81rem;
+        color: var(--text-soft);
+      }
+
+      .bar-track {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .bar-fill {
+        height: 100%;
+        width: 0;
+        border-radius: inherit;
+        transition: width 800ms cubic-bezier(0.3, 1, 0.5, 1);
+        background: linear-gradient(90deg, var(--accent-cyan), var(--accent-mint));
+      }
+
+      body.ready .bar-fill {
+        width: var(--target, 0%);
+      }
+
+      .list-card {
+        border: 1px solid rgba(130, 154, 221, 0.27);
+        border-radius: 10px;
+        padding: 0.55rem;
+        background: rgba(12, 18, 39, 0.84);
+      }
+
+      .list-k {
+        margin: 0;
+        color: var(--text-main);
+      }
+
+      .list-link {
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .list-link:hover {
+        color: var(--accent-cyan);
+      }
+
+      .list-sub {
+        margin: 0.22rem 0 0;
+        color: var(--text-soft);
+        font-size: 0.79rem;
+      }
+
+      .pill {
+        display: inline-block;
+        margin-left: 0.3rem;
+        padding: 0.08rem 0.38rem;
+        border-radius: 999px;
+        font: 700 0.64rem "JetBrains Mono", monospace;
+        letter-spacing: 0.04em;
+        vertical-align: 0.1em;
+      }
+
+      .pill-open {
+        color: #022c1a;
+        background: var(--accent-mint);
+      }
+
+      .pill-merged {
+        color: #1f0838;
+        background: #c8a5ff;
+      }
+
+      .pill-closed {
+        color: #3a0b17;
+        background: var(--accent-pink);
+      }
+
+      .matrix-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 13px;
+      }
+
+      table {
+        width: 100%;
+        min-width: 640px;
+        border-collapse: collapse;
+        font-size: 0.84rem;
+      }
+
+      th,
+      td {
+        text-align: left;
+        border-bottom: 1px solid rgba(132, 154, 218, 0.2);
+        padding: 0.55rem 0.62rem;
+      }
+
+      th {
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.69rem;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      td a {
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      td a:hover {
+        color: var(--accent-cyan);
+      }
+
+      .empty-state {
+        margin: 0;
+        color: var(--text-soft);
+        font-size: 0.85rem;
+      }
+
+      .status {
+        margin: 0.4rem 0 0;
+        color: var(--text-soft);
+      }
+
+      .status-error {
+        color: #ffc2cd;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        animation-delay: var(--delay, 0s);
+      }
+
+      @keyframes rise {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 980px) {
+        .score-grid,
+        .snapshot-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .focus-grid,
+        .split {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .shell {
+          width: calc(100% - 1rem);
+          margin-top: 0.55rem;
+        }
+
+        .hero {
+          padding: 0.95rem;
+        }
+
+        .section {
+          padding: 0.9rem;
+        }
+
+        .score-grid,
+        .snapshot-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
   <body>
-    <main>
-      <h1>Profile Site</h1>
-      <p>The playable game has been removed from this page.</p>
-      <p>
-        View projects and activity on
-        <a href="https://github.com/jguida941">github.com/jguida941</a>.
-      </p>
+    <main class="shell">
+      <header class="panel hero reveal" style="--delay: 0.02s">
+        <p class="eyebrow">Live Engineering Signal</p>
+        <h1 id="hero-title">Builder Dashboard</h1>
+        <p class="hero-subtitle">
+          Data-driven profile view generated from GitHub APIs and refreshed by CI.
+        </p>
+        <div class="hero-meta">
+          <span class="meta-pill">
+            GitHub:
+            <a id="github-link" href="https://github.com/jguida941">jguida941</a>
+          </span>
+          <span class="meta-pill">
+            README:
+            <a id="readme-link" href="https://github.com/jguida941/jguida941">profile</a>
+          </span>
+          <span class="meta-pill" id="generated-pill">Generated: loading...</span>
+        </div>
+      </header>
+
+      <section class="panel section reveal" style="--delay: 0.08s">
+        <div class="section-head">
+          <h2>Builder Scorecard</h2>
+          <p class="section-note">6 credibility metrics</p>
+        </div>
+        <div id="score-grid" class="score-grid"></div>
+      </section>
+
+      <section class="panel section reveal" style="--delay: 0.14s">
+        <div class="section-head">
+          <h2>Snapshot</h2>
+          <p class="section-note">raw profile counters</p>
+        </div>
+        <div id="snapshot-grid" class="snapshot-grid"></div>
+      </section>
+
+      <section class="panel section reveal" style="--delay: 0.2s">
+        <div class="section-head">
+          <h2>Now / Next / Shipped</h2>
+          <p class="section-note">activity scanline</p>
+        </div>
+        <div id="focus-grid" class="focus-grid"></div>
+      </section>
+
+      <section class="panel section reveal" style="--delay: 0.26s">
+        <div class="split">
+          <article class="stack-panel">
+            <div class="section-head">
+              <h3>Top Languages</h3>
+              <p class="section-note">by byte volume</p>
+            </div>
+            <ul id="language-list" class="language-list"></ul>
+          </article>
+          <article class="stack-panel">
+            <div class="section-head">
+              <h3>Flagship Facts</h3>
+              <p class="section-note">featured repos</p>
+            </div>
+            <ul id="featured-list" class="list-cards"></ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel section reveal" style="--delay: 0.32s">
+        <div class="split">
+          <article class="stack-panel">
+            <div class="section-head">
+              <h3>Recent Releases</h3>
+              <p class="section-note">event feed</p>
+            </div>
+            <ul id="releases-list" class="list-cards"></ul>
+          </article>
+          <article class="stack-panel">
+            <div class="section-head">
+              <h3>Recent Pull Requests</h3>
+              <p class="section-note">event feed</p>
+            </div>
+            <ul id="prs-list" class="list-cards"></ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel section reveal" style="--delay: 0.38s">
+        <div class="section-head">
+          <h2>Project Matrix</h2>
+          <p class="section-note">language + CI + activity</p>
+        </div>
+        <div id="repo-matrix"></div>
+      </section>
     </main>
+
+    <script>
+      const DATA_URL = "./data/profile_snapshot.json";
+
+      const scorecardMeta = [
+        {
+          key: "releases_30d",
+          label: "Release Velocity (30d)",
+          detail: "public release events",
+          format: (value) => formatInt(value),
+        },
+        {
+          key: "active_repos_7d",
+          label: "Active Repos (7d)",
+          detail: "pushed in last week",
+          format: (value) => formatInt(value),
+        },
+        {
+          key: "avg_release_gap_days",
+          label: "Avg Release Gap",
+          detail: "days between release events",
+          format: (value) => formatFixed(value, 1) + "d",
+        },
+        {
+          key: "stars_per_public_repo",
+          label: "Stars / Public Repo",
+          detail: "signal density",
+          format: (value) => formatFixed(value, 2),
+        },
+        {
+          key: "ci_coverage_pct",
+          label: "CI Coverage",
+          detail: "repos with workflows",
+          format: (value) => formatFixed(value, 1) + "%",
+        },
+        {
+          key: "last_year_contributions",
+          label: "12mo Contributions",
+          detail: "contribution calendar",
+          format: (value) => formatInt(value),
+        },
+      ];
+
+      const snapshotMeta = [
+        ["last_year_contributions", "12mo Contributions"],
+        ["public_scope_commits", "Public Scope Commits"],
+        ["total_repos", "Public Non-Fork Repos"],
+        ["total_stars", "Total Stars"],
+        ["languages_count", "Languages Detected"],
+        ["prs_merged", "PRs Merged (Recent)"],
+        ["releases", "Releases (Recent)"],
+        ["ci_repos", "Repos With CI"],
+        ["streak_days", "Current Streak Days"],
+      ];
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (char) => {
+          if (char === "&") return "&amp;";
+          if (char === "<") return "&lt;";
+          if (char === ">") return "&gt;";
+          if (char === '"') return "&quot;";
+          return "&#39;";
+        });
+      }
+
+      function formatInt(value) {
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) return "0";
+        return new Intl.NumberFormat("en-US").format(numeric);
+      }
+
+      function formatFixed(value, digits) {
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) return "0";
+        return numeric.toFixed(digits);
+      }
+
+      function formatGeneratedAt(isoString) {
+        if (!isoString) return "unknown";
+        const date = new Date(isoString);
+        if (Number.isNaN(date.getTime())) return escapeHtml(isoString);
+        return date.toLocaleString("en-US", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        });
+      }
+
+      function renderEmptyList(container, message) {
+        container.innerHTML = `<p class="empty-state">${escapeHtml(message)}</p>`;
+      }
+
+      function renderScorecard(scorecard) {
+        const root = document.getElementById("score-grid");
+        root.innerHTML = scorecardMeta
+          .map((meta) => {
+            const raw = scorecard?.[meta.key] ?? 0;
+            return `
+              <article class="metric-card">
+                <p class="metric-label">${escapeHtml(meta.label)}</p>
+                <p class="metric-value">${escapeHtml(meta.format(raw))}</p>
+                <p class="metric-detail">${escapeHtml(meta.detail)}</p>
+              </article>
+            `;
+          })
+          .join("");
+      }
+
+      function renderSnapshot(snapshot) {
+        const root = document.getElementById("snapshot-grid");
+        root.innerHTML = snapshotMeta
+          .map(([key, label]) => {
+            const value = snapshot?.[key] ?? 0;
+            return `
+              <article class="snapshot-chip">
+                <p class="snapshot-k">${escapeHtml(label)}</p>
+                <p class="snapshot-v">${escapeHtml(formatInt(value))}</p>
+              </article>
+            `;
+          })
+          .join("");
+      }
+
+      function renderFocus(focus) {
+        const root = document.getElementById("focus-grid");
+        const columns = [
+          ["now", "Now", "var(--accent-cyan)"],
+          ["next", "Next", "var(--accent-gold)"],
+          ["shipped", "Shipped", "var(--accent-mint)"],
+        ];
+
+        root.innerHTML = columns
+          .map(([key, label, color]) => {
+            const items = Array.isArray(focus?.[key]) ? focus[key] : [];
+            const content =
+              items.length > 0
+                ? items
+                    .map((item) => {
+                      const url = item?.url ? escapeHtml(item.url) : "#";
+                      return `
+                        <li class="focus-item">
+                          <a class="focus-link" href="${url}" target="_blank" rel="noreferrer">${escapeHtml(item?.title || "Untitled")}</a>
+                          <p class="focus-detail">${escapeHtml(item?.detail || "No details")}</p>
+                        </li>
+                      `;
+                    })
+                    .join("")
+                : `<li class="focus-item"><p class="focus-detail">No items available.</p></li>`;
+            return `
+              <article class="focus-column">
+                <h3 class="focus-title" style="color: ${color};">${escapeHtml(label)}</h3>
+                <ul class="focus-list">${content}</ul>
+              </article>
+            `;
+          })
+          .join("");
+      }
+
+      function renderTopLanguages(topLanguages) {
+        const root = document.getElementById("language-list");
+        const rows = Array.isArray(topLanguages) ? topLanguages.slice(0, 8) : [];
+        if (rows.length === 0) {
+          renderEmptyList(root, "No language data available.");
+          return;
+        }
+        root.innerHTML = rows
+          .map((lang) => {
+            const pct = Math.max(0, Math.min(100, Number(lang.percent) || 0));
+            return `
+              <li class="language-item">
+                <div class="language-meta">
+                  <span>${escapeHtml(lang.name || "Unknown")}</span>
+                  <span>${escapeHtml(formatFixed(pct, 2))}% - ${escapeHtml(formatInt(lang.bytes || 0))} bytes</span>
+                </div>
+                <div class="bar-track">
+                  <div class="bar-fill" style="--target: ${pct}%"></div>
+                </div>
+              </li>
+            `;
+          })
+          .join("");
+      }
+
+      function renderFeaturedFacts(repos) {
+        const root = document.getElementById("featured-list");
+        const items = Array.isArray(repos) ? repos : [];
+        if (items.length === 0) {
+          renderEmptyList(root, "No featured repository facts available.");
+          return;
+        }
+
+        root.innerHTML = items
+          .map((repo) => {
+            const repoUrl = repo?.url ? escapeHtml(repo.url) : "#";
+            return `
+              <li class="list-card">
+                <p class="list-k">
+                  <a class="list-link" href="${repoUrl}" target="_blank" rel="noreferrer">${escapeHtml(repo?.name || "repo")}</a>
+                </p>
+                <p class="list-sub">
+                  ${escapeHtml(repo?.language || "n/a")} - CI ${escapeHtml(repo?.ci || "n/a")} - stars ${escapeHtml(formatInt(repo?.stars || 0))} - pushed ${escapeHtml(repo?.pushed_at || "n/a")}
+                </p>
+              </li>
+            `;
+          })
+          .join("");
+      }
+
+      function renderRecentReleases(releases) {
+        const root = document.getElementById("releases-list");
+        const items = Array.isArray(releases) ? releases.slice(0, 5) : [];
+        if (items.length === 0) {
+          renderEmptyList(root, "No recent release events.");
+          return;
+        }
+
+        root.innerHTML = items
+          .map((release) => {
+            const tagUrl = release?.url || release?.repo_url || "#";
+            const repoUrl = release?.repo_url || "#";
+            return `
+              <li class="list-card">
+                <p class="list-k">
+                  <a class="list-link" href="${escapeHtml(tagUrl)}" target="_blank" rel="noreferrer">${escapeHtml(release?.tag || "unknown")}</a>
+                </p>
+                <p class="list-sub">
+                  <a class="list-link" href="${escapeHtml(repoUrl)}" target="_blank" rel="noreferrer">${escapeHtml(release?.repo || "repo")}</a> - ${escapeHtml(release?.time_ago || "unknown")}
+                </p>
+              </li>
+            `;
+          })
+          .join("");
+      }
+
+      function renderRecentPrs(prs) {
+        const root = document.getElementById("prs-list");
+        const items = Array.isArray(prs) ? prs.slice(0, 5) : [];
+        if (items.length === 0) {
+          renderEmptyList(root, "No recent pull request events.");
+          return;
+        }
+
+        root.innerHTML = items
+          .map((pr) => {
+            const state = String(pr?.state || "OPEN").toUpperCase();
+            let pillClass = "pill-open";
+            if (state === "MERGED") pillClass = "pill-merged";
+            if (state === "CLOSED") pillClass = "pill-closed";
+            return `
+              <li class="list-card">
+                <p class="list-k">
+                  <a class="list-link" href="${escapeHtml(pr?.url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(pr?.title || "pull request")}</a>
+                  <span class="pill ${pillClass}">${escapeHtml(state)}</span>
+                </p>
+                <p class="list-sub">
+                  <a class="list-link" href="${escapeHtml(pr?.repo_url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(pr?.repo || "repo")}</a> - ${escapeHtml(pr?.time_ago || "unknown")}
+                </p>
+              </li>
+            `;
+          })
+          .join("");
+      }
+
+      function renderRepoMatrix(repos) {
+        const root = document.getElementById("repo-matrix");
+        const items = Array.isArray(repos) ? repos : [];
+        if (items.length === 0) {
+          renderEmptyList(root, "No project matrix data available.");
+          return;
+        }
+
+        const rows = items
+          .map((repo) => {
+            return `
+              <tr>
+                <td><a href="${escapeHtml(repo?.url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(repo?.name || "repo")}</a></td>
+                <td>${escapeHtml(repo?.language || "n/a")}</td>
+                <td>${escapeHtml(String(repo?.ci || "n/a").toUpperCase())}</td>
+                <td>${escapeHtml(formatInt(repo?.stars || 0))}</td>
+                <td>${escapeHtml(formatInt(repo?.forks || 0))}</td>
+                <td>${escapeHtml(repo?.pushed_at || "n/a")}</td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        root.innerHTML = `
+          <div class="matrix-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Repository</th>
+                  <th>Language</th>
+                  <th>CI</th>
+                  <th>Stars</th>
+                  <th>Forks</th>
+                  <th>Last Push</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      function renderHeader(data) {
+        const username = data?.username || "jguida941";
+        const generatedText = formatGeneratedAt(data?.generated_at);
+
+        document.title = username + " - Builder Dashboard";
+        document.getElementById("hero-title").textContent = username + " Builder Dashboard";
+        document.getElementById("github-link").textContent = username;
+        document.getElementById("github-link").href = "https://github.com/" + username;
+        document.getElementById("readme-link").href = "https://github.com/" + username + "/" + username;
+        document.getElementById("generated-pill").textContent = "Generated: " + generatedText;
+      }
+
+      function renderDashboard(data) {
+        renderHeader(data);
+        renderScorecard(data?.scorecard || {});
+        renderSnapshot(data?.snapshot || {});
+        renderFocus(data?.focus || {});
+        renderTopLanguages(data?.top_languages || []);
+        renderFeaturedFacts(data?.featured_repo_facts || []);
+        renderRecentReleases(data?.recent_releases || []);
+        renderRecentPrs(data?.recent_pull_requests || []);
+        renderRepoMatrix(data?.repo_language_matrix || []);
+        requestAnimationFrame(() => {
+          document.body.classList.add("ready");
+        });
+      }
+
+      async function main() {
+        try {
+          const response = await fetch(DATA_URL, { cache: "no-store" });
+          if (!response.ok) {
+            throw new Error("Unable to load " + DATA_URL + " (" + response.status + ")");
+          }
+          const data = await response.json();
+          renderDashboard(data);
+        } catch (error) {
+          const generatedPill = document.getElementById("generated-pill");
+          generatedPill.classList.add("status-error");
+          generatedPill.textContent = "Data load failed";
+          document.getElementById("repo-matrix").innerHTML =
+            '<p class="status status-error">Dashboard data is missing. Run <code>python scripts/build_readme.py</code> and redeploy.</p>';
+          document.getElementById("score-grid").innerHTML =
+            '<p class="status status-error">Scorecard unavailable.</p>';
+          document.getElementById("snapshot-grid").innerHTML =
+            '<p class="status status-error">Snapshot unavailable.</p>';
+          document.getElementById("focus-grid").innerHTML =
+            '<p class="status status-error">Focus board unavailable.</p>';
+          document.getElementById("language-list").innerHTML =
+            '<p class="status status-error">Language breakdown unavailable.</p>';
+          document.getElementById("featured-list").innerHTML =
+            '<p class="status status-error">Featured repo facts unavailable.</p>';
+          document.getElementById("releases-list").innerHTML =
+            '<p class="status status-error">Release feed unavailable.</p>';
+          document.getElementById("prs-list").innerHTML =
+            '<p class="status status-error">Pull request feed unavailable.</p>';
+          console.error(error);
+        }
+      }
+
+      main();
+    </script>
   </body>
 </html>
