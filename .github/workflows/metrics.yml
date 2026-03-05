@@ -17,22 +17,13 @@ jobs:
       contents: write
 
     steps:
-      - name: Require PERSONAL_GITHUB_TOKEN
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-        run: |
-          if [ -z "${PERSONAL_GITHUB_TOKEN}" ]; then
-            echo "Missing required secret: PERSONAL_GITHUB_TOKEN"
-            exit 1
-          fi
-
       - uses: actions/checkout@v4
 
       - name: General Stats
         if: ${{ success() || failure() }}
         uses: lowlighter/metrics@latest
         with:
-          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          token: ${{ github.token }}
           user: jguida941
           filename: metrics.general.svg
           base: header, activity, community, repositories
@@ -91,7 +82,7 @@ jobs:
         if: ${{ success() || failure() }}
         uses: lowlighter/metrics@latest
         with:
-          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          token: ${{ github.token }}
           user: jguida941
           filename: metrics.isocalendar.svg
           base: ""
