@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: metrics-update
+  group: profile-stats-pipeline
   cancel-in-progress: false
 
 jobs:
@@ -17,25 +17,82 @@ jobs:
       contents: write
 
     steps:
+      - name: Require PERSONAL_GITHUB_TOKEN
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          if [ -z "${PERSONAL_GITHUB_TOKEN}" ]; then
+            echo "Missing required secret: PERSONAL_GITHUB_TOKEN"
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
 
       - name: General Stats
         if: ${{ success() || failure() }}
         uses: lowlighter/metrics@latest
         with:
-          token: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          user: jguida941
           filename: metrics.general.svg
           base: header, activity, community, repositories
+          base_indepth: yes
+          repositories: 500
+          repositories_affiliations: owner
+          repositories_forks: yes
           plugin_lines: yes
           plugin_lines_sections: base
           config_timezone: America/New_York
           config_order: base.header, base.activity+community, base.repositories
 
+      - name: Sanity check metrics.general.svg
+        run: |
+          python - <<'PY'
+          import re
+          import sys
+          from pathlib import Path
+
+          svg_path = Path("metrics.general.svg")
+          if not svg_path.exists():
+              print("metrics.general.svg not found")
+              sys.exit(1)
+
+          text = svg_path.read_text(encoding="utf-8")
+
+          def metric(label: str) -> int | None:
+              match = re.search(rf"([0-9][0-9,]*)\s+{re.escape(label)}\b", text)
+              if not match:
+                  return None
+              try:
+                  return int(match.group(1).replace(",", ""))
+              except ValueError:
+                  return None
+
+          repositories = metric("Repositories")
+          stargazers = metric("Stargazers")
+          releases = metric("Releases")
+
+          failures = []
+          if repositories is None or repositories <= 0:
+              failures.append("Repositories metric missing or non-positive")
+          if stargazers is None or stargazers <= 0:
+              failures.append("Stargazers metric missing or non-positive")
+          if releases is None or releases <= 0:
+              failures.append("Releases metric missing or non-positive")
+
+          if failures:
+              print("Metrics sanity check failed:")
+              for item in failures:
+                  print(f"  - {item}")
+              sys.exit(1)
+          PY
+
       - name: Isometric Calendar
         if: ${{ success() || failure() }}
         uses: lowlighter/metrics@latest
         with:
-          token: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          user: jguida941
           filename: metrics.isocalendar.svg
           base: ""
           plugin_isocalendar: yes

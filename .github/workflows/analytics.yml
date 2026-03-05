@@ -1,9 +1,10 @@
 name: Build Analytics & README
 
 on:
-  schedule:
-    # Run hourly off the top of the hour to reduce scheduler delay.
-    - cron: "47 * * * *"
+  workflow_run:
+    workflows: ["Generate Metrics"]
+    types:
+      - completed
   workflow_dispatch:
   push:
     branches: ["main"]
@@ -11,25 +12,33 @@ on:
       - "scripts/**"
       - "templates/**"
       - ".github/workflows/analytics.yml"
+      - ".github/workflows/metrics.yml"
 
 concurrency:
-  group: analytics-update
+  group: profile-stats-pipeline
   cancel-in-progress: false
 
 jobs:
   build:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
+      - name: Require PERSONAL_GITHUB_TOKEN
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+        run: |
+          if [ -z "${PERSONAL_GITHUB_TOKEN}" ]; then
+            echo "Missing required secret: PERSONAL_GITHUB_TOKEN"
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-
-      - name: Pull latest
-        run: git pull --rebase origin main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -46,7 +55,7 @@ jobs:
 
       - name: Build README
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           GITHUB_USERNAME: jguida941
         run: python scripts/build_readme.py
 

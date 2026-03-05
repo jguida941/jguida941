@@ -373,11 +373,15 @@ def main():
         payload = e.get("payload", {})
         release = payload.get("release", {})
         repo_name = e.get("repo", {}).get("name", "")
+        release_tag = (release.get("tag_name") or "").strip() or "unknown"
+        release_url = (release.get("html_url") or "").strip()
+        if not release_url and repo_name and release_tag != "unknown":
+            release_url = f"https://github.com/{repo_name}/releases/tag/{release_tag}"
         release_list.append({
             "repo": repo_name,
             "repo_url": f"https://github.com/{repo_name}",
-            "tag": release.get("tag_name", ""),
-            "url": release.get("html_url", ""),
+            "tag": release_tag,
+            "url": release_url,
             "time_ago": _time_ago(e.get("created_at", "")),
         })
         if len(release_list) >= 5:
@@ -393,9 +397,16 @@ def main():
         state = pr.get("state", "open").upper()
         if pr.get("merged"):
             state = "MERGED"
+        pr_number = pr.get("number")
+        pr_title = (pr.get("title") or "").strip()
+        if not pr_title:
+            pr_title = f"PR #{pr_number}" if pr_number else "pull request"
+        pr_url = (pr.get("html_url") or "").strip()
+        if not pr_url and repo_name and pr_number:
+            pr_url = f"https://github.com/{repo_name}/pull/{pr_number}"
         pr_list.append({
-            "title": pr.get("title", ""),
-            "url": pr.get("html_url", ""),
+            "title": pr_title,
+            "url": pr_url,
             "repo": repo_name,
             "repo_url": f"https://github.com/{repo_name}",
             "state": state,
