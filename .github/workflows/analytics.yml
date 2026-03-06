@@ -48,11 +48,15 @@ jobs:
         env:
           PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
-          GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN != '' && secrets.PERSONAL_GITHUB_TOKEN || github.token }}
-          PROFILE_TOKEN_MODE: ${{ secrets.PERSONAL_GITHUB_TOKEN != '' && 'personal_github_token' || 'github_token' }}
+          GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
           GITHUB_USERNAME: jguida941
           PROFILE_TIMEZONE: America/New_York
         run: |
+          if [ -n "${PERSONAL_GITHUB_TOKEN}" ]; then
+            export PROFILE_TOKEN_MODE="personal_github_token"
+          else
+            export PROFILE_TOKEN_MODE="github_token"
+          fi
           echo "Token mode: ${PROFILE_TOKEN_MODE}"
           python scripts/profile_cli.py doctor --fail-on critical
           python scripts/profile_cli.py generate-profile --validate
