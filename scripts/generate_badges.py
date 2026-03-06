@@ -30,18 +30,19 @@ def generate(
     public_forks: int,
     private_owned_repos: int | None,
     ci_count: int | None,
-    last_year_contributions: int,
+    last_year_contributions: int | None,
     output_path: str = "assets/badges.svg",
 ):
     private_value = "n/a" if private_owned_repos is None else str(private_owned_repos)
     ci_value = "n/a" if ci_count is None else str(ci_count)
+    contrib_value = "n/a" if last_year_contributions is None else str(last_year_contributions)
 
     badges_data = [
         ("Public Repos", str(public_nonfork_repos), BLUE),
         ("Public Forks", str(public_forks), CYAN),
         ("Private Repos", private_value, TEXT),
         ("CI/CD Repos", ci_value, ORANGE),
-        ("12mo Contribs", str(last_year_contributions), TEXT_DIM),
+        ("12mo Contribs", contrib_value, TEXT_DIM),
     ]
 
     badge_svgs = []

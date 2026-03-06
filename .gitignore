@@ -1,9 +1,14 @@
 .venv/
 .idea/
 .claude/
+.voiceterm/
 .DS_Store
 *.png
 *.jpg
 __pycache__/
 *.pyc
 /tmp/
+site/data/doctor_report.json
+site/data/triage_report.json
+site/data/run_diagnostics.json
+site/data/run_diagnostics_history.jsonl

@@ -26,15 +26,6 @@ jobs:
       contents: write
 
     steps:
-      - name: Require PERSONAL_GITHUB_TOKEN
-        env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-        run: |
-          if [ -z "${PERSONAL_GITHUB_TOKEN}" ]; then
-            echo "Missing required secret: PERSONAL_GITHUB_TOKEN"
-            exit 1
-          fi
-
       - uses: actions/checkout@v4
         with:
           ref: main
@@ -53,19 +44,32 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Build README
+      - name: Generate and validate profile artifacts
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN != '' && secrets.PERSONAL_GITHUB_TOKEN || github.token }}
+          PROFILE_TOKEN_MODE: ${{ secrets.PERSONAL_GITHUB_TOKEN != '' && 'personal_github_token' || 'github_token' }}
           GITHUB_USERNAME: jguida941
-        run: python scripts/build_readme.py
+          PROFILE_TIMEZONE: America/New_York
+        run: |
+          echo "Token mode: ${PROFILE_TOKEN_MODE}"
+          python scripts/profile_cli.py doctor --fail-on critical
+          python scripts/profile_cli.py generate-profile --validate
+          python scripts/profile_cli.py triage --workflow "Generate Metrics" --limit 20 --fail-on critical
 
-      - name: Validate generated profile data
-        env:
-          GITHUB_USERNAME: jguida941
-        run: python scripts/validate_generated_profile.py
+      - name: Upload diagnostics artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: profile-diagnostics
+          path: |
+            site/data/triage_report.json
+            site/data/doctor_report.json
+            site/data/run_diagnostics.json
+            site/data/run_diagnostics_history.jsonl
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "update analytics & readme [skip ci]"
+          commit_message: "update analytics & readme"
           branch: main
           file_pattern: "README.md assets/*.svg site/data/profile_snapshot.json"

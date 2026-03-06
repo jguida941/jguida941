@@ -8,16 +8,61 @@ import hashlib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import requests
+from scripts.runtime_env import token_mode_from_env
 
 CACHE_DIR = Path(os.environ.get("CACHE_DIR", "/tmp/github_cache"))
 CACHE_TTL_SECONDS = int(os.environ.get("CACHE_TTL_SECONDS", "21600"))
 BYPASS_CACHE = os.environ.get("BYPASS_GITHUB_CACHE", "").lower() in {"1", "true", "yes"}
-TOKEN = os.environ.get("GITHUB_TOKEN", "")
+TOKEN = (
+    os.environ.get("PERSONAL_GITHUB_TOKEN", "").strip()
+    or os.environ.get("GITHUB_TOKEN", "").strip()
+    or os.environ.get("GH_TOKEN", "").strip()
+    or ""
+)
 USERNAME = os.environ.get("GITHUB_USERNAME", "jguida941")
 API = "https://api.github.com"
 GRAPHQL = "https://api.github.com/graphql"
+
+
+def _profile_timezone():
+    tz_name = os.environ.get("PROFILE_TIMEZONE", "America/New_York").strip() or "America/New_York"
+    try:
+        return ZoneInfo(tz_name)
+    except ZoneInfoNotFoundError:
+        return timezone.utc
+
+
+def _calendar_window(days: int) -> tuple[datetime, datetime, str]:
+    window_days = max(1, int(days))
+    tz = _profile_timezone()
+    now_local = datetime.now(tz)
+    end_local = now_local
+    start_local = (now_local - timedelta(days=window_days - 1)).replace(
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0,
+    )
+    return (
+        start_local.astimezone(timezone.utc),
+        end_local.astimezone(timezone.utc),
+        now_local.date().isoformat(),
+    )
+
+
+def _parse_iso_datetime(value: str) -> datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
 
 
 def _headers():
@@ -71,8 +116,16 @@ def _set_cached(key: str, data):
 
 def _request_with_retry(url, headers=None, params=None, max_retries=3):
     """GET request with retry on 429/5xx."""
+    last_error = None
     for attempt in range(max_retries):
-        resp = requests.get(url, headers=headers or _headers(), params=params)
+        try:
+            resp = requests.get(url, headers=headers or _headers(), params=params)
+        except requests.RequestException as exc:
+            last_error = exc
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(2 ** attempt)
+            continue
         if resp.status_code == 200:
             return resp
         if resp.status_code == 429 or resp.status_code >= 500:
@@ -80,14 +133,24 @@ def _request_with_retry(url, headers=None, params=None, max_retries=3):
             time.sleep(wait)
             continue
         resp.raise_for_status()
+    if last_error is not None:
+        raise last_error
     return resp
 
 
 def _request_public_with_retry(url, params=None, max_retries=2):
     """GET request without auth, for public fallback checks."""
     public_headers = {"Accept": "application/vnd.github+json"}
+    last_error = None
     for attempt in range(max_retries):
-        resp = requests.get(url, headers=public_headers, params=params)
+        try:
+            resp = requests.get(url, headers=public_headers, params=params)
+        except requests.RequestException as exc:
+            last_error = exc
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(2 ** attempt)
+            continue
         if resp.status_code == 200:
             return resp
         if resp.status_code == 429 or resp.status_code >= 500:
@@ -95,6 +158,8 @@ def _request_public_with_retry(url, params=None, max_retries=2):
             time.sleep(wait)
             continue
         resp.raise_for_status()
+    if last_error is not None:
+        raise last_error
     return resp
 
 
@@ -117,7 +182,7 @@ def _count_commits_from_commits_endpoint(owner: str, repo: str, use_public: bool
         return 0
 
     link = resp.headers.get("Link", "")
-    match = re.search(r"[?&]page=(\\d+)>;\\s*rel=\"last\"", link)
+    match = re.search(r"[?&]page=(\d+)>;\s*rel=\"last\"", link)
     if match:
         return int(match.group(1))
 
@@ -376,22 +441,36 @@ def get_repos(include_forks: bool = False) -> list:
         if not include_forks:
             repos = [r for r in repos if not r.get("fork")]
         return repos
-    except requests.HTTPError as exc:
-        status = exc.response.status_code if exc.response is not None else "unknown"
+    except requests.RequestException as exc:
+        status = (
+            exc.response.status_code
+            if isinstance(exc, requests.HTTPError) and exc.response is not None
+            else "network"
+        )
         print(f"  Warning: REST repo listing unavailable ({status}); falling back to GraphQL")
-        return _graphql_public_owned_repos(include_forks)
+        try:
+            return _graphql_public_owned_repos(include_forks)
+        except Exception:
+            print("  Warning: GraphQL fallback unavailable; returning empty repo list")
+            return []
 
 
 def _graphql_query(query: str, variables: dict) -> dict | None:
-    resp = requests.post(
-        GRAPHQL,
-        headers=_headers(),
-        json={"query": query, "variables": variables},
-    )
+    try:
+        resp = requests.post(
+            GRAPHQL,
+            headers=_headers(),
+            json={"query": query, "variables": variables},
+        )
+    except requests.RequestException:
+        return None
     if resp.status_code != 200:
         return None
 
-    payload = resp.json()
+    try:
+        payload = resp.json()
+    except ValueError:
+        return None
     if not isinstance(payload, dict):
         return None
     if payload.get("errors"):
@@ -437,11 +516,16 @@ def get_owned_repo_scope_counts() -> dict:
         data = _graphql_query(query, {"login": USERNAME})
         user = (data or {}).get("user")
         if isinstance(user, dict):
+            private_owned = int(user["privateOwned"]["totalCount"])
+            # GitHub Actions default repo token cannot reliably enumerate private user repos.
+            # Treat a zero private count from that token class as unknown rather than factual.
+            if token_mode_from_env() == "github_token" and private_owned == 0:
+                private_owned = None
             counts = {
                 "public_owned_total": int(user["publicOwned"]["totalCount"]),
                 "public_owned_forks": int(user["publicOwnedForks"]["totalCount"]),
                 "public_owned_nonfork": int(user["publicOwnedNonFork"]["totalCount"]),
-                "private_owned": int(user["privateOwned"]["totalCount"]),
+                "private_owned": private_owned,
             }
             _set_cached(cache_key, counts)
             return counts
@@ -535,21 +619,29 @@ def get_events(per_page: int = 100, max_pages: int = 3) -> list:
         url = f"{API}/users/{USERNAME}/events/public"
         try:
             resp = _request_with_retry(url, params={"per_page": per_page, "page": page})
-        except requests.HTTPError as exc:
-            status = exc.response.status_code if exc.response is not None else "unknown"
-            if status in {401, 403}:
-                # Retry public feed without auth in case token scope is restricted.
-                try:
-                    resp = _request_public_with_retry(url, params={"per_page": per_page, "page": page})
-                except requests.HTTPError as public_exc:
-                    public_status = public_exc.response.status_code if public_exc.response is not None else "unknown"
-                    print(
-                        "  Warning: events endpoint unavailable "
-                        f"(auth={status}, public={public_status}); using partial/empty event data"
-                    )
+        except requests.RequestException as exc:
+            if isinstance(exc, requests.HTTPError):
+                status = exc.response.status_code if exc.response is not None else "unknown"
+                if status in {401, 403}:
+                    # Retry public feed without auth in case token scope is restricted.
+                    try:
+                        resp = _request_public_with_retry(url, params={"per_page": per_page, "page": page})
+                    except requests.RequestException as public_exc:
+                        public_status = (
+                            public_exc.response.status_code
+                            if isinstance(public_exc, requests.HTTPError) and public_exc.response is not None
+                            else "network"
+                        )
+                        print(
+                            "  Warning: events endpoint unavailable "
+                            f"(auth={status}, public={public_status}); using partial/empty event data"
+                        )
+                        break
+                else:
+                    print(f"  Warning: events endpoint unavailable ({status}); using partial/empty event data")
                     break
             else:
-                print(f"  Warning: events endpoint unavailable ({status}); using partial/empty event data")
+                print("  Warning: events endpoint unavailable (network); using partial/empty event data")
                 break
 
         if resp.status_code != 200:
@@ -565,15 +657,137 @@ def get_events(per_page: int = 100, max_pages: int = 3) -> list:
     return results
 
 
+def _count_repo_releases_since(owner: str, repo: str, cutoff: datetime, per_page: int = 100) -> int | None:
+    cache_key = f"repo_releases_since_{owner}_{repo}_{cutoff.date().isoformat()}"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        try:
+            return int(cached)
+        except (TypeError, ValueError):
+            return None
+
+    url = f"{API}/repos/{owner}/{repo}/releases"
+    total = 0
+    page = 1
+
+    while True:
+        params = {"per_page": per_page, "page": page}
+        try:
+            resp = _request_with_retry(url, params=params)
+        except requests.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else None
+            if status == 404:
+                _set_cached(cache_key, 0)
+                return 0
+            if status in {401, 403}:
+                try:
+                    resp = _request_public_with_retry(url, params=params)
+                except requests.HTTPError as public_exc:
+                    public_status = public_exc.response.status_code if public_exc.response is not None else None
+                    if public_status == 404:
+                        _set_cached(cache_key, 0)
+                        return 0
+                    return None
+            else:
+                return None
+
+        if resp.status_code != 200:
+            return None
+
+        payload = resp.json()
+        if not isinstance(payload, list):
+            return None
+        if not payload:
+            break
+
+        reached_older_release = False
+        for release in payload:
+            if not isinstance(release, dict):
+                continue
+            when = str(release.get("published_at") or release.get("created_at") or "")
+            released_at = _parse_iso_datetime(when)
+            if released_at is None:
+                continue
+            if released_at >= cutoff:
+                total += 1
+            else:
+                reached_older_release = True
+
+        if reached_older_release or len(payload) < per_page:
+            break
+        page += 1
+
+    _set_cached(cache_key, total)
+    return total
+
+
+def get_releases_last_n_days(
+    repos: list | None = None,
+    days: int = 30,
+    max_workers: int = 8,
+) -> int | None:
+    """
+    Count published releases in the last N days across owned public non-fork repos.
+
+    Returns an integer count. Returns None when all per-repo counts were unavailable.
+    """
+    if repos is None:
+        repos = get_repos(include_forks=False)
+    if not repos:
+        return 0
+
+    cutoff = datetime.now(timezone.utc) - timedelta(days=max(1, int(days)))
+    cache_key = f"releases_last_{days}_{_repo_signature(repos)}"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        if isinstance(cached, dict):
+            return cached.get("total")
+        try:
+            return int(cached)
+        except (TypeError, ValueError):
+            return None
+
+    total_known = 0
+    unknown_repos = 0
+
+    def fetch_one(repo_obj: dict) -> int | None:
+        owner = repo_obj.get("owner", {}).get("login", USERNAME)
+        name = repo_obj.get("name", "")
+        if not name:
+            return 0
+        return _count_repo_releases_since(owner, name, cutoff)
+
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        futures = {pool.submit(fetch_one, repo): repo for repo in repos}
+        for future in as_completed(futures):
+            try:
+                count = future.result()
+            except Exception:
+                count = None
+            if count is None:
+                unknown_repos += 1
+            else:
+                total_known += int(count)
+
+    if unknown_repos > 0:
+        print(
+            "  Warning: release counting unavailable for "
+            f"{unknown_repos} repos; showing partial total"
+        )
+
+    result: int | None = total_known if total_known > 0 or unknown_repos == 0 else None
+    _set_cached(cache_key, {"total": result, "unknown_repos": unknown_repos})
+    return result
+
+
 def get_contribution_calendar(days: int = 365) -> dict | None:
     """Fetch contribution calendar via GraphQL for a rolling window."""
-    cache_key = f"contribution_calendar_{days}"
+    start, end, window_day = _calendar_window(days)
+    tz_name = os.environ.get("PROFILE_TIMEZONE", "America/New_York").strip() or "America/New_York"
+    cache_key = f"contribution_calendar_{days}_{tz_name}_{window_day}"
     cached = _get_cached(cache_key)
     if cached is not None:
         return cached
-
-    now = datetime.now(timezone.utc)
-    start = now - timedelta(days=max(1, int(days)))
 
     query = """
     query($login: String!, $from: DateTime!, $to: DateTime!) {
@@ -593,24 +807,19 @@ def get_contribution_calendar(days: int = 365) -> dict | None:
       }
     }
     """
-    resp = requests.post(
-        GRAPHQL,
-        headers=_headers(),
-        json={
-            "query": query,
-            "variables": {
-                "login": USERNAME,
-                "from": start.isoformat().replace("+00:00", "Z"),
-                "to": now.isoformat().replace("+00:00", "Z"),
-            },
+    data = _graphql_query(
+        query,
+        {
+            "login": USERNAME,
+            "from": start.isoformat().replace("+00:00", "Z"),
+            "to": end.isoformat().replace("+00:00", "Z"),
         },
     )
-    if resp.status_code != 200:
+    if not isinstance(data, dict):
         return None
 
-    data = resp.json()
     try:
-        cal = data["data"]["user"]["contributionsCollection"]["contributionCalendar"]
+        cal = data["user"]["contributionsCollection"]["contributionCalendar"]
         _set_cached(cache_key, cal)
         return cal
     except (KeyError, TypeError):
@@ -627,8 +836,12 @@ def get_repo_commits_last_n_weeks(owner: str, repo: str, weeks: int = 12) -> lis
     url = f"{API}/repos/{owner}/{repo}/stats/participation"
     try:
         resp = _request_with_retry(url)
-    except requests.HTTPError as exc:
-        status = exc.response.status_code if exc.response is not None else "unknown"
+    except requests.RequestException as exc:
+        status = (
+            exc.response.status_code
+            if isinstance(exc, requests.HTTPError) and exc.response is not None
+            else "network"
+        )
         # This endpoint is not always accessible for every repo/token context.
         print(f"  Warning: participation stats unavailable for {owner}/{repo} ({status}); using zeros")
         return [0] * weeks
@@ -646,50 +859,71 @@ def get_repo_commits_last_n_weeks(owner: str, repo: str, weeks: int = 12) -> lis
     return owner_commits
 
 
-def get_repo_user_commit_count(owner: str, repo: str) -> int:
-    """Get total commits by USERNAME in a repo via contributors API."""
-    cache_key = f"repo_user_commits_{owner}_{repo}_{USERNAME}"
+def get_repo_user_commit_count(owner: str, repo: str) -> int | None:
+    """
+    Get total commits by USERNAME in a repo.
+
+    Returns:
+      - int: a concrete commit count
+      - None: the count could not be determined for this repo in this run
+    """
+    cache_key = f"repo_user_commits_v2_{owner}_{repo}_{USERNAME}"
     cached = _get_cached(cache_key)
     if cached is not None:
-        return cached
+        if isinstance(cached, dict):
+            return cached.get("count")
+        try:
+            return int(cached)
+        except (TypeError, ValueError):
+            return None
 
-    # Primary path: contributors endpoint (fast when available).
+    def _cache_and_return(value: int | None) -> int | None:
+        _set_cached(cache_key, {"count": value})
+        return value
+
     try:
         contributors = paginated_get(
             f"repos/{owner}/{repo}/contributors",
             {"anon": "false"},
             per_page=100,
         )
-        for contributor in contributors:
-            login = contributor.get("login", "")
-            if login.lower() == USERNAME.lower():
-                count = int(contributor.get("contributions", 0))
-                _set_cached(cache_key, count)
-                return count
-        _set_cached(cache_key, 0)
-        return 0
+        if contributors:
+            for contributor in contributors:
+                login = contributor.get("login", "")
+                if login.lower() == USERNAME.lower():
+                    count = int(contributor.get("contributions", 0))
+                    return _cache_and_return(count)
+            return _cache_and_return(0)
     except requests.HTTPError as exc:
         status = exc.response.status_code if exc.response is not None else None
-        if status not in {401, 403, 404}:
+        if status == 404:
+            return _cache_and_return(0)
+        if status not in {401, 403}:
             raise
 
-    # Fallback path for restricted tokens: commits endpoint with author filter.
+    # Fallback path for restricted/empty contributors responses:
+    # commits endpoint filtered by author.
     try:
         count = _count_commits_from_commits_endpoint(owner, repo, use_public=False)
-        _set_cached(cache_key, count)
-        return count
+        return _cache_and_return(count)
     except requests.HTTPError as exc:
         status = exc.response.status_code if exc.response is not None else None
-        if status in {401, 403}:
-            try:
-                count = _count_commits_from_commits_endpoint(owner, repo, use_public=True)
-                _set_cached(cache_key, count)
-                return count
-            except requests.HTTPError:
-                pass
+        if status in {404, 409}:
+            return _cache_and_return(0)
+        if status not in {401, 403}:
+            raise
 
-    _set_cached(cache_key, 0)
-    return 0
+    try:
+        count = _count_commits_from_commits_endpoint(owner, repo, use_public=True)
+        return _cache_and_return(count)
+    except requests.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else None
+        if status in {404, 409}:
+            return _cache_and_return(0)
+        if status in {401, 403}:
+            # Do not cache unknown; auth conditions can change between runs.
+            return None
+        raise
 
 
 def get_total_commit_contributions_via_graphql() -> int | None:
@@ -755,19 +989,25 @@ def get_total_commits(
     repos: list | None = None,
     max_workers: int = 4,
     use_global_fallback: bool = False,
-) -> int:
+) -> int | None:
     """Count commits authored by USERNAME across the selected repos."""
     if repos is None:
         repos = get_repos(include_forks=False)
     cache_key = (
-        "total_commits_owned_public_nonfork_"
+        "total_commits_v2_owned_public_nonfork_"
         f"{_repo_signature(repos)}_{int(use_global_fallback)}"
     )
     cached = _get_cached(cache_key)
     if cached is not None:
-        return cached
+        if isinstance(cached, dict):
+            return cached.get("total")
+        try:
+            return int(cached)
+        except (TypeError, ValueError):
+            return None
 
-    total = 0
+    total_known = 0
+    unknown = 0
     failures = 0
 
     def fetch_one(repo):
@@ -778,18 +1018,30 @@ def get_total_commits(
         for f in as_completed(futures):
             repo = futures[f]
             try:
-                total += int(f.result())
+                count = f.result()
+                if count is None:
+                    unknown += 1
+                else:
+                    total_known += int(count)
             except Exception as exc:
                 failures += 1
                 print(f"  Warning: commit count failed for {repo['name']}: {exc}")
 
-    # Optional global fallback for contexts that prefer a non-zero broad metric.
-    if use_global_fallback and repos and (total == 0 or failures >= max(1, len(repos) // 2)):
+    total: int | None
+    if not repos:
+        total = 0
+    elif unknown > 0 or failures > 0:
+        total = None
+    else:
+        total = total_known
+
+    # Optional global fallback for contexts that prefer a broad non-zero metric.
+    if use_global_fallback and repos and total is None:
         fallback_total = get_total_commit_contributions_via_graphql()
         if fallback_total is not None:
             print("  Info: using GraphQL commit contribution fallback for total commits")
             total = fallback_total
-        elif total == 0:
+        else:
             calendar = get_contribution_calendar()
             if isinstance(calendar, dict):
                 try:
@@ -800,7 +1052,7 @@ def get_total_commits(
                     print("  Info: using contribution-calendar fallback for total commits")
                     total = calendar_total
 
-    _set_cached(cache_key, total)
+    _set_cached(cache_key, {"total": total, "unknown_repos": unknown, "failed_repos": failures})
     return total
 
 

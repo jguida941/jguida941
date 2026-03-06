@@ -1,0 +1,175 @@
+{
+  "repo_counts": {
+    "public_owned_total": 2,
+    "public_owned_forks": 0,
+    "public_owned_nonfork": 2,
+    "private_owned": 1
+  },
+  "repos": [
+    {
+      "name": "ci-cd-hub",
+      "owner": {
+        "login": "jguida941"
+      },
+      "pushed_at": "2026-03-06T00:00:00Z",
+      "created_at": "2025-01-10T00:00:00Z",
+      "stargazers_count": 5,
+      "forks_count": 1,
+      "language": "Python",
+      "html_url": "https://github.com/jguida941/ci-cd-hub",
+      "latest_commit_message": "add workflow checks",
+      "has_ci_workflows": true
+    },
+    {
+      "name": "stats-lab",
+      "owner": {
+        "login": "jguida941"
+      },
+      "pushed_at": "2026-03-05T00:00:00Z",
+      "created_at": "2025-02-15T00:00:00Z",
+      "stargazers_count": 2,
+      "forks_count": 0,
+      "language": "Rust",
+      "html_url": "https://github.com/jguida941/stats-lab",
+      "latest_commit_message": "improve dashboard output",
+      "has_ci_workflows": false
+    }
+  ],
+  "all_repos": [
+    {
+      "name": "ci-cd-hub",
+      "owner": {
+        "login": "jguida941"
+      },
+      "pushed_at": "2026-03-06T00:00:00Z",
+      "created_at": "2025-01-10T00:00:00Z",
+      "stargazers_count": 5,
+      "forks_count": 1,
+      "language": "Python",
+      "html_url": "https://github.com/jguida941/ci-cd-hub",
+      "description": "pipeline toolkit",
+      "latest_commit_message": "add workflow checks",
+      "has_ci_workflows": true
+    },
+    {
+      "name": "stats-lab",
+      "owner": {
+        "login": "jguida941"
+      },
+      "pushed_at": "2026-03-05T00:00:00Z",
+      "created_at": "2025-02-15T00:00:00Z",
+      "stargazers_count": 2,
+      "forks_count": 0,
+      "language": "Rust",
+      "html_url": "https://github.com/jguida941/stats-lab",
+      "description": "experiments",
+      "latest_commit_message": "improve dashboard output",
+      "has_ci_workflows": false
+    }
+  ],
+  "language_bytes": {
+    "Python": 10000,
+    "Rust": 5000
+  },
+  "events": [
+    {
+      "type": "PushEvent",
+      "created_at": "2026-03-06T00:30:00Z",
+      "repo": {
+        "name": "jguida941/ci-cd-hub"
+      },
+      "payload": {
+        "commits": [
+          {
+            "message": "ship triage layer"
+          }
+        ]
+      }
+    },
+    {
+      "type": "ReleaseEvent",
+      "created_at": "2026-03-05T20:00:00Z",
+      "repo": {
+        "name": "jguida941/ci-cd-hub"
+      },
+      "payload": {
+        "release": {
+          "tag_name": "v1.2.0",
+          "html_url": "https://github.com/jguida941/ci-cd-hub/releases/tag/v1.2.0"
+        }
+      }
+    },
+    {
+      "type": "PullRequestEvent",
+      "created_at": "2026-03-05T19:00:00Z",
+      "repo": {
+        "name": "jguida941/ci-cd-hub"
+      },
+      "payload": {
+        "action": "closed",
+        "pull_request": {
+          "merged": true,
+          "state": "closed",
+          "number": 42,
+          "title": "Add triage command",
+          "html_url": "https://github.com/jguida941/ci-cd-hub/pull/42"
+        }
+      }
+    }
+  ],
+  "latest_push_message_by_repo": {
+    "jguida941/ci-cd-hub": "ship triage layer"
+  },
+  "public_scope_commits": 123,
+  "ci_count_probe": 1,
+  "calendar": {
+    "totalContributions": 321,
+    "weeks": [
+      {
+        "contributionDays": [
+          {
+            "date": "2026-03-01",
+            "contributionCount": 1,
+            "weekday": 0
+          },
+          {
+            "date": "2026-03-02",
+            "contributionCount": 2,
+            "weekday": 1
+          },
+          {
+            "date": "2026-03-03",
+            "contributionCount": 3,
+            "weekday": 2
+          },
+          {
+            "date": "2026-03-04",
+            "contributionCount": 0,
+            "weekday": 3
+          },
+          {
+            "date": "2026-03-05",
+            "contributionCount": 1,
+            "weekday": 4
+          },
+          {
+            "date": "2026-03-06",
+            "contributionCount": 1,
+            "weekday": 5
+          },
+          {
+            "date": "2026-03-07",
+            "contributionCount": 1,
+            "weekday": 6
+          }
+        ]
+      }
+    ]
+  },
+  "total_contributions": 321,
+  "token_mode": "github_token",
+  "cache_mode": {
+    "bypass": false,
+    "ttl_seconds": 21600
+  }
+}

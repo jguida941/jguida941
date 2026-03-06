@@ -1,0 +1,44 @@
+name: Test Profile Pipeline
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - ".github/workflows/tests.yml"
+      - ".github/workflows/analytics.yml"
+      - ".github/workflows/metrics.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: profile-pipeline-tests
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Fixture smoke CLI run (offline path)
+        env:
+          GITHUB_TOKEN: ""
+          GH_TOKEN: ""
+          PERSONAL_GITHUB_TOKEN: ""
+        run: |
+          python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json

@@ -9,7 +9,7 @@ SCORECARD_METRICS = [
     {
         "key": "releases_30d",
         "label": "Release Velocity (30d)",
-        "detail": "public release events",
+        "detail": "published releases across public repos",
         "format": "int",
         "accent": "ORANGE",
     },
@@ -50,7 +50,7 @@ SCORECARD_METRICS = [
         "key": "last_year_contributions",
         "label": "12mo Contributions",
         "detail": "contribution calendar",
-        "format": "int",
+        "format": "int_or_na",
         "accent": "CYAN",
     },
 ]
@@ -61,13 +61,13 @@ SNAPSHOT_METRICS = [
         "key": "last_year_contributions",
         "label": "Last 12 Months Contributions",
         "dashboard_label": "12mo Contributions",
-        "format": "int",
+        "format": "int_or_na",
     },
     {
         "key": "public_scope_commits",
         "label": "Public Repo Commits (Owned Non-Fork)",
         "dashboard_label": "Public Scope Commits",
-        "format": "int",
+        "format": "int_or_na",
     },
     {
         "key": "total_repos",

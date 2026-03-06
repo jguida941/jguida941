@@ -88,8 +88,14 @@ def generate(
         )
 
     ci_status = _esc(data_quality.get("ci_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
+    commits_status = (
+        _esc(data_quality.get("commits_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
+    )
     events_status = _esc(data_quality.get("events_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
-    ci_note = _truncate(_esc(data_quality.get("ci_note", "")) if isinstance(data_quality, dict) else "", 90)
+    ci_note = _esc(data_quality.get("ci_note", "")) if isinstance(data_quality, dict) else ""
+    commits_note = _esc(data_quality.get("commits_note", "")) if isinstance(data_quality, dict) else ""
+    quality_notes = [note for note in (ci_note, commits_note) if note]
+    quality_note = _truncate(" | ".join(quality_notes), 90)
     scope_note = ""
     if isinstance(data_scope, dict):
         private_owned = data_scope.get("private_owned_repos_total")
@@ -104,18 +110,18 @@ def generate(
     footer_y = header_h + body_h + 18
     parts.append(
         f'<text x="{pad}" y="{footer_y}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}">'
-        f'Data quality · CI: {ci_status} · Events: {events_status}</text>'
+        f'Data quality · CI: {ci_status} · Commits: {commits_status} · Events: {events_status}</text>'
     )
     if scope_note:
         parts.append(
             f'<text x="{pad}" y="{footer_y + 16}" fill="{TEXT_DIM}" font-size="10" '
             f'font-family="{FONT_SANS}">{scope_note}</text>'
         )
-    if ci_note:
+    if quality_note:
         ci_note_y = footer_y + (32 if scope_note else 16)
         parts.append(
             f'<text x="{pad}" y="{ci_note_y}" fill="{CYAN}" font-size="10" '
-            f'font-family="{FONT_SANS}">{ci_note}</text>'
+            f'font-family="{FONT_SANS}">{quality_note}</text>'
         )
 
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">

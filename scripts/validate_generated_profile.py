@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-"""Validate generated profile artifacts for obvious data-quality regressions."""
+"""Validate generated profile files and data contracts."""
 
+from __future__ import annotations
+
+from dataclasses import dataclass
 import json
 import os
 import re
@@ -11,7 +14,13 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 os.chdir(ROOT)
 
-from scripts.profile_contract import SNAPSHOT_METRICS
+from scripts.contracts import (
+    REQUIRED_PROFILE_SNAPSHOT_KEYS,
+    REQUIRED_README_SECTIONS,
+    expected_snapshot_metric_keys,
+    missing_required_keys,
+)
+from scripts.metrics_svg import parse_metrics_svg
 
 
 USERNAME = os.environ.get("GITHUB_USERNAME", "jguida941")
@@ -20,7 +29,18 @@ WORKING_SVG_PATH = Path("assets/currently_working.svg")
 METRICS_SVG_PATH = Path("metrics.general.svg")
 FOCUS_SVG_PATH = Path("assets/now_next_shipped.svg")
 SNAPSHOT_SVG_PATH = Path("assets/raw_snapshot.svg")
+CONTRIBUTION_SVG_PATH = Path("assets/contribution_calendar.svg")
 PROFILE_SNAPSHOT_PATH = Path("site/data/profile_snapshot.json")
+
+
+@dataclass(frozen=True)
+class ValidationResult:
+    errors: tuple[str, ...]
+    warnings: tuple[str, ...]
+
+    @property
+    def ok(self) -> bool:
+        return not self.errors
 
 
 def _section(text: str, heading: str) -> str:
@@ -39,32 +59,17 @@ def _parse_int(value: object) -> int | None:
         return None
 
 
-def _extract_svg_metric(svg_text: str, label: str) -> int | None:
-    match = re.search(rf"([0-9][0-9,]*)\s+{re.escape(label)}\b", svg_text)
-    if not match:
-        return None
-    return _parse_int(match.group(1))
-
-
-def main() -> int:
+def validate_profile() -> ValidationResult:
     errors: list[str] = []
     warnings: list[str] = []
 
     if not README_PATH.exists():
         errors.append("README.md not found")
-        _finish(errors, warnings)
-        return 1
+        return ValidationResult(errors=tuple(errors), warnings=tuple(warnings))
 
     readme = README_PATH.read_text(encoding="utf-8")
 
-    required_sections = (
-        "Builder Scorecard",
-        "Current Focus",
-        "By The Numbers",
-        "Raw Data Snapshot (Python Pull)",
-        "Deep Dive Data",
-    )
-    for heading in required_sections:
+    for heading in REQUIRED_README_SECTIONS:
         if not _section(readme, heading):
             errors.append(f"Missing section: {heading}")
 
@@ -72,6 +77,8 @@ def main() -> int:
         errors.append("README does not embed assets/now_next_shipped.svg")
     if "assets/raw_snapshot.svg" not in readme:
         errors.append("README does not embed assets/raw_snapshot.svg")
+    if "assets/contribution_calendar.svg" not in readme:
+        errors.append("README does not embed assets/contribution_calendar.svg")
     if "site/data/profile_snapshot.json" not in readme:
         errors.append("README does not link site/data/profile_snapshot.json")
 
@@ -79,6 +86,8 @@ def main() -> int:
         errors.append("assets/now_next_shipped.svg not found")
     if not SNAPSHOT_SVG_PATH.exists():
         errors.append("assets/raw_snapshot.svg not found")
+    if not CONTRIBUTION_SVG_PATH.exists():
+        errors.append("assets/contribution_calendar.svg not found")
 
     profile_snapshot: dict = {}
     if PROFILE_SNAPSHOT_PATH.exists():
@@ -91,24 +100,7 @@ def main() -> int:
         errors.append("site/data/profile_snapshot.json not found")
 
     if profile_snapshot:
-        required_keys = {
-            "generated_at",
-            "username",
-            "dashboard_url",
-            "snapshot",
-            "snapshot_rows",
-            "snapshot_cards",
-            "scorecard",
-            "scorecard_cards",
-            "data_scope",
-            "data_quality",
-            "focus",
-            "top_languages",
-            "repo_language_matrix",
-            "activity_feed",
-            "recent_created",
-        }
-        missing_keys = sorted(key for key in required_keys if key not in profile_snapshot)
+        missing_keys = missing_required_keys(profile_snapshot, REQUIRED_PROFILE_SNAPSHOT_KEYS)
         if missing_keys:
             errors.append(
                 "site/data/profile_snapshot.json missing keys: " + ", ".join(missing_keys)
@@ -128,7 +120,7 @@ def main() -> int:
             errors.append("site/data/profile_snapshot.json snapshot_rows must be an array")
             snapshot_rows = []
 
-        expected_snapshot_keys = {entry["key"] for entry in SNAPSHOT_METRICS}
+        expected_snapshot_keys = expected_snapshot_metric_keys()
         row_keys = {
             row.get("key")
             for row in snapshot_rows
@@ -195,10 +187,10 @@ def main() -> int:
             warnings.append("Snapshot releases is missing or non-numeric")
 
         if METRICS_SVG_PATH.exists():
-            metrics_svg = METRICS_SVG_PATH.read_text(encoding="utf-8")
-            metrics_repositories = _extract_svg_metric(metrics_svg, "Repositories")
-            metrics_releases = _extract_svg_metric(metrics_svg, "Releases")
-            metrics_stargazers = _extract_svg_metric(metrics_svg, "Stargazers")
+            metrics = parse_metrics_svg(METRICS_SVG_PATH)
+            metrics_repositories = metrics.repositories
+            metrics_releases = metrics.releases
+            metrics_stargazers = metrics.stargazers
 
             if metrics_repositories is None:
                 warnings.append("metrics.general.svg missing Repositories metric")
@@ -237,23 +229,29 @@ def main() -> int:
     else:
         warnings.append("assets/currently_working.svg not found")
 
-    _finish(errors, warnings)
-    return 1 if errors else 0
+    return ValidationResult(errors=tuple(errors), warnings=tuple(warnings))
 
 
-def _finish(errors: list[str], warnings: list[str]) -> None:
-    if errors:
+def _finish(result: ValidationResult) -> None:
+    if result.errors:
         print("Profile validation failed:")
-        for err in errors:
+        for err in result.errors:
             print(f"  - {err}")
     else:
         print("Profile validation passed")
 
-    if warnings:
+    if result.warnings:
         print("Warnings:")
-        for warning in warnings:
+        for warning in result.warnings:
             print(f"  - {warning}")
+
+
+def main() -> int:
+    result = validate_profile()
+    _finish(result)
+    return 0 if result.ok else 1
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

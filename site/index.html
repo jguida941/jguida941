@@ -187,6 +187,8 @@
       .metric-value {
         margin: 0.3rem 0 0;
         font: 700 clamp(1.3rem, 2.2vw, 1.7rem) "Space Grotesk", sans-serif;
+        line-height: 1.08;
+        overflow-wrap: anywhere;
       }
 
       .metric-detail {
@@ -567,7 +569,7 @@
         {
           key: "releases_30d",
           label: "Release Velocity (30d)",
-          detail: "public release events",
+          detail: "published releases across public repos",
           format: (value) => formatInt(value),
         },
         {
@@ -667,8 +669,9 @@
           return "Data quality: unknown";
         }
         const ci = String(dataQuality.ci_status || "unknown");
+        const commits = String(dataQuality.commits_status || "unknown");
         const events = String(dataQuality.events_status || "unknown");
-        return `Data quality: CI ${ci} · events ${events}`;
+        return `Data quality: CI ${ci} · commits ${commits} · events ${events}`;
       }
 
       function applyTheme(theme) {
@@ -688,27 +691,33 @@
 
       function renderScorecard(scorecard, scorecardCards) {
         const root = document.getElementById("score-grid");
-        const cards =
+        const cardRows =
           Array.isArray(scorecardCards) && scorecardCards.length > 0
-            ? scorecardCards.map((card) => {
-                const definition = {
-                  key: card.key,
-                  label: card.label || card.key,
-                  detail: card.detail || "",
-                  format: () => card.display_value ?? formatInt(card.value ?? 0),
-                };
-                return definition;
-              })
-            : defaultScorecardMeta;
+            ? scorecardCards
+            : defaultScorecardMeta.map((meta) => ({
+                key: meta.key,
+                label: meta.label,
+                detail: meta.detail,
+                value: scorecard?.[meta.key] ?? 0,
+              }));
 
-        root.innerHTML = cards
-          .map((meta) => {
-            const raw = scorecard?.[meta.key] ?? 0;
+        const formatterByKey = Object.fromEntries(
+          defaultScorecardMeta.map((meta) => [meta.key, meta.format]),
+        );
+
+        root.innerHTML = cardRows
+          .map((card) => {
+            const key = String(card?.key || "");
+            const label = card?.label || key || "Metric";
+            const detail = card?.detail || "";
+            const raw = card?.value ?? scorecard?.[key] ?? 0;
+            const fallbackFormatter = formatterByKey[key] || ((value) => formatInt(value));
+            const value = card?.display_value ?? fallbackFormatter(raw);
             return `
               <article class="metric-card">
-                <p class="metric-label">${escapeHtml(meta.label)}</p>
-                <p class="metric-value">${escapeHtml(meta.format(raw))}</p>
-                <p class="metric-detail">${escapeHtml(meta.detail)}</p>
+                <p class="metric-label">${escapeHtml(label)}</p>
+                <p class="metric-value">${escapeHtml(value)}</p>
+                <p class="metric-detail">${escapeHtml(detail)}</p>
               </article>
             `;
           })
@@ -911,8 +920,9 @@
         const qualityPill = document.getElementById("quality-pill");
         qualityPill.textContent = formatDataQuality(quality);
         const ciNote = quality?.ci_note ? `CI: ${quality.ci_note}` : "";
+        const commitsNote = quality?.commits_note ? `Commits: ${quality.commits_note}` : "";
         const eventsNote = quality?.events_note ? `Events: ${quality.events_note}` : "";
-        qualityPill.title = [ciNote, eventsNote].filter(Boolean).join(" | ");
+        qualityPill.title = [ciNote, commitsNote, eventsNote].filter(Boolean).join(" | ");
         document.getElementById("generated-pill").textContent = "Generated: " + generatedText;
       }
 
@@ -945,7 +955,7 @@
           generatedPill.textContent = "Data load failed";
           document.getElementById("quality-pill").textContent = "Data quality: unavailable";
           document.getElementById("repo-matrix").innerHTML =
-            '<p class="status status-error">Dashboard data is missing. Run <code>python scripts/build_readme.py</code> and redeploy.</p>';
+            '<p class="status status-error">Dashboard data is missing. Run <code>python scripts/profile_cli.py generate-profile --validate</code> and redeploy.</p>';
           document.getElementById("score-grid").innerHTML =
             '<p class="status status-error">Scorecard unavailable.</p>';
           document.getElementById("snapshot-grid").innerHTML =

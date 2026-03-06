@@ -19,11 +19,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Show token mode
+        env:
+          PROFILE_TOKEN_MODE: ${{ secrets.PERSONAL_GITHUB_TOKEN != '' && 'personal_github_token' || 'github_token' }}
+        run: echo "Token mode: ${PROFILE_TOKEN_MODE}"
+
       - name: General Stats
         if: ${{ success() || failure() }}
         uses: lowlighter/metrics@latest
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN != '' && secrets.PERSONAL_GITHUB_TOKEN || github.token }}
           user: jguida941
           filename: metrics.general.svg
           base: header, activity, community, repositories
@@ -36,56 +41,29 @@ jobs:
           config_timezone: America/New_York
           config_order: base.header, base.activity+community, base.repositories
 
-      - name: Sanity check metrics.general.svg
-        run: |
-          python - <<'PY'
-          import re
-          import sys
-          from pathlib import Path
-
-          svg_path = Path("metrics.general.svg")
-          if not svg_path.exists():
-              print("metrics.general.svg not found")
-              sys.exit(1)
-
-          text = svg_path.read_text(encoding="utf-8")
-
-          def metric(label: str) -> int | None:
-              match = re.search(rf"([0-9][0-9,]*)\s+{re.escape(label)}\b", text)
-              if not match:
-                  return None
-              try:
-                  return int(match.group(1).replace(",", ""))
-              except ValueError:
-                  return None
-
-          repositories = metric("Repositories")
-          stargazers = metric("Stargazers")
-          releases = metric("Releases")
-
-          failures = []
-          if repositories is None or repositories <= 0:
-              failures.append("Repositories metric missing or non-positive")
-          if stargazers is None or stargazers <= 0:
-              failures.append("Stargazers metric missing or non-positive")
-          if releases is None or releases <= 0:
-              failures.append("Releases metric missing or non-positive")
-
-          if failures:
-              print("Metrics sanity check failed:")
-              for item in failures:
-                  print(f"  - {item}")
-              sys.exit(1)
-          PY
+      - name: Check metrics.general.svg
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN != '' && secrets.PERSONAL_GITHUB_TOKEN || github.token }}
+          PROFILE_TOKEN_MODE: ${{ secrets.PERSONAL_GITHUB_TOKEN != '' && 'personal_github_token' || 'github_token' }}
+          PROFILE_TIMEZONE: America/New_York
+        run: python scripts/profile_cli.py check-metrics --path metrics.general.svg
 
       - name: Isometric Calendar
         if: ${{ success() || failure() }}
         uses: lowlighter/metrics@latest
         with:
-          token: ${{ github.token }}
+          token: ${{ secrets.PERSONAL_GITHUB_TOKEN != '' && secrets.PERSONAL_GITHUB_TOKEN || github.token }}
           user: jguida941
           filename: metrics.isocalendar.svg
           base: ""
           plugin_isocalendar: yes
           plugin_isocalendar_duration: full-year
           config_timezone: America/New_York
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "update metrics cards"
+          branch: main
+          file_pattern: "metrics.general.svg metrics.isocalendar.svg"

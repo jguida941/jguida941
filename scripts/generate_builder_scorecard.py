@@ -90,7 +90,7 @@ def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg",
                 tile_w,
                 tile_h,
                 str(tile.get("label", "")),
-                str(tile.get("value", "0")),
+                str(tile.get("display_value", tile.get("value", "0"))),
                 str(tile.get("detail", "")),
                 str(tile.get("accent", CYAN)),
             )
