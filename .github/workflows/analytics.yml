@@ -72,7 +72,19 @@ jobs:
             site/data/run_diagnostics.json
             site/data/run_diagnostics_history.jsonl
 
+      - name: Upload rendered profile artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: profile-rendered-artifacts
+          path: |
+            README.md
+            assets/*.svg
+            site/data/profile_snapshot.json
+            metrics.general.svg
+
       - uses: stefanzweifel/git-auto-commit-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
         with:
           commit_message: "update analytics & readme"
           branch: main

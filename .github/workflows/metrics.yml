@@ -56,7 +56,17 @@ jobs:
           plugin_isocalendar_duration: full-year
           config_timezone: America/New_York
 
+      - name: Upload metrics artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: metrics-cards
+          path: |
+            metrics.general.svg
+            metrics.isocalendar.svg
+
       - uses: stefanzweifel/git-auto-commit-action@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
         with:
           commit_message: "update metrics cards"
           branch: main
