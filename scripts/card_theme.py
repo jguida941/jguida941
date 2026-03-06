@@ -5,8 +5,8 @@ from __future__ import annotations
 from scripts.config import BLUE, BORDER, BG_CARD, CYAN, FONT_SANS, ORANGE, TEXT, TEXT_BRIGHT
 
 TITLE_Y = 29
-TITLE_SIZE = 18
-SUBTITLE_SIZE = 12
+TITLE_SIZE = 16
+SUBTITLE_SIZE = 11
 LABEL_SIZE = 11
 VALUE_SIZE = 18
 

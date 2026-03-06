@@ -155,9 +155,9 @@ def generate(
     # Middle: current streak ring
     parts.extend(
         [
-            f'<circle cx="{center_x}" cy="106" r="38" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="4"/>',
-            f'<circle cx="{center_x}" cy="68" r="5" fill="{ORANGE}"/>',
-            f'<text x="{center_x}" y="119" fill="{TEXT_BRIGHT}" font-size="44" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(current_days))}</text>',
+            f'<circle cx="{center_x}" cy="100" r="38" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="4"/>',
+            f'<circle cx="{center_x}" cy="62" r="5" fill="{ORANGE}"/>',
+            f'<text x="{center_x}" y="113" fill="{TEXT_BRIGHT}" font-size="44" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(current_days))}</text>',
             f'<text x="{center_x}" y="156" fill="{BLUE}" font-size="18" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">Current Streak</text>',
             f'<text x="{center_x}" y="178" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(current_start, current_end))}</text>',
         ]

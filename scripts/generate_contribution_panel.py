@@ -5,19 +5,14 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from scripts.config import (
-    BG_CARD,
-    BG_DARK,
     BG_HIGHLIGHT,
-    BLUE,
-    CYAN,
-    GREEN,
     TEXT,
     TEXT_BRIGHT,
-    TEXT_DIM,
     BORDER,
     SVG_WIDTH,
     FONT_SANS,
 )
+from scripts.card_theme import card_bg, title_accent, title_left, title_right
 
 
 def _month_label(date_str: str) -> str:
@@ -101,8 +96,7 @@ def _level(count: int, max_count: int) -> int:
 
 def generate(calendar: dict | None, output_path: str = "assets/contribution_calendar.svg") -> str:
     pad = 20
-    header_h = 30
-    grid_y = 48
+    grid_y = 64
     cell = 10
     gap = 2
 
@@ -116,12 +110,13 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
             total_contributions = 0
 
     if not weeks:
-        svg_h = 156
+        svg_h = 176
         svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
-  <rect width="{SVG_WIDTH}" height="{svg_h}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>
-  <text x="{pad}" y="23" fill="{TEXT_BRIGHT}" font-size="16" font-family="{FONT_SANS}" font-weight="700">Contribution Calendar</text>
-  <text x="{SVG_WIDTH - pad}" y="23" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">last 12 months</text>
-  <text x="{pad}" y="74" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}">Calendar data unavailable for this run.</text>
+  {card_bg(SVG_WIDTH, svg_h)}
+  {title_left("Contribution Calendar", x=pad, y=30)}
+  {title_right("last 12 months", width=SVG_WIDTH, pad=pad, y=30)}
+  {title_accent(width=SVG_WIDTH, pad=pad, y=35)}
+  <text x="{pad}" y="92" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}">Calendar data unavailable for this run.</text>
 </svg>'''
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(svg)
@@ -163,19 +158,14 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
     palette = [BG_HIGHLIGHT, "#313c5c", "#3f5380", "#5876ad", "#7aa2f7"]
 
     parts = []
-    parts.append(
-        f'<text x="{pad}" y="23" fill="{TEXT_BRIGHT}" font-size="16" '
-        f'font-family="{FONT_SANS}" font-weight="700">Contribution Calendar</text>'
-    )
-    parts.append(
-        f'<text x="{SVG_WIDTH - pad}" y="23" fill="{TEXT_DIM}" font-size="11" '
-        f'font-family="{FONT_SANS}" text-anchor="end">last 12 months</text>'
-    )
+    parts.append(title_left("Contribution Calendar", x=pad, y=30))
+    parts.append(title_right("last 12 months", width=SVG_WIDTH, pad=pad, y=30))
+    parts.append(title_accent(width=SVG_WIDTH, pad=pad, y=35))
 
     for idx, month in month_markers:
         x = grid_x + idx * (cell + gap)
         parts.append(
-            f'<text x="{x}" y="{grid_y - 7}" fill="{TEXT_DIM}" font-size="9" '
+            f'<text x="{x}" y="{grid_y - 7}" fill="{TEXT}" font-size="9" '
             f'font-family="{FONT_SANS}">{month}</text>'
         )
 
@@ -212,7 +202,7 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
 
     legend_y = stats_y + 18
     parts.append(
-        f'<text x="{grid_x}" y="{legend_y + 10}" fill="{TEXT_DIM}" font-size="9" font-family="{FONT_SANS}">Less</text>'
+        f'<text x="{grid_x}" y="{legend_y + 10}" fill="{TEXT}" font-size="9" font-family="{FONT_SANS}">Less</text>'
     )
     legend_x = grid_x + 30
     for idx, color in enumerate(palette):
@@ -222,12 +212,12 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
             f'fill="{color}" stroke="{BORDER}" stroke-width="0.4"/>'
         )
     parts.append(
-        f'<text x="{legend_x + len(palette) * (cell + 4) + 4}" y="{legend_y + 10}" fill="{TEXT_DIM}" '
+        f'<text x="{legend_x + len(palette) * (cell + 4) + 4}" y="{legend_y + 10}" fill="{TEXT}" '
         f'font-size="9" font-family="{FONT_SANS}">More</text>'
     )
 
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
-  <rect width="{SVG_WIDTH}" height="{svg_h}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>
+  {card_bg(SVG_WIDTH, svg_h)}
   {''.join(parts)}
 </svg>'''
 

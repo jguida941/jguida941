@@ -1,20 +1,7 @@
 """Build the builder scorecard SVG."""
 
-from scripts.config import (
-    BG_CARD,
-    BG_DARK,
-    BG_HIGHLIGHT,
-    BLUE,
-    CYAN,
-    GREEN,
-    ORANGE,
-    TEXT,
-    TEXT_BRIGHT,
-    TEXT_DIM,
-    BORDER,
-    SVG_WIDTH,
-    FONT_SANS,
-)
+from scripts.config import BG_HIGHLIGHT, BLUE, CYAN, GREEN, ORANGE, TEXT, TEXT_BRIGHT, BORDER, SVG_WIDTH, FONT_SANS
+from scripts.card_theme import card_bg, title_accent, title_left, title_right
 from scripts.profile_contract import SCORECARD_METRICS, format_metric_value
 
 
@@ -31,7 +18,7 @@ def _tile(
     return f"""<g transform="translate({x}, {y})">
   <rect width="{width}" height="{height}" rx="12" fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>
   <rect x="0" y="0" width="{width}" height="4" rx="12" fill="{accent}"/>
-  <text x="16" y="30" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" font-weight="600">{label}</text>
+  <text x="16" y="30" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}" font-weight="600">{label}</text>
   <text x="16" y="62" fill="{TEXT_BRIGHT}" font-size="28" font-family="{FONT_SANS}" font-weight="700">{value}</text>
   <text x="16" y="86" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}">{detail}</text>
 </g>"""
@@ -72,7 +59,7 @@ def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg",
     pad = 20
     tile_w = int((SVG_WIDTH - pad * 2 - gap * (cols - 1)) / cols)
     tile_h = 106
-    title_h = 44
+    title_h = 52
     svg_h = title_h + rows * tile_h + (rows - 1) * gap + pad
 
     card_tiles = tiles or _default_tiles(scorecard)
@@ -104,10 +91,10 @@ def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg",
         )
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
-  <rect width="{SVG_WIDTH}" height="{svg_h}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>
-  <rect x="0" y="0" width="{SVG_WIDTH}" height="{title_h}" rx="14" fill="{BG_DARK}"/>
-  <text x="{pad}" y="29" fill="{TEXT_BRIGHT}" font-size="16" font-family="{FONT_SANS}" font-weight="700">Builder Scorecard</text>
-  <text x="{SVG_WIDTH - pad}" y="29" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">auto-generated from GitHub API</text>
+  {card_bg(SVG_WIDTH, svg_h)}
+  {title_left("Builder Scorecard", x=pad, y=30)}
+  {title_right("auto-generated from GitHub API", width=SVG_WIDTH, pad=pad, y=30)}
+  {title_accent(width=SVG_WIDTH, pad=pad, y=35)}
   {"".join(parts)}
 </svg>"""
 

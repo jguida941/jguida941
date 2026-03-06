@@ -77,7 +77,7 @@ def generate(
 
     rows = []
     rows.append(card_bg(width, height))
-    rows.append(title_left(xml_escape(username), x=pad, y=30, size=20))
+    rows.append(title_left(xml_escape(username), x=pad, y=30))
     rows.append(title_right("Canonical CLI Metrics", width=width, pad=pad, y=30))
     rows.append(title_accent(width=width, pad=pad, y=35))
     rows.append(meta_text(f"Generated: {xml_escape(_fmt_iso_date(generated_at))}", x=pad, y=50))
