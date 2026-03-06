@@ -64,8 +64,8 @@
 
 #### Focus Links
 
-- Now: [voiceterm](https://github.com/jguida941/voiceterm) — push · today · ★8 · Rust
 - Now: [jguida941](https://github.com/jguida941/jguida941) — push · today · ★1 · Python
+- Now: [voiceterm](https://github.com/jguida941/voiceterm) — push · today · ★8 · Rust
 - Now: [homebrew-voiceterm](https://github.com/jguida941/homebrew-voiceterm) — push · 2 days ago · ★1 · Ruby
 
 - Next: [PR #11](https://github.com/jguida941/voiceterm/pull/11) — voiceterm · open · today
