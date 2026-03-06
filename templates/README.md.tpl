@@ -61,20 +61,6 @@
 
 </div>
 
-{% if focus_links_now or focus_links_next or focus_links_shipped %}
-#### Focus Links
-
-{% for item in focus_links_now -%}
-- Now: [{{ item.title }}]({{ item.url }}) — {{ item.detail }}
-{% endfor %}
-{% for item in focus_links_next -%}
-- Next: [{{ item.title }}]({{ item.url }}) — {{ item.detail }}
-{% endfor %}
-{% for item in focus_links_shipped -%}
-- Shipped: [{{ item.title }}]({{ item.url }}) — {{ item.detail }}
-{% endfor %}
-{% endif %}
-
 ---
 
 ### Currently Working On
@@ -97,8 +83,6 @@
 
 ---
 
-### When I Code
-
 <div align="center">
 
 <img src="assets/activity_heatmap.svg?v={{ cache_bust }}" alt="Activity Heatmap" />
@@ -107,19 +91,11 @@
 
 ---
 
-### Flagship Projects
-
 <div align="center">
 
 <img src="assets/repo_spotlight.svg?v={{ cache_bust }}" alt="Flagship Projects" />
 
 </div>
-
-#### Project Links
-
-{% for repo in featured_links -%}
-- [{{ repo.name }}]({{ repo.url }}) — ★{{ repo.stars }} · {{ repo.language }} · CI {{ repo.ci }}
-{% endfor %}
 
 ---
 

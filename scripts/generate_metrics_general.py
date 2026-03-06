@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from scripts.config import BG_CARD, BG_DARK, BG_HIGHLIGHT, BORDER, TEXT, TEXT_BRIGHT, TEXT_DIM, FONT_SANS
+from scripts.config import BG_CARD, BG_HIGHLIGHT, BORDER, TEXT, TEXT_BRIGHT, TEXT_DIM, FONT_SANS
 
 
 def _esc(value: str) -> str:
@@ -79,7 +79,7 @@ def generate(
     width = 840
     height = 352
     pad = 22
-    header_h = 54
+    header_h = 34
     col_gap = 14
     col_w = int((width - pad * 2 - col_gap) / 2)
     row_gap = 10
@@ -90,25 +90,22 @@ def generate(
         f'<rect x="0" y="0" width="{width}" height="{height}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>'
     )
     rows.append(
-        f'<rect x="0" y="0" width="{width}" height="{header_h}" rx="14" fill="{BG_DARK}"/>'
+        f'<text x="{pad}" y="24" fill="{TEXT_BRIGHT}" font-size="18" font-family="{FONT_SANS}" font-weight="700">{_esc(username)}</text>'
     )
     rows.append(
-        f'<text x="{pad}" y="33" fill="{TEXT_BRIGHT}" font-size="20" font-family="{FONT_SANS}" font-weight="700">{_esc(username)}</text>'
-    )
-    rows.append(
-        f'<text x="{width - pad}" y="33" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">'
+        f'<text x="{width - pad}" y="24" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">'
         f"Canonical CLI Metrics</text>"
     )
     rows.append(
-        f'<text x="{pad}" y="{header_h + 18}" fill="{TEXT_DIM}" font-size="10" font-family="{FONT_SANS}">'
+        f'<text x="{pad}" y="40" fill="{TEXT_DIM}" font-size="10" font-family="{FONT_SANS}">'
         f"Generated: {_esc(_fmt_iso_date(generated_at))}</text>"
     )
     if scope_text:
         rows.append(
-            f'<text x="{pad}" y="{header_h + 34}" fill="{TEXT_DIM}" font-size="10" font-family="{FONT_SANS}">{_esc(scope_text)}</text>'
+            f'<text x="{pad}" y="54" fill="{TEXT_DIM}" font-size="10" font-family="{FONT_SANS}">{_esc(scope_text)}</text>'
         )
 
-    start_y = header_h + 48
+    start_y = 66 if scope_text else 54
     left_x = pad
     right_x = pad + col_w + col_gap
 
