@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T07:08:44.478590Z",
+  "generated_at": "2026-03-06T07:52:51.449019Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,7 +18,7 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 4321,
+    "last_year_contributions": 4325,
     "public_scope_commits": 2956,
     "total_repos": 66,
     "public_forks": 0,
@@ -26,7 +26,7 @@
     "total_stars": 73,
     "languages_count": 24,
     "prs_merged": 11,
-    "releases": 50,
+    "releases": 51,
     "ci_repos": 16,
     "streak_days": 23
   },
@@ -35,8 +35,8 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 4321,
-      "display_value": "4,321"
+      "value": 4325,
+      "display_value": "4,325"
     },
     {
       "key": "public_scope_commits",
@@ -91,8 +91,8 @@
       "key": "releases",
       "label": "Releases (30 Days)",
       "dashboard_label": "Releases (30d)",
-      "value": 50,
-      "display_value": "50"
+      "value": 51,
+      "display_value": "51"
     },
     {
       "key": "ci_repos",
@@ -113,8 +113,8 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 4321,
-      "display_value": "4,321"
+      "value": 4325,
+      "display_value": "4,325"
     },
     {
       "key": "public_scope_commits",
@@ -161,8 +161,8 @@
     {
       "key": "releases",
       "label": "Releases (30d)",
-      "value": 50,
-      "display_value": "50"
+      "value": 51,
+      "display_value": "51"
     },
     {
       "key": "ci_repos",
@@ -186,20 +186,20 @@
     "events_note": "Public events feed available."
   },
   "scorecard": {
-    "releases_30d": 50,
+    "releases_30d": 51,
     "active_repos_7d": 8,
-    "avg_release_gap_days": 1.1825219907407407,
+    "avg_release_gap_days": 1.3945277777777778,
     "stars_per_public_repo": 1.106060606060606,
     "ci_coverage_pct": 24.242424242424242,
-    "last_year_contributions": 4321
+    "last_year_contributions": 4325
   },
   "scorecard_cards": [
     {
       "key": "releases_30d",
       "label": "Release Velocity (30d)",
       "detail": "published releases across public repos",
-      "value": 50,
-      "display_value": "50",
+      "value": 51,
+      "display_value": "51",
       "accent": "#ff9e64"
     },
     {
@@ -214,8 +214,8 @@
       "key": "avg_release_gap_days",
       "label": "Avg Release Gap",
       "detail": "days between release events",
-      "value": 1.1825219907407407,
-      "display_value": "1.2d",
+      "value": 1.3945277777777778,
+      "display_value": "1.4d",
       "accent": "#9ece6a"
     },
     {
@@ -238,8 +238,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 4321,
-      "display_value": "4,321",
+      "value": 4325,
+      "display_value": "4,325",
       "accent": "#7dcfff"
     }
   ],
@@ -276,10 +276,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T06:58:15Z",
+      "pushed_at_raw": "2026-03-06T07:45:01Z",
       "pushed_ago": "today",
       "created_at": "2025-11-06",
-      "last_commit_msg": "ci: run preflight zizmor in offline mode",
+      "last_commit_msg": "ci: make preflight devctl security advisory",
       "featured": true
     },
     {
@@ -292,7 +292,7 @@
       "ci": "yes",
       "pushed_at": "2026-03-02",
       "pushed_at_raw": "2026-03-02T07:20:57Z",
-      "pushed_ago": "3 days ago",
+      "pushed_ago": "4 days ago",
       "created_at": "2025-11-15",
       "last_commit_msg": "Update badges from CI [skip ci]",
       "featured": true
@@ -301,8 +301,8 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 12078502,
-      "percent": 49.55
+      "bytes": 12079143,
+      "percent": 49.56
     },
     {
       "name": "Makefile",
@@ -385,10 +385,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T06:58:15Z",
+      "pushed_at_raw": "2026-03-06T07:45:01Z",
       "pushed_ago": "today",
       "created_at": "2025-11-06",
-      "last_commit_msg": "ci: run preflight zizmor in offline mode",
+      "last_commit_msg": "ci: make preflight devctl security advisory",
       "featured": true
     },
     {
@@ -401,10 +401,25 @@
       "ci": "yes",
       "pushed_at": "2026-03-02",
       "pushed_at_raw": "2026-03-02T07:20:57Z",
-      "pushed_ago": "3 days ago",
+      "pushed_ago": "4 days ago",
       "created_at": "2025-11-15",
       "last_commit_msg": "Update badges from CI [skip ci]",
       "featured": true
+    },
+    {
+      "name": "homebrew-voiceterm",
+      "full_name": "jguida941/homebrew-voiceterm",
+      "url": "https://github.com/jguida941/homebrew-voiceterm",
+      "language": "Ruby",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-03-06",
+      "pushed_at_raw": "2026-03-06T07:45:35Z",
+      "pushed_ago": "today",
+      "created_at": "2026-01-22",
+      "last_commit_msg": "Update to v1.1.0",
+      "featured": false
     },
     {
       "name": "jguida941",
@@ -415,25 +430,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T06:42:33Z",
+      "pushed_at_raw": "2026-03-06T07:08:48Z",
       "pushed_ago": "today",
       "created_at": "2026-02-20",
-      "last_commit_msg": "update analytics & readme",
-      "featured": false
-    },
-    {
-      "name": "homebrew-voiceterm",
-      "full_name": "jguida941/homebrew-voiceterm",
-      "url": "https://github.com/jguida941/homebrew-voiceterm",
-      "language": "Ruby",
-      "stars": 1,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-03-04",
-      "pushed_at_raw": "2026-03-04T00:50:25Z",
-      "pushed_ago": "2 days ago",
-      "created_at": "2026-01-22",
-      "last_commit_msg": "Update to v1.0.99",
+      "last_commit_msg": "update canonical profile artifacts",
       "featured": false
     },
     {
@@ -710,7 +710,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-03-06T06:42:33Z",
+      "pushed_at": "2026-03-06T07:08:48Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -723,7 +723,7 @@
         "Python": 231482,
         "HTML": 30566
       },
-      "latest_commit_message": "update analytics & readme"
+      "latest_commit_message": "update canonical profile artifacts"
     },
     {
       "name": "homebrew-tap-setup",
@@ -795,7 +795,7 @@
       "visibility": "public",
       "description": "Homebrew tap for VoiceTerm -VoiceHUD for Codex and Claude with Whisper STT",
       "html_url": "https://github.com/jguida941/homebrew-voiceterm",
-      "pushed_at": "2026-03-04T00:50:25Z",
+      "pushed_at": "2026-03-06T07:45:35Z",
       "created_at": "2026-01-22T17:52:18Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -805,9 +805,9 @@
       },
       "has_ci_workflows": false,
       "language_bytes": {
-        "Ruby": 1182
+        "Ruby": 1180
       },
-      "latest_commit_message": "Update to v1.0.99"
+      "latest_commit_message": "Update to v1.1.0"
     },
     {
       "name": "OpenGL-Hourglass",
@@ -857,19 +857,19 @@
   "focus": {
     "now": [
       {
+        "title": "homebrew-voiceterm",
+        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Ruby",
+        "url": "https://github.com/jguida941/homebrew-voiceterm"
+      },
+      {
         "title": "voiceterm",
-        "detail": "push \u00b7 today \u00b7 \u26058 \u00b7 Rust",
+        "detail": "release \u00b7 today \u00b7 \u26058 \u00b7 Rust",
         "url": "https://github.com/jguida941/voiceterm"
       },
       {
         "title": "jguida941",
         "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
         "url": "https://github.com/jguida941/jguida941"
-      },
-      {
-        "title": "homebrew-voiceterm",
-        "detail": "push \u00b7 2 days ago \u00b7 \u26051 \u00b7 Ruby",
-        "url": "https://github.com/jguida941/homebrew-voiceterm"
       }
     ],
     "next": [
@@ -891,6 +891,11 @@
     ],
     "shipped": [
       {
+        "title": "v1.1.0",
+        "detail": "voiceterm \u00b7 today",
+        "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.1.0"
+      },
+      {
         "title": "v1.0.99",
         "detail": "voiceterm \u00b7 2 days ago",
         "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.0.99"
@@ -899,11 +904,6 @@
         "title": "v1.0.98",
         "detail": "voiceterm \u00b7 4 days ago",
         "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.0.98"
-      },
-      {
-        "title": "v1.0.97",
-        "detail": "voiceterm \u00b7 4 days ago",
-        "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.0.97"
       }
     ]
   },
@@ -911,12 +911,32 @@
     {
       "kind": "activity",
       "title": "push",
+      "url": "https://github.com/jguida941/homebrew-voiceterm",
+      "repo": "jguida941/homebrew-voiceterm",
+      "repo_url": "https://github.com/jguida941/homebrew-voiceterm",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-03-06T07:45:36Z"
+    },
+    {
+      "kind": "release",
+      "title": "v1.1.0",
+      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.1.0",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "RELEASED",
+      "time_ago": "today",
+      "created_at": "2026-03-06T07:45:18Z"
+    },
+    {
+      "kind": "activity",
+      "title": "release",
       "url": "https://github.com/jguida941/voiceterm",
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
-      "state": "PUSH",
+      "state": "RELEASE",
       "time_ago": "today",
-      "created_at": "2026-03-06T06:58:16Z"
+      "created_at": "2026-03-06T07:45:18Z"
     },
     {
       "kind": "activity",
@@ -947,16 +967,6 @@
       "state": "OPEN",
       "time_ago": "1 day ago",
       "created_at": "2026-03-04T11:17:49Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/homebrew-voiceterm",
-      "repo": "jguida941/homebrew-voiceterm",
-      "repo_url": "https://github.com/jguida941/homebrew-voiceterm",
-      "state": "PUSH",
-      "time_ago": "2 days ago",
-      "created_at": "2026-03-04T00:50:26Z"
     },
     {
       "kind": "release",
@@ -1069,16 +1079,6 @@
       "created_at": "2026-03-01T12:40:32Z"
     },
     {
-      "kind": "release",
-      "title": "v1.0.95",
-      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.0.95",
-      "repo": "jguida941/voiceterm",
-      "repo_url": "https://github.com/jguida941/voiceterm",
-      "state": "RELEASED",
-      "time_ago": "6 days ago",
-      "created_at": "2026-02-27T17:14:18Z"
-    },
-    {
       "kind": "created",
       "title": "opengl-cyberpunk",
       "url": "https://github.com/jguida941/opengl-cyberpunk",
@@ -1090,6 +1090,14 @@
     }
   ],
   "recent_releases": [
+    {
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "tag": "v1.1.0",
+      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.1.0",
+      "time_ago": "today",
+      "created_at": "2026-03-06T07:45:18Z"
+    },
     {
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
@@ -1121,14 +1129,6 @@
       "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.0.96",
       "time_ago": "4 days ago",
       "created_at": "2026-03-01T12:40:32Z"
-    },
-    {
-      "repo": "jguida941/voiceterm",
-      "repo_url": "https://github.com/jguida941/voiceterm",
-      "tag": "v1.0.95",
-      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.0.95",
-      "time_ago": "6 days ago",
-      "created_at": "2026-02-27T17:14:18Z"
     }
   ],
   "recent_pull_requests": [
