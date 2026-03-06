@@ -10,7 +10,7 @@
 <div align="center">
 
 <img src="metrics.general.svg" width="49%" alt="GitHub Stats" />
-<img src="https://streak-stats.demolab.com/?user={{ username }}&theme=tokyonight&hide_border=true&background=1a1b27&ring=7AA2F7&fire=ff9e64&currStreakNum=7AA2F7&sideNums=7AA2F7&currStreakLabel=7AA2F7&sideLabels=a9b1d6&dates=565f89" width="49%" alt="GitHub Streak" />
+<img src="assets/streak_summary.svg" width="49%" alt="Streak Summary" />
 
 </div>
 

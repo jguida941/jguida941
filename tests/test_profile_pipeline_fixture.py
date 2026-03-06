@@ -38,6 +38,15 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
             self.assertTrue((tmp_root / "README.md").exists())
             self.assertTrue((tmp_root / "site/data/profile_snapshot.json").exists())
             self.assertTrue((tmp_root / "assets/raw_snapshot.svg").exists())
+            self.assertTrue((tmp_root / "assets/streak_summary.svg").exists())
+            metrics_svg = tmp_root / "metrics.general.svg"
+            self.assertTrue(metrics_svg.exists())
+            metrics_text = metrics_svg.read_text(encoding="utf-8")
+            self.assertIn("Repositories", metrics_text)
+            self.assertIn("Stargazers", metrics_text)
+            self.assertIn("Releases", metrics_text)
+            readme_text = (tmp_root / "README.md").read_text(encoding="utf-8")
+            self.assertIn("assets/streak_summary.svg", readme_text)
 
 
 if __name__ == "__main__":

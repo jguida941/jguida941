@@ -28,6 +28,49 @@ from scripts.profile_contract import SCORECARD_METRICS, SNAPSHOT_METRICS, format
 from scripts.profile_helpers import activity_label, ci_text, has_ci_workflow, time_ago
 
 
+def _parse_calendar_day_date(value: str) -> datetime | None:
+    if not value:
+        return None
+    try:
+        return datetime.fromisoformat(value).replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def _compute_current_streak_days(calendar: dict | None, now_utc: datetime) -> int:
+    if not isinstance(calendar, dict):
+        return 0
+
+    all_days: list[dict] = []
+    for week in calendar.get("weeks", []):
+        days = week.get("contributionDays", []) if isinstance(week, dict) else []
+        if not isinstance(days, list):
+            continue
+        for day in days:
+            if isinstance(day, dict):
+                all_days.append(day)
+
+    if not all_days:
+        return 0
+
+    today_utc = now_utc.date()
+    streak = 0
+    for day in reversed(all_days):
+        day_dt = _parse_calendar_day_date(str(day.get("date", "")))
+        if day_dt is not None and day_dt.date() > today_utc:
+            continue
+        try:
+            count = int(day.get("contributionCount", 0))
+        except (TypeError, ValueError):
+            count = 0
+        if count > 0:
+            streak += 1
+            continue
+        break
+
+    return streak
+
+
 def _build_recent_repos(
     repos: list[dict],
     seven_days_ago: datetime,
@@ -520,13 +563,18 @@ def compute_profile_model(
             }
         )
 
-    prs_merged = sum(
+    prs_merged_from_events = sum(
         1
         for event in events
         if event.get("type") == "PullRequestEvent"
         and event.get("payload", {}).get("action") == "closed"
         and event.get("payload", {}).get("pull_request", {}).get("merged")
     )
+    prs_merged = prs_merged_from_events
+    if allow_network_calls:
+        merged_pr_total = gh.get_merged_prs_last_n_days(days=365)
+        if merged_pr_total is not None:
+            prs_merged = merged_pr_total
     releases = sum(1 for event in events if event.get("type") == "ReleaseEvent")
 
     release_event_times = []
@@ -586,17 +634,7 @@ def compute_profile_model(
 
     stars_per_public_repo = (total_stars / len(repos)) if repos else 0.0
 
-    streak_days = 0
-    if calendar:
-        all_days = []
-        for week in calendar.get("weeks", []):
-            for day in week.get("contributionDays", []):
-                all_days.append(day)
-        for day in reversed(all_days):
-            if day["contributionCount"] > 0:
-                streak_days += 1
-            else:
-                break
+    streak_days = _compute_current_streak_days(calendar, now_utc)
 
     recent_repos, recent_commit_message_by_repo = _build_recent_repos(
         repos,

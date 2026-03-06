@@ -76,4 +76,4 @@ jobs:
         with:
           commit_message: "update analytics & readme"
           branch: main
-          file_pattern: "README.md assets/*.svg site/data/profile_snapshot.json"
+          file_pattern: "README.md assets/*.svg site/data/profile_snapshot.json metrics.general.svg"

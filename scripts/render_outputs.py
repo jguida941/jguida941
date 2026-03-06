@@ -15,8 +15,10 @@ from scripts.generate_contribution_panel import generate as gen_contribution_pan
 from scripts.generate_currently_working import generate as gen_working
 from scripts.generate_focus_board import generate as gen_focus_board
 from scripts.generate_language_chart import generate as gen_lang_chart
+from scripts.generate_metrics_general import generate as gen_metrics_general
 from scripts.generate_repo_spotlight import generate as gen_spotlight
 from scripts.generate_snapshot_panel import generate as gen_snapshot_panel
+from scripts.generate_streak_summary import generate as gen_streak_summary
 
 
 def ensure_output_dirs() -> None:
@@ -57,12 +59,28 @@ def generate_assets(collected: CollectedProfileData, model: dict, logger=print) 
     gen_focus_board(model["focus"])
     logger("  -> assets/now_next_shipped.svg")
 
+    gen_streak_summary(
+        calendar=collected.calendar,
+        current_streak_days=model["snapshot"]["streak_days"],
+        total_contributions=collected.total_contributions,
+    )
+    logger("  -> assets/streak_summary.svg")
+
     gen_snapshot_panel(
         model["snapshot_rows"],
         model["data_quality"],
         data_scope=model["data_scope"],
     )
     logger("  -> assets/raw_snapshot.svg")
+
+    gen_metrics_general(
+        username=model["dashboard_data"]["username"],
+        snapshot=model["snapshot"],
+        data_scope=model["data_scope"],
+        generated_at=model["dashboard_data"]["generated_at"],
+        output_path="metrics.general.svg",
+    )
+    logger("  -> metrics.general.svg")
 
 
 def write_dashboard_json(model: dict, logger=print) -> None:
@@ -103,4 +121,3 @@ def render_readme(model: dict, logger=print) -> None:
 
     Path("README.md").write_text(readme, encoding="utf-8")
     logger("-> README.md written")
-

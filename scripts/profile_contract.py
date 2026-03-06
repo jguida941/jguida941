@@ -101,8 +101,8 @@ SNAPSHOT_METRICS = [
     },
     {
         "key": "prs_merged",
-        "label": "PRs Merged (Recent Events)",
-        "dashboard_label": "PRs Merged (Recent)",
+        "label": "PRs Merged (Last 12 Months)",
+        "dashboard_label": "PRs Merged (12mo)",
         "format": "int",
     },
     {

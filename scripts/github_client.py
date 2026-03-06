@@ -780,6 +780,65 @@ def get_releases_last_n_days(
     return result
 
 
+def get_merged_prs_last_n_days(days: int = 365) -> int | None:
+    """
+    Count merged pull requests authored by USERNAME in repos owned by USERNAME.
+
+    Returns None when the query cannot be resolved for this run.
+    """
+    window_days = max(1, int(days))
+    start, _end, window_day = _calendar_window(window_days)
+    since = start.date().isoformat()
+    cache_key = f"merged_prs_last_{window_days}_{window_day}"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        if isinstance(cached, dict):
+            try:
+                return int(cached.get("total"))
+            except (TypeError, ValueError):
+                return None
+        try:
+            return int(cached)
+        except (TypeError, ValueError):
+            return None
+
+    query = f"author:{USERNAME} user:{USERNAME} is:pr is:merged merged:>={since}"
+    params = {"q": query, "per_page": 1}
+    url = f"{API}/search/issues"
+
+    def _fetch_total(use_public: bool) -> int | None:
+        requester = _request_public_with_retry if use_public else _request_with_retry
+        try:
+            resp = requester(url, params=params)
+        except requests.HTTPError as exc:
+            status = exc.response.status_code if exc.response is not None else None
+            if status in {401, 403, 422}:
+                return None
+            raise
+        except requests.RequestException:
+            return None
+
+        if resp.status_code != 200:
+            return None
+        try:
+            payload = resp.json()
+        except ValueError:
+            return None
+        if not isinstance(payload, dict):
+            return None
+        try:
+            return int(payload.get("total_count", 0))
+        except (TypeError, ValueError):
+            return None
+
+    total = _fetch_total(use_public=False)
+    if total is None and TOKEN:
+        total = _fetch_total(use_public=True)
+
+    _set_cached(cache_key, {"total": total, "since": since})
+    return total
+
+
 def get_contribution_calendar(days: int = 365) -> dict | None:
     """Fetch contribution calendar via GraphQL for a rolling window."""
     start, end, window_day = _calendar_window(days)

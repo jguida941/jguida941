@@ -78,11 +78,18 @@ def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg",
     card_tiles = tiles or _default_tiles(scorecard)
 
     parts = []
+    definition_by_key = {definition["key"]: definition for definition in SCORECARD_METRICS}
     for i, tile in enumerate(card_tiles):
         row = i // cols
         col = i % cols
         x = pad + col * (tile_w + gap)
         y = title_h + row * (tile_h + gap)
+        key = str(tile.get("key", ""))
+        display_value = tile.get("display_value")
+        if display_value is None and key in definition_by_key:
+            display_value = format_metric_value(tile.get("value"), definition_by_key[key])
+        if display_value is None:
+            display_value = tile.get("value", "0")
         parts.append(
             _tile(
                 x,
@@ -90,7 +97,7 @@ def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg",
                 tile_w,
                 tile_h,
                 str(tile.get("label", "")),
-                str(tile.get("display_value", tile.get("value", "0"))),
+                str(display_value),
                 str(tile.get("detail", "")),
                 str(tile.get("accent", CYAN)),
             )

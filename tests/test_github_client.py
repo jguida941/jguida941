@@ -59,6 +59,24 @@ class GitHubClientTests(unittest.TestCase):
         self.assertEqual(counts["public_owned_nonfork"], 62)
         self.assertIsNone(counts["private_owned"])
 
+    def test_get_merged_prs_last_n_days_returns_total(self):
+        with patch("scripts.github_client._get_cached", return_value=None), patch(
+            "scripts.github_client._set_cached",
+        ), patch(
+            "scripts.github_client._calendar_window",
+            return_value=(
+                datetime(2025, 3, 6, tzinfo=timezone.utc),
+                datetime(2026, 3, 6, tzinfo=timezone.utc),
+                "2026-03-06",
+            ),
+        ), patch(
+            "scripts.github_client._request_with_retry",
+            return_value=_FakeResponse(200, {"total_count": 42}),
+        ):
+            total = gh.get_merged_prs_last_n_days(days=365)
+
+        self.assertEqual(total, 42)
+
     def test_get_contribution_calendar_uses_aligned_window(self):
         start = datetime(2026, 3, 1, 0, 0, 0, tzinfo=timezone.utc)
         end = datetime(2026, 3, 6, 23, 59, 59, tzinfo=timezone.utc)

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from scripts.config import (
     BG_CARD,
     BG_DARK,
@@ -42,9 +44,23 @@ def _compute_streaks(days: list[dict]) -> tuple[int, int]:
     if not days:
         return 0, 0
 
+    today_utc = datetime.now(timezone.utc).date()
+    filtered_days = []
+    for day in days:
+        raw_date = str(day.get("date", ""))
+        try:
+            parsed = datetime.fromisoformat(raw_date).date()
+        except ValueError:
+            parsed = None
+        if parsed is None or parsed <= today_utc:
+            filtered_days.append(day)
+
+    if not filtered_days:
+        return 0, 0
+
     longest = 0
     current_run = 0
-    for day in days:
+    for day in filtered_days:
         try:
             count = int(day.get("contributionCount", 0))
         except (TypeError, ValueError):
@@ -57,7 +73,7 @@ def _compute_streaks(days: list[dict]) -> tuple[int, int]:
             current_run = 0
 
     current = 0
-    for day in reversed(days):
+    for day in reversed(filtered_days):
         try:
             count = int(day.get("contributionCount", 0))
         except (TypeError, ValueError):
