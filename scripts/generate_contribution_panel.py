@@ -146,6 +146,7 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
     cols = len(weeks)
     grid_w = cols * cell + max(0, cols - 1) * gap
     grid_h = 7 * cell + 6 * gap
+    grid_x = max(pad, int((SVG_WIDTH - grid_w) / 2))
 
     month_markers = []
     prev_month = ""
@@ -173,7 +174,7 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
     )
 
     for idx, month in month_markers:
-        x = pad + idx * (cell + gap)
+        x = grid_x + idx * (cell + gap)
         parts.append(
             f'<text x="{x}" y="51" fill="{TEXT_DIM}" font-size="9" '
             f'font-family="{FONT_SANS}">{month}</text>'
@@ -189,31 +190,32 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
             except (TypeError, ValueError):
                 count = 0
             level = _level(count, max_count)
-            x = pad + w_idx * (cell + gap)
+            x = grid_x + w_idx * (cell + gap)
             y = grid_y + d_idx * (cell + gap)
             parts.append(
                 f'<rect x="{x}" y="{y}" width="{cell}" height="{cell}" rx="2" '
                 f'fill="{palette[level]}" stroke="{BORDER}" stroke-width="0.4"/>'
             )
 
+    thirds = [int(SVG_WIDTH * 0.2), int(SVG_WIDTH * 0.5), int(SVG_WIDTH * 0.8)]
     parts.append(
-        f'<text x="{pad}" y="{stats_y}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}">'
+        f'<text x="{thirds[0]}" y="{stats_y}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}" text-anchor="middle">'
         f'Total: {total_contributions:,} contributions</text>'
     )
     parts.append(
-        f'<text x="{pad + 250}" y="{stats_y}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}">'
+        f'<text x="{thirds[1]}" y="{stats_y}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}" text-anchor="middle">'
         f'Current streak: {current_streak} days</text>'
     )
     parts.append(
-        f'<text x="{pad + 490}" y="{stats_y}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}">'
+        f'<text x="{thirds[2]}" y="{stats_y}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}" text-anchor="middle">'
         f'Longest streak: {longest_streak} days</text>'
     )
 
     legend_y = stats_y + 18
     parts.append(
-        f'<text x="{pad}" y="{legend_y + 10}" fill="{TEXT_DIM}" font-size="9" font-family="{FONT_SANS}">Less</text>'
+        f'<text x="{grid_x}" y="{legend_y + 10}" fill="{TEXT_DIM}" font-size="9" font-family="{FONT_SANS}">Less</text>'
     )
-    legend_x = pad + 30
+    legend_x = grid_x + 30
     for idx, color in enumerate(palette):
         lx = legend_x + idx * (cell + 4)
         parts.append(

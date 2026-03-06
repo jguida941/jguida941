@@ -138,10 +138,10 @@ def generate(
     contrib_end = day_rows[-1][0] if day_rows else None
 
     width = SVG_WIDTH
-    height = 226
+    height = 206
     pad = 24
     header_h = 44
-    content_top = 58
+    content_top = 54
     content_bottom = height - 16
     col_w = int((width - pad * 2) / 3)
     sep_left = pad + col_w
@@ -164,21 +164,21 @@ def generate(
             f'<circle cx="{left_cx}" cy="86" r="10" fill="{BG_HIGHLIGHT}" stroke="{CYAN}" stroke-width="2"/>',
             f'<line x1="{left_cx - 5}" y1="86" x2="{left_cx + 5}" y2="86" stroke="{CYAN}" stroke-width="1.5"/>',
             f'<line x1="{left_cx}" y1="81" x2="{left_cx}" y2="91" stroke="{CYAN}" stroke-width="1.5"/>',
-            f'<text x="{left_cx}" y="130" fill="{TEXT_BRIGHT}" font-size="48" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(total_contributions))}</text>',
-            f'<text x="{left_cx}" y="162" fill="{TEXT}" font-size="28" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Total Contributions</text>',
-            f'<text x="{left_cx}" y="188" fill="{TEXT_DIM}" font-size="15" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(contrib_start, contrib_end))}</text>',
+            f'<text x="{left_cx}" y="126" fill="{TEXT_BRIGHT}" font-size="42" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(total_contributions))}</text>',
+            f'<text x="{left_cx}" y="150" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Total Contributions</text>',
+            f'<text x="{left_cx}" y="172" fill="{TEXT_DIM}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(contrib_start, contrib_end))}</text>',
         ]
     )
 
     # Middle: current streak ring
     parts.extend(
         [
-            f'<circle cx="{center_x}" cy="118" r="58" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="6"/>',
+            f'<circle cx="{center_x}" cy="108" r="46" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="5"/>',
             f'<circle cx="{center_x}" cy="67" r="7" fill="{ORANGE}"/>',
             f'<path d="M {center_x - 4} 61 C {center_x - 2} 54, {center_x + 2} 54, {center_x + 4} 61" fill="{ORANGE}"/>',
-            f'<text x="{center_x}" y="131" fill="{BLUE}" font-size="56" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(current_days))}</text>',
-            f'<text x="{center_x}" y="186" fill="{BLUE}" font-size="34" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">Current Streak</text>',
-            f'<text x="{center_x}" y="210" fill="{TEXT_DIM}" font-size="15" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(current_start, current_end))}</text>',
+            f'<text x="{center_x}" y="122" fill="{BLUE}" font-size="50" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(current_days))}</text>',
+            f'<text x="{center_x}" y="162" fill="{BLUE}" font-size="20" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">Current Streak</text>',
+            f'<text x="{center_x}" y="182" fill="{TEXT_DIM}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(current_start, current_end))}</text>',
         ]
     )
 
@@ -188,9 +188,9 @@ def generate(
         [
             f'<circle cx="{right_cx}" cy="86" r="10" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="2"/>',
             f'<polygon points="{right_cx},{78} {right_cx + 5},{86} {right_cx},{94} {right_cx - 5},{86}" fill="{BLUE}"/>',
-            f'<text x="{right_cx}" y="130" fill="{TEXT_BRIGHT}" font-size="48" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(longest_days))}</text>',
-            f'<text x="{right_cx}" y="162" fill="{TEXT}" font-size="28" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Longest Streak</text>',
-            f'<text x="{right_cx}" y="188" fill="{TEXT_DIM}" font-size="15" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(longest_start, longest_end))}</text>',
+            f'<text x="{right_cx}" y="126" fill="{TEXT_BRIGHT}" font-size="42" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(longest_days))}</text>',
+            f'<text x="{right_cx}" y="150" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Longest Streak</text>',
+            f'<text x="{right_cx}" y="172" fill="{TEXT_DIM}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(longest_start, longest_end))}</text>',
         ]
     )
 
