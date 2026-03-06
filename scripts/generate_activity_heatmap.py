@@ -1,11 +1,12 @@
-"""Generate a readable coding-activity heatmap + workflow breakdown panel."""
+"""Build an SVG heatmap for coding time and event mix."""
 
 import os
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-from scripts.config import BG_CARD, GREEN, TEXT, TEXT_DIM, BORDER, SVG_WIDTH, FONT_SANS
+from scripts.config import CYAN, TEXT, TEXT_BRIGHT, TEXT_DIM, SVG_WIDTH, FONT_SANS
+from scripts.card_theme import card_bg, title_left, title_right
 
 EVENT_LABELS = {
     "PushEvent": "push",
@@ -81,7 +82,7 @@ def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
 
     # Layout
     pad = 24
-    title_y = 34
+    title_y = 29
     day_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     label_w = 36
     cell = 12
@@ -89,27 +90,23 @@ def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
     grid_w = 24 * (cell + gap) - gap
     grid_h = 7 * (cell + gap) - gap
     heatmap_x = pad + label_w
-    heatmap_y = 58
+    heatmap_y = 66
 
     panel_x = heatmap_x + grid_w + 34
     panel_w = SVG_WIDTH - panel_x - pad
+    panel_heading_y = 56
 
-    parts = []
-    parts.append(
-        f'<text x="{pad}" y="{title_y}" fill="{TEXT}" font-size="14" '
-        f'font-family="{FONT_SANS}" font-weight="700">When I Code</text>'
-    )
-    parts.append(
-        f'<text x="{pad + 108}" y="{title_y}" fill="{TEXT_DIM}" font-size="10" '
-        f'font-family="{FONT_SANS}">(public events, {tz_label})</text>'
-    )
+    parts = [
+        title_left("When I Code", x=pad, y=title_y),
+        title_right(f"public events ({tz_label})", width=SVG_WIDTH, pad=pad, y=title_y),
+    ]
 
     # Heatmap hour labels
     for h in range(24):
         if h % 3 == 0:
             x = heatmap_x + h * (cell + gap) + cell / 2
             parts.append(
-                f'<text x="{x}" y="{heatmap_y - 6}" fill="{TEXT_DIM}" font-size="9" '
+                f'<text x="{x}" y="{heatmap_y - 6}" fill="{TEXT}" font-size="9" '
                 f'font-family="{FONT_SANS}" text-anchor="middle">{h:02d}</text>'
             )
 
@@ -117,7 +114,7 @@ def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
     for d in range(7):
         y = heatmap_y + d * (cell + gap)
         parts.append(
-            f'<text x="{pad}" y="{y + cell - 1}" fill="{TEXT_DIM}" font-size="10" '
+            f'<text x="{pad}" y="{y + cell - 1}" fill="{TEXT}" font-size="10" '
             f'font-family="{FONT_SANS}">{day_labels[d]}</text>'
         )
         for h in range(24):
@@ -131,7 +128,7 @@ def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
 
     # Right panel A: time-of-day blocks
     parts.append(
-        f'<text x="{panel_x}" y="{title_y}" fill="{TEXT}" font-size="12" '
+        f'<text x="{panel_x}" y="{panel_heading_y}" fill="{TEXT_BRIGHT}" font-size="12" '
         f'font-family="{FONT_SANS}" font-weight="600">By Time Block</text>'
     )
     max_block = max(block_totals.values(), default=1)
@@ -146,20 +143,20 @@ def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
         pct = (count / total_events * 100.0) if total_events else 0.0
         w = (count / max(max_block, 1)) * block_bar_w
         parts.append(
-            f'<text x="{panel_x}" y="{y + 10}" fill="{TEXT_DIM}" font-size="10" font-family="{FONT_SANS}">{block_name}</text>'
+            f'<text x="{panel_x}" y="{y + 10}" fill="{TEXT}" font-size="10" font-family="{FONT_SANS}">{block_name}</text>'
         )
         parts.append(
-            f'<rect x="{block_bar_x}" y="{y}" width="{max(w, 2):.1f}" height="12" rx="2" fill="{GREEN}" opacity="0.75"/>'
+            f'<rect x="{block_bar_x}" y="{y}" width="{max(w, 2):.1f}" height="12" rx="2" fill="{CYAN}" opacity="0.72"/>'
         )
         parts.append(
-            f'<text x="{block_bar_x + max(w, 2) + 6:.1f}" y="{y + 10}" fill="{TEXT_DIM}" font-size="10" '
+            f'<text x="{block_bar_x + max(w, 2) + 6:.1f}" y="{y + 10}" fill="{TEXT}" font-size="10" '
             f'font-family="{FONT_SANS}">{count} ({pct:.0f}%)</text>'
         )
 
     # Right panel B: event mix
     mix_title_y = block_start_y + len(TIME_BLOCKS) * block_row_h + 22
     parts.append(
-        f'<text x="{panel_x}" y="{mix_title_y}" fill="{TEXT}" font-size="12" '
+        f'<text x="{panel_x}" y="{mix_title_y}" fill="{TEXT_BRIGHT}" font-size="12" '
         f'font-family="{FONT_SANS}" font-weight="600">Event Mix</text>'
     )
     mix_items = event_mix.most_common(5)
@@ -174,13 +171,13 @@ def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
         pct = (count / total_events * 100.0) if total_events else 0.0
         w = (count / max(max_mix, 1)) * mix_bar_w
         parts.append(
-            f'<text x="{panel_x}" y="{y + 10}" fill="{TEXT_DIM}" font-size="10" font-family="{FONT_SANS}">{label}</text>'
+            f'<text x="{panel_x}" y="{y + 10}" fill="{TEXT}" font-size="10" font-family="{FONT_SANS}">{label}</text>'
         )
         parts.append(
-            f'<rect x="{mix_bar_x}" y="{y}" width="{max(w, 2):.1f}" height="10" rx="2" fill="{GREEN}" opacity="0.55"/>'
+            f'<rect x="{mix_bar_x}" y="{y}" width="{max(w, 2):.1f}" height="10" rx="2" fill="{CYAN}" opacity="0.48"/>'
         )
         parts.append(
-            f'<text x="{mix_bar_x + max(w, 2) + 6:.1f}" y="{y + 9}" fill="{TEXT_DIM}" font-size="9" '
+            f'<text x="{mix_bar_x + max(w, 2) + 6:.1f}" y="{y + 9}" fill="{TEXT}" font-size="9" '
             f'font-family="{FONT_SANS}">{count} ({pct:.0f}%)</text>'
         )
 
@@ -195,7 +192,7 @@ def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
 
     svg_h = footer_y + 18
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
-  <rect width="{SVG_WIDTH}" height="{svg_h}" rx="12" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>
+  {card_bg(SVG_WIDTH, svg_h)}
   {"".join(parts)}
 </svg>"""
 

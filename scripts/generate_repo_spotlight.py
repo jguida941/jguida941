@@ -1,9 +1,9 @@
-"""Generate a 2x2 grid of featured project cards with sparklines."""
+"""Build featured project cards with sparklines."""
 
 from scripts.config import (
-    BG_CARD, BG_HIGHLIGHT, BLUE, CYAN, GREEN, ORANGE, TEXT, TEXT_DIM,
-    TEXT_BRIGHT, BORDER, SVG_WIDTH, FONT_SANS, LANG_COLORS,
+    BG_CARD, BG_HIGHLIGHT, BLUE, CYAN, GREEN, TEXT, BORDER, SVG_WIDTH, FONT_SANS, LANG_COLORS,
 )
+from scripts.card_theme import card_bg, title_left, title_right
 
 
 def _lang_color(lang: str | None) -> str:
@@ -61,19 +61,16 @@ def generate(
     card_h = 160
     pad = 20
     gap = 20
-    title_h = 40
+    title_h = 50
 
     cols = 2
     rows_count = (len(repos_data) + cols - 1) // cols
     svg_h = title_h + rows_count * (card_h + gap) + pad
 
-    parts = []
-
-    # Section title
-    parts.append(
-        f'<text x="{pad + 10}" y="28" fill="{TEXT}" font-size="14" '
-        f'font-family="{FONT_SANS}" font-weight="700">Flagship Projects</text>'
-    )
+    parts = [
+        title_left("Flagship Projects", x=pad, y=29),
+        title_right("featured repos + sparkline activity", width=SVG_WIDTH, pad=pad, y=29),
+    ]
 
     for i, repo in enumerate(repos_data):
         col = i % cols
@@ -121,7 +118,7 @@ def generate(
 
         # Description
         parts.append(
-            f'<text x="{cx + 16}" y="{cy + 48}" fill="{TEXT_DIM}" font-size="11" '
+            f'<text x="{cx + 16}" y="{cy + 48}" fill="{TEXT}" font-size="11" '
             f'font-family="{FONT_SANS}">{desc}</text>'
         )
 
@@ -135,7 +132,7 @@ def generate(
         # Stars + Forks
         star_x = cx + 120
         parts.append(
-            f'<text x="{star_x}" y="{cy + 74}" fill="{TEXT_DIM}" font-size="11" '
+            f'<text x="{star_x}" y="{cy + 74}" fill="{TEXT}" font-size="11" '
             f'font-family="{FONT_SANS}">\u2605 {stars}  Forks: {forks}</text>'
         )
 
@@ -153,12 +150,12 @@ def generate(
 
         # "12 weeks" label
         parts.append(
-            f'<text x="{spark_x + spark_w - 4}" y="{spark_y + spark_h + 12}" fill="{TEXT_DIM}" '
+            f'<text x="{spark_x + spark_w - 4}" y="{spark_y + spark_h + 12}" fill="{TEXT}" '
             f'font-size="9" font-family="{FONT_SANS}" text-anchor="end">12 weeks</text>'
         )
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{int(svg_h)}" viewBox="0 0 {SVG_WIDTH} {int(svg_h)}">
-  <rect width="{SVG_WIDTH}" height="{int(svg_h)}" rx="12" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>
+  {card_bg(SVG_WIDTH, int(svg_h))}
   {"".join(parts)}
 </svg>"""
 

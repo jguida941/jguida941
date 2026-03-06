@@ -1,21 +1,19 @@
-"""Generate a themed Now / Next / Shipped focus board SVG."""
+"""Build a Now/Next/Shipped focus board SVG."""
 
 from __future__ import annotations
 
 from scripts.config import (
-    BG_CARD,
     BG_HIGHLIGHT,
     BLUE,
     CYAN,
     GREEN,
     ORANGE,
     TEXT,
-    TEXT_BRIGHT,
-    TEXT_DIM,
     BORDER,
     SVG_WIDTH,
     FONT_SANS,
 )
+from scripts.card_theme import card_bg, title_left, title_right
 
 
 def _esc(value: str) -> str:
@@ -43,21 +41,16 @@ def generate(focus: dict, output_path: str = "assets/now_next_shipped.svg") -> s
     ]
 
     pad = 20
-    header_h = 44
+    header_h = 52
     col_gap = 14
     col_w = (SVG_WIDTH - pad * 2 - col_gap * 2) / 3
-    col_h = 190
+    col_h = 198
     svg_h = header_h + col_h + pad
 
-    parts = []
-    parts.append(
-        f'<text x="{pad}" y="29" fill="{TEXT_BRIGHT}" font-size="16" '
-        f'font-family="{FONT_SANS}" font-weight="700">Current Focus</text>'
-    )
-    parts.append(
-        f'<text x="{SVG_WIDTH - pad}" y="29" fill="{TEXT_DIM}" font-size="11" '
-        f'font-family="{FONT_SANS}" text-anchor="end">now / next / shipped lanes</text>'
-    )
+    parts = [
+        title_left("Current Focus", x=pad, y=29),
+        title_right("now / next / shipped lanes", width=SVG_WIDTH, pad=pad, y=29),
+    ]
 
     for idx, (key, label, accent) in enumerate(columns):
         x = pad + idx * (col_w + col_gap)
@@ -77,7 +70,7 @@ def generate(focus: dict, output_path: str = "assets/now_next_shipped.svg") -> s
         items = focus.get(key, []) if isinstance(focus, dict) else []
         if not items:
             parts.append(
-                f'<text x="{x + 14}" y="{y + 50}" fill="{TEXT_DIM}" font-size="11" '
+                f'<text x="{x + 14}" y="{y + 50}" fill="{TEXT}" font-size="11" '
                 f'font-family="{FONT_SANS}">No items in this lane.</text>'
             )
             continue
@@ -105,7 +98,7 @@ def generate(focus: dict, output_path: str = "assets/now_next_shipped.svg") -> s
             )
 
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
-  <rect width="{SVG_WIDTH}" height="{svg_h}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>
+  {card_bg(SVG_WIDTH, svg_h)}
   {''.join(parts)}
 </svg>'''
 

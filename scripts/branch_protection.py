@@ -1,4 +1,4 @@
-"""Helpers for auditing and updating required branch status checks."""
+"""Audit and update required branch checks."""
 
 from __future__ import annotations
 

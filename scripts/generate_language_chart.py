@@ -1,9 +1,9 @@
-"""Generate a horizontal stacked bar + legend for language usage by bytes."""
+"""Build a language usage bar chart SVG."""
 
 from scripts.config import (
-    BG_DARK, BG_CARD, TEXT, TEXT_DIM, TEXT_BRIGHT, BORDER,
-    SVG_WIDTH, FONT_SANS, LANG_COLORS,
+    TEXT, TEXT_BRIGHT, SVG_WIDTH, FONT_SANS, LANG_COLORS,
 )
+from scripts.card_theme import card_bg, title_left, title_right
 
 
 def _lang_color(lang: str) -> str:
@@ -17,9 +17,11 @@ def generate(
 ):
     total = sum(language_bytes.values())
     if total == 0:
-        svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="80" viewBox="0 0 {SVG_WIDTH} 80">
-  <rect width="{SVG_WIDTH}" height="80" rx="12" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>
-  <text x="420" y="45" fill="{TEXT_DIM}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">No language data available</text>
+        svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="98" viewBox="0 0 {SVG_WIDTH} 98">
+  {card_bg(SVG_WIDTH, 98)}
+  {title_left("Language Breakdown", x=30, y=29)}
+  {title_right("public owned repos by bytes", width=SVG_WIDTH, pad=30, y=29)}
+  <text x="420" y="66" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">No language data available</text>
 </svg>"""
         with open(output_path, "w") as f:
             f.write(svg)
@@ -36,10 +38,10 @@ def generate(
 
     # Layout
     pad = 30
-    bar_y = 40
+    bar_y = 52
     bar_h = 24
     bar_w = SVG_WIDTH - 2 * pad
-    legend_y = bar_y + bar_h + 30
+    legend_y = bar_y + bar_h + 26
     cols = 3
     col_w = bar_w // cols
     row_h = 24
@@ -76,20 +78,19 @@ def generate(
             f'<circle cx="{lx + 6}" cy="{ly + 8}" r="5" fill="{_lang_color(lang)}"/>'
             f'<text x="{lx + 16}" y="{ly + 12}" fill="{TEXT_BRIGHT}" font-size="12" '
             f'font-family="{FONT_SANS}" font-weight="600">{lang}</text>'
-            f'<text x="{lx + 16 + len(lang) * 7.5 + 6}" y="{ly + 12}" fill="{TEXT_DIM}" '
+            f'<text x="{lx + 16 + len(lang) * 7.5 + 6}" y="{ly + 12}" fill="{TEXT}" '
             f'font-size="11" font-family="{FONT_SANS}">{pct:.1f}%</text>'
         )
 
     # Title
-    title = (
-        f'<text x="{pad}" y="24" fill="{TEXT}" font-size="14" '
-        f'font-family="{FONT_SANS}" font-weight="700">Language Breakdown</text>'
-    )
+    title = title_left("Language Breakdown", x=pad, y=28)
+    subtitle = title_right("public owned repos by bytes", width=SVG_WIDTH, pad=pad, y=28)
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
-  <rect width="{SVG_WIDTH}" height="{svg_h}" rx="12" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>
+  {card_bg(SVG_WIDTH, svg_h)}
   {clip_def}
   {title}
+  {subtitle}
   <g clip-path="url(#barClip)">{"".join(bar_parts)}</g>
   {"".join(legend_parts)}
 </svg>"""

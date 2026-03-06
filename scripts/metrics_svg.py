@@ -1,4 +1,4 @@
-"""Read `metrics.general.svg` values and run basic checks."""
+"""Read values from `metrics.general.svg` and run basic checks."""
 
 from __future__ import annotations
 

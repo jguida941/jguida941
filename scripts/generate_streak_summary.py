@@ -1,10 +1,11 @@
-"""Generate a streak summary SVG with a classic center-ring layout."""
+"""Build the streak summary SVG."""
 
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
 
-from scripts.config import BG_CARD, BG_HIGHLIGHT, BLUE, BORDER, CYAN, ORANGE, TEXT, TEXT_BRIGHT, TEXT_DIM, FONT_SANS, SVG_WIDTH
+from scripts.config import BG_HIGHLIGHT, BLUE, BORDER, ORANGE, TEXT, TEXT_BRIGHT, TEXT_DIM, FONT_SANS, SVG_WIDTH
+from scripts.card_theme import card_bg, title_left, title_right
 
 
 def _parse_day_date(value: str) -> date | None:
@@ -149,9 +150,9 @@ def generate(
     center_x = pad + int(col_w * 1.5)
 
     parts = [
-        f'<rect width="{width}" height="{height}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>',
-        f'<text x="{pad}" y="23" fill="{TEXT_BRIGHT}" font-size="16" font-family="{FONT_SANS}" font-weight="700">Streak Summary</text>',
-        f'<text x="{width - pad}" y="23" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">from contribution calendar</text>',
+        card_bg(width, height),
+        title_left("Streak Summary", x=pad, y=23),
+        title_right("from contribution calendar", width=width, pad=pad, y=23),
         f'<line x1="{sep_left}" y1="{content_top}" x2="{sep_left}" y2="{content_bottom}" stroke="{BORDER}" stroke-width="1"/>',
         f'<line x1="{sep_right}" y1="{content_top}" x2="{sep_right}" y2="{content_bottom}" stroke="{BORDER}" stroke-width="1"/>',
     ]
@@ -160,9 +161,6 @@ def generate(
     left_cx = pad + int(col_w * 0.5)
     parts.extend(
         [
-            f'<circle cx="{left_cx}" cy="84" r="8" fill="{BG_HIGHLIGHT}" stroke="{CYAN}" stroke-width="2"/>',
-            f'<line x1="{left_cx - 4}" y1="84" x2="{left_cx + 4}" y2="84" stroke="{CYAN}" stroke-width="1.5"/>',
-            f'<line x1="{left_cx}" y1="80" x2="{left_cx}" y2="88" stroke="{CYAN}" stroke-width="1.5"/>',
             f'<text x="{left_cx}" y="124" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(total_contributions))}</text>',
             f'<text x="{left_cx}" y="150" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Total Contributions</text>',
             f'<text x="{left_cx}" y="172" fill="{TEXT_DIM}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(contrib_start, contrib_end))}</text>',
@@ -185,8 +183,6 @@ def generate(
     right_cx = pad + int(col_w * 2.5)
     parts.extend(
         [
-            f'<circle cx="{right_cx}" cy="84" r="8" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="2"/>',
-            f'<polygon points="{right_cx},{78} {right_cx + 4},{84} {right_cx},{90} {right_cx - 4},{84}" fill="{BLUE}"/>',
             f'<text x="{right_cx}" y="124" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(longest_days))}</text>',
             f'<text x="{right_cx}" y="150" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Longest Streak</text>',
             f'<text x="{right_cx}" y="172" fill="{TEXT_DIM}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(longest_start, longest_end))}</text>',

@@ -1,4 +1,4 @@
-"""Tokyo Night theme colors and shared constants."""
+"""Theme colors and shared constants."""
 
 # Tokyo Night palette
 BG_DARK = "#1a1b27"

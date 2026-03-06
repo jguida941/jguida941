@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CLI entry point for profile generation, checks, triage, and diagnostics."""
+"""CLI for profile generation, checks, triage, and diagnostics."""
 
 from __future__ import annotations
 

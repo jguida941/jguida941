@@ -15,8 +15,9 @@ sys.path.insert(0, str(ROOT))
 os.chdir(ROOT)
 
 from scripts.contracts import (
+    DISALLOWED_README_HEADINGS,
     REQUIRED_PROFILE_SNAPSHOT_KEYS,
-    REQUIRED_README_SECTIONS,
+    REQUIRED_README_MARKERS,
     expected_snapshot_metric_keys,
     missing_required_keys,
 )
@@ -31,6 +32,18 @@ FOCUS_SVG_PATH = Path("assets/now_next_shipped.svg")
 SNAPSHOT_SVG_PATH = Path("assets/raw_snapshot.svg")
 CONTRIBUTION_SVG_PATH = Path("assets/contribution_calendar.svg")
 PROFILE_SNAPSHOT_PATH = Path("site/data/profile_snapshot.json")
+EXPECTED_CARD_TITLES = {
+    Path("assets/badges.svg"): "By The Numbers",
+    Path("assets/builder_scorecard.svg"): "Builder Scorecard",
+    Path("assets/contribution_calendar.svg"): "Contribution Calendar",
+    Path("assets/now_next_shipped.svg"): "Current Focus",
+    Path("assets/currently_working.svg"): "Currently Working On",
+    Path("assets/lang_breakdown.svg"): "Language Breakdown",
+    Path("assets/activity_heatmap.svg"): "When I Code",
+    Path("assets/repo_spotlight.svg"): "Flagship Projects",
+    Path("assets/raw_snapshot.svg"): "Raw Data Snapshot (Python Pull)",
+    Path("assets/streak_summary.svg"): "Streak Summary",
+}
 
 
 @dataclass(frozen=True)
@@ -41,12 +54,6 @@ class ValidationResult:
     @property
     def ok(self) -> bool:
         return not self.errors
-
-
-def _section(text: str, heading: str) -> str:
-    pattern = rf"### {re.escape(heading)}\n(.*?)(?:\n### |\Z)"
-    match = re.search(pattern, text, flags=re.S)
-    return match.group(1) if match else ""
 
 
 def _parse_int(value: object) -> int | None:
@@ -69,9 +76,13 @@ def validate_profile() -> ValidationResult:
 
     readme = README_PATH.read_text(encoding="utf-8")
 
-    for heading in REQUIRED_README_SECTIONS:
-        if not _section(readme, heading):
-            errors.append(f"Missing section: {heading}")
+    for marker in REQUIRED_README_MARKERS:
+        if marker not in readme:
+            errors.append(f"README missing required marker: {marker}")
+
+    for heading in DISALLOWED_README_HEADINGS:
+        if heading in readme:
+            errors.append(f"README should not contain duplicate heading: {heading}")
 
     if "assets/now_next_shipped.svg" not in readme:
         errors.append("README does not embed assets/now_next_shipped.svg")
@@ -88,6 +99,17 @@ def validate_profile() -> ValidationResult:
         errors.append("assets/raw_snapshot.svg not found")
     if not CONTRIBUTION_SVG_PATH.exists():
         errors.append("assets/contribution_calendar.svg not found")
+
+    for svg_path, title in EXPECTED_CARD_TITLES.items():
+        if not svg_path.exists():
+            errors.append(f"{svg_path} not found")
+            continue
+        svg_text = svg_path.read_text(encoding="utf-8")
+        title_hits = len(re.findall(rf">{re.escape(title)}</text>", svg_text))
+        if title_hits != 1:
+            errors.append(
+                f"{svg_path} should contain exactly one in-image title '{title}' (found {title_hits})"
+            )
 
     profile_snapshot: dict = {}
     if PROFILE_SNAPSHOT_PATH.exists():
@@ -183,7 +205,8 @@ def validate_profile() -> ValidationResult:
             warnings.append("Snapshot total_stars is missing or non-numeric")
 
         releases_value = _parse_int(snapshot.get("releases"))
-        if releases_value is None:
+        releases_status = str(profile_snapshot.get("data_quality", {}).get("releases_status", "")).strip().lower()
+        if releases_value is None and releases_status not in {"unavailable", "events_fallback", "partial", "fallback"}:
             warnings.append("Snapshot releases is missing or non-numeric")
 
         if METRICS_SVG_PATH.exists():
@@ -254,4 +277,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

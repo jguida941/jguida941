@@ -1,4 +1,4 @@
-"""Render SVG assets, dashboard JSON, and README from computed model data."""
+"""Render SVG assets, dashboard JSON, and README."""
 
 from __future__ import annotations
 

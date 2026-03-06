@@ -115,7 +115,7 @@ def _set_cached(key: str, data):
 
 
 def _request_with_retry(url, headers=None, params=None, max_retries=3):
-    """GET request with retry on 429/5xx."""
+    """Send a GET request and retry on 429/5xx."""
     last_error = None
     for attempt in range(max_retries):
         try:
@@ -139,7 +139,7 @@ def _request_with_retry(url, headers=None, params=None, max_retries=3):
 
 
 def _request_public_with_retry(url, params=None, max_retries=2):
-    """GET request without auth, for public fallback checks."""
+    """Send a public GET request for fallback checks."""
     public_headers = {"Accept": "application/vnd.github+json"}
     last_error = None
     for attempt in range(max_retries):
@@ -775,7 +775,8 @@ def get_releases_last_n_days(
             f"{unknown_repos} repos; showing partial total"
         )
 
-    result: int | None = total_known if total_known > 0 or unknown_repos == 0 else None
+    # If any repo is unknown, return None instead of a partial count.
+    result: int | None = total_known if unknown_repos == 0 else None
     _set_cached(cache_key, {"total": result, "unknown_repos": unknown_repos})
     return result
 

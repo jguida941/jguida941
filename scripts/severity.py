@@ -1,4 +1,4 @@
-"""Shared severity helpers for checks and triage findings."""
+"""Severity helpers for checks and triage findings."""
 
 from __future__ import annotations
 

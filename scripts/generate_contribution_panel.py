@@ -1,4 +1,4 @@
-"""Generate a themed contribution calendar SVG panel."""
+"""Build the contribution calendar SVG panel."""
 
 from __future__ import annotations
 

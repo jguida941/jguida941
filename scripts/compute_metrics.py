@@ -1,4 +1,4 @@
-"""Compute profile metrics and dashboard model from collected data."""
+"""Build the profile metrics and dashboard model from collected data."""
 
 from __future__ import annotations
 
@@ -150,18 +150,18 @@ def _build_ci_quality(
         ci_count_effective = ci_true_count
         ci_coverage_pct = (ci_true_count / ci_total_repos * 100) if ci_total_repos else 0.0
     elif ci_known_count == 0:
-        ci_status = "unavailable"
-        ci_note = "CI workflow detection unavailable for this run; shown as n/a."
-        ci_count_effective = None
-        ci_coverage_pct = None
+        ci_status = "fallback"
+        ci_note = "CI workflow detection unavailable for this run; using 0 fallback."
+        ci_count_effective = 0
+        ci_coverage_pct = 0.0
     else:
         ci_status = "partial"
         ci_note = (
-            "CI workflow detection partial for this run; unknown repos shown as n/a "
+            "CI workflow detection partial for this run; showing known minimum with unknown repos noted "
             f"({ci_unknown_count}/{ci_total_repos})."
         )
-        ci_count_effective = None
-        ci_coverage_pct = None
+        ci_count_effective = ci_true_count
+        ci_coverage_pct = (ci_true_count / ci_known_count * 100) if ci_known_count else None
 
     return repo_ci_lookup, {
         "ci_status": ci_status,
@@ -575,8 +575,6 @@ def compute_profile_model(
         merged_pr_total = gh.get_merged_prs_last_n_days(days=365)
         if merged_pr_total is not None:
             prs_merged = merged_pr_total
-    releases = sum(1 for event in events if event.get("type") == "ReleaseEvent")
-
     release_event_times = []
     for event in events:
         if event.get("type") != "ReleaseEvent":
@@ -588,11 +586,21 @@ def compute_profile_model(
             release_event_times.append(datetime.fromisoformat(created_at.replace("Z", "+00:00")))
         except ValueError:
             continue
-    releases_30d = sum(1 for ts in release_event_times if (now_utc - ts).days < 30)
+    releases_from_events_30d = sum(1 for ts in release_event_times if (now_utc - ts).days < 30)
+    releases_30d: int | None = releases_from_events_30d
     if allow_network_calls:
         release_total_via_api = gh.get_releases_last_n_days(repos, days=30)
-        if release_total_via_api is not None:
+        if release_total_via_api is None:
+            releases_30d = releases_from_events_30d
+            releases_status = "fallback"
+            releases_note = "Release API count unavailable for this run; using events fallback."
+        else:
             releases_30d = release_total_via_api
+            releases_status = "ok"
+            releases_note = "Release aggregation complete."
+    else:
+        releases_status = "events_fallback"
+        releases_note = "Release count derived from events feed fallback (offline or fixture mode)."
     avg_release_gap_days = 0.0
     if len(release_event_times) >= 2:
         sorted_times = sorted(release_event_times, reverse=True)
@@ -626,8 +634,18 @@ def compute_profile_model(
         commits_status = "empty"
         commits_note = "No repositories in scope."
     elif public_scope_commits is None:
-        commits_status = "unavailable"
-        commits_note = "Public-scope commit aggregation unavailable for this run; shown as n/a."
+        fallback_commit_total = gh.get_total_commit_contributions_via_graphql() if allow_network_calls else None
+        if fallback_commit_total is not None:
+            public_scope_commits = fallback_commit_total
+            commits_status = "fallback"
+            commits_note = (
+                "Public-scope commit aggregation unavailable; using GitHub total commit contributions fallback."
+            )
+        else:
+            fallback_calendar_total = int(collected.total_contributions or 0)
+            public_scope_commits = fallback_calendar_total
+            commits_status = "fallback"
+            commits_note = "Public-scope commit aggregation unavailable; using contribution-calendar fallback."
     else:
         commits_status = "ok"
         commits_note = "Public-scope commit aggregation complete."
@@ -779,8 +797,11 @@ def compute_profile_model(
         "ci_note": ci_quality["ci_note"],
         "commits_status": commits_status,
         "commits_note": commits_note,
+        "releases_status": releases_status,
+        "releases_note": releases_note,
         "events_status": events_status,
         "events_note": events_note,
+        "token_mode": collected.token_mode,
     }
 
     theme = {

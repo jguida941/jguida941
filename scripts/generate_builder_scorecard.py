@@ -1,4 +1,4 @@
-"""Generate a compact builder scorecard SVG for profile credibility metrics."""
+"""Build the builder scorecard SVG."""
 
 from scripts.config import (
     BG_CARD,

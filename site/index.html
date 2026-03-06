@@ -610,7 +610,7 @@
         { key: "total_repos", label: "Public Non-Fork Repos" },
         { key: "public_forks", label: "Public Fork Repos" },
         { key: "private_owned_repos", label: "Private Owned Repos" },
-        { key: "total_stars", label: "Total Stars" },
+        { key: "total_stars", label: "Repo Stargazers (Received)" },
         { key: "languages_count", label: "Languages Detected" },
         { key: "prs_merged", label: "PRs Merged (12mo)" },
         { key: "releases", label: "Releases (Recent)" },
@@ -670,8 +670,9 @@
         }
         const ci = String(dataQuality.ci_status || "unknown");
         const commits = String(dataQuality.commits_status || "unknown");
+        const releases = String(dataQuality.releases_status || "unknown");
         const events = String(dataQuality.events_status || "unknown");
-        return `Data quality: CI ${ci} · commits ${commits} · events ${events}`;
+        return `Data quality: CI ${ci} · commits ${commits} · releases ${releases} · events ${events}`;
       }
 
       function applyTheme(theme) {
@@ -921,8 +922,10 @@
         qualityPill.textContent = formatDataQuality(quality);
         const ciNote = quality?.ci_note ? `CI: ${quality.ci_note}` : "";
         const commitsNote = quality?.commits_note ? `Commits: ${quality.commits_note}` : "";
+        const releasesNote = quality?.releases_note ? `Releases: ${quality.releases_note}` : "";
         const eventsNote = quality?.events_note ? `Events: ${quality.events_note}` : "";
-        qualityPill.title = [ciNote, commitsNote, eventsNote].filter(Boolean).join(" | ");
+        const tokenMode = quality?.token_mode ? `Token mode: ${quality.token_mode}` : "";
+        qualityPill.title = [ciNote, commitsNote, releasesNote, eventsNote, tokenMode].filter(Boolean).join(" | ");
         document.getElementById("generated-pill").textContent = "Generated: " + generatedText;
       }
 

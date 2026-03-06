@@ -1,4 +1,4 @@
-"""Shared metric definitions and formatting contracts for README/site/SVG outputs."""
+"""Metric definitions and formatting rules for profile outputs."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ SCORECARD_METRICS = [
         "key": "releases_30d",
         "label": "Release Velocity (30d)",
         "detail": "published releases across public repos",
-        "format": "int",
+        "format": "int_or_na",
         "accent": "ORANGE",
     },
     {
@@ -89,8 +89,8 @@ SNAPSHOT_METRICS = [
     },
     {
         "key": "total_stars",
-        "label": "Total Stars",
-        "dashboard_label": "Total Stars",
+        "label": "Repo Stargazers (Received)",
+        "dashboard_label": "Repo Stargazers (Received)",
         "format": "int",
     },
     {
@@ -109,7 +109,7 @@ SNAPSHOT_METRICS = [
         "key": "releases",
         "label": "Releases (30 Days)",
         "dashboard_label": "Releases (30d)",
-        "format": "int",
+        "format": "int_or_na",
     },
     {
         "key": "ci_repos",

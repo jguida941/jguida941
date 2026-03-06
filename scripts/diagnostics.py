@@ -1,4 +1,4 @@
-"""Write command diagnostics so runs are easier to debug."""
+"""Write run diagnostics for debugging."""
 
 from __future__ import annotations
 

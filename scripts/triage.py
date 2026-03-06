@@ -1,4 +1,4 @@
-"""Build a machine-friendly triage report for profile pipeline health."""
+"""Build a triage report for profile pipeline health."""
 
 from __future__ import annotations
 

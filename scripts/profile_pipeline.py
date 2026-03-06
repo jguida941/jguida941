@@ -1,4 +1,4 @@
-"""Main pipeline orchestration for profile generation."""
+"""Run the profile build pipeline."""
 
 from __future__ import annotations
 

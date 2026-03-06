@@ -1,4 +1,4 @@
-"""Helpers for reading GitHub Actions run data with the `gh` CLI."""
+"""Read GitHub Actions run data with the `gh` CLI."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Collect raw profile data from GitHub APIs."""
+"""Collect profile data from GitHub APIs."""
 
 from __future__ import annotations
 
@@ -75,7 +75,7 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
             latest_push_message_by_repo[repo_full_name] = message
 
     logger("[5/7] Fetching public repo commit count...")
-    public_scope_commits = gh.get_total_commits(repos)
+    public_scope_commits = gh.get_total_commits(repos, use_global_fallback=True)
     if public_scope_commits is None:
         logger("  n/a public-scope commits (data unavailable for this run)")
     else:

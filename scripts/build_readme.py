@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Backward-compatible wrapper for legacy build command usage.
+"""Legacy wrapper for the profile build command.
 
-Canonical entrypoint:
+Use this as the main command:
   python scripts/profile_cli.py generate-profile --validate
 """
 

@@ -1,8 +1,9 @@
-"""Generate a self-contained badge strip SVG (no shields.io dependency)."""
+"""Build a row of profile stat badges as SVG."""
 
 from scripts.config import (
     BG_DARK, BLUE, CYAN, ORANGE, TEXT, TEXT_DIM, SVG_WIDTH, FONT_SANS,
 )
+from scripts.card_theme import card_bg, title_left, title_right
 
 
 def _badge(x: int, label: str, value: str, color: str) -> str:
@@ -57,8 +58,11 @@ def generate(
     total_w = x - gap
     offset_x = (SVG_WIDTH - total_w) / 2
 
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="60" viewBox="0 0 {SVG_WIDTH} 60">
-  <g transform="translate({offset_x}, 14)">
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="98" viewBox="0 0 {SVG_WIDTH} 98">
+  {card_bg(SVG_WIDTH, 98)}
+  {title_left("By The Numbers", x=24, y=29)}
+  {title_right("repo scope + CI + contribution volume", width=SVG_WIDTH, pad=24, y=29)}
+  <g transform="translate({offset_x}, 50)">
     {"".join(badge_svgs)}
   </g>
 </svg>"""

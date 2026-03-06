@@ -23,8 +23,6 @@
 
 ---
 
-### By The Numbers
-
 <div align="center">
 
 <img src="assets/badges.svg?v={{ cache_bust }}" alt="Profile Badges" />
@@ -32,8 +30,6 @@
 </div>
 
 ---
-
-### Builder Scorecard
 
 <div align="center">
 
@@ -43,8 +39,6 @@
 
 ---
 
-### Contribution Calendar
-
 <div align="center">
 
 <img src="assets/contribution_calendar.svg?v={{ cache_bust }}" alt="Contribution Calendar" />
@@ -52,8 +46,6 @@
 </div>
 
 ---
-
-### Current Focus
 
 <div align="center">
 
@@ -63,8 +55,6 @@
 
 ---
 
-### Currently Working On
-
 <div align="center">
 
 <img src="assets/currently_working.svg?v={{ cache_bust }}" alt="Currently Working On" />
@@ -72,8 +62,6 @@
 </div>
 
 ---
-
-### Language Breakdown
 
 <div align="center">
 
@@ -98,8 +86,6 @@
 </div>
 
 ---
-
-### Raw Data Snapshot (Python Pull)
 
 <div align="center">
 

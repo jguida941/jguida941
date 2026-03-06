@@ -1,10 +1,11 @@
-"""Generate `metrics.general.svg` from the canonical profile snapshot model."""
+"""Build `metrics.general.svg` from the profile snapshot model."""
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from scripts.config import BG_CARD, BG_HIGHLIGHT, BORDER, TEXT, TEXT_BRIGHT, TEXT_DIM, FONT_SANS
+from scripts.config import BG_HIGHLIGHT, BORDER, TEXT, TEXT_BRIGHT, FONT_SANS
+from scripts.card_theme import card_bg, meta_text, title_left, title_right
 
 
 def _esc(value: str) -> str:
@@ -65,6 +66,11 @@ def generate(
     streak_days = snapshot.get("streak_days")
     ci_repos = snapshot.get("ci_repos")
 
+    releases_text = _fmt_int(int(releases)) if releases is not None else "n/a"
+    prs_text = _fmt_int(int(prs_merged)) if prs_merged is not None else "n/a"
+    ci_text = _fmt_int(int(ci_repos)) if ci_repos is not None else "n/a"
+    streak_text = _fmt_int(int(streak_days)) if streak_days is not None else "n/a"
+
     scope_text = ""
     if isinstance(data_scope, dict):
         private_scope = data_scope.get("private_owned_repos_total")
@@ -86,24 +92,12 @@ def generate(
     card_h = 74
 
     rows = []
-    rows.append(
-        f'<rect x="0" y="0" width="{width}" height="{height}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>'
-    )
-    rows.append(
-        f'<text x="{pad}" y="24" fill="{TEXT_BRIGHT}" font-size="18" font-family="{FONT_SANS}" font-weight="700">{_esc(username)}</text>'
-    )
-    rows.append(
-        f'<text x="{width - pad}" y="24" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">'
-        f"Canonical CLI Metrics</text>"
-    )
-    rows.append(
-        f'<text x="{pad}" y="40" fill="{TEXT_DIM}" font-size="10" font-family="{FONT_SANS}">'
-        f"Generated: {_esc(_fmt_iso_date(generated_at))}</text>"
-    )
+    rows.append(card_bg(width, height))
+    rows.append(title_left(_esc(username), x=pad, y=25, size=18))
+    rows.append(title_right("Canonical CLI Metrics", width=width, pad=pad, y=25))
+    rows.append(meta_text(f"Generated: {_esc(_fmt_iso_date(generated_at))}", x=pad, y=40))
     if scope_text:
-        rows.append(
-            f'<text x="{pad}" y="54" fill="{TEXT_DIM}" font-size="10" font-family="{FONT_SANS}">{_esc(scope_text)}</text>'
-        )
+        rows.append(meta_text(_esc(scope_text), x=pad, y=54))
 
     start_y = 66 if scope_text else 54
     left_x = pad
@@ -140,7 +134,7 @@ def generate(
             right_x + 14,
             y2 + 30,
             f"{_fmt_int(int(total_stars or 0))} Stargazers",
-            "Total Stars",
+            "Repo Stargazers (Received)",
         )
     )
 
@@ -165,8 +159,8 @@ def generate(
             right_x + 14,
             y3 + 30,
             (
-                f"{_fmt_int(int(releases or 0))} Releases | {_fmt_int(int(prs_merged or 0))} PRs | "
-                f"CI {_fmt_int(int(ci_repos or 0))} | Streak {_fmt_int(int(streak_days or 0))}"
+                f"{releases_text} Releases | {prs_text} PRs | "
+                f"CI {ci_text} | Streak {streak_text}"
             ),
             "Recent Delivery",
         )
