@@ -17,8 +17,7 @@ def _tile(
 ) -> str:
     return f"""<g transform="translate({x}, {y})">
   <rect width="{width}" height="{height}" rx="12" fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>
-  <rect x="0" y="0" width="{width}" height="4" rx="12" fill="{accent}"/>
-  <text x="16" y="30" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}" font-weight="600">{label}</text>
+  <text x="16" y="30" fill="{accent}" font-size="11" font-family="{FONT_SANS}" font-weight="600">{label}</text>
   <text x="16" y="62" fill="{TEXT_BRIGHT}" font-size="28" font-family="{FONT_SANS}" font-weight="700">{value}</text>
   <text x="16" y="86" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}">{detail}</text>
 </g>"""

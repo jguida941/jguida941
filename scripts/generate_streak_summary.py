@@ -133,6 +133,12 @@ def generate(
     sep_right = pad + col_w * 2
     center_x = pad + int(col_w * 1.5)
 
+    value_y = 124
+    label_y = 150
+    date_y = 176
+    ring_cy = 110
+    ring_r = 34
+
     parts = [
         card_bg(width, height),
         title_left("Streak Summary", x=pad, y=30),
@@ -146,20 +152,20 @@ def generate(
     left_cx = pad + int(col_w * 0.5)
     parts.extend(
         [
-            f'<text x="{left_cx}" y="124" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(total_contributions))}</text>',
-            f'<text x="{left_cx}" y="150" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Total Contributions</text>',
-            f'<text x="{left_cx}" y="176" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(contrib_start, contrib_end))}</text>',
+            f'<text x="{left_cx}" y="{value_y}" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(total_contributions))}</text>',
+            f'<text x="{left_cx}" y="{label_y}" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Total Contributions</text>',
+            f'<text x="{left_cx}" y="{date_y}" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(contrib_start, contrib_end))}</text>',
         ]
     )
 
     # Middle: current streak ring
     parts.extend(
         [
-            f'<circle cx="{center_x}" cy="100" r="38" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="4"/>',
-            f'<circle cx="{center_x}" cy="62" r="5" fill="{ORANGE}"/>',
-            f'<text x="{center_x}" y="113" fill="{TEXT_BRIGHT}" font-size="44" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(current_days))}</text>',
-            f'<text x="{center_x}" y="156" fill="{BLUE}" font-size="18" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">Current Streak</text>',
-            f'<text x="{center_x}" y="178" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(current_start, current_end))}</text>',
+            f'<circle cx="{center_x}" cy="{ring_cy}" r="{ring_r}" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="4"/>',
+            f'<circle cx="{center_x}" cy="{ring_cy - ring_r}" r="5" fill="{ORANGE}"/>',
+            f'<text x="{center_x}" y="{value_y}" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(current_days))}</text>',
+            f'<text x="{center_x}" y="{label_y}" fill="{BLUE}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Current Streak</text>',
+            f'<text x="{center_x}" y="{date_y}" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(current_start, current_end))}</text>',
         ]
     )
 
@@ -167,9 +173,9 @@ def generate(
     right_cx = pad + int(col_w * 2.5)
     parts.extend(
         [
-            f'<text x="{right_cx}" y="124" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(longest_days))}</text>',
-            f'<text x="{right_cx}" y="150" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Longest Streak</text>',
-            f'<text x="{right_cx}" y="176" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(longest_start, longest_end))}</text>',
+            f'<text x="{right_cx}" y="{value_y}" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(longest_days))}</text>',
+            f'<text x="{right_cx}" y="{label_y}" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Longest Streak</text>',
+            f'<text x="{right_cx}" y="{date_y}" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(longest_start, longest_end))}</text>',
         ]
     )
 

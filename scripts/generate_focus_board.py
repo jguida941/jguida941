@@ -45,9 +45,6 @@ def generate(focus: dict, output_path: str = "assets/now_next_shipped.svg") -> s
             f'fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>'
         )
         parts.append(
-            f'<rect x="{x}" y="{y}" width="{col_w}" height="4" rx="12" fill="{accent}"/>'
-        )
-        parts.append(
             f'<text x="{x + 14}" y="{y + 24}" fill="{accent}" font-size="12" '
             f'font-family="{FONT_SANS}" font-weight="700">{label}</text>'
         )
