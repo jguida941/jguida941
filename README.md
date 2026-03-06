@@ -9,7 +9,7 @@
 
 <div align="center">
 
-<img src="metrics.general.svg?v=20260306055959.304886" width="100%" alt="GitHub Stats" />
+<img src="metrics.general.svg?v=20260306063141.312286" width="100%" alt="GitHub Stats" />
 
 </div>
 
@@ -17,7 +17,7 @@
 
 <div align="center">
 
-<img src="assets/streak_summary.svg?v=20260306055959.304886" width="100%" alt="Streak Summary" />
+<img src="assets/streak_summary.svg?v=20260306063141.312286" width="100%" alt="Streak Summary" />
 
 </div>
 
@@ -27,7 +27,7 @@
 
 <div align="center">
 
-<img src="assets/badges.svg?v=20260306055959.304886" alt="Profile Badges" />
+<img src="assets/badges.svg?v=20260306063141.312286" alt="Profile Badges" />
 
 </div>
 
@@ -37,7 +37,7 @@
 
 <div align="center">
 
-<img src="assets/builder_scorecard.svg?v=20260306055959.304886" alt="Builder Scorecard" />
+<img src="assets/builder_scorecard.svg?v=20260306063141.312286" alt="Builder Scorecard" />
 
 </div>
 
@@ -47,7 +47,7 @@
 
 <div align="center">
 
-<img src="assets/contribution_calendar.svg?v=20260306055959.304886" alt="Contribution Calendar" />
+<img src="assets/contribution_calendar.svg?v=20260306063141.312286" alt="Contribution Calendar" />
 
 </div>
 
@@ -57,25 +57,9 @@
 
 <div align="center">
 
-<img src="assets/now_next_shipped.svg?v=20260306055959.304886" alt="Current Focus" />
+<img src="assets/now_next_shipped.svg?v=20260306063141.312286" alt="Current Focus" />
 
 </div>
-
-
-#### Focus Links
-
-- Now: [voiceterm](https://github.com/jguida941/voiceterm) — push · today · ★8 · Rust
-- Now: [jguida941](https://github.com/jguida941/jguida941) — push · today · ★1 · Python
-- Now: [homebrew-voiceterm](https://github.com/jguida941/homebrew-voiceterm) — push · 2 days ago · ★1 · Ruby
-
-- Next: [PR #11](https://github.com/jguida941/voiceterm/pull/11) — voiceterm · open · today
-- Next: [PR #10](https://github.com/jguida941/voiceterm/pull/10) — voiceterm · open · 2 days ago
-
-- Shipped: [v1.0.99](https://github.com/jguida941/voiceterm/releases/tag/v1.0.99) — voiceterm · 2 days ago
-- Shipped: [v1.0.98](https://github.com/jguida941/voiceterm/releases/tag/v1.0.98) — voiceterm · 4 days ago
-- Shipped: [v1.0.97](https://github.com/jguida941/voiceterm/releases/tag/v1.0.97) — voiceterm · 4 days ago
-
-
 
 ---
 
@@ -83,7 +67,7 @@
 
 <div align="center">
 
-<img src="assets/currently_working.svg?v=20260306055959.304886" alt="Currently Working On" />
+<img src="assets/currently_working.svg?v=20260306063141.312286" alt="Currently Working On" />
 
 </div>
 
@@ -93,36 +77,25 @@
 
 <div align="center">
 
-<img src="assets/lang_breakdown.svg?v=20260306055959.304886" alt="Language Breakdown" />
+<img src="assets/lang_breakdown.svg?v=20260306063141.312286" alt="Language Breakdown" />
 
 </div>
 
 ---
 
-### When I Code
-
 <div align="center">
 
-<img src="assets/activity_heatmap.svg?v=20260306055959.304886" alt="Activity Heatmap" />
+<img src="assets/activity_heatmap.svg?v=20260306063141.312286" alt="Activity Heatmap" />
 
 </div>
 
 ---
 
-### Flagship Projects
-
 <div align="center">
 
-<img src="assets/repo_spotlight.svg?v=20260306055959.304886" alt="Flagship Projects" />
+<img src="assets/repo_spotlight.svg?v=20260306063141.312286" alt="Flagship Projects" />
 
 </div>
-
-#### Project Links
-
-- [ci-cd-hub](https://github.com/jguida941/ci-cd-hub) — ★2 · Python · CI yes
-- [voiceterm](https://github.com/jguida941/voiceterm) — ★8 · Rust · CI yes
-- [contact-suite-spring-react](https://github.com/jguida941/contact-suite-spring-react) — ★2 · Java · CI yes
-
 
 ---
 
@@ -130,7 +103,7 @@
 
 <div align="center">
 
-<img src="assets/raw_snapshot.svg?v=20260306055959.304886" alt="Raw Data Snapshot" />
+<img src="assets/raw_snapshot.svg?v=20260306063141.312286" alt="Raw Data Snapshot" />
 
 </div>
 
