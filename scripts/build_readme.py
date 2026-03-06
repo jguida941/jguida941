@@ -15,13 +15,30 @@ os.chdir(ROOT)
 import jinja2
 
 from scripts import github_client as gh
-from scripts.config import USERNAME, FEATURED_REPOS
+from scripts.config import (
+    USERNAME,
+    FEATURED_REPOS,
+    BG_DARK,
+    BG_CARD,
+    BG_HIGHLIGHT,
+    BLUE,
+    CYAN,
+    GREEN,
+    ORANGE,
+    RED,
+    YELLOW,
+    TEXT,
+    TEXT_DIM,
+    TEXT_BRIGHT,
+    BORDER,
+)
 from scripts.generate_badges import generate as gen_badges
 from scripts.generate_language_chart import generate as gen_lang_chart
 from scripts.generate_currently_working import generate as gen_working
 from scripts.generate_activity_heatmap import generate as gen_heatmap
 from scripts.generate_repo_spotlight import generate as gen_spotlight
 from scripts.generate_builder_scorecard import generate as gen_scorecard
+from scripts.profile_contract import SCORECARD_METRICS, SNAPSHOT_METRICS, format_metric_value
 
 
 def _time_ago(iso_str: str) -> str:
@@ -75,6 +92,14 @@ def _activity_label(event_type: str) -> str:
     if event_type in labels:
         return labels[event_type]
     return (event_type or "activity").replace("Event", "").lower() or "activity"
+
+
+def _ci_text(ci_state: bool | None) -> str:
+    if ci_state is True:
+        return "yes"
+    if ci_state is False:
+        return "no"
+    return "n/a"
 
 
 def main():
@@ -133,8 +158,8 @@ def main():
     print(f"  {public_scope_commits} public-scope commits")
 
     print("[6/7] Counting CI/CD pipelines...")
-    ci_count = gh.get_repos_with_ci(repos)
-    print(f"  {ci_count} repos with CI/CD")
+    ci_count_probe = gh.get_repos_with_ci(repos)
+    print(f"  Probe found {ci_count_probe} repos with CI/CD")
 
     print("[7/7] Fetching contribution calendar...")
     calendar = gh.get_contribution_calendar()
@@ -200,8 +225,45 @@ def main():
         if pushed_dt >= seven_days_ago:
             active_repos_7d += 1
 
+    # CI observability can degrade when API/token access is limited.
+    # Compute an explicit quality status so we can show n/a rather than misleading zeros.
+    repo_ci_lookup: dict[str, bool | None] = {}
+    for repo in repos:
+        name = repo.get("name", "")
+        if not name:
+            continue
+        repo_ci_lookup[name] = _has_ci_workflow(repo)
+
+    ci_total_repos = len(repo_ci_lookup)
+    ci_unknown_count = sum(1 for state in repo_ci_lookup.values() if state is None)
+    ci_true_count = sum(1 for state in repo_ci_lookup.values() if state is True)
+    ci_known_count = ci_total_repos - ci_unknown_count
+
+    if ci_total_repos == 0:
+        ci_status = "empty"
+        ci_note = "No repositories in scope."
+        ci_count_effective = 0
+        ci_coverage_pct = 0.0
+    elif ci_unknown_count == 0:
+        ci_status = "ok"
+        ci_note = "CI workflow detection complete."
+        ci_count_effective = ci_true_count
+        ci_coverage_pct = (ci_true_count / ci_total_repos * 100) if ci_total_repos else 0.0
+    elif ci_known_count == 0:
+        ci_status = "unavailable"
+        ci_note = "CI workflow detection unavailable for this run; shown as n/a."
+        ci_count_effective = None
+        ci_coverage_pct = None
+    else:
+        ci_status = "partial"
+        ci_note = (
+            "CI workflow detection partial for this run; unknown repos shown as n/a "
+            f"({ci_unknown_count}/{ci_total_repos})."
+        )
+        ci_count_effective = None
+        ci_coverage_pct = None
+
     stars_per_public_repo = (total_stars / len(repos)) if repos else 0.0
-    ci_coverage_pct = (ci_count / len(repos) * 100) if repos else 0.0
 
     # Streak days estimate from calendar
     streak_days = 0
@@ -225,7 +287,7 @@ def main():
         public_nonfork_repos=repo_counts["public_owned_nonfork"],
         public_forks=repo_counts["public_owned_forks"],
         private_owned_repos=repo_counts["private_owned"],
-        ci_count=ci_count,
+        ci_count=ci_count_effective,
         last_year_contributions=total_contributions,
     )
     print("  -> assets/badges.svg")
@@ -236,6 +298,7 @@ def main():
 
     # 3. Currently working on
     recent_repos = []
+    recent_commit_message_by_repo: dict[str, str] = {}
     seen = set()
     for r in sorted(repos, key=lambda x: x.get("pushed_at", ""), reverse=True):
         pushed = r.get("pushed_at", "")
@@ -264,7 +327,8 @@ def main():
                 full_name = f"{r['owner']['login']}/{r['name']}"
                 last_msg = latest_push_message_by_repo.get(full_name, "")
             if not last_msg:
-                last_msg = "latest commit message unavailable"
+                last_msg = "recent push detected"
+            recent_commit_message_by_repo[r["name"]] = last_msg
             recent_repos.append({
                 "name": r["name"],
                 "html_url": r.get("html_url", ""),
@@ -309,56 +373,79 @@ def main():
         "ci_coverage_pct": ci_coverage_pct,
         "last_year_contributions": total_contributions,
     }
-    gen_scorecard(scorecard)
+    accent_colors = {
+        "BLUE": BLUE,
+        "CYAN": CYAN,
+        "GREEN": GREEN,
+        "ORANGE": ORANGE,
+    }
+    scorecard_cards = []
+    for definition in SCORECARD_METRICS:
+        value = scorecard.get(definition["key"], 0)
+        scorecard_cards.append({
+            "key": definition["key"],
+            "label": definition["label"],
+            "detail": definition["detail"],
+            "value": value,
+            "display_value": format_metric_value(value, definition),
+            "accent": accent_colors.get(definition.get("accent", "CYAN"), CYAN),
+        })
+    gen_scorecard(scorecard, tiles=scorecard_cards)
     print("  -> assets/builder_scorecard.svg")
 
     # ── Render README ───────────────────────────────────────
     print("\nRendering README.md...")
 
-    # Prepare template data
-    # Most active projects with explicit language + CI signals
-    active_repos = sorted(repos, key=lambda r: r.get("pushed_at", ""), reverse=True)[:15]
-    repo_language_matrix = []
-    for repo in active_repos:
-        ci_state = _has_ci_workflow(repo)
-        if ci_state is True:
-            ci_text = "yes"
-        elif ci_state is False:
-            ci_text = "no"
-        else:
-            ci_text = "unknown"
+    # Prepare template and dashboard data from a single canonical model.
+    sorted_repos_by_push = sorted(repos, key=lambda r: r.get("pushed_at", ""), reverse=True)
+    repo_by_name = {repo.get("name", ""): repo for repo in repos if repo.get("name")}
+    featured_set = set(FEATURED_REPOS)
 
-        repo_language_matrix.append({
-            "name": repo.get("name", ""),
+    def build_repo_row(repo: dict) -> dict:
+        owner_login = repo.get("owner", {}).get("login", USERNAME)
+        name = repo.get("name", "")
+        full_name = f"{owner_login}/{name}" if name else ""
+        pushed_raw = repo.get("pushed_at", "") or ""
+        pushed_date = pushed_raw[:10] if pushed_raw else ""
+        commit_msg = (repo.get("latest_commit_message") or "").split("\n")[0].strip()
+        if not commit_msg and name:
+            commit_msg = recent_commit_message_by_repo.get(name, "")
+        if not commit_msg and full_name:
+            commit_msg = latest_push_message_by_repo.get(full_name, "")
+        if not commit_msg:
+            commit_msg = "recent push detected"
+
+        ci_state = repo_ci_lookup.get(name)
+        return {
+            "name": name,
+            "full_name": full_name,
             "url": repo.get("html_url", ""),
             "language": repo.get("language") or "n/a",
             "stars": repo.get("stargazers_count", 0),
             "forks": repo.get("forks_count", 0),
-            "pushed_at": (repo.get("pushed_at") or "")[:10],
-            "ci": ci_text,
-        })
+            "ci": _ci_text(ci_state),
+            "pushed_at": pushed_date,
+            "pushed_at_raw": pushed_raw,
+            "pushed_ago": _time_ago(pushed_raw) if pushed_raw else "unknown",
+            "created_at": (repo.get("created_at") or "")[:10],
+            "last_commit_msg": commit_msg,
+            "featured": name in featured_set,
+        }
 
-    featured_repo_facts = []
-    for repo_name in FEATURED_REPOS:
-        repo = next((r for r in repos if r.get("name") == repo_name), None)
-        if not repo:
-            continue
-        ci_state = _has_ci_workflow(repo)
-        if ci_state is True:
-            ci_text = "yes"
-        elif ci_state is False:
-            ci_text = "no"
-        else:
-            ci_text = "unknown"
-        featured_repo_facts.append({
-            "name": repo.get("name", ""),
-            "url": repo.get("html_url", ""),
-            "language": repo.get("language") or "n/a",
-            "stars": repo.get("stargazers_count", 0),
-            "forks": repo.get("forks_count", 0),
-            "ci": ci_text,
-            "pushed_at": (repo.get("pushed_at") or "")[:10],
-        })
+    ordered_repo_names = []
+    for featured_name in FEATURED_REPOS:
+        if featured_name in repo_by_name and featured_name not in ordered_repo_names:
+            ordered_repo_names.append(featured_name)
+    for repo in sorted_repos_by_push:
+        repo_name = repo.get("name", "")
+        if repo_name and repo_name not in ordered_repo_names:
+            ordered_repo_names.append(repo_name)
+        if len(ordered_repo_names) >= 18:
+            break
+
+    repo_overview_rows = [build_repo_row(repo_by_name[name]) for name in ordered_repo_names if name in repo_by_name]
+    repo_row_by_full_name = {row["full_name"]: row for row in repo_overview_rows if row.get("full_name")}
+    featured_repo_facts = [row for row in repo_overview_rows if row.get("featured")]
 
     data_scope = {
         "repos_included": "public + owned + non-fork",
@@ -373,18 +460,40 @@ def main():
         "last_year_contributions": total_contributions,
         "public_scope_commits": public_scope_commits,
         "total_repos": repo_counts["public_owned_nonfork"],
+        "public_forks": repo_counts["public_owned_forks"],
+        "private_owned_repos": repo_counts["private_owned"],
         "total_stars": total_stars,
         "languages_count": lang_count,
         "prs_merged": prs_merged,
         "releases": releases,
-        "ci_repos": ci_count,
+        "ci_repos": ci_count_effective,
         "streak_days": streak_days,
     }
+    snapshot_rows = []
+    for definition in SNAPSHOT_METRICS:
+        key = definition["key"]
+        value = snapshot.get(key)
+        snapshot_rows.append({
+            "key": key,
+            "label": definition["label"],
+            "dashboard_label": definition["dashboard_label"],
+            "value": value,
+            "display_value": format_metric_value(value, definition),
+        })
+    snapshot_cards = [
+        {
+            "key": row["key"],
+            "label": row["dashboard_label"],
+            "value": row["value"],
+            "display_value": row["display_value"],
+        }
+        for row in snapshot_rows
+    ]
 
     # Recently created repos (top 10 non-fork by creation date)
     recent_created = sorted(repos, key=lambda r: r.get("created_at", ""), reverse=True)[:10]
 
-    # Latest owned-repo contribution activity (from events)
+    # Latest owned-repo contribution activity (from events, with active-repo fallback).
     contribution_event_types = {
         "PushEvent",
         "PullRequestEvent",
@@ -398,31 +507,43 @@ def main():
     owned_repo_prefix = f"{USERNAME}/"
     contributions = []
     seen_contrib = set()
-    for e in events:
-        if e.get("type") not in contribution_event_types:
+    for event in events:
+        if event.get("type") not in contribution_event_types:
             continue
-        repo_name = e.get("repo", {}).get("name", "")
+        repo_name = event.get("repo", {}).get("name", "")
         if not repo_name.startswith(owned_repo_prefix):
             continue
-        if repo_name not in seen_contrib:
-            seen_contrib.add(repo_name)
-            contributions.append({
-                "repo": repo_name,
-                "url": f"https://github.com/{repo_name}",
-                "activity": _activity_label(e.get("type", "")),
-                "time_ago": _time_ago(e.get("created_at", "")),
-            })
+        if repo_name in seen_contrib:
+            continue
+        seen_contrib.add(repo_name)
+        contributions.append({
+            "repo": repo_name,
+            "url": f"https://github.com/{repo_name}",
+            "activity": _activity_label(event.get("type", "")),
+            "time_ago": _time_ago(event.get("created_at", "")),
+            "created_at": event.get("created_at", ""),
+        })
         if len(contributions) >= 10:
             break
+    if not contributions:
+        for repo in recent_repos[:10]:
+            full_name = f"{USERNAME}/{repo['name']}"
+            contributions.append({
+                "repo": full_name,
+                "url": repo.get("html_url", f"https://github.com/{full_name}"),
+                "activity": "push",
+                "time_ago": _time_ago(repo.get("pushed_at", "")),
+                "created_at": repo.get("pushed_at", ""),
+            })
 
     # Recent releases
     release_list = []
-    for e in events:
-        if e.get("type") != "ReleaseEvent":
+    for event in events:
+        if event.get("type") != "ReleaseEvent":
             continue
-        payload = e.get("payload", {})
+        payload = event.get("payload", {})
         release = payload.get("release", {})
-        repo_name = e.get("repo", {}).get("name", "")
+        repo_name = event.get("repo", {}).get("name", "")
         release_tag = (release.get("tag_name") or "").strip() or "unknown"
         release_url = (release.get("html_url") or "").strip()
         if not release_url and repo_name and release_tag != "unknown":
@@ -432,18 +553,19 @@ def main():
             "repo_url": f"https://github.com/{repo_name}",
             "tag": release_tag,
             "url": release_url,
-            "time_ago": _time_ago(e.get("created_at", "")),
+            "time_ago": _time_ago(event.get("created_at", "")),
+            "created_at": event.get("created_at", ""),
         })
         if len(release_list) >= 5:
             break
 
     # Recent PRs
     pr_list = []
-    for e in events:
-        if e.get("type") != "PullRequestEvent":
+    for event in events:
+        if event.get("type") != "PullRequestEvent":
             continue
-        pr = e.get("payload", {}).get("pull_request", {})
-        repo_name = e.get("repo", {}).get("name", "")
+        pr = event.get("payload", {}).get("pull_request", {})
+        repo_name = event.get("repo", {}).get("name", "")
         state = pr.get("state", "open").upper()
         if pr.get("merged"):
             state = "MERGED"
@@ -462,74 +584,210 @@ def main():
             "repo": repo_name,
             "repo_url": f"https://github.com/{repo_name}",
             "state": state,
-            "time_ago": _time_ago(e.get("created_at", "")),
+            "time_ago": _time_ago(event.get("created_at", "")),
+            "created_at": event.get("created_at", ""),
         })
         if len(pr_list) >= 5:
             break
 
-    # Focus board (Now / Next / Shipped) for fast scan value.
+    # Focus board (Now / Next / Shipped).
     focus_now = []
     for entry in contributions[:3]:
-        repo_short = entry["repo"].split("/")[-1]
+        repo_short = entry["repo"].split("/")[-1] if entry.get("repo") else "repo"
+        repo_ctx = repo_row_by_full_name.get(entry.get("repo", ""))
+        detail_bits = [entry["activity"], entry["time_ago"]]
+        if repo_ctx:
+            detail_bits.append(f"★{repo_ctx['stars']}")
+            if repo_ctx.get("language") and repo_ctx["language"] != "n/a":
+                detail_bits.append(repo_ctx["language"])
         focus_now.append({
             "title": repo_short,
-            "detail": f"{entry['activity']} · {entry['time_ago']}",
+            "detail": " · ".join(detail_bits),
             "url": entry["url"],
         })
     if not focus_now:
-        focus_now.append({
-            "title": "No recent owned-repo activity found",
-            "detail": "Waiting for next push/PR/release event",
-            "url": f"https://github.com/{USERNAME}",
-        })
+        for row in repo_overview_rows[:3]:
+            focus_now.append({
+                "title": row["name"],
+                "detail": f"{row['language']} · {row['pushed_ago']} · ★{row['stars']}",
+                "url": row["url"],
+            })
 
     focus_next = []
     open_prs = [pr for pr in pr_list if pr.get("state") == "OPEN"]
     for pr in open_prs[:3]:
-        repo_short = pr["repo"].split("/")[-1]
+        repo_short = pr["repo"].split("/")[-1] if pr.get("repo") else "repo"
         focus_next.append({
             "title": pr["title"],
-            "detail": f"{repo_short} · {pr['state'].lower()}",
+            "detail": f"{repo_short} · open · {pr['time_ago']}",
             "url": pr["url"],
         })
     if not focus_next:
-        for repo in repo_language_matrix[:2]:
+        candidate_rows = [row for row in repo_overview_rows if row.get("ci") != "yes"] or repo_overview_rows
+        for row in candidate_rows[:3]:
+            ci_detail = row["ci"] if row["ci"] in {"yes", "no"} else "unavailable"
             focus_next.append({
-                "title": f"Ship next iteration in {repo['name']}",
-                "detail": f"{repo['language']} · last push {repo['pushed_at'] or 'n/a'}",
-                "url": repo["url"],
+                "title": f"Next pass: {row['name']}",
+                "detail": f"CI {ci_detail} · ★{row['stars']} · pushed {row['pushed_at'] or 'n/a'}",
+                "url": row["url"],
             })
 
     focus_shipped = []
-    for rel in release_list[:4]:
-        repo_short = rel["repo"].split("/")[-1] if rel["repo"] else "repo"
+    for rel in release_list[:3]:
+        repo_short = rel["repo"].split("/")[-1] if rel.get("repo") else "repo"
         focus_shipped.append({
             "title": rel["tag"],
             "detail": f"{repo_short} · {rel['time_ago']}",
             "url": rel["url"] or rel["repo_url"],
         })
     if not focus_shipped:
-        focus_shipped.append({
-            "title": "No recent release events captured",
-            "detail": "Release feed is event-driven and may lag",
-            "url": f"https://github.com/{USERNAME}?tab=repositories",
+        merged_prs = [pr for pr in pr_list if pr.get("state") == "MERGED"]
+        for pr in merged_prs[:3]:
+            repo_short = pr["repo"].split("/")[-1] if pr.get("repo") else "repo"
+            focus_shipped.append({
+                "title": pr["title"],
+                "detail": f"{repo_short} · merged · {pr['time_ago']}",
+                "url": pr["url"],
+            })
+    if not focus_shipped:
+        for repo in recent_repos[:3]:
+            msg = repo.get("last_commit_msg", "")
+            if len(msg) > 58:
+                msg = msg[:55] + "..."
+            focus_shipped.append({
+                "title": msg or repo["name"],
+                "detail": f"{repo['name']} · pushed {_time_ago(repo.get('pushed_at', ''))}",
+                "url": repo.get("html_url", f"https://github.com/{USERNAME}/{repo['name']}"),
+            })
+
+    # Unified delivery feed (releases + PRs + owned activity) to avoid repeated sections.
+    activity_feed = []
+    for rel in release_list:
+        activity_feed.append({
+            "kind": "release",
+            "title": rel["tag"],
+            "url": rel["url"] or rel["repo_url"],
+            "repo": rel["repo"],
+            "repo_url": rel["repo_url"],
+            "state": "RELEASED",
+            "time_ago": rel["time_ago"],
+            "created_at": rel["created_at"],
         })
+    for pr in pr_list:
+        activity_feed.append({
+            "kind": "pull request",
+            "title": pr["title"],
+            "url": pr["url"],
+            "repo": pr["repo"],
+            "repo_url": pr["repo_url"],
+            "state": pr["state"],
+            "time_ago": pr["time_ago"],
+            "created_at": pr["created_at"],
+        })
+    for contrib in contributions:
+        activity_feed.append({
+            "kind": "activity",
+            "title": contrib["activity"],
+            "url": contrib["url"],
+            "repo": contrib["repo"],
+            "repo_url": contrib["url"],
+            "state": contrib["activity"].upper(),
+            "time_ago": contrib["time_ago"],
+            "created_at": contrib["created_at"],
+        })
+    for repo in recent_created[:3]:
+        repo_name = f"{USERNAME}/{repo.get('name', '')}"
+        activity_feed.append({
+            "kind": "created",
+            "title": repo.get("name", "repository"),
+            "url": repo.get("html_url", ""),
+            "repo": repo_name,
+            "repo_url": repo.get("html_url", ""),
+            "state": "CREATED",
+            "time_ago": _time_ago(repo.get("created_at", "")),
+            "created_at": repo.get("created_at", ""),
+        })
+    if not activity_feed:
+        for repo in recent_repos[:10]:
+            repo_name = f"{USERNAME}/{repo.get('name', '')}"
+            activity_feed.append({
+                "kind": "activity",
+                "title": repo.get("last_commit_msg", "push"),
+                "url": repo.get("html_url", ""),
+                "repo": repo_name,
+                "repo_url": repo.get("html_url", ""),
+                "state": "PUSH",
+                "time_ago": _time_ago(repo.get("pushed_at", "")),
+                "created_at": repo.get("pushed_at", ""),
+            })
+
+    activity_feed = sorted(activity_feed, key=lambda item: item.get("created_at", ""), reverse=True)
+    deduped_feed = []
+    seen_feed = set()
+    for item in activity_feed:
+        signature = (
+            item.get("kind", ""),
+            item.get("title", ""),
+            item.get("repo", ""),
+            item.get("created_at", ""),
+        )
+        if signature in seen_feed:
+            continue
+        seen_feed.add(signature)
+        deduped_feed.append(item)
+    activity_feed = deduped_feed[:18]
+
+    events_status = "ok" if events else "limited"
+    events_note = (
+        "Public events feed available."
+        if events
+        else "No recent public events returned in this run; focus/feed use repo push fallbacks."
+    )
+    data_quality = {
+        "ci_status": ci_status,
+        "ci_note": ci_note,
+        "events_status": events_status,
+        "events_note": events_note,
+    }
+
+    theme = {
+        "bg_main": BG_DARK,
+        "bg_panel": BG_CARD,
+        "bg_panel_strong": BG_HIGHLIGHT,
+        "text_main": TEXT_BRIGHT,
+        "text_soft": TEXT,
+        "text_dim": TEXT_DIM,
+        "line": BORDER,
+        "accent_cyan": CYAN,
+        "accent_gold": YELLOW,
+        "accent_mint": GREEN,
+        "accent_pink": RED,
+        "accent_orange": ORANGE,
+        "accent_blue": BLUE,
+    }
 
     dashboard_data = {
         "generated_at": now_utc.isoformat().replace("+00:00", "Z"),
         "username": USERNAME,
         "dashboard_url": f"https://{USERNAME}.github.io/{USERNAME}/",
+        "theme": theme,
         "snapshot": snapshot,
+        "snapshot_rows": snapshot_rows,
+        "snapshot_cards": snapshot_cards,
+        "data_quality": data_quality,
         "scorecard": scorecard,
+        "scorecard_cards": scorecard_cards,
         "data_scope": data_scope,
         "featured_repo_facts": featured_repo_facts,
         "top_languages": top_languages,
-        "repo_language_matrix": repo_language_matrix[:10],
+        "repo_language_matrix": repo_overview_rows,
+        "recent_created": recent_created,
         "focus": {
             "now": focus_now,
             "next": focus_next,
             "shipped": focus_shipped,
         },
+        "activity_feed": activity_feed,
         "recent_releases": release_list,
         "recent_pull_requests": pr_list,
     }
@@ -550,18 +808,18 @@ def main():
         username=USERNAME,
         dashboard_url=f"https://{USERNAME}.github.io/{USERNAME}/",
         recent_created=recent_created,
-        contributions=contributions,
-        releases=release_list,
-        pull_requests=pr_list,
         focus_now=focus_now,
         focus_next=focus_next,
         focus_shipped=focus_shipped,
         snapshot=snapshot,
+        snapshot_rows=snapshot_rows,
+        data_quality=data_quality,
         scorecard=scorecard,
+        scorecard_cards=scorecard_cards,
         data_scope=data_scope,
         top_languages=top_languages,
-        featured_repo_facts=featured_repo_facts,
-        repo_language_matrix=repo_language_matrix,
+        repo_overview_rows=repo_overview_rows,
+        activity_feed=activity_feed,
     )
 
     Path("README.md").write_text(readme)

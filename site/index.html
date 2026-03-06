@@ -17,17 +17,17 @@
     <style>
       :root {
         color-scheme: dark;
-        --bg-main: #0d1124;
-        --bg-panel: rgba(19, 27, 58, 0.85);
-        --bg-panel-strong: #121a3a;
-        --text-main: #f5f8ff;
-        --text-soft: #b8c3df;
-        --text-dim: #8f9cc5;
-        --line: rgba(135, 156, 215, 0.26);
-        --accent-cyan: #4cdeff;
-        --accent-gold: #ffbc67;
-        --accent-mint: #65e4a8;
-        --accent-pink: #ff7aa6;
+        --bg-main: #1a1b27;
+        --bg-panel: rgba(36, 40, 59, 0.9);
+        --bg-panel-strong: #292e42;
+        --text-main: #c0caf5;
+        --text-soft: #a9b1d6;
+        --text-dim: #565f89;
+        --line: rgba(65, 72, 104, 0.9);
+        --accent-cyan: #7dcfff;
+        --accent-gold: #e0af68;
+        --accent-mint: #9ece6a;
+        --accent-pink: #f7768e;
         --shadow: 0 26px 70px rgba(2, 8, 30, 0.5);
       }
 
@@ -41,10 +41,10 @@
         font-family: "IBM Plex Sans", sans-serif;
         color: var(--text-main);
         background:
-          radial-gradient(circle at 8% 12%, rgba(75, 162, 255, 0.18), transparent 40%),
-          radial-gradient(circle at 92% 4%, rgba(255, 122, 166, 0.16), transparent 42%),
-          radial-gradient(circle at 88% 92%, rgba(101, 228, 168, 0.14), transparent 35%),
-          linear-gradient(180deg, #0b1020, #080b17 60%, #070912);
+          radial-gradient(circle at 8% 12%, rgba(122, 162, 247, 0.18), transparent 40%),
+          radial-gradient(circle at 92% 4%, rgba(247, 118, 142, 0.16), transparent 42%),
+          radial-gradient(circle at 88% 92%, rgba(158, 206, 106, 0.14), transparent 35%),
+          linear-gradient(180deg, #1a1b27, #1f2335 60%, #16161e);
       }
 
       body::before {
@@ -495,6 +495,7 @@
             README:
             <a id="readme-link" href="https://github.com/jguida941/jguida941">profile</a>
           </span>
+          <span class="meta-pill" id="quality-pill">Data quality: loading...</span>
           <span class="meta-pill" id="generated-pill">Generated: loading...</span>
         </div>
       </header>
@@ -534,31 +535,20 @@
           </article>
           <article class="stack-panel">
             <div class="section-head">
-              <h3>Flagship Facts</h3>
-              <p class="section-note">featured repos</p>
+              <h3>Recent Delivery Feed</h3>
+              <p class="section-note">releases + PRs + activity</p>
             </div>
-            <ul id="featured-list" class="list-cards"></ul>
+            <ul id="activity-feed-list" class="list-cards"></ul>
           </article>
         </div>
       </section>
 
       <section class="panel section reveal" style="--delay: 0.32s">
-        <div class="split">
-          <article class="stack-panel">
-            <div class="section-head">
-              <h3>Recent Releases</h3>
-              <p class="section-note">event feed</p>
-            </div>
-            <ul id="releases-list" class="list-cards"></ul>
-          </article>
-          <article class="stack-panel">
-            <div class="section-head">
-              <h3>Recent Pull Requests</h3>
-              <p class="section-note">event feed</p>
-            </div>
-            <ul id="prs-list" class="list-cards"></ul>
-          </article>
+        <div class="section-head">
+          <h2>Recently Created</h2>
+          <p class="section-note">new repositories</p>
         </div>
+        <ul id="recent-created-list" class="list-cards"></ul>
       </section>
 
       <section class="panel section reveal" style="--delay: 0.38s">
@@ -573,7 +563,7 @@
     <script>
       const DATA_URL = "./data/profile_snapshot.json";
 
-      const scorecardMeta = [
+      const defaultScorecardMeta = [
         {
           key: "releases_30d",
           label: "Release Velocity (30d)",
@@ -612,17 +602,33 @@
         },
       ];
 
-      const snapshotMeta = [
-        ["last_year_contributions", "12mo Contributions"],
-        ["public_scope_commits", "Public Scope Commits"],
-        ["total_repos", "Public Non-Fork Repos"],
-        ["total_stars", "Total Stars"],
-        ["languages_count", "Languages Detected"],
-        ["prs_merged", "PRs Merged (Recent)"],
-        ["releases", "Releases (Recent)"],
-        ["ci_repos", "Repos With CI"],
-        ["streak_days", "Current Streak Days"],
+      const defaultSnapshotCards = [
+        { key: "last_year_contributions", label: "12mo Contributions" },
+        { key: "public_scope_commits", label: "Public Scope Commits" },
+        { key: "total_repos", label: "Public Non-Fork Repos" },
+        { key: "public_forks", label: "Public Fork Repos" },
+        { key: "private_owned_repos", label: "Private Owned Repos" },
+        { key: "total_stars", label: "Total Stars" },
+        { key: "languages_count", label: "Languages Detected" },
+        { key: "prs_merged", label: "PRs Merged (Recent)" },
+        { key: "releases", label: "Releases (Recent)" },
+        { key: "ci_repos", label: "Repos With CI" },
+        { key: "streak_days", label: "Current Streak Days" },
       ];
+
+      const themeVarMap = {
+        bg_main: "--bg-main",
+        bg_panel: "--bg-panel",
+        bg_panel_strong: "--bg-panel-strong",
+        text_main: "--text-main",
+        text_soft: "--text-soft",
+        text_dim: "--text-dim",
+        line: "--line",
+        accent_cyan: "--accent-cyan",
+        accent_gold: "--accent-gold",
+        accent_mint: "--accent-mint",
+        accent_pink: "--accent-pink",
+      };
 
       function escapeHtml(value) {
         return String(value ?? "").replace(/[&<>"']/g, (char) => {
@@ -656,13 +662,46 @@
         });
       }
 
+      function formatDataQuality(dataQuality) {
+        if (!dataQuality || typeof dataQuality !== "object") {
+          return "Data quality: unknown";
+        }
+        const ci = String(dataQuality.ci_status || "unknown");
+        const events = String(dataQuality.events_status || "unknown");
+        return `Data quality: CI ${ci} · events ${events}`;
+      }
+
+      function applyTheme(theme) {
+        if (!theme || typeof theme !== "object") return;
+        const rootStyle = document.documentElement.style;
+        for (const [key, cssVar] of Object.entries(themeVarMap)) {
+          const value = theme[key];
+          if (typeof value === "string" && value.trim()) {
+            rootStyle.setProperty(cssVar, value);
+          }
+        }
+      }
+
       function renderEmptyList(container, message) {
         container.innerHTML = `<p class="empty-state">${escapeHtml(message)}</p>`;
       }
 
-      function renderScorecard(scorecard) {
+      function renderScorecard(scorecard, scorecardCards) {
         const root = document.getElementById("score-grid");
-        root.innerHTML = scorecardMeta
+        const cards =
+          Array.isArray(scorecardCards) && scorecardCards.length > 0
+            ? scorecardCards.map((card) => {
+                const definition = {
+                  key: card.key,
+                  label: card.label || card.key,
+                  detail: card.detail || "",
+                  format: () => card.display_value ?? formatInt(card.value ?? 0),
+                };
+                return definition;
+              })
+            : defaultScorecardMeta;
+
+        root.innerHTML = cards
           .map((meta) => {
             const raw = scorecard?.[meta.key] ?? 0;
             return `
@@ -676,15 +715,24 @@
           .join("");
       }
 
-      function renderSnapshot(snapshot) {
+      function renderSnapshot(snapshot, snapshotCards) {
         const root = document.getElementById("snapshot-grid");
-        root.innerHTML = snapshotMeta
-          .map(([key, label]) => {
-            const value = snapshot?.[key] ?? 0;
+        const cards =
+          Array.isArray(snapshotCards) && snapshotCards.length > 0
+            ? snapshotCards
+            : defaultSnapshotCards.map((item) => ({
+                key: item.key,
+                label: item.label,
+                display_value: formatInt(snapshot?.[item.key] ?? 0),
+              }));
+
+        root.innerHTML = cards
+          .map((item) => {
+            const value = item.display_value ?? formatInt(snapshot?.[item.key] ?? 0);
             return `
               <article class="snapshot-chip">
-                <p class="snapshot-k">${escapeHtml(label)}</p>
-                <p class="snapshot-v">${escapeHtml(formatInt(value))}</p>
+                <p class="snapshot-k">${escapeHtml(item.label || item.key || "Metric")}</p>
+                <p class="snapshot-v">${escapeHtml(value)}</p>
               </article>
             `;
           })
@@ -751,79 +799,54 @@
           .join("");
       }
 
-      function renderFeaturedFacts(repos) {
-        const root = document.getElementById("featured-list");
-        const items = Array.isArray(repos) ? repos : [];
+      function renderActivityFeed(feedItems) {
+        const root = document.getElementById("activity-feed-list");
+        const items = Array.isArray(feedItems) ? feedItems.slice(0, 12) : [];
         if (items.length === 0) {
-          renderEmptyList(root, "No featured repository facts available.");
+          renderEmptyList(root, "No recent delivery events.");
+          return;
+        }
+
+        root.innerHTML = items
+          .map((item) => {
+            const state = String(item?.state || "EVENT").toUpperCase();
+            let pillClass = "pill-open";
+            if (state === "MERGED" || state === "RELEASED") pillClass = "pill-merged";
+            if (state === "CLOSED") pillClass = "pill-closed";
+            return `
+              <li class="list-card">
+                <p class="list-k">
+                  <a class="list-link" href="${escapeHtml(item?.url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(item?.title || "event")}</a>
+                  <span class="pill ${pillClass}">${escapeHtml(state)}</span>
+                </p>
+                <p class="list-sub">
+                  ${escapeHtml(item?.kind || "activity")} - <a class="list-link" href="${escapeHtml(item?.repo_url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(item?.repo || "repo")}</a> - ${escapeHtml(item?.time_ago || "unknown")}
+                </p>
+              </li>
+            `;
+          })
+          .join("");
+      }
+
+      function renderRecentCreated(repos) {
+        const root = document.getElementById("recent-created-list");
+        const items = Array.isArray(repos) ? repos.slice(0, 8) : [];
+        if (items.length === 0) {
+          renderEmptyList(root, "No recent repository creation events.");
           return;
         }
 
         root.innerHTML = items
           .map((repo) => {
-            const repoUrl = repo?.url ? escapeHtml(repo.url) : "#";
+            const url = repo?.html_url || "#";
+            const created = String(repo?.created_at || "").slice(0, 10) || "n/a";
             return `
               <li class="list-card">
                 <p class="list-k">
-                  <a class="list-link" href="${repoUrl}" target="_blank" rel="noreferrer">${escapeHtml(repo?.name || "repo")}</a>
+                  <a class="list-link" href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(repo?.name || "repo")}</a>
                 </p>
                 <p class="list-sub">
-                  ${escapeHtml(repo?.language || "n/a")} - CI ${escapeHtml(repo?.ci || "n/a")} - stars ${escapeHtml(formatInt(repo?.stars || 0))} - pushed ${escapeHtml(repo?.pushed_at || "n/a")}
-                </p>
-              </li>
-            `;
-          })
-          .join("");
-      }
-
-      function renderRecentReleases(releases) {
-        const root = document.getElementById("releases-list");
-        const items = Array.isArray(releases) ? releases.slice(0, 5) : [];
-        if (items.length === 0) {
-          renderEmptyList(root, "No recent release events.");
-          return;
-        }
-
-        root.innerHTML = items
-          .map((release) => {
-            const tagUrl = release?.url || release?.repo_url || "#";
-            const repoUrl = release?.repo_url || "#";
-            return `
-              <li class="list-card">
-                <p class="list-k">
-                  <a class="list-link" href="${escapeHtml(tagUrl)}" target="_blank" rel="noreferrer">${escapeHtml(release?.tag || "unknown")}</a>
-                </p>
-                <p class="list-sub">
-                  <a class="list-link" href="${escapeHtml(repoUrl)}" target="_blank" rel="noreferrer">${escapeHtml(release?.repo || "repo")}</a> - ${escapeHtml(release?.time_ago || "unknown")}
-                </p>
-              </li>
-            `;
-          })
-          .join("");
-      }
-
-      function renderRecentPrs(prs) {
-        const root = document.getElementById("prs-list");
-        const items = Array.isArray(prs) ? prs.slice(0, 5) : [];
-        if (items.length === 0) {
-          renderEmptyList(root, "No recent pull request events.");
-          return;
-        }
-
-        root.innerHTML = items
-          .map((pr) => {
-            const state = String(pr?.state || "OPEN").toUpperCase();
-            let pillClass = "pill-open";
-            if (state === "MERGED") pillClass = "pill-merged";
-            if (state === "CLOSED") pillClass = "pill-closed";
-            return `
-              <li class="list-card">
-                <p class="list-k">
-                  <a class="list-link" href="${escapeHtml(pr?.url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(pr?.title || "pull request")}</a>
-                  <span class="pill ${pillClass}">${escapeHtml(state)}</span>
-                </p>
-                <p class="list-sub">
-                  <a class="list-link" href="${escapeHtml(pr?.repo_url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(pr?.repo || "repo")}</a> - ${escapeHtml(pr?.time_ago || "unknown")}
+                  ${escapeHtml(repo?.language || "n/a")} - created ${escapeHtml(created)}
                 </p>
               </li>
             `;
@@ -844,6 +867,7 @@
             return `
               <tr>
                 <td><a href="${escapeHtml(repo?.url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(repo?.name || "repo")}</a></td>
+                <td>${escapeHtml(repo?.featured ? "YES" : "NO")}</td>
                 <td>${escapeHtml(repo?.language || "n/a")}</td>
                 <td>${escapeHtml(String(repo?.ci || "n/a").toUpperCase())}</td>
                 <td>${escapeHtml(formatInt(repo?.stars || 0))}</td>
@@ -860,6 +884,7 @@
               <thead>
                 <tr>
                   <th>Repository</th>
+                  <th>Featured</th>
                   <th>Language</th>
                   <th>CI</th>
                   <th>Stars</th>
@@ -876,24 +901,30 @@
       function renderHeader(data) {
         const username = data?.username || "jguida941";
         const generatedText = formatGeneratedAt(data?.generated_at);
+        const quality = data?.data_quality || {};
 
         document.title = username + " - Builder Dashboard";
         document.getElementById("hero-title").textContent = username + " Builder Dashboard";
         document.getElementById("github-link").textContent = username;
         document.getElementById("github-link").href = "https://github.com/" + username;
         document.getElementById("readme-link").href = "https://github.com/" + username + "/" + username;
+        const qualityPill = document.getElementById("quality-pill");
+        qualityPill.textContent = formatDataQuality(quality);
+        const ciNote = quality?.ci_note ? `CI: ${quality.ci_note}` : "";
+        const eventsNote = quality?.events_note ? `Events: ${quality.events_note}` : "";
+        qualityPill.title = [ciNote, eventsNote].filter(Boolean).join(" | ");
         document.getElementById("generated-pill").textContent = "Generated: " + generatedText;
       }
 
       function renderDashboard(data) {
+        applyTheme(data?.theme || {});
         renderHeader(data);
-        renderScorecard(data?.scorecard || {});
-        renderSnapshot(data?.snapshot || {});
+        renderScorecard(data?.scorecard || {}, data?.scorecard_cards || []);
+        renderSnapshot(data?.snapshot || {}, data?.snapshot_cards || []);
         renderFocus(data?.focus || {});
         renderTopLanguages(data?.top_languages || []);
-        renderFeaturedFacts(data?.featured_repo_facts || []);
-        renderRecentReleases(data?.recent_releases || []);
-        renderRecentPrs(data?.recent_pull_requests || []);
+        renderActivityFeed(data?.activity_feed || []);
+        renderRecentCreated(data?.recent_created || []);
         renderRepoMatrix(data?.repo_language_matrix || []);
         requestAnimationFrame(() => {
           document.body.classList.add("ready");
@@ -912,6 +943,7 @@
           const generatedPill = document.getElementById("generated-pill");
           generatedPill.classList.add("status-error");
           generatedPill.textContent = "Data load failed";
+          document.getElementById("quality-pill").textContent = "Data quality: unavailable";
           document.getElementById("repo-matrix").innerHTML =
             '<p class="status status-error">Dashboard data is missing. Run <code>python scripts/build_readme.py</code> and redeploy.</p>';
           document.getElementById("score-grid").innerHTML =
@@ -922,12 +954,10 @@
             '<p class="status status-error">Focus board unavailable.</p>';
           document.getElementById("language-list").innerHTML =
             '<p class="status status-error">Language breakdown unavailable.</p>';
-          document.getElementById("featured-list").innerHTML =
-            '<p class="status status-error">Featured repo facts unavailable.</p>';
-          document.getElementById("releases-list").innerHTML =
-            '<p class="status status-error">Release feed unavailable.</p>';
-          document.getElementById("prs-list").innerHTML =
-            '<p class="status status-error">Pull request feed unavailable.</p>';
+          document.getElementById("activity-feed-list").innerHTML =
+            '<p class="status status-error">Delivery feed unavailable.</p>';
+          document.getElementById("recent-created-list").innerHTML =
+            '<p class="status status-error">Recently created list unavailable.</p>';
           console.error(error);
         }
       }

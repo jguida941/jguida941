@@ -64,12 +64,16 @@ def main() -> int:
                 "generated_at",
                 "username",
                 "snapshot",
+                "snapshot_rows",
+                "snapshot_cards",
                 "scorecard",
+                "scorecard_cards",
+                "data_quality",
                 "focus",
                 "top_languages",
                 "repo_language_matrix",
-                "recent_releases",
-                "recent_pull_requests",
+                "activity_feed",
+                "recent_created",
             }
             missing_keys = sorted(key for key in required_keys if key not in profile_snapshot)
             if missing_keys:
@@ -98,17 +102,27 @@ def main() -> int:
                 errors.append("site/data/profile_snapshot.json scorecard must be an object")
             if not isinstance(profile_snapshot.get("snapshot", {}), dict):
                 errors.append("site/data/profile_snapshot.json snapshot must be an object")
+            if not isinstance(profile_snapshot.get("data_quality", {}), dict):
+                errors.append("site/data/profile_snapshot.json data_quality must be an object")
+            if not isinstance(profile_snapshot.get("activity_feed", []), list):
+                errors.append("site/data/profile_snapshot.json activity_feed must be an array")
+            if not isinstance(profile_snapshot.get("repo_language_matrix", []), list):
+                errors.append("site/data/profile_snapshot.json repo_language_matrix must be an array")
     else:
         errors.append("site/data/profile_snapshot.json not found")
 
-    activity = _section(readme, "Latest Owned Repo Activity")
-    if not activity:
-        errors.append("Missing section: Latest Owned Repo Activity")
+    delivery = _section(readme, "Recent Delivery Feed")
+    if not delivery:
+        errors.append("Missing section: Recent Delivery Feed")
+
+    matrix = _section(readme, "Project Matrix (Featured + Active)")
+    if not matrix:
+        errors.append("Missing section: Project Matrix (Featured + Active)")
     else:
-        repos = re.findall(r"\[\*\*([^*]+)\*\*\]\(https://github\.com/[^\)]+\)", activity)
+        repos = re.findall(r"\[\*\*([^*]+)\*\*\]\(https://github\.com/[^\)]+\)", matrix)
         for repo in repos:
             if "/" in repo and not repo.startswith(f"{USERNAME}/"):
-                errors.append(f"Unexpected external repo in owned-activity section: {repo}")
+                errors.append(f"Unexpected external repo in project matrix: {repo}")
 
     twelve_month_match = re.search(
         r"\| Last 12 Months Contributions \| `([^`]+)` \|",
@@ -132,9 +146,8 @@ def main() -> int:
     if recent_releases is None:
         errors.append("Missing or invalid row: Releases (Recent Events)")
 
-    blank_pr_links = readme.count("| []() |")
-    if blank_pr_links > 0:
-        warnings.append(f"README contains {blank_pr_links} blank PR links")
+    if "No recent owned-repo activity found" in readme:
+        warnings.append("README still contains old empty focus fallback text")
 
     if METRICS_SVG_PATH.exists():
         metrics_svg = METRICS_SVG_PATH.read_text(encoding="utf-8")

@@ -15,6 +15,7 @@ from scripts.config import (
     SVG_WIDTH,
     FONT_SANS,
 )
+from scripts.profile_contract import SCORECARD_METRICS, format_metric_value
 
 
 def _tile(
@@ -36,7 +37,26 @@ def _tile(
 </g>"""
 
 
-def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg") -> str:
+def _default_tiles(scorecard: dict) -> list[dict]:
+    accent_map = {
+        "BLUE": BLUE,
+        "CYAN": CYAN,
+        "GREEN": GREEN,
+        "ORANGE": ORANGE,
+    }
+    tiles = []
+    for definition in SCORECARD_METRICS:
+        key = definition["key"]
+        tiles.append({
+            "label": definition["label"],
+            "value": format_metric_value(scorecard.get(key, 0), definition),
+            "detail": definition["detail"],
+            "accent": accent_map.get(definition.get("accent", "CYAN"), CYAN),
+        })
+    return tiles
+
+
+def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg", tiles: list | None = None) -> str:
     """
     scorecard fields:
       - releases_30d
@@ -55,52 +75,26 @@ def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg")
     title_h = 44
     svg_h = title_h + rows * tile_h + (rows - 1) * gap + pad
 
-    tiles = [
-        (
-            "Release Velocity (30d)",
-            str(scorecard.get("releases_30d", 0)),
-            "public release events",
-            ORANGE,
-        ),
-        (
-            "Active Repos (7d)",
-            str(scorecard.get("active_repos_7d", 0)),
-            "pushed in last week",
-            CYAN,
-        ),
-        (
-            "Avg Release Gap",
-            f"{scorecard.get('avg_release_gap_days', 0):.1f}d",
-            "recent cadence",
-            GREEN,
-        ),
-        (
-            "Stars / Public Repo",
-            f"{scorecard.get('stars_per_public_repo', 0):.2f}",
-            "signal density",
-            BLUE,
-        ),
-        (
-            "CI Coverage",
-            f"{scorecard.get('ci_coverage_pct', 0):.1f}%",
-            "repos with workflows",
-            ORANGE,
-        ),
-        (
-            "12mo Contributions",
-            f"{scorecard.get('last_year_contributions', 0):,}",
-            "GitHub contribution calendar",
-            CYAN,
-        ),
-    ]
+    card_tiles = tiles or _default_tiles(scorecard)
 
     parts = []
-    for i, (label, value, detail, accent) in enumerate(tiles):
+    for i, tile in enumerate(card_tiles):
         row = i // cols
         col = i % cols
         x = pad + col * (tile_w + gap)
         y = title_h + row * (tile_h + gap)
-        parts.append(_tile(x, y, tile_w, tile_h, label, value, detail, accent))
+        parts.append(
+            _tile(
+                x,
+                y,
+                tile_w,
+                tile_h,
+                str(tile.get("label", "")),
+                str(tile.get("value", "0")),
+                str(tile.get("detail", "")),
+                str(tile.get("accent", CYAN)),
+            )
+        )
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
   <rect width="{SVG_WIDTH}" height="{svg_h}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>

@@ -4,6 +4,7 @@ import json
 import os
 import re
 import time
+import hashlib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -30,6 +31,23 @@ def _cache_path(key: str) -> Path:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     safe = key.replace("/", "__").replace("?", "_Q_").replace("&", "_A_")
     return CACHE_DIR / f"{safe}.json"
+
+
+def _repo_signature(repos: list | None) -> str:
+    if not repos:
+        return "none"
+    parts = []
+    for repo in repos:
+        owner = repo.get("owner", {}).get("login", USERNAME)
+        name = repo.get("name", "")
+        pushed = (repo.get("pushed_at") or "")[:19]
+        if "has_ci_workflows" in repo:
+            ci_hint = "1" if bool(repo.get("has_ci_workflows")) else "0"
+        else:
+            ci_hint = "x"
+        parts.append(f"{owner}/{name}:{pushed}:{ci_hint}")
+    payload = "|".join(sorted(parts))
+    return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:16]
 
 
 def _get_cached(key: str):
@@ -739,13 +757,15 @@ def get_total_commits(
     use_global_fallback: bool = False,
 ) -> int:
     """Count commits authored by USERNAME across the selected repos."""
-    cache_key = f"total_commits_owned_public_nonfork_{int(use_global_fallback)}"
+    if repos is None:
+        repos = get_repos(include_forks=False)
+    cache_key = (
+        "total_commits_owned_public_nonfork_"
+        f"{_repo_signature(repos)}_{int(use_global_fallback)}"
+    )
     cached = _get_cached(cache_key)
     if cached is not None:
         return cached
-
-    if repos is None:
-        repos = get_repos(include_forks=False)
 
     total = 0
     failures = 0
@@ -786,13 +806,12 @@ def get_total_commits(
 
 def get_repos_with_ci(repos: list | None = None, max_workers: int = 10) -> int:
     """Count repos that have CI/CD workflows."""
-    cache_key = "ci_count"
+    if repos is None:
+        repos = get_repos()
+    cache_key = f"ci_count_{_repo_signature(repos)}"
     cached = _get_cached(cache_key)
     if cached is not None:
         return cached
-
-    if repos is None:
-        repos = get_repos()
 
     if repos and all("has_ci_workflows" in repo for repo in repos):
         count = sum(1 for repo in repos if bool(repo.get("has_ci_workflows")))
