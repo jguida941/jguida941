@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T15:54:28.095214Z",
+  "generated_at": "2026-03-06T16:16:40.778827Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -8,7 +8,7 @@
     "bg_panel_strong": "#292e42",
     "text_main": "#c0caf5",
     "text_soft": "#a9b1d6",
-    "text_dim": "#565f89",
+    "text_dim": "#8a94bd",
     "line": "#414868",
     "accent_cyan": "#7dcfff",
     "accent_gold": "#e0af68",
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 4334,
-    "public_scope_commits": 2969,
+    "last_year_contributions": 4337,
+    "public_scope_commits": 2972,
     "total_repos": 66,
     "public_forks": 0,
     "private_owned_repos": 140,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 4334,
-      "display_value": "4,334"
+      "value": 4337,
+      "display_value": "4,337"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 2969,
-      "display_value": "2,969"
+      "value": 2972,
+      "display_value": "2,972"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 4334,
-      "display_value": "4,334"
+      "value": 4337,
+      "display_value": "4,337"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 2969,
-      "display_value": "2,969"
+      "value": 2972,
+      "display_value": "2,972"
     },
     {
       "key": "total_repos",
@@ -194,7 +194,7 @@
     "avg_release_gap_days": 1.3945277777777778,
     "stars_per_public_repo": 1.106060606060606,
     "ci_coverage_pct": 24.242424242424242,
-    "last_year_contributions": 4334
+    "last_year_contributions": 4337
   },
   "scorecard_cards": [
     {
@@ -241,8 +241,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 4334,
-      "display_value": "4,334",
+      "value": 4337,
+      "display_value": "4,337",
       "accent": "#7dcfff"
     }
   ],
@@ -304,23 +304,23 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 12082162,
-      "percent": 49.56
+      "bytes": 12100198,
+      "percent": 49.6
     },
     {
       "name": "Makefile",
       "bytes": 3931581,
-      "percent": 16.13
+      "percent": 16.12
     },
     {
       "name": "Rust",
       "bytes": 2991636,
-      "percent": 12.27
+      "percent": 12.26
     },
     {
       "name": "C++",
       "bytes": 1824966,
-      "percent": 7.49
+      "percent": 7.48
     },
     {
       "name": "Java",
@@ -418,10 +418,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T14:57:41Z",
+      "pushed_at_raw": "2026-03-06T16:16:10Z",
       "pushed_ago": "today",
       "created_at": "2026-02-20",
-      "last_commit_msg": "update canonical profile artifacts",
+      "last_commit_msg": "Stabilize refactor entrypoints and align card outputs",
       "featured": false
     },
     {
@@ -713,7 +713,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-03-06T14:57:41Z",
+      "pushed_at": "2026-03-06T16:16:10Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -723,10 +723,10 @@
       },
       "has_ci_workflows": true,
       "language_bytes": {
-        "Python": 234501,
+        "Python": 252537,
         "HTML": 30892
       },
-      "latest_commit_message": "update canonical profile artifacts"
+      "latest_commit_message": "Stabilize refactor entrypoints and align card outputs"
     },
     {
       "name": "homebrew-tap-setup",
@@ -861,7 +861,7 @@
     "now": [
       {
         "title": "jguida941",
-        "detail": "push \u00b7 7 hours ago \u00b7 \u26051 \u00b7 Python",
+        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
         "url": "https://github.com/jguida941/jguida941"
       },
       {
@@ -878,7 +878,7 @@
     "next": [
       {
         "title": "PR #11",
-        "detail": "voiceterm \u00b7 open \u00b7 10 hours ago",
+        "detail": "voiceterm \u00b7 open \u00b7 11 hours ago",
         "url": "https://github.com/jguida941/voiceterm/pull/11"
       },
       {
@@ -918,8 +918,8 @@
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
       "state": "PUSH",
-      "time_ago": "7 hours ago",
-      "created_at": "2026-03-06T08:10:30Z"
+      "time_ago": "today",
+      "created_at": "2026-03-06T16:16:10Z"
     },
     {
       "kind": "activity",
@@ -958,7 +958,7 @@
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "OPEN",
-      "time_ago": "10 hours ago",
+      "time_ago": "11 hours ago",
       "created_at": "2026-03-06T04:55:22Z"
     },
     {
@@ -1141,7 +1141,7 @@
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "OPEN",
-      "time_ago": "10 hours ago",
+      "time_ago": "11 hours ago",
       "created_at": "2026-03-06T04:55:22Z"
     },
     {
