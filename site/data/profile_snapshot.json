@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T16:26:12.197934Z",
+  "generated_at": "2026-03-06T16:29:29.210334Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,15 +18,15 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 4308,
-    "public_scope_commits": 2969,
+    "last_year_contributions": 4339,
+    "public_scope_commits": 2974,
     "total_repos": 66,
     "public_forks": 0,
     "private_owned_repos": 140,
     "total_stars": 73,
     "languages_count": 24,
-    "prs_merged": 10,
-    "releases": 50,
+    "prs_merged": 11,
+    "releases": 51,
     "ci_repos": 16,
     "streak_days": 23
   },
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 4308,
-      "display_value": "4,308"
+      "value": 4339,
+      "display_value": "4,339"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 2969,
-      "display_value": "2,969"
+      "value": 2974,
+      "display_value": "2,974"
     },
     {
       "key": "total_repos",
@@ -84,15 +84,15 @@
       "key": "prs_merged",
       "label": "PRs Merged (Last 12 Months)",
       "dashboard_label": "PRs Merged (12mo)",
-      "value": 10,
-      "display_value": "10"
+      "value": 11,
+      "display_value": "11"
     },
     {
       "key": "releases",
       "label": "Releases (30 Days)",
       "dashboard_label": "Releases (30d)",
-      "value": 50,
-      "display_value": "50"
+      "value": 51,
+      "display_value": "51"
     },
     {
       "key": "ci_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 4308,
-      "display_value": "4,308"
+      "value": 4339,
+      "display_value": "4,339"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 2969,
-      "display_value": "2,969"
+      "value": 2974,
+      "display_value": "2,974"
     },
     {
       "key": "total_repos",
@@ -155,14 +155,14 @@
     {
       "key": "prs_merged",
       "label": "PRs Merged (12mo)",
-      "value": 10,
-      "display_value": "10"
+      "value": 11,
+      "display_value": "11"
     },
     {
       "key": "releases",
       "label": "Releases (30d)",
-      "value": 50,
-      "display_value": "50"
+      "value": 51,
+      "display_value": "51"
     },
     {
       "key": "ci_repos",
@@ -186,23 +186,23 @@
     "releases_note": "Release aggregation complete.",
     "events_status": "ok",
     "events_note": "Public events feed available.",
-    "token_mode": "none"
+    "token_mode": "personal_github_token"
   },
   "scorecard": {
-    "releases_30d": 50,
+    "releases_30d": 51,
     "active_repos_7d": 8,
     "avg_release_gap_days": 1.3945277777777778,
     "stars_per_public_repo": 1.106060606060606,
     "ci_coverage_pct": 24.242424242424242,
-    "last_year_contributions": 4308
+    "last_year_contributions": 4339
   },
   "scorecard_cards": [
     {
       "key": "releases_30d",
       "label": "Release Velocity (30d)",
       "detail": "published releases across public repos",
-      "value": 50,
-      "display_value": "50",
+      "value": 51,
+      "display_value": "51",
       "accent": "#ff9e64"
     },
     {
@@ -241,8 +241,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 4308,
-      "display_value": "4,308",
+      "value": 4339,
+      "display_value": "4,339",
       "accent": "#7dcfff"
     }
   ],
@@ -279,10 +279,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T05:41:30Z",
-      "pushed_ago": "10 hours ago",
+      "pushed_at_raw": "2026-03-06T07:45:01Z",
+      "pushed_ago": "8 hours ago",
       "created_at": "2025-11-06",
-      "last_commit_msg": "test: harden memory recovery cap test against GC flake",
+      "last_commit_msg": "ci: make preflight devctl security advisory",
       "featured": true
     },
     {
@@ -304,28 +304,28 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 12070161,
-      "percent": 49.54
+      "bytes": 12099484,
+      "percent": 49.6
     },
     {
       "name": "Makefile",
       "bytes": 3931581,
-      "percent": 16.14
+      "percent": 16.12
     },
     {
       "name": "Rust",
       "bytes": 2991636,
-      "percent": 12.28
+      "percent": 12.26
     },
     {
       "name": "C++",
       "bytes": 1824966,
-      "percent": 7.49
+      "percent": 7.48
     },
     {
       "name": "Java",
       "bytes": 1583192,
-      "percent": 6.5
+      "percent": 6.49
     },
     {
       "name": "TypeScript",
@@ -344,7 +344,7 @@
     },
     {
       "name": "HTML",
-      "bytes": 229204,
+      "bytes": 229530,
       "percent": 0.94
     },
     {
@@ -388,10 +388,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T05:41:30Z",
-      "pushed_ago": "10 hours ago",
+      "pushed_at_raw": "2026-03-06T07:45:01Z",
+      "pushed_ago": "8 hours ago",
       "created_at": "2025-11-06",
-      "last_commit_msg": "test: harden memory recovery cap test against GC flake",
+      "last_commit_msg": "ci: make preflight devctl security advisory",
       "featured": true
     },
     {
@@ -418,10 +418,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T05:30:09Z",
-      "pushed_ago": "10 hours ago",
+      "pushed_at_raw": "2026-03-06T16:28:53Z",
+      "pushed_ago": "today",
       "created_at": "2026-02-20",
-      "last_commit_msg": "update analytics & readme",
+      "last_commit_msg": "Normalize card title sizing and unify remaining headers",
       "featured": false
     },
     {
@@ -432,11 +432,11 @@
       "stars": 1,
       "forks": 0,
       "ci": "no",
-      "pushed_at": "2026-03-04",
-      "pushed_at_raw": "2026-03-04T00:50:25Z",
-      "pushed_ago": "2 days ago",
+      "pushed_at": "2026-03-06",
+      "pushed_at_raw": "2026-03-06T07:45:35Z",
+      "pushed_ago": "8 hours ago",
       "created_at": "2026-01-22",
-      "last_commit_msg": "Update to v1.0.99",
+      "last_commit_msg": "Update to v1.1.0",
       "featured": false
     },
     {
@@ -713,7 +713,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-03-06T05:30:09Z",
+      "pushed_at": "2026-03-06T16:28:53Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -723,10 +723,10 @@
       },
       "has_ci_workflows": true,
       "language_bytes": {
-        "Python": 230487,
-        "HTML": 30566
+        "Python": 251823,
+        "HTML": 30892
       },
-      "latest_commit_message": "update analytics & readme"
+      "latest_commit_message": "Normalize card title sizing and unify remaining headers"
     },
     {
       "name": "homebrew-tap-setup",
@@ -798,7 +798,7 @@
       "visibility": "public",
       "description": "Homebrew tap for VoiceTerm -VoiceHUD for Codex and Claude with Whisper STT",
       "html_url": "https://github.com/jguida941/homebrew-voiceterm",
-      "pushed_at": "2026-03-04T00:50:25Z",
+      "pushed_at": "2026-03-06T07:45:35Z",
       "created_at": "2026-01-22T17:52:18Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -808,9 +808,9 @@
       },
       "has_ci_workflows": false,
       "language_bytes": {
-        "Ruby": 1182
+        "Ruby": 1180
       },
-      "latest_commit_message": "Update to v1.0.99"
+      "latest_commit_message": "Update to v1.1.0"
     },
     {
       "name": "OpenGL-Hourglass",
@@ -861,7 +861,7 @@
     "now": [
       {
         "title": "jguida941",
-        "detail": "push \u00b7 8 hours ago \u00b7 \u26051 \u00b7 Python",
+        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
         "url": "https://github.com/jguida941/jguida941"
       },
       {
@@ -918,8 +918,8 @@
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
       "state": "PUSH",
-      "time_ago": "8 hours ago",
-      "created_at": "2026-03-06T08:10:30Z"
+      "time_ago": "today",
+      "created_at": "2026-03-06T16:28:54Z"
     },
     {
       "kind": "activity",
