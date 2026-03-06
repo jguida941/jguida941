@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T05:43:00.858758Z",
+  "generated_at": "2026-03-06T05:59:59.304886Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 4309,
-    "public_scope_commits": 2939,
+    "last_year_contributions": 4311,
+    "public_scope_commits": 2946,
     "total_repos": 66,
     "public_forks": 0,
     "private_owned_repos": 140,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 4309,
-      "display_value": "4,309"
+      "value": 4311,
+      "display_value": "4,311"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 2939,
-      "display_value": "2,939"
+      "value": 2946,
+      "display_value": "2,946"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 4309,
-      "display_value": "4,309"
+      "value": 4311,
+      "display_value": "4,311"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 2939,
-      "display_value": "2,939"
+      "value": 2946,
+      "display_value": "2,946"
     },
     {
       "key": "total_repos",
@@ -191,7 +191,7 @@
     "avg_release_gap_days": 1.1825219907407407,
     "stars_per_public_repo": 1.106060606060606,
     "ci_coverage_pct": 24.242424242424242,
-    "last_year_contributions": 4309
+    "last_year_contributions": 4311
   },
   "scorecard_cards": [
     {
@@ -238,8 +238,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 4309,
-      "display_value": "4,309",
+      "value": 4311,
+      "display_value": "4,311",
       "accent": "#7dcfff"
     }
   ],
@@ -276,10 +276,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T05:41:30Z",
+      "pushed_at_raw": "2026-03-06T05:50:54Z",
       "pushed_ago": "today",
       "created_at": "2025-11-06",
-      "last_commit_msg": "test: harden memory recovery cap test against GC flake",
+      "last_commit_msg": "chore: trigger release gates after bot badge update",
       "featured": true
     },
     {
@@ -385,10 +385,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T05:41:30Z",
+      "pushed_at_raw": "2026-03-06T05:50:54Z",
       "pushed_ago": "today",
       "created_at": "2025-11-06",
-      "last_commit_msg": "test: harden memory recovery cap test against GC flake",
+      "last_commit_msg": "chore: trigger release gates after bot badge update",
       "featured": true
     },
     {
@@ -415,10 +415,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T05:42:28Z",
+      "pushed_at_raw": "2026-03-06T05:43:10Z",
       "pushed_ago": "today",
       "created_at": "2026-02-20",
-      "last_commit_msg": "Refine card headers and add README image cache busting",
+      "last_commit_msg": "update analytics & readme",
       "featured": false
     },
     {
@@ -710,7 +710,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-03-06T05:42:28Z",
+      "pushed_at": "2026-03-06T05:43:10Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -723,7 +723,7 @@
         "Python": 230444,
         "HTML": 30566
       },
-      "latest_commit_message": "Refine card headers and add README image cache busting"
+      "latest_commit_message": "update analytics & readme"
     },
     {
       "name": "homebrew-tap-setup",
@@ -857,14 +857,14 @@
   "focus": {
     "now": [
       {
-        "title": "jguida941",
-        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
-        "url": "https://github.com/jguida941/jguida941"
-      },
-      {
         "title": "voiceterm",
         "detail": "push \u00b7 today \u00b7 \u26058 \u00b7 Rust",
         "url": "https://github.com/jguida941/voiceterm"
+      },
+      {
+        "title": "jguida941",
+        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
+        "url": "https://github.com/jguida941/jguida941"
       },
       {
         "title": "homebrew-voiceterm",
@@ -911,22 +911,22 @@
     {
       "kind": "activity",
       "title": "push",
+      "url": "https://github.com/jguida941/voiceterm",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-03-06T05:50:54Z"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
       "url": "https://github.com/jguida941/jguida941",
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
       "state": "PUSH",
       "time_ago": "today",
       "created_at": "2026-03-06T05:42:29Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/voiceterm",
-      "repo": "jguida941/voiceterm",
-      "repo_url": "https://github.com/jguida941/voiceterm",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-03-06T05:41:30Z"
     },
     {
       "kind": "pull request",
