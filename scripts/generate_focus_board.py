@@ -14,23 +14,7 @@ from scripts.config import (
     FONT_SANS,
 )
 from scripts.card_theme import card_bg, title_accent, title_left, title_right
-
-
-def _esc(value: str) -> str:
-    return (
-        str(value)
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-    )
-
-
-def _truncate(value: str, max_len: int) -> str:
-    text = (value or "").strip()
-    if len(text) <= max_len:
-        return text
-    return text[: max_len - 3] + "..."
+from scripts.svg_utils import xml_escape, truncate
 
 
 def generate(focus: dict, output_path: str = "assets/now_next_shipped.svg") -> str:
@@ -78,9 +62,9 @@ def generate(focus: dict, output_path: str = "assets/now_next_shipped.svg") -> s
 
         for item_idx, item in enumerate(items[:3]):
             iy = y + 42 + item_idx * 48
-            title = _truncate(_esc(item.get("title", "item")), 35)
-            detail = _truncate(_esc(item.get("detail", "")), 52)
-            url = _esc(item.get("url", ""))
+            title = truncate(xml_escape(item.get("title", "item")), 35)
+            detail = truncate(xml_escape(item.get("detail", "")), 52)
+            url = xml_escape(item.get("url", ""))
 
             parts.append(f'<circle cx="{x + 14}" cy="{iy + 4}" r="3" fill="{accent}"/>')
             if url:

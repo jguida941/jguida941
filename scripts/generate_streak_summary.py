@@ -6,6 +6,7 @@ from datetime import date, datetime, timezone
 
 from scripts.config import BG_HIGHLIGHT, BLUE, BORDER, ORANGE, TEXT, TEXT_BRIGHT, FONT_SANS, SVG_WIDTH
 from scripts.card_theme import card_bg, title_accent, title_left, title_right
+from scripts.svg_utils import xml_escape, fmt_int
 
 
 def _parse_day_date(value: str) -> date | None:
@@ -15,23 +16,6 @@ def _parse_day_date(value: str) -> date | None:
         return datetime.fromisoformat(value).date()
     except ValueError:
         return None
-
-
-def _esc(value: str) -> str:
-    return (
-        str(value)
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-        .replace("'", "&#39;")
-    )
-
-
-def _fmt_int(value: int | None) -> str:
-    if value is None:
-        return "n/a"
-    return f"{int(value):,}"
 
 
 def _fmt_day(value: date, with_year: bool = False) -> str:
@@ -162,9 +146,9 @@ def generate(
     left_cx = pad + int(col_w * 0.5)
     parts.extend(
         [
-            f'<text x="{left_cx}" y="124" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(total_contributions))}</text>',
+            f'<text x="{left_cx}" y="124" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(total_contributions))}</text>',
             f'<text x="{left_cx}" y="150" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Total Contributions</text>',
-            f'<text x="{left_cx}" y="176" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(contrib_start, contrib_end))}</text>',
+            f'<text x="{left_cx}" y="176" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(contrib_start, contrib_end))}</text>',
         ]
     )
 
@@ -173,9 +157,9 @@ def generate(
         [
             f'<circle cx="{center_x}" cy="106" r="38" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="4"/>',
             f'<circle cx="{center_x}" cy="68" r="5" fill="{ORANGE}"/>',
-            f'<text x="{center_x}" y="119" fill="{TEXT_BRIGHT}" font-size="44" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(current_days))}</text>',
+            f'<text x="{center_x}" y="119" fill="{TEXT_BRIGHT}" font-size="44" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(current_days))}</text>',
             f'<text x="{center_x}" y="156" fill="{BLUE}" font-size="18" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">Current Streak</text>',
-            f'<text x="{center_x}" y="178" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(current_start, current_end))}</text>',
+            f'<text x="{center_x}" y="178" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(current_start, current_end))}</text>',
         ]
     )
 
@@ -183,9 +167,9 @@ def generate(
     right_cx = pad + int(col_w * 2.5)
     parts.extend(
         [
-            f'<text x="{right_cx}" y="124" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(longest_days))}</text>',
+            f'<text x="{right_cx}" y="124" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(longest_days))}</text>',
             f'<text x="{right_cx}" y="150" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Longest Streak</text>',
-            f'<text x="{right_cx}" y="176" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(longest_start, longest_end))}</text>',
+            f'<text x="{right_cx}" y="176" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(longest_start, longest_end))}</text>',
         ]
     )
 

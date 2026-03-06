@@ -1,13 +1,10 @@
 """Build a language usage bar chart SVG."""
 
 from scripts.config import (
-    TEXT, TEXT_BRIGHT, SVG_WIDTH, FONT_SANS, LANG_COLORS,
+    TEXT, TEXT_BRIGHT, SVG_WIDTH, FONT_SANS,
 )
 from scripts.card_theme import card_bg, title_accent, title_left, title_right
-
-
-def _lang_color(lang: str) -> str:
-    return LANG_COLORS.get(lang, "#8b8b8b")
+from scripts.svg_utils import lang_color
 
 
 def generate(
@@ -62,7 +59,7 @@ def generate(
         w = bar_w * pct / 100
         bar_parts.append(
             f'<rect x="{x:.1f}" y="{bar_y}" width="{w:.1f}" height="{bar_h}" '
-            f'fill="{_lang_color(lang)}">'
+            f'fill="{lang_color(lang)}">'
             f'<title>{lang}: {pct:.1f}%</title></rect>'
         )
         x += w
@@ -76,7 +73,7 @@ def generate(
         ly = legend_y + row * row_h
 
         legend_parts.append(
-            f'<circle cx="{lx + 6}" cy="{ly + 8}" r="5" fill="{_lang_color(lang)}"/>'
+            f'<circle cx="{lx + 6}" cy="{ly + 8}" r="5" fill="{lang_color(lang)}"/>'
             f'<text x="{lx + 16}" y="{ly + 12}" fill="{TEXT_BRIGHT}" font-size="12" '
             f'font-family="{FONT_SANS}" font-weight="600">{lang}</text>'
             f'<text x="{lx + 16 + len(lang) * 7.5 + 6}" y="{ly + 12}" fill="{TEXT}" '

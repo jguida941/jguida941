@@ -19,23 +19,7 @@ from scripts.config import (
     FONT_SANS,
 )
 from scripts.card_theme import card_bg, title_accent, title_left, title_right
-
-
-def _esc(value: str) -> str:
-    return (
-        str(value)
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-    )
-
-
-def _truncate(value: str, max_len: int) -> str:
-    text = (value or "").strip()
-    if len(text) <= max_len:
-        return text
-    return text[: max_len - 3] + "..."
+from scripts.svg_utils import xml_escape, truncate
 
 
 def _status_color(status: str) -> str:
@@ -65,20 +49,20 @@ def generate(
     content_top = 56
     body_h = row_count * tile_h + (row_count - 1) * row_gap
 
-    ci_status = _esc(data_quality.get("ci_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
+    ci_status = xml_escape(data_quality.get("ci_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
     commits_status = (
-        _esc(data_quality.get("commits_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
+        xml_escape(data_quality.get("commits_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
     )
     releases_status = (
-        _esc(data_quality.get("releases_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
+        xml_escape(data_quality.get("releases_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
     )
-    events_status = _esc(data_quality.get("events_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
-    ci_note = _esc(data_quality.get("ci_note", "")) if isinstance(data_quality, dict) else ""
-    commits_note = _esc(data_quality.get("commits_note", "")) if isinstance(data_quality, dict) else ""
-    releases_note = _esc(data_quality.get("releases_note", "")) if isinstance(data_quality, dict) else ""
+    events_status = xml_escape(data_quality.get("events_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
+    ci_note = xml_escape(data_quality.get("ci_note", "")) if isinstance(data_quality, dict) else ""
+    commits_note = xml_escape(data_quality.get("commits_note", "")) if isinstance(data_quality, dict) else ""
+    releases_note = xml_escape(data_quality.get("releases_note", "")) if isinstance(data_quality, dict) else ""
 
     quality_notes = [note for note in (ci_note, commits_note, releases_note) if note]
-    quality_note = _truncate(" | ".join(quality_notes), 132)
+    quality_note = truncate(" | ".join(quality_notes), 132)
 
     scope_note = ""
     if isinstance(data_scope, dict):
@@ -89,7 +73,7 @@ def generate(
             f"{data_scope.get('public_owned_nonfork_repos_total', 'n/a')} | forks="
             f"{data_scope.get('public_owned_forks_total', 'n/a')} | private owned={private_text}"
         )
-        scope_note = _truncate(_esc(scope_note), 118)
+        scope_note = truncate(xml_escape(scope_note), 118)
 
     status_y = content_top + body_h + 14
     notes_y = status_y + 46
@@ -114,8 +98,8 @@ def generate(
         x = pad + col * (tile_w + col_gap)
         y = content_top + row_idx * (tile_h + row_gap)
 
-        label = _truncate(_esc(row.get("label", "Metric")), 52)
-        value = _esc(row.get("display_value", "n/a"))
+        label = truncate(xml_escape(row.get("label", "Metric")), 52)
+        value = xml_escape(row.get("display_value", "n/a"))
         value_font = "24" if len(value) <= 8 else "20" if len(value) <= 16 else "16"
         parts.append(
             f'<rect x="{x}" y="{y}" width="{tile_w}" height="{tile_h}" rx="11" '
@@ -150,7 +134,7 @@ def generate(
         )
         parts.append(
             f'<text x="{x + 24}" y="{status_y + 19}" fill="{TEXT}" font-size="11" '
-            f'font-family="{FONT_SANS}" font-weight="600">{_esc(label)}: {_truncate(_esc(status), 20)}</text>'
+            f'font-family="{FONT_SANS}" font-weight="600">{xml_escape(label)}: {truncate(xml_escape(status), 20)}</text>'
         )
 
     for idx, (line, color) in enumerate(notes):

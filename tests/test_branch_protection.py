@@ -8,7 +8,7 @@ from scripts.branch_protection import apply_required_checks, audit_required_chec
 class BranchProtectionTests(unittest.TestCase):
     def test_audit_required_checks_detects_missing(self):
         with patch(
-            "scripts.branch_protection.subprocess.run",
+            "scripts.gh_cli.subprocess.run",
             return_value=Mock(stdout='{"required_status_checks":{"contexts":["Test Profile Pipeline"]}}'),
         ):
             audit = audit_required_checks(
@@ -20,7 +20,7 @@ class BranchProtectionTests(unittest.TestCase):
 
     def test_apply_required_checks_sends_patch_call(self):
         with patch(
-            "scripts.branch_protection.subprocess.run",
+            "scripts.gh_cli.subprocess.run",
             return_value=Mock(stdout="{}"),
         ) as mocked_run:
             apply_required_checks(
@@ -40,7 +40,7 @@ class BranchProtectionTests(unittest.TestCase):
             stderr="gh: Branch not protected (HTTP 404)",
         )
         with patch(
-            "scripts.branch_protection.subprocess.run",
+            "scripts.gh_cli.subprocess.run",
             side_effect=[patch_error, Mock(stdout="{}")],
         ) as mocked_run:
             apply_required_checks(

@@ -6,14 +6,14 @@ from scripts.actions_audit import WorkflowRun, fetch_runs, summarize_runs
 
 class ActionsAuditTests(unittest.TestCase):
     def test_fetch_runs_handles_missing_gh_cli(self):
-        with patch("scripts.actions_audit.subprocess.run", side_effect=FileNotFoundError()):
+        with patch("scripts.gh_cli.subprocess.run", side_effect=FileNotFoundError()):
             with self.assertRaisesRegex(RuntimeError, "GitHub CLI not found"):
                 fetch_runs("Generate Metrics")
 
     def test_fetch_runs_parses_items_and_tolerates_bad_database_id(self):
         payload = '[{"databaseId":"bad-id","workflowName":"Generate Metrics","displayTitle":"run","status":"completed","conclusion":"success","createdAt":"2026-03-06T00:00:00Z","url":"https://example.com"}]'
         with patch(
-            "scripts.actions_audit.subprocess.run",
+            "scripts.gh_cli.subprocess.run",
             return_value=Mock(stdout=payload),
         ):
             runs = fetch_runs("Generate Metrics")

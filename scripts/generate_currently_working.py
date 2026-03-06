@@ -4,9 +4,10 @@ from datetime import datetime, timezone
 
 from scripts.config import (
     BLUE, TEXT, TEXT_DIM,
-    SVG_WIDTH, FONT_SANS, LANG_COLORS,
+    SVG_WIDTH, FONT_SANS,
 )
 from scripts.card_theme import card_bg, title_accent, title_left, title_right
+from scripts.svg_utils import xml_escape, lang_color
 
 
 def _time_ago(iso_str: str) -> str:
@@ -21,22 +22,6 @@ def _time_ago(iso_str: str) -> str:
     if days == 1:
         return "1 day ago"
     return f"{days} days ago"
-
-
-def _lang_color(lang: str | None) -> str:
-    if lang is None:
-        return "#8b8b8b"
-    return LANG_COLORS.get(lang, "#8b8b8b")
-
-
-def _esc_attr(text: str) -> str:
-    return (
-        str(text)
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-    )
 
 
 def generate(
@@ -74,7 +59,7 @@ def generate(
         # Escape XML
         msg = msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         name_esc = name.replace("&", "&amp;").replace("<", "&lt;")
-        repo_url = _esc_attr(repo.get("html_url", ""))
+        repo_url = xml_escape(repo.get("html_url", ""))
         name_svg = (
             f'<a href="{repo_url}"><text x="{pad + 16}" y="14" fill="{BLUE}" font-size="13" font-family="{FONT_SANS}" font-weight="600">{name_esc}</text></a>'
             if repo_url
@@ -82,7 +67,7 @@ def generate(
         )
 
         rows.append(f"""<g transform="translate(0, {y})">
-  <circle cx="{pad + 5}" cy="18" r="4" fill="{_lang_color(lang)}"/>
+  <circle cx="{pad + 5}" cy="18" r="4" fill="{lang_color(lang)}"/>
   {name_svg}
   <text x="{pad + 16}" y="30" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}">{msg}</text>
   <text x="{SVG_WIDTH - pad}" y="14" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">{pushed}</text>

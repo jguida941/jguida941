@@ -12,13 +12,15 @@ from pathlib import Path
 import sys
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
-os.chdir(ROOT)
-
-from scripts.profile_cli import main as profile_cli_main
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 
 def main() -> int:
+    os.chdir(ROOT)
+
+    from scripts.profile_cli import main as profile_cli_main
+
     return profile_cli_main(["generate-profile"])
 
 

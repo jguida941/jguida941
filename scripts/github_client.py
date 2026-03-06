@@ -1,9 +1,13 @@
-"""GitHub API wrapper with pagination, caching, and rate-limit handling."""
+"""GitHub API wrapper - facade module.
+
+All public functions are re-exported from focused sub-modules or defined
+here (domain aggregation).  Import from this module for backward
+compatibility.
+"""
 
 import json
 import os
 import re
-import time
 import hashlib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
@@ -13,19 +17,62 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import requests
 from scripts.runtime_env import token_mode_from_env
 
-CACHE_DIR = Path(os.environ.get("CACHE_DIR", "/tmp/github_cache"))
-CACHE_TTL_SECONDS = int(os.environ.get("CACHE_TTL_SECONDS", "21600"))
-BYPASS_CACHE = os.environ.get("BYPASS_GITHUB_CACHE", "").lower() in {"1", "true", "yes"}
-TOKEN = (
-    os.environ.get("PERSONAL_GITHUB_TOKEN", "").strip()
-    or os.environ.get("GITHUB_TOKEN", "").strip()
-    or os.environ.get("GH_TOKEN", "").strip()
-    or ""
+# ── sub-module imports ───────────────────────────────────────────────
+from scripts.settings import Settings  # noqa: F401
+from scripts.github_cache import read_cache, write_cache  # noqa: F401
+from scripts.github_transport import (  # noqa: F401
+    request_with_retry,
+    request_public_with_retry,
 )
-USERNAME = os.environ.get("GITHUB_USERNAME", "jguida941")
-API = "https://api.github.com"
-GRAPHQL = "https://api.github.com/graphql"
+from scripts.github_graphql import graphql_query  # noqa: F401
 
+# ── module-level settings (backward compat) ──────────────────────────
+_settings = Settings.from_env()
+
+CACHE_DIR: Path = _settings.cache_dir
+CACHE_TTL_SECONDS: int = _settings.cache_ttl_seconds
+BYPASS_CACHE: bool = _settings.bypass_cache
+TOKEN: str = _settings.token
+USERNAME: str = _settings.username
+API: str = "https://api.github.com"
+GRAPHQL: str = "https://api.github.com/graphql"
+
+
+# ── thin internal wrappers (keep old call-sites identical) ───────────
+
+def _headers():
+    from scripts.github_transport import _auth_headers
+    return _auth_headers(_settings)
+
+
+def _cache_path(key: str) -> Path:
+    from scripts.github_cache import _cache_path as _cp
+    return _cp(key, _settings.cache_dir)
+
+
+def _get_cached(key: str):
+    return read_cache(key, _settings)
+
+
+def _set_cached(key: str, data):
+    write_cache(key, data, _settings)
+
+
+def _request_with_retry(url, headers=None, params=None, max_retries=3):
+    return request_with_retry(
+        url, _settings, headers=headers, params=params, max_retries=max_retries,
+    )
+
+
+def _request_public_with_retry(url, params=None, max_retries=2):
+    return request_public_with_retry(url, params=params, max_retries=max_retries)
+
+
+def _graphql_query(query: str, variables: dict) -> dict | None:
+    return graphql_query(query, variables, _settings)
+
+
+# ── private helpers (domain logic, kept in facade) ───────────────────
 
 def _profile_timezone():
     tz_name = os.environ.get("PROFILE_TIMEZONE", "America/New_York").strip() or "America/New_York"
@@ -65,19 +112,6 @@ def _parse_iso_datetime(value: str) -> datetime | None:
     return parsed.astimezone(timezone.utc)
 
 
-def _headers():
-    h = {"Accept": "application/vnd.github+json"}
-    if TOKEN:
-        h["Authorization"] = f"Bearer {TOKEN}"
-    return h
-
-
-def _cache_path(key: str) -> Path:
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    safe = key.replace("/", "__").replace("?", "_Q_").replace("&", "_A_")
-    return CACHE_DIR / f"{safe}.json"
-
-
 def _repo_signature(repos: list | None) -> str:
     if not repos:
         return "none"
@@ -93,74 +127,6 @@ def _repo_signature(repos: list | None) -> str:
         parts.append(f"{owner}/{name}:{pushed}:{ci_hint}")
     payload = "|".join(sorted(parts))
     return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:16]
-
-
-def _get_cached(key: str):
-    if BYPASS_CACHE:
-        return None
-
-    p = _cache_path(key)
-    if p.exists():
-        if CACHE_TTL_SECONDS > 0:
-            age_seconds = time.time() - p.stat().st_mtime
-            if age_seconds > CACHE_TTL_SECONDS:
-                return None
-        return json.loads(p.read_text())
-    return None
-
-
-def _set_cached(key: str, data):
-    p = _cache_path(key)
-    p.write_text(json.dumps(data))
-
-
-def _request_with_retry(url, headers=None, params=None, max_retries=3):
-    """Send a GET request and retry on 429/5xx."""
-    last_error = None
-    for attempt in range(max_retries):
-        try:
-            resp = requests.get(url, headers=headers or _headers(), params=params)
-        except requests.RequestException as exc:
-            last_error = exc
-            if attempt == max_retries - 1:
-                raise
-            time.sleep(2 ** attempt)
-            continue
-        if resp.status_code == 200:
-            return resp
-        if resp.status_code == 429 or resp.status_code >= 500:
-            wait = int(resp.headers.get("Retry-After", 2 ** attempt))
-            time.sleep(wait)
-            continue
-        resp.raise_for_status()
-    if last_error is not None:
-        raise last_error
-    return resp
-
-
-def _request_public_with_retry(url, params=None, max_retries=2):
-    """Send a public GET request for fallback checks."""
-    public_headers = {"Accept": "application/vnd.github+json"}
-    last_error = None
-    for attempt in range(max_retries):
-        try:
-            resp = requests.get(url, headers=public_headers, params=params)
-        except requests.RequestException as exc:
-            last_error = exc
-            if attempt == max_retries - 1:
-                raise
-            time.sleep(2 ** attempt)
-            continue
-        if resp.status_code == 200:
-            return resp
-        if resp.status_code == 429 or resp.status_code >= 500:
-            wait = int(resp.headers.get("Retry-After", 2 ** attempt))
-            time.sleep(wait)
-            continue
-        resp.raise_for_status()
-    if last_error is not None:
-        raise last_error
-    return resp
 
 
 def _count_commits_from_commits_endpoint(owner: str, repo: str, use_public: bool) -> int:
@@ -187,36 +153,6 @@ def _count_commits_from_commits_endpoint(owner: str, repo: str, use_public: bool
         return int(match.group(1))
 
     return len(data)
-
-
-def paginated_get(endpoint: str, params: dict | None = None, per_page: int = 100) -> list:
-    """Fetch all pages from a REST endpoint."""
-    cache_key = f"paginated_{endpoint}_{json.dumps(params or {}, sort_keys=True)}"
-    cached = _get_cached(cache_key)
-    if cached is not None:
-        return cached
-
-    results = []
-    p = dict(params or {})
-    p["per_page"] = per_page
-    page = 1
-
-    while True:
-        p["page"] = page
-        url = f"{API}/{endpoint}" if not endpoint.startswith("http") else endpoint
-        resp = _request_with_retry(url, params=p)
-        if resp.status_code != 200:
-            break
-        data = resp.json()
-        if not data:
-            break
-        results.extend(data)
-        if len(data) < per_page:
-            break
-        page += 1
-
-    _set_cached(cache_key, results)
-    return results
 
 
 def _is_public_owned_repo(repo: dict) -> bool:
@@ -422,8 +358,44 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
     return repos
 
 
+# ── public API (signatures unchanged) ────────────────────────────────
+
+def paginated_get(endpoint: str, params: dict | None = None, per_page: int = 100) -> list:
+    """Fetch all pages from a REST endpoint."""
+    cache_key = f"paginated_{endpoint}_{json.dumps(params or {}, sort_keys=True)}"
+    cached = _get_cached(cache_key)
+    if cached is not None:
+        return cached
+
+    results = []
+    p = dict(params or {})
+    p["per_page"] = per_page
+    page = 1
+
+    while True:
+        p["page"] = page
+        url = f"{API}/{endpoint}" if not endpoint.startswith("http") else endpoint
+        resp = _request_with_retry(url, params=p)
+        if resp.status_code != 200:
+            break
+        data = resp.json()
+        if not data:
+            break
+        results.extend(data)
+        if len(data) < per_page:
+            break
+        page += 1
+
+    _set_cached(cache_key, results)
+    return results
+
+
 def get_repos(include_forks: bool = False) -> list:
     """Get public repos owned by USERNAME, optionally including forks."""
+    cached_graphql = _get_cached(f"graphql_public_owned_repos_{int(include_forks)}")
+    if isinstance(cached_graphql, list) and cached_graphql:
+        return cached_graphql
+
     if TOKEN:
         try:
             repos = _graphql_public_owned_repos(include_forks)
@@ -455,29 +427,6 @@ def get_repos(include_forks: bool = False) -> list:
             return []
 
 
-def _graphql_query(query: str, variables: dict) -> dict | None:
-    try:
-        resp = requests.post(
-            GRAPHQL,
-            headers=_headers(),
-            json={"query": query, "variables": variables},
-        )
-    except requests.RequestException:
-        return None
-    if resp.status_code != 200:
-        return None
-
-    try:
-        payload = resp.json()
-    except ValueError:
-        return None
-    if not isinstance(payload, dict):
-        return None
-    if payload.get("errors"):
-        return None
-    return payload.get("data")
-
-
 def get_owned_repo_scope_counts() -> dict:
     """
     Return repo counts with explicit scope splits.
@@ -491,6 +440,24 @@ def get_owned_repo_scope_counts() -> dict:
     cache_key = "owned_repo_scope_counts"
     cached = _get_cached(cache_key)
     if cached is not None:
+        if (
+            isinstance(cached, dict)
+            and int(cached.get("public_owned_nonfork", 0) or 0) == 0
+            and int(cached.get("public_owned_total", 0) or 0) == 0
+        ):
+            cached_nonfork = _get_cached("graphql_public_owned_repos_0")
+            cached_all = _get_cached("graphql_public_owned_repos_1")
+            if isinstance(cached_nonfork, list) and cached_nonfork:
+                nonfork_total = len(cached_nonfork)
+                public_total = len(cached_all) if isinstance(cached_all, list) and cached_all else nonfork_total
+                recovered = {
+                    "public_owned_total": public_total,
+                    "public_owned_forks": max(0, public_total - nonfork_total),
+                    "public_owned_nonfork": nonfork_total,
+                    "private_owned": cached.get("private_owned"),
+                }
+                _set_cached(cache_key, recovered)
+                return recovered
         return cached
 
     # Prefer GraphQL totals when authenticated. This avoids pagination math drift.
@@ -737,15 +704,22 @@ def get_releases_last_n_days(
         return 0
 
     cutoff = datetime.now(timezone.utc) - timedelta(days=max(1, int(days)))
-    cache_key = f"releases_last_{days}_{_repo_signature(repos)}"
+    repo_sig = _repo_signature(repos)
+    cache_key = f"releases_last_{days}_{repo_sig}"
     cached = _get_cached(cache_key)
     if cached is not None:
         if isinstance(cached, dict):
-            return cached.get("total")
+            total = cached.get("total")
+            if total is None:
+                return _get_recent_release_cache(days=days, exclude_signature=repo_sig)
+            try:
+                return int(total)
+            except (TypeError, ValueError):
+                return _get_recent_release_cache(days=days, exclude_signature=repo_sig)
         try:
             return int(cached)
         except (TypeError, ValueError):
-            return None
+            return _get_recent_release_cache(days=days, exclude_signature=repo_sig)
 
     total_known = 0
     unknown_repos = 0
@@ -781,6 +755,34 @@ def get_releases_last_n_days(
     return result
 
 
+def _get_recent_release_cache(days: int, exclude_signature: str) -> int | None:
+    """Return a recent cached release count for the same day window when available."""
+    prefix = f"releases_last_{days}_"
+    candidates: list[tuple[float, Path]] = []
+    try:
+        for path in CACHE_DIR.glob(f"{prefix}*.json"):
+            if path.stem.endswith(exclude_signature):
+                continue
+            candidates.append((path.stat().st_mtime, path))
+    except OSError:
+        return None
+
+    for _mtime, path in sorted(candidates, key=lambda item: item[0], reverse=True):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(payload, dict):
+            total = payload.get("total")
+        else:
+            total = payload
+        try:
+            return int(total)
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
 def get_merged_prs_last_n_days(days: int = 365) -> int | None:
     """
     Count merged pull requests authored by USERNAME in repos owned by USERNAME.
@@ -797,11 +799,13 @@ def get_merged_prs_last_n_days(days: int = 365) -> int | None:
             try:
                 return int(cached.get("total"))
             except (TypeError, ValueError):
-                return None
+                fallback = _get_recent_merged_pr_cache(window_days=window_days, exclude_day=window_day)
+                return fallback
         try:
             return int(cached)
         except (TypeError, ValueError):
-            return None
+            fallback = _get_recent_merged_pr_cache(window_days=window_days, exclude_day=window_day)
+            return fallback
 
     query = f"author:{USERNAME} user:{USERNAME} is:pr is:merged merged:>={since}"
     params = {"q": query, "per_page": 1}
@@ -838,6 +842,35 @@ def get_merged_prs_last_n_days(days: int = 365) -> int | None:
 
     _set_cached(cache_key, {"total": total, "since": since})
     return total
+
+
+def _get_recent_merged_pr_cache(window_days: int, exclude_day: str) -> int | None:
+    """Return the most recent cached merged PR total for the same window when available."""
+    prefix = f"merged_prs_last_{window_days}_"
+    candidates: list[tuple[str, Path]] = []
+    try:
+        for path in CACHE_DIR.glob(f"{prefix}*.json"):
+            day = path.stem.replace(prefix, "", 1)
+            if day == exclude_day:
+                continue
+            candidates.append((day, path))
+    except OSError:
+        return None
+
+    for _day, path in sorted(candidates, key=lambda item: item[0], reverse=True):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(payload, dict):
+            total = payload.get("total")
+        else:
+            total = payload
+        try:
+            return int(total)
+        except (TypeError, ValueError):
+            continue
+    return None
 
 
 def get_contribution_calendar(days: int = 365) -> dict | None:

@@ -24,6 +24,13 @@ from scripts.config import (
     TEXT_BRIGHT,
     BORDER,
 )
+from scripts.contracts import (
+    DataQuality,
+    DataScope,
+    Snapshot,
+    ScorecardCard,
+    SnapshotRow,
+)
 from scripts.profile_contract import SCORECARD_METRICS, SNAPSHOT_METRICS, format_metric_value
 from scripts.profile_helpers import activity_label, ci_text, has_ci_workflow, time_ago
 
@@ -533,24 +540,15 @@ def _build_activity_feed(
     return deduped_feed[:18]
 
 
-def compute_profile_model(
-    collected: CollectedProfileData,
-    logger=print,
-    *,
-    allow_network_calls: bool = True,
-) -> dict[str, Any]:
-    repos = collected.repos
-    events = collected.events
-    language_bytes = collected.language_bytes
-    calendar = collected.calendar
-    repo_counts = collected.repo_counts
-
-    now_utc = datetime.now(timezone.utc)
-    total_stars = sum(repo.get("stargazers_count", 0) for repo in repos)
+def _build_language_stats(
+    repos: list[dict[str, Any]],
+    language_bytes: dict[str, int],
+) -> tuple[list[dict[str, Any]], int, int]:
+    """Return (top_languages, lang_count, total_language_bytes)."""
     total_language_bytes = sum(bytes_ for bytes_ in language_bytes.values() if bytes_ > 0)
     lang_count = len([lang for lang, bytes_ in language_bytes.items() if bytes_ > 0])
 
-    top_languages = []
+    top_languages: list[dict[str, Any]] = []
     for lang, byte_count in sorted(language_bytes.items(), key=lambda item: item[1], reverse=True)[:12]:
         if byte_count <= 0:
             continue
@@ -562,7 +560,17 @@ def compute_profile_model(
                 "percent": round(pct, 2),
             }
         )
+    return top_languages, lang_count, total_language_bytes
 
+
+def _build_pr_and_release_stats(
+    events: list[dict[str, Any]],
+    repos: list[dict[str, Any]],
+    now_utc: datetime,
+    *,
+    allow_network_calls: bool,
+) -> dict[str, Any]:
+    """Return dict with prs_merged, releases_30d, releases_status, releases_note, avg_release_gap_days."""
     prs_merged_from_events = sum(
         1
         for event in events
@@ -575,7 +583,8 @@ def compute_profile_model(
         merged_pr_total = gh.get_merged_prs_last_n_days(days=365)
         if merged_pr_total is not None:
             prs_merged = merged_pr_total
-    release_event_times = []
+
+    release_event_times: list[datetime] = []
     for event in events:
         if event.get("type") != "ReleaseEvent":
             continue
@@ -586,6 +595,7 @@ def compute_profile_model(
             release_event_times.append(datetime.fromisoformat(created_at.replace("Z", "+00:00")))
         except ValueError:
             continue
+
     releases_from_events_30d = sum(1 for ts in release_event_times if (now_utc - ts).days < 30)
     releases_30d: int | None = releases_from_events_30d
     if allow_network_calls:
@@ -601,6 +611,7 @@ def compute_profile_model(
     else:
         releases_status = "events_fallback"
         releases_note = "Release count derived from events feed fallback (offline or fixture mode)."
+
     avg_release_gap_days = 0.0
     if len(release_event_times) >= 2:
         sorted_times = sorted(release_event_times, reverse=True)
@@ -609,26 +620,22 @@ def compute_profile_model(
             gaps.append((sorted_times[idx] - sorted_times[idx + 1]).total_seconds() / 86400.0)
         avg_release_gap_days = sum(gaps) / len(gaps)
 
-    seven_days_ago = now_utc - timedelta(days=7)
-    active_repos_7d = 0
-    for repo in repos:
-        pushed = repo.get("pushed_at", "")
-        if not pushed:
-            continue
-        try:
-            pushed_dt = datetime.fromisoformat(pushed.replace("Z", "+00:00"))
-        except ValueError:
-            continue
-        if pushed_dt >= seven_days_ago:
-            active_repos_7d += 1
+    return {
+        "prs_merged": prs_merged,
+        "releases_30d": releases_30d,
+        "releases_status": releases_status,
+        "releases_note": releases_note,
+        "avg_release_gap_days": avg_release_gap_days,
+    }
 
-    repo_ci_lookup, ci_quality = _build_ci_quality(
-        repos,
-        allow_network_calls=allow_network_calls,
-    )
-    ci_count_effective = ci_quality["ci_count_effective"]
-    ci_coverage_pct = ci_quality["ci_coverage_pct"]
 
+def _build_commit_stats(
+    collected: CollectedProfileData,
+    repos: list[dict[str, Any]],
+    *,
+    allow_network_calls: bool,
+) -> tuple[int | None, str, str]:
+    """Return (public_scope_commits, commits_status, commits_note)."""
     public_scope_commits = collected.public_scope_commits
     if not repos:
         commits_status = "empty"
@@ -649,11 +656,167 @@ def compute_profile_model(
     else:
         commits_status = "ok"
         commits_note = "Public-scope commit aggregation complete."
+    return public_scope_commits, commits_status, commits_note
+
+
+def _build_snapshot_dict(
+    collected: CollectedProfileData,
+    repo_counts: dict[str, int | None],
+    total_stars: int,
+    lang_count: int,
+    prs_merged: int,
+    releases_30d: int | None,
+    ci_count_effective: int | None,
+    streak_days: int,
+    public_scope_commits: int | None,
+) -> Snapshot:
+    """Assemble the snapshot dict."""
+    return {
+        "last_year_contributions": collected.total_contributions,
+        "public_scope_commits": public_scope_commits,
+        "total_repos": repo_counts["public_owned_nonfork"],
+        "public_forks": repo_counts["public_owned_forks"],
+        "private_owned_repos": repo_counts["private_owned"],
+        "total_stars": total_stars,
+        "languages_count": lang_count,
+        "prs_merged": prs_merged,
+        "releases": releases_30d,
+        "ci_repos": ci_count_effective,
+        "streak_days": streak_days,
+    }
+
+
+def _build_scorecard_cards(
+    scorecard: dict[str, Any],
+    accent_colors: dict[str, str],
+) -> list[ScorecardCard]:
+    """Build the scorecard_cards list from scorecard values and accent colour map."""
+    scorecard_cards: list[ScorecardCard] = []
+    for definition in SCORECARD_METRICS:
+        value = scorecard.get(definition["key"], 0)
+        scorecard_cards.append(
+            {
+                "key": definition["key"],
+                "label": definition["label"],
+                "detail": definition["detail"],
+                "value": value,
+                "display_value": format_metric_value(value, definition),
+                "accent": accent_colors.get(definition.get("accent", "CYAN"), accent_colors.get("CYAN", CYAN)),
+            }
+        )
+    return scorecard_cards
+
+
+def _build_dashboard_payload(
+    *,
+    now_utc: datetime,
+    username: str,
+    theme: dict[str, str],
+    snapshot: Snapshot,
+    snapshot_rows: list[SnapshotRow],
+    snapshot_cards: list[dict[str, Any]],
+    data_quality: DataQuality,
+    scorecard: dict[str, Any],
+    scorecard_cards: list[ScorecardCard],
+    data_scope: DataScope,
+    featured_repo_facts: list[dict[str, Any]],
+    top_languages: list[dict[str, Any]],
+    repo_overview_rows: list[dict[str, Any]],
+    recent_created: list[dict[str, Any]],
+    focus_now: list[dict[str, Any]],
+    focus_next: list[dict[str, Any]],
+    focus_shipped: list[dict[str, Any]],
+    activity_feed: list[dict[str, Any]],
+    release_list: list[dict[str, Any]],
+    pr_list: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Assemble the dashboard_data payload."""
+    return {
+        "generated_at": now_utc.isoformat().replace("+00:00", "Z"),
+        "username": username,
+        "dashboard_url": f"https://{username}.github.io/{username}/",
+        "theme": theme,
+        "snapshot": snapshot,
+        "snapshot_rows": snapshot_rows,
+        "snapshot_cards": snapshot_cards,
+        "data_quality": data_quality,
+        "scorecard": scorecard,
+        "scorecard_cards": scorecard_cards,
+        "data_scope": data_scope,
+        "featured_repo_facts": featured_repo_facts,
+        "top_languages": top_languages,
+        "repo_language_matrix": repo_overview_rows,
+        "recent_created": recent_created,
+        "focus": {
+            "now": focus_now,
+            "next": focus_next,
+            "shipped": focus_shipped,
+        },
+        "activity_feed": activity_feed,
+        "recent_releases": release_list,
+        "recent_pull_requests": pr_list,
+    }
+
+
+def compute_profile_model(
+    collected: CollectedProfileData,
+    logger=print,
+    *,
+    allow_network_calls: bool = True,
+) -> dict[str, Any]:  # returns a dict matching the ProfileModel shape
+    repos = collected.repos
+    events = collected.events
+    language_bytes = collected.language_bytes
+    calendar = collected.calendar
+    repo_counts = collected.repo_counts
+
+    now_utc = datetime.now(timezone.utc)
+    total_stars = sum(repo.get("stargazers_count", 0) for repo in repos)
+
+    # --- language stats ---
+    top_languages, lang_count, _total_language_bytes = _build_language_stats(repos, language_bytes)
+
+    # --- PR & release stats ---
+    pr_release = _build_pr_and_release_stats(
+        events, repos, now_utc, allow_network_calls=allow_network_calls,
+    )
+    prs_merged = pr_release["prs_merged"]
+    releases_30d = pr_release["releases_30d"]
+    releases_status = pr_release["releases_status"]
+    releases_note = pr_release["releases_note"]
+    avg_release_gap_days = pr_release["avg_release_gap_days"]
+
+    # --- active repos (7d) ---
+    seven_days_ago = now_utc - timedelta(days=7)
+    active_repos_7d = 0
+    for repo in repos:
+        pushed = repo.get("pushed_at", "")
+        if not pushed:
+            continue
+        try:
+            pushed_dt = datetime.fromisoformat(pushed.replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        if pushed_dt >= seven_days_ago:
+            active_repos_7d += 1
+
+    # --- CI quality ---
+    repo_ci_lookup, ci_quality = _build_ci_quality(
+        repos,
+        allow_network_calls=allow_network_calls,
+    )
+    ci_count_effective = ci_quality["ci_count_effective"]
+    ci_coverage_pct = ci_quality["ci_coverage_pct"]
+
+    # --- commit stats ---
+    public_scope_commits, commits_status, commits_note = _build_commit_stats(
+        collected, repos, allow_network_calls=allow_network_calls,
+    )
 
     stars_per_public_repo = (total_stars / len(repos)) if repos else 0.0
-
     streak_days = _compute_current_streak_days(calendar, now_utc)
 
+    # --- recent repos ---
     recent_repos, recent_commit_message_by_repo = _build_recent_repos(
         repos,
         seven_days_ago,
@@ -661,6 +824,7 @@ def compute_profile_model(
         allow_network_calls,
     )
 
+    # --- spotlight ---
     spotlight_data = []
     for repo_name in FEATURED_REPOS:
         repo = next((item for item in collected.all_repos if item["name"] == repo_name), None)
@@ -684,6 +848,7 @@ def compute_profile_model(
             }
         )
 
+    # --- scorecard ---
     scorecard = {
         "releases_30d": releases_30d,
         "active_repos_7d": active_repos_7d,
@@ -698,20 +863,9 @@ def compute_profile_model(
         "GREEN": GREEN,
         "ORANGE": ORANGE,
     }
-    scorecard_cards = []
-    for definition in SCORECARD_METRICS:
-        value = scorecard.get(definition["key"], 0)
-        scorecard_cards.append(
-            {
-                "key": definition["key"],
-                "label": definition["label"],
-                "detail": definition["detail"],
-                "value": value,
-                "display_value": format_metric_value(value, definition),
-                "accent": accent_colors.get(definition.get("accent", "CYAN"), CYAN),
-            }
-        )
+    scorecard_cards = _build_scorecard_cards(scorecard, accent_colors)
 
+    # --- repo overview ---
     repo_overview_rows, featured_repo_facts = _build_repo_overview_rows(
         repos,
         recent_commit_message_by_repo,
@@ -719,7 +873,8 @@ def compute_profile_model(
         repo_ci_lookup,
     )
 
-    data_scope = {
+    # --- data scope ---
+    data_scope: DataScope = {
         "repos_included": "public + owned + non-fork",
         "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
         "public_owned_repos_total": repo_counts["public_owned_total"],
@@ -728,21 +883,15 @@ def compute_profile_model(
         "private_owned_repos_total": repo_counts["private_owned"],
     }
 
-    snapshot = {
-        "last_year_contributions": collected.total_contributions,
-        "public_scope_commits": public_scope_commits,
-        "total_repos": repo_counts["public_owned_nonfork"],
-        "public_forks": repo_counts["public_owned_forks"],
-        "private_owned_repos": repo_counts["private_owned"],
-        "total_stars": total_stars,
-        "languages_count": lang_count,
-        "prs_merged": prs_merged,
-        "releases": releases_30d,
-        "ci_repos": ci_count_effective,
-        "streak_days": streak_days,
-    }
+    # --- snapshot ---
+    snapshot: Snapshot = _build_snapshot_dict(
+        collected, repo_counts, total_stars, lang_count,
+        prs_merged, releases_30d, ci_count_effective, streak_days,
+        public_scope_commits,
+    )
 
-    snapshot_rows = []
+    # --- snapshot rows & cards ---
+    snapshot_rows: list[SnapshotRow] = []
     for definition in SNAPSHOT_METRICS:
         key = definition["key"]
         value = snapshot.get(key)
@@ -765,6 +914,7 @@ def compute_profile_model(
         for row in snapshot_rows
     ]
 
+    # --- recent activity & focus ---
     recent_created = sorted(repos, key=lambda item: item.get("created_at", ""), reverse=True)[:10]
 
     (
@@ -786,13 +936,14 @@ def compute_profile_model(
         USERNAME,
     )
 
+    # --- data quality ---
     events_status = "ok" if events else "limited"
     events_note = (
         "Public events feed available."
         if events
         else "No recent public events returned in this run; focus/feed use repo push fallbacks."
     )
-    data_quality = {
+    data_quality: DataQuality = {
         "ci_status": ci_quality["ci_status"],
         "ci_note": ci_quality["ci_note"],
         "commits_status": commits_status,
@@ -804,6 +955,7 @@ def compute_profile_model(
         "token_mode": collected.token_mode,
     }
 
+    # --- theme ---
     theme = {
         "bg_main": BG_DARK,
         "bg_panel": BG_CARD,
@@ -820,31 +972,29 @@ def compute_profile_model(
         "accent_blue": BLUE,
     }
 
-    dashboard_data = {
-        "generated_at": now_utc.isoformat().replace("+00:00", "Z"),
-        "username": USERNAME,
-        "dashboard_url": f"https://{USERNAME}.github.io/{USERNAME}/",
-        "theme": theme,
-        "snapshot": snapshot,
-        "snapshot_rows": snapshot_rows,
-        "snapshot_cards": snapshot_cards,
-        "data_quality": data_quality,
-        "scorecard": scorecard,
-        "scorecard_cards": scorecard_cards,
-        "data_scope": data_scope,
-        "featured_repo_facts": featured_repo_facts,
-        "top_languages": top_languages,
-        "repo_language_matrix": repo_overview_rows,
-        "recent_created": recent_created,
-        "focus": {
-            "now": focus_now,
-            "next": focus_next,
-            "shipped": focus_shipped,
-        },
-        "activity_feed": activity_feed,
-        "recent_releases": release_list,
-        "recent_pull_requests": pr_list,
-    }
+    # --- dashboard payload ---
+    dashboard_data = _build_dashboard_payload(
+        now_utc=now_utc,
+        username=USERNAME,
+        theme=theme,
+        snapshot=snapshot,
+        snapshot_rows=snapshot_rows,
+        snapshot_cards=snapshot_cards,
+        data_quality=data_quality,
+        scorecard=scorecard,
+        scorecard_cards=scorecard_cards,
+        data_scope=data_scope,
+        featured_repo_facts=featured_repo_facts,
+        top_languages=top_languages,
+        repo_overview_rows=repo_overview_rows,
+        recent_created=recent_created,
+        focus_now=focus_now,
+        focus_next=focus_next,
+        focus_shipped=focus_shipped,
+        activity_feed=activity_feed,
+        release_list=release_list,
+        pr_list=pr_list,
+    )
 
     return {
         "now_utc": now_utc,

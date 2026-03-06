@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import json
+import subprocess
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 from scripts import github_client as gh
 from scripts.runtime_env import cache_mode_from_env, token_mode_from_env
@@ -18,18 +22,18 @@ def detect_cache_mode() -> dict[str, object]:
 
 @dataclass(frozen=True)
 class CollectedProfileData:
-    repo_counts: dict
-    repos: list[dict]
-    all_repos: list[dict]
-    language_bytes: dict
-    events: list[dict]
+    repo_counts: dict[str, int | None]
+    repos: list[dict[str, Any]]
+    all_repos: list[dict[str, Any]]
+    language_bytes: dict[str, int]
+    events: list[dict[str, Any]]
     latest_push_message_by_repo: dict[str, str]
     public_scope_commits: int | None
     ci_count_probe: int
-    calendar: dict | None
+    calendar: dict[str, Any] | None
     total_contributions: int | None
     token_mode: str
-    cache_mode: dict[str, object]
+    cache_mode: dict[str, Any]
 
 
 def collect_profile_data(logger=print) -> CollectedProfileData:
@@ -46,6 +50,20 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
     logger("[2/7] Fetching repos...")
     repos = gh.get_repos(include_forks=False)
     all_repos = gh.get_repos(include_forks=True)
+    # Keep scope counts and fetched repo lists consistent when the scope endpoint degrades.
+    if repos and int(repo_counts.get("public_owned_nonfork", 0) or 0) == 0:
+        repo_counts["public_owned_nonfork"] = len(repos)
+    if all_repos and int(repo_counts.get("public_owned_total", 0) or 0) == 0:
+        repo_counts["public_owned_total"] = len(all_repos)
+    if repo_counts.get("public_owned_total") is not None and repo_counts.get("public_owned_nonfork") is not None:
+        repo_counts["public_owned_forks"] = max(
+            0,
+            int(repo_counts["public_owned_total"]) - int(repo_counts["public_owned_nonfork"]),
+        )
+    if repo_counts.get("private_owned") is None:
+        previous_private = _read_previous_private_owned_count()
+        if previous_private is not None:
+            repo_counts["private_owned"] = previous_private
     logger(
         f"  Found {len(repos)} public non-fork repos "
         f"({len(all_repos)} public owned total, {repo_counts['public_owned_forks']} forks)"
@@ -112,3 +130,42 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
         token_mode=detect_token_mode(),
         cache_mode=detect_cache_mode(),
     )
+
+
+def _read_previous_private_owned_count() -> int | None:
+    """Read the last known private-owned repo count from snapshot output."""
+    snapshot_path = Path("site/data/profile_snapshot.json")
+    payloads: list[dict[str, Any]] = []
+    if snapshot_path.exists():
+        try:
+            loaded = json.loads(snapshot_path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict):
+                payloads.append(loaded)
+        except (OSError, ValueError):
+            pass
+
+    try:
+        result = subprocess.run(
+            ["git", "show", "HEAD:site/data/profile_snapshot.json"],
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        loaded = json.loads(result.stdout)
+        if isinstance(loaded, dict):
+            payloads.append(loaded)
+    except (OSError, ValueError, subprocess.CalledProcessError):
+        pass
+
+    for payload in payloads:
+        snapshot = payload.get("snapshot") if isinstance(payload, dict) else None
+        if not isinstance(snapshot, dict):
+            continue
+        value = snapshot.get("private_owned_repos")
+        try:
+            parsed = int(value)
+        except (TypeError, ValueError):
+            continue
+        if parsed >= 0:
+            return parsed
+    return None

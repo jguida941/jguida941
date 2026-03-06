@@ -1,15 +1,10 @@
 """Build featured project cards with sparklines."""
 
 from scripts.config import (
-    BG_CARD, BG_HIGHLIGHT, BLUE, CYAN, GREEN, TEXT, BORDER, SVG_WIDTH, FONT_SANS, LANG_COLORS,
+    BG_CARD, BG_HIGHLIGHT, BLUE, CYAN, GREEN, TEXT, BORDER, SVG_WIDTH, FONT_SANS,
 )
 from scripts.card_theme import card_bg, title_accent, title_left, title_right
-
-
-def _lang_color(lang: str | None) -> str:
-    if not lang:
-        return "#8b8b8b"
-    return LANG_COLORS.get(lang, "#8b8b8b")
+from scripts.svg_utils import xml_escape, truncate, lang_color
 
 
 def _sparkline(data: list, x: float, y: float, w: float, h: float, color: str) -> str:
@@ -29,23 +24,12 @@ def _sparkline(data: list, x: float, y: float, w: float, h: float, color: str) -
     )
 
 
-def _truncate(text: str, max_len: int) -> str:
+def _desc_truncate(text: str, max_len: int) -> str:
+    """Truncate a repo description, returning a placeholder for empty text."""
     if not text:
         return "No description"
-    text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-    if len(text) > max_len:
-        return text[:max_len - 3] + "..."
-    return text
-
-
-def _esc_attr(text: str) -> str:
-    return (
-        str(text)
-        .replace("&", "&amp;")
-        .replace("<", "&lt;")
-        .replace(">", "&gt;")
-        .replace('"', "&quot;")
-    )
+    escaped = xml_escape(text, quote=False)
+    return truncate(escaped, max_len)
 
 
 def generate(
@@ -80,13 +64,13 @@ def generate(
         cy = title_h + row * (card_h + gap)
 
         name = repo.get("name", "unknown")
-        desc = _truncate(repo.get("description", ""), 70)
+        desc = _desc_truncate(repo.get("description", ""), 70)
         lang = repo.get("language")
         stars = repo.get("stars", 0)
         forks = repo.get("forks", 0)
         has_ci = repo.get("has_ci", False)
         weekly = repo.get("weekly_commits", [])
-        url = _esc_attr(repo.get("html_url", ""))
+        url = xml_escape(repo.get("html_url", ""))
 
         name_esc = name.replace("&", "&amp;").replace("<", "&lt;")
 
@@ -125,7 +109,7 @@ def generate(
 
         # Language dot + label
         parts.append(
-            f'<circle cx="{cx + 22}" cy="{cy + 70}" r="4" fill="{_lang_color(lang)}"/>'
+            f'<circle cx="{cx + 22}" cy="{cy + 70}" r="4" fill="{lang_color(lang)}"/>'
             f'<text x="{cx + 32}" y="{cy + 74}" fill="{TEXT}" font-size="11" '
             f'font-family="{FONT_SANS}">{lang or "n/a"}</text>'
         )

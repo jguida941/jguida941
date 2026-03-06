@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import json
-import subprocess
+
+from scripts.gh_cli import run_json
 
 
 DEFAULT_REQUIRED_CHECKS = (
@@ -23,24 +23,9 @@ class BranchProtectionAudit:
     extra_checks: list[str]
 
 
-def _run_gh_json(cmd: list[str]) -> dict:
-    try:
-        result = subprocess.run(
-            cmd,
-            check=True,
-            text=True,
-            capture_output=True,
-        )
-    except FileNotFoundError as exc:
-        raise RuntimeError("GitHub CLI not found. Install `gh` to manage branch protection.") from exc
-    except subprocess.CalledProcessError as exc:
-        message = (exc.stderr or exc.stdout or str(exc)).strip()
-        raise RuntimeError(message) from exc
-
-    try:
-        payload = json.loads(result.stdout or "{}")
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Could not parse JSON output from `gh api`") from exc
+def _run_gh_json_dict(cmd: list[str]) -> dict:
+    """Call run_json and verify the result is a dict."""
+    payload = run_json(cmd)
     if not isinstance(payload, dict):
         raise RuntimeError("Unexpected response shape from `gh api`")
     return payload
@@ -60,7 +45,7 @@ def _normalized_unique(items: list[str]) -> list[str]:
 
 def get_configured_required_checks(repo: str, branch: str) -> list[str]:
     try:
-        payload = _run_gh_json(
+        payload = _run_gh_json_dict(
             [
                 "gh",
                 "api",
@@ -138,7 +123,7 @@ def apply_required_checks(
         cmd_patch.extend(["-F", f"contexts[]={check}"])
 
     try:
-        _run_gh_json(cmd_patch)
+        _run_gh_json_dict(cmd_patch)
         return
     except RuntimeError as exc:
         message = str(exc)
@@ -166,4 +151,4 @@ def apply_required_checks(
     for check in checks:
         cmd_put.extend(["-F", f"required_status_checks[contexts][]={check}"])
 
-    _run_gh_json(cmd_put)
+    _run_gh_json_dict(cmd_put)

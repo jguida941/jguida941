@@ -2,9 +2,78 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict
 
 from scripts.profile_contract import SNAPSHOT_METRICS
+
+
+# ---------------------------------------------------------------------------
+# Typed contracts for key data shapes
+# ---------------------------------------------------------------------------
+
+
+class Snapshot(TypedDict):
+    last_year_contributions: int | None
+    public_scope_commits: int | None
+    total_repos: int
+    public_forks: int
+    private_owned_repos: int | None
+    total_stars: int
+    languages_count: int
+    prs_merged: int
+    releases: int | None
+    ci_repos: int | None
+    streak_days: int
+
+
+class DataQuality(TypedDict):
+    ci_status: str
+    ci_note: str
+    commits_status: str
+    commits_note: str
+    releases_status: str
+    releases_note: str
+    events_status: str
+    events_note: str
+    token_mode: str
+
+
+class DataScope(TypedDict):
+    repos_included: str
+    activity_metric_scope: str
+    public_owned_repos_total: int
+    public_owned_forks_total: int
+    public_owned_nonfork_repos_total: int
+    private_owned_repos_total: int | None
+
+
+class FocusItem(TypedDict):
+    title: str
+    detail: str
+    url: str
+
+
+class FocusLanes(TypedDict):
+    now: list[FocusItem]
+    next: list[FocusItem]
+    shipped: list[FocusItem]
+
+
+class ScorecardCard(TypedDict):
+    key: str
+    label: str
+    detail: str
+    value: object
+    display_value: str
+    accent: str
+
+
+class SnapshotRow(TypedDict):
+    key: str
+    label: str
+    dashboard_label: str
+    value: object
+    display_value: str
 
 
 REQUIRED_README_MARKERS = (

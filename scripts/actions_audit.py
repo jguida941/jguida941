@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import json
-import subprocess
+
+from scripts.gh_cli import run_json
 
 
 @dataclass(frozen=True)
@@ -40,23 +40,7 @@ def fetch_runs(workflow: str, limit: int = 20, branch: str | None = None) -> lis
     if branch:
         cmd.extend(["--branch", branch])
 
-    try:
-        result = subprocess.run(
-            cmd,
-            check=True,
-            text=True,
-            capture_output=True,
-        )
-    except FileNotFoundError as exc:
-        raise RuntimeError("GitHub CLI not found. Install `gh` to use workflow run audit.") from exc
-    except subprocess.CalledProcessError as exc:
-        message = (exc.stderr or exc.stdout or str(exc)).strip()
-        raise RuntimeError(message) from exc
-
-    try:
-        payload = json.loads(result.stdout or "[]")
-    except json.JSONDecodeError as exc:
-        raise RuntimeError("Could not parse JSON output from `gh run list`") from exc
+    payload = run_json(cmd, default=[])
     runs: list[WorkflowRun] = []
     for item in payload:
         if not isinstance(item, dict):

@@ -42,8 +42,10 @@ SVG_WIDTH = 840
 FONT_MONO = "'Courier New', Courier, monospace"
 FONT_SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
 
-# GitHub username
-USERNAME = "jguida941"
+# GitHub username (sourced from unified settings)
+from scripts.settings import Settings as _Settings  # noqa: E402
+
+USERNAME = _Settings.from_env().username
 
 # Featured repos for spotlight
 FEATURED_REPOS = [

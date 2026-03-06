@@ -5,22 +5,24 @@ from __future__ import annotations
 
 import argparse
 import os
+from dataclasses import dataclass, field
 from pathlib import Path
 import sys
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 os.chdir(ROOT)
 
 
-def _set_diag(args: argparse.Namespace, *, warnings=None, errors=None, extra=None) -> None:
-    args._diag = {
-        "warnings": list(warnings or []),
-        "errors": list(errors or []),
-        "extra": extra or {},
-    }
+@dataclass(frozen=True)
+class CommandResult:
+    exit_code: int
+    warnings: list[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
+    extra: dict[str, Any] = field(default_factory=dict)
 
 
 def _print_validation_result(result) -> None:
@@ -47,27 +49,25 @@ def _run_live_profile_generation() -> None:
     print("\nDone!")
 
 
-def _cmd_build(args: argparse.Namespace) -> int:
+def _cmd_build(args: argparse.Namespace) -> CommandResult:
     _run_live_profile_generation()
-    _set_diag(args, extra={"step": "build"})
-    return 0
+    return CommandResult(exit_code=0, extra={"step": "build"})
 
 
-def _cmd_validate(args: argparse.Namespace) -> int:
+def _cmd_validate(args: argparse.Namespace) -> CommandResult:
     from scripts.validate_generated_profile import validate_profile
 
     result = validate_profile()
     _print_validation_result(result)
-    _set_diag(
-        args,
+    return CommandResult(
+        exit_code=0 if result.ok else 1,
         warnings=list(result.warnings),
         errors=list(result.errors),
         extra={"step": "validate"},
     )
-    return 0 if result.ok else 1
 
 
-def _cmd_generate_profile(args: argparse.Namespace) -> int:
+def _cmd_generate_profile(args: argparse.Namespace) -> CommandResult:
     from scripts.profile_pipeline import run_profile_pipeline_from_fixture
     from scripts.validate_generated_profile import validate_profile
 
@@ -89,8 +89,8 @@ def _cmd_generate_profile(args: argparse.Namespace) -> int:
         errors = list(result.errors)
         rc = 0 if result.ok else 1
 
-    _set_diag(
-        args,
+    return CommandResult(
+        exit_code=rc,
         warnings=warnings,
         errors=errors,
         extra={
@@ -99,18 +99,16 @@ def _cmd_generate_profile(args: argparse.Namespace) -> int:
             "fixture": args.fixture,
         },
     )
-    return rc
 
 
-def _cmd_check_metrics(args: argparse.Namespace) -> int:
+def _cmd_check_metrics(args: argparse.Namespace) -> CommandResult:
     from scripts.metrics_svg import parse_metrics_svg, check_metrics
 
     svg_path = Path(args.path)
     if not svg_path.exists():
         message = f"{svg_path} not found"
         print(message)
-        _set_diag(args, errors=[message], extra={"step": "check_metrics"})
-        return 1
+        return CommandResult(exit_code=1, errors=[message], extra={"step": "check_metrics"})
 
     snapshot = parse_metrics_svg(svg_path)
     result = check_metrics(
@@ -134,23 +132,21 @@ def _cmd_check_metrics(args: argparse.Namespace) -> int:
         print("Checks failed:")
         for failure in result.failures:
             print(f"  - {failure}")
-        _set_diag(
-            args,
+        return CommandResult(
+            exit_code=1,
             warnings=list(result.warnings),
             errors=list(result.failures),
             extra={"step": "check_metrics"},
         )
-        return 1
     print("Checks passed")
-    _set_diag(
-        args,
+    return CommandResult(
+        exit_code=0,
         warnings=list(result.warnings),
         extra={"step": "check_metrics"},
     )
-    return 0
 
 
-def _cmd_audit_runs(args: argparse.Namespace) -> int:
+def _cmd_audit_runs(args: argparse.Namespace) -> CommandResult:
     from scripts import actions_audit
 
     try:
@@ -162,8 +158,7 @@ def _cmd_audit_runs(args: argparse.Namespace) -> int:
     except Exception as exc:
         message = f"Failed to read GitHub Actions runs: {exc}"
         print(message)
-        _set_diag(args, errors=[message], extra={"step": "audit_runs"})
-        return 1
+        return CommandResult(exit_code=1, errors=[message], extra={"step": "audit_runs"})
 
     summary = actions_audit.summarize_runs(runs, failure_limit=args.failure_limit)
 
@@ -183,8 +178,8 @@ def _cmd_audit_runs(args: argparse.Namespace) -> int:
     else:
         print("No failed runs in the selected range")
 
-    _set_diag(
-        args,
+    return CommandResult(
+        exit_code=0,
         extra={
             "step": "audit_runs",
             "workflow": args.workflow,
@@ -192,18 +187,16 @@ def _cmd_audit_runs(args: argparse.Namespace) -> int:
             "state_counts": summary.by_state,
         },
     )
-    return 0
 
 
-def _cmd_branch_protection(args: argparse.Namespace) -> int:
+def _cmd_branch_protection(args: argparse.Namespace) -> CommandResult:
     from scripts import branch_protection
 
     repo = args.repo or os.environ.get("GITHUB_REPOSITORY", "").strip()
     if not repo:
         message = "Repository is required. Pass --repo <owner/repo> or set GITHUB_REPOSITORY."
         print(message)
-        _set_diag(args, errors=[message], extra={"step": "branch_protection"})
-        return 1
+        return CommandResult(exit_code=1, errors=[message], extra={"step": "branch_protection"})
 
     required_checks = list(args.require or branch_protection.DEFAULT_REQUIRED_CHECKS)
 
@@ -216,8 +209,11 @@ def _cmd_branch_protection(args: argparse.Namespace) -> int:
     except Exception as exc:
         message = f"Failed to audit branch protection: {exc}"
         print(message)
-        _set_diag(args, errors=[message], extra={"step": "branch_protection", "repo": repo})
-        return 1
+        return CommandResult(
+            exit_code=1,
+            errors=[message],
+            extra={"step": "branch_protection", "repo": repo},
+        )
 
     print(f"Branch protection audit for {repo}@{args.branch}")
     print(f"Required checks: {', '.join(audit.required_checks) if audit.required_checks else '(none)'}")
@@ -238,12 +234,11 @@ def _cmd_branch_protection(args: argparse.Namespace) -> int:
         except Exception as exc:
             message = f"Failed to apply required checks: {exc}"
             print(message)
-            _set_diag(
-                args,
+            return CommandResult(
+                exit_code=1,
                 errors=[message],
                 extra={"step": "branch_protection", "repo": repo, "branch": args.branch},
             )
-            return 1
 
         audit = branch_protection.audit_required_checks(
             repo=repo,
@@ -257,8 +252,8 @@ def _cmd_branch_protection(args: argparse.Namespace) -> int:
 
     should_fail = bool(audit.missing_checks) and bool(args.fail_on_missing)
     if should_fail:
-        _set_diag(
-            args,
+        return CommandResult(
+            exit_code=1,
             errors=[f"missing required checks: {', '.join(audit.missing_checks)}"],
             extra={
                 "step": "branch_protection",
@@ -267,10 +262,9 @@ def _cmd_branch_protection(args: argparse.Namespace) -> int:
                 "missing_checks": audit.missing_checks,
             },
         )
-        return 1
 
-    _set_diag(
-        args,
+    return CommandResult(
+        exit_code=0,
         extra={
             "step": "branch_protection",
             "repo": repo,
@@ -279,10 +273,9 @@ def _cmd_branch_protection(args: argparse.Namespace) -> int:
             "applied": bool(args.apply),
         },
     )
-    return 0
 
 
-def _cmd_triage(args: argparse.Namespace) -> int:
+def _cmd_triage(args: argparse.Namespace) -> CommandResult:
     from scripts import triage
 
     report = triage.build_triage_report(
@@ -304,34 +297,30 @@ def _cmd_triage(args: argparse.Namespace) -> int:
     should_fail = fail_on != "none" and triage.has_severity_at_or_above(report, fail_on)
     if should_fail:
         print(f"Triage failed because finding severity >= {fail_on}")
-        _set_diag(
-            args,
+        return CommandResult(
+            exit_code=1,
             errors=[f"triage severity threshold reached: {fail_on}"],
             extra={"step": "triage", "output": args.output},
         )
-        return 1
 
-    _set_diag(args, extra={"step": "triage", "output": args.output})
-    return 0
+    return CommandResult(exit_code=0, extra={"step": "triage", "output": args.output})
 
 
-def _cmd_triage_summary(args: argparse.Namespace) -> int:
+def _cmd_triage_summary(args: argparse.Namespace) -> CommandResult:
     from scripts import triage
 
     input_path = Path(args.input)
     if not input_path.exists():
         message = f"{args.input} not found"
         print(message)
-        _set_diag(args, errors=[message], extra={"step": "triage_summary"})
-        return 1
+        return CommandResult(exit_code=1, errors=[message], extra={"step": "triage_summary"})
 
     try:
         report = triage.read_triage_report(args.input)
     except Exception as exc:
         message = f"Failed to read triage report: {exc}"
         print(message)
-        _set_diag(args, errors=[message], extra={"step": "triage_summary"})
-        return 1
+        return CommandResult(exit_code=1, errors=[message], extra={"step": "triage_summary"})
 
     ranked = triage.ranked_open_findings(
         report,
@@ -342,8 +331,10 @@ def _cmd_triage_summary(args: argparse.Namespace) -> int:
     print(f"Triage summary from: {args.input}")
     if not ranked:
         print("No open findings at or above the selected severity.")
-        _set_diag(args, extra={"step": "triage_summary", "input": args.input, "count": 0})
-        return 0
+        return CommandResult(
+            exit_code=0,
+            extra={"step": "triage_summary", "input": args.input, "count": 0},
+        )
 
     for idx, finding in enumerate(ranked, start=1):
         severity = finding.get("severity", "unknown")
@@ -354,8 +345,8 @@ def _cmd_triage_summary(args: argparse.Namespace) -> int:
         if fix_hint:
             print(f"   fix: {fix_hint}")
 
-    _set_diag(
-        args,
+    return CommandResult(
+        exit_code=0,
         extra={
             "step": "triage_summary",
             "input": args.input,
@@ -363,7 +354,6 @@ def _cmd_triage_summary(args: argparse.Namespace) -> int:
             "min_severity": args.min_severity,
         },
     )
-    return 0
 
 
 def _doctor_has_failure_at_or_above(report: dict[str, Any], threshold: str) -> bool:
@@ -377,7 +367,7 @@ def _doctor_has_failure_at_or_above(report: dict[str, Any], threshold: str) -> b
     return False
 
 
-def _cmd_doctor(args: argparse.Namespace) -> int:
+def _cmd_doctor(args: argparse.Namespace) -> CommandResult:
     from scripts.diagnostics import doctor_checks
     import json
 
@@ -393,15 +383,13 @@ def _cmd_doctor(args: argparse.Namespace) -> int:
     fail_on = (args.fail_on or "").lower()
     should_fail = fail_on != "none" and _doctor_has_failure_at_or_above(report, fail_on)
     if should_fail:
-        _set_diag(
-            args,
+        return CommandResult(
+            exit_code=1,
             errors=[f"doctor severity threshold reached: {fail_on}"],
             extra={"step": "doctor", "output": args.output},
         )
-        return 1
 
-    _set_diag(args, extra={"step": "doctor", "output": args.output})
-    return 0
+    return CommandResult(exit_code=0, extra={"step": "doctor", "output": args.output})
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -605,18 +593,18 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     from scripts.diagnostics import write_run_diagnostics
 
+    os.chdir(ROOT)
     parser = build_parser()
     args = parser.parse_args(argv)
-    exit_code = int(args.func(args))
-    diag = getattr(args, "_diag", {"warnings": [], "errors": [], "extra": {}})
+    result: CommandResult = args.func(args)
     write_run_diagnostics(
         command=str(args.command),
-        exit_code=exit_code,
-        warnings=diag.get("warnings", []),
-        errors=diag.get("errors", []),
-        extra=diag.get("extra", {}),
+        exit_code=result.exit_code,
+        warnings=result.warnings,
+        errors=result.errors,
+        extra=result.extra,
     )
-    return exit_code
+    return result.exit_code
 
 
 if __name__ == "__main__":
