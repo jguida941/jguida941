@@ -9,8 +9,15 @@
 
 <div align="center">
 
-<img src="metrics.general.svg" width="49%" alt="GitHub Stats" />
-<img src="assets/streak_summary.svg" width="49%" alt="Streak Summary" />
+<img src="metrics.general.svg" width="100%" alt="GitHub Stats" />
+
+</div>
+
+---
+
+<div align="center">
+
+<img src="assets/streak_summary.svg" width="100%" alt="Streak Summary" />
 
 </div>
 
@@ -54,6 +61,20 @@
 
 </div>
 
+{% if focus_links_now or focus_links_next or focus_links_shipped %}
+#### Focus Links
+
+{% for item in focus_links_now -%}
+- Now: [{{ item.title }}]({{ item.url }}) — {{ item.detail }}
+{% endfor %}
+{% for item in focus_links_next -%}
+- Next: [{{ item.title }}]({{ item.url }}) — {{ item.detail }}
+{% endfor %}
+{% for item in focus_links_shipped -%}
+- Shipped: [{{ item.title }}]({{ item.url }}) — {{ item.detail }}
+{% endfor %}
+{% endif %}
+
 ---
 
 ### Currently Working On
@@ -90,9 +111,15 @@
 
 <div align="center">
 
-<img src="assets/repo_spotlight.svg" alt="Featured Projects" />
+<img src="assets/repo_spotlight.svg" alt="Flagship Projects" />
 
 </div>
+
+#### Project Links
+
+{% for repo in featured_links -%}
+- [{{ repo.name }}]({{ repo.url }}) — ★{{ repo.stars }} · {{ repo.language }} · CI {{ repo.ci }}
+{% endfor %}
 
 ---
 

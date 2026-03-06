@@ -160,7 +160,7 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
     stats_y = grid_y + grid_h + 28
     svg_h = stats_y + 58
 
-    palette = [BG_HIGHLIGHT, "#33456a", BLUE, GREEN, CYAN]
+    palette = [BG_HIGHLIGHT, "#313c5c", "#3f5380", "#5876ad", "#7aa2f7"]
 
     parts = []
     parts.append(

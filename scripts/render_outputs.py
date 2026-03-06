@@ -101,6 +101,26 @@ def render_readme(model: dict, logger=print) -> None:
     )
     template = env.get_template("README.md.tpl")
 
+    def _dedupe_links(items: list[dict], limit: int = 3) -> list[dict]:
+        unique = []
+        seen = set()
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            url = str(item.get("url", "")).strip()
+            title = str(item.get("title", "")).strip()
+            detail = str(item.get("detail", "")).strip()
+            key = url or f"{title}|{detail}"
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            unique.append(item)
+            if len(unique) >= limit:
+                break
+        return unique
+
+    featured_links = [row for row in model["repo_overview_rows"] if row.get("featured")][:6]
+
     readme = template.render(
         username=model["dashboard_data"]["username"],
         dashboard_url=model["dashboard_data"]["dashboard_url"],
@@ -108,6 +128,12 @@ def render_readme(model: dict, logger=print) -> None:
         focus_now=model["focus"]["now"],
         focus_next=model["focus"]["next"],
         focus_shipped=model["focus"]["shipped"],
+        focus_links_now=_dedupe_links(model["focus"]["now"], 3),
+        focus_links_next=_dedupe_links(model["focus"]["next"], 3),
+        focus_links_shipped=_dedupe_links(model["focus"]["shipped"], 3),
+        featured_links=featured_links,
+        recent_releases=model["recent_releases"],
+        recent_pull_requests=model["recent_pull_requests"],
         snapshot=model["snapshot"],
         snapshot_rows=model["snapshot_rows"],
         data_quality=model["data_quality"],

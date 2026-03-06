@@ -719,7 +719,7 @@ def compute_profile_model(
         "total_stars": total_stars,
         "languages_count": lang_count,
         "prs_merged": prs_merged,
-        "releases": releases,
+        "releases": releases_30d,
         "ci_repos": ci_count_effective,
         "streak_days": streak_days,
     }

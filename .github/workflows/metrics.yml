@@ -19,22 +19,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: General Stats
-        if: ${{ success() || failure() }}
-        uses: lowlighter/metrics@latest
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          token: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
-          user: jguida941
-          filename: metrics.general.svg
-          base: header, activity, community, repositories
-          base_indepth: yes
-          repositories: 500
-          repositories_affiliations: owner
-          repositories_forks: yes
-          plugin_lines: yes
-          plugin_lines_sections: base
-          config_timezone: America/New_York
-          config_order: base.header, base.activity+community, base.repositories
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate and validate canonical profile artifacts
+        env:
+          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
+          GITHUB_USERNAME: jguida941
+          PROFILE_TIMEZONE: America/New_York
+        run: |
+          if [ -n "${PERSONAL_GITHUB_TOKEN}" ]; then
+            export PROFILE_TOKEN_MODE="personal_github_token"
+          else
+            export PROFILE_TOKEN_MODE="github_token"
+          fi
+          echo "Token mode: ${PROFILE_TOKEN_MODE}"
+          python scripts/profile_cli.py generate-profile --validate
 
       - name: Check metrics.general.svg
         env:
@@ -44,30 +51,20 @@ jobs:
           PROFILE_TIMEZONE: America/New_York
         run: python scripts/profile_cli.py check-metrics --path metrics.general.svg
 
-      - name: Isometric Calendar
-        if: ${{ success() || failure() }}
-        uses: lowlighter/metrics@latest
-        with:
-          token: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
-          user: jguida941
-          filename: metrics.isocalendar.svg
-          base: ""
-          plugin_isocalendar: yes
-          plugin_isocalendar_duration: full-year
-          config_timezone: America/New_York
-
       - name: Upload metrics artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: metrics-cards
+          name: profile-hourly-artifacts
           path: |
+            README.md
+            assets/*.svg
+            site/data/profile_snapshot.json
             metrics.general.svg
-            metrics.isocalendar.svg
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
         with:
-          commit_message: "update metrics cards"
+          commit_message: "update canonical profile artifacts"
           branch: main
-          file_pattern: "metrics.general.svg metrics.isocalendar.svg"
+          file_pattern: "README.md assets/*.svg site/data/profile_snapshot.json metrics.general.svg"

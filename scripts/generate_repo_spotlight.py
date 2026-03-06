@@ -38,6 +38,16 @@ def _truncate(text: str, max_len: int) -> str:
     return text
 
 
+def _esc_attr(text: str) -> str:
+    return (
+        str(text)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
+
+
 def generate(
     repos_data: list,
     output_path: str = "assets/repo_spotlight.svg",
@@ -62,7 +72,7 @@ def generate(
     # Section title
     parts.append(
         f'<text x="{pad + 10}" y="28" fill="{TEXT}" font-size="14" '
-        f'font-family="{FONT_SANS}" font-weight="700">Featured Projects</text>'
+        f'font-family="{FONT_SANS}" font-weight="700">Flagship Projects</text>'
     )
 
     for i, repo in enumerate(repos_data):
@@ -78,6 +88,7 @@ def generate(
         forks = repo.get("forks", 0)
         has_ci = repo.get("has_ci", False)
         weekly = repo.get("weekly_commits", [])
+        url = _esc_attr(repo.get("html_url", ""))
 
         name_esc = name.replace("&", "&amp;").replace("<", "&lt;")
 
@@ -88,10 +99,16 @@ def generate(
         )
 
         # Repo name
-        parts.append(
-            f'<text x="{cx + 16}" y="{cy + 28}" fill="{BLUE}" font-size="14" '
-            f'font-family="{FONT_SANS}" font-weight="700">{name_esc}</text>'
-        )
+        if url:
+            parts.append(
+                f'<a href="{url}"><text x="{cx + 16}" y="{cy + 28}" fill="{BLUE}" font-size="14" '
+                f'font-family="{FONT_SANS}" font-weight="700">{name_esc}</text></a>'
+            )
+        else:
+            parts.append(
+                f'<text x="{cx + 16}" y="{cy + 28}" fill="{BLUE}" font-size="14" '
+                f'font-family="{FONT_SANS}" font-weight="700">{name_esc}</text>'
+            )
 
         # CI badge
         if has_ci:

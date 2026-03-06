@@ -28,6 +28,16 @@ def _lang_color(lang: str | None) -> str:
     return LANG_COLORS.get(lang, "#8b8b8b")
 
 
+def _esc_attr(text: str) -> str:
+    return (
+        str(text)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
+
+
 def generate(
     repos: list,
     output_path: str = "assets/currently_working.svg",
@@ -60,10 +70,16 @@ def generate(
         # Escape XML
         msg = msg.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         name_esc = name.replace("&", "&amp;").replace("<", "&lt;")
+        repo_url = _esc_attr(repo.get("html_url", ""))
+        name_svg = (
+            f'<a href="{repo_url}"><text x="{pad + 16}" y="14" fill="{BLUE}" font-size="13" font-family="{FONT_SANS}" font-weight="600">{name_esc}</text></a>'
+            if repo_url
+            else f'<text x="{pad + 16}" y="14" fill="{BLUE}" font-size="13" font-family="{FONT_SANS}" font-weight="600">{name_esc}</text>'
+        )
 
         rows.append(f"""<g transform="translate(0, {y})">
   <circle cx="{pad + 5}" cy="18" r="4" fill="{_lang_color(lang)}"/>
-  <text x="{pad + 16}" y="14" fill="{BLUE}" font-size="13" font-family="{FONT_SANS}" font-weight="600">{name_esc}</text>
+  {name_svg}
   <text x="{pad + 16}" y="30" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}">{msg}</text>
   <text x="{SVG_WIDTH - pad}" y="14" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">{pushed}</text>
   <text x="{SVG_WIDTH - pad}" y="30" fill="{TEXT_DIM}" font-size="10" font-family="{FONT_SANS}" text-anchor="end">{lang or "n/a"}</text>

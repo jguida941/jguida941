@@ -9,8 +9,15 @@
 
 <div align="center">
 
-<img src="metrics.general.svg" width="49%" alt="GitHub Stats" />
-<img src="assets/streak_summary.svg" width="49%" alt="Streak Summary" />
+<img src="metrics.general.svg" width="100%" alt="GitHub Stats" />
+
+</div>
+
+---
+
+<div align="center">
+
+<img src="assets/streak_summary.svg" width="100%" alt="Streak Summary" />
 
 </div>
 
@@ -54,6 +61,22 @@
 
 </div>
 
+
+#### Focus Links
+
+- Now: [voiceterm](https://github.com/jguida941/voiceterm) — push · today · ★8 · Rust
+- Now: [jguida941](https://github.com/jguida941/jguida941) — push · today · ★1 · Python
+- Now: [homebrew-voiceterm](https://github.com/jguida941/homebrew-voiceterm) — push · 2 days ago · ★1 · Ruby
+
+- Next: [PR #11](https://github.com/jguida941/voiceterm/pull/11) — voiceterm · open · today
+- Next: [PR #10](https://github.com/jguida941/voiceterm/pull/10) — voiceterm · open · 2 days ago
+
+- Shipped: [v1.0.99](https://github.com/jguida941/voiceterm/releases/tag/v1.0.99) — voiceterm · 2 days ago
+- Shipped: [v1.0.98](https://github.com/jguida941/voiceterm/releases/tag/v1.0.98) — voiceterm · 4 days ago
+- Shipped: [v1.0.97](https://github.com/jguida941/voiceterm/releases/tag/v1.0.97) — voiceterm · 4 days ago
+
+
+
 ---
 
 ### Currently Working On
@@ -90,9 +113,16 @@
 
 <div align="center">
 
-<img src="assets/repo_spotlight.svg" alt="Featured Projects" />
+<img src="assets/repo_spotlight.svg" alt="Flagship Projects" />
 
 </div>
+
+#### Project Links
+
+- [ci-cd-hub](https://github.com/jguida941/ci-cd-hub) — ★2 · Python · CI yes
+- [voiceterm](https://github.com/jguida941/voiceterm) — ★8 · Rust · CI yes
+- [contact-suite-spring-react](https://github.com/jguida941/contact-suite-spring-react) — ★2 · Java · CI yes
+
 
 ---
 

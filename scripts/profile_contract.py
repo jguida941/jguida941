@@ -107,8 +107,8 @@ SNAPSHOT_METRICS = [
     },
     {
         "key": "releases",
-        "label": "Releases (Recent Events)",
-        "dashboard_label": "Releases (Recent)",
+        "label": "Releases (30 Days)",
+        "dashboard_label": "Releases (30d)",
         "format": "int",
     },
     {
