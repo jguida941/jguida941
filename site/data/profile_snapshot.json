@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T05:30:01.308510Z",
+  "generated_at": "2026-03-06T05:42:01.287484Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 4305,
-    "public_scope_commits": 2930,
+    "last_year_contributions": 4308,
+    "public_scope_commits": 2942,
     "total_repos": 66,
     "public_forks": 0,
     "private_owned_repos": 140,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 4305,
-      "display_value": "4,305"
+      "value": 4308,
+      "display_value": "4,308"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 2930,
-      "display_value": "2,930"
+      "value": 2942,
+      "display_value": "2,942"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 4305,
-      "display_value": "4,305"
+      "value": 4308,
+      "display_value": "4,308"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 2930,
-      "display_value": "2,930"
+      "value": 2942,
+      "display_value": "2,942"
     },
     {
       "key": "total_repos",
@@ -188,10 +188,10 @@
   "scorecard": {
     "releases_30d": 50,
     "active_repos_7d": 8,
-    "avg_release_gap_days": 1.1825219907407407,
+    "avg_release_gap_days": 1.182521990740741,
     "stars_per_public_repo": 1.106060606060606,
     "ci_coverage_pct": 24.242424242424242,
-    "last_year_contributions": 4305
+    "last_year_contributions": 4308
   },
   "scorecard_cards": [
     {
@@ -214,7 +214,7 @@
       "key": "avg_release_gap_days",
       "label": "Avg Release Gap",
       "detail": "days between release events",
-      "value": 1.1825219907407407,
+      "value": 1.182521990740741,
       "display_value": "1.2d",
       "accent": "#9ece6a"
     },
@@ -238,8 +238,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 4305,
-      "display_value": "4,305",
+      "value": 4308,
+      "display_value": "4,308",
       "accent": "#7dcfff"
     }
   ],
@@ -276,10 +276,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T05:21:26Z",
+      "pushed_at_raw": "2026-03-06T05:41:30Z",
       "pushed_ago": "today",
       "created_at": "2025-11-06",
-      "last_commit_msg": "ci: track clippy high-signal baseline config",
+      "last_commit_msg": "test: harden memory recovery cap test against GC flake",
       "featured": true
     },
     {
@@ -311,7 +311,7 @@
     },
     {
       "name": "Rust",
-      "bytes": 2991453,
+      "bytes": 2991636,
       "percent": 12.28
     },
     {
@@ -385,10 +385,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T05:21:26Z",
+      "pushed_at_raw": "2026-03-06T05:41:30Z",
       "pushed_ago": "today",
       "created_at": "2025-11-06",
-      "last_commit_msg": "ci: track clippy high-signal baseline config",
+      "last_commit_msg": "test: harden memory recovery cap test against GC flake",
       "featured": true
     },
     {
@@ -415,10 +415,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T05:29:31Z",
+      "pushed_at_raw": "2026-03-06T05:30:09Z",
       "pushed_ago": "today",
       "created_at": "2026-02-20",
-      "last_commit_msg": "Tighten streak/calendar layout and regenerate profile artifacts",
+      "last_commit_msg": "update analytics & readme",
       "featured": false
     },
     {
@@ -710,7 +710,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-03-06T05:29:31Z",
+      "pushed_at": "2026-03-06T05:30:09Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -723,7 +723,7 @@
         "Python": 230487,
         "HTML": 30566
       },
-      "latest_commit_message": "Tighten streak/calendar layout and regenerate profile artifacts"
+      "latest_commit_message": "update analytics & readme"
     },
     {
       "name": "homebrew-tap-setup",
@@ -857,14 +857,14 @@
   "focus": {
     "now": [
       {
-        "title": "jguida941",
-        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
-        "url": "https://github.com/jguida941/jguida941"
-      },
-      {
         "title": "voiceterm",
         "detail": "push \u00b7 today \u00b7 \u26058 \u00b7 Rust",
         "url": "https://github.com/jguida941/voiceterm"
+      },
+      {
+        "title": "jguida941",
+        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
+        "url": "https://github.com/jguida941/jguida941"
       },
       {
         "title": "homebrew-voiceterm",
@@ -911,22 +911,22 @@
     {
       "kind": "activity",
       "title": "push",
+      "url": "https://github.com/jguida941/voiceterm",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-03-06T05:41:30Z"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
       "url": "https://github.com/jguida941/jguida941",
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
       "state": "PUSH",
       "time_ago": "today",
       "created_at": "2026-03-06T05:29:31Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/voiceterm",
-      "repo": "jguida941/voiceterm",
-      "repo_url": "https://github.com/jguida941/voiceterm",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-03-06T05:21:27Z"
     },
     {
       "kind": "pull request",

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 
-from scripts.config import BG_CARD, BG_DARK, BG_HIGHLIGHT, BLUE, BORDER, CYAN, ORANGE, TEXT, TEXT_BRIGHT, TEXT_DIM, FONT_SANS, SVG_WIDTH
+from scripts.config import BG_CARD, BG_HIGHLIGHT, BLUE, BORDER, CYAN, ORANGE, TEXT, TEXT_BRIGHT, TEXT_DIM, FONT_SANS, SVG_WIDTH
 
 
 def _parse_day_date(value: str) -> date | None:
@@ -140,8 +140,8 @@ def generate(
     width = SVG_WIDTH
     height = 206
     pad = 24
-    header_h = 44
-    content_top = 54
+    header_h = 30
+    content_top = 40
     content_bottom = height - 16
     col_w = int((width - pad * 2) / 3)
     sep_left = pad + col_w
@@ -150,9 +150,8 @@ def generate(
 
     parts = [
         f'<rect width="{width}" height="{height}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>',
-        f'<rect x="0" y="0" width="{width}" height="{header_h}" rx="14" fill="{BG_DARK}"/>',
-        f'<text x="{pad}" y="29" fill="{TEXT_BRIGHT}" font-size="16" font-family="{FONT_SANS}" font-weight="700">Streak Summary</text>',
-        f'<text x="{width - pad}" y="29" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">from contribution calendar</text>',
+        f'<text x="{pad}" y="23" fill="{TEXT_BRIGHT}" font-size="16" font-family="{FONT_SANS}" font-weight="700">Streak Summary</text>',
+        f'<text x="{width - pad}" y="23" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">from contribution calendar</text>',
         f'<line x1="{sep_left}" y1="{content_top}" x2="{sep_left}" y2="{content_bottom}" stroke="{BORDER}" stroke-width="1"/>',
         f'<line x1="{sep_right}" y1="{content_top}" x2="{sep_right}" y2="{content_bottom}" stroke="{BORDER}" stroke-width="1"/>',
     ]

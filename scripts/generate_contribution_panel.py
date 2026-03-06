@@ -101,8 +101,8 @@ def _level(count: int, max_count: int) -> int:
 
 def generate(calendar: dict | None, output_path: str = "assets/contribution_calendar.svg") -> str:
     pad = 20
-    header_h = 44
-    grid_y = 58
+    header_h = 30
+    grid_y = 48
     cell = 10
     gap = 2
 
@@ -116,13 +116,12 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
             total_contributions = 0
 
     if not weeks:
-        svg_h = 170
+        svg_h = 156
         svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
   <rect width="{SVG_WIDTH}" height="{svg_h}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>
-  <rect x="0" y="0" width="{SVG_WIDTH}" height="{header_h}" rx="14" fill="{BG_DARK}"/>
-  <text x="{pad}" y="29" fill="{TEXT_BRIGHT}" font-size="16" font-family="{FONT_SANS}" font-weight="700">Contribution Calendar</text>
-  <text x="{SVG_WIDTH - pad}" y="29" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">last 12 months</text>
-  <text x="{pad}" y="86" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}">Calendar data unavailable for this run.</text>
+  <text x="{pad}" y="23" fill="{TEXT_BRIGHT}" font-size="16" font-family="{FONT_SANS}" font-weight="700">Contribution Calendar</text>
+  <text x="{SVG_WIDTH - pad}" y="23" fill="{TEXT_DIM}" font-size="11" font-family="{FONT_SANS}" text-anchor="end">last 12 months</text>
+  <text x="{pad}" y="74" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}">Calendar data unavailable for this run.</text>
 </svg>'''
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(svg)
@@ -165,18 +164,18 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
 
     parts = []
     parts.append(
-        f'<text x="{pad}" y="29" fill="{TEXT_BRIGHT}" font-size="16" '
+        f'<text x="{pad}" y="23" fill="{TEXT_BRIGHT}" font-size="16" '
         f'font-family="{FONT_SANS}" font-weight="700">Contribution Calendar</text>'
     )
     parts.append(
-        f'<text x="{SVG_WIDTH - pad}" y="29" fill="{TEXT_DIM}" font-size="11" '
+        f'<text x="{SVG_WIDTH - pad}" y="23" fill="{TEXT_DIM}" font-size="11" '
         f'font-family="{FONT_SANS}" text-anchor="end">last 12 months</text>'
     )
 
     for idx, month in month_markers:
         x = grid_x + idx * (cell + gap)
         parts.append(
-            f'<text x="{x}" y="51" fill="{TEXT_DIM}" font-size="9" '
+            f'<text x="{x}" y="{grid_y - 7}" fill="{TEXT_DIM}" font-size="9" '
             f'font-family="{FONT_SANS}">{month}</text>'
         )
 
@@ -229,7 +228,6 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
 
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
   <rect width="{SVG_WIDTH}" height="{svg_h}" rx="14" fill="{BG_CARD}" stroke="{BORDER}" stroke-width="1"/>
-  <rect x="0" y="0" width="{SVG_WIDTH}" height="{header_h}" rx="14" fill="{BG_DARK}"/>
   {''.join(parts)}
 </svg>'''
 

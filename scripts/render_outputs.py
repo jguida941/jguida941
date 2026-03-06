@@ -101,6 +101,10 @@ def render_readme(model: dict, logger=print) -> None:
     )
     template = env.get_template("README.md.tpl")
 
+    cache_bust = str(model["dashboard_data"].get("generated_at", "")).replace("-", "").replace(":", "").replace("T", "").replace("Z", "")
+    if not cache_bust:
+        cache_bust = "latest"
+
     def _dedupe_links(items: list[dict], limit: int = 3) -> list[dict]:
         unique = []
         seen = set()
@@ -124,6 +128,7 @@ def render_readme(model: dict, logger=print) -> None:
     readme = template.render(
         username=model["dashboard_data"]["username"],
         dashboard_url=model["dashboard_data"]["dashboard_url"],
+        cache_bust=cache_bust,
         recent_created=model["recent_created"],
         focus_now=model["focus"]["now"],
         focus_next=model["focus"]["next"],
