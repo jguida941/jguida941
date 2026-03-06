@@ -38,6 +38,8 @@ from scripts.generate_currently_working import generate as gen_working
 from scripts.generate_activity_heatmap import generate as gen_heatmap
 from scripts.generate_repo_spotlight import generate as gen_spotlight
 from scripts.generate_builder_scorecard import generate as gen_scorecard
+from scripts.generate_focus_board import generate as gen_focus_board
+from scripts.generate_snapshot_panel import generate as gen_snapshot_panel
 from scripts.profile_contract import SCORECARD_METRICS, SNAPSHOT_METRICS, format_metric_value
 
 
@@ -749,6 +751,16 @@ def main():
         "events_status": events_status,
         "events_note": events_note,
     }
+
+    gen_focus_board({
+        "now": focus_now,
+        "next": focus_next,
+        "shipped": focus_shipped,
+    })
+    print("  -> assets/now_next_shipped.svg")
+
+    gen_snapshot_panel(snapshot_rows, data_quality, data_scope=data_scope)
+    print("  -> assets/raw_snapshot.svg")
 
     theme = {
         "bg_main": BG_DARK,
