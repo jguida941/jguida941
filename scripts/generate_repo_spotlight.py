@@ -3,7 +3,7 @@
 from scripts.config import (
     BG_CARD, BG_HIGHLIGHT, BLUE, CYAN, GREEN, TEXT, BORDER, SVG_WIDTH, FONT_SANS, LANG_COLORS,
 )
-from scripts.card_theme import card_bg, title_left, title_right
+from scripts.card_theme import card_bg, title_accent, title_left, title_right
 
 
 def _lang_color(lang: str | None) -> str:
@@ -68,8 +68,9 @@ def generate(
     svg_h = title_h + rows_count * (card_h + gap) + pad
 
     parts = [
-        title_left("Flagship Projects", x=pad, y=29),
-        title_right("featured repos + sparkline activity", width=SVG_WIDTH, pad=pad, y=29),
+        title_left("Flagship Projects", x=pad, y=30),
+        title_right("featured repos + sparkline activity", width=SVG_WIDTH, pad=pad, y=30),
+        title_accent(width=SVG_WIDTH, pad=pad, y=35),
     ]
 
     for i, repo in enumerate(repos_data):

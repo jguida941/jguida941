@@ -3,7 +3,7 @@
 from scripts.config import (
     BG_DARK, BLUE, CYAN, ORANGE, TEXT, TEXT_DIM, SVG_WIDTH, FONT_SANS,
 )
-from scripts.card_theme import card_bg, title_left, title_right
+from scripts.card_theme import card_bg, title_accent, title_left, title_right
 
 
 def _badge(x: int, label: str, value: str, color: str) -> str:
@@ -60,8 +60,9 @@ def generate(
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="98" viewBox="0 0 {SVG_WIDTH} 98">
   {card_bg(SVG_WIDTH, 98)}
-  {title_left("By The Numbers", x=24, y=29)}
-  {title_right("repo scope + CI + contribution volume", width=SVG_WIDTH, pad=24, y=29)}
+  {title_left("By The Numbers", x=24, y=30)}
+  {title_right("repo scope + CI + contribution volume", width=SVG_WIDTH, pad=24, y=30)}
+  {title_accent(width=SVG_WIDTH, pad=24, y=35)}
   <g transform="translate({offset_x}, 50)">
     {"".join(badge_svgs)}
   </g>

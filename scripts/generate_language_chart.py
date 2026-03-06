@@ -3,7 +3,7 @@
 from scripts.config import (
     TEXT, TEXT_BRIGHT, SVG_WIDTH, FONT_SANS, LANG_COLORS,
 )
-from scripts.card_theme import card_bg, title_left, title_right
+from scripts.card_theme import card_bg, title_accent, title_left, title_right
 
 
 def _lang_color(lang: str) -> str:
@@ -19,8 +19,9 @@ def generate(
     if total == 0:
         svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="98" viewBox="0 0 {SVG_WIDTH} 98">
   {card_bg(SVG_WIDTH, 98)}
-  {title_left("Language Breakdown", x=30, y=29)}
-  {title_right("public owned repos by bytes", width=SVG_WIDTH, pad=30, y=29)}
+  {title_left("Language Breakdown", x=30, y=30)}
+  {title_right("public owned repos by bytes", width=SVG_WIDTH, pad=30, y=30)}
+  {title_accent(width=SVG_WIDTH, pad=30, y=35)}
   <text x="420" y="66" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">No language data available</text>
 </svg>"""
         with open(output_path, "w") as f:
@@ -83,14 +84,16 @@ def generate(
         )
 
     # Title
-    title = title_left("Language Breakdown", x=pad, y=28)
-    subtitle = title_right("public owned repos by bytes", width=SVG_WIDTH, pad=pad, y=28)
+    title = title_left("Language Breakdown", x=pad, y=30)
+    subtitle = title_right("public owned repos by bytes", width=SVG_WIDTH, pad=pad, y=30)
+    accent = title_accent(width=SVG_WIDTH, pad=pad, y=35)
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
   {card_bg(SVG_WIDTH, svg_h)}
   {clip_def}
   {title}
   {subtitle}
+  {accent}
   <g clip-path="url(#barClip)">{"".join(bar_parts)}</g>
   {"".join(legend_parts)}
 </svg>"""

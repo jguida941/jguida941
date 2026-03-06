@@ -18,7 +18,7 @@ from scripts.config import (
     SVG_WIDTH,
     FONT_SANS,
 )
-from scripts.card_theme import card_bg, title_left, title_right
+from scripts.card_theme import card_bg, title_accent, title_left, title_right
 
 
 def _esc(value: str) -> str:
@@ -62,7 +62,7 @@ def generate(
     tile_h = 62
     tile_w = (SVG_WIDTH - pad * 2 - col_gap) / cols
     row_count = max(1, ceil(max(len(snapshot_rows), 1) / cols))
-    content_top = 48
+    content_top = 56
     body_h = row_count * tile_h + (row_count - 1) * row_gap
 
     ci_status = _esc(data_quality.get("ci_status", "unknown")) if isinstance(data_quality, dict) else "unknown"
@@ -95,16 +95,17 @@ def generate(
     notes_y = status_y + 46
     notes: list[tuple[str, str]] = []
     if scope_note:
-        notes.append((scope_note, TEXT_DIM))
+        notes.append((scope_note, TEXT))
     if quality_note:
         notes.append((quality_note, CYAN))
     if not notes:
-        notes.append(("Data pulled from the canonical profile CLI snapshot.", TEXT_DIM))
+        notes.append(("Data pulled from the canonical profile CLI snapshot.", TEXT))
     svg_h = notes_y + max(28, len(notes) * 14 + 10)
 
     parts = [
-        title_left("Raw Data Snapshot (Python Pull)", x=pad, y=29),
-        title_right("from GitHub API", width=SVG_WIDTH, pad=pad, y=29),
+        title_left("Raw Data Snapshot (Python Pull)", x=pad, y=30),
+        title_right("from GitHub API", width=SVG_WIDTH, pad=pad, y=30),
+        title_accent(width=SVG_WIDTH, pad=pad, y=35),
     ]
 
     for idx, row in enumerate(snapshot_rows or []):

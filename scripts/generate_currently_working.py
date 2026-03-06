@@ -6,7 +6,7 @@ from scripts.config import (
     BLUE, TEXT, TEXT_DIM,
     SVG_WIDTH, FONT_SANS, LANG_COLORS,
 )
-from scripts.card_theme import card_bg, title_left, title_right
+from scripts.card_theme import card_bg, title_accent, title_left, title_right
 
 
 def _time_ago(iso_str: str) -> str:
@@ -48,8 +48,9 @@ def generate(
         # Empty state
         svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="108" viewBox="0 0 {SVG_WIDTH} 108">
   {card_bg(SVG_WIDTH, 108)}
-  {title_left("Currently Working On", x=24, y=29)}
-  {title_right("pushed in the last 7 days", width=SVG_WIDTH, pad=24, y=29)}
+  {title_left("Currently Working On", x=24, y=30)}
+  {title_right("pushed in the last 7 days", width=SVG_WIDTH, pad=24, y=30)}
+  {title_accent(width=SVG_WIDTH, pad=24, y=35)}
   <text x="420" y="72" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">No recent activity in the last 7 days</text>
 </svg>"""
         with open(output_path, "w") as f:
@@ -90,8 +91,9 @@ def generate(
 
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
   {card_bg(SVG_WIDTH, svg_h)}
-  {title_left("Currently Working On", x=pad, y=29)}
-  {title_right("pushed in the last 7 days", width=SVG_WIDTH, pad=pad, y=29)}
+  {title_left("Currently Working On", x=pad, y=30)}
+  {title_right("pushed in the last 7 days", width=SVG_WIDTH, pad=pad, y=30)}
+  {title_accent(width=SVG_WIDTH, pad=pad, y=35)}
   {"".join(rows)}
 </svg>"""
 

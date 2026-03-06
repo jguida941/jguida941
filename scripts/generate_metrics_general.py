@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from scripts.config import BG_HIGHLIGHT, BORDER, TEXT, TEXT_BRIGHT, FONT_SANS
-from scripts.card_theme import card_bg, meta_text, title_left, title_right
+from scripts.card_theme import card_bg, meta_text, title_accent, title_left, title_right
 
 
 def _esc(value: str) -> str:
@@ -93,13 +93,14 @@ def generate(
 
     rows = []
     rows.append(card_bg(width, height))
-    rows.append(title_left(_esc(username), x=pad, y=25, size=18))
-    rows.append(title_right("Canonical CLI Metrics", width=width, pad=pad, y=25))
-    rows.append(meta_text(f"Generated: {_esc(_fmt_iso_date(generated_at))}", x=pad, y=40))
+    rows.append(title_left(_esc(username), x=pad, y=30, size=20))
+    rows.append(title_right("Canonical CLI Metrics", width=width, pad=pad, y=30))
+    rows.append(title_accent(width=width, pad=pad, y=35))
+    rows.append(meta_text(f"Generated: {_esc(_fmt_iso_date(generated_at))}", x=pad, y=50))
     if scope_text:
-        rows.append(meta_text(_esc(scope_text), x=pad, y=54))
+        rows.append(meta_text(_esc(scope_text), x=pad, y=64))
 
-    start_y = 66 if scope_text else 54
+    start_y = 76 if scope_text else 64
     left_x = pad
     right_x = pad + col_w + col_gap
 

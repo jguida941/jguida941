@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 from scripts.config import CYAN, TEXT, TEXT_BRIGHT, TEXT_DIM, SVG_WIDTH, FONT_SANS
-from scripts.card_theme import card_bg, title_left, title_right
+from scripts.card_theme import card_bg, title_accent, title_left, title_right
 
 EVENT_LABELS = {
     "PushEvent": "push",
@@ -82,7 +82,6 @@ def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
 
     # Layout
     pad = 24
-    title_y = 29
     day_labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     label_w = 36
     cell = 12
@@ -97,8 +96,9 @@ def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
     panel_heading_y = 56
 
     parts = [
-        title_left("When I Code", x=pad, y=title_y),
-        title_right(f"public events ({tz_label})", width=SVG_WIDTH, pad=pad, y=title_y),
+        title_left("When I Code", x=pad, y=30),
+        title_right(f"public events ({tz_label})", width=SVG_WIDTH, pad=pad, y=30),
+        title_accent(width=SVG_WIDTH, pad=pad, y=35),
     ]
 
     # Heatmap hour labels

@@ -12,7 +12,7 @@ PURPLE = "#bb9af7"
 RED = "#f7768e"
 YELLOW = "#e0af68"
 TEXT = "#a9b1d6"
-TEXT_DIM = "#565f89"
+TEXT_DIM = "#8a94bd"
 TEXT_BRIGHT = "#c0caf5"
 BORDER = "#414868"
 

@@ -13,7 +13,7 @@ from scripts.config import (
     SVG_WIDTH,
     FONT_SANS,
 )
-from scripts.card_theme import card_bg, title_left, title_right
+from scripts.card_theme import card_bg, title_accent, title_left, title_right
 
 
 def _esc(value: str) -> str:
@@ -48,8 +48,9 @@ def generate(focus: dict, output_path: str = "assets/now_next_shipped.svg") -> s
     svg_h = header_h + col_h + pad
 
     parts = [
-        title_left("Current Focus", x=pad, y=29),
-        title_right("now / next / shipped lanes", width=SVG_WIDTH, pad=pad, y=29),
+        title_left("Current Focus", x=pad, y=30),
+        title_right("now / next / shipped lanes", width=SVG_WIDTH, pad=pad, y=30),
+        title_accent(width=SVG_WIDTH, pad=pad, y=35),
     ]
 
     for idx, (key, label, accent) in enumerate(columns):

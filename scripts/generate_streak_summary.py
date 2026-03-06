@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 
-from scripts.config import BG_HIGHLIGHT, BLUE, BORDER, ORANGE, TEXT, TEXT_BRIGHT, TEXT_DIM, FONT_SANS, SVG_WIDTH
-from scripts.card_theme import card_bg, title_left, title_right
+from scripts.config import BG_HIGHLIGHT, BLUE, BORDER, ORANGE, TEXT, TEXT_BRIGHT, FONT_SANS, SVG_WIDTH
+from scripts.card_theme import card_bg, title_accent, title_left, title_right
 
 
 def _parse_day_date(value: str) -> date | None:
@@ -139,10 +139,10 @@ def generate(
     contrib_end = day_rows[-1][0] if day_rows else None
 
     width = SVG_WIDTH
-    height = 206
+    height = 214
     pad = 24
-    header_h = 30
-    content_top = 38
+    header_h = 38
+    content_top = 46
     content_bottom = height - 16
     col_w = int((width - pad * 2) / 3)
     sep_left = pad + col_w
@@ -151,8 +151,9 @@ def generate(
 
     parts = [
         card_bg(width, height),
-        title_left("Streak Summary", x=pad, y=23),
-        title_right("from contribution calendar", width=width, pad=pad, y=23),
+        title_left("Streak Summary", x=pad, y=30),
+        title_right("from contribution calendar", width=width, pad=pad, y=30),
+        title_accent(width=width, pad=pad, y=35),
         f'<line x1="{sep_left}" y1="{content_top}" x2="{sep_left}" y2="{content_bottom}" stroke="{BORDER}" stroke-width="1"/>',
         f'<line x1="{sep_right}" y1="{content_top}" x2="{sep_right}" y2="{content_bottom}" stroke="{BORDER}" stroke-width="1"/>',
     ]
@@ -163,19 +164,18 @@ def generate(
         [
             f'<text x="{left_cx}" y="124" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(total_contributions))}</text>',
             f'<text x="{left_cx}" y="150" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Total Contributions</text>',
-            f'<text x="{left_cx}" y="172" fill="{TEXT_DIM}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(contrib_start, contrib_end))}</text>',
+            f'<text x="{left_cx}" y="176" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(contrib_start, contrib_end))}</text>',
         ]
     )
 
     # Middle: current streak ring
     parts.extend(
         [
-            f'<circle cx="{center_x}" cy="108" r="40" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="4"/>',
-            f'<circle cx="{center_x}" cy="71" r="6" fill="{ORANGE}"/>',
-            f'<path d="M {center_x - 3} 66 C {center_x - 1} 60, {center_x + 1} 60, {center_x + 3} 66" fill="{ORANGE}"/>',
-            f'<text x="{center_x}" y="121" fill="{BLUE}" font-size="44" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(current_days))}</text>',
-            f'<text x="{center_x}" y="162" fill="{BLUE}" font-size="18" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">Current Streak</text>',
-            f'<text x="{center_x}" y="182" fill="{TEXT_DIM}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(current_start, current_end))}</text>',
+            f'<circle cx="{center_x}" cy="106" r="38" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="4"/>',
+            f'<circle cx="{center_x}" cy="68" r="5" fill="{ORANGE}"/>',
+            f'<text x="{center_x}" y="119" fill="{TEXT_BRIGHT}" font-size="44" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(current_days))}</text>',
+            f'<text x="{center_x}" y="156" fill="{BLUE}" font-size="18" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">Current Streak</text>',
+            f'<text x="{center_x}" y="178" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(current_start, current_end))}</text>',
         ]
     )
 
@@ -185,7 +185,7 @@ def generate(
         [
             f'<text x="{right_cx}" y="124" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{_esc(_fmt_int(longest_days))}</text>',
             f'<text x="{right_cx}" y="150" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Longest Streak</text>',
-            f'<text x="{right_cx}" y="172" fill="{TEXT_DIM}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(longest_start, longest_end))}</text>',
+            f'<text x="{right_cx}" y="176" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{_esc(_fmt_range(longest_start, longest_end))}</text>',
         ]
     )
 
