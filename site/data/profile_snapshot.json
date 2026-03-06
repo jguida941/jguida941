@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-06T07:52:51.449019Z",
+  "generated_at": "2026-03-06T08:10:56.272125Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 4325,
-    "public_scope_commits": 2956,
+    "last_year_contributions": 4327,
+    "public_scope_commits": 2962,
     "total_repos": 66,
     "public_forks": 0,
     "private_owned_repos": 140,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 4325,
-      "display_value": "4,325"
+      "value": 4327,
+      "display_value": "4,327"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 2956,
-      "display_value": "2,956"
+      "value": 2962,
+      "display_value": "2,962"
     },
     {
       "key": "total_repos",
@@ -68,8 +68,8 @@
     },
     {
       "key": "total_stars",
-      "label": "Total Stars",
-      "dashboard_label": "Total Stars",
+      "label": "Repo Stargazers (Received)",
+      "dashboard_label": "Repo Stargazers (Received)",
       "value": 73,
       "display_value": "73"
     },
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 4325,
-      "display_value": "4,325"
+      "value": 4327,
+      "display_value": "4,327"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 2956,
-      "display_value": "2,956"
+      "value": 2962,
+      "display_value": "2,962"
     },
     {
       "key": "total_repos",
@@ -142,7 +142,7 @@
     },
     {
       "key": "total_stars",
-      "label": "Total Stars",
+      "label": "Repo Stargazers (Received)",
       "value": 73,
       "display_value": "73"
     },
@@ -182,8 +182,11 @@
     "ci_note": "CI workflow detection complete.",
     "commits_status": "ok",
     "commits_note": "Public-scope commit aggregation complete.",
+    "releases_status": "ok",
+    "releases_note": "Release aggregation complete.",
     "events_status": "ok",
-    "events_note": "Public events feed available."
+    "events_note": "Public events feed available.",
+    "token_mode": "personal_github_token"
   },
   "scorecard": {
     "releases_30d": 51,
@@ -191,7 +194,7 @@
     "avg_release_gap_days": 1.3945277777777778,
     "stars_per_public_repo": 1.106060606060606,
     "ci_coverage_pct": 24.242424242424242,
-    "last_year_contributions": 4325
+    "last_year_contributions": 4327
   },
   "scorecard_cards": [
     {
@@ -238,8 +241,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 4325,
-      "display_value": "4,325",
+      "value": 4327,
+      "display_value": "4,327",
       "accent": "#7dcfff"
     }
   ],
@@ -301,7 +304,7 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 12079143,
+      "bytes": 12082162,
       "percent": 49.56
     },
     {
@@ -322,7 +325,7 @@
     {
       "name": "Java",
       "bytes": 1583192,
-      "percent": 6.5
+      "percent": 6.49
     },
     {
       "name": "TypeScript",
@@ -341,7 +344,7 @@
     },
     {
       "name": "HTML",
-      "bytes": 229204,
+      "bytes": 229530,
       "percent": 0.94
     },
     {
@@ -407,6 +410,21 @@
       "featured": true
     },
     {
+      "name": "jguida941",
+      "full_name": "jguida941/jguida941",
+      "url": "https://github.com/jguida941/jguida941",
+      "language": "Python",
+      "stars": 1,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-03-06",
+      "pushed_at_raw": "2026-03-06T08:10:29Z",
+      "pushed_ago": "today",
+      "created_at": "2026-02-20",
+      "last_commit_msg": "Unify card theme and stabilize metric fallbacks",
+      "featured": false
+    },
+    {
       "name": "homebrew-voiceterm",
       "full_name": "jguida941/homebrew-voiceterm",
       "url": "https://github.com/jguida941/homebrew-voiceterm",
@@ -419,21 +437,6 @@
       "pushed_ago": "today",
       "created_at": "2026-01-22",
       "last_commit_msg": "Update to v1.1.0",
-      "featured": false
-    },
-    {
-      "name": "jguida941",
-      "full_name": "jguida941/jguida941",
-      "url": "https://github.com/jguida941/jguida941",
-      "language": "Python",
-      "stars": 1,
-      "forks": 0,
-      "ci": "yes",
-      "pushed_at": "2026-03-06",
-      "pushed_at_raw": "2026-03-06T07:08:48Z",
-      "pushed_ago": "today",
-      "created_at": "2026-02-20",
-      "last_commit_msg": "update canonical profile artifacts",
       "featured": false
     },
     {
@@ -710,7 +713,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-03-06T07:08:48Z",
+      "pushed_at": "2026-03-06T08:10:29Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -720,10 +723,10 @@
       },
       "has_ci_workflows": true,
       "language_bytes": {
-        "Python": 231482,
-        "HTML": 30566
+        "Python": 234501,
+        "HTML": 30892
       },
-      "latest_commit_message": "update canonical profile artifacts"
+      "latest_commit_message": "Unify card theme and stabilize metric fallbacks"
     },
     {
       "name": "homebrew-tap-setup",
@@ -857,6 +860,11 @@
   "focus": {
     "now": [
       {
+        "title": "jguida941",
+        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
+        "url": "https://github.com/jguida941/jguida941"
+      },
+      {
         "title": "homebrew-voiceterm",
         "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Ruby",
         "url": "https://github.com/jguida941/homebrew-voiceterm"
@@ -865,17 +873,12 @@
         "title": "voiceterm",
         "detail": "release \u00b7 today \u00b7 \u26058 \u00b7 Rust",
         "url": "https://github.com/jguida941/voiceterm"
-      },
-      {
-        "title": "jguida941",
-        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
-        "url": "https://github.com/jguida941/jguida941"
       }
     ],
     "next": [
       {
         "title": "PR #11",
-        "detail": "voiceterm \u00b7 open \u00b7 2 hours ago",
+        "detail": "voiceterm \u00b7 open \u00b7 3 hours ago",
         "url": "https://github.com/jguida941/voiceterm/pull/11"
       },
       {
@@ -911,6 +914,16 @@
     {
       "kind": "activity",
       "title": "push",
+      "url": "https://github.com/jguida941/jguida941",
+      "repo": "jguida941/jguida941",
+      "repo_url": "https://github.com/jguida941/jguida941",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-03-06T08:10:30Z"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
       "url": "https://github.com/jguida941/homebrew-voiceterm",
       "repo": "jguida941/homebrew-voiceterm",
       "repo_url": "https://github.com/jguida941/homebrew-voiceterm",
@@ -939,23 +952,13 @@
       "created_at": "2026-03-06T07:45:18Z"
     },
     {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/jguida941",
-      "repo": "jguida941/jguida941",
-      "repo_url": "https://github.com/jguida941/jguida941",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-03-06T06:41:55Z"
-    },
-    {
       "kind": "pull request",
       "title": "PR #11",
       "url": "https://github.com/jguida941/voiceterm/pull/11",
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "OPEN",
-      "time_ago": "2 hours ago",
+      "time_ago": "3 hours ago",
       "created_at": "2026-03-06T04:55:22Z"
     },
     {
@@ -1138,7 +1141,7 @@
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "OPEN",
-      "time_ago": "2 hours ago",
+      "time_ago": "3 hours ago",
       "created_at": "2026-03-06T04:55:22Z"
     },
     {
