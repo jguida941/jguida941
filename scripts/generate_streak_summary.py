@@ -133,11 +133,12 @@ def generate(
     sep_right = pad + col_w * 2
     center_x = pad + int(col_w * 1.5)
 
-    value_y = 124
+    value_y = 118
     label_y = 150
-    date_y = 176
-    ring_cy = 110
-    ring_r = 34
+    date_y = 178
+    ring_cy = 96
+    ring_r = 29
+    marker_cy = ring_cy - ring_r - 3
 
     parts = [
         card_bg(width, height),
@@ -162,7 +163,7 @@ def generate(
     parts.extend(
         [
             f'<circle cx="{center_x}" cy="{ring_cy}" r="{ring_r}" fill="{BG_HIGHLIGHT}" stroke="{BLUE}" stroke-width="4"/>',
-            f'<circle cx="{center_x}" cy="{ring_cy - ring_r}" r="5" fill="{ORANGE}"/>',
+            f'<circle cx="{center_x}" cy="{marker_cy}" r="5" fill="{ORANGE}"/>',
             f'<text x="{center_x}" y="{value_y}" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(current_days))}</text>',
             f'<text x="{center_x}" y="{label_y}" fill="{BLUE}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Current Streak</text>',
             f'<text x="{center_x}" y="{date_y}" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(current_start, current_end))}</text>',
