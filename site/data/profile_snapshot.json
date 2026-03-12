@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-03-08T06:19:47.972078Z",
+  "generated_at": "2026-03-12T22:27:43.483250Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,39 +18,39 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": null,
-    "public_scope_commits": 0,
-    "total_repos": 0,
+    "last_year_contributions": 4494,
+    "public_scope_commits": 3126,
+    "total_repos": 67,
     "public_forks": 0,
     "private_owned_repos": 140,
-    "total_stars": 0,
-    "languages_count": 0,
-    "prs_merged": 0,
-    "releases": 0,
-    "ci_repos": 0,
-    "streak_days": 0
+    "total_stars": 74,
+    "languages_count": 25,
+    "prs_merged": 13,
+    "releases": 44,
+    "ci_repos": 17,
+    "streak_days": 29
   },
   "snapshot_rows": [
     {
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": null,
-      "display_value": "n/a"
+      "value": 4494,
+      "display_value": "4,494"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 0,
-      "display_value": "0"
+      "value": 3126,
+      "display_value": "3,126"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 0,
-      "display_value": "0"
+      "value": 67,
+      "display_value": "67"
     },
     {
       "key": "public_forks",
@@ -70,63 +70,63 @@
       "key": "total_stars",
       "label": "Repo Stargazers (Received)",
       "dashboard_label": "Repo Stargazers (Received)",
-      "value": 0,
-      "display_value": "0"
+      "value": 74,
+      "display_value": "74"
     },
     {
       "key": "languages_count",
       "label": "Languages Detected",
       "dashboard_label": "Languages Detected",
-      "value": 0,
-      "display_value": "0"
+      "value": 25,
+      "display_value": "25"
     },
     {
       "key": "prs_merged",
       "label": "PRs Merged (Last 12 Months)",
       "dashboard_label": "PRs Merged (12mo)",
-      "value": 0,
-      "display_value": "0"
+      "value": 13,
+      "display_value": "13"
     },
     {
       "key": "releases",
       "label": "Releases (30 Days)",
       "dashboard_label": "Releases (30d)",
-      "value": 0,
-      "display_value": "0"
+      "value": 44,
+      "display_value": "44"
     },
     {
       "key": "ci_repos",
       "label": "Repos With CI/CD",
       "dashboard_label": "Repos With CI",
-      "value": 0,
-      "display_value": "0"
+      "value": 17,
+      "display_value": "17"
     },
     {
       "key": "streak_days",
       "label": "Current Streak Days",
       "dashboard_label": "Current Streak Days",
-      "value": 0,
-      "display_value": "0"
+      "value": 29,
+      "display_value": "29"
     }
   ],
   "snapshot_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": null,
-      "display_value": "n/a"
+      "value": 4494,
+      "display_value": "4,494"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 0,
-      "display_value": "0"
+      "value": 3126,
+      "display_value": "3,126"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 0,
-      "display_value": "0"
+      "value": 67,
+      "display_value": "67"
     },
     {
       "key": "public_forks",
@@ -143,127 +143,975 @@
     {
       "key": "total_stars",
       "label": "Repo Stargazers (Received)",
-      "value": 0,
-      "display_value": "0"
+      "value": 74,
+      "display_value": "74"
     },
     {
       "key": "languages_count",
       "label": "Languages Detected",
-      "value": 0,
-      "display_value": "0"
+      "value": 25,
+      "display_value": "25"
     },
     {
       "key": "prs_merged",
       "label": "PRs Merged (12mo)",
-      "value": 0,
-      "display_value": "0"
+      "value": 13,
+      "display_value": "13"
     },
     {
       "key": "releases",
       "label": "Releases (30d)",
-      "value": 0,
-      "display_value": "0"
+      "value": 44,
+      "display_value": "44"
     },
     {
       "key": "ci_repos",
       "label": "Repos With CI",
-      "value": 0,
-      "display_value": "0"
+      "value": 17,
+      "display_value": "17"
     },
     {
       "key": "streak_days",
       "label": "Current Streak Days",
-      "value": 0,
-      "display_value": "0"
+      "value": 29,
+      "display_value": "29"
     }
   ],
   "data_quality": {
-    "ci_status": "empty",
-    "ci_note": "No repositories in scope.",
-    "commits_status": "empty",
-    "commits_note": "No repositories in scope.",
+    "ci_status": "ok",
+    "ci_note": "CI workflow detection complete.",
+    "commits_status": "ok",
+    "commits_note": "Public-scope commit aggregation complete.",
     "releases_status": "ok",
     "releases_note": "Release aggregation complete.",
-    "events_status": "limited",
-    "events_note": "No recent public events returned in this run; focus/feed use repo push fallbacks.",
-    "token_mode": "none"
+    "events_status": "ok",
+    "events_note": "Public events feed available.",
+    "token_mode": "personal_github_token"
   },
   "scorecard": {
-    "releases_30d": 0,
-    "active_repos_7d": 0,
-    "avg_release_gap_days": 0.0,
-    "stars_per_public_repo": 0.0,
-    "ci_coverage_pct": 0.0,
-    "last_year_contributions": null
+    "releases_30d": 44,
+    "active_repos_7d": 5,
+    "avg_release_gap_days": 0.8112847222222223,
+    "stars_per_public_repo": 1.1044776119402986,
+    "ci_coverage_pct": 25.37313432835821,
+    "last_year_contributions": 4494
   },
   "scorecard_cards": [
     {
       "key": "releases_30d",
       "label": "Release Velocity (30d)",
       "detail": "published releases across public repos",
-      "value": 0,
-      "display_value": "0",
+      "value": 44,
+      "display_value": "44",
       "accent": "#ff9e64"
     },
     {
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 0,
-      "display_value": "0",
+      "value": 5,
+      "display_value": "5",
       "accent": "#7dcfff"
     },
     {
       "key": "avg_release_gap_days",
       "label": "Avg Release Gap",
       "detail": "days between release events",
-      "value": 0.0,
-      "display_value": "0.0d",
+      "value": 0.8112847222222223,
+      "display_value": "0.8d",
       "accent": "#9ece6a"
     },
     {
       "key": "stars_per_public_repo",
       "label": "Stars / Public Repo",
       "detail": "signal density",
-      "value": 0.0,
-      "display_value": "0.00",
+      "value": 1.1044776119402986,
+      "display_value": "1.10",
       "accent": "#7aa2f7"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with workflows",
-      "value": 0.0,
-      "display_value": "0.0%",
+      "value": 25.37313432835821,
+      "display_value": "25.4%",
       "accent": "#ff9e64"
     },
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": null,
-      "display_value": "n/a",
+      "value": 4494,
+      "display_value": "4,494",
       "accent": "#7dcfff"
     }
   ],
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 0,
+    "public_owned_repos_total": 67,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 0,
+    "public_owned_nonfork_repos_total": 67,
     "private_owned_repos_total": 140
   },
-  "featured_repo_facts": [],
-  "top_languages": [],
-  "repo_language_matrix": [],
-  "recent_created": [],
+  "featured_repo_facts": [
+    {
+      "name": "ci-cd-hub",
+      "full_name": "jguida941/ci-cd-hub",
+      "url": "https://github.com/jguida941/ci-cd-hub",
+      "language": "Python",
+      "stars": 2,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-03-09",
+      "pushed_at_raw": "2026-03-09T06:51:56Z",
+      "pushed_ago": "3 days ago",
+      "created_at": "2025-12-14",
+      "last_commit_msg": "chore: update CI badges [skip ci]",
+      "featured": true
+    },
+    {
+      "name": "voiceterm",
+      "full_name": "jguida941/voiceterm",
+      "url": "https://github.com/jguida941/voiceterm",
+      "language": "Rust",
+      "stars": 9,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-03-12",
+      "pushed_at_raw": "2026-03-12T02:11:07Z",
+      "pushed_ago": "20 hours ago",
+      "created_at": "2025-11-06",
+      "last_commit_msg": "chore: update lockfile for v1.1.1",
+      "featured": true
+    },
+    {
+      "name": "contact-suite-spring-react",
+      "full_name": "jguida941/contact-suite-spring-react",
+      "url": "https://github.com/jguida941/contact-suite-spring-react",
+      "language": "Java",
+      "stars": 2,
+      "forks": 1,
+      "ci": "yes",
+      "pushed_at": "2026-03-02",
+      "pushed_at_raw": "2026-03-02T07:20:57Z",
+      "pushed_ago": "1 week ago",
+      "created_at": "2025-11-15",
+      "last_commit_msg": "Update badges from CI [skip ci]",
+      "featured": true
+    }
+  ],
+  "top_languages": [
+    {
+      "name": "Python",
+      "bytes": 12133804,
+      "percent": 49.62
+    },
+    {
+      "name": "Makefile",
+      "bytes": 3931581,
+      "percent": 16.08
+    },
+    {
+      "name": "Rust",
+      "bytes": 3003018,
+      "percent": 12.28
+    },
+    {
+      "name": "C++",
+      "bytes": 1824966,
+      "percent": 7.46
+    },
+    {
+      "name": "Java",
+      "bytes": 1583192,
+      "percent": 6.47
+    },
+    {
+      "name": "TypeScript",
+      "bytes": 411851,
+      "percent": 1.68
+    },
+    {
+      "name": "Shell",
+      "bytes": 283578,
+      "percent": 1.16
+    },
+    {
+      "name": "C",
+      "bytes": 268582,
+      "percent": 1.1
+    },
+    {
+      "name": "HTML",
+      "bytes": 231727,
+      "percent": 0.95
+    },
+    {
+      "name": "JavaScript",
+      "bytes": 211396,
+      "percent": 0.86
+    },
+    {
+      "name": "Jupyter Notebook",
+      "bytes": 192686,
+      "percent": 0.79
+    },
+    {
+      "name": "CMake",
+      "bytes": 141191,
+      "percent": 0.58
+    }
+  ],
+  "repo_language_matrix": [
+    {
+      "name": "ci-cd-hub",
+      "full_name": "jguida941/ci-cd-hub",
+      "url": "https://github.com/jguida941/ci-cd-hub",
+      "language": "Python",
+      "stars": 2,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-03-09",
+      "pushed_at_raw": "2026-03-09T06:51:56Z",
+      "pushed_ago": "3 days ago",
+      "created_at": "2025-12-14",
+      "last_commit_msg": "chore: update CI badges [skip ci]",
+      "featured": true
+    },
+    {
+      "name": "voiceterm",
+      "full_name": "jguida941/voiceterm",
+      "url": "https://github.com/jguida941/voiceterm",
+      "language": "Rust",
+      "stars": 9,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-03-12",
+      "pushed_at_raw": "2026-03-12T02:11:07Z",
+      "pushed_ago": "20 hours ago",
+      "created_at": "2025-11-06",
+      "last_commit_msg": "chore: update lockfile for v1.1.1",
+      "featured": true
+    },
+    {
+      "name": "contact-suite-spring-react",
+      "full_name": "jguida941/contact-suite-spring-react",
+      "url": "https://github.com/jguida941/contact-suite-spring-react",
+      "language": "Java",
+      "stars": 2,
+      "forks": 1,
+      "ci": "yes",
+      "pushed_at": "2026-03-02",
+      "pushed_at_raw": "2026-03-02T07:20:57Z",
+      "pushed_ago": "1 week ago",
+      "created_at": "2025-11-15",
+      "last_commit_msg": "Update badges from CI [skip ci]",
+      "featured": true
+    },
+    {
+      "name": "jguida941",
+      "full_name": "jguida941/jguida941",
+      "url": "https://github.com/jguida941/jguida941",
+      "language": "Python",
+      "stars": 1,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-03-12",
+      "pushed_at_raw": "2026-03-12T22:27:07Z",
+      "pushed_ago": "today",
+      "created_at": "2026-02-20",
+      "last_commit_msg": "Adjust streak summary layout",
+      "featured": false
+    },
+    {
+      "name": "terminal-as-interface",
+      "full_name": "jguida941/terminal-as-interface",
+      "url": "https://github.com/jguida941/terminal-as-interface",
+      "language": "SCSS",
+      "stars": 0,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-03-12",
+      "pushed_at_raw": "2026-03-12T02:10:21Z",
+      "pushed_ago": "20 hours ago",
+      "created_at": "2026-03-07",
+      "last_commit_msg": "docs: refresh voiceterm snapshot",
+      "featured": false
+    },
+    {
+      "name": "homebrew-voiceterm",
+      "full_name": "jguida941/homebrew-voiceterm",
+      "url": "https://github.com/jguida941/homebrew-voiceterm",
+      "language": "Ruby",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-03-07",
+      "pushed_at_raw": "2026-03-07T03:23:26Z",
+      "pushed_ago": "5 days ago",
+      "created_at": "2026-01-22",
+      "last_commit_msg": "Update to v1.1.1",
+      "featured": false
+    },
+    {
+      "name": "SNHU-CS-330",
+      "full_name": "jguida941/SNHU-CS-330",
+      "url": "https://github.com/jguida941/SNHU-CS-330",
+      "language": "C++",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-03-02",
+      "pushed_at_raw": "2026-03-02T01:16:45Z",
+      "pushed_ago": "1 week ago",
+      "created_at": "2026-03-02",
+      "last_commit_msg": "Add .gitattributes to exclude vendored/generated library files from L\u2026",
+      "featured": false
+    },
+    {
+      "name": "opengl-cyberpunk",
+      "full_name": "jguida941/opengl-cyberpunk",
+      "url": "https://github.com/jguida941/opengl-cyberpunk",
+      "language": "C++",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-03-02",
+      "pushed_at_raw": "2026-03-02T01:14:07Z",
+      "pushed_ago": "1 week ago",
+      "created_at": "2026-02-23",
+      "last_commit_msg": "chore: remove legacy final project and fix language stats",
+      "featured": false
+    },
+    {
+      "name": "breakout-game-opengl",
+      "full_name": "jguida941/breakout-game-opengl",
+      "url": "https://github.com/jguida941/breakout-game-opengl",
+      "language": "C++",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-03-01",
+      "pushed_at_raw": "2026-03-01T22:39:09Z",
+      "pushed_ago": "1 week ago",
+      "created_at": "2026-03-01",
+      "last_commit_msg": "Adjust GitHub language stats to ignore vendor folders",
+      "featured": false
+    },
+    {
+      "name": "java-spring-tutorials",
+      "full_name": "jguida941/java-spring-tutorials",
+      "url": "https://github.com/jguida941/java-spring-tutorials",
+      "language": "Java",
+      "stars": 1,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-02-28",
+      "pushed_at_raw": "2026-02-28T23:32:23Z",
+      "pushed_ago": "1 week ago",
+      "created_at": "2025-12-12",
+      "last_commit_msg": "chore: sync hub templates",
+      "featured": false
+    },
+    {
+      "name": "homebrew-tap-setup",
+      "full_name": "jguida941/homebrew-tap-setup",
+      "url": "https://github.com/jguida941/homebrew-tap-setup",
+      "language": "Rust",
+      "stars": 1,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-02-13",
+      "pushed_at_raw": "2026-02-13T10:17:22Z",
+      "pushed_ago": "3 weeks ago",
+      "created_at": "2026-02-13",
+      "last_commit_msg": "Update README with status and next steps",
+      "featured": false
+    },
+    {
+      "name": "homebrew-tap-setup-proof",
+      "full_name": "jguida941/homebrew-tap-setup-proof",
+      "url": "https://github.com/jguida941/homebrew-tap-setup-proof",
+      "language": "Ruby",
+      "stars": 1,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-02-13",
+      "pushed_at_raw": "2026-02-13T09:51:56Z",
+      "pushed_ago": "3 weeks ago",
+      "created_at": "2026-02-13",
+      "last_commit_msg": "Update tap files",
+      "featured": false
+    },
+    {
+      "name": "gitui",
+      "full_name": "jguida941/gitui",
+      "url": "https://github.com/jguida941/gitui",
+      "language": "Python",
+      "stars": 1,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-01-31",
+      "pushed_at_raw": "2026-01-31T07:02:50Z",
+      "pushed_ago": "1 month ago",
+      "created_at": "2026-01-15",
+      "last_commit_msg": "Add macOS launcher script",
+      "featured": false
+    },
+    {
+      "name": "homebrew-gitui",
+      "full_name": "jguida941/homebrew-gitui",
+      "url": "https://github.com/jguida941/homebrew-gitui",
+      "language": "Ruby",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-01-31",
+      "pushed_at_raw": "2026-01-31T05:59:54Z",
+      "pushed_ago": "1 month ago",
+      "created_at": "2026-01-31",
+      "last_commit_msg": "Add gitui v0.1.0 formula",
+      "featured": false
+    },
+    {
+      "name": "dijkstra-dashboard",
+      "full_name": "jguida941/dijkstra-dashboard",
+      "url": "https://github.com/jguida941/dijkstra-dashboard",
+      "language": "Python",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-01-27",
+      "pushed_at_raw": "2026-01-27T06:42:35Z",
+      "pushed_ago": "1 month ago",
+      "created_at": "2025-05-17",
+      "last_commit_msg": "Store demo video locally instead of user-attachments URL",
+      "featured": false
+    },
+    {
+      "name": "pysort-visualizer",
+      "full_name": "jguida941/pysort-visualizer",
+      "url": "https://github.com/jguida941/pysort-visualizer",
+      "language": "Python",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-01-26",
+      "pushed_at_raw": "2026-01-26T07:17:56Z",
+      "pushed_ago": "1 month ago",
+      "created_at": "2025-09-28",
+      "last_commit_msg": "Fix header formatting in README.md",
+      "featured": false
+    },
+    {
+      "name": "doubly_linked_list_demo",
+      "full_name": "jguida941/doubly_linked_list_demo",
+      "url": "https://github.com/jguida941/doubly_linked_list_demo",
+      "language": "Makefile",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-01-26",
+      "pushed_at_raw": "2026-01-26T07:06:51Z",
+      "pushed_ago": "1 month ago",
+      "created_at": "2025-09-18",
+      "last_commit_msg": "Fix image alt text for accessibility and portfolio captions",
+      "featured": false
+    },
+    {
+      "name": "OpenGL-Hourglass",
+      "full_name": "jguida941/OpenGL-Hourglass",
+      "url": "https://github.com/jguida941/OpenGL-Hourglass",
+      "language": "C++",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-01-26",
+      "pushed_at_raw": "2026-01-26T07:06:42Z",
+      "pushed_ago": "1 month ago",
+      "created_at": "2026-01-22",
+      "last_commit_msg": "Fix image alt text for accessibility",
+      "featured": false
+    }
+  ],
+  "recent_created": [
+    {
+      "name": "terminal-as-interface",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "The Terminal as Interface: AI CLI Tools and the New Programming Workflow",
+      "html_url": "https://github.com/jguida941/terminal-as-interface",
+      "pushed_at": "2026-03-12T02:10:21Z",
+      "created_at": "2026-03-07T20:34:39Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": "SCSS",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": true,
+      "language_bytes": {
+        "SCSS": 10916,
+        "Python": 7887,
+        "HTML": 2197
+      },
+      "latest_commit_message": "docs: refresh voiceterm snapshot"
+    },
+    {
+      "name": "SNHU-CS-330",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": null,
+      "html_url": "https://github.com/jguida941/SNHU-CS-330",
+      "pushed_at": "2026-03-02T01:16:45Z",
+      "created_at": "2026-03-02T00:25:11Z",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "language": "C++",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "language_bytes": {
+        "C++": 845411,
+        "GLSL": 78585,
+        "C": 2092
+      },
+      "latest_commit_message": "Add .gitattributes to exclude vendored/generated library files from L\u2026"
+    },
+    {
+      "name": "breakout-game-opengl",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "A 2D Breakout game built in C++ with OpenGL and GLFW. Break multi-hit bricks, manage limited reserve balls, collect power-ups, and survive randomized ball-collision events across progressive difficulty levels.",
+      "html_url": "https://github.com/jguida941/breakout-game-opengl",
+      "pushed_at": "2026-03-01T22:39:09Z",
+      "created_at": "2026-03-01T22:26:47Z",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "language": "C++",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "language_bytes": {
+        "C++": 77265,
+        "C": 2092
+      },
+      "latest_commit_message": "Adjust GitHub language stats to ignore vendor folders"
+    },
+    {
+      "name": "opengl-cyberpunk",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "Stylized OpenGL cyberpunk 3D scene built in C++ with GLFW, GLEW, and GLM.",
+      "html_url": "https://github.com/jguida941/opengl-cyberpunk",
+      "pushed_at": "2026-03-02T01:14:07Z",
+      "created_at": "2026-02-23T18:16:38Z",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "language": "C++",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "language_bytes": {
+        "C++": 169638,
+        "GLSL": 8428,
+        "PowerShell": 3706,
+        "Shell": 772,
+        "Batchfile": 316
+      },
+      "latest_commit_message": "chore: remove legacy final project and fix language stats"
+    },
+    {
+      "name": "jguida941",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "Profile README auto-updated",
+      "html_url": "https://github.com/jguida941/jguida941",
+      "pushed_at": "2026-03-12T22:27:07Z",
+      "created_at": "2026-02-20T03:08:54Z",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "language": "Python",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": true,
+      "language_bytes": {
+        "Python": 254118,
+        "HTML": 30892
+      },
+      "latest_commit_message": "Adjust streak summary layout"
+    },
+    {
+      "name": "homebrew-tap-setup",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "Step-based CLI to create Homebrew taps, wire GitHub, and scaffold formulas.",
+      "html_url": "https://github.com/jguida941/homebrew-tap-setup",
+      "pushed_at": "2026-02-13T10:17:22Z",
+      "created_at": "2026-02-13T09:58:15Z",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "language": "Rust",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": true,
+      "language_bytes": {
+        "Rust": 48940
+      },
+      "latest_commit_message": "Update README with status and next steps"
+    },
+    {
+      "name": "homebrew-tap-setup-proof",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": null,
+      "html_url": "https://github.com/jguida941/homebrew-tap-setup-proof",
+      "pushed_at": "2026-02-13T09:51:56Z",
+      "created_at": "2026-02-13T09:47:25Z",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "language": "Ruby",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": true,
+      "language_bytes": {
+        "Ruby": 499
+      },
+      "latest_commit_message": "Update tap files"
+    },
+    {
+      "name": "homebrew-gitui",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": null,
+      "html_url": "https://github.com/jguida941/homebrew-gitui",
+      "pushed_at": "2026-01-31T05:59:54Z",
+      "created_at": "2026-01-31T05:43:48Z",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "language": "Ruby",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "language_bytes": {
+        "Ruby": 614
+      },
+      "latest_commit_message": "Add gitui v0.1.0 formula"
+    },
+    {
+      "name": "homebrew-voiceterm",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "Homebrew tap for VoiceTerm -VoiceHUD for Codex and Claude with Whisper STT",
+      "html_url": "https://github.com/jguida941/homebrew-voiceterm",
+      "pushed_at": "2026-03-07T03:23:26Z",
+      "created_at": "2026-01-22T17:52:18Z",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "language": "Ruby",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "language_bytes": {
+        "Ruby": 1180
+      },
+      "latest_commit_message": "Update to v1.1.1"
+    },
+    {
+      "name": "OpenGL-Hourglass",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "OpenGL hourglass scene (CS-330) with run.bat and shaders included.",
+      "html_url": "https://github.com/jguida941/OpenGL-Hourglass",
+      "pushed_at": "2026-01-26T07:06:42Z",
+      "created_at": "2026-01-22T03:32:41Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": "C++",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "language_bytes": {
+        "C++": 22938,
+        "GLSL": 16418,
+        "Batchfile": 284
+      },
+      "latest_commit_message": "Fix image alt text for accessibility"
+    }
+  ],
   "focus": {
-    "now": [],
-    "next": [],
-    "shipped": []
+    "now": [
+      {
+        "title": "jguida941",
+        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
+        "url": "https://github.com/jguida941/jguida941"
+      },
+      {
+        "title": "voiceterm",
+        "detail": "push \u00b7 20 hours ago \u00b7 \u26059 \u00b7 Rust",
+        "url": "https://github.com/jguida941/voiceterm"
+      },
+      {
+        "title": "terminal-as-interface",
+        "detail": "push \u00b7 20 hours ago \u00b7 \u26050 \u00b7 SCSS",
+        "url": "https://github.com/jguida941/terminal-as-interface"
+      }
+    ],
+    "next": [
+      {
+        "title": "PR #16",
+        "detail": "voiceterm \u00b7 open \u00b7 23 hours ago",
+        "url": "https://github.com/jguida941/voiceterm/pull/16"
+      },
+      {
+        "title": "PR #14",
+        "detail": "voiceterm \u00b7 open \u00b7 5 days ago",
+        "url": "https://github.com/jguida941/voiceterm/pull/14"
+      },
+      {
+        "title": "PR #14",
+        "detail": "voiceterm \u00b7 open \u00b7 5 days ago",
+        "url": "https://github.com/jguida941/voiceterm/pull/14"
+      }
+    ],
+    "shipped": [
+      {
+        "title": "v1.1.1",
+        "detail": "voiceterm \u00b7 5 days ago",
+        "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.1.1"
+      },
+      {
+        "title": "v1.1.0",
+        "detail": "voiceterm \u00b7 6 days ago",
+        "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.1.0"
+      }
+    ]
   },
-  "activity_feed": [],
-  "recent_releases": [],
-  "recent_pull_requests": []
+  "activity_feed": [
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/jguida941",
+      "repo": "jguida941/jguida941",
+      "repo_url": "https://github.com/jguida941/jguida941",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-03-12T22:27:08Z"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/voiceterm",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "PUSH",
+      "time_ago": "20 hours ago",
+      "created_at": "2026-03-12T02:11:07Z"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/terminal-as-interface",
+      "repo": "jguida941/terminal-as-interface",
+      "repo_url": "https://github.com/jguida941/terminal-as-interface",
+      "state": "PUSH",
+      "time_ago": "20 hours ago",
+      "created_at": "2026-03-12T02:10:22Z"
+    },
+    {
+      "kind": "pull request",
+      "title": "PR #16",
+      "url": "https://github.com/jguida941/voiceterm/pull/16",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "OPEN",
+      "time_ago": "23 hours ago",
+      "created_at": "2026-03-11T23:13:03Z"
+    },
+    {
+      "kind": "created",
+      "title": "terminal-as-interface",
+      "url": "https://github.com/jguida941/terminal-as-interface",
+      "repo": "jguida941/terminal-as-interface",
+      "repo_url": "https://github.com/jguida941/terminal-as-interface",
+      "state": "CREATED",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T20:34:39Z"
+    },
+    {
+      "kind": "pull request",
+      "title": "PR #14",
+      "url": "https://github.com/jguida941/voiceterm/pull/14",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "OPEN",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T17:22:31Z"
+    },
+    {
+      "kind": "pull request",
+      "title": "PR #14",
+      "url": "https://github.com/jguida941/voiceterm/pull/14",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "OPEN",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T17:22:23Z"
+    },
+    {
+      "kind": "pull request",
+      "title": "PR #13",
+      "url": "https://github.com/jguida941/voiceterm/pull/13",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "OPEN",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T17:14:47Z"
+    },
+    {
+      "kind": "pull request",
+      "title": "PR #13",
+      "url": "https://github.com/jguida941/voiceterm/pull/13",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "OPEN",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T17:06:02Z"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/homebrew-voiceterm",
+      "repo": "jguida941/homebrew-voiceterm",
+      "repo_url": "https://github.com/jguida941/homebrew-voiceterm",
+      "state": "PUSH",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T03:23:26Z"
+    },
+    {
+      "kind": "release",
+      "title": "v1.1.1",
+      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.1.1",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "RELEASED",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T03:13:33Z"
+    },
+    {
+      "kind": "release",
+      "title": "v1.1.0",
+      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.1.0",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "RELEASED",
+      "time_ago": "6 days ago",
+      "created_at": "2026-03-06T07:45:18Z"
+    },
+    {
+      "kind": "created",
+      "title": "SNHU-CS-330",
+      "url": "https://github.com/jguida941/SNHU-CS-330",
+      "repo": "jguida941/SNHU-CS-330",
+      "repo_url": "https://github.com/jguida941/SNHU-CS-330",
+      "state": "CREATED",
+      "time_ago": "1 week ago",
+      "created_at": "2026-03-02T00:25:11Z"
+    },
+    {
+      "kind": "created",
+      "title": "breakout-game-opengl",
+      "url": "https://github.com/jguida941/breakout-game-opengl",
+      "repo": "jguida941/breakout-game-opengl",
+      "repo_url": "https://github.com/jguida941/breakout-game-opengl",
+      "state": "CREATED",
+      "time_ago": "1 week ago",
+      "created_at": "2026-03-01T22:26:47Z"
+    }
+  ],
+  "recent_releases": [
+    {
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "tag": "v1.1.1",
+      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.1.1",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T03:13:33Z"
+    },
+    {
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "tag": "v1.1.0",
+      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.1.0",
+      "time_ago": "6 days ago",
+      "created_at": "2026-03-06T07:45:18Z"
+    }
+  ],
+  "recent_pull_requests": [
+    {
+      "title": "PR #16",
+      "url": "https://github.com/jguida941/voiceterm/pull/16",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "OPEN",
+      "time_ago": "23 hours ago",
+      "created_at": "2026-03-11T23:13:03Z"
+    },
+    {
+      "title": "PR #14",
+      "url": "https://github.com/jguida941/voiceterm/pull/14",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "OPEN",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T17:22:31Z"
+    },
+    {
+      "title": "PR #14",
+      "url": "https://github.com/jguida941/voiceterm/pull/14",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "OPEN",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T17:22:23Z"
+    },
+    {
+      "title": "PR #13",
+      "url": "https://github.com/jguida941/voiceterm/pull/13",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "OPEN",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T17:14:47Z"
+    },
+    {
+      "title": "PR #13",
+      "url": "https://github.com/jguida941/voiceterm/pull/13",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "OPEN",
+      "time_ago": "5 days ago",
+      "created_at": "2026-03-07T17:06:02Z"
+    }
+  ]
 }
