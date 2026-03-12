@@ -25,7 +25,7 @@ def _build_calendar(day_rows: list[tuple[str, int]]) -> dict:
 
 
 class StreakSummarySvgTests(unittest.TestCase):
-    def test_current_streak_ring_clears_label_and_columns_share_baselines(self):
+    def test_current_streak_column_uses_plain_text_and_shared_baselines(self):
         calendar = _build_calendar(
             [
                 ("2000-01-01", 0),
@@ -50,11 +50,9 @@ class StreakSummarySvgTests(unittest.TestCase):
             "".join(node.itertext()).strip(): int(node.attrib["y"])
             for node in root.findall(f".//{SVG_NS}text")
         }
-        ring = next(node for node in root.findall(f".//{SVG_NS}circle") if "stroke" in node.attrib)
+        circles = root.findall(f".//{SVG_NS}circle")
 
-        ring_bottom = int(ring.attrib["cy"]) + int(ring.attrib["r"])
-
-        self.assertGreaterEqual(text_y["Current Streak"] - ring_bottom, 25)
+        self.assertEqual(circles, [])
         self.assertEqual(text_y["321"], text_y["25"])
         self.assertEqual(text_y["25"], text_y["29"])
         self.assertEqual(text_y["Total Contributions"], text_y["Current Streak"])
