@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-29T20:21:07.115278Z",
+  "generated_at": "2026-04-29T22:11:20.500016Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,9 +18,9 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 5275,
-    "public_scope_commits": 3892,
-    "total_repos": 66,
+    "last_year_contributions": 5276,
+    "public_scope_commits": 3893,
+    "total_repos": 67,
     "public_forks": 0,
     "private_owned_repos": 141,
     "total_stars": 78,
@@ -35,22 +35,22 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 5275,
-      "display_value": "5,275"
+      "value": 5276,
+      "display_value": "5,276"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 3892,
-      "display_value": "3,892"
+      "value": 3893,
+      "display_value": "3,893"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 66,
-      "display_value": "66"
+      "value": 67,
+      "display_value": "67"
     },
     {
       "key": "public_forks",
@@ -113,20 +113,20 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 5275,
-      "display_value": "5,275"
+      "value": 5276,
+      "display_value": "5,276"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 3892,
-      "display_value": "3,892"
+      "value": 3893,
+      "display_value": "3,893"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 66,
-      "display_value": "66"
+      "value": 67,
+      "display_value": "67"
     },
     {
       "key": "public_forks",
@@ -190,11 +190,11 @@
   },
   "scorecard": {
     "releases_30d": 0,
-    "active_repos_7d": 2,
+    "active_repos_7d": 3,
     "avg_release_gap_days": 0.0,
-    "stars_per_public_repo": 1.1818181818181819,
-    "ci_coverage_pct": 24.242424242424242,
-    "last_year_contributions": 5275
+    "stars_per_public_repo": 1.164179104477612,
+    "ci_coverage_pct": 23.88059701492537,
+    "last_year_contributions": 5276
   },
   "scorecard_cards": [
     {
@@ -209,8 +209,8 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 2,
-      "display_value": "2",
+      "value": 3,
+      "display_value": "3",
       "accent": "#7dcfff"
     },
     {
@@ -225,33 +225,33 @@
       "key": "stars_per_public_repo",
       "label": "Stars / Public Repo",
       "detail": "signal density",
-      "value": 1.1818181818181819,
-      "display_value": "1.18",
+      "value": 1.164179104477612,
+      "display_value": "1.16",
       "accent": "#7aa2f7"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with workflows",
-      "value": 24.242424242424242,
-      "display_value": "24.2%",
+      "value": 23.88059701492537,
+      "display_value": "23.9%",
       "accent": "#ff9e64"
     },
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 5275,
-      "display_value": "5,275",
+      "value": 5276,
+      "display_value": "5,276",
       "accent": "#7dcfff"
     }
   ],
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 66,
+    "public_owned_repos_total": 67,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 66,
+    "public_owned_nonfork_repos_total": 67,
     "private_owned_repos_total": 141
   },
   "featured_repo_facts": [
@@ -278,9 +278,9 @@
       "stars": 12,
       "forks": 0,
       "ci": "yes",
-      "pushed_at": "2026-04-28",
-      "pushed_at_raw": "2026-04-28T21:32:43Z",
-      "pushed_ago": "22 hours ago",
+      "pushed_at": "2026-04-29",
+      "pushed_at_raw": "2026-04-29T21:31:30Z",
+      "pushed_ago": "today",
       "created_at": "2025-11-06",
       "last_commit_msg": "chore: update lockfile for v1.1.1",
       "featured": true
@@ -387,9 +387,9 @@
       "stars": 12,
       "forks": 0,
       "ci": "yes",
-      "pushed_at": "2026-04-28",
-      "pushed_at_raw": "2026-04-28T21:32:43Z",
-      "pushed_ago": "22 hours ago",
+      "pushed_at": "2026-04-29",
+      "pushed_at_raw": "2026-04-29T21:31:30Z",
+      "pushed_ago": "today",
       "created_at": "2025-11-06",
       "last_commit_msg": "chore: update lockfile for v1.1.1",
       "featured": true
@@ -410,6 +410,21 @@
       "featured": true
     },
     {
+      "name": "guardir",
+      "full_name": "jguida941/guardir",
+      "url": "https://github.com/jguida941/guardir",
+      "language": "n/a",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-04-29",
+      "pushed_at_raw": "2026-04-29T21:24:38Z",
+      "pushed_ago": "today",
+      "created_at": "2026-04-29",
+      "last_commit_msg": "recent push detected",
+      "featured": false
+    },
+    {
       "name": "jguida941",
       "full_name": "jguida941/jguida941",
       "url": "https://github.com/jguida941/jguida941",
@@ -418,7 +433,7 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-04-29",
-      "pushed_at_raw": "2026-04-29T18:48:22Z",
+      "pushed_at_raw": "2026-04-29T20:21:15Z",
       "pushed_ago": "today",
       "created_at": "2026-02-20",
       "last_commit_msg": "update canonical profile artifacts",
@@ -618,24 +633,28 @@
       "created_at": "2026-01-22",
       "last_commit_msg": "Fix image alt text for accessibility",
       "featured": false
-    },
-    {
-      "name": "learn-caesar-cipher",
-      "full_name": "jguida941/learn-caesar-cipher",
-      "url": "https://github.com/jguida941/learn-caesar-cipher",
-      "language": "Python",
-      "stars": 1,
-      "forks": 0,
-      "ci": "yes",
-      "pushed_at": "2026-01-26",
-      "pushed_at_raw": "2026-01-26T07:06:40Z",
-      "pushed_ago": "3 months ago",
-      "created_at": "2025-10-22",
-      "last_commit_msg": "Fix image alt text for accessibility and portfolio captions",
-      "featured": false
     }
   ],
   "recent_created": [
+    {
+      "name": "guardir",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": null,
+      "html_url": "https://github.com/jguida941/guardir",
+      "pushed_at": "2026-04-29T21:24:38Z",
+      "created_at": "2026-04-29T21:24:38Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": null,
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "language_bytes": {},
+      "latest_commit_message": ""
+    },
     {
       "name": "SNHU-CS-330",
       "fork": false,
@@ -713,7 +732,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-04-29T18:48:22Z",
+      "pushed_at": "2026-04-29T20:21:15Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -834,38 +853,22 @@
         "Batchfile": 284
       },
       "latest_commit_message": "Fix image alt text for accessibility"
-    },
-    {
-      "name": "mkgui",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": "Analyze Python code and generate PyQt6 GUI scaffolding. Extracts functions, type hints, and CLI decorators to create spec.json and launcher templates for building interactive forms.",
-      "html_url": "https://github.com/jguida941/mkgui",
-      "pushed_at": "2026-01-21T08:17:27Z",
-      "created_at": "2026-01-20T04:35:40Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "language": "Python",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": false,
-      "language_bytes": {
-        "Python": 334930
-      },
-      "latest_commit_message": "Add status and improve runtime path handling"
     }
   ],
   "focus": {
     "now": [
       {
         "title": "voiceterm",
-        "detail": "push \u00b7 22 hours ago \u00b7 \u260512 \u00b7 Rust",
+        "detail": "push \u00b7 today \u00b7 \u260512 \u00b7 Rust",
         "url": "https://github.com/jguida941/voiceterm"
       }
     ],
     "next": [
+      {
+        "title": "Next pass: guardir",
+        "detail": "CI no \u00b7 \u26050 \u00b7 pushed 2026-04-29",
+        "url": "https://github.com/jguida941/guardir"
+      },
       {
         "title": "Next pass: homebrew-voiceterm",
         "detail": "CI no \u00b7 \u26051 \u00b7 pushed 2026-03-07",
@@ -875,23 +878,23 @@
         "title": "Next pass: SNHU-CS-330",
         "detail": "CI no \u00b7 \u26051 \u00b7 pushed 2026-03-02",
         "url": "https://github.com/jguida941/SNHU-CS-330"
-      },
-      {
-        "title": "Next pass: opengl-cyberpunk",
-        "detail": "CI no \u00b7 \u26051 \u00b7 pushed 2026-03-02",
-        "url": "https://github.com/jguida941/opengl-cyberpunk"
       }
     ],
     "shipped": [
       {
+        "title": "chore: update lockfile for v1.1.1",
+        "detail": "voiceterm \u00b7 pushed today",
+        "url": "https://github.com/jguida941/voiceterm"
+      },
+      {
+        "title": "recent push detected",
+        "detail": "guardir \u00b7 pushed today",
+        "url": "https://github.com/jguida941/guardir"
+      },
+      {
         "title": "update canonical profile artifacts",
         "detail": "jguida941 \u00b7 pushed today",
         "url": "https://github.com/jguida941/jguida941"
-      },
-      {
-        "title": "chore: update lockfile for v1.1.1",
-        "detail": "voiceterm \u00b7 pushed 22 hours ago",
-        "url": "https://github.com/jguida941/voiceterm"
       }
     ]
   },
@@ -903,8 +906,18 @@
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "PUSH",
-      "time_ago": "22 hours ago",
-      "created_at": "2026-04-28T21:32:44Z"
+      "time_ago": "today",
+      "created_at": "2026-04-29T21:31:31Z"
+    },
+    {
+      "kind": "created",
+      "title": "guardir",
+      "url": "https://github.com/jguida941/guardir",
+      "repo": "jguida941/guardir",
+      "repo_url": "https://github.com/jguida941/guardir",
+      "state": "CREATED",
+      "time_ago": "today",
+      "created_at": "2026-04-29T21:24:38Z"
     },
     {
       "kind": "created",
@@ -925,16 +938,6 @@
       "state": "CREATED",
       "time_ago": "1 month ago",
       "created_at": "2026-03-01T22:26:47Z"
-    },
-    {
-      "kind": "created",
-      "title": "opengl-cyberpunk",
-      "url": "https://github.com/jguida941/opengl-cyberpunk",
-      "repo": "jguida941/opengl-cyberpunk",
-      "repo_url": "https://github.com/jguida941/opengl-cyberpunk",
-      "state": "CREATED",
-      "time_ago": "2 months ago",
-      "created_at": "2026-02-23T18:16:38Z"
     }
   ],
   "recent_releases": [],
