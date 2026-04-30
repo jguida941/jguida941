@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-30T18:45:03.602060Z",
+  "generated_at": "2026-04-30T20:19:51.738826Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 5285,
-    "public_scope_commits": 3902,
+    "last_year_contributions": 5286,
+    "public_scope_commits": 3903,
     "total_repos": 67,
     "public_forks": 0,
     "private_owned_repos": 141,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 5285,
-      "display_value": "5,285"
+      "value": 5286,
+      "display_value": "5,286"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 3902,
-      "display_value": "3,902"
+      "value": 3903,
+      "display_value": "3,903"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 5285,
-      "display_value": "5,285"
+      "value": 5286,
+      "display_value": "5,286"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 3902,
-      "display_value": "3,902"
+      "value": 3903,
+      "display_value": "3,903"
     },
     {
       "key": "total_repos",
@@ -184,8 +184,8 @@
     "commits_note": "Public-scope commit aggregation complete.",
     "releases_status": "ok",
     "releases_note": "Release aggregation complete.",
-    "events_status": "limited",
-    "events_note": "No recent public events returned in this run; focus/feed use repo push fallbacks.",
+    "events_status": "ok",
+    "events_note": "Public events feed available.",
     "token_mode": "personal_github_token"
   },
   "scorecard": {
@@ -194,7 +194,7 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.164179104477612,
     "ci_coverage_pct": 23.88059701492537,
-    "last_year_contributions": 5285
+    "last_year_contributions": 5286
   },
   "scorecard_cards": [
     {
@@ -241,8 +241,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 5285,
-      "display_value": "5,285",
+      "value": 5286,
+      "display_value": "5,286",
       "accent": "#7dcfff"
     }
   ],
@@ -280,7 +280,7 @@
       "ci": "yes",
       "pushed_at": "2026-04-29",
       "pushed_at_raw": "2026-04-29T23:53:00Z",
-      "pushed_ago": "18 hours ago",
+      "pushed_ago": "20 hours ago",
       "created_at": "2025-11-06",
       "last_commit_msg": "chore: update lockfile for v1.1.1",
       "featured": true
@@ -389,7 +389,7 @@
       "ci": "yes",
       "pushed_at": "2026-04-29",
       "pushed_at_raw": "2026-04-29T23:53:00Z",
-      "pushed_ago": "18 hours ago",
+      "pushed_ago": "20 hours ago",
       "created_at": "2025-11-06",
       "last_commit_msg": "chore: update lockfile for v1.1.1",
       "featured": true
@@ -418,7 +418,7 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-04-30",
-      "pushed_at_raw": "2026-04-30T16:48:10Z",
+      "pushed_at_raw": "2026-04-30T18:45:09Z",
       "pushed_ago": "today",
       "created_at": "2026-02-20",
       "last_commit_msg": "update canonical profile artifacts",
@@ -434,7 +434,7 @@
       "ci": "no",
       "pushed_at": "2026-04-29",
       "pushed_at_raw": "2026-04-29T21:24:38Z",
-      "pushed_ago": "21 hours ago",
+      "pushed_ago": "22 hours ago",
       "created_at": "2026-04-29",
       "last_commit_msg": "recent push detected",
       "featured": false
@@ -732,7 +732,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-04-30T16:48:10Z",
+      "pushed_at": "2026-04-30T18:45:09Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -858,19 +858,9 @@
   "focus": {
     "now": [
       {
-        "title": "jguida941",
-        "detail": "push \u00b7 today \u00b7 \u26051 \u00b7 Python",
-        "url": "https://github.com/jguida941/jguida941"
-      },
-      {
         "title": "voiceterm",
-        "detail": "push \u00b7 18 hours ago \u00b7 \u260512 \u00b7 Rust",
+        "detail": "push \u00b7 20 hours ago \u00b7 \u260512 \u00b7 Rust",
         "url": "https://github.com/jguida941/voiceterm"
-      },
-      {
-        "title": "guardir",
-        "detail": "push \u00b7 21 hours ago \u00b7 \u26050",
-        "url": "https://github.com/jguida941/guardir"
       }
     ],
     "next": [
@@ -898,12 +888,12 @@
       },
       {
         "title": "chore: update lockfile for v1.1.1",
-        "detail": "voiceterm \u00b7 pushed 18 hours ago",
+        "detail": "voiceterm \u00b7 pushed 20 hours ago",
         "url": "https://github.com/jguida941/voiceterm"
       },
       {
         "title": "recent push detected",
-        "detail": "guardir \u00b7 pushed 21 hours ago",
+        "detail": "guardir \u00b7 pushed 22 hours ago",
         "url": "https://github.com/jguida941/guardir"
       }
     ]
@@ -912,32 +902,12 @@
     {
       "kind": "activity",
       "title": "push",
-      "url": "https://github.com/jguida941/jguida941",
-      "repo": "jguida941/jguida941",
-      "repo_url": "https://github.com/jguida941/jguida941",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-04-30T16:48:10Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
       "url": "https://github.com/jguida941/voiceterm",
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "PUSH",
-      "time_ago": "18 hours ago",
+      "time_ago": "20 hours ago",
       "created_at": "2026-04-29T23:53:00Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/guardir",
-      "repo": "jguida941/guardir",
-      "repo_url": "https://github.com/jguida941/guardir",
-      "state": "PUSH",
-      "time_ago": "21 hours ago",
-      "created_at": "2026-04-29T21:24:38Z"
     },
     {
       "kind": "created",
@@ -946,7 +916,7 @@
       "repo": "jguida941/guardir",
       "repo_url": "https://github.com/jguida941/guardir",
       "state": "CREATED",
-      "time_ago": "21 hours ago",
+      "time_ago": "22 hours ago",
       "created_at": "2026-04-29T21:24:38Z"
     },
     {
