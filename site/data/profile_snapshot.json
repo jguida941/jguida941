@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-18T12:47:43.688989Z",
+  "generated_at": "2026-05-18T16:33:18.158062Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,16 +18,16 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 5480,
-    "public_scope_commits": 4116,
+    "last_year_contributions": 8031,
+    "public_scope_commits": 6667,
     "total_repos": 67,
     "public_forks": 0,
     "private_owned_repos": 141,
     "total_stars": 78,
-    "languages_count": 24,
+    "languages_count": 25,
     "prs_merged": 13,
     "releases": 0,
-    "ci_repos": 16,
+    "ci_repos": 17,
     "streak_days": 96
   },
   "snapshot_rows": [
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 5480,
-      "display_value": "5,480"
+      "value": 8031,
+      "display_value": "8,031"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 4116,
-      "display_value": "4,116"
+      "value": 6667,
+      "display_value": "6,667"
     },
     {
       "key": "total_repos",
@@ -77,8 +77,8 @@
       "key": "languages_count",
       "label": "Languages Detected",
       "dashboard_label": "Languages Detected",
-      "value": 24,
-      "display_value": "24"
+      "value": 25,
+      "display_value": "25"
     },
     {
       "key": "prs_merged",
@@ -98,8 +98,8 @@
       "key": "ci_repos",
       "label": "Repos With CI/CD",
       "dashboard_label": "Repos With CI",
-      "value": 16,
-      "display_value": "16"
+      "value": 17,
+      "display_value": "17"
     },
     {
       "key": "streak_days",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 5480,
-      "display_value": "5,480"
+      "value": 8031,
+      "display_value": "8,031"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 4116,
-      "display_value": "4,116"
+      "value": 6667,
+      "display_value": "6,667"
     },
     {
       "key": "total_repos",
@@ -149,8 +149,8 @@
     {
       "key": "languages_count",
       "label": "Languages Detected",
-      "value": 24,
-      "display_value": "24"
+      "value": 25,
+      "display_value": "25"
     },
     {
       "key": "prs_merged",
@@ -167,8 +167,8 @@
     {
       "key": "ci_repos",
       "label": "Repos With CI",
-      "value": 16,
-      "display_value": "16"
+      "value": 17,
+      "display_value": "17"
     },
     {
       "key": "streak_days",
@@ -190,11 +190,11 @@
   },
   "scorecard": {
     "releases_30d": 0,
-    "active_repos_7d": 2,
+    "active_repos_7d": 3,
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.164179104477612,
-    "ci_coverage_pct": 23.88059701492537,
-    "last_year_contributions": 5480
+    "ci_coverage_pct": 25.37313432835821,
+    "last_year_contributions": 8031
   },
   "scorecard_cards": [
     {
@@ -209,8 +209,8 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 2,
-      "display_value": "2",
+      "value": 3,
+      "display_value": "3",
       "accent": "#7dcfff"
     },
     {
@@ -233,16 +233,16 @@
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with workflows",
-      "value": 23.88059701492537,
-      "display_value": "23.9%",
+      "value": 25.37313432835821,
+      "display_value": "25.4%",
       "accent": "#ff9e64"
     },
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 5480,
-      "display_value": "5,480",
+      "value": 8031,
+      "display_value": "8,031",
       "accent": "#7dcfff"
     }
   ],
@@ -280,7 +280,7 @@
       "ci": "yes",
       "pushed_at": "2026-05-17",
       "pushed_at_raw": "2026-05-17T23:40:28Z",
-      "pushed_ago": "13 hours ago",
+      "pushed_ago": "16 hours ago",
       "created_at": "2025-11-06",
       "last_commit_msg": "chore: update lockfile for v1.1.1",
       "featured": true
@@ -304,63 +304,63 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 12125456,
-      "percent": 49.63
-    },
-    {
-      "name": "Makefile",
-      "bytes": 3931581,
-      "percent": 16.09
+      "bytes": 34146610,
+      "percent": 67.98
     },
     {
       "name": "Rust",
-      "bytes": 3003018,
-      "percent": 12.29
+      "bytes": 6542108,
+      "percent": 13.02
+    },
+    {
+      "name": "Makefile",
+      "bytes": 3941396,
+      "percent": 7.85
     },
     {
       "name": "C++",
       "bytes": 1824966,
-      "percent": 7.47
+      "percent": 3.63
     },
     {
       "name": "Java",
       "bytes": 1583192,
-      "percent": 6.48
+      "percent": 3.15
     },
     {
       "name": "TypeScript",
       "bytes": 411851,
-      "percent": 1.69
+      "percent": 0.82
     },
     {
       "name": "Shell",
-      "bytes": 283578,
-      "percent": 1.16
+      "bytes": 399747,
+      "percent": 0.8
     },
     {
       "name": "C",
       "bytes": 268582,
-      "percent": 1.1
+      "percent": 0.53
     },
     {
       "name": "HTML",
       "bytes": 229530,
-      "percent": 0.94
+      "percent": 0.46
     },
     {
       "name": "JavaScript",
       "bytes": 211396,
-      "percent": 0.87
+      "percent": 0.42
     },
     {
       "name": "Jupyter Notebook",
       "bytes": 192686,
-      "percent": 0.79
+      "percent": 0.38
     },
     {
       "name": "CMake",
       "bytes": 141191,
-      "percent": 0.58
+      "percent": 0.28
     }
   ],
   "repo_language_matrix": [
@@ -389,7 +389,7 @@
       "ci": "yes",
       "pushed_at": "2026-05-17",
       "pushed_at_raw": "2026-05-17T23:40:28Z",
-      "pushed_ago": "13 hours ago",
+      "pushed_ago": "16 hours ago",
       "created_at": "2025-11-06",
       "last_commit_msg": "chore: update lockfile for v1.1.1",
       "featured": true
@@ -410,6 +410,21 @@
       "featured": true
     },
     {
+      "name": "guardir",
+      "full_name": "jguida941/guardir",
+      "url": "https://github.com/jguida941/guardir",
+      "language": "Python",
+      "stars": 0,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-05-18",
+      "pushed_at_raw": "2026-05-18T15:04:01Z",
+      "pushed_ago": "today",
+      "created_at": "2026-04-29",
+      "last_commit_msg": "Refresh external review snapshot for 92ef4032",
+      "featured": false
+    },
+    {
       "name": "jguida941",
       "full_name": "jguida941/jguida941",
       "url": "https://github.com/jguida941/jguida941",
@@ -418,25 +433,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-05-18",
-      "pushed_at_raw": "2026-05-18T08:53:00Z",
+      "pushed_at_raw": "2026-05-18T12:47:50Z",
       "pushed_ago": "3 hours ago",
       "created_at": "2026-02-20",
       "last_commit_msg": "update canonical profile artifacts",
-      "featured": false
-    },
-    {
-      "name": "guardir",
-      "full_name": "jguida941/guardir",
-      "url": "https://github.com/jguida941/guardir",
-      "language": "n/a",
-      "stars": 0,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-04-29",
-      "pushed_at_raw": "2026-04-29T21:24:38Z",
-      "pushed_ago": "2 weeks ago",
-      "created_at": "2026-04-29",
-      "last_commit_msg": "recent push detected",
       "featured": false
     },
     {
@@ -643,17 +643,24 @@
       "visibility": "public",
       "description": null,
       "html_url": "https://github.com/jguida941/guardir",
-      "pushed_at": "2026-04-29T21:24:38Z",
+      "pushed_at": "2026-05-18T15:04:01Z",
       "created_at": "2026-04-29T21:24:38Z",
       "stargazers_count": 0,
       "forks_count": 0,
-      "language": null,
+      "language": "Python",
       "owner": {
         "login": "jguida941"
       },
-      "has_ci_workflows": false,
-      "language_bytes": {},
-      "latest_commit_message": ""
+      "has_ci_workflows": true,
+      "language_bytes": {
+        "Python": 22021154,
+        "Rust": 3539090,
+        "Shell": 116169,
+        "Swift": 113981,
+        "Makefile": 9815,
+        "Batchfile": 193
+      },
+      "latest_commit_message": "Refresh external review snapshot for 92ef4032"
     },
     {
       "name": "SNHU-CS-330",
@@ -732,7 +739,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-05-18T08:53:00Z",
+      "pushed_at": "2026-05-18T12:47:50Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -858,17 +865,17 @@
   "focus": {
     "now": [
       {
+        "title": "guardir",
+        "detail": "create \u00b7 today \u00b7 \u26050 \u00b7 Python",
+        "url": "https://github.com/jguida941/guardir"
+      },
+      {
         "title": "voiceterm",
-        "detail": "push \u00b7 13 hours ago \u00b7 \u260512 \u00b7 Rust",
+        "detail": "push \u00b7 16 hours ago \u00b7 \u260512 \u00b7 Rust",
         "url": "https://github.com/jguida941/voiceterm"
       }
     ],
     "next": [
-      {
-        "title": "Next pass: guardir",
-        "detail": "CI no \u00b7 \u26050 \u00b7 pushed 2026-04-29",
-        "url": "https://github.com/jguida941/guardir"
-      },
       {
         "title": "Next pass: homebrew-voiceterm",
         "detail": "CI no \u00b7 \u26051 \u00b7 pushed 2026-03-07",
@@ -878,9 +885,19 @@
         "title": "Next pass: SNHU-CS-330",
         "detail": "CI no \u00b7 \u26051 \u00b7 pushed 2026-03-02",
         "url": "https://github.com/jguida941/SNHU-CS-330"
+      },
+      {
+        "title": "Next pass: opengl-cyberpunk",
+        "detail": "CI no \u00b7 \u26051 \u00b7 pushed 2026-03-02",
+        "url": "https://github.com/jguida941/opengl-cyberpunk"
       }
     ],
     "shipped": [
+      {
+        "title": "Refresh external review snapshot for 92ef4032",
+        "detail": "guardir \u00b7 pushed today",
+        "url": "https://github.com/jguida941/guardir"
+      },
       {
         "title": "update canonical profile artifacts",
         "detail": "jguida941 \u00b7 pushed 3 hours ago",
@@ -888,7 +905,7 @@
       },
       {
         "title": "chore: update lockfile for v1.1.1",
-        "detail": "voiceterm \u00b7 pushed 13 hours ago",
+        "detail": "voiceterm \u00b7 pushed 16 hours ago",
         "url": "https://github.com/jguida941/voiceterm"
       }
     ]
@@ -896,12 +913,22 @@
   "activity_feed": [
     {
       "kind": "activity",
+      "title": "create",
+      "url": "https://github.com/jguida941/guardir",
+      "repo": "jguida941/guardir",
+      "repo_url": "https://github.com/jguida941/guardir",
+      "state": "CREATE",
+      "time_ago": "today",
+      "created_at": "2026-05-18T14:56:49Z"
+    },
+    {
+      "kind": "activity",
       "title": "push",
       "url": "https://github.com/jguida941/voiceterm",
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "PUSH",
-      "time_ago": "13 hours ago",
+      "time_ago": "16 hours ago",
       "created_at": "2026-05-17T23:40:29Z"
     },
     {
