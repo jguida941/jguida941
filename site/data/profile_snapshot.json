@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-23T06:46:05.496126Z",
+  "generated_at": "2026-05-23T09:14:00.992068Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 8062,
-    "public_scope_commits": 6705,
+    "last_year_contributions": 8064,
+    "public_scope_commits": 6707,
     "total_repos": 68,
     "public_forks": 0,
     "private_owned_repos": 141,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 8062,
-      "display_value": "8,062"
+      "value": 8064,
+      "display_value": "8,064"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6705,
-      "display_value": "6,705"
+      "value": 6707,
+      "display_value": "6,707"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 8062,
-      "display_value": "8,062"
+      "value": 8064,
+      "display_value": "8,064"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6705,
-      "display_value": "6,705"
+      "value": 6707,
+      "display_value": "6,707"
     },
     {
       "key": "total_repos",
@@ -194,7 +194,7 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.1470588235294117,
     "ci_coverage_pct": 25.0,
-    "last_year_contributions": 8062
+    "last_year_contributions": 8064
   },
   "scorecard_cards": [
     {
@@ -241,8 +241,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 8062,
-      "display_value": "8,062",
+      "value": 8064,
+      "display_value": "8,064",
       "accent": "#7dcfff"
     }
   ],
@@ -304,7 +304,7 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 34164717,
+      "bytes": 34164715,
       "percent": 67.99
     },
     {
@@ -418,10 +418,10 @@
       "forks": 0,
       "ci": "no",
       "pushed_at": "2026-05-23",
-      "pushed_at_raw": "2026-05-23T06:41:17Z",
-      "pushed_ago": "today",
+      "pushed_at_raw": "2026-05-23T06:46:26Z",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-05-23",
-      "last_commit_msg": "initial release: semantic-tdd alpha",
+      "last_commit_msg": "scrub em/en dashes across docs and code",
       "featured": false
     },
     {
@@ -433,7 +433,7 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-05-23",
-      "pushed_at_raw": "2026-05-23T04:08:11Z",
+      "pushed_at_raw": "2026-05-23T06:46:12Z",
       "pushed_ago": "2 hours ago",
       "created_at": "2026-02-20",
       "last_commit_msg": "update canonical profile artifacts",
@@ -643,7 +643,7 @@
       "visibility": "public",
       "description": "TDD for AI-agent command output. Catch contradictions between what the output claims and what it shows.",
       "html_url": "https://github.com/jguida941/semantic-tdd",
-      "pushed_at": "2026-05-23T06:41:17Z",
+      "pushed_at": "2026-05-23T06:46:26Z",
       "created_at": "2026-05-23T06:39:12Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -653,10 +653,10 @@
       },
       "has_ci_workflows": false,
       "language_bytes": {
-        "Python": 18107,
+        "Python": 18105,
         "Shell": 869
       },
-      "latest_commit_message": "initial release: semantic-tdd alpha"
+      "latest_commit_message": "scrub em/en dashes across docs and code"
     },
     {
       "name": "guardir",
@@ -761,7 +761,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-05-23T04:08:11Z",
+      "pushed_at": "2026-05-23T06:46:12Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -865,7 +865,7 @@
     "now": [
       {
         "title": "semantic-tdd",
-        "detail": "release \u00b7 today \u00b7 \u26050 \u00b7 Python",
+        "detail": "push \u00b7 2 hours ago \u00b7 \u26050 \u00b7 Python",
         "url": "https://github.com/jguida941/semantic-tdd"
       },
       {
@@ -899,12 +899,22 @@
     "shipped": [
       {
         "title": "v0.1.0a1",
-        "detail": "semantic-tdd \u00b7 today",
+        "detail": "semantic-tdd \u00b7 2 hours ago",
         "url": "https://github.com/jguida941/semantic-tdd/releases/tag/v0.1.0a1"
       }
     ]
   },
   "activity_feed": [
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/semantic-tdd",
+      "repo": "jguida941/semantic-tdd",
+      "repo_url": "https://github.com/jguida941/semantic-tdd",
+      "state": "PUSH",
+      "time_ago": "2 hours ago",
+      "created_at": "2026-05-23T06:46:27Z"
+    },
     {
       "kind": "release",
       "title": "v0.1.0a1",
@@ -912,17 +922,7 @@
       "repo": "jguida941/semantic-tdd",
       "repo_url": "https://github.com/jguida941/semantic-tdd",
       "state": "RELEASED",
-      "time_ago": "today",
-      "created_at": "2026-05-23T06:41:17Z"
-    },
-    {
-      "kind": "activity",
-      "title": "release",
-      "url": "https://github.com/jguida941/semantic-tdd",
-      "repo": "jguida941/semantic-tdd",
-      "repo_url": "https://github.com/jguida941/semantic-tdd",
-      "state": "RELEASE",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-05-23T06:41:17Z"
     },
     {
@@ -932,7 +932,7 @@
       "repo": "jguida941/semantic-tdd",
       "repo_url": "https://github.com/jguida941/semantic-tdd",
       "state": "CREATED",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-05-23T06:39:12Z"
     },
     {
@@ -982,7 +982,7 @@
       "repo_url": "https://github.com/jguida941/semantic-tdd",
       "tag": "v0.1.0a1",
       "url": "https://github.com/jguida941/semantic-tdd/releases/tag/v0.1.0a1",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-05-23T06:41:17Z"
     }
   ],
