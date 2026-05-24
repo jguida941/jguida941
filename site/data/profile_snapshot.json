@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-24T22:10:37.673526Z",
+  "generated_at": "2026-05-24T23:15:03.186633Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 8090,
-    "public_scope_commits": 6732,
+    "last_year_contributions": 8094,
+    "public_scope_commits": 6736,
     "total_repos": 68,
     "public_forks": 0,
     "private_owned_repos": 141,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 8090,
-      "display_value": "8,090"
+      "value": 8094,
+      "display_value": "8,094"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6732,
-      "display_value": "6,732"
+      "value": 6736,
+      "display_value": "6,736"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 8090,
-      "display_value": "8,090"
+      "value": 8094,
+      "display_value": "8,094"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6732,
-      "display_value": "6,732"
+      "value": 6736,
+      "display_value": "6,736"
     },
     {
       "key": "total_repos",
@@ -194,7 +194,7 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.161764705882353,
     "ci_coverage_pct": 26.47058823529412,
-    "last_year_contributions": 8090
+    "last_year_contributions": 8094
   },
   "scorecard_cards": [
     {
@@ -241,8 +241,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 8090,
-      "display_value": "8,090",
+      "value": 8094,
+      "display_value": "8,094",
       "accent": "#7dcfff"
     }
   ],
@@ -280,7 +280,7 @@
       "ci": "yes",
       "pushed_at": "2026-05-23",
       "pushed_at_raw": "2026-05-23T23:03:11Z",
-      "pushed_ago": "23 hours ago",
+      "pushed_ago": "1 day ago",
       "created_at": "2025-11-06",
       "last_commit_msg": "chore: update lockfile for v1.1.1",
       "featured": true
@@ -304,8 +304,8 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 34258706,
-      "percent": 67.97
+      "bytes": 34262562,
+      "percent": 67.96
     },
     {
       "name": "Rust",
@@ -344,13 +344,13 @@
     },
     {
       "name": "JavaScript",
-      "bytes": 244181,
-      "percent": 0.48
+      "bytes": 249978,
+      "percent": 0.5
     },
     {
       "name": "HTML",
-      "bytes": 243352,
-      "percent": 0.48
+      "bytes": 244726,
+      "percent": 0.49
     },
     {
       "name": "Jupyter Notebook",
@@ -389,7 +389,7 @@
       "ci": "yes",
       "pushed_at": "2026-05-23",
       "pushed_at_raw": "2026-05-23T23:03:11Z",
-      "pushed_ago": "23 hours ago",
+      "pushed_ago": "1 day ago",
       "created_at": "2025-11-06",
       "last_commit_msg": "chore: update lockfile for v1.1.1",
       "featured": true
@@ -418,10 +418,25 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-05-24",
-      "pushed_at_raw": "2026-05-24T22:02:43Z",
+      "pushed_at_raw": "2026-05-24T22:45:38Z",
       "pushed_ago": "today",
       "created_at": "2026-05-23",
-      "last_commit_msg": "Add OpenClaw proof targets and priority scanning",
+      "last_commit_msg": "Polish evidence dashboard UI",
+      "featured": false
+    },
+    {
+      "name": "jguida941",
+      "full_name": "jguida941/jguida941",
+      "url": "https://github.com/jguida941/jguida941",
+      "language": "Python",
+      "stars": 1,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-05-24",
+      "pushed_at_raw": "2026-05-24T22:10:42Z",
+      "pushed_ago": "today",
+      "created_at": "2026-02-20",
+      "last_commit_msg": "update canonical profile artifacts",
       "featured": false
     },
     {
@@ -437,21 +452,6 @@
       "pushed_ago": "today",
       "created_at": "2026-04-29",
       "last_commit_msg": "Refresh external review snapshot for 92ef4032",
-      "featured": false
-    },
-    {
-      "name": "jguida941",
-      "full_name": "jguida941/jguida941",
-      "url": "https://github.com/jguida941/jguida941",
-      "language": "Python",
-      "stars": 1,
-      "forks": 0,
-      "ci": "yes",
-      "pushed_at": "2026-05-24",
-      "pushed_at_raw": "2026-05-24T21:11:51Z",
-      "pushed_ago": "today",
-      "created_at": "2026-02-20",
-      "last_commit_msg": "update canonical profile artifacts",
       "featured": false
     },
     {
@@ -643,7 +643,7 @@
       "visibility": "public",
       "description": "TDD for AI-agent command output. Catch contradictions between what the output claims and what it shows.",
       "html_url": "https://github.com/jguida941/semantic-tdd",
-      "pushed_at": "2026-05-24T22:02:43Z",
+      "pushed_at": "2026-05-24T22:45:38Z",
       "created_at": "2026-05-23T06:39:12Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -653,13 +653,13 @@
       },
       "has_ci_workflows": true,
       "language_bytes": {
-        "Python": 112096,
-        "JavaScript": 32785,
-        "HTML": 13822,
-        "CSS": 9984,
+        "Python": 115952,
+        "JavaScript": 38582,
+        "HTML": 15196,
+        "CSS": 13030,
         "Shell": 887
       },
-      "latest_commit_message": "Add OpenClaw proof targets and priority scanning"
+      "latest_commit_message": "Polish evidence dashboard UI"
     },
     {
       "name": "guardir",
@@ -764,7 +764,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-05-24T21:11:51Z",
+      "pushed_at": "2026-05-24T22:10:42Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -878,7 +878,7 @@
       },
       {
         "title": "voiceterm",
-        "detail": "push \u00b7 23 hours ago \u00b7 \u260512 \u00b7 Rust",
+        "detail": "push \u00b7 1 day ago \u00b7 \u260512 \u00b7 Rust",
         "url": "https://github.com/jguida941/voiceterm"
       }
     ],
@@ -916,7 +916,7 @@
       "repo_url": "https://github.com/jguida941/semantic-tdd",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-05-24T22:02:44Z"
+      "created_at": "2026-05-24T22:45:39Z"
     },
     {
       "kind": "activity",
@@ -935,7 +935,7 @@
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "PUSH",
-      "time_ago": "23 hours ago",
+      "time_ago": "1 day ago",
       "created_at": "2026-05-23T23:03:12Z"
     },
     {
