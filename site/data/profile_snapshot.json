@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-24T23:15:03.186633Z",
+  "generated_at": "2026-05-25T00:14:50.543279Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 8094,
-    "public_scope_commits": 6736,
+    "last_year_contributions": 8097,
+    "public_scope_commits": 6737,
     "total_repos": 68,
     "public_forks": 0,
     "private_owned_repos": 141,
@@ -28,22 +28,22 @@
     "prs_merged": 13,
     "releases": 1,
     "ci_repos": 18,
-    "streak_days": 102
+    "streak_days": 0
   },
   "snapshot_rows": [
     {
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 8094,
-      "display_value": "8,094"
+      "value": 8097,
+      "display_value": "8,097"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6736,
-      "display_value": "6,736"
+      "value": 6737,
+      "display_value": "6,737"
     },
     {
       "key": "total_repos",
@@ -105,22 +105,22 @@
       "key": "streak_days",
       "label": "Current Streak Days",
       "dashboard_label": "Current Streak Days",
-      "value": 102,
-      "display_value": "102"
+      "value": 0,
+      "display_value": "0"
     }
   ],
   "snapshot_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 8094,
-      "display_value": "8,094"
+      "value": 8097,
+      "display_value": "8,097"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6736,
-      "display_value": "6,736"
+      "value": 6737,
+      "display_value": "6,737"
     },
     {
       "key": "total_repos",
@@ -173,8 +173,8 @@
     {
       "key": "streak_days",
       "label": "Current Streak Days",
-      "value": 102,
-      "display_value": "102"
+      "value": 0,
+      "display_value": "0"
     }
   ],
   "data_quality": {
@@ -194,7 +194,7 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.161764705882353,
     "ci_coverage_pct": 26.47058823529412,
-    "last_year_contributions": 8094
+    "last_year_contributions": 8097
   },
   "scorecard_cards": [
     {
@@ -241,8 +241,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 8094,
-      "display_value": "8,094",
+      "value": 8097,
+      "display_value": "8,097",
       "accent": "#7dcfff"
     }
   ],
@@ -304,18 +304,18 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 34262562,
-      "percent": 67.96
+      "bytes": 34282512,
+      "percent": 67.95
     },
     {
       "name": "Rust",
       "bytes": 6542108,
-      "percent": 12.98
+      "percent": 12.97
     },
     {
       "name": "Makefile",
-      "bytes": 3941396,
-      "percent": 7.82
+      "bytes": 3942384,
+      "percent": 7.81
     },
     {
       "name": "C++",
@@ -344,12 +344,12 @@
     },
     {
       "name": "JavaScript",
-      "bytes": 249978,
-      "percent": 0.5
+      "bytes": 262019,
+      "percent": 0.52
     },
     {
       "name": "HTML",
-      "bytes": 244726,
+      "bytes": 249394,
       "percent": 0.49
     },
     {
@@ -417,11 +417,11 @@
       "stars": 1,
       "forks": 0,
       "ci": "yes",
-      "pushed_at": "2026-05-24",
-      "pushed_at_raw": "2026-05-24T22:45:38Z",
+      "pushed_at": "2026-05-25",
+      "pushed_at_raw": "2026-05-25T00:03:53Z",
       "pushed_ago": "today",
       "created_at": "2026-05-23",
-      "last_commit_msg": "Polish evidence dashboard UI",
+      "last_commit_msg": "Add proof packet workflow and scanner modules",
       "featured": false
     },
     {
@@ -433,7 +433,7 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-05-24",
-      "pushed_at_raw": "2026-05-24T22:10:42Z",
+      "pushed_at_raw": "2026-05-24T23:15:09Z",
       "pushed_ago": "today",
       "created_at": "2026-02-20",
       "last_commit_msg": "update canonical profile artifacts",
@@ -449,7 +449,7 @@
       "ci": "yes",
       "pushed_at": "2026-05-24",
       "pushed_at_raw": "2026-05-24T21:39:52Z",
-      "pushed_ago": "today",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-04-29",
       "last_commit_msg": "Refresh external review snapshot for 92ef4032",
       "featured": false
@@ -643,7 +643,7 @@
       "visibility": "public",
       "description": "TDD for AI-agent command output. Catch contradictions between what the output claims and what it shows.",
       "html_url": "https://github.com/jguida941/semantic-tdd",
-      "pushed_at": "2026-05-24T22:45:38Z",
+      "pushed_at": "2026-05-25T00:03:53Z",
       "created_at": "2026-05-23T06:39:12Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -653,13 +653,14 @@
       },
       "has_ci_workflows": true,
       "language_bytes": {
-        "Python": 115952,
-        "JavaScript": 38582,
-        "HTML": 15196,
-        "CSS": 13030,
+        "Python": 135902,
+        "JavaScript": 50623,
+        "HTML": 19864,
+        "CSS": 14605,
+        "Makefile": 988,
         "Shell": 887
       },
-      "latest_commit_message": "Polish evidence dashboard UI"
+      "latest_commit_message": "Add proof packet workflow and scanner modules"
     },
     {
       "name": "guardir",
@@ -764,7 +765,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-05-24T22:10:42Z",
+      "pushed_at": "2026-05-24T23:15:09Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -873,7 +874,7 @@
       },
       {
         "title": "guardir",
-        "detail": "push \u00b7 today \u00b7 \u26050 \u00b7 Python",
+        "detail": "push \u00b7 2 hours ago \u00b7 \u26050 \u00b7 Python",
         "url": "https://github.com/jguida941/guardir"
       },
       {
@@ -916,7 +917,7 @@
       "repo_url": "https://github.com/jguida941/semantic-tdd",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-05-24T22:45:39Z"
+      "created_at": "2026-05-25T00:03:54Z"
     },
     {
       "kind": "activity",
@@ -925,7 +926,7 @@
       "repo": "jguida941/guardir",
       "repo_url": "https://github.com/jguida941/guardir",
       "state": "PUSH",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-05-24T21:39:52Z"
     },
     {
