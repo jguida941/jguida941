@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T23:32:26.461071Z",
+  "generated_at": "2026-05-26T04:34:33.404715Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -19,16 +19,16 @@
   },
   "snapshot": {
     "last_year_contributions": 8112,
-    "public_scope_commits": 4204,
-    "total_repos": 67,
+    "public_scope_commits": 4188,
+    "total_repos": 66,
     "public_forks": 0,
-    "private_owned_repos": 142,
-    "total_stars": 79,
+    "private_owned_repos": 143,
+    "total_stars": 78,
     "languages_count": 24,
     "prs_merged": 13,
-    "releases": 1,
-    "ci_repos": 17,
-    "streak_days": 103
+    "releases": 0,
+    "ci_repos": 16,
+    "streak_days": 0
   },
   "snapshot_rows": [
     {
@@ -42,15 +42,15 @@
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 4204,
-      "display_value": "4,204"
+      "value": 4188,
+      "display_value": "4,188"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 67,
-      "display_value": "67"
+      "value": 66,
+      "display_value": "66"
     },
     {
       "key": "public_forks",
@@ -63,15 +63,15 @@
       "key": "private_owned_repos",
       "label": "Private Owned Repos",
       "dashboard_label": "Private Owned Repos",
-      "value": 142,
-      "display_value": "142"
+      "value": 143,
+      "display_value": "143"
     },
     {
       "key": "total_stars",
       "label": "Repo Stargazers (Received)",
       "dashboard_label": "Repo Stargazers (Received)",
-      "value": 79,
-      "display_value": "79"
+      "value": 78,
+      "display_value": "78"
     },
     {
       "key": "languages_count",
@@ -91,22 +91,22 @@
       "key": "releases",
       "label": "Releases (30 Days)",
       "dashboard_label": "Releases (30d)",
-      "value": 1,
-      "display_value": "1"
+      "value": 0,
+      "display_value": "0"
     },
     {
       "key": "ci_repos",
       "label": "Repos With CI/CD",
       "dashboard_label": "Repos With CI",
-      "value": 17,
-      "display_value": "17"
+      "value": 16,
+      "display_value": "16"
     },
     {
       "key": "streak_days",
       "label": "Current Streak Days",
       "dashboard_label": "Current Streak Days",
-      "value": 103,
-      "display_value": "103"
+      "value": 0,
+      "display_value": "0"
     }
   ],
   "snapshot_cards": [
@@ -119,14 +119,14 @@
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 4204,
-      "display_value": "4,204"
+      "value": 4188,
+      "display_value": "4,188"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 67,
-      "display_value": "67"
+      "value": 66,
+      "display_value": "66"
     },
     {
       "key": "public_forks",
@@ -137,14 +137,14 @@
     {
       "key": "private_owned_repos",
       "label": "Private Owned Repos",
-      "value": 142,
-      "display_value": "142"
+      "value": 143,
+      "display_value": "143"
     },
     {
       "key": "total_stars",
       "label": "Repo Stargazers (Received)",
-      "value": 79,
-      "display_value": "79"
+      "value": 78,
+      "display_value": "78"
     },
     {
       "key": "languages_count",
@@ -161,20 +161,20 @@
     {
       "key": "releases",
       "label": "Releases (30d)",
-      "value": 1,
-      "display_value": "1"
+      "value": 0,
+      "display_value": "0"
     },
     {
       "key": "ci_repos",
       "label": "Repos With CI",
-      "value": 17,
-      "display_value": "17"
+      "value": 16,
+      "display_value": "16"
     },
     {
       "key": "streak_days",
       "label": "Current Streak Days",
-      "value": 103,
-      "display_value": "103"
+      "value": 0,
+      "display_value": "0"
     }
   ],
   "data_quality": {
@@ -189,11 +189,11 @@
     "token_mode": "personal_github_token"
   },
   "scorecard": {
-    "releases_30d": 1,
-    "active_repos_7d": 3,
+    "releases_30d": 0,
+    "active_repos_7d": 2,
     "avg_release_gap_days": 0.0,
-    "stars_per_public_repo": 1.1791044776119404,
-    "ci_coverage_pct": 25.37313432835821,
+    "stars_per_public_repo": 1.1818181818181819,
+    "ci_coverage_pct": 24.242424242424242,
     "last_year_contributions": 8112
   },
   "scorecard_cards": [
@@ -201,16 +201,16 @@
       "key": "releases_30d",
       "label": "Release Velocity (30d)",
       "detail": "published releases across public repos",
-      "value": 1,
-      "display_value": "1",
+      "value": 0,
+      "display_value": "0",
       "accent": "#ff9e64"
     },
     {
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 3,
-      "display_value": "3",
+      "value": 2,
+      "display_value": "2",
       "accent": "#7dcfff"
     },
     {
@@ -225,7 +225,7 @@
       "key": "stars_per_public_repo",
       "label": "Stars / Public Repo",
       "detail": "signal density",
-      "value": 1.1791044776119404,
+      "value": 1.1818181818181819,
       "display_value": "1.18",
       "accent": "#7aa2f7"
     },
@@ -233,8 +233,8 @@
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with workflows",
-      "value": 25.37313432835821,
-      "display_value": "25.4%",
+      "value": 24.242424242424242,
+      "display_value": "24.2%",
       "accent": "#ff9e64"
     },
     {
@@ -249,10 +249,10 @@
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 67,
+    "public_owned_repos_total": 66,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 67,
-    "private_owned_repos_total": 142
+    "public_owned_nonfork_repos_total": 66,
+    "private_owned_repos_total": 143
   },
   "featured_repo_facts": [
     {
@@ -280,7 +280,7 @@
       "ci": "yes",
       "pushed_at": "2026-05-25",
       "pushed_at_raw": "2026-05-25T07:05:21Z",
-      "pushed_ago": "16 hours ago",
+      "pushed_ago": "21 hours ago",
       "created_at": "2025-11-06",
       "last_commit_msg": "chore: update lockfile for v1.1.1",
       "featured": true
@@ -304,63 +304,63 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 12328751,
-      "percent": 49.82
+      "bytes": 12125456,
+      "percent": 49.63
     },
     {
       "name": "Makefile",
-      "bytes": 3933147,
-      "percent": 15.89
+      "bytes": 3931581,
+      "percent": 16.09
     },
     {
       "name": "Rust",
       "bytes": 3003018,
-      "percent": 12.13
+      "percent": 12.29
     },
     {
       "name": "C++",
       "bytes": 1824966,
-      "percent": 7.37
+      "percent": 7.47
     },
     {
       "name": "Java",
       "bytes": 1583192,
-      "percent": 6.4
+      "percent": 6.48
     },
     {
       "name": "TypeScript",
       "bytes": 411851,
-      "percent": 1.66
+      "percent": 1.69
     },
     {
       "name": "Shell",
-      "bytes": 284465,
-      "percent": 1.15
-    },
-    {
-      "name": "JavaScript",
-      "bytes": 281640,
-      "percent": 1.14
+      "bytes": 283578,
+      "percent": 1.16
     },
     {
       "name": "C",
       "bytes": 268582,
-      "percent": 1.09
+      "percent": 1.1
     },
     {
       "name": "HTML",
-      "bytes": 251691,
-      "percent": 1.02
+      "bytes": 229530,
+      "percent": 0.94
+    },
+    {
+      "name": "JavaScript",
+      "bytes": 211396,
+      "percent": 0.87
     },
     {
       "name": "Jupyter Notebook",
       "bytes": 192686,
-      "percent": 0.78
+      "percent": 0.79
     },
     {
       "name": "CMake",
       "bytes": 141191,
-      "percent": 0.57
+      "percent": 0.58
     }
   ],
   "repo_language_matrix": [
@@ -389,7 +389,7 @@
       "ci": "yes",
       "pushed_at": "2026-05-25",
       "pushed_at_raw": "2026-05-25T07:05:21Z",
-      "pushed_ago": "16 hours ago",
+      "pushed_ago": "21 hours ago",
       "created_at": "2025-11-06",
       "last_commit_msg": "chore: update lockfile for v1.1.1",
       "featured": true
@@ -418,25 +418,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-05-25",
-      "pushed_at_raw": "2026-05-25T21:34:08Z",
-      "pushed_ago": "today",
+      "pushed_at_raw": "2026-05-25T23:32:33Z",
+      "pushed_ago": "5 hours ago",
       "created_at": "2026-02-20",
       "last_commit_msg": "update canonical profile artifacts",
-      "featured": false
-    },
-    {
-      "name": "semantic-tdd",
-      "full_name": "jguida941/semantic-tdd",
-      "url": "https://github.com/jguida941/semantic-tdd",
-      "language": "Python",
-      "stars": 1,
-      "forks": 0,
-      "ci": "yes",
-      "pushed_at": "2026-05-25",
-      "pushed_at_raw": "2026-05-25T03:10:41Z",
-      "pushed_ago": "20 hours ago",
-      "created_at": "2026-05-23",
-      "last_commit_msg": "Add security-depth proof hunting",
       "featured": false
     },
     {
@@ -633,35 +618,24 @@
       "created_at": "2026-01-22",
       "last_commit_msg": "Fix image alt text for accessibility",
       "featured": false
+    },
+    {
+      "name": "learn-caesar-cipher",
+      "full_name": "jguida941/learn-caesar-cipher",
+      "url": "https://github.com/jguida941/learn-caesar-cipher",
+      "language": "Python",
+      "stars": 1,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-01-26",
+      "pushed_at_raw": "2026-01-26T07:06:40Z",
+      "pushed_ago": "3 months ago",
+      "created_at": "2025-10-22",
+      "last_commit_msg": "Fix image alt text for accessibility and portfolio captions",
+      "featured": false
     }
   ],
   "recent_created": [
-    {
-      "name": "semantic-tdd",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": "TDD for AI-agent command output. Catch contradictions between what the output claims and what it shows.",
-      "html_url": "https://github.com/jguida941/semantic-tdd",
-      "pushed_at": "2026-05-25T03:10:41Z",
-      "created_at": "2026-05-23T06:39:12Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "language": "Python",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": true,
-      "language_bytes": {
-        "Python": 203295,
-        "JavaScript": 70244,
-        "HTML": 22161,
-        "CSS": 16049,
-        "Makefile": 1566,
-        "Shell": 887
-      },
-      "latest_commit_message": "Add security-depth proof hunting"
-    },
     {
       "name": "SNHU-CS-330",
       "fork": false,
@@ -739,7 +713,7 @@
       "visibility": "public",
       "description": "Profile README auto-updated",
       "html_url": "https://github.com/jguida941/jguida941",
-      "pushed_at": "2026-05-25T21:34:08Z",
+      "pushed_at": "2026-05-25T23:32:33Z",
       "created_at": "2026-02-20T03:08:54Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -860,13 +834,34 @@
         "Batchfile": 284
       },
       "latest_commit_message": "Fix image alt text for accessibility"
+    },
+    {
+      "name": "mkgui",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "Analyze Python code and generate PyQt6 GUI scaffolding. Extracts functions, type hints, and CLI decorators to create spec.json and launcher templates for building interactive forms.",
+      "html_url": "https://github.com/jguida941/mkgui",
+      "pushed_at": "2026-01-21T08:17:27Z",
+      "created_at": "2026-01-20T04:35:40Z",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "language": "Python",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "language_bytes": {
+        "Python": 334930
+      },
+      "latest_commit_message": "Add status and improve runtime path handling"
     }
   ],
   "focus": {
     "now": [
       {
         "title": "semantic-tdd",
-        "detail": "push \u00b7 20 hours ago \u00b7 \u26051 \u00b7 Python",
+        "detail": "create \u00b7 today",
         "url": "https://github.com/jguida941/semantic-tdd"
       },
       {
@@ -908,13 +903,13 @@
   "activity_feed": [
     {
       "kind": "activity",
-      "title": "push",
+      "title": "create",
       "url": "https://github.com/jguida941/semantic-tdd",
       "repo": "jguida941/semantic-tdd",
       "repo_url": "https://github.com/jguida941/semantic-tdd",
-      "state": "PUSH",
-      "time_ago": "20 hours ago",
-      "created_at": "2026-05-25T03:10:41Z"
+      "state": "CREATE",
+      "time_ago": "today",
+      "created_at": "2026-05-26T04:07:41Z"
     },
     {
       "kind": "activity",
@@ -948,16 +943,6 @@
     },
     {
       "kind": "created",
-      "title": "semantic-tdd",
-      "url": "https://github.com/jguida941/semantic-tdd",
-      "repo": "jguida941/semantic-tdd",
-      "repo_url": "https://github.com/jguida941/semantic-tdd",
-      "state": "CREATED",
-      "time_ago": "2 days ago",
-      "created_at": "2026-05-23T06:39:12Z"
-    },
-    {
-      "kind": "created",
       "title": "SNHU-CS-330",
       "url": "https://github.com/jguida941/SNHU-CS-330",
       "repo": "jguida941/SNHU-CS-330",
@@ -975,6 +960,16 @@
       "state": "CREATED",
       "time_ago": "2 months ago",
       "created_at": "2026-03-01T22:26:47Z"
+    },
+    {
+      "kind": "created",
+      "title": "opengl-cyberpunk",
+      "url": "https://github.com/jguida941/opengl-cyberpunk",
+      "repo": "jguida941/opengl-cyberpunk",
+      "repo_url": "https://github.com/jguida941/opengl-cyberpunk",
+      "state": "CREATED",
+      "time_ago": "3 months ago",
+      "created_at": "2026-02-23T18:16:38Z"
     }
   ],
   "recent_releases": [
