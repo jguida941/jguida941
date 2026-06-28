@@ -70,5 +70,46 @@ class FontLegibilityContract(unittest.TestCase):
         )
 
 
+class HierarchyContract(unittest.TestCase):
+    """DESIGN_SPEC 3.2/3.3: one dominant KPI per metric surface, strictly larger
+    than every secondary value (Power BI 'size = emphasis')."""
+
+    def _render_hero(self, out: str) -> str:
+        from scripts.rendering.generate_metrics_general import generate
+
+        snapshot = {
+            "last_year_contributions": 8104,
+            "public_scope_commits": 4264,
+            "total_repos": 67,
+            "private_owned_repos": 146,
+            "total_stars": 78,
+            "languages_count": 24,
+            "prs_merged": 35,
+            "releases": 0,
+            "ci_repos": 16,
+            "streak_days": 2,
+        }
+        generate(
+            username="jguida941",
+            snapshot=snapshot,
+            generated_at="2026-06-28T00:00:00Z",
+            output_path=out,
+        )
+        return Path(out).read_text(encoding="utf-8")
+
+    def test_hero_has_one_dominant_kpi(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render_hero(str(Path(d) / "hero.svg"))
+        sizes = [float(m) for m in re.findall(r'font-size="([0-9.]+)"', svg)]
+        self.assertTrue(sizes, "hero emitted no text")
+        top = max(sizes)
+        self.assertGreaterEqual(top, 40, "hero must promote one KPI to display size")
+        self.assertEqual(sizes.count(top), 1, "exactly one dominant KPI value")
+        second = max(s for s in sizes if s < top)
+        self.assertLess(second, top, "KPI must be strictly larger than every secondary value")
+
+
 if __name__ == "__main__":
     unittest.main()

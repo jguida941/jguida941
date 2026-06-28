@@ -80,6 +80,24 @@ LANG_COLORS = {
 # SVG dimensions
 SVG_WIDTH = 840
 
+# --- Type scale (DESIGN_SPEC Part 0): the ONLY allowed text sizes. Hierarchy is
+#     expressed via this scale + weight, never via ad-hoc sizes. (size, weight) ---
+TYPE_SCALE = {
+    "display": (46, 700),    # the one PrimaryKpiCard value
+    "metric_lg": (26, 700),  # secondary metric values
+    "metric": (22, 700),     # compact metric values
+    "title": (20, 700),      # section / hero titles
+    "body": (14, 400),       # primary labels, row primary text
+    "caption": (12, 400),    # secondary labels, timestamps
+    "eyebrow": (11, 600),    # overlines (UPPERCASE, tracked)
+    "chip": (11, 500),       # chip text
+}
+# Legibility floor for README SVGs downscaled into the column.
+MIN_FONT_PX = 10
+
+# Spacing scale (4px base) — gaps/pads resolve from here, not one-off literals.
+SPACE = {"xs": 4, "sm": 8, "md": 12, "lg": 16, "xl": 24, "xxl": 32}
+
 # Fonts
 FONT_MONO = "'Courier New', Courier, monospace"
 FONT_SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"

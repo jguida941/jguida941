@@ -1,29 +1,19 @@
-"""Build `metrics.general.svg` from the profile snapshot model.
+"""Build `metrics.general.svg` — the hero banner for the profile README.
 
-This is the hero banner for the profile README: a frosted-glass card whose
-single title is the GitHub username, with an eyebrow caption, a generated/scope
-line, two status chips, and a balanced grid of glass stat tiles.
-
-Three of those tiles intentionally render the metric as a *single* text node with
-the number and word adjacent ("67 Repositories", "78 Stargazers", "0 Releases")
-so the metrics validator (scripts/metrics_svg.py) can read them back.
+Power BI information architecture (DESIGN_SPEC): one dominant KPI top-left
+(12-month contributions at `display` size), a supporting grid of secondary
+engineering metrics, and a scope/provenance footer. The footer carries the three
+totals as a single text node ("67 Repositories", "78 Stargazers", "0 Releases")
+so the metrics validator (scripts/quality/metrics_svg.py) reads them back.
 """
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from scripts.core.config import BLUE, CYAN, FONT_SANS, TEXT, TEXT_BRIGHT, TEXT_DIM
-from scripts.rendering.card_theme import title_left
-from scripts.rendering.glass_kit import (
-    accent_ribbon,
-    chip,
-    chip_width,
-    eyebrow_text,
-    glass_panel,
-    glass_tile,
-    icon,
-)
+from scripts.core.config import SVG_WIDTH, SPACE, TEXT_DIM
+from scripts.rendering.components import metric_tile, primary_kpi, section_header, text
+from scripts.rendering.glass_kit import glass_panel
 from scripts.rendering.svg_utils import fmt_int, truncate, xml_escape
 
 
@@ -46,38 +36,6 @@ def _int(value: object) -> int:
         return 0
 
 
-def _stat_tile(
-    x: float,
-    y: float,
-    w: float,
-    h: float,
-    *,
-    icon_name: str,
-    value: str,
-    caption: str,
-    accent: str,
-    value_size: int,
-) -> str:
-    """One frosted stat cell: accent icon, big bold value, dim caption."""
-    pad_x = 16
-    return "".join(
-        [
-            glass_tile(x, y, w, h),
-            icon(icon_name, x + pad_x, y + 15, size=16, color=accent),
-            (
-                f'<text x="{x + pad_x:g}" y="{y + 60:g}" fill="{TEXT_BRIGHT}" '
-                f'font-size="{value_size}" font-family="{FONT_SANS}" '
-                f'font-weight="700">{value}</text>'
-            ),
-            (
-                f'<text x="{x + pad_x:g}" y="{y + 80:g}" fill="{TEXT_DIM}" '
-                f'font-size="10.5" font-family="{FONT_SANS}" '
-                f'letter-spacing="0.2">{caption}</text>'
-            ),
-        ]
-    )
-
-
 def generate(
     *,
     username: str,
@@ -97,108 +55,75 @@ def generate(
     ci_repos = _int(snapshot.get("ci_repos"))
     streak_days = _int(snapshot.get("streak_days"))
 
-    # --- geometry ----------------------------------------------------------
-    width = 840
-    height = 384
-    pad = 30
-    right = width - pad
-
-    cols = 4
-    col_gap = 14
-    tile_w = (width - pad * 2 - col_gap * (cols - 1)) / cols
-    tile_h = 92
-    row_gap = 14
-    row1_y = 162
-    row2_y = row1_y + tile_h + row_gap  # 268 -> bottom 360, panel inner bottom 372
-
-    def col_x(i: int) -> float:
-        return pad + i * (tile_w + col_gap)
-
-    # --- header copy -------------------------------------------------------
+    width = SVG_WIDTH
+    height = 326
+    pad = 28
     name = xml_escape(truncate(str(username), 28))
     generated = xml_escape(_fmt_iso_date(generated_at))
-    if isinstance(data_scope, dict) and data_scope.get("repos_included"):
-        scope = xml_escape(
-            f"Scope: {data_scope['repos_included']} repositories "
-            f"· contributions over the last 12 months"
+
+    parts: list[str] = [glass_panel(width, height)]
+
+    # --- header: eyebrow + single title + "Updated <date>" + hairline ----------
+    header_svg, content_top = section_header(
+        pad,
+        46,
+        name,
+        width=width,
+        eyebrow="Developer Analytics · Backend",
+        right_text=f"Updated {generated}",
+        pad=pad,
+    )
+    parts.append(header_svg)
+
+    # --- PrimaryKpiCard (the one dominant metric, top-left) ---------------------
+    kpi_y = content_top + 58
+    parts.append(
+        primary_kpi(
+            pad,
+            kpi_y,
+            value=fmt_int(contributions),
+            label="contributions",
+            sublabel="last 12 months",
         )
-    else:
-        scope = "Scope: public, owned, non-fork repositories · last 12 months"
-
-    parts: list[str] = []
-    # 1) frosted card background (emits its own defs)
-    parts.append(glass_panel(width, height))
-
-    # 2) header: eyebrow + username title (the single bold title node) + meta
-    parts.append(eyebrow_text("GITHUB PROFILE · BACKEND ENGINEERING", x=pad, y=48))
-    parts.append(title_left(name, x=pad, y=88, size=33))
-    parts.append(
-        f'<text x="{pad}" y="111" fill="{TEXT}" font-size="11.5" '
-        f'font-family="{FONT_SANS}">Generated {generated}</text>'
     )
+    # vertical hairline separating the KPI from the supporting grid
+    kpi_w = 244
     parts.append(
-        f'<text x="{pad}" y="129" fill="{TEXT_DIM}" font-size="10.5" '
-        f'font-family="{FONT_SANS}">{scope}</text>'
+        f'<rect x="{pad + kpi_w:g}" y="{content_top + 6:g}" width="1" '
+        f'height="150" fill="{TEXT_DIM}" fill-opacity="0.16"/>'
     )
 
-    # 3) status chips, stacked + right-aligned with the header
-    streak_text = f"{fmt_int(streak_days)}-day streak"
-    ci_text = f"{fmt_int(ci_repos)} CI pipelines"
-    cw_streak = chip_width(streak_text, size=11, icon=True)
-    cw_ci = chip_width(ci_text, size=11, icon=True)
-    parts.append(
-        chip(right - cw_streak, 50, streak_text, color=CYAN, icon_name="fire", height=24)
-    )
-    parts.append(
-        chip(right - cw_ci, 82, ci_text, color=BLUE, icon_name="ci_check", height=24)
-    )
-
-    # 4) one calm gradient divider between header and stat grid
-    parts.append(accent_ribbon(width, pad=pad, y=147, h=2))
-
-    # 5a) primary row: the big headline numbers
-    primary = [
-        ("fire", fmt_int(contributions), "contributions · 12 mo"),
-        ("commit", fmt_int(commits), "public-scope commits"),
-        ("lock", fmt_int(private_owned), "private repositories"),
-        ("pr_merged", fmt_int(prs_merged), "pull requests merged"),
-    ]
-    for i, (icon_name, value, caption) in enumerate(primary):
-        parts.append(
-            _stat_tile(
-                col_x(i),
-                row1_y,
-                tile_w,
-                tile_h,
-                icon_name=icon_name,
-                value=value,
-                caption=caption,
-                accent=BLUE,
-                value_size=26,
-            )
-        )
-
-    # 5b) secondary row: "<N> Word" metrics (validator reads these three back)
+    # --- supporting grid: 6 secondary engineering metrics (3 x 2) --------------
+    grid_x = pad + kpi_w + SPACE["xl"]
+    cols, gap = 3, SPACE["md"]
+    col_w = (width - pad - grid_x - gap * (cols - 1)) / cols
+    tile_h, row_gap = 66, SPACE["md"]
     secondary = [
-        ("code", f"{fmt_int(total_repos)} Repositories", "public · non-fork"),
-        ("star", f"{fmt_int(total_stars)} Stargazers", "received across repos"),
-        ("release_tag", f"{fmt_int(releases)} Releases", "tagged + published"),
-        ("globe", f"{fmt_int(languages_count)} Languages", "used in public code"),
+        ("commit", fmt_int(commits), "commits"),
+        ("lock", fmt_int(private_owned), "private repos"),
+        ("pr_merged", fmt_int(prs_merged), "PRs merged"),
+        ("globe", fmt_int(languages_count), "languages"),
+        ("workflow", fmt_int(ci_repos), "CI pipelines"),
+        ("fire", fmt_int(streak_days), "day streak"),
     ]
-    for i, (icon_name, value, caption) in enumerate(secondary):
+    for i, (icon_name, value, label) in enumerate(secondary):
+        col, row = i % cols, i // cols
+        x = grid_x + col * (col_w + gap)
+        y = content_top + row * (tile_h + row_gap)
         parts.append(
-            _stat_tile(
-                col_x(i),
-                row2_y,
-                tile_w,
-                tile_h,
-                icon_name=icon_name,
-                value=value,
-                caption=caption,
-                accent=CYAN,
-                value_size=19,
-            )
+            metric_tile(x, y, col_w, tile_h, value=value, label=label, icon_name=icon_name)
         )
+
+    # --- scope / provenance footer (single text node; carries the 3 totals the
+    #     metrics validator reads back: "<n> Repositories/Stargazers/Releases") --
+    scope_bits = "public · owned · non-fork" if not (
+        isinstance(data_scope, dict) and data_scope.get("repos_included")
+    ) else xml_escape(str(data_scope["repos_included"]))
+    footer = (
+        f"{fmt_int(total_repos)} Repositories · {fmt_int(total_stars)} Stargazers · "
+        f"{fmt_int(releases)} Releases · {scope_bits} · last 12 months"
+    )
+    parts.append(text(footer, pad, height - 18, token="caption", color=TEXT_DIM))
 
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
