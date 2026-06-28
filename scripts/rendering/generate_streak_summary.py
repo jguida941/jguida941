@@ -4,18 +4,10 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 
-from scripts.core.config import (
-    FONT_SANS,
-    GRAD_ORANGE_PINK,
-    ORANGE,
-    SVG_WIDTH,
-    TEXT,
-    TEXT_BRIGHT,
-    TEXT_DIM,
-)
-from scripts.rendering.card_theme import title_left
-from scripts.rendering.glass_kit import accent_ribbon, eyebrow_text, glass_panel, glass_tile, icon
-from scripts.rendering.svg_utils import xml_escape, fmt_int
+from scripts.core.config import SPACE, SVG_WIDTH, TEXT_DIM
+from scripts.rendering.components import empty_state, metric_tile, primary_kpi, section_header
+from scripts.rendering.glass_kit import glass_panel
+from scripts.rendering.svg_utils import fmt_compact
 
 
 def _parse_day_date(value: str) -> date | None:
@@ -131,80 +123,81 @@ def generate(
     contrib_start = day_rows[0][0] if day_rows else None
     contrib_end = day_rows[-1][0] if day_rows else None
 
-    # --- Geometry (12px glass inset reserved for the drop shadow) ----------- #
     width = SVG_WIDTH
-    pad = 24
-    gap = 16
-    inner_w = width - pad * 2
-    tile_w = (inner_w - gap * 2) / 3
+    pad = 28
 
-    tiles_top = 94
-    tile_h = 150
-    height = tiles_top + tile_h + 20  # +20 -> 12px shadow margin + breathing room
+    header_svg, content_top = section_header(
+        pad,
+        46,
+        "Streak Summary",
+        width=width,
+        eyebrow="Contribution Calendar",
+        right_text="Last 12 months",
+        pad=pad,
+    )
 
-    # Shared baselines (the test asserts each row shares one y across columns).
-    icon_y = tiles_top + 26
-    value_y = tiles_top + 82
-    label_y = tiles_top + 110
-    date_y = tiles_top + 134
+    # Honest empty state: no contribution days -> one explanatory line, no zeros.
+    if not day_rows:
+        empty_header, _ = section_header(
+            pad, 46, "Streak Summary", width=width, eyebrow="Contribution Calendar", pad=pad
+        )
+        height = int(content_top + 92)
+        parts = [glass_panel(width, height), empty_header]
+        parts.append(
+            empty_state(
+                width / 2,
+                content_top + 48,
+                "No recent contribution activity recorded",
+                icon_name="calendar",
+            )
+        )
+        svg = (
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+            f'viewBox="0 0 {width} {height}">{"".join(parts)}</svg>'
+        )
+        with open(output_path, "w", encoding="utf-8") as handle:
+            handle.write(svg)
+        return output_path
 
-    columns = [
-        (
-            "calendar",
-            TEXT_DIM,
-            fmt_int(total_contributions),
-            "Total Contributions",
-            _fmt_range(contrib_start, contrib_end),
-            False,
-        ),
-        (
-            "fire",
-            ORANGE,
-            fmt_int(current_days),
-            "Current Streak",
-            _fmt_range(current_start, current_end),
-            True,
-        ),
-        (
-            "trend_up",
-            TEXT_DIM,
-            fmt_int(longest_days),
-            "Longest Streak",
-            _fmt_range(longest_start, longest_end),
-            False,
-        ),
+    height = int(content_top + 130)
+    parts = [glass_panel(width, height), header_svg]
+
+    # PrimaryKpiCard: Current Streak is the one dominant metric, top-left.
+    kpi_y = content_top + 58
+    parts.append(
+        primary_kpi(
+            pad,
+            kpi_y,
+            value=fmt_compact(current_days),
+            label="current streak",
+            sublabel=_fmt_range(current_start, current_end),
+        )
+    )
+    kpi_w = 244
+    parts.append(
+        f'<rect x="{pad + kpi_w:g}" y="{content_top + 6:g}" width="1" '
+        f'height="90" fill="{TEXT_DIM}" fill-opacity="0.16"/>'
+    )
+
+    # Two secondary tiles (neutral icons + date-range caption).
+    grid_x = pad + kpi_w + SPACE["xl"]
+    gap = SPACE["md"]
+    col_w = (width - pad - grid_x - gap) / 2
+    tile_h = 88
+    tile_y = content_top + 24
+    secondary = [
+        ("calendar", fmt_compact(total_contributions), "total contributions",
+         _fmt_range(contrib_start, contrib_end)),
+        ("trend_up", fmt_compact(longest_days), "longest streak",
+         _fmt_range(longest_start, longest_end)),
     ]
-
-    parts: list[str] = [
-        glass_panel(width, height),
-        eyebrow_text("Contribution Calendar", x=pad, y=40),
-        title_left("Streak Summary", x=pad, y=66, size=20),
-        f'<text x="{width - pad}" y="40" fill="{TEXT_DIM}" font-size="10" '
-        f'font-family="{FONT_SANS}" font-weight="600" letter-spacing="1.2" '
-        f'text-anchor="end">LAST 12 MONTHS</text>',
-        accent_ribbon(width, pad=pad, y=78, grad=GRAD_ORANGE_PINK),
-    ]
-
-    for col, (ico, ico_color, number, label, drange, hero) in enumerate(columns):
-        tx = pad + col * (tile_w + gap)
-        cx = tx + tile_w / 2
-        parts.append(glass_tile(tx, tiles_top, tile_w, tile_h))
-        # category icon, centered above the number
-        isize = 22
-        parts.append(icon(ico, cx - isize / 2, icon_y, size=isize, color=ico_color))
-        num_color = ORANGE if hero else TEXT_BRIGHT
-        parts.extend(
-            [
-                f'<text x="{cx:.1f}" y="{value_y}" fill="{num_color}" font-size="42" '
-                f'font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">'
-                f'{xml_escape(number)}</text>',
-                f'<text x="{cx:.1f}" y="{label_y}" fill="{TEXT}" font-size="14" '
-                f'font-family="{FONT_SANS}" text-anchor="middle" font-weight="600" '
-                f'letter-spacing="0.2">{label}</text>',
-                f'<text x="{cx:.1f}" y="{date_y}" fill="{TEXT_DIM}" font-size="12" '
-                f'font-family="{FONT_SANS}" text-anchor="middle">'
-                f'{xml_escape(drange)}</text>',
-            ]
+    for i, (icon_name, value, label, caption) in enumerate(secondary):
+        x = grid_x + i * (col_w + gap)
+        parts.append(
+            metric_tile(
+                x, tile_y, col_w, tile_h,
+                value=value, label=label, icon_name=icon_name, caption=caption,
+            )
         )
 
     svg = (

@@ -207,5 +207,84 @@ class ByTheNumbersContract(unittest.TestCase):
         )
 
 
+class StreakSummaryContract(unittest.TestCase):
+    """DESIGN_SPEC 3.2/3.3/Part 1.2/Part 4: Streak Summary promotes Current Streak
+    to one dominant display KPI, left-aligned (not a centered triptych), demotes
+    Total/Longest to secondary tiles, and drops the orange gradient ribbon + the
+    decorative orange hero number for neutral ink (emphasis via size, not hue)."""
+
+    SCALE = {46.0, 26.0, 22.0, 20.0, 14.0, 12.0, 11.0}
+
+    def _calendar(self, days_back: int = 14, count: int = 3):
+        from datetime import datetime, timezone, timedelta
+
+        today = datetime.now(timezone.utc).date()
+        days = [
+            {"date": str(today - timedelta(days=i)), "contributionCount": count}
+            for i in range(days_back)
+        ]
+        return {"weeks": [{"contributionDays": days}]}
+
+    def _render(self, out: str, *, calendar=None, current=12, total=1843) -> str:
+        from scripts.rendering.generate_streak_summary import generate
+
+        generate(
+            calendar=self._calendar() if calendar is None else calendar,
+            current_streak_days=current,
+            total_contributions=total,
+            output_path=out,
+        )
+        return Path(out).read_text(encoding="utf-8")
+
+    def _sizes(self, svg: str):
+        return [float(m) for m in _FONT.findall(svg)]
+
+    def test_one_dominant_kpi(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "streak.svg"))
+        sizes = self._sizes(svg)
+        top = max(sizes)
+        self.assertGreaterEqual(top, 40, "current streak must be the display KPI")
+        self.assertEqual(sizes.count(top), 1, "exactly one dominant KPI value")
+        self.assertLessEqual(max(s for s in sizes if s < top), 26, "secondaries below the KPI")
+
+    def test_sizes_on_scale_and_legible(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "streak.svg"))
+        for s in self._sizes(svg):
+            self.assertIn(s, self.SCALE, f"off-scale font-size {s}")
+            self.assertGreaterEqual(s, 11.0, f"sub-floor font-size {s}")
+
+    def test_kpi_left_aligned(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "streak.svg"))
+        # the display-size KPI node must not be centered (top-left reading path)
+        kpi = re.search(r'<text[^>]*font-size="46"[^>]*>', svg)
+        self.assertIsNotNone(kpi, "no display KPI node")
+        self.assertNotIn('text-anchor="middle"', kpi.group(0), "KPI must be left-aligned")
+
+    def test_no_orange_accent(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "streak.svg"))
+        self.assertNotIn("#ff9e64", svg, "orange gradient ribbon / hero hue must be gone")
+
+    def test_empty_state_when_no_calendar(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "streak.svg"), calendar={"weeks": []}, current=0, total=None)
+        texts = _TEXT_NODE.findall(svg)
+        self.assertLessEqual(len(texts), 3, "empty card = header + one explanatory line")
+        self.assertIsNone(re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers")
+
+
 if __name__ == "__main__":
     unittest.main()

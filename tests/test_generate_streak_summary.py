@@ -25,7 +25,10 @@ def _build_calendar(day_rows: list[tuple[str, int]]) -> dict:
 
 
 class StreakSummarySvgTests(unittest.TestCase):
-    def test_current_streak_column_uses_plain_text_and_shared_baselines(self):
+    def test_current_streak_is_dominant_kpi_with_demoted_tiles(self):
+        """Power BI hierarchy (DESIGN_SPEC 3.2/3.3): Current Streak is promoted to
+        the single display KPI; Total Contributions and Longest Streak demote to
+        secondary tiles (no longer a centered, equal-baseline triptych)."""
         calendar = _build_calendar(
             [
                 ("2000-01-01", 0),
@@ -46,19 +49,25 @@ class StreakSummarySvgTests(unittest.TestCase):
 
             root = ET.fromstring(output_path.read_text(encoding="utf-8"))
 
-        text_y = {
-            "".join(node.itertext()).strip(): int(node.attrib["y"])
-            for node in root.findall(f".//{SVG_NS}text")
-        }
-        circles = root.findall(f".//{SVG_NS}circle")
+        text_nodes = root.findall(f".//{SVG_NS}text")
+        by_text = {"".join(node.itertext()).strip(): node for node in text_nodes}
+        sizes = [float(node.attrib.get("font-size", "0")) for node in text_nodes]
 
-        self.assertEqual(circles, [])
-        self.assertEqual(text_y["321"], text_y["25"])
-        self.assertEqual(text_y["25"], text_y["29"])
-        self.assertEqual(text_y["Total Contributions"], text_y["Current Streak"])
-        self.assertEqual(text_y["Current Streak"], text_y["Longest Streak"])
-        self.assertEqual(text_y["Jan 1 - Feb 25"], text_y["Feb 1 - Feb 25"])
-        self.assertEqual(text_y["Feb 1 - Feb 25"], text_y["Jan 2 - Jan 30"])
+        # Current Streak (25) is the one display-size KPI, unique and left-aligned.
+        self.assertEqual(sizes.count(46.0), 1, "exactly one display KPI")
+        kpi = by_text["25"]
+        self.assertEqual(float(kpi.attrib["font-size"]), 46.0)
+        self.assertNotIn("middle", kpi.attrib.get("text-anchor", ""))
+
+        # Secondary metrics demote to tiles, strictly smaller than the KPI.
+        for value in ("321", "29"):
+            self.assertLess(float(by_text[value].attrib["font-size"]), 46.0)
+
+        # The three are no longer a centered triptych sharing one baseline.
+        self.assertNotEqual(int(by_text["321"].attrib["y"]), int(kpi.attrib["y"]))
+        self.assertIn("current streak", by_text)
+        self.assertIn("total contributions", by_text)
+        self.assertIn("longest streak", by_text)
 
 
 if __name__ == "__main__":
