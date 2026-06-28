@@ -40,3 +40,23 @@ def fmt_int(value: int | None) -> str:
     if value is None:
         return "n/a"
     return f"{int(value):,}"
+
+
+def fmt_compact(value: int | None) -> str:
+    """Format an integer to <=4 numerals, k/M-scaled (DESIGN_SPEC Part 1.8).
+
+    Keeps <10,000 as comma-grouped digits ('8,104'); scales 10k+ to 'k' and 1M+
+    to 'M' so no rendered value exceeds four numerals ('12k', '123k', '1.2M').
+    """
+    if value is None:
+        return "n/a"
+    try:
+        n = int(value)
+    except (TypeError, ValueError):
+        return "n/a"
+    a = abs(n)
+    if a < 10_000:
+        return f"{n:,}"
+    if a < 1_000_000:
+        return f"{n / 1000:.0f}k"
+    return f"{n / 1_000_000:.1f}M"

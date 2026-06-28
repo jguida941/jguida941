@@ -111,5 +111,101 @@ class HierarchyContract(unittest.TestCase):
         self.assertLess(second, top, "KPI must be strictly larger than every secondary value")
 
 
+_TEXT_NODE = re.compile(r"<text[^>]*>(.*?)</text>", re.S)
+
+
+def _text_contents(svg: str) -> str:
+    return " ".join(_TEXT_NODE.findall(svg))
+
+
+class ByTheNumbersContract(unittest.TestCase):
+    """DESIGN_SPEC 3.2/3.3/3.15/Part 1.8: the "By The Numbers" card promotes one
+    dominant KPI (12-month contributions) at display size, demotes the rest to
+    secondary metric tiles on the type scale, drops the decorative gradient
+    ribbon, scales numbers to <=4 numerals, and renders an honest empty state."""
+
+    SCALE = {46.0, 26.0, 22.0, 20.0, 14.0, 12.0, 11.0}
+
+    def _render(self, out: str, **overrides) -> str:
+        from scripts.rendering.generate_badges import generate
+
+        params = dict(
+            public_nonfork_repos=42,
+            public_forks=8,
+            private_owned_repos=146,
+            ci_count=16,
+            last_year_contributions=8104,
+        )
+        params.update(overrides)
+        generate(output_path=out, **params)
+        return Path(out).read_text(encoding="utf-8")
+
+    def _sizes(self, svg: str):
+        return [float(m) for m in _FONT.findall(svg)]
+
+    def test_one_dominant_kpi(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "badges.svg"))
+        sizes = self._sizes(svg)
+        self.assertTrue(sizes, "card emitted no text")
+        top = max(sizes)
+        self.assertGreaterEqual(top, 40, "needs one display-size KPI (contributions)")
+        self.assertEqual(sizes.count(top), 1, "exactly one dominant KPI value")
+        second = max(s for s in sizes if s < top)
+        self.assertLessEqual(second, 26, "secondary values must be metric-scale, below the KPI")
+
+    def test_sizes_on_scale_and_legible(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "badges.svg"))
+        for s in self._sizes(svg):
+            self.assertIn(s, self.SCALE, f"off-scale font-size {s}")
+            self.assertGreaterEqual(s, 11.0, f"sub-floor font-size {s}")
+
+    def test_no_gradient_ribbon(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "badges.svg"))
+        self.assertNotIn("url(#bn-accent)", svg, "decorative gradient ribbon must be gone")
+
+    def test_numbers_scaled_to_four_numerals(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(
+                str(Path(d) / "badges.svg"),
+                last_year_contributions=123456,
+                ci_count=98765,
+            )
+        self.assertIsNone(
+            re.search(r"\d{5,}", _text_contents(svg)),
+            "values must be k/M scaled to <=4 numerals",
+        )
+
+    def test_empty_state_when_no_data(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(
+                str(Path(d) / "badges.svg"),
+                public_nonfork_repos=None,
+                public_forks=None,
+                private_owned_repos=None,
+                ci_count=None,
+                last_year_contributions=None,
+            )
+        texts = _TEXT_NODE.findall(svg)
+        self.assertLessEqual(
+            len(texts), 3, "empty card should be header + one explanatory line, not metric tiles"
+        )
+        self.assertIsNone(
+            re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers"
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

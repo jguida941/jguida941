@@ -105,20 +105,29 @@ def metric_tile(
     value: str,
     label: str,
     icon_name: str | None = None,
+    caption: str | None = None,
     value_token: str = "metric",
 ) -> str:
-    """A secondary metric cell: neutral icon + value + caption label. DESIGN_SPEC 3.3/3.4.
+    """A secondary metric cell: neutral icon + value + label (+ optional caption).
 
-    Value uses a smaller scale token than `primary_kpi` so the KPI always dominates.
-    Icon is neutral (tertiary ink) — color is reserved for status, not decoration.
+    DESIGN_SPEC 3.3/3.4. Value uses a smaller scale token than `primary_kpi` so the
+    KPI always dominates; icon is neutral (tertiary ink) — color is reserved for
+    status, not decoration. The optional third-line `caption` (e.g. a date range)
+    rides at the caption token without scattering raw <text> at call sites.
     """
     pad = SPACE["lg"]
-    vy = y + h - 24
     parts = [glass_tile(x, y, w, h)]
     if icon_name:
         parts.append(_icon(icon_name, x + pad, y + 13, size=15, color=TEXT_DIM))
-    parts.append(text(value, x + pad, vy, token=value_token, color=TEXT_BRIGHT))
-    parts.append(text(label, x + pad, vy + 15, token="caption", color=TEXT_DIM))
+    if caption:
+        vy = y + h - 40
+        parts.append(text(value, x + pad, vy, token=value_token, color=TEXT_BRIGHT))
+        parts.append(text(label, x + pad, vy + 16, token="caption", color=TEXT_DIM))
+        parts.append(text(caption, x + pad, vy + 31, token="caption", color=TEXT_DIM))
+    else:
+        vy = y + h - 24
+        parts.append(text(value, x + pad, vy, token=value_token, color=TEXT_BRIGHT))
+        parts.append(text(label, x + pad, vy + 15, token="caption", color=TEXT_DIM))
     return "".join(parts)
 
 

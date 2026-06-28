@@ -1,41 +1,22 @@
-"""Build the "By The Numbers" stat row as a frosted-glass SVG card."""
+"""Build the "By The Numbers" totals card.
+
+Power BI information architecture (DESIGN_SPEC 3.2/3.3): one dominant KPI
+(12-month contributions) at display size, top-left, with the remaining profile
+totals demoted to a row of secondary metric tiles with neutral monochrome icons.
+Numbers are k/M-scaled to <=4 numerals; an honest empty state renders when there
+is no data at all.
+"""
 
 from __future__ import annotations
 
-from scripts.core.config import (
-    BLUE,
-    CYAN,
-    FONT_SANS,
-    GRAD_BLUE_CYAN,
-    PURPLE,
-    SVG_WIDTH,
-    TEXT_BRIGHT,
-)
-from scripts.rendering.card_theme import title_left
-from scripts.rendering.glass_kit import eyebrow_text, glass_panel, glass_tile, icon
-from scripts.rendering.svg_utils import fmt_int
-
-# Card geometry (one row of stat tiles + a margin for the glass drop shadow).
-_W = SVG_WIDTH
-_H = 132
-_PAD = 28          # content inset inside the 12px glass band
-_TILE_Y = 58
-_TILE_H = 58
-_GAP = 14
-_N = 5
+from scripts.core.config import SVG_WIDTH, SPACE, TEXT_DIM
+from scripts.rendering.components import empty_state, metric_tile, primary_kpi, section_header
+from scripts.rendering.glass_kit import glass_panel
+from scripts.rendering.svg_utils import fmt_compact
 
 
-def _stat_tile(x: float, y: float, w: float, h: float, name: str, value: str, label: str, accent: str) -> str:
-    """One frosted stat cell: accent icon + bold value on top, tiny label beneath."""
-    return "".join(
-        (
-            glass_tile(x, y, w, h),
-            icon(name, x + 16, y + 14, size=16, color=accent),
-            f'<text x="{x + 41:g}" y="{y + 33:g}" fill="{TEXT_BRIGHT}" '
-            f'font-size="22" font-family="{FONT_SANS}" font-weight="700">{value}</text>',
-            eyebrow_text(label, x=x + 16, y=y + 50, size=9),
-        )
-    )
+def _empty(value: object) -> bool:
+    return value is None or value == 0
 
 
 def generate(
@@ -46,43 +27,90 @@ def generate(
     last_year_contributions: int | None,
     output_path: str = "assets/badges.svg",
 ):
-    # value, label, icon, accent — contributions leads as the hero metric.
-    stats = [
-        (fmt_int(last_year_contributions), "CONTRIBUTIONS", "commit", CYAN),
-        (fmt_int(public_nonfork_repos), "PUBLIC REPOS", "code", BLUE),
-        (fmt_int(public_forks), "FORKS", "fork", BLUE),
-        (fmt_int(private_owned_repos), "PRIVATE", "lock", PURPLE),
-        (fmt_int(ci_count), "CI PIPELINES", "workflow", CYAN),
+    width = SVG_WIDTH
+    pad = 28
+
+    header_svg, content_top = section_header(
+        pad,
+        46,
+        "By The Numbers",
+        width=width,
+        eyebrow="GitHub · Profile Totals",
+        pad=pad,
+    )
+
+    secondary = [
+        ("code", fmt_compact(public_nonfork_repos), "public repos"),
+        ("fork", fmt_compact(public_forks), "forks"),
+        ("lock", fmt_compact(private_owned_repos), "private repos"),
+        ("workflow", fmt_compact(ci_count), "CI pipelines"),
     ]
 
-    avail = _W - _PAD * 2
-    tile_w = (avail - _GAP * (_N - 1)) / _N
+    # Honest empty state: nothing to show -> one explanatory line, no fabricated tiles.
+    if all(
+        _empty(v)
+        for v in (
+            last_year_contributions,
+            public_nonfork_repos,
+            public_forks,
+            private_owned_repos,
+            ci_count,
+        )
+    ):
+        height = int(content_top + 92)
+        parts = [glass_panel(width, height), header_svg]
+        parts.append(
+            empty_state(
+                width / 2,
+                content_top + 48,
+                "No profile metrics available yet",
+                icon_name="code",
+            )
+        )
+        svg = (
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+            f'viewBox="0 0 {width} {height}">{"".join(parts)}</svg>'
+        )
+        with open(output_path, "w") as f:
+            f.write(svg)
+        return output_path
 
-    tiles = []
-    for i, (value, label, name, accent) in enumerate(stats):
-        tx = _PAD + i * (tile_w + _GAP)
-        tiles.append(_stat_tile(tx, _TILE_Y, tile_w, _TILE_H, name, value, label, accent))
+    height = int(content_top + 124)
+    parts = [glass_panel(width, height), header_svg]
 
-    # One calm accent: a short blue->cyan underline beneath the title.
-    g0, g1 = GRAD_BLUE_CYAN
-    accent = (
-        '<linearGradient id="bn-accent" x1="0" y1="0" x2="1" y2="0">'
-        f'<stop offset="0" stop-color="{g0}" stop-opacity="0.95"/>'
-        f'<stop offset="1" stop-color="{g1}" stop-opacity="0.85"/>'
-        "</linearGradient>"
-        f'<rect x="{_PAD}" y="45" width="46" height="3" rx="1.5" fill="url(#bn-accent)"/>'
+    # PrimaryKpiCard: the one dominant metric, top-left.
+    kpi_y = content_top + 58
+    parts.append(
+        primary_kpi(
+            pad,
+            kpi_y,
+            value=fmt_compact(last_year_contributions),
+            label="contributions",
+            sublabel="last 12 months",
+        )
     )
+    kpi_w = 244
+    parts.append(
+        f'<rect x="{pad + kpi_w:g}" y="{content_top + 6:g}" width="1" '
+        f'height="84" fill="{TEXT_DIM}" fill-opacity="0.16"/>'
+    )
+
+    # Supporting row of four secondary metric tiles (neutral icons).
+    grid_x = pad + kpi_w + SPACE["xl"]
+    cols, gap = 4, SPACE["md"]
+    col_w = (width - pad - grid_x - gap * (cols - 1)) / cols
+    tile_h = 66
+    tile_y = content_top + 26
+    for i, (icon_name, value, label) in enumerate(secondary):
+        x = grid_x + i * (col_w + gap)
+        parts.append(
+            metric_tile(x, tile_y, col_w, tile_h, value=value, label=label, icon_name=icon_name)
+        )
 
     svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{_W}" height="{_H}" '
-        f'viewBox="0 0 {_W} {_H}">'
-        f"{glass_panel(_W, _H)}"
-        f"{title_left('By The Numbers', x=_PAD, y=37)}"
-        f"{accent}"
-        f"{''.join(tiles)}"
-        "</svg>"
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}">{"".join(parts)}</svg>'
     )
-
     with open(output_path, "w") as f:
         f.write(svg)
     return output_path
