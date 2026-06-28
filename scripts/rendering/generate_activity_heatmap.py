@@ -10,6 +10,7 @@ from scripts.core.config import (
     CYAN,
     FONT_SANS,
     GLASS_HAIRLINE_HEX,
+    HEATMAP_RAMP,
     SVG_WIDTH,
     TEXT,
     TEXT_BRIGHT,
@@ -45,15 +46,8 @@ TIME_BLOCKS = [
 
 DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
-# Refined cool ramp: faint frost (empty) -> deep blue -> bright cyan.
-# Each level is (hex, fill_opacity) so we never emit rgba() in fills.
-_RAMP = [
-    ("#c0caf5", 0.06),  # 0  empty cell (cool frost)
-    ("#35507a", 0.92),  # 1  low
-    ("#4574b8", 0.96),  # 2  med
-    ("#5ea6e8", 1.00),  # 3  high
-    ("#7dcfff", 1.00),  # 4  peak (CYAN)
-]
+# Cool intensity ramp (empty -> deep blue -> bright cyan); from the token source.
+_RAMP = HEATMAP_RAMP
 
 
 def _ramp_level(count: int, max_count: int) -> int:

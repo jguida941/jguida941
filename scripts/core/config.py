@@ -42,6 +42,22 @@ GRAD_CYAN_MINT = ("#7dcfff", "#9ece6a")
 GRAD_ORANGE_PINK = ("#ff9e64", "#f7768e")
 GRAD_PURPLE_BLUE = ("#bb9af7", "#7aa2f7")
 
+# --- Chart/status color tokens (single source; rendering code imports these,
+#     never hard-codes hex — enforced by tests/test_design_contract.py) ---
+SURFACE_BACKDROP = "#0c0e18"          # near-black card backdrop behind the frost
+LANG_DEFAULT = "#8b8b8b"              # fallback language dot color
+# Contribution-calendar intensity ramp (empty + levels 1..4)
+CONTRIB_EMPTY = "#c0caf5"
+CONTRIB_RAMP = ["#34528a", "#5b86d4", "#7dcfff", "#9ece6a"]
+# Activity heatmap intensity ramp: (hex, fill_opacity) for empty + levels 1..4
+HEATMAP_RAMP = [
+    ("#c0caf5", 0.06),
+    ("#35507a", 0.92),
+    ("#4574b8", 0.96),
+    ("#5ea6e8", 1.00),
+    ("#7dcfff", 1.00),
+]
+
 # Language colors (GitHub-style)
 LANG_COLORS = {
     "Python": "#3572A5",

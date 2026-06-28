@@ -6,9 +6,12 @@ from datetime import datetime, timezone
 
 from scripts.core.config import (
     BLUE,
+    CONTRIB_EMPTY,
+    CONTRIB_RAMP,
     CYAN,
     FONT_SANS,
     GLASS_INSET,
+    GLASS_SHEEN_HEX,
     GREEN,
     SVG_WIDTH,
     TEXT,
@@ -24,10 +27,10 @@ from scripts.rendering.glass_kit import (
 from scripts.rendering.card_theme import title_left
 from scripts.rendering.svg_utils import fmt_int
 
-# Refined 5-step intensity ramp: idle slot + cool blue -> cyan -> mint (low -> high).
-_EMPTY_HEX = "#c0caf5"
+# 5-step intensity ramp (idle slot + cool blue -> cyan -> mint); from the token source.
+_EMPTY_HEX = CONTRIB_EMPTY
 _EMPTY_OP = 0.06
-_RAMP = ["#34528a", "#5b86d4", "#7dcfff", "#9ece6a"]  # levels 1..4
+_RAMP = CONTRIB_RAMP  # levels 1..4
 
 
 def _month_label(date_str: str) -> str:
@@ -122,7 +125,7 @@ def _cell(x: float, y: float, size: float, level: int) -> str:
         f'<rect x="{x:g}" y="{y:g}" width="{size:g}" height="{size:g}" rx="{rx}" '
         f'fill="{color}"/>'
         f'<rect x="{x + 0.5:g}" y="{y + 0.5:g}" width="{size - 1:g}" height="{size - 1:g}" '
-        f'rx="{rx - 0.5:g}" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="0.75"/>'
+        f'rx="{rx - 0.5:g}" fill="none" stroke="{GLASS_SHEEN_HEX}" stroke-opacity="0.10" stroke-width="0.75"/>'
     )
 
 

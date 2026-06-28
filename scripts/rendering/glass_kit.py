@@ -30,6 +30,7 @@ from scripts.core.config import (
     GLASS_TILE_SHADE_HEX,
     GRAD_BLUE_CYAN,
     GRAD_PURPLE_BLUE,
+    SURFACE_BACKDROP,
     SURFACE_BASE,
     SURFACE_RAISED,
     TEXT,
@@ -43,7 +44,7 @@ from scripts.core.config import (
 _BLOB_HUES = (BLUE, PURPLE, CYAN)
 
 # Near-black backdrop so blurred color blobs read as glass refraction.
-_BACKDROP = "#0c0e18"
+_BACKDROP = SURFACE_BACKDROP
 
 
 def _f(value: float) -> str:
@@ -472,7 +473,7 @@ _ICONS: dict[str, tuple[str, str]] = {
     "rocket": (
         "mixed",
         '<path d="M12 2c2.6 2 4 5.2 4 8.4 0 1.6-.5 3.1-1.4 4.4h-5.2C8.5 13.5 8 12 8 10.4 8 7.2 9.4 4 12 2z" '
-        'fill="C"/><circle cx="12" cy="9" r="1.7" fill="#0c0e18"/>'
+        'fill="C"/><circle cx="12" cy="9" r="1.7" fill="B"/>'
         '<path d="M9.4 16.4l-1.4 3.6 3.2-1.6M14.6 16.4l1.4 3.6-3.2-1.6" '
         'fill="none" stroke="C" stroke-width="1.6" stroke-linejoin="round"/>',
     ),
@@ -531,7 +532,9 @@ def icon(name: str, x: float, y: float, *, size: float = 14, color: str = TEXT, 
     if not entry:
         return ""
     mode, body = entry
-    body = body.replace("C", color)
+    # "B" = backdrop placeholder (token), "C" = the icon color. Replace B first so a
+    # color hex can never collide with the backdrop marker.
+    body = body.replace("B", SURFACE_BACKDROP).replace("C", color)
     scale = size / 24.0
     op = f' opacity="{opacity}"' if opacity < 1.0 else ""
     if mode == "stroke":

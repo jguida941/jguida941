@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Mapping
 
-from scripts.core.config import LANG_COLORS
+from scripts.core.config import LANG_COLORS, LANG_DEFAULT
 
 
 def xml_escape(value: object, *, quote: bool = True) -> str:
@@ -27,7 +27,7 @@ def truncate(text: str, max_len: int, suffix: str = "...") -> str:
     return text[: max_len - len(suffix)] + suffix
 
 
-def lang_color(lang: str | None, palette: Mapping[str, str] | None = None, default: str = "#8b8b8b") -> str:
+def lang_color(lang: str | None, palette: Mapping[str, str] | None = None, default: str = LANG_DEFAULT) -> str:
     """Return the display color for a programming language."""
     if lang is None:
         return default
