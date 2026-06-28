@@ -1,6 +1,6 @@
 import unittest
 
-from scripts.diagnostics.diagnostics import doctor_checks
+from scripts.quality.diagnostics import doctor_checks
 
 
 class DiagnosticsTests(unittest.TestCase):

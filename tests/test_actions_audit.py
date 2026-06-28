@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import Mock, patch
 
-from scripts.diagnostics.actions_audit import WorkflowRun, fetch_runs, summarize_runs
+from scripts.github.actions_audit import WorkflowRun, fetch_runs, summarize_runs
 
 
 class ActionsAuditTests(unittest.TestCase):

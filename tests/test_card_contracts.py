@@ -8,8 +8,8 @@ import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from scripts.analytics.collect import CollectedProfileData
-from scripts.analytics.model import compute_profile_model
+from scripts.pipeline.collect_data import CollectedProfileData
+from scripts.pipeline.compute_metrics import compute_profile_model
 
 ROOT = Path(__file__).resolve().parent.parent
 NS = "{http://www.w3.org/2000/svg}"
@@ -31,47 +31,47 @@ COLLECTED, MODEL = _model()
 def _render(card, out):
     m, c = MODEL, COLLECTED
     if card == "metrics_general":
-        from scripts.render.cards.generate_metrics_general import generate
+        from scripts.rendering.generate_metrics_general import generate
         return generate(username=m["dashboard_data"]["username"], snapshot=m["snapshot"],
                         data_scope=m["data_scope"], generated_at=m["dashboard_data"]["generated_at"],
                         output_path=out)
     if card == "badges":
-        from scripts.render.cards.generate_badges import generate
+        from scripts.rendering.generate_badges import generate
         return generate(public_nonfork_repos=c.repo_counts["public_owned_nonfork"],
                         public_forks=c.repo_counts["public_owned_forks"],
                         private_owned_repos=c.repo_counts["private_owned"],
                         ci_count=m["snapshot"]["ci_repos"],
                         last_year_contributions=c.total_contributions, output_path=out)
     if card == "scorecard":
-        from scripts.render.cards.generate_builder_scorecard import generate
+        from scripts.rendering.generate_builder_scorecard import generate
         return generate(m["scorecard"], output_path=out, tiles=m["scorecard_cards"])
     if card == "engineering":
-        from scripts.render.cards.generate_engineering_cadence import generate
+        from scripts.rendering.generate_engineering_cadence import generate
         return generate(m["engineering"], output_path=out)
     if card == "focus":
-        from scripts.render.cards.generate_focus_board import generate
+        from scripts.rendering.generate_focus_board import generate
         return generate(m["focus"], output_path=out)
     if card == "currently_working":
-        from scripts.render.cards.generate_currently_working import generate
+        from scripts.rendering.generate_currently_working import generate
         return generate(m["recent_repos"], output_path=out)
     if card == "streak":
-        from scripts.render.cards.generate_streak_summary import generate
+        from scripts.rendering.generate_streak_summary import generate
         return generate(calendar=c.calendar, current_streak_days=m["snapshot"]["streak_days"],
                         total_contributions=c.total_contributions, output_path=out)
     if card == "snapshot":
-        from scripts.render.cards.generate_snapshot_panel import generate
+        from scripts.rendering.generate_snapshot_panel import generate
         return generate(m["snapshot_rows"], m["data_quality"], data_scope=m["data_scope"], output_path=out)
     if card == "lang":
-        from scripts.render.cards.generate_language_chart import generate
+        from scripts.rendering.generate_language_chart import generate
         return generate(c.language_bytes, output_path=out)
     if card == "heatmap":
-        from scripts.render.cards.generate_activity_heatmap import generate
+        from scripts.rendering.generate_activity_heatmap import generate
         return generate(c.events, output_path=out)
     if card == "contribution":
-        from scripts.render.cards.generate_contribution_panel import generate
+        from scripts.rendering.generate_contribution_panel import generate
         return generate(c.calendar, output_path=out)
     if card == "spotlight":
-        from scripts.render.cards.generate_repo_spotlight import generate
+        from scripts.rendering.generate_repo_spotlight import generate
         return generate(m["spotlight_data"], output_path=out)
     raise ValueError(card)
 

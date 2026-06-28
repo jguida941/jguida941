@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest import mock
 
-from scripts.settings import Settings
+from scripts.core.settings import Settings
 
 
 class SettingsTokensTests(unittest.TestCase):

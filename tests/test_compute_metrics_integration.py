@@ -3,8 +3,8 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-from scripts.analytics.collect import CollectedProfileData
-from scripts.analytics.model import compute_profile_model
+from scripts.pipeline.collect_data import CollectedProfileData
+from scripts.pipeline.compute_metrics import compute_profile_model
 
 
 class ComputeMetricsIntegrationTests(unittest.TestCase):
@@ -14,13 +14,13 @@ class ComputeMetricsIntegrationTests(unittest.TestCase):
         collected = CollectedProfileData(**payload)
 
         with patch(
-            "scripts.analytics.model.gh.get_repo_commits_last_n_weeks",
+            "scripts.pipeline.compute_metrics.gh.get_repo_commits_last_n_weeks",
             return_value=[1] * 12,
         ), patch(
-            "scripts.analytics.model.gh.get_releases_last_n_days",
+            "scripts.pipeline.compute_metrics.gh.get_releases_last_n_days",
             return_value=1,
         ), patch(
-            "scripts.analytics.model.gh.get_merged_prs_last_n_days",
+            "scripts.pipeline.compute_metrics.gh.get_merged_prs_last_n_days",
             return_value=9,
         ):
             model = compute_profile_model(collected, logger=lambda *_args, **_kwargs: None)

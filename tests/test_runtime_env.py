@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import patch
 
-from scripts.runtime_env import cache_mode_from_env, token_mode_from_env
+from scripts.core.runtime_env import cache_mode_from_env, token_mode_from_env
 
 
 class RuntimeEnvTests(unittest.TestCase):

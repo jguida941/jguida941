@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock, patch
 import subprocess
 
-from scripts.diagnostics.branch_protection import apply_required_checks, audit_required_checks
+from scripts.github.branch_protection import apply_required_checks, audit_required_checks
 
 
 class BranchProtectionTests(unittest.TestCase):

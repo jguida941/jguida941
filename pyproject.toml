@@ -17,7 +17,7 @@ dev = [
 ]
 
 [project.scripts]
-profile-cli = "scripts.profile_cli:main"
+profile-cli = "scripts.cli.profile_cli:main"
 
 [tool.setuptools.packages.find]
 include = ["scripts*"]

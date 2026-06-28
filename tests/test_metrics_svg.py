@@ -1,6 +1,6 @@
 import unittest
 
-from scripts.render.metrics_svg import parse_metrics_svg_text, check_metrics
+from scripts.quality.metrics_svg import parse_metrics_svg_text, check_metrics
 
 
 class MetricsSvgTests(unittest.TestCase):

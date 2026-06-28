@@ -1,6 +1,6 @@
 import unittest
 
-from scripts.render.cards.generate_contribution_panel import _compute_streaks
+from scripts.rendering.generate_contribution_panel import _compute_streaks
 
 
 class ContributionPanelTests(unittest.TestCase):

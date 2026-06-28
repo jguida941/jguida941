@@ -6,9 +6,9 @@ import io
 import unittest
 from unittest.mock import patch
 
-from scripts.diagnostics.branch_protection import BranchProtectionAudit
-from scripts.profile_cli import main
-from scripts.render.validate import ValidationResult
+from scripts.github.branch_protection import BranchProtectionAudit
+from scripts.cli.profile_cli import main
+from scripts.quality.validate_generated_profile import ValidationResult
 
 
 class ProfileCliTests(unittest.TestCase):
@@ -32,10 +32,10 @@ class ProfileCliTests(unittest.TestCase):
 
     def test_cli_triage_runs_with_mocked_inputs(self):
         with patch(
-            "scripts.diagnostics.triage.validate_profile",
+            "scripts.quality.triage.validate_profile",
             return_value=ValidationResult(errors=(), warnings=()),
-        ), patch("scripts.diagnostics.triage._load_snapshot", return_value={}), patch(
-            "scripts.diagnostics.triage.actions_audit.fetch_runs",
+        ), patch("scripts.quality.triage._load_snapshot", return_value={}), patch(
+            "scripts.quality.triage.actions_audit.fetch_runs",
             return_value=[],
         ):
             with redirect_stdout(io.StringIO()):
@@ -44,9 +44,9 @@ class ProfileCliTests(unittest.TestCase):
 
     def test_cli_generate_profile_fixture_runs(self):
         with patch(
-            "scripts.profile_pipeline.run_profile_pipeline_from_fixture",
+            "scripts.pipeline.profile_pipeline.run_profile_pipeline_from_fixture",
         ) as mock_fixture_run, patch(
-            "scripts.render.validate.validate_profile",
+            "scripts.quality.validate_generated_profile.validate_profile",
             return_value=ValidationResult(errors=(), warnings=()),
         ):
             with redirect_stdout(io.StringIO()):
@@ -94,7 +94,7 @@ class ProfileCliTests(unittest.TestCase):
             extra_checks=[],
         )
         with patch(
-            "scripts.diagnostics.branch_protection.audit_required_checks",
+            "scripts.github.branch_protection.audit_required_checks",
             return_value=audit,
         ):
             with redirect_stdout(io.StringIO()):

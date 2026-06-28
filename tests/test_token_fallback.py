@@ -4,8 +4,8 @@ from unittest import mock
 
 import requests
 
-from scripts.github import graphql as github_graphql, transport as github_transport
-from scripts.settings import Settings
+from scripts.github import github_graphql, github_transport
+from scripts.core.settings import Settings
 
 
 def _settings(tokens):

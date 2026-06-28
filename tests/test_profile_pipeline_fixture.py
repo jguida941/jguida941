@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from scripts.profile_pipeline import run_profile_pipeline_from_fixture
+from scripts.pipeline.profile_pipeline import run_profile_pipeline_from_fixture
 
 
 class ProfilePipelineFixtureTests(unittest.TestCase):
@@ -22,13 +22,13 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
             os.chdir(tmp_root)
             try:
                 with patch(
-                    "scripts.analytics.model.gh.get_repo_commits_last_n_weeks",
+                    "scripts.pipeline.compute_metrics.gh.get_repo_commits_last_n_weeks",
                     side_effect=AssertionError("network lookup should not run"),
                 ), patch(
-                    "scripts.analytics.model.gh.paginated_get",
+                    "scripts.pipeline.compute_metrics.gh.paginated_get",
                     side_effect=AssertionError("network lookup should not run"),
                 ), patch(
-                    "scripts.analytics.helpers.gh.get_repo_ci_state",
+                    "scripts.pipeline.profile_helpers.gh.get_repo_ci_state",
                     side_effect=AssertionError("network lookup should not run"),
                 ):
                     run_profile_pipeline_from_fixture(str(fixture_path), logger=lambda *_args, **_kwargs: None)

@@ -2,8 +2,8 @@ import json
 import unittest
 from datetime import date, datetime, timedelta, timezone
 
-from scripts.analytics.collect import CollectedProfileData
-from scripts.analytics.model import _compute_current_streak_days, compute_profile_model
+from scripts.pipeline.collect_data import CollectedProfileData
+from scripts.pipeline.compute_metrics import _compute_current_streak_days, compute_profile_model
 
 
 def _iso(dt):
