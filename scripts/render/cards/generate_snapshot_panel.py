@@ -74,16 +74,6 @@ _STATUS_DISPLAY = {
     "fail": "Failed",
 }
 
-_TOKEN_DISPLAY = {
-    "personal_github_token": "Personal token",
-    "github_token": "Actions token",
-    "github_app": "App token",
-    "app": "App token",
-    "none": "Unauthenticated",
-    "unauthenticated": "Unauthenticated",
-}
-
-
 def _status_color(status: str) -> str:
     normalized = str(status or "").strip().lower()
     if normalized in {"ok", "pass", "passing", "healthy", "complete", "available"}:
@@ -170,15 +160,9 @@ def generate(
     parts.append(title_left(TITLE, x=pad, y=58, size=17))
     parts.append(accent_ribbon(SVG_WIDTH, pad=pad, y=70))
 
-    # Token-mode chip, right-aligned in the header.
-    if token_mode:
-        tdisp = _TOKEN_DISPLAY.get(token_mode.strip().lower(), token_mode.replace("_", " ").title())
-        authed = token_mode.strip().lower() not in {"none", "unauthenticated", ""}
-        tcolor = BLUE if authed else ORANGE
-        tw = chip_width(tdisp, icon=True)
-        parts.append(
-            chip(SVG_WIDTH - pad - tw, 39, tdisp, color=tcolor, icon_name="lock", filled=True)
-        )
+    # NOTE: token_mode is internal diagnostic state — never surface it on the
+    # public profile (it was previously rendered as a "Personal token" chip).
+    _ = token_mode
 
     # Metric grid: 2-col glass tiles, label + big display value.
     n_rows = len(rows)

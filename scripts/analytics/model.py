@@ -1113,7 +1113,13 @@ def compute_profile_model(
         "releases_note": releases_note,
         "events_status": events_status,
         "events_note": events_note,
-        "token_mode": collected.token_mode,
+        # Coarse auth state only — the precise token mode is internal diagnostics
+        # and must never appear on the public profile / published snapshot.
+        "token_mode": (
+            "authenticated"
+            if collected.token_mode not in {"none", "unauthenticated", ""}
+            else "unauthenticated"
+        ),
     }
 
     # --- theme ---

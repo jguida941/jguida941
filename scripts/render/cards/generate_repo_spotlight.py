@@ -22,12 +22,11 @@ from scripts.config import (
 from scripts.render.card_theme import title_left, title_right
 from scripts.render.glass_kit import (
     accent_ribbon,
-    chip,
-    chip_width,
     eyebrow_text,
     glass_panel,
     glass_tile,
     icon,
+    metadata,
     sparkline,
 )
 from scripts.render.svg_utils import fmt_int, lang_color, truncate, xml_escape
@@ -124,33 +123,26 @@ def _project_card(repo: dict, cx: float, cy: float, card_w: float, idx: int) -> 
     else:
         parts.append(name_node)
 
-    # --- status + CI chips ---
-    chip_y = cy + 44
+    # --- recency + CI as inline metadata (Apple: recency is text, not a pill;
+    #     status color lives only on the CI checkmark) ---
+    meta_y = cy + 54
     ago = str(repo.get("pushed_ago") or "").strip()
-    ago = truncate(ago, 20) if ago else "date unknown"
-    status_text = f"last active {ago}"
+    ago = truncate(ago, 22) if ago else "date unknown"
     parts.append(
-        chip(
-            cx + IP,
-            chip_y,
-            status_text,
-            color=accent,
-            icon_name="clock",
-            filled=True,
-        )
+        metadata(cx + IP, meta_y, f"Updated {ago}", icon_name="clock", color=TEXT_DIM, size=12)
     )
     if repo.get("has_ci"):
-        ci_text = "CI/CD"
-        ci_w = chip_width(ci_text, icon=True)
+        ci_label = "CI/CD"
+        ci_w = 13 + 5 + _tw(ci_label, 12)
         parts.append(
-            chip(
+            metadata(
                 cx + card_w - IP - ci_w,
-                chip_y,
-                ci_text,
-                color=accent,
+                meta_y,
+                ci_label,
                 icon_name="ci_check",
-                filled=False,
-                width=ci_w,
+                color=TEXT_DIM,
+                icon_color=GREEN,
+                size=12,
             )
         )
 
@@ -185,40 +177,31 @@ def _project_card(repo: dict, cx: float, cy: float, card_w: float, idx: int) -> 
     parts.append(icon("fork", fx, icon_y, size=13, color=TEXT_DIM))
     parts.append(_text(forks, fx + 17, fy, size=fs, fill=TEXT_BRIGHT, weight=600))
 
-    # --- weekly-commit sparkline band ---
+    # --- weekly-commit sparkline band (only when there is REAL activity) ---
+    # The participation API often returns zeros (still computing / no data); never
+    # claim "0 commits" or draw a fake-flat line — just omit the band honestly.
     weekly = [int(v) for v in (repo.get("weekly_commits") or []) if v is not None]
     total = sum(weekly)
-    band_y = cy + 150
-    # faint separator above the band
-    parts.append(
-        f'<rect x="{_n(cx + IP)}" y="{_n(band_y)}" width="{_n(inner_w)}" height="1" '
-        f'fill="{GLASS_HAIRLINE_HEX}" fill-opacity="0.10"/>'
-    )
-    label = f"{total} commits · 12 wk" if weekly else "no commit data"
-    parts.append(eyebrow_text(label, x=cx + IP, y=band_y + 18, color=TEXT_DIM, size=9))
-    spark_x = cx + IP + 110
-    spark_w = inner_w - 110
-    spark_y = band_y + 8
-    spark_h = 22
-    # baseline the curve rests on
-    parts.append(
-        f'<rect x="{_n(spark_x)}" y="{_n(spark_y + spark_h)}" width="{_n(spark_w)}" '
-        f'height="1" fill="{GLASS_HAIRLINE_HEX}" fill-opacity="0.10"/>'
-    )
-    if weekly:
-        spark = sparkline(
-            weekly,
-            spark_x,
-            spark_y,
-            spark_w,
-            spark_h,
-            color=accent,
-            uid=f"spk{idx}",
+    if total > 0:
+        band_y = cy + 150
+        parts.append(
+            f'<rect x="{_n(cx + IP)}" y="{_n(band_y)}" width="{_n(inner_w)}" height="1" '
+            f'fill="{GLASS_HAIRLINE_HEX}" fill-opacity="0.10"/>'
         )
-        # dim a flat/dormant trend so a maintained repo never implies live activity
-        if total == 0:
-            spark = f'<g opacity="0.5">{spark}</g>'
-        parts.append(spark)
+        parts.append(
+            eyebrow_text(f"{total} commits · 12 wk", x=cx + IP, y=band_y + 18, color=TEXT_DIM, size=9)
+        )
+        spark_x = cx + IP + 110
+        spark_w = inner_w - 110
+        spark_y = band_y + 8
+        spark_h = 22
+        parts.append(
+            f'<rect x="{_n(spark_x)}" y="{_n(spark_y + spark_h)}" width="{_n(spark_w)}" '
+            f'height="1" fill="{GLASS_HAIRLINE_HEX}" fill-opacity="0.10"/>'
+        )
+        parts.append(
+            sparkline(weekly, spark_x, spark_y, spark_w, spark_h, color=accent, uid=f"spk{idx}")
+        )
     return "".join(parts)
 
 

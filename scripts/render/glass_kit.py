@@ -210,12 +210,10 @@ def glass_tile(
         f'<rect x="{_f(x + rx * 0.5)}" y="{_f(y + 1)}" width="{_f(w - rx)}" height="1" '
         f'rx="0.5" fill="{GLASS_SHEEN_HEX}" fill-opacity="0.14"/>',
     ]
-    if accent:
-        aw = accent_w if accent_w is not None else min(34.0, w * 0.42)
-        parts.append(
-            f'<rect x="{_f(x + 12)}" y="{_f(y + 11)}" width="{_f(aw)}" height="3" '
-            f'rx="1.5" fill="{accent}"/>'
-        )
+    # NOTE: the per-tile colored accent bar was removed — Apple uses one accent per
+    # context, not a stripe on every tile (a common "AI look" tell). `accent`/`accent_w`
+    # are kept for back-compat but intentionally no longer rendered.
+    _ = (accent, accent_w)
     return "".join(parts)
 
 
@@ -378,31 +376,61 @@ def chip(
     *,
     color: str = CYAN,
     icon_name: str | None = None,
-    filled: bool = False,
+    filled: bool = False,  # back-compat, unused
+    tone: str = "neutral",
     size: int = 11,
     height: float = 22,
     width: float | None = None,
 ) -> str:
-    """A rounded pill badge (status / language / count)."""
+    """An Apple-style tag: a soft FILL, no stroke (fill OR label, never both).
+
+    tone="neutral" -> grey fill + secondary text (the workhorse, Recipe A).
+    tone="accent"  -> low-opacity hue fill + same hue text/icon (Recipe B; use at
+    most once per card). Color lives only on the fill+text, never a 1px outline.
+    """
+    _ = filled
     w = width if width is not None else chip_width(text, size=size, icon=bool(icon_name))
-    rad = height / 2
-    text_x = x + 11 + (15 if icon_name else 0)
-    parts = []
-    if filled:
-        parts.append(
-            f'<rect x="{_f(x)}" y="{_f(y)}" width="{_f(w)}" height="{_f(height)}" '
-            f'rx="{_f(rad)}" fill="{color}" fill-opacity="0.16"/>'
-        )
-    parts.append(
-        f'<rect x="{_f(x + 0.5)}" y="{_f(y + 0.5)}" width="{_f(w - 1)}" '
-        f'height="{_f(height - 1)}" rx="{_f(rad)}" fill="none" stroke="{color}" '
-        f'stroke-opacity="0.45" stroke-width="1"/>'
-    )
+    rad = 7  # small concentric radius, not a full pill
+    icon_sz = 12
+    text_x = x + 10 + (icon_sz + 3 if icon_name else 0)
+    if tone == "accent":
+        fill, fill_op, fg = color, 0.14, color
+    else:
+        fill, fill_op, fg = TEXT_DIM, 0.16, TEXT
+    parts = [
+        f'<rect x="{_f(x)}" y="{_f(y)}" width="{_f(w)}" height="{_f(height)}" '
+        f'rx="{rad}" fill="{fill}" fill-opacity="{fill_op}"/>'
+    ]
     if icon_name:
-        parts.append(icon(icon_name, x + 8, y + (height - 11) / 2, size=11, color=color))
+        parts.append(icon(icon_name, x + 9, y + (height - icon_sz) / 2, size=icon_sz, color=fg))
     parts.append(
-        f'<text x="{_f(text_x)}" y="{_f(y + height / 2 + size * 0.36)}" fill="{color}" '
-        f'font-size="{size}" font-family="{FONT_SANS}" font-weight="600">{text}</text>'
+        f'<text x="{_f(text_x)}" y="{_f(y + height / 2 + size * 0.34)}" fill="{fg}" '
+        f'font-size="{size}" font-family="{FONT_SANS}" font-weight="500">{text}</text>'
+    )
+    return "".join(parts)
+
+
+def metadata(
+    x: float,
+    y: float,
+    text: str,
+    *,
+    icon_name: str | None = None,
+    color: str = TEXT,
+    icon_color: str | None = None,
+    size: int = 12,
+    icon_size: int = 13,
+) -> str:
+    """Inline metadata (Apple App-Store style): optional leading symbol + secondary
+    text, NO container. For recency/measurements joined with ' · ' separators."""
+    parts = []
+    tx = x
+    if icon_name:
+        parts.append(icon(icon_name, x, y - icon_size + 2.5, size=icon_size, color=icon_color or color))
+        tx = x + icon_size + 5
+    parts.append(
+        f'<text x="{_f(tx)}" y="{_f(y)}" fill="{color}" font-size="{size}" '
+        f'font-family="{FONT_SANS}" font-weight="400">{text}</text>'
     )
     return "".join(parts)
 

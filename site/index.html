@@ -1280,8 +1280,7 @@
         const commitsNote = quality?.commits_note ? `Commits: ${quality.commits_note}` : "";
         const releasesNote = quality?.releases_note ? `Releases: ${quality.releases_note}` : "";
         const eventsNote = quality?.events_note ? `Events: ${quality.events_note}` : "";
-        const tokenMode = quality?.token_mode ? `Token mode: ${quality.token_mode}` : "";
-        qualityPill.title = [ciNote, commitsNote, releasesNote, eventsNote, tokenMode].filter(Boolean).join(" | ");
+        qualityPill.title = [ciNote, commitsNote, releasesNote, eventsNote].filter(Boolean).join(" | ");
         document.getElementById("generated-pill").textContent = "Generated: " + generatedText;
       }
 

@@ -86,9 +86,10 @@ def _render_tile(x: float, y: float, w: float, h: float, tile: dict) -> str:
     icon_name = ICON_BY_KEY.get(key, "lang_dot")
     ix = x + 16
 
-    parts = [glass_tile(x, y, w, h, accent=accent)]
-    # leading line-icon, tinted with the tile accent
-    parts.append(icon(icon_name, ix, y + 24, size=16, color=accent))
+    parts = [glass_tile(x, y, w, h)]
+    # leading line-icon — neutral secondary (Apple: color isn't a per-tile
+    # decoration; the big number leads, color is reserved for one signal)
+    parts.append(icon(icon_name, ix, y + 24, size=16, color=TEXT_DIM))
 
     is_ring = key == "ci_coverage_pct"
     if is_ring:
