@@ -11,14 +11,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-from scripts.contracts import (
+from scripts.contracts.schema import (
     DISALLOWED_README_HEADINGS,
     REQUIRED_PROFILE_SNAPSHOT_KEYS,
     REQUIRED_README_MARKERS,
     expected_snapshot_metric_keys,
     missing_required_keys,
 )
-from scripts.metrics_svg import parse_metrics_svg
+from scripts.render.metrics_svg import parse_metrics_svg
 
 
 USERNAME = os.environ.get("GITHUB_USERNAME", "jguida941")

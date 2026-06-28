@@ -7,13 +7,13 @@ import json
 from pathlib import Path
 from typing import Any
 
-from scripts import actions_audit
-from scripts.contracts import REQUIRED_PROFILE_SNAPSHOT_KEYS, missing_required_keys
+from scripts.diagnostics import actions_audit
+from scripts.contracts.schema import REQUIRED_PROFILE_SNAPSHOT_KEYS, missing_required_keys
 from scripts.runtime_env import token_mode_from_env
-from scripts.metrics_svg import parse_metrics_svg
-from scripts.severity import SEVERITY_ORDER
-from scripts.severity import any_at_or_above
-from scripts.validate_generated_profile import validate_profile
+from scripts.render.metrics_svg import parse_metrics_svg
+from scripts.diagnostics.severity import SEVERITY_ORDER
+from scripts.diagnostics.severity import any_at_or_above
+from scripts.render.validate import validate_profile
 
 
 def _finding(

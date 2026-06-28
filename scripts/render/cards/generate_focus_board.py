@@ -14,8 +14,8 @@ from scripts.config import (
     GLASS_HAIRLINE_HEX,
     GLASS_HAIRLINE_OP,
 )
-from scripts.card_theme import title_left
-from scripts.glass_kit import (
+from scripts.render.card_theme import title_left
+from scripts.render.glass_kit import (
     accent_ribbon,
     chip,
     chip_width,
@@ -23,7 +23,7 @@ from scripts.glass_kit import (
     glass_tile,
     icon,
 )
-from scripts.svg_utils import xml_escape, truncate
+from scripts.render.svg_utils import xml_escape, truncate
 
 # Layout constants -----------------------------------------------------------
 _PAD = 24                 # content margin (sits inside the 12px glass inset)

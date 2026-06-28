@@ -5,10 +5,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from scripts.collect_data import collect_profile_data
-from scripts.collect_data import CollectedProfileData
-from scripts.compute_metrics import compute_profile_model
-from scripts.render_outputs import ensure_output_dirs, generate_assets, render_readme, write_dashboard_json
+from scripts.analytics.collect import collect_profile_data
+from scripts.analytics.collect import CollectedProfileData
+from scripts.analytics.model import compute_profile_model
+from scripts.render.outputs import ensure_output_dirs, generate_assets, render_readme, write_dashboard_json
 
 
 def run_profile_pipeline_with_collected(

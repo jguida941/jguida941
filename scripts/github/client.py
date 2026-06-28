@@ -19,12 +19,12 @@ from scripts.runtime_env import token_mode_from_env
 
 # ── sub-module imports ───────────────────────────────────────────────
 from scripts.settings import Settings  # noqa: F401
-from scripts.github_cache import read_cache, write_cache  # noqa: F401
-from scripts.github_transport import (  # noqa: F401
+from scripts.github.cache import read_cache, write_cache  # noqa: F401
+from scripts.github.transport import (  # noqa: F401
     request_with_retry,
     request_public_with_retry,
 )
-from scripts.github_graphql import graphql_query  # noqa: F401
+from scripts.github.graphql import graphql_query  # noqa: F401
 
 # ── module-level settings (backward compat) ──────────────────────────
 _settings = Settings.from_env()
@@ -41,12 +41,12 @@ GRAPHQL: str = "https://api.github.com/graphql"
 # ── thin internal wrappers (keep old call-sites identical) ───────────
 
 def _headers():
-    from scripts.github_transport import _auth_headers
+    from scripts.github.transport import _auth_headers
     return _auth_headers(_settings)
 
 
 def _cache_path(key: str) -> Path:
-    from scripts.github_cache import _cache_path as _cp
+    from scripts.github.cache import _cache_path as _cp
     return _cp(key, _settings.cache_dir)
 
 

@@ -22,8 +22,8 @@ from scripts.config import (
     TEXT_BRIGHT,
     TEXT_DIM,
 )
-from scripts.card_theme import title_left
-from scripts.glass_kit import (
+from scripts.render.card_theme import title_left
+from scripts.render.glass_kit import (
     accent_ribbon,
     chip,
     chip_width,
@@ -33,8 +33,8 @@ from scripts.glass_kit import (
     icon,
     progress_ring,
 )
-from scripts.profile_contract import SCORECARD_METRICS, format_metric_value
-from scripts.svg_utils import truncate, xml_escape
+from scripts.contracts.metrics import SCORECARD_METRICS, format_metric_value
+from scripts.render.svg_utils import truncate, xml_escape
 
 TITLE = "Builder Scorecard"
 

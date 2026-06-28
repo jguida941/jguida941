@@ -15,8 +15,8 @@ from scripts.config import (
     TEXT_BRIGHT,
     TEXT_DIM,
 )
-from scripts.card_theme import title_left
-from scripts.glass_kit import (
+from scripts.render.card_theme import title_left
+from scripts.render.glass_kit import (
     chip,
     chip_width,
     eyebrow_text,

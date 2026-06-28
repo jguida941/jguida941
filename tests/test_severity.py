@@ -1,6 +1,6 @@
 import unittest
 
-from scripts.severity import any_at_or_above, is_at_or_above
+from scripts.diagnostics.severity import any_at_or_above, is_at_or_above
 
 
 class SeverityTests(unittest.TestCase):

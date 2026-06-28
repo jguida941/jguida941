@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from scripts import github_client as gh
+from scripts.github import client as gh
 from scripts.config import BOT_ACTOR_PREFIXES, BOT_COMMIT_MARKERS, SELF_REPO, USERNAME
 
 

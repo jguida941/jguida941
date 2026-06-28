@@ -4,7 +4,7 @@ from unittest import mock
 
 import requests
 
-from scripts import github_graphql, github_transport
+from scripts.github import graphql as github_graphql, transport as github_transport
 from scripts.settings import Settings
 
 

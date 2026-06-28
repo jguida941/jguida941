@@ -55,7 +55,7 @@ def _cmd_build(args: argparse.Namespace) -> CommandResult:
 
 
 def _cmd_validate(args: argparse.Namespace) -> CommandResult:
-    from scripts.validate_generated_profile import validate_profile
+    from scripts.render.validate import validate_profile
 
     result = validate_profile()
     _print_validation_result(result)
@@ -69,7 +69,7 @@ def _cmd_validate(args: argparse.Namespace) -> CommandResult:
 
 def _cmd_generate_profile(args: argparse.Namespace) -> CommandResult:
     from scripts.profile_pipeline import run_profile_pipeline_from_fixture
-    from scripts.validate_generated_profile import validate_profile
+    from scripts.render.validate import validate_profile
 
     if args.fixture:
         print("=== GitHub Profile README Builder (fixture mode) ===")
@@ -102,7 +102,7 @@ def _cmd_generate_profile(args: argparse.Namespace) -> CommandResult:
 
 
 def _cmd_check_metrics(args: argparse.Namespace) -> CommandResult:
-    from scripts.metrics_svg import parse_metrics_svg, check_metrics
+    from scripts.render.metrics_svg import parse_metrics_svg, check_metrics
 
     svg_path = Path(args.path)
     if not svg_path.exists():
@@ -147,7 +147,7 @@ def _cmd_check_metrics(args: argparse.Namespace) -> CommandResult:
 
 
 def _cmd_audit_runs(args: argparse.Namespace) -> CommandResult:
-    from scripts import actions_audit
+    from scripts.diagnostics import actions_audit
 
     try:
         runs = actions_audit.fetch_runs(
@@ -190,7 +190,7 @@ def _cmd_audit_runs(args: argparse.Namespace) -> CommandResult:
 
 
 def _cmd_branch_protection(args: argparse.Namespace) -> CommandResult:
-    from scripts import branch_protection
+    from scripts.diagnostics import branch_protection
 
     repo = args.repo or os.environ.get("GITHUB_REPOSITORY", "").strip()
     if not repo:
@@ -276,7 +276,7 @@ def _cmd_branch_protection(args: argparse.Namespace) -> CommandResult:
 
 
 def _cmd_triage(args: argparse.Namespace) -> CommandResult:
-    from scripts import triage
+    from scripts.diagnostics import triage
 
     report = triage.build_triage_report(
         workflow=args.workflow,
@@ -307,7 +307,7 @@ def _cmd_triage(args: argparse.Namespace) -> CommandResult:
 
 
 def _cmd_triage_summary(args: argparse.Namespace) -> CommandResult:
-    from scripts import triage
+    from scripts.diagnostics import triage
 
     input_path = Path(args.input)
     if not input_path.exists():
@@ -357,7 +357,7 @@ def _cmd_triage_summary(args: argparse.Namespace) -> CommandResult:
 
 
 def _doctor_has_failure_at_or_above(report: dict[str, Any], threshold: str) -> bool:
-    from scripts.severity import is_at_or_above
+    from scripts.diagnostics.severity import is_at_or_above
 
     for check in report.get("checks", []):
         if check.get("ok"):
@@ -368,7 +368,7 @@ def _doctor_has_failure_at_or_above(report: dict[str, Any], threshold: str) -> b
 
 
 def _cmd_doctor(args: argparse.Namespace) -> CommandResult:
-    from scripts.diagnostics import doctor_checks
+    from scripts.diagnostics.diagnostics import doctor_checks
     import json
 
     report = doctor_checks()
@@ -591,7 +591,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    from scripts.diagnostics import write_run_diagnostics
+    from scripts.diagnostics.diagnostics import write_run_diagnostics
 
     os.chdir(ROOT)
     parser = build_parser()

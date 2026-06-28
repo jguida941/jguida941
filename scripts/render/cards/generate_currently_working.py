@@ -13,9 +13,9 @@ from scripts.config import (
     TEXT_BRIGHT,
     TEXT_DIM,
 )
-from scripts.card_theme import title_left, title_right
-from scripts.glass_kit import accent_ribbon, glass_panel, glass_tile, icon
-from scripts.svg_utils import lang_color, truncate, xml_escape
+from scripts.render.card_theme import title_left, title_right
+from scripts.render.glass_kit import accent_ribbon, glass_panel, glass_tile, icon
+from scripts.render.svg_utils import lang_color, truncate, xml_escape
 
 TITLE = "Currently Working On"
 SUBTITLE = "pushed in the last 7 days"

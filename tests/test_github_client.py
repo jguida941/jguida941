@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
-from scripts import github_client as gh
+from scripts.github import client as gh
 
 
 class _FakeResponse:
@@ -22,10 +22,10 @@ class GitHubClientTests(unittest.TestCase):
         old = (now - timedelta(days=45)).isoformat().replace("+00:00", "Z")
         repos = [{"owner": {"login": "jguida941"}, "name": "voiceterm"}]
 
-        with patch("scripts.github_client._get_cached", return_value=None), patch(
-            "scripts.github_client._set_cached",
+        with patch("scripts.github.client._get_cached", return_value=None), patch(
+            "scripts.github.client._set_cached",
         ), patch(
-            "scripts.github_client._request_with_retry",
+            "scripts.github.client._request_with_retry",
             return_value=_FakeResponse(200, [{"published_at": recent}, {"published_at": old}]),
         ):
             total = gh.get_releases_last_n_days(repos=repos, days=30, max_workers=1)
@@ -42,16 +42,16 @@ class GitHubClientTests(unittest.TestCase):
             }
         }
 
-        with patch("scripts.github_client.TOKEN", "x"), patch(
-            "scripts.github_client._get_cached",
+        with patch("scripts.github.client.TOKEN", "x"), patch(
+            "scripts.github.client._get_cached",
             return_value=None,
         ), patch(
-            "scripts.github_client._set_cached",
+            "scripts.github.client._set_cached",
         ), patch(
-            "scripts.github_client._graphql_query",
+            "scripts.github.client._graphql_query",
             return_value=payload,
         ), patch(
-            "scripts.github_client.token_mode_from_env",
+            "scripts.github.client.token_mode_from_env",
             return_value="github_token",
         ):
             counts = gh.get_owned_repo_scope_counts()
@@ -60,17 +60,17 @@ class GitHubClientTests(unittest.TestCase):
         self.assertIsNone(counts["private_owned"])
 
     def test_get_merged_prs_last_n_days_returns_total(self):
-        with patch("scripts.github_client._get_cached", return_value=None), patch(
-            "scripts.github_client._set_cached",
+        with patch("scripts.github.client._get_cached", return_value=None), patch(
+            "scripts.github.client._set_cached",
         ), patch(
-            "scripts.github_client._calendar_window",
+            "scripts.github.client._calendar_window",
             return_value=(
                 datetime(2025, 3, 6, tzinfo=timezone.utc),
                 datetime(2026, 3, 6, tzinfo=timezone.utc),
                 "2026-03-06",
             ),
         ), patch(
-            "scripts.github_client._request_with_retry",
+            "scripts.github.client._request_with_retry",
             return_value=_FakeResponse(200, {"total_count": 42}),
         ):
             total = gh.get_merged_prs_last_n_days(days=365)
@@ -93,13 +93,13 @@ class GitHubClientTests(unittest.TestCase):
             }
         }
 
-        with patch("scripts.github_client._get_cached", return_value=None), patch(
-            "scripts.github_client._set_cached",
+        with patch("scripts.github.client._get_cached", return_value=None), patch(
+            "scripts.github.client._set_cached",
         ), patch(
-            "scripts.github_client._calendar_window",
+            "scripts.github.client._calendar_window",
             return_value=(start, end, "2026-03-06"),
         ), patch(
-            "scripts.github_client.requests.post",
+            "scripts.github.client.requests.post",
             return_value=_FakeResponse(200, graphql_payload),
         ) as post_mock:
             calendar = gh.get_contribution_calendar(days=365)

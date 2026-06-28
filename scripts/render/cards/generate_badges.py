@@ -11,9 +11,9 @@ from scripts.config import (
     SVG_WIDTH,
     TEXT_BRIGHT,
 )
-from scripts.card_theme import title_left
-from scripts.glass_kit import eyebrow_text, glass_panel, glass_tile, icon
-from scripts.svg_utils import fmt_int
+from scripts.render.card_theme import title_left
+from scripts.render.glass_kit import eyebrow_text, glass_panel, glass_tile, icon
+from scripts.render.svg_utils import fmt_int
 
 # Card geometry (one row of stat tiles + a margin for the glass drop shadow).
 _W = SVG_WIDTH

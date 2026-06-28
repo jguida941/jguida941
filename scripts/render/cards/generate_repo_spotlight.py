@@ -19,8 +19,8 @@ from scripts.config import (
     TEXT_BRIGHT,
     TEXT_DIM,
 )
-from scripts.card_theme import title_left, title_right
-from scripts.glass_kit import (
+from scripts.render.card_theme import title_left, title_right
+from scripts.render.glass_kit import (
     accent_ribbon,
     chip,
     chip_width,
@@ -30,7 +30,7 @@ from scripts.glass_kit import (
     icon,
     sparkline,
 )
-from scripts.svg_utils import fmt_int, lang_color, truncate, xml_escape
+from scripts.render.svg_utils import fmt_int, lang_color, truncate, xml_escape
 
 # --- layout constants ---------------------------------------------------------
 PAD_X = 28          # interior left/right margin (>= GLASS_INSET so nothing clips)

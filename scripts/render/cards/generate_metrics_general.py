@@ -14,8 +14,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from scripts.config import BLUE, CYAN, FONT_SANS, TEXT, TEXT_BRIGHT, TEXT_DIM
-from scripts.card_theme import title_left
-from scripts.glass_kit import (
+from scripts.render.card_theme import title_left
+from scripts.render.glass_kit import (
     accent_ribbon,
     chip,
     chip_width,
@@ -24,7 +24,7 @@ from scripts.glass_kit import (
     glass_tile,
     icon,
 )
-from scripts.svg_utils import fmt_int, truncate, xml_escape
+from scripts.render.svg_utils import fmt_int, truncate, xml_escape
 
 
 def _fmt_iso_date(iso_value: str | None) -> str:

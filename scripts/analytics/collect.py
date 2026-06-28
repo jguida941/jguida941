@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from scripts import github_client as gh
+from scripts.github import client as gh
 from scripts.runtime_env import cache_mode_from_env, token_mode_from_env
 
 

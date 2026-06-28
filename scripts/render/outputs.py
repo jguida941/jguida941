@@ -7,19 +7,19 @@ from pathlib import Path
 
 import jinja2
 
-from scripts.collect_data import CollectedProfileData
-from scripts.generate_activity_heatmap import generate as gen_heatmap
-from scripts.generate_badges import generate as gen_badges
-from scripts.generate_builder_scorecard import generate as gen_scorecard
-from scripts.generate_contribution_panel import generate as gen_contribution_panel
-from scripts.generate_currently_working import generate as gen_working
-from scripts.generate_engineering_cadence import generate as gen_cadence
-from scripts.generate_focus_board import generate as gen_focus_board
-from scripts.generate_language_chart import generate as gen_lang_chart
-from scripts.generate_metrics_general import generate as gen_metrics_general
-from scripts.generate_repo_spotlight import generate as gen_spotlight
-from scripts.generate_snapshot_panel import generate as gen_snapshot_panel
-from scripts.generate_streak_summary import generate as gen_streak_summary
+from scripts.analytics.collect import CollectedProfileData
+from scripts.render.cards.generate_activity_heatmap import generate as gen_heatmap
+from scripts.render.cards.generate_badges import generate as gen_badges
+from scripts.render.cards.generate_builder_scorecard import generate as gen_scorecard
+from scripts.render.cards.generate_contribution_panel import generate as gen_contribution_panel
+from scripts.render.cards.generate_currently_working import generate as gen_working
+from scripts.render.cards.generate_engineering_cadence import generate as gen_cadence
+from scripts.render.cards.generate_focus_board import generate as gen_focus_board
+from scripts.render.cards.generate_language_chart import generate as gen_lang_chart
+from scripts.render.cards.generate_metrics_general import generate as gen_metrics_general
+from scripts.render.cards.generate_repo_spotlight import generate as gen_spotlight
+from scripts.render.cards.generate_snapshot_panel import generate as gen_snapshot_panel
+from scripts.render.cards.generate_streak_summary import generate as gen_streak_summary
 
 
 def ensure_output_dirs() -> None:

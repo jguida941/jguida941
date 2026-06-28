@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from scripts.gh_cli import run_json
+from scripts.github.gh_cli import run_json
 
 
 DEFAULT_REQUIRED_CHECKS = (

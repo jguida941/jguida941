@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
-from scripts.profile_contract import SNAPSHOT_METRICS
+from scripts.contracts.metrics import SNAPSHOT_METRICS
 
 
 # ---------------------------------------------------------------------------

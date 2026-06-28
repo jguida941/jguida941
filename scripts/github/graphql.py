@@ -5,7 +5,7 @@ from __future__ import annotations
 import requests
 
 from scripts.settings import Settings
-from scripts.github_transport import _auth_headers_for_token, candidate_tokens
+from scripts.github.transport import _auth_headers_for_token, candidate_tokens
 
 GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 

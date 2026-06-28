@@ -1,20 +1,20 @@
 import unittest
 from unittest.mock import patch
 
-from scripts.triage import build_triage_report, has_severity_at_or_above, ranked_open_findings
-from scripts.validate_generated_profile import ValidationResult
+from scripts.diagnostics.triage import build_triage_report, has_severity_at_or_above, ranked_open_findings
+from scripts.render.validate import ValidationResult
 
 
 class TriageTests(unittest.TestCase):
     def test_build_triage_report_includes_critical_for_validation_errors(self):
         with patch(
-            "scripts.triage.validate_profile",
+            "scripts.diagnostics.triage.validate_profile",
             return_value=ValidationResult(
                 errors=("missing required section",),
                 warnings=(),
             ),
-        ), patch("scripts.triage._load_snapshot", return_value={}), patch(
-            "scripts.triage.actions_audit.fetch_runs",
+        ), patch("scripts.diagnostics.triage._load_snapshot", return_value={}), patch(
+            "scripts.diagnostics.triage.actions_audit.fetch_runs",
             return_value=[],
         ):
             report = build_triage_report(workflow="Generate Metrics", run_limit=5)

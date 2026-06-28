@@ -7,8 +7,8 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from scripts import github_client as gh
-from scripts.collect_data import CollectedProfileData
+from scripts.github import client as gh
+from scripts.analytics.collect import CollectedProfileData
 from scripts.config import (
     USERNAME,
     FEATURED_REPOS,
@@ -26,15 +26,15 @@ from scripts.config import (
     TEXT_BRIGHT,
     BORDER,
 )
-from scripts.contracts import (
+from scripts.contracts.schema import (
     DataQuality,
     DataScope,
     Snapshot,
     ScorecardCard,
     SnapshotRow,
 )
-from scripts.profile_contract import SCORECARD_METRICS, SNAPSHOT_METRICS, format_metric_value
-from scripts.profile_helpers import (
+from scripts.contracts.metrics import SCORECARD_METRICS, SNAPSHOT_METRICS, format_metric_value
+from scripts.analytics.helpers import (
     activity_label,
     ci_text,
     has_ci_workflow,

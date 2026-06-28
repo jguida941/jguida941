@@ -13,9 +13,9 @@ from scripts.config import (
     TEXT_BRIGHT,
     TEXT_DIM,
 )
-from scripts.card_theme import title_left
-from scripts.glass_kit import accent_ribbon, eyebrow_text, glass_panel, glass_tile, icon
-from scripts.svg_utils import xml_escape, fmt_int
+from scripts.render.card_theme import title_left
+from scripts.render.glass_kit import accent_ribbon, eyebrow_text, glass_panel, glass_tile, icon
+from scripts.render.svg_utils import xml_escape, fmt_int
 
 
 def _parse_day_date(value: str) -> date | None:
