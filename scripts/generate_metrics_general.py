@@ -1,12 +1,30 @@
-"""Build `metrics.general.svg` from the profile snapshot model."""
+"""Build `metrics.general.svg` from the profile snapshot model.
+
+This is the hero banner for the profile README: a frosted-glass card whose
+single title is the GitHub username, with an eyebrow caption, a generated/scope
+line, two status chips, and a balanced grid of glass stat tiles.
+
+Three of those tiles intentionally render the metric as a *single* text node with
+the number and word adjacent ("67 Repositories", "78 Stargazers", "0 Releases")
+so the metrics validator (scripts/metrics_svg.py) can read them back.
+"""
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from scripts.config import BG_HIGHLIGHT, BORDER, TEXT, TEXT_BRIGHT, FONT_SANS
-from scripts.card_theme import card_bg, meta_text, title_accent, title_left, title_right
-from scripts.svg_utils import xml_escape, fmt_int
+from scripts.config import BLUE, CYAN, FONT_SANS, TEXT, TEXT_BRIGHT, TEXT_DIM
+from scripts.card_theme import title_left
+from scripts.glass_kit import (
+    accent_ribbon,
+    chip,
+    chip_width,
+    eyebrow_text,
+    glass_panel,
+    glass_tile,
+    icon,
+)
+from scripts.svg_utils import fmt_int, truncate, xml_escape
 
 
 def _fmt_iso_date(iso_value: str | None) -> str:
@@ -21,13 +39,42 @@ def _fmt_iso_date(iso_value: str | None) -> str:
     return dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 
-def _field(x: int, y: int, value: str, label: str) -> str:
-    value_text = xml_escape(value)
-    value_size = "14" if len(str(value)) > 24 else "18"
-    return (
-        f'<text x="{x}" y="{y}" fill="{TEXT_BRIGHT}" font-size="{value_size}" font-family="{FONT_SANS}" '
-        f'font-weight="700">{value_text}</text>'
-        f'<text x="{x}" y="{y + 18}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}">{xml_escape(label)}</text>'
+def _int(value: object) -> int:
+    try:
+        return int(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return 0
+
+
+def _stat_tile(
+    x: float,
+    y: float,
+    w: float,
+    h: float,
+    *,
+    icon_name: str,
+    value: str,
+    caption: str,
+    accent: str,
+    value_size: int,
+) -> str:
+    """One frosted stat cell: accent icon, big bold value, dim caption."""
+    pad_x = 16
+    return "".join(
+        [
+            glass_tile(x, y, w, h),
+            icon(icon_name, x + pad_x, y + 15, size=16, color=accent),
+            (
+                f'<text x="{x + pad_x:g}" y="{y + 60:g}" fill="{TEXT_BRIGHT}" '
+                f'font-size="{value_size}" font-family="{FONT_SANS}" '
+                f'font-weight="700">{value}</text>'
+            ),
+            (
+                f'<text x="{x + pad_x:g}" y="{y + 80:g}" fill="{TEXT_DIM}" '
+                f'font-size="10.5" font-family="{FONT_SANS}" '
+                f'letter-spacing="0.2">{caption}</text>'
+            ),
+        ]
     )
 
 
@@ -39,121 +86,123 @@ def generate(
     generated_at: str | None = None,
     output_path: str = "metrics.general.svg",
 ) -> str:
-    public_nonfork = snapshot.get("total_repos")
-    public_forks = snapshot.get("public_forks")
-    private_owned = snapshot.get("private_owned_repos")
-    total_stars = snapshot.get("total_stars")
-    releases = snapshot.get("releases")
-    contributions = snapshot.get("last_year_contributions")
-    commits = snapshot.get("public_scope_commits")
-    prs_merged = snapshot.get("prs_merged")
-    streak_days = snapshot.get("streak_days")
-    ci_repos = snapshot.get("ci_repos")
+    contributions = _int(snapshot.get("last_year_contributions"))
+    commits = _int(snapshot.get("public_scope_commits"))
+    total_repos = _int(snapshot.get("total_repos"))
+    private_owned = _int(snapshot.get("private_owned_repos"))
+    total_stars = _int(snapshot.get("total_stars"))
+    languages_count = _int(snapshot.get("languages_count"))
+    prs_merged = _int(snapshot.get("prs_merged"))
+    releases = _int(snapshot.get("releases"))
+    ci_repos = _int(snapshot.get("ci_repos"))
+    streak_days = _int(snapshot.get("streak_days"))
 
-    releases_text = fmt_int(int(releases)) if releases is not None else "n/a"
-    prs_text = fmt_int(int(prs_merged)) if prs_merged is not None else "n/a"
-    ci_text = fmt_int(int(ci_repos)) if ci_repos is not None else "n/a"
-    streak_text = fmt_int(int(streak_days)) if streak_days is not None else "n/a"
-
-    scope_text = ""
-    if isinstance(data_scope, dict):
-        private_scope = data_scope.get("private_owned_repos_total")
-        private_scope_text = "n/a" if private_scope is None else fmt_int(int(private_scope))
-        scope_text = (
-            "Scope: public owned non-fork repos="
-            f"{fmt_int(int(data_scope.get('public_owned_nonfork_repos_total', 0)))}"
-            f" | forks={fmt_int(int(data_scope.get('public_owned_forks_total', 0)))}"
-            f" | private owned={private_scope_text}"
-        )
-
+    # --- geometry ----------------------------------------------------------
     width = 840
-    height = 352
-    pad = 22
-    header_h = 34
+    height = 384
+    pad = 30
+    right = width - pad
+
+    cols = 4
     col_gap = 14
-    col_w = int((width - pad * 2 - col_gap) / 2)
-    row_gap = 10
-    card_h = 74
+    tile_w = (width - pad * 2 - col_gap * (cols - 1)) / cols
+    tile_h = 92
+    row_gap = 14
+    row1_y = 162
+    row2_y = row1_y + tile_h + row_gap  # 268 -> bottom 360, panel inner bottom 372
 
-    rows = []
-    rows.append(card_bg(width, height))
-    rows.append(title_left(xml_escape(username), x=pad, y=30))
-    rows.append(title_right("Canonical CLI Metrics", width=width, pad=pad, y=30))
-    rows.append(title_accent(width=width, pad=pad, y=35))
-    rows.append(meta_text(f"Generated: {xml_escape(_fmt_iso_date(generated_at))}", x=pad, y=50))
-    if scope_text:
-        rows.append(meta_text(xml_escape(scope_text), x=pad, y=64))
+    def col_x(i: int) -> float:
+        return pad + i * (tile_w + col_gap)
 
-    start_y = 76 if scope_text else 64
-    left_x = pad
-    right_x = pad + col_w + col_gap
-
-    # Row 1
-    rows.append(
-        f'<rect x="{left_x}" y="{start_y}" width="{col_w}" height="{card_h}" rx="11" fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>'
-    )
-    rows.append(_field(left_x + 14, start_y + 30, fmt_int(contributions), "12mo Contributions"))
-    rows.append(
-        f'<rect x="{right_x}" y="{start_y}" width="{col_w}" height="{card_h}" rx="11" fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>'
-    )
-    rows.append(_field(right_x + 14, start_y + 30, fmt_int(commits), "Public Scope Commits"))
-
-    # Row 2
-    y2 = start_y + card_h + row_gap
-    rows.append(
-        f'<rect x="{left_x}" y="{y2}" width="{col_w}" height="{card_h}" rx="11" fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>'
-    )
-    rows.append(
-        _field(
-            left_x + 14,
-            y2 + 30,
-            f"{fmt_int(int(public_nonfork or 0))} Repositories",
-            "Public Non-Fork Repos",
+    # --- header copy -------------------------------------------------------
+    name = xml_escape(truncate(str(username), 28))
+    generated = xml_escape(_fmt_iso_date(generated_at))
+    if isinstance(data_scope, dict) and data_scope.get("repos_included"):
+        scope = xml_escape(
+            f"Scope: {data_scope['repos_included']} repositories "
+            f"· contributions over the last 12 months"
         )
+    else:
+        scope = "Scope: public, owned, non-fork repositories · last 12 months"
+
+    parts: list[str] = []
+    # 1) frosted card background (emits its own defs)
+    parts.append(glass_panel(width, height))
+
+    # 2) header: eyebrow + username title (the single bold title node) + meta
+    parts.append(eyebrow_text("GITHUB PROFILE · BACKEND ENGINEERING", x=pad, y=48))
+    parts.append(title_left(name, x=pad, y=88, size=33))
+    parts.append(
+        f'<text x="{pad}" y="111" fill="{TEXT}" font-size="11.5" '
+        f'font-family="{FONT_SANS}">Generated {generated}</text>'
     )
-    rows.append(
-        f'<rect x="{right_x}" y="{y2}" width="{col_w}" height="{card_h}" rx="11" fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>'
-    )
-    rows.append(
-        _field(
-            right_x + 14,
-            y2 + 30,
-            f"{fmt_int(int(total_stars or 0))} Stargazers",
-            "Repo Stargazers (Received)",
-        )
+    parts.append(
+        f'<text x="{pad}" y="129" fill="{TEXT_DIM}" font-size="10.5" '
+        f'font-family="{FONT_SANS}">{scope}</text>'
     )
 
-    # Row 3
-    y3 = y2 + card_h + row_gap
-    rows.append(
-        f'<rect x="{left_x}" y="{y3}" width="{col_w}" height="{card_h}" rx="11" fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>'
+    # 3) status chips, stacked + right-aligned with the header
+    streak_text = f"{fmt_int(streak_days)}-day streak"
+    ci_text = f"{fmt_int(ci_repos)} CI pipelines"
+    cw_streak = chip_width(streak_text, size=11, icon=True)
+    cw_ci = chip_width(ci_text, size=11, icon=True)
+    parts.append(
+        chip(right - cw_streak, 50, streak_text, color=CYAN, icon_name="fire", height=24)
     )
-    rows.append(
-        _field(
-            left_x + 14,
-            y3 + 30,
-            f"{fmt_int(int(public_forks or 0))} public forks | {fmt_int(private_owned)} private",
-            "Repository Scope",
+    parts.append(
+        chip(right - cw_ci, 82, ci_text, color=BLUE, icon_name="ci_check", height=24)
+    )
+
+    # 4) one calm gradient divider between header and stat grid
+    parts.append(accent_ribbon(width, pad=pad, y=147, h=2))
+
+    # 5a) primary row: the big headline numbers
+    primary = [
+        ("fire", fmt_int(contributions), "contributions · 12 mo"),
+        ("commit", fmt_int(commits), "public-scope commits"),
+        ("lock", fmt_int(private_owned), "private repositories"),
+        ("pr_merged", fmt_int(prs_merged), "pull requests merged"),
+    ]
+    for i, (icon_name, value, caption) in enumerate(primary):
+        parts.append(
+            _stat_tile(
+                col_x(i),
+                row1_y,
+                tile_w,
+                tile_h,
+                icon_name=icon_name,
+                value=value,
+                caption=caption,
+                accent=BLUE,
+                value_size=26,
+            )
         )
-    )
-    rows.append(
-        f'<rect x="{right_x}" y="{y3}" width="{col_w}" height="{card_h}" rx="11" fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>'
-    )
-    rows.append(
-        _field(
-            right_x + 14,
-            y3 + 30,
-            (
-                f"{releases_text} Releases | {prs_text} PRs | "
-                f"CI {ci_text} | Streak {streak_text}"
-            ),
-            "Recent Delivery",
+
+    # 5b) secondary row: "<N> Word" metrics (validator reads these three back)
+    secondary = [
+        ("code", f"{fmt_int(total_repos)} Repositories", "public · non-fork"),
+        ("star", f"{fmt_int(total_stars)} Stargazers", "received across repos"),
+        ("release_tag", f"{fmt_int(releases)} Releases", "tagged + published"),
+        ("globe", f"{fmt_int(languages_count)} Languages", "used in public code"),
+    ]
+    for i, (icon_name, value, caption) in enumerate(secondary):
+        parts.append(
+            _stat_tile(
+                col_x(i),
+                row2_y,
+                tile_w,
+                tile_h,
+                icon_name=icon_name,
+                value=value,
+                caption=caption,
+                accent=CYAN,
+                value_size=19,
+            )
         )
-    )
 
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
-        f'viewBox="0 0 {width} {height}">{"".join(rows)}</svg>'
+        f'viewBox="0 0 {width} {height}">{"".join(parts)}</svg>'
     )
     with open(output_path, "w", encoding="utf-8") as handle:
         handle.write(svg)

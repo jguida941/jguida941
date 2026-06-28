@@ -41,6 +41,14 @@
 
 <div align="center">
 
+<img src="assets/engineering_cadence.svg?v={{ cache_bust }}" alt="Engineering Cadence" />
+
+</div>
+
+---
+
+<div align="center">
+
 <img src="assets/contribution_calendar.svg?v={{ cache_bust }}" alt="Contribution Calendar" />
 
 </div>

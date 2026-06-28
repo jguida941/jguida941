@@ -18,17 +18,38 @@
       :root {
         color-scheme: dark;
         --bg-main: #1a1b27;
-        --bg-panel: rgba(36, 40, 59, 0.9);
+        --bg-panel: rgba(36, 40, 59, 0.5);
         --bg-panel-strong: #292e42;
         --text-main: #c0caf5;
-        --text-soft: #a9b1d6;
-        --text-dim: #565f89;
-        --line: rgba(65, 72, 104, 0.9);
+        --text-soft: rgba(235, 235, 245, 0.62);
+        --text-dim: rgba(235, 235, 245, 0.34);
+        --line: rgba(255, 255, 255, 0.1);
         --accent-cyan: #7dcfff;
+        --accent-blue: #7aa2f7;
+        --accent-violet: #bb9af7;
+        --accent-green: #9ece6a;
+        --accent-teal: #73daca;
+        --accent-orange: #ff9e64;
         --accent-gold: #e0af68;
         --accent-mint: #9ece6a;
         --accent-pink: #f7768e;
-        --shadow: 0 26px 70px rgba(2, 8, 30, 0.5);
+        --glass-fill: rgba(36, 40, 59, 0.5);
+        --glass-fill-solid: rgba(36, 40, 59, 0.92);
+        --glass-sheen: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.06),
+          rgba(255, 255, 255, 0) 38%
+        );
+        --glass-blur: blur(22px) saturate(160%);
+        --tile-fill: rgba(255, 255, 255, 0.045);
+        --tile-blur: blur(10px) saturate(140%);
+        --glass-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.55),
+          inset 0 1px 0 rgba(255, 255, 255, 0.16),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+        --card-shadow: 0 10px 30px -14px rgba(0, 0, 0, 0.55),
+          inset 0 1px 0 rgba(255, 255, 255, 0.14),
+          inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+        --shadow: var(--glass-shadow);
       }
 
       * {
@@ -52,7 +73,7 @@
         position: fixed;
         inset: 0;
         pointer-events: none;
-        opacity: 0.26;
+        opacity: 0.16;
         background-image: repeating-linear-gradient(
           -45deg,
           rgba(255, 255, 255, 0.06) 0,
@@ -70,23 +91,26 @@
       }
 
       .panel {
+        position: relative;
         border: 1px solid var(--line);
-        border-radius: 16px;
-        background: var(--bg-panel);
-        backdrop-filter: blur(8px);
-        box-shadow: var(--shadow);
+        border-radius: 20px;
+        background: var(--glass-sheen), var(--glass-fill);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        box-shadow: var(--glass-shadow);
       }
 
       .hero {
-        padding: 1.2rem 1.35rem 1.35rem;
+        padding: 1.3rem 1.5rem 1.45rem;
         background:
           linear-gradient(
-            120deg,
-            rgba(76, 222, 255, 0.08),
-            rgba(255, 122, 166, 0.08) 55%,
-            rgba(101, 228, 168, 0.08)
+            125deg,
+            rgba(122, 162, 247, 0.16),
+            rgba(187, 154, 247, 0.1) 52%,
+            rgba(125, 207, 255, 0.1)
           ),
-          var(--bg-panel-strong);
+          var(--glass-sheen),
+          var(--glass-fill);
       }
 
       .eyebrow {
@@ -131,11 +155,13 @@
       }
 
       .meta-pill {
-        border: 1px solid var(--line);
-        background: rgba(18, 27, 56, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
         color: var(--text-soft);
         border-radius: 999px;
-        padding: 0.35rem 0.62rem;
+        padding: 0.36rem 0.64rem;
         font-size: 0.78rem;
       }
 
@@ -163,6 +189,28 @@
         font-family: "JetBrains Mono", monospace;
       }
 
+      .section-head h2,
+      .section-head h3 {
+        position: relative;
+        padding-left: 0.72rem;
+      }
+
+      .section-head h2::before,
+      .section-head h3::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.12em;
+        bottom: 0.12em;
+        width: 3px;
+        border-radius: 999px;
+        background: linear-gradient(
+          180deg,
+          var(--accent-cyan),
+          var(--accent-violet)
+        );
+      }
+
       .score-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -170,10 +218,37 @@
       }
 
       .metric-card {
-        border: 1px solid var(--line);
-        border-radius: 13px;
-        padding: 0.76rem 0.82rem 0.78rem;
-        background: rgba(16, 24, 51, 0.82);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 0.78rem 0.85rem 0.8rem;
+        background: var(--glass-sheen), var(--glass-fill);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        box-shadow: var(--card-shadow);
+        transition:
+          border-color 200ms ease,
+          transform 200ms ease;
+      }
+
+      .metric-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(
+          180deg,
+          var(--card-accent, var(--accent-cyan)),
+          transparent
+        );
+      }
+
+      .metric-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
       }
 
       .metric-label {
@@ -204,10 +279,13 @@
       }
 
       .snapshot-chip {
-        border: 1px solid var(--line);
-        border-radius: 11px;
-        padding: 0.6rem 0.7rem 0.66rem;
-        background: rgba(13, 20, 44, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 0.62rem 0.72rem 0.68rem;
+        background: var(--glass-sheen), var(--glass-fill);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        box-shadow: var(--card-shadow);
       }
 
       .snapshot-k {
@@ -229,10 +307,13 @@
       }
 
       .focus-column {
-        border: 1px solid var(--line);
-        border-radius: 13px;
-        padding: 0.72rem;
-        background: rgba(15, 23, 49, 0.78);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 0.78rem;
+        background: var(--glass-sheen), var(--glass-fill);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        box-shadow: var(--card-shadow);
       }
 
       .focus-title {
@@ -251,10 +332,17 @@
       }
 
       .focus-item {
-        border: 1px solid rgba(129, 152, 218, 0.26);
-        border-radius: 10px;
-        background: rgba(15, 22, 46, 0.86);
-        padding: 0.52rem 0.55rem;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        background: var(--tile-fill);
+        -webkit-backdrop-filter: var(--tile-blur);
+        backdrop-filter: var(--tile-blur);
+        padding: 0.55rem 0.6rem;
+        transition: border-color 200ms ease;
+      }
+
+      .focus-item:hover {
+        border-color: rgba(255, 255, 255, 0.18);
       }
 
       .focus-link {
@@ -280,10 +368,13 @@
       }
 
       .stack-panel {
-        border: 1px solid var(--line);
-        border-radius: 13px;
-        padding: 0.72rem;
-        background: rgba(14, 21, 45, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 0.8rem;
+        background: var(--glass-sheen), var(--glass-fill);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        box-shadow: var(--card-shadow);
       }
 
       .language-list,
@@ -328,10 +419,18 @@
       }
 
       .list-card {
-        border: 1px solid rgba(130, 154, 221, 0.27);
-        border-radius: 10px;
-        padding: 0.55rem;
-        background: rgba(12, 18, 39, 0.84);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 0.6rem 0.65rem;
+        background: var(--glass-sheen), var(--glass-fill);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        box-shadow: var(--card-shadow);
+        transition: border-color 200ms ease;
+      }
+
+      .list-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
       }
 
       .list-k {
@@ -447,6 +546,226 @@
         }
       }
 
+      .engineering-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.72rem;
+        align-items: start;
+      }
+
+      .eng-card {
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 0.85rem 0.95rem 0.95rem;
+        background: var(--glass-sheen), var(--glass-fill);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        box-shadow: var(--card-shadow);
+      }
+
+      .eng-card--wide {
+        grid-column: 1 / -1;
+      }
+
+      .eng-card-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.6rem;
+      }
+
+      .eng-card-title {
+        margin: 0;
+        font: 600 0.84rem "Space Grotesk", sans-serif;
+        color: var(--text-main);
+      }
+
+      .eng-card-sub {
+        margin: 0;
+        color: var(--text-soft);
+        font-size: 0.74rem;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .eng-spark {
+        display: block;
+        width: 100%;
+        height: 58px;
+        margin-top: 0.6rem;
+        overflow: visible;
+      }
+
+      .eng-ring-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
+        text-align: center;
+      }
+
+      .eng-ring-dial {
+        --pct: 0;
+        width: 118px;
+        height: 118px;
+        border-radius: 50%;
+        background: conic-gradient(
+          from -90deg,
+          var(--accent-cyan) calc(var(--pct) * 1%),
+          rgba(255, 255, 255, 0.09) 0
+        );
+        display: grid;
+        place-items: center;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.14),
+          0 8px 22px -14px rgba(0, 0, 0, 0.65);
+      }
+
+      .eng-ring-hole {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background: rgba(22, 24, 36, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.12rem;
+      }
+
+      .eng-ring-pct {
+        font: 700 1.45rem "Space Grotesk", sans-serif;
+        color: #fff;
+        line-height: 1;
+      }
+
+      .eng-ring-cap {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-soft);
+      }
+
+      .eng-ring-foot {
+        text-align: center;
+      }
+
+      .eng-split-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.65rem;
+      }
+
+      .eng-split-track {
+        height: 12px;
+        background: rgba(187, 154, 247, 0.3);
+      }
+
+      .eng-split-fill {
+        background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
+      }
+
+      .eng-split-legend {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.7rem;
+        font-size: 0.78rem;
+        color: var(--text-soft);
+      }
+
+      .eng-dot {
+        display: inline-block;
+        width: 0.55rem;
+        height: 0.55rem;
+        border-radius: 50%;
+        margin-right: 0.32rem;
+      }
+
+      .eng-dot-pub {
+        background: var(--accent-cyan);
+      }
+
+      .eng-dot-priv {
+        background: rgba(187, 154, 247, 0.7);
+      }
+
+      .eng-chip-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.6rem;
+      }
+
+      @media (prefers-reduced-transparency: reduce) {
+        .panel,
+        .metric-card,
+        .snapshot-chip,
+        .focus-column,
+        .stack-panel,
+        .list-card,
+        .eng-card {
+          background: var(--glass-fill-solid);
+          -webkit-backdrop-filter: none;
+          backdrop-filter: none;
+        }
+
+        .hero {
+          background:
+            linear-gradient(
+              125deg,
+              rgba(122, 162, 247, 0.2),
+              rgba(187, 154, 247, 0.14) 52%,
+              rgba(125, 207, 255, 0.14)
+            ),
+            var(--glass-fill-solid);
+        }
+
+        .focus-item {
+          background: rgba(46, 50, 70, 0.92);
+          -webkit-backdrop-filter: none;
+          backdrop-filter: none;
+        }
+
+        .meta-pill {
+          background: rgba(255, 255, 255, 0.08);
+          -webkit-backdrop-filter: none;
+          backdrop-filter: none;
+        }
+      }
+
+      @supports not
+        ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        .panel,
+        .metric-card,
+        .snapshot-chip,
+        .focus-column,
+        .stack-panel,
+        .list-card,
+        .eng-card {
+          background: var(--glass-fill-solid);
+        }
+
+        .hero {
+          background:
+            linear-gradient(
+              125deg,
+              rgba(122, 162, 247, 0.2),
+              rgba(187, 154, 247, 0.14) 52%,
+              rgba(125, 207, 255, 0.14)
+            ),
+            var(--glass-fill-solid);
+        }
+
+        .focus-item {
+          background: rgba(46, 50, 70, 0.92);
+        }
+
+        .meta-pill {
+          background: rgba(255, 255, 255, 0.08);
+        }
+      }
+
       @media (max-width: 980px) {
         .score-grid,
         .snapshot-grid {
@@ -456,6 +775,14 @@
         .focus-grid,
         .split {
           grid-template-columns: 1fr;
+        }
+
+        .engineering-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .eng-chip-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
         }
       }
 
@@ -474,7 +801,8 @@
         }
 
         .score-grid,
-        .snapshot-grid {
+        .snapshot-grid,
+        .eng-chip-grid {
           grid-template-columns: 1fr;
         }
       }
@@ -505,9 +833,17 @@
       <section class="panel section reveal" style="--delay: 0.08s">
         <div class="section-head">
           <h2>Builder Scorecard</h2>
-          <p class="section-note">6 credibility metrics</p>
+          <p class="section-note">8 credibility metrics</p>
         </div>
         <div id="score-grid" class="score-grid"></div>
+      </section>
+
+      <section class="panel section reveal" style="--delay: 0.11s">
+        <div class="section-head">
+          <h2>Engineering Cadence</h2>
+          <p class="section-note">throughput + automation</p>
+        </div>
+        <div id="engineering-grid" class="engineering-grid"></div>
       </section>
 
       <section class="panel section reveal" style="--delay: 0.14s">
@@ -567,9 +903,15 @@
 
       const defaultScorecardMeta = [
         {
-          key: "releases_30d",
-          label: "Release Velocity (30d)",
-          detail: "published releases across public repos",
+          key: "last_year_contributions",
+          label: "12mo Contributions",
+          detail: "contribution calendar",
+          format: (value) => formatInt(value),
+        },
+        {
+          key: "active_days_last_year",
+          label: "Active Days",
+          detail: "days shipped in last 12mo",
           format: (value) => formatInt(value),
         },
         {
@@ -579,28 +921,34 @@
           format: (value) => formatInt(value),
         },
         {
-          key: "avg_release_gap_days",
-          label: "Avg Release Gap",
-          detail: "days between release events",
-          format: (value) => formatFixed(value, 1) + "d",
-        },
-        {
-          key: "stars_per_public_repo",
-          label: "Stars / Public Repo",
-          detail: "signal density",
-          format: (value) => formatFixed(value, 2),
-        },
-        {
           key: "ci_coverage_pct",
           label: "CI Coverage",
-          detail: "repos with workflows",
+          detail: "repos with pipelines",
           format: (value) => formatFixed(value, 1) + "%",
         },
         {
-          key: "last_year_contributions",
-          label: "12mo Contributions",
-          detail: "contribution calendar",
+          key: "automation_workflows",
+          label: "CI Pipelines",
+          detail: "workflow files across repos",
           format: (value) => formatInt(value),
+        },
+        {
+          key: "releases_30d",
+          label: "Releases (30d)",
+          detail: "published in last month",
+          format: (value) => formatInt(value),
+        },
+        {
+          key: "primary_lang_share_pct",
+          label: "Primary Language",
+          detail: "share of code by bytes",
+          format: (value) => formatFixed(value, 1) + "%",
+        },
+        {
+          key: "median_days_since_push",
+          label: "Median Repo Freshness",
+          detail: "median days since last push",
+          format: (value) => formatFixed(value, 0) + "d",
         },
       ];
 
@@ -618,18 +966,21 @@
         { key: "streak_days", label: "Current Streak Days" },
       ];
 
+      // NOTE: --bg-panel, --bg-panel-strong and --line are intentionally omitted
+      // here so the translucent glass values defined in CSS win. Mapping them
+      // would overwrite the rgba() surfaces with the solid hex from data.theme
+      // and kill the frosted-glass effect after applyTheme() runs.
       const themeVarMap = {
         bg_main: "--bg-main",
-        bg_panel: "--bg-panel",
-        bg_panel_strong: "--bg-panel-strong",
         text_main: "--text-main",
         text_soft: "--text-soft",
         text_dim: "--text-dim",
-        line: "--line",
         accent_cyan: "--accent-cyan",
         accent_gold: "--accent-gold",
         accent_mint: "--accent-mint",
         accent_pink: "--accent-pink",
+        accent_blue: "--accent-blue",
+        accent_orange: "--accent-orange",
       };
 
       function escapeHtml(value) {
@@ -714,8 +1065,13 @@
             const raw = card?.value ?? scorecard?.[key] ?? 0;
             const fallbackFormatter = formatterByKey[key] || ((value) => formatInt(value));
             const value = card?.display_value ?? fallbackFormatter(raw);
+            const accent =
+              typeof card?.accent === "string" &&
+              /^#[0-9a-fA-F]{3,8}$/.test(card.accent)
+                ? card.accent
+                : "var(--accent-cyan)";
             return `
-              <article class="metric-card">
+              <article class="metric-card" style="--card-accent: ${accent}">
                 <p class="metric-label">${escapeHtml(label)}</p>
                 <p class="metric-value">${escapeHtml(value)}</p>
                 <p class="metric-detail">${escapeHtml(detail)}</p>
@@ -929,10 +1285,130 @@
         document.getElementById("generated-pill").textContent = "Generated: " + generatedText;
       }
 
+      function buildSparkline(values) {
+        const vals = Array.isArray(values) ? values.map((v) => Number(v) || 0) : [];
+        if (vals.length < 2) {
+          return '<p class="empty-state">No cadence data available.</p>';
+        }
+        const W = 100;
+        const H = 36;
+        const padY = 4;
+        const max = Math.max(...vals);
+        const min = Math.min(...vals);
+        const range = max - min || 1;
+        const stepX = W / (vals.length - 1);
+        const coords = vals.map((value, index) => {
+          const x = index * stepX;
+          const y = padY + (H - 2 * padY) * (1 - (value - min) / range);
+          return [x, y];
+        });
+        const line = coords.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
+        const last = coords[coords.length - 1];
+        const area = `0,${H} ${line} ${W},${H}`;
+        const gid = "spark-" + Math.random().toString(36).slice(2, 8);
+        return `
+          <svg class="eng-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Weekly commit cadence">
+            <defs>
+              <linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(125, 207, 255, 0.45)" />
+                <stop offset="100%" stop-color="rgba(125, 207, 255, 0)" />
+              </linearGradient>
+            </defs>
+            <polygon points="${area}" fill="url(#${gid})" />
+            <polyline points="${line}" fill="none" stroke="#7dcfff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+            <circle cx="${last[0].toFixed(2)}" cy="${last[1].toFixed(2)}" r="1.6" fill="#7dcfff" />
+          </svg>
+        `;
+      }
+
+      function renderEngineering(engineering) {
+        const root = document.getElementById("engineering-grid");
+        if (!root) return;
+        const eng =
+          engineering && typeof engineering === "object" ? engineering : {};
+        const cadence = Array.isArray(eng.weekly_cadence) ? eng.weekly_cadence : [];
+        const autoRepos = Number(eng.automation_repos) || 0;
+        const nonfork = Number(eng.public_nonfork_repos) || 0;
+        const coveragePct = nonfork > 0 ? (autoRepos / nonfork) * 100 : 0;
+        const publicTotal = Number(eng.public_repos_total) || 0;
+        const privateRaw = eng.private_repos_total;
+        const hasPrivate =
+          privateRaw !== null &&
+          privateRaw !== undefined &&
+          Number.isFinite(Number(privateRaw));
+        const privateTotal = hasPrivate ? Number(privateRaw) : 0;
+        const denom = publicTotal + privateTotal;
+        const pubPct = hasPrivate
+          ? denom > 0
+            ? (publicTotal / denom) * 100
+            : 0
+          : 100;
+        const peak = cadence.length
+          ? Math.max(...cadence.map((value) => Number(value) || 0))
+          : 0;
+
+        const chips = [
+          { label: "Active Days (12mo)", value: formatInt(eng.active_days_last_year) },
+          { label: "CI Pipelines", value: formatInt(eng.automation_workflows) },
+          {
+            label: "Primary Lang %",
+            value: formatFixed(eng.primary_lang_share_pct, 1) + "%",
+          },
+          {
+            label: "Median Days Since Push",
+            value: formatFixed(eng.median_days_since_push, 0) + "d",
+          },
+          { label: "Recent Private", value: formatInt(eng.recent_private_count) },
+        ];
+        const chipHtml = chips
+          .map(
+            (chip) => `
+              <article class="snapshot-chip">
+                <p class="snapshot-k">${escapeHtml(chip.label)}</p>
+                <p class="snapshot-v">${escapeHtml(chip.value)}</p>
+              </article>
+            `,
+          )
+          .join("");
+
+        root.innerHTML = `
+          <article class="eng-card eng-card--wide">
+            <div class="eng-card-head">
+              <p class="eng-card-title">Weekly Commit Cadence</p>
+              <p class="eng-card-sub">last ${cadence.length} weeks · peak ${escapeHtml(formatInt(peak))}</p>
+            </div>
+            ${buildSparkline(cadence)}
+          </article>
+          <article class="eng-card eng-ring-card">
+            <div class="eng-ring-dial" style="--pct: ${coveragePct.toFixed(1)}">
+              <div class="eng-ring-hole">
+                <span class="eng-ring-pct">${escapeHtml(formatFixed(coveragePct, 0))}%</span>
+                <span class="eng-ring-cap">CI Coverage</span>
+              </div>
+            </div>
+            <p class="eng-card-sub eng-ring-foot">${escapeHtml(formatInt(autoRepos))} / ${escapeHtml(formatInt(nonfork))} repos automated</p>
+          </article>
+          <article class="eng-card eng-split-card">
+            <p class="eng-card-title">Public vs Private Repos</p>
+            <div class="bar-track eng-split-track">
+              <div class="bar-fill eng-split-fill" style="--target: ${pubPct.toFixed(1)}%"></div>
+            </div>
+            <div class="eng-split-legend">
+              <span><i class="eng-dot eng-dot-pub"></i>Public · ${escapeHtml(formatInt(publicTotal))}</span>
+              <span><i class="eng-dot eng-dot-priv"></i>Private · ${hasPrivate ? escapeHtml(formatInt(privateTotal)) : "n/a"}</span>
+            </div>
+          </article>
+          <div class="eng-chip-grid eng-card--wide">
+            ${chipHtml}
+          </div>
+        `;
+      }
+
       function renderDashboard(data) {
         applyTheme(data?.theme || {});
         renderHeader(data);
         renderScorecard(data?.scorecard || {}, data?.scorecard_cards || []);
+        renderEngineering(data?.engineering || {});
         renderSnapshot(data?.snapshot || {}, data?.snapshot_cards || []);
         renderFocus(data?.focus || {});
         renderTopLanguages(data?.top_languages || []);
@@ -961,6 +1437,8 @@
             '<p class="status status-error">Dashboard data is missing. Run <code>python scripts/profile_cli.py generate-profile --validate</code> and redeploy.</p>';
           document.getElementById("score-grid").innerHTML =
             '<p class="status status-error">Scorecard unavailable.</p>';
+          document.getElementById("engineering-grid").innerHTML =
+            '<p class="status status-error">Engineering cadence unavailable.</p>';
           document.getElementById("snapshot-grid").innerHTML =
             '<p class="status status-error">Snapshot unavailable.</p>';
           document.getElementById("focus-grid").innerHTML =

@@ -1,18 +1,33 @@
-"""Build the contribution calendar SVG panel."""
+"""Build the contribution calendar SVG panel (Apple/glass styling)."""
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
 
 from scripts.config import (
-    BG_HIGHLIGHT,
+    BLUE,
+    CYAN,
+    FONT_SANS,
+    GLASS_INSET,
+    GREEN,
+    SVG_WIDTH,
     TEXT,
     TEXT_BRIGHT,
-    BORDER,
-    SVG_WIDTH,
-    FONT_SANS,
+    TEXT_DIM,
 )
-from scripts.card_theme import card_bg, title_accent, title_left, title_right
+from scripts.glass_kit import (
+    accent_ribbon,
+    glass_panel,
+    glass_tile,
+    icon,
+)
+from scripts.card_theme import title_left
+from scripts.svg_utils import fmt_int
+
+# Refined 5-step intensity ramp: idle slot + cool blue -> cyan -> mint (low -> high).
+_EMPTY_HEX = "#c0caf5"
+_EMPTY_OP = 0.06
+_RAMP = ["#34528a", "#5b86d4", "#7dcfff", "#9ece6a"]  # levels 1..4
 
 
 def _month_label(date_str: str) -> str:
@@ -94,11 +109,58 @@ def _level(count: int, max_count: int) -> int:
     return 1
 
 
+def _cell(x: float, y: float, size: float, level: int) -> str:
+    """One rounded heatmap cell: faint frosted slot when idle, ramp color when active."""
+    rx = 3
+    if level <= 0:
+        return (
+            f'<rect x="{x:g}" y="{y:g}" width="{size:g}" height="{size:g}" rx="{rx}" '
+            f'fill="{_EMPTY_HEX}" fill-opacity="{_EMPTY_OP}"/>'
+        )
+    color = _RAMP[level - 1]
+    return (
+        f'<rect x="{x:g}" y="{y:g}" width="{size:g}" height="{size:g}" rx="{rx}" '
+        f'fill="{color}"/>'
+        f'<rect x="{x + 0.5:g}" y="{y + 0.5:g}" width="{size - 1:g}" height="{size - 1:g}" '
+        f'rx="{rx - 0.5:g}" fill="none" stroke="#ffffff" stroke-opacity="0.10" stroke-width="0.75"/>'
+    )
+
+
+def _stat_tile(
+    x: float,
+    y: float,
+    w: float,
+    h: float,
+    *,
+    accent: str,
+    icon_name: str,
+    value: str,
+    unit: str,
+    label: str,
+) -> str:
+    parts = [glass_tile(x, y, w, h, accent=accent)]
+    parts.append(icon(icon_name, x + 16, y + 24, size=15, color=accent))
+    num_x = x + 41
+    num_baseline = y + 40
+    parts.append(
+        f'<text x="{num_x:g}" y="{num_baseline:g}" fill="{TEXT_BRIGHT}" font-size="21" '
+        f'font-family="{FONT_SANS}" font-weight="700">{value}</text>'
+    )
+    if unit:
+        unit_x = num_x + len(value) * 21 * 0.6 + 6
+        parts.append(
+            f'<text x="{unit_x:g}" y="{num_baseline:g}" fill="{TEXT_DIM}" font-size="11" '
+            f'font-family="{FONT_SANS}" font-weight="500">{unit}</text>'
+        )
+    parts.append(
+        f'<text x="{x + 16:g}" y="{y + 55:g}" fill="{TEXT_DIM}" font-size="9.5" '
+        f'font-family="{FONT_SANS}" font-weight="600" letter-spacing="1.1">{label}</text>'
+    )
+    return "".join(parts)
+
+
 def generate(calendar: dict | None, output_path: str = "assets/contribution_calendar.svg") -> str:
-    pad = 20
-    grid_y = 64
-    cell = 10
-    gap = 2
+    title = "Contribution Calendar"
 
     weeks = []
     total_contributions = 0
@@ -110,20 +172,26 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
             total_contributions = 0
 
     if not weeks:
-        svg_h = 176
-        svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
-  {card_bg(SVG_WIDTH, svg_h)}
-  {title_left("Contribution Calendar", x=pad, y=30)}
-  {title_right("last 12 months", width=SVG_WIDTH, pad=pad, y=30)}
-  {title_accent(width=SVG_WIDTH, pad=pad, y=35)}
-  <text x="{pad}" y="92" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}">Calendar data unavailable for this run.</text>
-</svg>'''
+        svg_h = 150
+        body = (
+            glass_panel(SVG_WIDTH, svg_h)
+            + title_left(title, x=30, y=44)
+            + accent_ribbon(SVG_WIDTH, pad=30, y=56)
+            + f'<text x="30" y="96" fill="{TEXT}" font-size="13" '
+            f'font-family="{FONT_SANS}">Calendar data unavailable for this run.</text>'
+        )
+        svg = (
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" '
+            f'viewBox="0 0 {SVG_WIDTH} {svg_h}">{body}</svg>'
+        )
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(svg)
         return output_path
 
     all_days = []
     for week in weeks:
+        if not isinstance(week, dict):
+            continue
         for day in week.get("contributionDays", []):
             if isinstance(day, dict):
                 all_days.append(day)
@@ -137,89 +205,121 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
 
     current_streak, longest_streak = _compute_streaks(all_days)
 
+    # --- Grid geometry (centered, with ~38px breathing room from the panel rim) ---
+    cell = 11
+    gap = 3
     cols = len(weeks)
     grid_w = cols * cell + max(0, cols - 1) * gap
     grid_h = 7 * cell + 6 * gap
-    grid_x = max(pad, int((SVG_WIDTH - grid_w) / 2))
+    grid_x = round((SVG_WIDTH - grid_w) / 2)
+    grid_y = 88
+    grid_bottom = grid_y + grid_h
+    left = grid_x
+    right = grid_x + grid_w
 
-    month_markers = []
+    # --- Vertical layout ---
+    title_y = 42
+    ribbon_y = 53
+    legend_y = grid_bottom + 22
+    tiles_y = grid_bottom + 44
+    tile_h = 64
+    svg_h = tiles_y + tile_h + GLASS_INSET + 12
+
+    parts: list[str] = [glass_panel(SVG_WIDTH, svg_h)]
+
+    # Title + eyebrow caption
+    parts.append(title_left(title, x=left, y=title_y))
+    parts.append(
+        f'<text x="{right:g}" y="{title_y - 1:g}" fill="{TEXT_DIM}" font-size="10" '
+        f'font-family="{FONT_SANS}" font-weight="600" letter-spacing="1.5" '
+        f'text-anchor="end">LAST 12 MONTHS</text>'
+    )
+    parts.append(accent_ribbon(SVG_WIDTH, pad=left, y=ribbon_y))
+
+    # Month labels above the grid (skip a new month if it would crowd the prior label)
     prev_month = ""
+    last_label_x = -1e9
     for idx, week in enumerate(weeks):
-        days = week.get("contributionDays") or []
+        days = week.get("contributionDays") or [] if isinstance(week, dict) else []
         first_date = days[0].get("date", "") if days and isinstance(days[0], dict) else ""
         month = _month_label(first_date)
         if month and month != prev_month:
-            month_markers.append((idx, month))
             prev_month = month
+            lx = grid_x + idx * (cell + gap)
+            if lx - last_label_x < 34:
+                continue
+            last_label_x = lx
+            parts.append(
+                f'<text x="{lx:g}" y="{grid_y - 9:g}" fill="{TEXT_DIM}" font-size="9.5" '
+                f'font-family="{FONT_SANS}" font-weight="500">{month}</text>'
+            )
 
-    stats_y = grid_y + grid_h + 28
-    svg_h = stats_y + 58
-
-    palette = [BG_HIGHLIGHT, "#313c5c", "#3f5380", "#5876ad", "#7aa2f7"]
-
-    parts = []
-    parts.append(title_left("Contribution Calendar", x=pad, y=30))
-    parts.append(title_right("last 12 months", width=SVG_WIDTH, pad=pad, y=30))
-    parts.append(title_accent(width=SVG_WIDTH, pad=pad, y=35))
-
-    for idx, month in month_markers:
-        x = grid_x + idx * (cell + gap)
-        parts.append(
-            f'<text x="{x}" y="{grid_y - 7}" fill="{TEXT}" font-size="9" '
-            f'font-family="{FONT_SANS}">{month}</text>'
-        )
-
+    # Heatmap cells
     for w_idx, week in enumerate(weeks):
         days = week.get("contributionDays") if isinstance(week, dict) else []
         if not isinstance(days, list):
             continue
+        cx = grid_x + w_idx * (cell + gap)
         for d_idx, day in enumerate(days[:7]):
             try:
                 count = int(day.get("contributionCount", 0))
             except (TypeError, ValueError):
                 count = 0
             level = _level(count, max_count)
-            x = grid_x + w_idx * (cell + gap)
-            y = grid_y + d_idx * (cell + gap)
-            parts.append(
-                f'<rect x="{x}" y="{y}" width="{cell}" height="{cell}" rx="2" '
-                f'fill="{palette[level]}" stroke="{BORDER}" stroke-width="0.4"/>'
-            )
+            cy = grid_y + d_idx * (cell + gap)
+            parts.append(_cell(cx, cy, cell, level))
 
-    thirds = [int(SVG_WIDTH * 0.2), int(SVG_WIDTH * 0.5), int(SVG_WIDTH * 0.8)]
+    # Legend: Less [ramp swatches] More (right-aligned to the grid)
+    sw = 12
+    sgap = 4
+    swatches = 5
+    legend_w = swatches * sw + (swatches - 1) * sgap
+    text_pad = 8
+    less_w = 30
+    more_w = 32
+    sw_x = right - more_w - legend_w
     parts.append(
-        f'<text x="{thirds[0]}" y="{stats_y}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}" text-anchor="middle">'
-        f'Total: {total_contributions:,} contributions</text>'
+        f'<text x="{sw_x - text_pad:g}" y="{legend_y + sw - 2.5:g}" fill="{TEXT_DIM}" '
+        f'font-size="9.5" font-family="{FONT_SANS}" text-anchor="end">Less</text>'
     )
+    for i in range(swatches):
+        lx = sw_x + i * (sw + sgap)
+        parts.append(_cell(lx, legend_y, sw, i))
     parts.append(
-        f'<text x="{thirds[1]}" y="{stats_y}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}" text-anchor="middle">'
-        f'Current streak: {current_streak} days</text>'
-    )
-    parts.append(
-        f'<text x="{thirds[2]}" y="{stats_y}" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}" text-anchor="middle">'
-        f'Longest streak: {longest_streak} days</text>'
+        f'<text x="{sw_x + legend_w + text_pad:g}" y="{legend_y + sw - 2.5:g}" fill="{TEXT_DIM}" '
+        f'font-size="9.5" font-family="{FONT_SANS}">More</text>'
     )
 
-    legend_y = stats_y + 18
-    parts.append(
-        f'<text x="{grid_x}" y="{legend_y + 10}" fill="{TEXT}" font-size="9" font-family="{FONT_SANS}">Less</text>'
-    )
-    legend_x = grid_x + 30
-    for idx, color in enumerate(palette):
-        lx = legend_x + idx * (cell + 4)
+    # Stat tiles (frosted) — Total / Current streak / Longest streak
+    t_gap = 16
+    tile_w = (grid_w - 2 * t_gap) / 3
+    streak_unit = "day" if current_streak == 1 else "days"
+    longest_unit = "day" if longest_streak == 1 else "days"
+    stats = [
+        (BLUE, "calendar", fmt_int(total_contributions), "", "TOTAL CONTRIBUTIONS"),
+        (CYAN, "fire", str(current_streak), streak_unit, "CURRENT STREAK"),
+        (GREEN, "trend_up", str(longest_streak), longest_unit, "LONGEST STREAK"),
+    ]
+    for i, (accent, icon_name, value, unit, label) in enumerate(stats):
+        tx = grid_x + i * (tile_w + t_gap)
         parts.append(
-            f'<rect x="{lx}" y="{legend_y}" width="{cell}" height="{cell}" rx="2" '
-            f'fill="{color}" stroke="{BORDER}" stroke-width="0.4"/>'
+            _stat_tile(
+                tx,
+                tiles_y,
+                tile_w,
+                tile_h,
+                accent=accent,
+                icon_name=icon_name,
+                value=value,
+                unit=unit,
+                label=label,
+            )
         )
-    parts.append(
-        f'<text x="{legend_x + len(palette) * (cell + 4) + 4}" y="{legend_y + 10}" fill="{TEXT}" '
-        f'font-size="9" font-family="{FONT_SANS}">More</text>'
-    )
 
-    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
-  {card_bg(SVG_WIDTH, svg_h)}
-  {''.join(parts)}
-</svg>'''
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" '
+        f'viewBox="0 0 {SVG_WIDTH} {svg_h}">{"".join(parts)}</svg>'
+    )
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(svg)

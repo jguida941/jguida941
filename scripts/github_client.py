@@ -171,9 +171,12 @@ def _normalize_graphql_repo(node: dict) -> dict:
     visibility = str(node.get("visibility", "PUBLIC")).lower()
     workflows_dir = node.get("workflowsDir")
     has_ci_workflows = False
+    workflow_file_count = 0
     if isinstance(workflows_dir, dict):
         entries = workflows_dir.get("entries")
-        has_ci_workflows = isinstance(entries, list) and len(entries) > 0
+        if isinstance(entries, list):
+            workflow_file_count = len(entries)
+            has_ci_workflows = workflow_file_count > 0
     language_bytes = {}
     languages = node.get("languages")
     if isinstance(languages, dict):
@@ -216,6 +219,7 @@ def _normalize_graphql_repo(node: dict) -> dict:
         "language": language_name,
         "owner": {"login": owner_login},
         "has_ci_workflows": has_ci_workflows,
+        "workflow_file_count": workflow_file_count,
         "language_bytes": language_bytes,
         "latest_commit_message": latest_commit_message,
     }
@@ -356,6 +360,81 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
 
     _set_cached(cache_key, repos)
     return repos
+
+
+def _graphql_private_owned_repos(limit: int = 40) -> list:
+    """Fetch recently-pushed PRIVATE owned repos (name + metadata only).
+
+    Reuses the same node shape as the public query. Returns metadata only
+    (name, language, pushedAt, commit headline, isPrivate) — never file
+    contents. Requires a user PAT; the Actions default token sees no private
+    user repos and yields an empty list.
+    """
+    cache_key = f"graphql_private_owned_repos_{int(limit)}"
+    cached = _get_cached(cache_key)
+    if isinstance(cached, list):
+        return cached
+    if not TOKEN:
+        return []
+
+    query = """
+    query($login: String!, $first: Int!) {
+      user(login: $login) {
+        repositories(
+          ownerAffiliations: OWNER
+          privacy: PRIVATE
+          isFork: false
+          first: $first
+          orderBy: { field: PUSHED_AT, direction: DESC }
+        ) {
+          nodes {
+            name
+            isFork
+            isPrivate
+            visibility
+            description
+            url
+            pushedAt
+            createdAt
+            stargazerCount
+            forkCount
+            owner { login }
+            primaryLanguage { name }
+            defaultBranchRef {
+              target {
+                __typename
+                ... on Commit { messageHeadline }
+              }
+            }
+            workflowsDir: object(expression: "HEAD:.github/workflows") {
+              __typename
+              ... on Tree { entries { name } }
+            }
+          }
+        }
+      }
+    }
+    """
+    try:
+        data = _graphql_query(query, {"login": USERNAME, "first": max(1, int(limit))})
+    except Exception:
+        return []
+    user = (data or {}).get("user")
+    repo_conn = (user or {}).get("repositories")
+    if not isinstance(repo_conn, dict):
+        return []
+    nodes = repo_conn.get("nodes") or []
+    repos = [_normalize_graphql_repo(node) for node in nodes if isinstance(node, dict)]
+    _set_cached(cache_key, repos)
+    return repos
+
+
+def get_private_repos(limit: int = 40) -> list:
+    """Public wrapper: recently-pushed private owned repos (metadata only)."""
+    try:
+        return _graphql_private_owned_repos(limit=limit)
+    except Exception:
+        return []
 
 
 # ── public API (signatures unchanged) ────────────────────────────────

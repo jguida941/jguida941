@@ -12,3 +12,8 @@ site/data/doctor_report.json
 site/data/triage_report.json
 site/data/run_diagnostics.json
 site/data/run_diagnostics_history.jsonl
+
+# local dev / QA scratch (not part of the pipeline)
+render_one.py
+render_fixture.json
+_dump_fixture.py

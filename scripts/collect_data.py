@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -34,6 +34,7 @@ class CollectedProfileData:
     total_contributions: int | None
     token_mode: str
     cache_mode: dict[str, Any]
+    private_repos: list[dict[str, Any]] = field(default_factory=list)
 
 
 def collect_profile_data(logger=print) -> CollectedProfileData:
@@ -60,8 +61,9 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
             0,
             int(repo_counts["public_owned_total"]) - int(repo_counts["public_owned_nonfork"]),
         )
+    previous_snapshot = _read_previous_snapshot()
     if repo_counts.get("private_owned") is None:
-        previous_private = _read_previous_private_owned_count()
+        previous_private = _prev_int(previous_snapshot, "private_owned_repos")
         if previous_private is not None:
             repo_counts["private_owned"] = previous_private
     logger(
@@ -95,7 +97,12 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
     logger("[5/7] Fetching public repo commit count...")
     public_scope_commits = gh.get_total_commits(repos, use_global_fallback=True)
     if public_scope_commits is None:
-        logger("  n/a public-scope commits (data unavailable for this run)")
+        restored = _prev_int(previous_snapshot, "public_scope_commits")
+        if restored is not None:
+            public_scope_commits = restored
+            logger(f"  preserved last-known-good public-scope commits: {restored}")
+        else:
+            logger("  n/a public-scope commits (data unavailable for this run)")
     else:
         logger(f"  {public_scope_commits} public-scope commits")
 
@@ -112,9 +119,20 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
         except (TypeError, ValueError):
             total_contributions = None
     if total_contributions is None:
-        logger("  n/a contributions in the last 12 months (calendar unavailable for this run)")
+        restored = _prev_int(previous_snapshot, "last_year_contributions")
+        if restored is not None:
+            total_contributions = restored
+            logger(f"  preserved last-known-good contributions: {restored}")
+        else:
+            logger("  n/a contributions in the last 12 months (calendar unavailable for this run)")
     else:
         logger(f"  {total_contributions} contributions in the last 12 months")
+
+    # Private repos (names + metadata only, never file contents) for the
+    # activity / currently-working surface. Empty unless a user PAT is present.
+    private_repos = gh.get_private_repos()
+    if private_repos:
+        logger(f"  {len(private_repos)} recent private repos (metadata only)")
 
     return CollectedProfileData(
         repo_counts=repo_counts,
@@ -129,11 +147,17 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
         total_contributions=total_contributions,
         token_mode=detect_token_mode(),
         cache_mode=detect_cache_mode(),
+        private_repos=private_repos,
     )
 
 
-def _read_previous_private_owned_count() -> int | None:
-    """Read the last known private-owned repo count from snapshot output."""
+def _read_previous_snapshot() -> dict[str, Any] | None:
+    """Return the most-trustworthy previous ``snapshot`` sub-dict.
+
+    Reads ``site/data/profile_snapshot.json`` from both the working tree and
+    ``git show HEAD:...`` so a degraded run can preserve last-known-good
+    user-specific metrics instead of regressing them to zero/n-a.
+    """
     snapshot_path = Path("site/data/profile_snapshot.json")
     payloads: list[dict[str, Any]] = []
     if snapshot_path.exists():
@@ -159,13 +183,22 @@ def _read_previous_private_owned_count() -> int | None:
 
     for payload in payloads:
         snapshot = payload.get("snapshot") if isinstance(payload, dict) else None
-        if not isinstance(snapshot, dict):
-            continue
-        value = snapshot.get("private_owned_repos")
-        try:
-            parsed = int(value)
-        except (TypeError, ValueError):
-            continue
-        if parsed >= 0:
-            return parsed
+        if isinstance(snapshot, dict):
+            return snapshot
     return None
+
+
+def _prev_int(snapshot: dict[str, Any] | None, key: str) -> int | None:
+    """Return a non-negative int from a previous snapshot dict, else None."""
+    if not isinstance(snapshot, dict):
+        return None
+    try:
+        parsed = int(snapshot.get(key))
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed >= 0 else None
+
+
+def _read_previous_private_owned_count() -> int | None:
+    """Back-compat: last known private-owned repo count from snapshot output."""
+    return _prev_int(_read_previous_snapshot(), "private_owned_repos")

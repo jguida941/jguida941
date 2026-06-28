@@ -81,6 +81,7 @@ REQUIRED_README_MARKERS = (
     "assets/streak_summary.svg",
     "assets/badges.svg",
     "assets/builder_scorecard.svg",
+    "assets/engineering_cadence.svg",
     "assets/contribution_calendar.svg",
     "assets/now_next_shipped.svg",
     "assets/currently_working.svg",

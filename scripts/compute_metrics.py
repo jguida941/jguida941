@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+import os
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from scripts import github_client as gh
 from scripts.collect_data import CollectedProfileData
@@ -32,7 +34,25 @@ from scripts.contracts import (
     SnapshotRow,
 )
 from scripts.profile_contract import SCORECARD_METRICS, SNAPSHOT_METRICS, format_metric_value
-from scripts.profile_helpers import activity_label, ci_text, has_ci_workflow, time_ago
+from scripts.profile_helpers import (
+    activity_label,
+    ci_text,
+    has_ci_workflow,
+    is_bot_actor,
+    is_bot_commit_message,
+    is_self_repo,
+    time_ago,
+)
+
+
+def _profile_today() -> date:
+    """Today's date in the profile timezone (so streaks aren't off-by-one in UTC)."""
+    tz_name = os.environ.get("PROFILE_TIMEZONE", "America/New_York").strip() or "America/New_York"
+    try:
+        tz = ZoneInfo(tz_name)
+    except ZoneInfoNotFoundError:
+        tz = timezone.utc
+    return datetime.now(tz).date()
 
 
 def _parse_calendar_day_date(value: str) -> datetime | None:
@@ -44,7 +64,9 @@ def _parse_calendar_day_date(value: str) -> datetime | None:
         return None
 
 
-def _compute_current_streak_days(calendar: dict | None, now_utc: datetime) -> int:
+def _compute_current_streak_days(
+    calendar: dict | None, now_utc: datetime, today_local: date | None = None
+) -> int:
     if not isinstance(calendar, dict):
         return 0
 
@@ -60,11 +82,11 @@ def _compute_current_streak_days(calendar: dict | None, now_utc: datetime) -> in
     if not all_days:
         return 0
 
-    today_utc = now_utc.date()
+    today_ref = today_local if today_local is not None else now_utc.date()
     streak = 0
     for day in reversed(all_days):
         day_dt = _parse_calendar_day_date(str(day.get("date", "")))
-        if day_dt is not None and day_dt.date() > today_utc:
+        if day_dt is not None and day_dt.date() > today_ref:
             continue
         try:
             count = int(day.get("contributionCount", 0))
@@ -83,47 +105,67 @@ def _build_recent_repos(
     seven_days_ago: datetime,
     latest_push_message_by_repo: dict[str, str],
     allow_network_calls: bool,
+    private_repos: list[dict] | None = None,
 ) -> tuple[list[dict], dict[str, str]]:
     recent_repos = []
     recent_commit_message_by_repo: dict[str, str] = {}
     seen = set()
-    for repo in sorted(repos, key=lambda item: item.get("pushed_at", ""), reverse=True):
+    candidates = list(repos) + list(private_repos or [])
+    for repo in sorted(candidates, key=lambda item: item.get("pushed_at", ""), reverse=True):
+        name = repo.get("name", "")
+        # Never surface the profile repo itself (the hourly bot commit).
+        if not name or is_self_repo(name):
+            continue
         pushed = repo.get("pushed_at", "")
         if not pushed:
             continue
         pushed_dt = datetime.fromisoformat(pushed.replace("Z", "+00:00"))
         if pushed_dt < seven_days_ago:
             break
-        if repo["name"] in seen:
+        if name in seen:
             continue
-        seen.add(repo["name"])
+        seen.add(name)
 
-        last_msg = (repo.get("latest_commit_message") or "").split("\n")[0].strip()
-        if not last_msg and allow_network_calls:
-            try:
-                commits_data = gh.paginated_get(
-                    f"repos/{repo['owner']['login']}/{repo['name']}/commits",
-                    {"per_page": 1},
-                    per_page=1,
-                )
-                if commits_data:
-                    last_msg = commits_data[0].get("commit", {}).get("message", "").split("\n")[0].strip()
-            except Exception:
-                pass
-        if not last_msg:
-            full_name = f"{repo['owner']['login']}/{repo['name']}"
-            last_msg = latest_push_message_by_repo.get(full_name, "")
-        if not last_msg:
-            last_msg = "recent push detected"
+        is_private = bool(repo.get("private"))
+        if is_private:
+            # Private projects show name + language + time only — never commit text.
+            last_msg = ""
+        else:
+            last_msg = (repo.get("latest_commit_message") or "").split("\n")[0].strip()
+            if is_bot_commit_message(last_msg):
+                last_msg = ""
+            if not last_msg and allow_network_calls:
+                try:
+                    commits_data = gh.paginated_get(
+                        f"repos/{repo['owner']['login']}/{name}/commits",
+                        {"per_page": 1},
+                        per_page=1,
+                    )
+                    if commits_data:
+                        candidate = commits_data[0].get("commit", {}).get("message", "").split("\n")[0].strip()
+                        if not is_bot_commit_message(candidate):
+                            last_msg = candidate
+                except Exception:
+                    pass
+            if not last_msg:
+                full_name = f"{repo['owner']['login']}/{name}"
+                candidate = latest_push_message_by_repo.get(full_name, "")
+                if not is_bot_commit_message(candidate):
+                    last_msg = candidate
+            if not last_msg:
+                last_msg = "recent push detected"
 
-        recent_commit_message_by_repo[repo["name"]] = last_msg
+        if last_msg:
+            recent_commit_message_by_repo[name] = last_msg
         recent_repos.append(
             {
-                "name": repo["name"],
-                "html_url": repo.get("html_url", ""),
+                "name": name,
+                # Private repo URLs 404 for visitors, so don't link them.
+                "html_url": "" if is_private else repo.get("html_url", ""),
                 "language": repo.get("language"),
                 "pushed_at": pushed,
                 "last_commit_msg": last_msg,
+                "is_private": is_private,
             }
         )
     return recent_repos, recent_commit_message_by_repo
@@ -195,10 +237,14 @@ def _build_repo_overview_rows(
         pushed_raw = repo.get("pushed_at", "") or ""
         pushed_date = pushed_raw[:10] if pushed_raw else ""
         commit_msg = (repo.get("latest_commit_message") or "").split("\n")[0].strip()
+        if is_bot_commit_message(commit_msg):
+            commit_msg = ""
         if not commit_msg and name:
-            commit_msg = recent_commit_message_by_repo.get(name, "")
+            candidate = recent_commit_message_by_repo.get(name, "")
+            commit_msg = "" if is_bot_commit_message(candidate) else candidate
         if not commit_msg and full_name:
-            commit_msg = latest_push_message_by_repo.get(full_name, "")
+            candidate = latest_push_message_by_repo.get(full_name, "")
+            commit_msg = "" if is_bot_commit_message(candidate) else candidate
         if not commit_msg:
             commit_msg = "recent push detected"
 
@@ -225,6 +271,8 @@ def _build_repo_overview_rows(
             ordered_repo_names.append(featured_name)
     for repo in sorted_repos_by_push:
         repo_name = repo.get("name", "")
+        if is_self_repo(repo_name):
+            continue
         if repo_name and repo_name not in ordered_repo_names:
             ordered_repo_names.append(repo_name)
         if len(ordered_repo_names) >= 18:
@@ -263,6 +311,11 @@ def _build_recent_activity(
         repo_name = event.get("repo", {}).get("name", "")
         if not repo_name.startswith(owned_repo_prefix):
             continue
+        # Drop the profile repo itself and automation-actor events.
+        if is_self_repo(None, repo_name):
+            continue
+        if is_bot_actor((event.get("actor") or {}).get("login")):
+            continue
         if repo_name in seen_contrib:
             continue
         seen_contrib.add(repo_name)
@@ -298,6 +351,8 @@ def _build_recent_activity(
         payload = event.get("payload", {})
         release = payload.get("release", {})
         repo_name = event.get("repo", {}).get("name", "")
+        if is_self_repo(None, repo_name):
+            continue
         release_tag = (release.get("tag_name") or "").strip() or "unknown"
         release_url = (release.get("html_url") or "").strip()
         if not release_url and repo_name and release_tag != "unknown":
@@ -321,6 +376,8 @@ def _build_recent_activity(
             continue
         pr = event.get("payload", {}).get("pull_request", {})
         repo_name = event.get("repo", {}).get("name", "")
+        if is_self_repo(None, repo_name):
+            continue
         state = pr.get("state", "open").upper()
         if pr.get("merged"):
             state = "MERGED"
@@ -351,32 +408,35 @@ def _build_recent_activity(
         row["full_name"]: row for row in repo_overview_rows if row.get("full_name")
     }
 
+    # "Now" = actual most-recent pushes (public + private, self-repo excluded),
+    # never the featured-ordered overview — this is what's genuinely in flight.
     focus_now = []
-    for entry in contributions[:3]:
-        repo_short = entry["repo"].split("/")[-1] if entry.get("repo") else "repo"
-        repo_ctx = repo_row_by_full_name.get(entry.get("repo", ""))
-        detail_bits = [entry["activity"], entry["time_ago"]]
-        if repo_ctx:
-            detail_bits.append(f"★{repo_ctx['stars']}")
-            if repo_ctx.get("language") and repo_ctx["language"] != "n/a":
-                detail_bits.append(repo_ctx["language"])
+    for repo in recent_repos[:3]:
+        lang = repo.get("language") or "code"
+        # Private repos show real name + language + activity (a subtle lock glyph is
+        # rendered by the card) — no "private" word, no commit text, no dead link.
+        detail = f"{lang} · pushed {time_ago(repo.get('pushed_at', ''))}"
         focus_now.append(
             {
-                "title": repo_short,
-                "detail": " · ".join(detail_bits),
-                "url": entry["url"],
+                "title": repo["name"],
+                "detail": detail,
+                "url": repo.get("html_url", ""),
+                "is_private": bool(repo.get("is_private")),
             }
         )
     if not focus_now:
-        for row in repo_overview_rows[:3]:
+        for entry in contributions[:3]:
+            repo_short = entry["repo"].split("/")[-1] if entry.get("repo") else "repo"
             focus_now.append(
                 {
-                    "title": row["name"],
-                    "detail": f"{row['language']} · {row['pushed_ago']} · ★{row['stars']}",
-                    "url": row["url"],
+                    "title": repo_short,
+                    "detail": f"{entry['activity']} · {entry['time_ago']}",
+                    "url": entry["url"],
                 }
             )
 
+    # "Next" is sourced ONLY from real open PRs. No fabricated "Next pass:" items —
+    # an empty lane is honest when there is nothing queued.
     focus_next = []
     open_prs = [pr for pr in pr_list if pr.get("state") == "OPEN"]
     for pr in open_prs[:3]:
@@ -388,17 +448,6 @@ def _build_recent_activity(
                 "url": pr["url"],
             }
         )
-    if not focus_next:
-        candidate_rows = [row for row in repo_overview_rows if row.get("ci") != "yes"] or repo_overview_rows
-        for row in candidate_rows[:3]:
-            ci_detail = row["ci"] if row["ci"] in {"yes", "no"} else "unavailable"
-            focus_next.append(
-                {
-                    "title": f"Next pass: {row['name']}",
-                    "detail": f"CI {ci_detail} · ★{row['stars']} · pushed {row['pushed_at'] or 'n/a'}",
-                    "url": row["url"],
-                }
-            )
 
     focus_shipped = []
     for rel in release_list[:3]:
@@ -422,17 +471,27 @@ def _build_recent_activity(
                 }
             )
     if not focus_shipped:
-        for repo in recent_repos[:3]:
+        # Fall back to recent PUBLIC pushes with a real commit message — never
+        # private repos (can't describe what they shipped) and never the repos
+        # already shown in "Now".
+        now_titles = {item.get("title") for item in focus_now}
+        for repo in recent_repos[:8]:
+            if repo.get("is_private") or repo["name"] in now_titles:
+                continue
             msg = repo.get("last_commit_msg", "")
+            if not msg or msg == "recent push detected":
+                continue
             if len(msg) > 58:
                 msg = msg[:55] + "..."
             focus_shipped.append(
                 {
-                    "title": msg or repo["name"],
-                    "detail": f"{repo['name']} · pushed {time_ago(repo.get('pushed_at', ''))}",
-                    "url": repo.get("html_url", f"https://github.com/{username}/{repo['name']}"),
+                    "title": msg,
+                    "detail": f"{repo['name']} · {time_ago(repo.get('pushed_at', ''))}",
+                    "url": repo.get("html_url", ""),
                 }
             )
+            if len(focus_shipped) >= 3:
+                break
 
     return (
         contributions,
@@ -659,6 +718,80 @@ def _build_commit_stats(
     return public_scope_commits, commits_status, commits_note
 
 
+def _build_engineering_metrics(
+    collected: CollectedProfileData,
+    repos: list[dict[str, Any]],
+    top_languages: list[dict[str, Any]],
+    now_utc: datetime,
+) -> dict[str, Any]:
+    """Backend-developer analytics derived from already-fetched data."""
+    calendar = collected.calendar if isinstance(collected.calendar, dict) else {}
+    weeks = calendar.get("weeks", []) if isinstance(calendar, dict) else []
+
+    active_days = 0
+    for week in weeks:
+        days = week.get("contributionDays", []) if isinstance(week, dict) else []
+        for day in days:
+            try:
+                if int(day.get("contributionCount", 0)) > 0:
+                    active_days += 1
+            except (TypeError, ValueError):
+                continue
+
+    weekly_cadence: list[int] = []
+    for week in weeks[-12:]:
+        total = 0
+        days = week.get("contributionDays", []) if isinstance(week, dict) else []
+        for day in days:
+            try:
+                total += int(day.get("contributionCount", 0))
+            except (TypeError, ValueError):
+                pass
+        weekly_cadence.append(total)
+
+    non_self = [r for r in repos if not is_self_repo(r.get("name"))]
+    automation_workflows = sum(int(r.get("workflow_file_count", 0) or 0) for r in non_self)
+    automation_repos = sum(1 for r in non_self if r.get("has_ci_workflows"))
+
+    primary_lang_share_pct = float(top_languages[0]["percent"]) if top_languages else 0.0
+    languages_over_5pct = sum(1 for lang in top_languages if float(lang.get("percent", 0)) >= 5.0)
+
+    gaps: list[int] = []
+    for r in non_self:
+        pushed = r.get("pushed_at", "")
+        if not pushed:
+            continue
+        try:
+            pushed_dt = datetime.fromisoformat(pushed.replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        gaps.append((now_utc - pushed_dt).days)
+    gaps.sort()
+    if gaps:
+        mid = len(gaps) // 2
+        median_days_since_push = float(
+            gaps[mid] if len(gaps) % 2 else (gaps[mid - 1] + gaps[mid]) / 2
+        )
+    else:
+        median_days_since_push = 0.0
+
+    counts = collected.repo_counts
+    private_count = counts.get("private_owned")
+    return {
+        "active_days_last_year": active_days,
+        "weekly_cadence": weekly_cadence,
+        "automation_workflows": automation_workflows,
+        "automation_repos": automation_repos,
+        "primary_lang_share_pct": round(primary_lang_share_pct, 1),
+        "languages_over_5pct": languages_over_5pct,
+        "median_days_since_push": round(median_days_since_push, 1),
+        "public_repos_total": int(counts.get("public_owned_total", 0) or 0),
+        "public_nonfork_repos": int(counts.get("public_owned_nonfork", 0) or 0),
+        "private_repos_total": int(private_count) if isinstance(private_count, int) else None,
+        "recent_private_count": len(collected.private_repos),
+    }
+
+
 def _build_snapshot_dict(
     collected: CollectedProfileData,
     repo_counts: dict[str, int | None],
@@ -790,6 +923,8 @@ def compute_profile_model(
     seven_days_ago = now_utc - timedelta(days=7)
     active_repos_7d = 0
     for repo in repos:
+        if is_self_repo(repo.get("name")):
+            continue
         pushed = repo.get("pushed_at", "")
         if not pushed:
             continue
@@ -814,7 +949,7 @@ def compute_profile_model(
     )
 
     stars_per_public_repo = (total_stars / len(repos)) if repos else 0.0
-    streak_days = _compute_current_streak_days(calendar, now_utc)
+    streak_days = _compute_current_streak_days(calendar, now_utc, _profile_today())
 
     # --- recent repos ---
     recent_repos, recent_commit_message_by_repo = _build_recent_repos(
@@ -822,6 +957,7 @@ def compute_profile_model(
         seven_days_ago,
         collected.latest_push_message_by_repo,
         allow_network_calls,
+        private_repos=collected.private_repos,
     )
 
     # --- spotlight ---
@@ -834,6 +970,14 @@ def compute_profile_model(
         if allow_network_calls:
             weekly = gh.get_repo_commits_last_n_weeks(repo["owner"]["login"], repo["name"])
         has_ci = has_ci_workflow(repo, allow_network_calls=allow_network_calls)
+        pushed_raw = repo.get("pushed_at") or ""
+        status = "active"
+        if pushed_raw:
+            try:
+                pushed_dt = datetime.fromisoformat(pushed_raw.replace("Z", "+00:00"))
+                status = "active" if (now_utc - pushed_dt).days <= 30 else "maintained"
+            except ValueError:
+                status = "active"
         spotlight_data.append(
             {
                 "name": repo["name"],
@@ -842,13 +986,16 @@ def compute_profile_model(
                 "stars": repo.get("stargazers_count", 0),
                 "forks": repo.get("forks_count", 0),
                 "html_url": repo.get("html_url", ""),
-                "pushed_at": (repo.get("pushed_at") or "")[:10],
+                "pushed_at": pushed_raw[:10],
+                "pushed_ago": time_ago(pushed_raw) if pushed_raw else "",
+                "status": status,
                 "weekly_commits": weekly,
                 "has_ci": has_ci,
             }
         )
 
     # --- scorecard ---
+    engineering = _build_engineering_metrics(collected, repos, top_languages, now_utc)
     scorecard = {
         "releases_30d": releases_30d,
         "active_repos_7d": active_repos_7d,
@@ -856,6 +1003,10 @@ def compute_profile_model(
         "stars_per_public_repo": stars_per_public_repo,
         "ci_coverage_pct": ci_coverage_pct,
         "last_year_contributions": collected.total_contributions,
+        "active_days_last_year": engineering["active_days_last_year"],
+        "automation_workflows": engineering["automation_workflows"],
+        "primary_lang_share_pct": engineering["primary_lang_share_pct"],
+        "median_days_since_push": engineering["median_days_since_push"],
     }
     accent_colors = {
         "BLUE": BLUE,
@@ -915,7 +1066,17 @@ def compute_profile_model(
     ]
 
     # --- recent activity & focus ---
-    recent_created = sorted(repos, key=lambda item: item.get("created_at", ""), reverse=True)[:10]
+    recent_created = []
+    for r in sorted(
+        [r for r in repos if not is_self_repo(r.get("name"))],
+        key=lambda item: item.get("created_at", ""),
+        reverse=True,
+    )[:10]:
+        rr = dict(r)
+        # Don't leak bot/CI-noise commit messages into the published snapshot.
+        if is_bot_commit_message(rr.get("latest_commit_message", "")):
+            rr["latest_commit_message"] = ""
+        recent_created.append(rr)
 
     (
         contributions,
@@ -995,6 +1156,7 @@ def compute_profile_model(
         release_list=release_list,
         pr_list=pr_list,
     )
+    dashboard_data["engineering"] = engineering
 
     return {
         "now_utc": now_utc,
@@ -1021,6 +1183,7 @@ def compute_profile_model(
         "dashboard_data": dashboard_data,
         "recent_repos": recent_repos,
         "spotlight_data": spotlight_data,
+        "engineering": engineering,
         "token_mode": collected.token_mode,
         "cache_mode": collected.cache_mode,
     }

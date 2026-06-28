@@ -1,148 +1,283 @@
-"""Build featured project cards with sparklines."""
+"""Flagship Projects card — Apple/glassmorphism re-skin.
+
+Renders a 2-column grid of frosted ``glass_tile`` project cards. Each card shows a
+linked repo name, a status chip ("last active <ago>") so a stale flagship never
+implies current work, an optional CI/CD chip, a wrapped description, a
+language/star/fork footer with line icons, and a glowing weekly-commit sparkline.
+Height is data-driven; an inset margin keeps the glass drop-shadow from clipping.
+"""
+
+from __future__ import annotations
 
 from scripts.config import (
-    BG_CARD, BG_HIGHLIGHT, BLUE, CYAN, GREEN, TEXT, BORDER, SVG_WIDTH, FONT_SANS,
+    BLUE,
+    FONT_SANS,
+    GLASS_HAIRLINE_HEX,
+    GREEN,
+    SVG_WIDTH,
+    TEXT,
+    TEXT_BRIGHT,
+    TEXT_DIM,
 )
-from scripts.card_theme import card_bg, title_accent, title_left, title_right
-from scripts.svg_utils import xml_escape, truncate, lang_color
+from scripts.card_theme import title_left, title_right
+from scripts.glass_kit import (
+    accent_ribbon,
+    chip,
+    chip_width,
+    eyebrow_text,
+    glass_panel,
+    glass_tile,
+    icon,
+    sparkline,
+)
+from scripts.svg_utils import fmt_int, lang_color, truncate, xml_escape
+
+# --- layout constants ---------------------------------------------------------
+PAD_X = 28          # interior left/right margin (>= GLASS_INSET so nothing clips)
+HEADER_H = 88       # title block height; grid starts here
+BOTTOM_PAD = 28     # below the grid: GLASS_INSET (12) + breathing room
+COLS = 2
+CARD_H = 190
+CARD_GAP = 18
+IP = 16             # inner padding inside each project tile
+
+# active = green, maintained = calm gray-blue (so "maintained" never reads as live work)
+STATUS_COLOR = {"active": GREEN, "maintained": BLUE}
 
 
-def _sparkline(data: list, x: float, y: float, w: float, h: float, color: str) -> str:
-    """Generate an SVG sparkline polyline from weekly commit data."""
-    if not data or max(data) == 0:
-        return ""
-    n = len(data)
-    max_val = max(data)
-    points = []
-    for i, v in enumerate(data):
-        px = x + (i / max(n - 1, 1)) * w
-        py = y + h - (v / max(max_val, 1)) * h
-        points.append(f"{px:.1f},{py:.1f}")
+def _n(value: float) -> str:
+    """Compact coordinate formatting."""
+    return f"{round(float(value), 2):g}"
+
+
+def _tw(text: str, size: float) -> float:
+    """Rough proportional text width estimate for layout."""
+    return len(text) * size * 0.6
+
+
+def _text(
+    s: str,
+    x: float,
+    y: float,
+    *,
+    size: float,
+    fill: str,
+    weight: int | None = None,
+    anchor: str | None = None,
+) -> str:
+    w = f' font-weight="{weight}"' if weight else ""
+    a = f' text-anchor="{anchor}"' if anchor else ""
     return (
-        f'<polyline points="{" ".join(points)}" fill="none" '
-        f'stroke="{color}" stroke-width="1.5" stroke-linecap="round"/>'
+        f'<text x="{_n(x)}" y="{_n(y)}" fill="{fill}" font-size="{_n(size)}" '
+        f'font-family="{FONT_SANS}"{w}{a}>{s}</text>'
     )
 
 
-def _desc_truncate(text: str, max_len: int) -> str:
-    """Truncate a repo description, returning a placeholder for empty text."""
+def _wrap2(text: str, max_chars: int) -> list[str]:
+    """Word-wrap into at most two lines; ellipsize overflow on the second line."""
+    text = (text or "").strip()
     if not text:
-        return "No description"
-    escaped = xml_escape(text, quote=False)
-    return truncate(escaped, max_len)
+        return ["No description provided."]
+    words = text.split()
+    lines: list[str] = []
+    cur = ""
+    for word in words:
+        cand = f"{cur} {word}".strip()
+        if len(cand) <= max_chars:
+            cur = cand
+            continue
+        if cur:
+            lines.append(cur)
+            cur = word
+        else:  # single very long word
+            cur = word
+        if len(lines) == 2:
+            break
+    if cur and len(lines) < 2:
+        lines.append(cur)
+    lines = lines[:2]
+    if len(" ".join(lines)) < len(text):  # something was dropped -> mark truncated
+        last = lines[-1].rstrip()
+        if len(last) > max_chars - 1:
+            last = last[: max_chars - 1].rstrip()
+        lines[-1] = last + "…"
+    return lines
+
+
+def _project_card(repo: dict, cx: float, cy: float, card_w: float, idx: int) -> str:
+    inner_w = card_w - IP * 2
+    status = str(repo.get("status") or "maintained").lower()
+    accent = STATUS_COLOR.get(status, BLUE)
+
+    parts: list[str] = [glass_tile(cx, cy, card_w, CARD_H, accent=accent)]
+
+    # --- repo name (linked) ---
+    name = str(repo.get("name") or "unknown")
+    name = truncate(name, 36)
+    name_esc = xml_escape(name, quote=False)
+    url = str(repo.get("html_url") or "")
+    name_node = _text(
+        name_esc, cx + IP, cy + 32, size=15, fill=TEXT_BRIGHT, weight=700
+    )
+    if url:
+        parts.append(f'<a href="{xml_escape(url)}">{name_node}</a>')
+    else:
+        parts.append(name_node)
+
+    # --- status + CI chips ---
+    chip_y = cy + 44
+    ago = str(repo.get("pushed_ago") or "").strip()
+    ago = truncate(ago, 20) if ago else "date unknown"
+    status_text = f"last active {ago}"
+    parts.append(
+        chip(
+            cx + IP,
+            chip_y,
+            status_text,
+            color=accent,
+            icon_name="clock",
+            filled=True,
+        )
+    )
+    if repo.get("has_ci"):
+        ci_text = "CI/CD"
+        ci_w = chip_width(ci_text, icon=True)
+        parts.append(
+            chip(
+                cx + card_w - IP - ci_w,
+                chip_y,
+                ci_text,
+                color=accent,
+                icon_name="ci_check",
+                filled=False,
+                width=ci_w,
+            )
+        )
+
+    # --- description (up to 2 wrapped lines) ---
+    desc_lines = _wrap2(str(repo.get("description") or ""), 56)
+    desc_y = cy + 90
+    for line in desc_lines:
+        parts.append(
+            _text(xml_escape(line, quote=False), cx + IP, desc_y, size=11, fill=TEXT)
+        )
+        desc_y += 18
+
+    # --- footer: language . stars . forks (line icons) ---
+    fy = cy + 138
+    fs = 11.5
+    lang = repo.get("language")
+    lang_label = str(lang) if lang else "n/a"
+    fx = cx + IP
+    # language dot
+    dot_y = fy - fs * 0.35 - 4.5
+    parts.append(icon("lang_dot", fx, dot_y, size=9, color=lang_color(lang)))
+    parts.append(_text(xml_escape(lang_label, quote=False), fx + 15, fy, size=fs, fill=TEXT))
+    fx += 15 + _tw(lang_label, fs) + 22
+    # stars
+    icon_y = fy - fs * 0.35 - 6.5
+    stars = fmt_int(repo.get("stars", 0))
+    parts.append(icon("star", fx, icon_y, size=13, color=TEXT_DIM))
+    parts.append(_text(stars, fx + 17, fy, size=fs, fill=TEXT_BRIGHT, weight=600))
+    fx += 17 + _tw(stars, fs) + 22
+    # forks
+    forks = fmt_int(repo.get("forks", 0))
+    parts.append(icon("fork", fx, icon_y, size=13, color=TEXT_DIM))
+    parts.append(_text(forks, fx + 17, fy, size=fs, fill=TEXT_BRIGHT, weight=600))
+
+    # --- weekly-commit sparkline band ---
+    weekly = [int(v) for v in (repo.get("weekly_commits") or []) if v is not None]
+    total = sum(weekly)
+    band_y = cy + 150
+    # faint separator above the band
+    parts.append(
+        f'<rect x="{_n(cx + IP)}" y="{_n(band_y)}" width="{_n(inner_w)}" height="1" '
+        f'fill="{GLASS_HAIRLINE_HEX}" fill-opacity="0.10"/>'
+    )
+    label = f"{total} commits · 12 wk" if weekly else "no commit data"
+    parts.append(eyebrow_text(label, x=cx + IP, y=band_y + 18, color=TEXT_DIM, size=9))
+    spark_x = cx + IP + 110
+    spark_w = inner_w - 110
+    spark_y = band_y + 8
+    spark_h = 22
+    # baseline the curve rests on
+    parts.append(
+        f'<rect x="{_n(spark_x)}" y="{_n(spark_y + spark_h)}" width="{_n(spark_w)}" '
+        f'height="1" fill="{GLASS_HAIRLINE_HEX}" fill-opacity="0.10"/>'
+    )
+    if weekly:
+        spark = sparkline(
+            weekly,
+            spark_x,
+            spark_y,
+            spark_w,
+            spark_h,
+            color=accent,
+            uid=f"spk{idx}",
+        )
+        # dim a flat/dormant trend so a maintained repo never implies live activity
+        if total == 0:
+            spark = f'<g opacity="0.5">{spark}</g>'
+        parts.append(spark)
+    return "".join(parts)
 
 
 def generate(
     repos_data: list,
     output_path: str = "assets/repo_spotlight.svg",
 ):
-    """
+    """Render the Flagship Projects spotlight card.
+
     repos_data: list of dicts with keys:
-        name, description, language, stars, forks, html_url,
-        weekly_commits (list of 12 ints), has_ci (bool)
+        name, description, language, stars, forks, html_url, pushed_at,
+        pushed_ago, status ("active"|"maintained"), weekly_commits (list[int]),
+        has_ci (bool)
     """
-    card_w = (SVG_WIDTH - 60) / 2  # 2 columns with gaps
-    card_h = 160
-    pad = 20
-    gap = 20
-    title_h = 50
+    repos = list(repos_data or [])
+    n = len(repos)
+    rows = max((n + COLS - 1) // COLS, 1)
 
-    cols = 2
-    rows_count = (len(repos_data) + cols - 1) // cols
-    svg_h = title_h + rows_count * (card_h + gap) + pad
+    grid_w = SVG_WIDTH - PAD_X * 2
+    card_w = (grid_w - CARD_GAP * (COLS - 1)) / COLS
+    gaps = max(rows - 1, 0)
+    svg_h = int(HEADER_H + rows * CARD_H + gaps * CARD_GAP + BOTTOM_PAD)
 
-    parts = [
-        title_left("Flagship Projects", x=pad, y=30),
-        title_right("featured repos + sparkline activity", width=SVG_WIDTH, pad=pad, y=30),
-        title_accent(width=SVG_WIDTH, pad=pad, y=35),
-    ]
+    parts: list[str] = [glass_panel(SVG_WIDTH, svg_h)]
 
-    for i, repo in enumerate(repos_data):
-        col = i % cols
-        row = i // cols
-        cx = pad + col * (card_w + gap)
-        cy = title_h + row * (card_h + gap)
+    # header
+    parts.append(eyebrow_text("SHOWCASE · BEST WORK", x=PAD_X, y=34))
+    parts.append(title_left("Flagship Projects", x=PAD_X, y=58, size=18))
+    parts.append(
+        title_right(f"{n} repositories", width=SVG_WIDTH, pad=PAD_X, y=58, size=11)
+    )
+    parts.append(accent_ribbon(SVG_WIDTH, pad=PAD_X, y=70))
 
-        name = repo.get("name", "unknown")
-        desc = _desc_truncate(repo.get("description", ""), 70)
-        lang = repo.get("language")
-        stars = repo.get("stars", 0)
-        forks = repo.get("forks", 0)
-        has_ci = repo.get("has_ci", False)
-        weekly = repo.get("weekly_commits", [])
-        url = xml_escape(repo.get("html_url", ""))
-
-        name_esc = name.replace("&", "&amp;").replace("<", "&lt;")
-
-        # Card background
+    if not repos:
+        parts.append(glass_tile(PAD_X, HEADER_H, grid_w, CARD_H))
         parts.append(
-            f'<rect x="{cx}" y="{cy}" width="{card_w}" height="{card_h}" '
-            f'rx="10" fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>'
-        )
-
-        # Repo name
-        if url:
-            parts.append(
-                f'<a href="{url}"><text x="{cx + 16}" y="{cy + 28}" fill="{BLUE}" font-size="14" '
-                f'font-family="{FONT_SANS}" font-weight="700">{name_esc}</text></a>'
+            _text(
+                "No flagship repositories to show yet.",
+                SVG_WIDTH / 2,
+                HEADER_H + CARD_H / 2,
+                size=13,
+                fill=TEXT_DIM,
+                anchor="middle",
             )
-        else:
-            parts.append(
-                f'<text x="{cx + 16}" y="{cy + 28}" fill="{BLUE}" font-size="14" '
-                f'font-family="{FONT_SANS}" font-weight="700">{name_esc}</text>'
-            )
-
-        # CI badge
-        if has_ci:
-            badge_x = cx + card_w - 60
-            parts.append(
-                f'<rect x="{badge_x}" y="{cy + 14}" width="44" height="18" rx="9" fill="{GREEN}" opacity="0.2"/>'
-                f'<text x="{badge_x + 22}" y="{cy + 27}" fill="{GREEN}" font-size="9" '
-                f'font-family="{FONT_SANS}" font-weight="600" text-anchor="middle">CI/CD</text>'
-            )
-
-        # Description
-        parts.append(
-            f'<text x="{cx + 16}" y="{cy + 48}" fill="{TEXT}" font-size="11" '
-            f'font-family="{FONT_SANS}">{desc}</text>'
         )
+    else:
+        for i, repo in enumerate(repos):
+            col = i % COLS
+            row = i // COLS
+            cx = PAD_X + col * (card_w + CARD_GAP)
+            cy = HEADER_H + row * (CARD_H + CARD_GAP)
+            parts.append(_project_card(repo, cx, cy, card_w, i))
 
-        # Language dot + label
-        parts.append(
-            f'<circle cx="{cx + 22}" cy="{cy + 70}" r="4" fill="{lang_color(lang)}"/>'
-            f'<text x="{cx + 32}" y="{cy + 74}" fill="{TEXT}" font-size="11" '
-            f'font-family="{FONT_SANS}">{lang or "n/a"}</text>'
-        )
-
-        # Stars + Forks
-        star_x = cx + 120
-        parts.append(
-            f'<text x="{star_x}" y="{cy + 74}" fill="{TEXT}" font-size="11" '
-            f'font-family="{FONT_SANS}">\u2605 {stars}  Forks: {forks}</text>'
-        )
-
-        # Sparkline
-        spark_x = cx + 16
-        spark_y = cy + 90
-        spark_w = card_w - 32
-        spark_h = 50
-        # Sparkline background
-        parts.append(
-            f'<rect x="{spark_x}" y="{spark_y}" width="{spark_w}" height="{spark_h}" '
-            f'rx="4" fill="{BG_CARD}" opacity="0.5"/>'
-        )
-        parts.append(_sparkline(weekly, spark_x + 4, spark_y + 4, spark_w - 8, spark_h - 8, CYAN))
-
-        # "12 weeks" label
-        parts.append(
-            f'<text x="{spark_x + spark_w - 4}" y="{spark_y + spark_h + 12}" fill="{TEXT}" '
-            f'font-size="9" font-family="{FONT_SANS}" text-anchor="end">12 weeks</text>'
-        )
-
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{int(svg_h)}" viewBox="0 0 {SVG_WIDTH} {int(svg_h)}">
-  {card_bg(SVG_WIDTH, int(svg_h))}
-  {"".join(parts)}
-</svg>"""
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" '
+        f'height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">'
+        f'{"".join(parts)}'
+        f"</svg>"
+    )
 
     with open(output_path, "w") as f:
         f.write(svg)

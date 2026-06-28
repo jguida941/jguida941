@@ -1,101 +1,183 @@
-"""Build the builder scorecard SVG."""
+"""Build the builder scorecard SVG (Apple glass / frosted look).
 
-from scripts.config import BG_HIGHLIGHT, BLUE, CYAN, GREEN, ORANGE, TEXT, TEXT_BRIGHT, BORDER, SVG_WIDTH, FONT_SANS
-from scripts.card_theme import card_bg, title_accent, title_left, title_right
+Data-length-driven 4-column grid of frosted metric tiles. Each tile shows a
+leading line-icon, the headline ``display_value`` as a big bold number, the
+metric label, and a dim caption. The grid height is sized from the number of
+tiles (rows = ceil(len(tiles) / cols)), never hardcoded.
+"""
+
+from __future__ import annotations
+
+import math
+
+from scripts.config import (
+    BLUE,
+    CYAN,
+    FONT_SANS,
+    GREEN,
+    ORANGE,
+    PURPLE,
+    SVG_WIDTH,
+    TEXT,
+    TEXT_BRIGHT,
+    TEXT_DIM,
+)
+from scripts.card_theme import title_left
+from scripts.glass_kit import (
+    accent_ribbon,
+    chip,
+    chip_width,
+    eyebrow_text,
+    glass_panel,
+    glass_tile,
+    icon,
+    progress_ring,
+)
 from scripts.profile_contract import SCORECARD_METRICS, format_metric_value
+from scripts.svg_utils import truncate, xml_escape
 
+TITLE = "Builder Scorecard"
 
-def _tile(
-    x: int,
-    y: int,
-    width: int,
-    height: int,
-    label: str,
-    value: str,
-    detail: str,
-    accent: str,
-) -> str:
-    return f"""<g transform="translate({x}, {y})">
-  <rect width="{width}" height="{height}" rx="12" fill="{BG_HIGHLIGHT}" stroke="{BORDER}" stroke-width="1"/>
-  <text x="16" y="30" fill="{accent}" font-size="11" font-family="{FONT_SANS}" font-weight="600">{label}</text>
-  <text x="16" y="62" fill="{TEXT_BRIGHT}" font-size="28" font-family="{FONT_SANS}" font-weight="700">{value}</text>
-  <text x="16" y="86" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}">{detail}</text>
-</g>"""
+# A sensible SF-Symbols-style icon per scorecard metric (fallback: lang_dot).
+ICON_BY_KEY = {
+    "last_year_contributions": "fire",
+    "active_days_last_year": "calendar",
+    "active_repos_7d": "commit",
+    "ci_coverage_pct": "ci_check",
+    "automation_workflows": "workflow",
+    "releases_30d": "release_tag",
+    "primary_lang_share_pct": "code",
+    "median_days_since_push": "clock",
+}
+
+_ACCENT_MAP = {"BLUE": BLUE, "CYAN": CYAN, "GREEN": GREEN, "ORANGE": ORANGE, "PURPLE": PURPLE}
 
 
 def _default_tiles(scorecard: dict) -> list[dict]:
-    accent_map = {
-        "BLUE": BLUE,
-        "CYAN": CYAN,
-        "GREEN": GREEN,
-        "ORANGE": ORANGE,
-    }
-    tiles = []
+    """Build the 8-tile list straight from the metric contract (fallback path)."""
+    tiles: list[dict] = []
     for definition in SCORECARD_METRICS:
         key = definition["key"]
-        tiles.append({
-            "label": definition["label"],
-            "value": format_metric_value(scorecard.get(key, 0), definition),
-            "detail": definition["detail"],
-            "accent": accent_map.get(definition.get("accent", "CYAN"), CYAN),
-        })
+        tiles.append(
+            {
+                "key": key,
+                "label": definition["label"],
+                "detail": definition["detail"],
+                "value": scorecard.get(key, 0),
+                "display_value": format_metric_value(scorecard.get(key), definition),
+                "accent": _ACCENT_MAP.get(definition.get("accent", "CYAN"), CYAN),
+            }
+        )
     return tiles
 
 
+def _render_tile(x: float, y: float, w: float, h: float, tile: dict) -> str:
+    """One frosted metric tile: accent bar + icon + big number + label + caption."""
+    key = str(tile.get("key", ""))
+    accent = str(tile.get("accent") or CYAN)
+    label = xml_escape(truncate(str(tile.get("label", "")), 22))
+    detail = xml_escape(truncate(str(tile.get("detail", "")), 32))
+
+    display_value = tile.get("display_value")
+    if display_value is None:
+        display_value = tile.get("value", "0")
+    value = xml_escape(str(display_value))
+
+    icon_name = ICON_BY_KEY.get(key, "lang_dot")
+    ix = x + 16
+
+    parts = [glass_tile(x, y, w, h, accent=accent)]
+    # leading line-icon, tinted with the tile accent
+    parts.append(icon(icon_name, ix, y + 24, size=16, color=accent))
+
+    is_ring = key == "ci_coverage_pct"
+    if is_ring:
+        # CI coverage reads as a small donut gauge instead of a plain number.
+        try:
+            pct = float(tile.get("value"))
+        except (TypeError, ValueError):
+            pct = 0.0
+        ring_cx = x + w - 32
+        ring_cy = y + 50
+        parts.append(
+            progress_ring(
+                ring_cx,
+                ring_cy,
+                19,
+                pct,
+                color=accent,
+                stroke=5,
+                label=value,
+                label_size=10,
+            )
+        )
+    else:
+        parts.append(
+            f'<text x="{ix:g}" y="{y + 63:g}" fill="{TEXT_BRIGHT}" font-size="29" '
+            f'font-family="{FONT_SANS}" font-weight="700">{value}</text>'
+        )
+
+    parts.append(
+        f'<text x="{ix:g}" y="{y + 86:g}" fill="{TEXT}" font-size="11.5" '
+        f'font-family="{FONT_SANS}" font-weight="600">{label}</text>'
+    )
+    parts.append(
+        f'<text x="{ix:g}" y="{y + 103:g}" fill="{TEXT_DIM}" font-size="10" '
+        f'font-family="{FONT_SANS}">{detail}</text>'
+    )
+    return "".join(parts)
+
+
 def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg", tiles: list | None = None) -> str:
+    """Render the Builder Scorecard card.
+
+    scorecard: raw metric dict (used to build tiles when ``tiles`` is omitted).
+    tiles: list of ``{key,label,detail,value,display_value,accent}`` dicts. The
+    grid is data-length-driven (cols=4, rows=ceil(n/4)) and the SVG height is
+    sized from the row count plus a margin so the glass shadow never clips.
     """
-    scorecard fields:
-      - releases_30d
-      - active_repos_7d
-      - avg_release_gap_days
-      - stars_per_public_repo
-      - ci_coverage_pct
-      - last_year_contributions
-    """
-    rows = 2
-    cols = 3
-    gap = 16
-    pad = 20
-    tile_w = int((SVG_WIDTH - pad * 2 - gap * (cols - 1)) / cols)
-    tile_h = 106
-    title_h = 52
-    svg_h = title_h + rows * tile_h + (rows - 1) * gap + pad
+    width = SVG_WIDTH
+    pad = 24
+    gap = 14
+    cols = 4
 
     card_tiles = tiles or _default_tiles(scorecard)
+    count = len(card_tiles)
+    rows = max(1, math.ceil(count / cols))
 
-    parts = []
-    definition_by_key = {definition["key"]: definition for definition in SCORECARD_METRICS}
+    tile_w = (width - pad * 2 - gap * (cols - 1)) / cols
+    tile_h = 120
+    header_h = 90          # eyebrow + title + ribbon (top 12px is the glass inset)
+    bottom_pad = 22        # below the grid (includes the 12px glass inset margin)
+    svg_h = int(header_h + rows * tile_h + (rows - 1) * gap + bottom_pad)
+
+    parts: list[str] = [glass_panel(width, svg_h)]
+
+    # Header: eyebrow caption, single title node, calm ribbon, source chip.
+    parts.append(eyebrow_text("GitHub Signals · Last 12 Months", x=pad, y=33))
+    parts.append(title_left(TITLE, x=pad, y=57, size=17))
+    parts.append(accent_ribbon(width, pad=pad, y=68))
+
+    chip_text = "GitHub API"
+    cw = chip_width(chip_text, size=10, icon=True)
+    parts.append(
+        chip(width - pad - cw, 41, chip_text, color=CYAN, icon_name="globe", filled=True, size=10, width=cw)
+    )
+
+    # Data-length-driven grid of frosted tiles.
     for i, tile in enumerate(card_tiles):
         row = i // cols
         col = i % cols
         x = pad + col * (tile_w + gap)
-        y = title_h + row * (tile_h + gap)
-        key = str(tile.get("key", ""))
-        display_value = tile.get("display_value")
-        if display_value is None and key in definition_by_key:
-            display_value = format_metric_value(tile.get("value"), definition_by_key[key])
-        if display_value is None:
-            display_value = tile.get("value", "0")
-        parts.append(
-            _tile(
-                x,
-                y,
-                tile_w,
-                tile_h,
-                str(tile.get("label", "")),
-                str(display_value),
-                str(tile.get("detail", "")),
-                str(tile.get("accent", CYAN)),
-            )
-        )
+        y = header_h + row * (tile_h + gap)
+        parts.append(_render_tile(x, y, tile_w, tile_h, tile))
 
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" viewBox="0 0 {SVG_WIDTH} {svg_h}">
-  {card_bg(SVG_WIDTH, svg_h)}
-  {title_left("Builder Scorecard", x=pad, y=30)}
-  {title_right("auto-generated from GitHub API", width=SVG_WIDTH, pad=pad, y=30)}
-  {title_accent(width=SVG_WIDTH, pad=pad, y=35)}
-  {"".join(parts)}
-</svg>"""
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{svg_h}" '
+        f'viewBox="0 0 {width} {svg_h}">'
+        + "".join(parts)
+        + "</svg>"
+    )
 
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(svg)

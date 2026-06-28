@@ -16,6 +16,32 @@ TEXT_DIM = "#8a94bd"
 TEXT_BRIGHT = "#c0caf5"
 BORDER = "#414868"
 
+# --- Glass / elevation tokens (stored as hex + opacity; never rgba() in SVG fills) ---
+# Deeper, cooler panel base so the white sheen reads as frosted glass.
+SURFACE_BASE = "#1b1e2e"        # card panel base
+SURFACE_RAISED = "#232843"      # inner tile base
+GLASS_SHEEN_HEX = "#ffffff"
+GLASS_SHEEN_TOP_OP = 0.07       # panel top sheen opacity
+GLASS_TILE_TOP_OP = 0.06        # tile top sheen opacity
+GLASS_TILE_SHADE_HEX = "#05060e"
+GLASS_TILE_SHADE_OP = 0.18      # tile base darken for depth
+GLASS_TOPHI_HEX = "#ffffff"
+GLASS_TOPHI_OP = 0.16           # 1px top inner highlight
+GLASS_HAIRLINE_HEX = "#c0caf5"  # TEXT_BRIGHT used at low alpha for borders
+GLASS_HAIRLINE_OP = 0.14
+GLASS_HAIRLINE_STRONG_OP = 0.22
+GLASS_SHADOW_HEX = "#03040c"
+GLASS_SHADOW_OP = 0.55
+GLASS_INSET = 12                # shadow reservation band so blur never clips
+GLASS_RX = 18                   # panel corner radius
+GLASS_TILE_RX = 13              # inner tile corner radius
+
+# Accent gradient stop pairs (for ribbons / sparklines / rings / progress)
+GRAD_BLUE_CYAN = ("#7aa2f7", "#7dcfff")
+GRAD_CYAN_MINT = ("#7dcfff", "#9ece6a")
+GRAD_ORANGE_PINK = ("#ff9e64", "#f7768e")
+GRAD_PURPLE_BLUE = ("#bb9af7", "#7aa2f7")
+
 # Language colors (GitHub-style)
 LANG_COLORS = {
     "Python": "#3572A5",
@@ -47,11 +73,27 @@ from scripts.settings import Settings as _Settings  # noqa: E402
 
 USERNAME = _Settings.from_env().username
 
-# Featured repos for spotlight
+# The profile repo itself (username/username) — excluded from "currently working"
+# and activity feeds so the hourly auto-commit bot never appears as real work.
+SELF_REPO = USERNAME
+
+# Commit-message / actor markers produced by automation. These must never be
+# surfaced as "currently working", "shipped", or activity.
+BOT_COMMIT_MARKERS = (
+    "update canonical profile artifacts",
+    "update analytics & readme",
+    "update badges from ci",
+    "[skip ci]",
+    "[ci skip]",
+)
+BOT_ACTOR_PREFIXES = ("github-actions",)
+
+# Curated flagship repos for the spotlight (best work to showcase). This is the
+# "showcase" set and is intentionally separate from the activity-driven
+# "currently working" surface.
 FEATURED_REPOS = [
     "ci-cd-hub",
     "voiceterm",
-    "lighting-opengl",
     "contact-suite-spring-react",
 ]
 

@@ -1,29 +1,41 @@
-"""Build a row of profile stat badges as SVG."""
+"""Build the "By The Numbers" stat row as a frosted-glass SVG card."""
+
+from __future__ import annotations
 
 from scripts.config import (
-    BG_DARK, BLUE, CYAN, ORANGE, TEXT, TEXT_DIM, SVG_WIDTH, FONT_SANS,
+    BLUE,
+    CYAN,
+    FONT_SANS,
+    GRAD_BLUE_CYAN,
+    PURPLE,
+    SVG_WIDTH,
+    TEXT_BRIGHT,
 )
-from scripts.card_theme import card_bg, title_accent, title_left, title_right
+from scripts.card_theme import title_left
+from scripts.glass_kit import eyebrow_text, glass_panel, glass_tile, icon
+from scripts.svg_utils import fmt_int
+
+# Card geometry (one row of stat tiles + a margin for the glass drop shadow).
+_W = SVG_WIDTH
+_H = 132
+_PAD = 28          # content inset inside the 12px glass band
+_TILE_Y = 58
+_TILE_H = 58
+_GAP = 14
+_N = 5
 
 
-def _badge(x: int, label: str, value: str, color: str) -> str:
-    """Render a single rounded-rectangle badge."""
-    label_w = max(len(label) * 7.5 + 16, 80)
-    value_w = max(len(str(value)) * 8.5 + 16, 50)
-    total_w = label_w + value_w
-    r = 6
-
-    return f"""<g transform="translate({x}, 0)">
-  <rect width="{total_w}" height="32" rx="{r}" fill="{BG_DARK}" stroke="{color}" stroke-width="1"/>
-  <rect width="{label_w}" height="32" rx="{r}" fill="{BG_DARK}"/>
-  <rect x="{label_w}" width="{value_w}" height="32" rx="{r}" fill="{color}"/>
-  <rect x="{label_w - r}" width="{r}" height="32" fill="{BG_DARK}"/>
-  <rect x="{label_w}" width="{r}" height="32" fill="{color}"/>
-  <text x="{label_w / 2}" y="21" fill="{TEXT}" font-size="11" font-family="{FONT_SANS}"
-        font-weight="600" text-anchor="middle">{label}</text>
-  <text x="{label_w + value_w / 2}" y="21" fill="{BG_DARK}" font-size="12" font-family="{FONT_SANS}"
-        font-weight="700" text-anchor="middle">{value}</text>
-</g>"""
+def _stat_tile(x: float, y: float, w: float, h: float, name: str, value: str, label: str, accent: str) -> str:
+    """One frosted stat cell: accent icon + bold value on top, tiny label beneath."""
+    return "".join(
+        (
+            glass_tile(x, y, w, h),
+            icon(name, x + 16, y + 14, size=16, color=accent),
+            f'<text x="{x + 41:g}" y="{y + 33:g}" fill="{TEXT_BRIGHT}" '
+            f'font-size="22" font-family="{FONT_SANS}" font-weight="700">{value}</text>',
+            eyebrow_text(label, x=x + 16, y=y + 50, size=9),
+        )
+    )
 
 
 def generate(
@@ -34,39 +46,42 @@ def generate(
     last_year_contributions: int | None,
     output_path: str = "assets/badges.svg",
 ):
-    private_value = "n/a" if private_owned_repos is None else str(private_owned_repos)
-    ci_value = "n/a" if ci_count is None else str(ci_count)
-    contrib_value = "n/a" if last_year_contributions is None else str(last_year_contributions)
-
-    badges_data = [
-        ("Public Repos", str(public_nonfork_repos), BLUE),
-        ("Public Forks", str(public_forks), CYAN),
-        ("Private Repos", private_value, TEXT),
-        ("CI/CD Repos", ci_value, ORANGE),
-        ("12mo Contribs", contrib_value, TEXT_DIM),
+    # value, label, icon, accent — contributions leads as the hero metric.
+    stats = [
+        (fmt_int(last_year_contributions), "CONTRIBUTIONS", "commit", CYAN),
+        (fmt_int(public_nonfork_repos), "PUBLIC REPOS", "code", BLUE),
+        (fmt_int(public_forks), "FORKS", "fork", BLUE),
+        (fmt_int(private_owned_repos), "PRIVATE", "lock", PURPLE),
+        (fmt_int(ci_count), "CI PIPELINES", "workflow", CYAN),
     ]
 
-    badge_svgs = []
-    x = 0
-    gap = 8
-    for label, value, color in badges_data:
-        badge_svgs.append(_badge(x, label, value, color))
-        label_w = max(len(label) * 7.5 + 16, 80)
-        value_w = max(len(str(value)) * 8.5 + 16, 50)
-        x += label_w + value_w + gap
+    avail = _W - _PAD * 2
+    tile_w = (avail - _GAP * (_N - 1)) / _N
 
-    total_w = x - gap
-    offset_x = (SVG_WIDTH - total_w) / 2
+    tiles = []
+    for i, (value, label, name, accent) in enumerate(stats):
+        tx = _PAD + i * (tile_w + _GAP)
+        tiles.append(_stat_tile(tx, _TILE_Y, tile_w, _TILE_H, name, value, label, accent))
 
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="98" viewBox="0 0 {SVG_WIDTH} 98">
-  {card_bg(SVG_WIDTH, 98)}
-  {title_left("By The Numbers", x=24, y=30)}
-  {title_right("repo scope + CI + contribution volume", width=SVG_WIDTH, pad=24, y=30)}
-  {title_accent(width=SVG_WIDTH, pad=24, y=35)}
-  <g transform="translate({offset_x}, 50)">
-    {"".join(badge_svgs)}
-  </g>
-</svg>"""
+    # One calm accent: a short blue->cyan underline beneath the title.
+    g0, g1 = GRAD_BLUE_CYAN
+    accent = (
+        '<linearGradient id="bn-accent" x1="0" y1="0" x2="1" y2="0">'
+        f'<stop offset="0" stop-color="{g0}" stop-opacity="0.95"/>'
+        f'<stop offset="1" stop-color="{g1}" stop-opacity="0.85"/>'
+        "</linearGradient>"
+        f'<rect x="{_PAD}" y="45" width="46" height="3" rx="1.5" fill="url(#bn-accent)"/>'
+    )
+
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{_W}" height="{_H}" '
+        f'viewBox="0 0 {_W} {_H}">'
+        f"{glass_panel(_W, _H)}"
+        f"{title_left('By The Numbers', x=_PAD, y=37)}"
+        f"{accent}"
+        f"{''.join(tiles)}"
+        "</svg>"
+    )
 
     with open(output_path, "w") as f:
         f.write(svg)

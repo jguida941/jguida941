@@ -13,6 +13,7 @@ from scripts.generate_badges import generate as gen_badges
 from scripts.generate_builder_scorecard import generate as gen_scorecard
 from scripts.generate_contribution_panel import generate as gen_contribution_panel
 from scripts.generate_currently_working import generate as gen_working
+from scripts.generate_engineering_cadence import generate as gen_cadence
 from scripts.generate_focus_board import generate as gen_focus_board
 from scripts.generate_language_chart import generate as gen_lang_chart
 from scripts.generate_metrics_general import generate as gen_metrics_general
@@ -55,6 +56,9 @@ def generate_assets(collected: CollectedProfileData, model: dict, logger=print) 
 
     gen_scorecard(model["scorecard"], tiles=model["scorecard_cards"])
     logger("  -> assets/builder_scorecard.svg")
+
+    gen_cadence(model["engineering"])
+    logger("  -> assets/engineering_cadence.svg")
 
     gen_focus_board(model["focus"])
     logger("  -> assets/now_next_shipped.svg")

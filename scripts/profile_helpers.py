@@ -5,6 +5,32 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from scripts import github_client as gh
+from scripts.config import BOT_ACTOR_PREFIXES, BOT_COMMIT_MARKERS, SELF_REPO, USERNAME
+
+
+def is_bot_commit_message(message: str | None) -> bool:
+    """True for empty or automation-generated commit messages."""
+    if not message or not message.strip():
+        return True
+    lowered = message.lower()
+    return any(marker in lowered for marker in BOT_COMMIT_MARKERS)
+
+
+def is_bot_actor(login: str | None) -> bool:
+    """True when the event actor is an automation account (e.g. github-actions[bot])."""
+    if not login:
+        return False
+    lowered = login.lower()
+    return any(lowered.startswith(prefix) for prefix in BOT_ACTOR_PREFIXES)
+
+
+def is_self_repo(name: str | None, full_name: str | None = None) -> bool:
+    """True when the repo is the profile repo itself (username/username)."""
+    if name and name == SELF_REPO:
+        return True
+    if full_name and full_name == f"{USERNAME}/{SELF_REPO}":
+        return True
+    return False
 
 
 def time_ago(iso_str: str) -> str:

@@ -27,31 +27,79 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # Probe the PAT once. If it is missing OR expired/invalid (e.g. 401), demote
+      # to the always-valid github.token so an expired secret can never freeze the
+      # profile. The resolved tokens + mode are exported via $GITHUB_ENV.
+      - name: Resolve GitHub token
+        env:
+          CANDIDATE_PAT: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          DEFAULT_TOKEN: ${{ github.token }}
+        run: |
+          use_default() {
+            {
+              echo "PERSONAL_GITHUB_TOKEN="
+              echo "GITHUB_TOKEN=${DEFAULT_TOKEN}"
+              echo "GH_TOKEN=${DEFAULT_TOKEN}"
+              echo "PROFILE_TOKEN_MODE=github_token"
+            } >> "$GITHUB_ENV"
+          }
+          if [ -z "${CANDIDATE_PAT}" ]; then
+            echo "No PERSONAL_GITHUB_TOKEN secret set; using github.token."
+            use_default
+            exit 0
+          fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer ${CANDIDATE_PAT}" https://api.github.com/user || echo 000)
+          if [ "${code}" = "200" ]; then
+            exp=$(curl -sS -D - -o /dev/null \
+              -H "Authorization: Bearer ${CANDIDATE_PAT}" https://api.github.com/user \
+              | tr -d '\r' | awk -F': ' 'tolower($1)=="github-authentication-token-expiration"{print $2}')
+            echo "PERSONAL_GITHUB_TOKEN healthy (expires: ${exp:-unknown})"
+            echo "::notice::PERSONAL_GITHUB_TOKEN healthy; expires ${exp:-unknown}"
+            {
+              echo "PERSONAL_GITHUB_TOKEN=${CANDIDATE_PAT}"
+              echo "GITHUB_TOKEN=${DEFAULT_TOKEN}"
+              echo "GH_TOKEN=${CANDIDATE_PAT}"
+              echo "PROFILE_TOKEN_MODE=personal_github_token"
+            } >> "$GITHUB_ENV"
+          else
+            echo "::warning::PERSONAL_GITHUB_TOKEN returned HTTP ${code}; using github.token. Private repos + contribution calendar fall back to last-known-good."
+            use_default
+          fi
+
       - name: Generate and validate canonical profile artifacts
         env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ github.token }}
-          GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
           GITHUB_USERNAME: jguida941
           PROFILE_TIMEZONE: America/New_York
         run: |
-          if [ -n "${PERSONAL_GITHUB_TOKEN}" ]; then
-            export PROFILE_TOKEN_MODE="personal_github_token"
-          else
-            export PROFILE_TOKEN_MODE="github_token"
-          fi
           echo "Token mode: ${PROFILE_TOKEN_MODE}"
           python scripts/profile_cli.py generate-profile --validate
 
-      - name: Check metrics.general.svg
+      # Never publish a zeroed profile, and never freeze on a transient/degraded run:
+      #  - repositories > 0          -> publish
+      #  - repositories == 0 + fallback token -> green no-op, keep last-known-good
+      #  - repositories == 0 + healthy PAT    -> real failure (red)
+      - name: Decide whether to publish
+        id: gate
         env:
-          PERSONAL_GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ github.token }}
-          GH_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
           PROFILE_TIMEZONE: America/New_York
-        run: python scripts/profile_cli.py check-metrics --path metrics.general.svg
+        run: |
+          python scripts/profile_cli.py check-metrics --path metrics.general.svg || true
+          repos=$(grep -oE '[0-9][0-9,]*[[:space:]]+Repositories' metrics.general.svg | head -1 | tr -dc '0-9')
+          repos=${repos:-0}
+          if [ "${repos}" -gt 0 ]; then
+            echo "repositories=${repos}; publishing."
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          elif [ "${PROFILE_TOKEN_MODE}" = "github_token" ]; then
+            echo "::warning::repositories=0 under github_token fallback; keeping last-known-good (no commit)."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::repositories=0 with a healthy PERSONAL_GITHUB_TOKEN — real failure."
+            exit 1
+          fi
 
       - name: Upload metrics artifacts
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: profile-hourly-artifacts
@@ -62,8 +110,9 @@ jobs:
             metrics.general.svg
 
       - uses: stefanzweifel/git-auto-commit-action@v5
+        if: ${{ steps.gate.outputs.publish == 'true' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN || github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           commit_message: "update canonical profile artifacts"
           branch: main

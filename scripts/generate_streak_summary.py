@@ -4,8 +4,17 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 
-from scripts.config import BLUE, BORDER, TEXT, TEXT_BRIGHT, FONT_SANS, SVG_WIDTH
-from scripts.card_theme import card_bg, title_accent, title_left, title_right
+from scripts.config import (
+    FONT_SANS,
+    GRAD_ORANGE_PINK,
+    ORANGE,
+    SVG_WIDTH,
+    TEXT,
+    TEXT_BRIGHT,
+    TEXT_DIM,
+)
+from scripts.card_theme import title_left
+from scripts.glass_kit import accent_ribbon, eyebrow_text, glass_panel, glass_tile, icon
 from scripts.svg_utils import xml_escape, fmt_int
 
 
@@ -122,59 +131,86 @@ def generate(
     contrib_start = day_rows[0][0] if day_rows else None
     contrib_end = day_rows[-1][0] if day_rows else None
 
+    # --- Geometry (12px glass inset reserved for the drop shadow) ----------- #
     width = SVG_WIDTH
-    height = 214
     pad = 24
-    header_h = 38
-    content_top = 46
-    content_bottom = height - 16
-    col_w = int((width - pad * 2) / 3)
-    sep_left = pad + col_w
-    sep_right = pad + col_w * 2
-    center_x = pad + int(col_w * 1.5)
+    gap = 16
+    inner_w = width - pad * 2
+    tile_w = (inner_w - gap * 2) / 3
 
-    value_y = 118
-    label_y = 150
-    date_y = 178
-    parts = [
-        card_bg(width, height),
-        title_left("Streak Summary", x=pad, y=30),
-        title_right("from contribution calendar", width=width, pad=pad, y=30),
-        title_accent(width=width, pad=pad, y=35),
-        f'<line x1="{sep_left}" y1="{content_top}" x2="{sep_left}" y2="{content_bottom}" stroke="{BORDER}" stroke-width="1"/>',
-        f'<line x1="{sep_right}" y1="{content_top}" x2="{sep_right}" y2="{content_bottom}" stroke="{BORDER}" stroke-width="1"/>',
+    tiles_top = 94
+    tile_h = 150
+    height = tiles_top + tile_h + 20  # +20 -> 12px shadow margin + breathing room
+
+    # Shared baselines (the test asserts each row shares one y across columns).
+    icon_y = tiles_top + 26
+    value_y = tiles_top + 82
+    label_y = tiles_top + 110
+    date_y = tiles_top + 134
+
+    columns = [
+        (
+            "calendar",
+            TEXT_DIM,
+            fmt_int(total_contributions),
+            "Total Contributions",
+            _fmt_range(contrib_start, contrib_end),
+            False,
+        ),
+        (
+            "fire",
+            ORANGE,
+            fmt_int(current_days),
+            "Current Streak",
+            _fmt_range(current_start, current_end),
+            True,
+        ),
+        (
+            "trend_up",
+            TEXT_DIM,
+            fmt_int(longest_days),
+            "Longest Streak",
+            _fmt_range(longest_start, longest_end),
+            False,
+        ),
     ]
 
-    # Left: contributions
-    left_cx = pad + int(col_w * 0.5)
-    parts.extend(
-        [
-            f'<text x="{left_cx}" y="{value_y}" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(total_contributions))}</text>',
-            f'<text x="{left_cx}" y="{label_y}" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Total Contributions</text>',
-            f'<text x="{left_cx}" y="{date_y}" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(contrib_start, contrib_end))}</text>',
-        ]
-    )
+    parts: list[str] = [
+        glass_panel(width, height),
+        eyebrow_text("Contribution Calendar", x=pad, y=40),
+        title_left("Streak Summary", x=pad, y=66, size=20),
+        f'<text x="{width - pad}" y="40" fill="{TEXT_DIM}" font-size="10" '
+        f'font-family="{FONT_SANS}" font-weight="600" letter-spacing="1.2" '
+        f'text-anchor="end">LAST 12 MONTHS</text>',
+        accent_ribbon(width, pad=pad, y=78, grad=GRAD_ORANGE_PINK),
+    ]
 
-    # Middle: current streak
-    parts.extend(
-        [
-            f'<text x="{center_x}" y="{value_y}" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(current_days))}</text>',
-            f'<text x="{center_x}" y="{label_y}" fill="{BLUE}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Current Streak</text>',
-            f'<text x="{center_x}" y="{date_y}" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(current_start, current_end))}</text>',
-        ]
-    )
+    for col, (ico, ico_color, number, label, drange, hero) in enumerate(columns):
+        tx = pad + col * (tile_w + gap)
+        cx = tx + tile_w / 2
+        parts.append(glass_tile(tx, tiles_top, tile_w, tile_h))
+        # category icon, centered above the number
+        isize = 22
+        parts.append(icon(ico, cx - isize / 2, icon_y, size=isize, color=ico_color))
+        num_color = ORANGE if hero else TEXT_BRIGHT
+        parts.extend(
+            [
+                f'<text x="{cx:.1f}" y="{value_y}" fill="{num_color}" font-size="42" '
+                f'font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">'
+                f'{xml_escape(number)}</text>',
+                f'<text x="{cx:.1f}" y="{label_y}" fill="{TEXT}" font-size="14" '
+                f'font-family="{FONT_SANS}" text-anchor="middle" font-weight="600" '
+                f'letter-spacing="0.2">{label}</text>',
+                f'<text x="{cx:.1f}" y="{date_y}" fill="{TEXT_DIM}" font-size="12" '
+                f'font-family="{FONT_SANS}" text-anchor="middle">'
+                f'{xml_escape(drange)}</text>',
+            ]
+        )
 
-    # Right: longest streak
-    right_cx = pad + int(col_w * 2.5)
-    parts.extend(
-        [
-            f'<text x="{right_cx}" y="{value_y}" fill="{TEXT_BRIGHT}" font-size="38" font-family="{FONT_SANS}" text-anchor="middle" font-weight="700">{xml_escape(fmt_int(longest_days))}</text>',
-            f'<text x="{right_cx}" y="{label_y}" fill="{TEXT}" font-size="16" font-family="{FONT_SANS}" text-anchor="middle" font-weight="600">Longest Streak</text>',
-            f'<text x="{right_cx}" y="{date_y}" fill="{TEXT}" font-size="13" font-family="{FONT_SANS}" text-anchor="middle">{xml_escape(_fmt_range(longest_start, longest_end))}</text>',
-        ]
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}">{"".join(parts)}</svg>'
     )
-
-    svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">{"".join(parts)}</svg>'
     with open(output_path, "w", encoding="utf-8") as handle:
         handle.write(svg)
     return output_path

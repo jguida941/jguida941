@@ -32,6 +32,7 @@ PROFILE_SNAPSHOT_PATH = Path("site/data/profile_snapshot.json")
 EXPECTED_CARD_TITLES = {
     Path("assets/badges.svg"): "By The Numbers",
     Path("assets/builder_scorecard.svg"): "Builder Scorecard",
+    Path("assets/engineering_cadence.svg"): "Engineering Cadence",
     Path("assets/contribution_calendar.svg"): "Contribution Calendar",
     Path("assets/now_next_shipped.svg"): "Current Focus",
     Path("assets/currently_working.svg"): "Currently Working On",

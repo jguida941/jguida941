@@ -9,27 +9,36 @@ import requests
 from scripts.settings import Settings
 
 
+def _auth_headers_for_token(token: str) -> dict[str, str]:
+    """Return request headers including auth for a specific token."""
+    h: dict[str, str] = {"Accept": "application/vnd.github+json"}
+    if token:
+        h["Authorization"] = f"Bearer {token}"
+    return h
+
+
 def _auth_headers(settings: Settings) -> dict[str, str]:
     """Return request headers including auth when a token is available."""
-    h: dict[str, str] = {"Accept": "application/vnd.github+json"}
-    if settings.token:
-        h["Authorization"] = f"Bearer {settings.token}"
-    return h
+    return _auth_headers_for_token(settings.token)
+
+
+def candidate_tokens(settings: Settings) -> tuple[str, ...]:
+    """Ordered tokens to try; falls back to the primary token for back-compat."""
+    if settings.tokens:
+        return settings.tokens
+    return (settings.token,) if settings.token else ("",)
 
 
 _PUBLIC_HEADERS: dict[str, str] = {"Accept": "application/vnd.github+json"}
 
 
-def request_with_retry(
+def _request_once(
     url: str,
-    settings: Settings,
-    *,
-    headers: dict[str, str] | None = None,
-    params: dict | None = None,
-    max_retries: int = 3,
+    hdrs: dict[str, str],
+    params: dict | None,
+    max_retries: int,
 ) -> requests.Response:
-    """Send an authenticated GET request and retry on 429/5xx."""
-    hdrs = headers or _auth_headers(settings)
+    """Single GET attempt with 429/5xx retry; raises on other non-200."""
     last_error: Exception | None = None
     resp: requests.Response | None = None
     for attempt in range(max_retries):
@@ -52,6 +61,36 @@ def request_with_retry(
         raise last_error
     assert resp is not None
     return resp
+
+
+def request_with_retry(
+    url: str,
+    settings: Settings,
+    *,
+    headers: dict[str, str] | None = None,
+    params: dict | None = None,
+    max_retries: int = 3,
+) -> requests.Response:
+    """Send an authenticated GET request and retry on 429/5xx.
+
+    When the caller does not supply explicit headers, iterate over the
+    available tokens and transparently retry with the next token on a 401
+    (e.g. an expired PERSONAL_GITHUB_TOKEN falling back to GITHUB_TOKEN).
+    """
+    if headers is not None:
+        return _request_once(url, headers, params, max_retries)
+
+    tokens = candidate_tokens(settings)
+    for idx, token in enumerate(tokens):
+        try:
+            return _request_once(url, _auth_headers_for_token(token), params, max_retries)
+        except requests.HTTPError as exc:
+            status = getattr(exc.response, "status_code", None)
+            if status == 401 and idx < len(tokens) - 1:
+                continue
+            raise
+    # Unreachable: tokens always has at least one entry.
+    raise RuntimeError("no tokens available for request")
 
 
 def request_public_with_retry(
