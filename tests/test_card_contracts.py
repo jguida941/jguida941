@@ -84,7 +84,7 @@ CARDS = {
     "focus": "Current Focus",
     "currently_working": "Currently Working On",
     "streak": "Streak Summary",
-    "snapshot": "Raw Data Snapshot (Python Pull)",
+    "snapshot": "Raw Data Snapshot",
     "lang": "Language Breakdown",
     "heatmap": "When I Code",
     "contribution": "Contribution Calendar",

@@ -520,6 +520,11 @@ _ICONS: dict[str, tuple[str, str]] = {
         "stroke",
         '<rect x="3.5" y="5" width="17" height="15.5" rx="2.2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>',
     ),
+    # --- status shapes (distinct per status: success != danger != warning) ---
+    "check": ("stroke", '<path d="M20 6 9 17l-5-5"/>'),
+    "alert": ("stroke", '<path d="M12 4 2.5 20h19L12 4z"/><path d="M12 10v4.5M12 17.5v.01"/>'),
+    "cross": ("stroke", '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>'),
+    "dot": ("fill", '<circle cx="12" cy="12" r="5"/>'),
 }
 
 

@@ -7,16 +7,22 @@ ad-hoc sizes. See docs/DESIGN_SPEC.md (Part 3) for each component's contract.
 from __future__ import annotations
 
 from scripts.core.config import (
+    CYAN,
     FONT_SANS,
     GLASS_HAIRLINE_HEX,
+    GREEN,
+    RED,
     SPACE,
     TEXT,
     TEXT_BRIGHT,
     TEXT_DIM,
     TYPE_SCALE,
+    YELLOW,
 )
+from scripts.rendering.glass_kit import chip as _chip
 from scripts.rendering.glass_kit import glass_tile
 from scripts.rendering.glass_kit import icon as _icon
+from scripts.rendering.glass_kit import progress_ring as _progress_ring
 
 
 def _n(v: float) -> str:
@@ -129,6 +135,43 @@ def metric_tile(
         parts.append(text(value, x + pad, vy, token=value_token, color=TEXT_BRIGHT))
         parts.append(text(label, x + pad, vy + 15, token="caption", color=TEXT_DIM))
     return "".join(parts)
+
+
+# Status -> (tone color, distinct icon shape). success != danger != warning
+# shape, so state survives desaturation (DESIGN_SPEC 3.6 / Power BI CVD-safety).
+_STATUS_TONE = {
+    "success": (GREEN, "check"),
+    "warning": (YELLOW, "alert"),
+    "danger": (RED, "cross"),
+    "neutral": (TEXT_DIM, "dot"),
+}
+
+
+def status_chip(x: float, y: float, *, label: str, status: str = "neutral", height: float = 22) -> str:
+    """A tinted status pill: state conveyed by icon SHAPE *and* text label, never
+    hue alone. DESIGN_SPEC 3.6 — hue in {success,warning,danger,neutral}."""
+    color, icon_name = _STATUS_TONE.get(status, _STATUS_TONE["neutral"])
+    return _chip(x, y, label, color=color, icon_name=icon_name, tone="accent", height=height)
+
+
+def donut_gauge(
+    cx: float,
+    cy: float,
+    *,
+    value: float,
+    max_value: float = 100.0,
+    label: str | None = None,
+    radius: float = 34,
+    stroke: float = 8,
+    color: str = CYAN,
+) -> str:
+    """A single value in [0, max_value] as a part-to-whole ring with a token-sized
+    (>=12) center label. DESIGN_SPEC 3.9 — the only sanctioned circular chart here;
+    comparisons use bars. No sublabel (progress_ring's sublabel is sub-floor)."""
+    mv = float(max_value) or 1.0
+    pct = max(0.0, min(100.0, float(value) / mv * 100.0))
+    center = label if label is not None else f"{round(pct)}%"
+    return _progress_ring(cx, cy, radius, pct, color=color, stroke=stroke, label=center, label_size=20)
 
 
 def empty_state(cx: float, cy: float, message: str, *, icon_name: str | None = None) -> str:

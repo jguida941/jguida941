@@ -286,5 +286,92 @@ class StreakSummaryContract(unittest.TestCase):
         self.assertIsNone(re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers")
 
 
+class SnapshotPanelContract(unittest.TestCase):
+    """DESIGN_SPEC 3.2/3.3/3.6/Part 1.7: the Raw Data Snapshot promotes one KPI,
+    curates to <=4 secondary tiles (not an 11-row dump), drops the gradient
+    ribbon, and renders pipeline status by distinct icon SHAPE + label."""
+
+    SCALE = {46.0, 26.0, 22.0, 20.0, 14.0, 12.0, 11.0}
+    CHECK = "M20 6 9 17l-5-5"      # success icon path (status_chip 'check')
+    CROSS = "M6.5 6.5l11 11"        # danger icon path (status_chip 'cross')
+
+    def _rows(self):
+        return [
+            {"key": "last_year_contributions", "label": "12-Month Contributions", "display_value": "8,104"},
+            {"key": "public_scope_commits", "label": "Public Commits", "display_value": "4,264"},
+            {"key": "total_repos", "label": "Repositories", "display_value": "67"},
+            {"key": "private_owned_repos", "label": "Private Repos", "display_value": "146"},
+            {"key": "total_stars", "label": "Stargazers", "display_value": "78"},
+            {"key": "languages_count", "label": "Languages", "display_value": "24"},
+        ]
+
+    def _render(self, out: str, *, rows=None, quality=None) -> str:
+        from scripts.rendering.generate_snapshot_panel import generate
+
+        generate(
+            self._rows() if rows is None else rows,
+            quality
+            if quality is not None
+            else {"ci_status": "ok", "commits_status": "ok", "releases_status": "error", "events_status": "partial"},
+            output_path=out,
+        )
+        return Path(out).read_text(encoding="utf-8")
+
+    def _sizes(self, svg):
+        return [float(m) for m in _FONT.findall(svg)]
+
+    def test_one_dominant_kpi(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "snap.svg"))
+        sizes = self._sizes(svg)
+        top = max(sizes)
+        self.assertGreaterEqual(top, 40, "needs one display KPI")
+        self.assertEqual(sizes.count(top), 1, "exactly one dominant KPI")
+        self.assertLessEqual(max(s for s in sizes if s < top), 26, "secondaries below KPI")
+
+    def test_sizes_on_scale_and_legible(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "snap.svg"))
+        for s in self._sizes(svg):
+            self.assertIn(s, self.SCALE, f"off-scale font-size {s}")
+            self.assertGreaterEqual(s, 11.0, f"sub-floor font-size {s}")
+
+    def test_no_gradient_ribbon(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "snap.svg"))
+        self.assertNotIn("gk-ribbon", svg, "gradient ribbon must be replaced by a hairline")
+
+    def test_secondary_tiles_curated(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "snap.svg"))
+        # secondary metric tile values render at the metric token (22)
+        self.assertLessEqual(svg.count('font-size="22"'), 4, "cap at <=4 curated secondary tiles")
+
+    def test_status_by_distinct_icon_shape(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "snap.svg"))
+        self.assertIn(self.CHECK, svg, "success status must use the check shape")
+        self.assertIn(self.CROSS, svg, "danger status must use a distinct (cross) shape")
+
+    def test_empty_state(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "snap.svg"), rows=[], quality={})
+        texts = _TEXT_NODE.findall(svg)
+        self.assertLessEqual(len(texts), 3, "empty snapshot = header + one explanatory line")
+        self.assertIsNone(re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers")
+
+
 if __name__ == "__main__":
     unittest.main()
