@@ -373,5 +373,82 @@ class SnapshotPanelContract(unittest.TestCase):
         self.assertIsNone(re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers")
 
 
+class BuilderScorecardContract(unittest.TestCase):
+    """DESIGN_SPEC 3.2/3.3/3.9/Part 4: the Builder Scorecard promotes contributions
+    to one display KPI, demotes the rest to uniform secondary tiles, renders CI
+    coverage as a token-labeled donut gauge (the one sanctioned circular chart),
+    and drops the rainbow accents + gradient ribbon."""
+
+    SCALE = {46.0, 26.0, 22.0, 20.0, 14.0, 12.0, 11.0}
+
+    def _scorecard(self):
+        return {
+            "last_year_contributions": 8104,
+            "active_days_last_year": 287,
+            "active_repos_7d": 5,
+            "ci_coverage_pct": 82,
+            "automation_workflows": 16,
+            "releases_30d": 3,
+            "primary_lang_share_pct": 61.4,
+            "median_days_since_push": 4,
+        }
+
+    def _render(self, out: str, *, scorecard=None) -> str:
+        from scripts.rendering.generate_builder_scorecard import generate
+
+        generate(self._scorecard() if scorecard is None else scorecard, output_path=out)
+        return Path(out).read_text(encoding="utf-8")
+
+    def _sizes(self, svg):
+        return [float(m) for m in _FONT.findall(svg)]
+
+    def test_one_dominant_kpi(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "score.svg"))
+        sizes = self._sizes(svg)
+        top = max(sizes)
+        self.assertGreaterEqual(top, 40, "needs one display KPI (contributions)")
+        self.assertEqual(sizes.count(top), 1, "exactly one dominant KPI")
+        self.assertLessEqual(max(s for s in sizes if s < top), 26, "secondaries below KPI")
+
+    def test_sizes_on_scale_and_legible(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "score.svg"))
+        for s in self._sizes(svg):
+            self.assertIn(s, self.SCALE, f"off-scale font-size {s}")
+            self.assertGreaterEqual(s, 11.0, f"sub-floor font-size {s}")
+
+    def test_no_gradient_ribbon(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "score.svg"))
+        self.assertNotIn("gk-ribbon", svg, "gradient ribbon must be replaced by a hairline")
+
+    def test_ci_coverage_is_labeled_gauge(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "score.svg"))
+        # gauge center label rides at a scale token (20) and shows a percent in [0,100]
+        self.assertRegex(
+            svg, r'<text[^>]*font-size="20"[^>]*>[^<]*%</text>',
+            "CI coverage must render as a >=12px labeled gauge",
+        )
+
+    def test_empty_state(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "score.svg"), scorecard={})
+        texts = _TEXT_NODE.findall(svg)
+        self.assertLessEqual(len(texts), 3, "empty scorecard = header + one explanatory line")
+        self.assertIsNone(re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers")
+
+
 if __name__ == "__main__":
     unittest.main()

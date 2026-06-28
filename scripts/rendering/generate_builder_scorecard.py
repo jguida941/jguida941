@@ -1,47 +1,30 @@
-"""Build the builder scorecard SVG (Apple glass / frosted look).
+"""Build the Builder Scorecard card.
 
-Data-length-driven 4-column grid of frosted metric tiles. Each tile shows a
-leading line-icon, the headline ``display_value`` as a big bold number, the
-metric label, and a dim caption. The grid height is sized from the number of
-tiles (rows = ceil(len(tiles) / cols)), never hardcoded.
+Power BI information architecture (DESIGN_SPEC): one dominant KPI (12-month
+contributions) top-left, a supporting grid of uniform secondary metric tiles
+with neutral monochrome icons, and CI coverage rendered as a token-labeled donut
+gauge (the one sanctioned circular chart — comparisons use the tiles). An honest
+empty state renders when there is no scorecard data.
 """
 
 from __future__ import annotations
 
-import math
-
-from scripts.core.config import (
-    BLUE,
-    CYAN,
-    FONT_SANS,
-    GREEN,
-    ORANGE,
-    PURPLE,
-    SVG_WIDTH,
-    TEXT,
-    TEXT_BRIGHT,
-    TEXT_DIM,
-)
-from scripts.rendering.card_theme import title_left
-from scripts.rendering.glass_kit import (
-    accent_ribbon,
-    chip,
-    chip_width,
-    eyebrow_text,
-    glass_panel,
-    glass_tile,
-    icon,
-    progress_ring,
-)
 from scripts.contracts.profile_contract import SCORECARD_METRICS, format_metric_value
-from scripts.rendering.svg_utils import truncate, xml_escape
+from scripts.core.config import SPACE, SVG_WIDTH, TEXT, TEXT_DIM
+from scripts.rendering.components import (
+    donut_gauge,
+    empty_state,
+    metric_tile,
+    primary_kpi,
+    section_header,
+    text,
+)
+from scripts.rendering.glass_kit import glass_panel, glass_tile
 
-TITLE = "Builder Scorecard"
-
-# A sensible SF-Symbols-style icon per scorecard metric (fallback: lang_dot).
+# Neutral monochrome icon per scorecard metric key (icon color is set by the kit).
 ICON_BY_KEY = {
-    "last_year_contributions": "fire",
-    "active_days_last_year": "calendar",
+    "last_year_contributions": "calendar",
+    "active_days_last_year": "fire",
     "active_repos_7d": "commit",
     "ci_coverage_pct": "ci_check",
     "automation_workflows": "workflow",
@@ -50,136 +33,122 @@ ICON_BY_KEY = {
     "median_days_since_push": "clock",
 }
 
-_ACCENT_MAP = {"BLUE": BLUE, "CYAN": CYAN, "GREEN": GREEN, "ORANGE": ORANGE, "PURPLE": PURPLE}
+# The single dominant KPI, and the curated supporting grid (CI coverage = gauge).
+_KPI_KEY = "last_year_contributions"
+_GRID_KEYS = (
+    "active_days_last_year",
+    "active_repos_7d",
+    "ci_coverage_pct",
+    "automation_workflows",
+    "releases_30d",
+    "primary_lang_share_pct",
+)
+_DEFS = {m["key"]: m for m in SCORECARD_METRICS}
 
 
-def _default_tiles(scorecard: dict) -> list[dict]:
-    """Build the 8-tile list straight from the metric contract (fallback path)."""
-    tiles: list[dict] = []
-    for definition in SCORECARD_METRICS:
-        key = definition["key"]
-        tiles.append(
-            {
-                "key": key,
-                "label": definition["label"],
-                "detail": definition["detail"],
-                "value": scorecard.get(key, 0),
-                "display_value": format_metric_value(scorecard.get(key), definition),
-                "accent": _ACCENT_MAP.get(definition.get("accent", "CYAN"), CYAN),
-            }
-        )
-    return tiles
+def _fmt(scorecard: dict, key: str) -> str:
+    defn = _DEFS.get(key, {"key": key})
+    return str(format_metric_value(scorecard.get(key), defn))
 
 
-def _render_tile(x: float, y: float, w: float, h: float, tile: dict) -> str:
-    """One frosted metric tile: accent bar + icon + big number + label + caption."""
-    key = str(tile.get("key", ""))
-    accent = str(tile.get("accent") or CYAN)
-    label = xml_escape(truncate(str(tile.get("label", "")), 22))
-    detail = xml_escape(truncate(str(tile.get("detail", "")), 32))
-
-    display_value = tile.get("display_value")
-    if display_value is None:
-        display_value = tile.get("value", "0")
-    value = xml_escape(str(display_value))
-
-    icon_name = ICON_BY_KEY.get(key, "lang_dot")
-    ix = x + 16
-
+def _gauge_cell(x: float, y: float, w: float, h: float, *, value: float, detail: str) -> str:
+    """A grid cell whose value is a single goal gauge (DESIGN_SPEC 3.9)."""
     parts = [glass_tile(x, y, w, h)]
-    # leading line-icon — neutral secondary (Apple: color isn't a per-tile
-    # decoration; the big number leads, color is reserved for one signal)
-    parts.append(icon(icon_name, ix, y + 24, size=16, color=TEXT_DIM))
-
-    is_ring = key == "ci_coverage_pct"
-    if is_ring:
-        # CI coverage reads as a small donut gauge instead of a plain number.
-        try:
-            pct = float(tile.get("value"))
-        except (TypeError, ValueError):
-            pct = 0.0
-        ring_cx = x + w - 32
-        ring_cy = y + 50
-        parts.append(
-            progress_ring(
-                ring_cx,
-                ring_cy,
-                19,
-                pct,
-                color=accent,
-                stroke=5,
-                label=value,
-                label_size=10,
-            )
-        )
-    else:
-        parts.append(
-            f'<text x="{ix:g}" y="{y + 63:g}" fill="{TEXT_BRIGHT}" font-size="29" '
-            f'font-family="{FONT_SANS}" font-weight="700">{value}</text>'
-        )
-
-    parts.append(
-        f'<text x="{ix:g}" y="{y + 86:g}" fill="{TEXT}" font-size="11.5" '
-        f'font-family="{FONT_SANS}" font-weight="600">{label}</text>'
-    )
-    parts.append(
-        f'<text x="{ix:g}" y="{y + 103:g}" fill="{TEXT_DIM}" font-size="10" '
-        f'font-family="{FONT_SANS}">{detail}</text>'
-    )
+    cx = x + 32
+    cy = y + h / 2
+    parts.append(donut_gauge(cx, cy, value=float(value or 0), radius=24, stroke=6))
+    parts.append(text("CI coverage", x + 64, y + h / 2 - 2, token="caption", color=TEXT))
+    parts.append(text(detail, x + 64, y + h / 2 + 14, token="caption", color=TEXT_DIM))
     return "".join(parts)
 
 
 def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg", tiles: list | None = None) -> str:
-    """Render the Builder Scorecard card.
-
-    scorecard: raw metric dict (used to build tiles when ``tiles`` is omitted).
-    tiles: list of ``{key,label,detail,value,display_value,accent}`` dicts. The
-    grid is data-length-driven (cols=4, rows=ceil(n/4)) and the SVG height is
-    sized from the row count plus a margin so the glass shadow never clips.
-    """
+    _ = tiles  # back-compat; the card is driven by the scorecard + metric contract
+    data = scorecard if isinstance(scorecard, dict) else {}
     width = SVG_WIDTH
-    pad = 24
-    gap = 14
-    cols = 4
+    pad = 28
 
-    card_tiles = tiles or _default_tiles(scorecard)
-    count = len(card_tiles)
-    rows = max(1, math.ceil(count / cols))
-
-    tile_w = (width - pad * 2 - gap * (cols - 1)) / cols
-    tile_h = 120
-    header_h = 90          # eyebrow + title + ribbon (top 12px is the glass inset)
-    bottom_pad = 22        # below the grid (includes the 12px glass inset margin)
-    svg_h = int(header_h + rows * tile_h + (rows - 1) * gap + bottom_pad)
-
-    parts: list[str] = [glass_panel(width, svg_h)]
-
-    # Header: eyebrow caption, single title node, calm ribbon, source chip.
-    parts.append(eyebrow_text("GitHub Signals · Last 12 Months", x=pad, y=33))
-    parts.append(title_left(TITLE, x=pad, y=57, size=17))
-    parts.append(accent_ribbon(width, pad=pad, y=68))
-
-    chip_text = "GitHub API"
-    cw = chip_width(chip_text, size=10, icon=True)
-    parts.append(
-        chip(width - pad - cw, 41, chip_text, color=CYAN, icon_name="globe", filled=True, size=10, width=cw)
+    header_svg, content_top = section_header(
+        pad,
+        46,
+        "Builder Scorecard",
+        width=width,
+        eyebrow="GitHub Signals · Last 12 Months",
+        right_text="GitHub API",
+        pad=pad,
     )
 
-    # Data-length-driven grid of frosted tiles.
-    for i, tile in enumerate(card_tiles):
-        row = i // cols
-        col = i % cols
-        x = pad + col * (tile_w + gap)
-        y = header_h + row * (tile_h + gap)
-        parts.append(_render_tile(x, y, tile_w, tile_h, tile))
+    # Honest empty state: no real signal -> one explanatory line, no fabricated tiles.
+    if not any(data.get(k) for k in (_KPI_KEY, *_GRID_KEYS)):
+        empty_header, _ = section_header(
+            pad, 46, "Builder Scorecard", width=width, eyebrow="GitHub Signals", pad=pad
+        )
+        height = int(content_top + 92)
+        parts = [glass_panel(width, height), empty_header]
+        parts.append(
+            empty_state(width / 2, content_top + 48, "No builder signals available yet", icon_name="workflow")
+        )
+        svg = (
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+            f'viewBox="0 0 {width} {height}">{"".join(parts)}</svg>'
+        )
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(svg)
+        return output_path
+
+    # --- geometry (KPI top-left + 3x2 supporting grid) ---
+    cols, row_gap = 3, SPACE["md"]
+    tile_h = 66
+    kpi_w = 244
+    grid_x = pad + kpi_w + SPACE["xl"]
+    gap = SPACE["md"]
+    col_w = (width - pad - grid_x - gap * (cols - 1)) / cols
+    rows = 2
+    grid_bottom = content_top + rows * tile_h + (rows - 1) * row_gap
+    height = int(grid_bottom + 30)
+
+    parts: list[str] = [glass_panel(width, height), header_svg]
+
+    # PrimaryKpiCard: contributions, top-left.
+    kpi_y = content_top + 58
+    parts.append(
+        primary_kpi(
+            pad,
+            kpi_y,
+            value=_fmt(data, _KPI_KEY),
+            label="contributions",
+            sublabel="last 12 months",
+        )
+    )
+    parts.append(
+        f'<rect x="{pad + kpi_w:g}" y="{content_top + 6:g}" width="1" '
+        f'height="{grid_bottom - content_top - 6:g}" fill="{TEXT_DIM}" fill-opacity="0.16"/>'
+    )
+
+    # Supporting grid: 5 uniform metric tiles + 1 donut gauge (CI coverage).
+    for i, key in enumerate(_GRID_KEYS):
+        col, row = i % cols, i // cols
+        x = grid_x + col * (col_w + gap)
+        y = content_top + row * (tile_h + row_gap)
+        defn = _DEFS.get(key, {})
+        if key == "ci_coverage_pct":
+            parts.append(
+                _gauge_cell(x, y, col_w, tile_h, value=data.get(key) or 0, detail=str(defn.get("detail", "")))
+            )
+        else:
+            parts.append(
+                metric_tile(
+                    x, y, col_w, tile_h,
+                    value=_fmt(data, key),
+                    label=str(defn.get("label", key)),
+                    icon_name=ICON_BY_KEY.get(key, "code"),
+                )
+            )
 
     svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{svg_h}" '
-        f'viewBox="0 0 {width} {svg_h}">'
-        + "".join(parts)
-        + "</svg>"
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}">{"".join(parts)}</svg>'
     )
-
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(svg)
     return output_path
