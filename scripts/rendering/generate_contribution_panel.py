@@ -1,265 +1,146 @@
-"""Build the contribution calendar SVG panel (Apple/glass styling)."""
+"""Contribution Calendar card — KPI + GitHub-style heatmap (DESIGN_SPEC, governed glass).
+
+12-month contributions promoted to the dominant KPI; the week x 7-day grid keeps the
+familiar contribution-graph shape; current/longest streak demote to neutral metric
+tiles. All labels on the locked type ladder (>=11). Glass kept.
+"""
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
 
 from scripts.core.config import (
-    BLUE,
     CONTRIB_EMPTY,
     CONTRIB_RAMP,
-    CYAN,
-    FONT_SANS,
-    GLASS_INSET,
     GLASS_SHEEN_HEX,
-    GREEN,
+    SPACE,
     SVG_WIDTH,
-    TEXT,
-    TEXT_BRIGHT,
     TEXT_DIM,
 )
-from scripts.rendering.glass_kit import (
-    accent_ribbon,
-    glass_panel,
-    glass_tile,
-    icon,
-)
-from scripts.rendering.card_theme import title_left
-from scripts.rendering.svg_utils import fmt_int
+from scripts.rendering.components import empty_state, metric_tile, primary_kpi, section_header, text
+from scripts.rendering.glass_kit import glass_panel
+from scripts.rendering.svg_utils import fmt_compact, fmt_int
 
-# 5-step intensity ramp (idle slot + cool blue -> cyan -> mint); from the token source.
 _EMPTY_HEX = CONTRIB_EMPTY
 _EMPTY_OP = 0.06
-_RAMP = CONTRIB_RAMP  # levels 1..4
+_RAMP = CONTRIB_RAMP
+_MONTHS = {f"{i:02d}": m for i, m in enumerate(
+    ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"])}
 
 
 def _month_label(date_str: str) -> str:
-    months = {
-        "01": "Jan",
-        "02": "Feb",
-        "03": "Mar",
-        "04": "Apr",
-        "05": "May",
-        "06": "Jun",
-        "07": "Jul",
-        "08": "Aug",
-        "09": "Sep",
-        "10": "Oct",
-        "11": "Nov",
-        "12": "Dec",
-    }
-    if not date_str or len(date_str) < 7:
-        return ""
-    return months.get(date_str[5:7], "")
+    return _MONTHS.get(date_str[5:7], "") if date_str and len(date_str) >= 7 else ""
 
 
 def _compute_streaks(days: list[dict]) -> tuple[int, int]:
     if not days:
         return 0, 0
-
-    today_utc = datetime.now(timezone.utc).date()
-    filtered_days = []
+    today = datetime.now(timezone.utc).date()
+    counts = []
     for day in days:
-        raw_date = str(day.get("date", ""))
         try:
-            parsed = datetime.fromisoformat(raw_date).date()
+            parsed = datetime.fromisoformat(str(day.get("date", ""))).date()
         except ValueError:
             parsed = None
-        if parsed is None or parsed <= today_utc:
-            filtered_days.append(day)
-
-    if not filtered_days:
-        return 0, 0
-
-    longest = 0
-    current_run = 0
-    for day in filtered_days:
-        try:
-            count = int(day.get("contributionCount", 0))
-        except (TypeError, ValueError):
-            count = 0
-        if count > 0:
-            current_run += 1
-            if current_run > longest:
-                longest = current_run
-        else:
-            current_run = 0
-
+        if parsed is None or parsed <= today:
+            try:
+                counts.append(int(day.get("contributionCount", 0)))
+            except (TypeError, ValueError):
+                counts.append(0)
+    longest = run = 0
+    for c in counts:
+        run = run + 1 if c > 0 else 0
+        longest = max(longest, run)
     current = 0
-    for day in reversed(filtered_days):
-        try:
-            count = int(day.get("contributionCount", 0))
-        except (TypeError, ValueError):
-            count = 0
-        if count > 0:
+    for c in reversed(counts):
+        if c > 0:
             current += 1
         else:
             break
-
     return current, longest
 
 
 def _level(count: int, max_count: int) -> int:
     if count <= 0 or max_count <= 0:
         return 0
-    ratio = count / max_count
-    if ratio >= 0.75:
-        return 4
-    if ratio >= 0.5:
-        return 3
-    if ratio >= 0.25:
-        return 2
-    return 1
+    r = count / max_count
+    return 4 if r >= 0.75 else 3 if r >= 0.5 else 2 if r >= 0.25 else 1
 
 
 def _cell(x: float, y: float, size: float, level: int) -> str:
-    """One rounded heatmap cell: faint frosted slot when idle, ramp color when active."""
     rx = 3
     if level <= 0:
-        return (
-            f'<rect x="{x:g}" y="{y:g}" width="{size:g}" height="{size:g}" rx="{rx}" '
-            f'fill="{_EMPTY_HEX}" fill-opacity="{_EMPTY_OP}"/>'
-        )
-    color = _RAMP[level - 1]
+        return (f'<rect x="{x:g}" y="{y:g}" width="{size:g}" height="{size:g}" rx="{rx}" '
+                f'fill="{_EMPTY_HEX}" fill-opacity="{_EMPTY_OP}"/>')
     return (
-        f'<rect x="{x:g}" y="{y:g}" width="{size:g}" height="{size:g}" rx="{rx}" '
-        f'fill="{color}"/>'
+        f'<rect x="{x:g}" y="{y:g}" width="{size:g}" height="{size:g}" rx="{rx}" fill="{_RAMP[level - 1]}"/>'
         f'<rect x="{x + 0.5:g}" y="{y + 0.5:g}" width="{size - 1:g}" height="{size - 1:g}" '
         f'rx="{rx - 0.5:g}" fill="none" stroke="{GLASS_SHEEN_HEX}" stroke-opacity="0.10" stroke-width="0.75"/>'
     )
 
 
-def _stat_tile(
-    x: float,
-    y: float,
-    w: float,
-    h: float,
-    *,
-    accent: str,
-    icon_name: str,
-    value: str,
-    unit: str,
-    label: str,
-) -> str:
-    parts = [glass_tile(x, y, w, h, accent=accent)]
-    parts.append(icon(icon_name, x + 16, y + 24, size=15, color=accent))
-    num_x = x + 41
-    num_baseline = y + 40
-    parts.append(
-        f'<text x="{num_x:g}" y="{num_baseline:g}" fill="{TEXT_BRIGHT}" font-size="21" '
-        f'font-family="{FONT_SANS}" font-weight="700">{value}</text>'
-    )
-    if unit:
-        unit_x = num_x + len(value) * 21 * 0.6 + 6
-        parts.append(
-            f'<text x="{unit_x:g}" y="{num_baseline:g}" fill="{TEXT_DIM}" font-size="11" '
-            f'font-family="{FONT_SANS}" font-weight="500">{unit}</text>'
-        )
-    parts.append(
-        f'<text x="{x + 16:g}" y="{y + 55:g}" fill="{TEXT_DIM}" font-size="9.5" '
-        f'font-family="{FONT_SANS}" font-weight="600" letter-spacing="1.1">{label}</text>'
-    )
-    return "".join(parts)
-
-
 def generate(calendar: dict | None, output_path: str = "assets/contribution_calendar.svg") -> str:
-    title = "Contribution Calendar"
+    width = SVG_WIDTH
+    pad = 28
+    weeks = calendar.get("weeks") if isinstance(calendar, dict) and isinstance(calendar.get("weeks"), list) else []
+    try:
+        total = int(calendar.get("totalContributions", 0)) if isinstance(calendar, dict) else 0
+    except (TypeError, ValueError):
+        total = 0
 
-    weeks = []
-    total_contributions = 0
-    if isinstance(calendar, dict):
-        weeks = calendar.get("weeks") if isinstance(calendar.get("weeks"), list) else []
-        try:
-            total_contributions = int(calendar.get("totalContributions", 0))
-        except (TypeError, ValueError):
-            total_contributions = 0
+    header_svg, content_top = section_header(
+        pad, 46, "Contribution Calendar", width=width, eyebrow="Last 12 Months", pad=pad
+    )
 
     if not weeks:
-        svg_h = 150
-        body = (
-            glass_panel(SVG_WIDTH, svg_h)
-            + title_left(title, x=30, y=44)
-            + accent_ribbon(SVG_WIDTH, pad=30, y=56)
-            + f'<text x="30" y="96" fill="{TEXT}" font-size="13" '
-            f'font-family="{FONT_SANS}">Calendar data unavailable for this run.</text>'
-        )
-        svg = (
-            f'<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" '
-            f'viewBox="0 0 {SVG_WIDTH} {svg_h}">{body}</svg>'
-        )
+        empty_header, _ = section_header(pad, 46, "Contribution Calendar", width=width, eyebrow="Last 12 Months", pad=pad)
+        height = int(content_top + 92)
+        body = "".join([glass_panel(width, height), empty_header,
+                        empty_state(width / 2, content_top + 48, "No contribution calendar available", icon_name="calendar")])
         with open(output_path, "w", encoding="utf-8") as f:
-            f.write(svg)
+            f.write(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+                    f'viewBox="0 0 {width} {height}">{body}</svg>')
         return output_path
 
-    all_days = []
-    for week in weeks:
-        if not isinstance(week, dict):
-            continue
-        for day in week.get("contributionDays", []):
-            if isinstance(day, dict):
-                all_days.append(day)
-
-    max_count = 0
-    for day in all_days:
-        try:
-            max_count = max(max_count, int(day.get("contributionCount", 0)))
-        except (TypeError, ValueError):
-            continue
-
+    all_days = [d for wk in weeks if isinstance(wk, dict) for d in (wk.get("contributionDays") or []) if isinstance(d, dict)]
+    max_count = max((int(d.get("contributionCount", 0)) for d in all_days if str(d.get("contributionCount", 0)).lstrip("-").isdigit()), default=0)
     current_streak, longest_streak = _compute_streaks(all_days)
 
-    # --- Grid geometry (centered, with ~38px breathing room from the panel rim) ---
-    cell = 11
-    gap = 3
+    cell, gap = 11, 3
     cols = len(weeks)
     grid_w = cols * cell + max(0, cols - 1) * gap
-    grid_h = 7 * cell + 6 * gap
-    grid_x = round((SVG_WIDTH - grid_w) / 2)
-    grid_y = 88
-    grid_bottom = grid_y + grid_h
-    left = grid_x
-    right = grid_x + grid_w
+    grid_x = round((width - grid_w) / 2)
+    grid_y = content_top + 124
+    grid_bottom = grid_y + 7 * cell + 6 * gap
+    legend_y = grid_bottom + 18
+    height = int(legend_y + 24)
 
-    # --- Vertical layout ---
-    title_y = 42
-    ribbon_y = 53
-    legend_y = grid_bottom + 22
-    tiles_y = grid_bottom + 44
-    tile_h = 64
-    svg_h = tiles_y + tile_h + GLASS_INSET + 12
+    parts = [glass_panel(width, height), header_svg]
 
-    parts: list[str] = [glass_panel(SVG_WIDTH, svg_h)]
+    # KPI (top-left) + two neutral streak tiles
+    parts.append(primary_kpi(pad, content_top + 58, value=fmt_compact(total), label="contributions", sublabel="last 12 months"))
+    grid_tx = pad + 244 + SPACE["xl"]
+    col_w = (width - pad - grid_tx - SPACE["md"]) / 2
+    for i, (val, label, icon_name) in enumerate(
+        [(fmt_int(current_streak), "current streak", "fire"), (fmt_int(longest_streak), "longest streak", "trend_up")]
+    ):
+        parts.append(metric_tile(grid_tx + i * (col_w + SPACE["md"]), content_top + 24, col_w, 66,
+                                 value=val, label=label, icon_name=icon_name))
 
-    # Title + eyebrow caption
-    parts.append(title_left(title, x=left, y=title_y))
-    parts.append(
-        f'<text x="{right:g}" y="{title_y - 1:g}" fill="{TEXT_DIM}" font-size="10" '
-        f'font-family="{FONT_SANS}" font-weight="600" letter-spacing="1.5" '
-        f'text-anchor="end">LAST 12 MONTHS</text>'
-    )
-    parts.append(accent_ribbon(SVG_WIDTH, pad=left, y=ribbon_y))
-
-    # Month labels above the grid (skip a new month if it would crowd the prior label)
-    prev_month = ""
-    last_label_x = -1e9
-    for idx, week in enumerate(weeks):
-        days = week.get("contributionDays") or [] if isinstance(week, dict) else []
-        first_date = days[0].get("date", "") if days and isinstance(days[0], dict) else ""
-        month = _month_label(first_date)
-        if month and month != prev_month:
-            prev_month = month
+    # month labels (>=12, sparse so they don't crowd)
+    prev, last_x = "", -1e9
+    for idx, wk in enumerate(weeks):
+        days = wk.get("contributionDays") or [] if isinstance(wk, dict) else []
+        month = _month_label(days[0].get("date", "") if days and isinstance(days[0], dict) else "")
+        if month and month != prev:
+            prev = month
             lx = grid_x + idx * (cell + gap)
-            if lx - last_label_x < 34:
-                continue
-            last_label_x = lx
-            parts.append(
-                f'<text x="{lx:g}" y="{grid_y - 9:g}" fill="{TEXT_DIM}" font-size="9.5" '
-                f'font-family="{FONT_SANS}" font-weight="500">{month}</text>'
-            )
+            if lx - last_x >= 46:
+                last_x = lx
+                parts.append(text(month, lx, grid_y - 8, token="caption", color=TEXT_DIM))
 
-    # Heatmap cells
-    for w_idx, week in enumerate(weeks):
-        days = week.get("contributionDays") if isinstance(week, dict) else []
+    for w_idx, wk in enumerate(weeks):
+        days = wk.get("contributionDays") if isinstance(wk, dict) else []
         if not isinstance(days, list):
             continue
         cx = grid_x + w_idx * (cell + gap)
@@ -268,62 +149,20 @@ def generate(calendar: dict | None, output_path: str = "assets/contribution_cale
                 count = int(day.get("contributionCount", 0))
             except (TypeError, ValueError):
                 count = 0
-            level = _level(count, max_count)
-            cy = grid_y + d_idx * (cell + gap)
-            parts.append(_cell(cx, cy, cell, level))
+            parts.append(_cell(cx, grid_y + d_idx * (cell + gap), cell, _level(count, max_count)))
 
-    # Legend: Less [ramp swatches] More (right-aligned to the grid)
-    sw = 12
-    sgap = 4
-    swatches = 5
-    legend_w = swatches * sw + (swatches - 1) * sgap
-    text_pad = 8
-    less_w = 30
-    more_w = 32
-    sw_x = right - more_w - legend_w
-    parts.append(
-        f'<text x="{sw_x - text_pad:g}" y="{legend_y + sw - 2.5:g}" fill="{TEXT_DIM}" '
-        f'font-size="9.5" font-family="{FONT_SANS}" text-anchor="end">Less</text>'
-    )
-    for i in range(swatches):
-        lx = sw_x + i * (sw + sgap)
-        parts.append(_cell(lx, legend_y, sw, i))
-    parts.append(
-        f'<text x="{sw_x + legend_w + text_pad:g}" y="{legend_y + sw - 2.5:g}" fill="{TEXT_DIM}" '
-        f'font-size="9.5" font-family="{FONT_SANS}">More</text>'
-    )
+    # legend: Less [ramp] More (>=12)
+    sw, sgap, n = 12, 4, 5
+    legend_w = n * sw + (n - 1) * sgap
+    right = grid_x + grid_w
+    sx = right - 36 - legend_w
+    parts.append(text("Less", sx - 8, legend_y + sw - 2, token="caption", color=TEXT_DIM, anchor="end"))
+    for i in range(n):
+        parts.append(_cell(sx + i * (sw + sgap), legend_y, sw, i))
+    parts.append(text("More", sx + legend_w + 8, legend_y + sw - 2, token="caption", color=TEXT_DIM))
 
-    # Stat tiles (frosted) — Total / Current streak / Longest streak
-    t_gap = 16
-    tile_w = (grid_w - 2 * t_gap) / 3
-    streak_unit = "day" if current_streak == 1 else "days"
-    longest_unit = "day" if longest_streak == 1 else "days"
-    stats = [
-        (BLUE, "calendar", fmt_int(total_contributions), "", "TOTAL CONTRIBUTIONS"),
-        (CYAN, "fire", str(current_streak), streak_unit, "CURRENT STREAK"),
-        (GREEN, "trend_up", str(longest_streak), longest_unit, "LONGEST STREAK"),
-    ]
-    for i, (accent, icon_name, value, unit, label) in enumerate(stats):
-        tx = grid_x + i * (tile_w + t_gap)
-        parts.append(
-            _stat_tile(
-                tx,
-                tiles_y,
-                tile_w,
-                tile_h,
-                accent=accent,
-                icon_name=icon_name,
-                value=value,
-                unit=unit,
-                label=label,
-            )
-        )
-
-    svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" height="{svg_h}" '
-        f'viewBox="0 0 {SVG_WIDTH} {svg_h}">{"".join(parts)}</svg>'
-    )
-
+    svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+           f'viewBox="0 0 {width} {height}">{"".join(parts)}</svg>')
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(svg)
     return output_path

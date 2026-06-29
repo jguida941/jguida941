@@ -7,11 +7,11 @@ On the RENDERED SVG of the real generators:
   3. A single card carries at most ONE *decorative* accent hue (status-chip pills
      and language dots excluded structurally).
 
-Covers the kit-converted cards (streak, scorecard, snapshot, badges, focus_board,
-repo_spotlight). The two remaining pre-kit calendar cards (activity_heatmap,
-contribution_panel) are deliberately NOT in this set yet — their sub-floor axis
-labels are tracked as an explicit, plan-tagged @unittest.expectedFailure in
-test_design_contract.FontLegibilityContract (Phase-4 B3), not silently dropped.
+Renders a representative set of kit-converted cards for the ladder/restraint/hero-ink
+checks. The calendar cards (activity_heatmap, contribution_panel) are also on the
+ladder now (Phase-4 B3) and are covered repo-wide by the GREEN
+test_design_contract.FontLegibilityContract (11px floor over all rendering source) +
+test_card_contracts geometry/safety — i.e. no card is left unguarded.
 """
 from __future__ import annotations
 

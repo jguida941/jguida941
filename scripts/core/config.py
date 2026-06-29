@@ -102,7 +102,7 @@ TYPE_SCALE = {
     "chip": (11, 500),       # chip text
 }
 # Legibility floor for README SVGs downscaled into the column.
-MIN_FONT_PX = 10
+MIN_FONT_PX = 11
 
 # Spacing scale (4px base) — gaps/pads resolve from here, not one-off literals.
 SPACE = {"xs": 4, "sm": 8, "md": 12, "lg": 16, "xl": 24, "xxl": 32}

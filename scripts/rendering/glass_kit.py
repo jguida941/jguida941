@@ -359,7 +359,7 @@ def progress_ring(
         )
         if sublabel:
             parts.append(
-                f'<text x="{_f(cx)}" y="{_f(cy + 13)}" fill="{TEXT_DIM}" font-size="8.5" '
+                f'<text x="{_f(cx)}" y="{_f(cy + 14)}" fill="{TEXT_DIM}" font-size="11" '
                 f'font-family="{FONT_SANS}" text-anchor="middle" '
                 f'letter-spacing="0.5">{sublabel}</text>'
             )

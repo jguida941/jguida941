@@ -23,7 +23,7 @@ _HEX = re.compile(r"#[0-9a-fA-F]{3,8}\b")
 # Literal font-size attributes emitted into SVG.
 _FONT = re.compile(r'font-size="([0-9.]+)"')
 # Legibility floor for README SVGs downscaled into the column (DESIGN_SPEC).
-MIN_FONT = 10.0
+MIN_FONT = 11.0
 
 
 def _code_lines(path: Path):
@@ -50,11 +50,9 @@ class DesignTokenContract(unittest.TestCase):
 
 
 class FontLegibilityContract(unittest.TestCase):
-    # RED (tracked): ~10 sub-10px labels remain (dense heatmap hour ticks +
-    # contribution legend + ring sublabel). DESIGN_SPEC 3.8/3.15/3.17 says the fix
-    # is a SPARSE-LABEL redesign (fewer ticks), not a font bump that would overflow.
-    # Driven green in WS4; remove this decorator when the redesign lands.
-    @unittest.expectedFailure
+    # GREEN permanent guard (Phase-4 B3 landed the sparse-label redesign of the
+    # heatmap + contribution + the progress_ring sublabel). No rendered text literal
+    # may fall below the 11px legibility floor (DESIGN_SPEC 3.8/3.15/3.17).
     def test_no_font_size_below_floor(self):
         offenders = []
         for path in sorted(RENDERING.glob("*.py")):

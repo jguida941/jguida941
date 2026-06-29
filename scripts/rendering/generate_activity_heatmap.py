@@ -1,4 +1,9 @@
-"""Build a glassmorphism SVG heatmap for coding time and event mix."""
+"""When-I-Code activity heatmap — hour x day matrix + time-block / event-mix bars.
+
+Governed glass + locked type ladder (>=11), single accent (no rainbow), no decorative
+halos. The day x hour intensity matrix keeps the heatmap shape; the two side panels
+are on-ladder bar lists. Section header carries the total + timezone.
+"""
 
 import os
 from collections import Counter, defaultdict
@@ -6,7 +11,6 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 from scripts.core.config import (
-    BLUE,
     CYAN,
     FONT_SANS,
     GLASS_HAIRLINE_HEX,
@@ -16,52 +20,23 @@ from scripts.core.config import (
     TEXT_BRIGHT,
     TEXT_DIM,
 )
-from scripts.rendering.card_theme import title_left
-from scripts.rendering.glass_kit import (
-    chip,
-    chip_width,
-    eyebrow_text,
-    glass_panel,
-    glass_tile,
-    icon,
-    progress_bar,
-)
+from scripts.rendering.components import empty_state, section_header
+from scripts.rendering.glass_kit import glass_panel, glass_tile, icon, progress_bar
 
 EVENT_LABELS = {
-    "PushEvent": "push",
-    "PullRequestEvent": "pull request",
-    "PullRequestReviewEvent": "pr review",
-    "IssuesEvent": "issue",
-    "IssueCommentEvent": "comment",
-    "ReleaseEvent": "release",
-    "CreateEvent": "create",
+    "PushEvent": "push", "PullRequestEvent": "pull request", "PullRequestReviewEvent": "pr review",
+    "IssuesEvent": "issue", "IssueCommentEvent": "comment", "ReleaseEvent": "release", "CreateEvent": "create",
 }
-
-TIME_BLOCKS = [
-    ("Night", range(0, 6)),
-    ("Morning", range(6, 12)),
-    ("Afternoon", range(12, 18)),
-    ("Evening", range(18, 24)),
-]
-
+TIME_BLOCKS = [("Night", range(0, 6)), ("Morning", range(6, 12)), ("Afternoon", range(12, 18)), ("Evening", range(18, 24))]
 DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-
-# Cool intensity ramp (empty -> deep blue -> bright cyan); from the token source.
 _RAMP = HEATMAP_RAMP
 
 
 def _ramp_level(count: int, max_count: int) -> int:
-    """Map a cell count to a 0..4 ramp index."""
     if count <= 0:
         return 0
-    ratio = count / max(max_count, 1)
-    if ratio <= 0.25:
-        return 1
-    if ratio <= 0.50:
-        return 2
-    if ratio <= 0.75:
-        return 3
-    return 4
+    r = count / max(max_count, 1)
+    return 1 if r <= 0.25 else 2 if r <= 0.5 else 3 if r <= 0.75 else 4
 
 
 def _timezone() -> tuple[timezone | ZoneInfo, str]:
@@ -72,257 +47,122 @@ def _timezone() -> tuple[timezone | ZoneInfo, str]:
         return timezone.utc, "UTC"
 
 
-def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
-    """Render activity heatmap + right panel with time blocks and event mix."""
-    tz, tz_label = _timezone()
-    grid = defaultdict(lambda: defaultdict(int))  # grid[weekday][hour]
-    block_totals = Counter()
-    event_mix = Counter()
+def _txt(s, x, y, *, size, fill, weight=400, anchor="start") -> str:
+    a = f' text-anchor="{anchor}"' if anchor != "start" else ""
+    w = f' font-weight="{weight}"' if weight != 400 else ""
+    return f'<text x="{x:.1f}" y="{y:.1f}" fill="{fill}" font-size="{size}" font-family="{FONT_SANS}"{w}{a}>{s}</text>'
 
-    for event in events:
-        event_type = event.get("type", "")
-        event_label = EVENT_LABELS.get(event_type)
-        if event_label is None:
-            continue
+
+def _bar_panel(parts, x, y, w, h, title, rows, total_events):
+    parts.append(glass_tile(x, y, w, h))
+    parts.append(_txt(title.upper(), x + 16, y + 24, size=11, fill=TEXT_DIM, weight=600))
+    parts.append(f'<rect x="{x + 16}" y="{y + 32}" width="{w - 32}" height="1" fill="{GLASS_HAIRLINE_HEX}" fill-opacity="0.14"/>')
+    if not rows:
+        parts.append(_txt("No events yet", x + 16, y + 58, size=12, fill=TEXT_DIM))
+        return
+    max_v = max((c for _, c in rows), default=1)
+    bar_x, val_x = x + 104, x + w - 16
+    bar_w = (val_x - 64) - bar_x
+    ry = y + 52
+    pitch = min(26.0, max(20.0, (y + h - 16 - ry) / max(len(rows), 1)))
+    for i, (label, count) in enumerate(rows):
+        cy = ry + i * pitch
+        pct = (count / total_events * 100.0) if total_events else 0.0
+        parts.append(_txt(label, x + 16, cy + 4, size=12, fill=TEXT))
+        parts.append(progress_bar(bar_x, cy - 4, bar_w, 8, (count / max_v) * 100.0, color=CYAN))
+        parts.append(_txt(str(count), val_x - 34, cy + 4, size=14, fill=TEXT_BRIGHT, weight=600, anchor="end"))
+        parts.append(_txt(f"{pct:.0f}%", val_x, cy + 4, size=12, fill=TEXT_DIM, anchor="end"))
+
+
+def generate(events: list, output_path: str = "assets/activity_heatmap.svg"):
+    tz, tz_label = _timezone()
+    grid = defaultdict(lambda: defaultdict(int))
+    block_totals, event_mix = Counter(), Counter()
+    for event in events or []:
+        label = EVENT_LABELS.get(event.get("type", ""))
         ts = event.get("created_at", "")
-        if not ts:
+        if label is None or not ts:
             continue
         try:
             dt = datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(tz)
         except ValueError:
             continue
-
-        wd = dt.weekday()  # 0=Mon, 6=Sun
-        hr = dt.hour
-        grid[wd][hr] += 1
-        event_mix[event_label] += 1
-
-        for block_name, block_hours in TIME_BLOCKS:
-            if hr in block_hours:
-                block_totals[block_name] += 1
+        grid[dt.weekday()][dt.hour] += 1
+        event_mix[label] += 1
+        for name, hrs in TIME_BLOCKS:
+            if dt.hour in hrs:
+                block_totals[name] += 1
                 break
 
     total_events = sum(event_mix.values())
     max_count = max((grid[d][h] for d in range(7) for h in range(24)), default=1)
+    tz_short = tz_label.rsplit("/", 1)[-1].replace("_", " ")
 
-    # Peak summary stats.
-    hour_totals = [sum(grid[d][h] for d in range(7)) for h in range(24)]
-    day_totals = [sum(grid[d][h] for h in range(24)) for d in range(7)]
-    peak_hour = max(range(24), key=lambda h: hour_totals[h]) if total_events else None
-    peak_day = max(range(7), key=lambda d: day_totals[d]) if total_events else None
-    busiest_block = block_totals.most_common(1)[0][0] if block_totals else None
+    width, pad = SVG_WIDTH, 28
+    header_svg, content_top = section_header(
+        pad, 46, "When I Code", width=width, eyebrow="Activity Rhythm",
+        right_text=f"{total_events} events · {tz_short}", pad=pad,
+    )
 
-    # ---- Layout geometry -------------------------------------------------- #
-    W = SVG_WIDTH                       # 840
-    margin = 12                         # glass_panel inset / shadow band
-    content_top = 78
+    if total_events == 0:
+        empty_header, _ = section_header(pad, 46, "When I Code", width=width, eyebrow="Activity Rhythm", pad=pad)
+        height = int(content_top + 92)
+        body = "".join([glass_panel(width, height), empty_header,
+                        empty_state(width / 2, content_top + 48, "No recent public activity returned", icon_name="clock")])
+        with open(output_path, "w") as f:
+            f.write(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">{body}</svg>')
+        return output_path
 
-    # Heatmap grid metrics.
+    # geometry: heatmap tile (left) + two bar panels (right)
     cell, gap = 14, 3
     step = cell + gap
-    grid_w = 24 * step - gap            # 405
-    grid_h = 7 * step - gap             # 116
+    hm_x, hm_y, hm_w = pad, content_top + 8, 452
+    grid_x, grid_y = hm_x + 44, hm_y + 44
+    grid_bottom = grid_y + 7 * step - gap
+    legend_y = grid_bottom + 20
 
-    # Left tile (heatmap).
-    hm_x, hm_y, hm_w = 24, content_top, 460
-    grid_x = hm_x + 44                  # 68
-    grid_y = hm_y + 40                  # space for hour labels
-    grid_bottom = grid_y + grid_h
-    legend_y = grid_bottom + 22
+    r_x = hm_x + hm_w + 16
+    r_w = width - pad - r_x
+    a_h = 132
+    b_y = hm_y + a_h + 14
 
-    # Right column tiles.
-    r_x = 500
-    r_w = (W - margin - 12) - r_x       # right edge sits 12px inside the panel
-    a_y, a_h = content_top, 118
-    a_bottom = a_y + a_h
-    b_y = a_bottom + 14
-    mix_items = event_mix.most_common(5)
-    n_mix = max(len(mix_items), 1)
-    b_h = 30 + n_mix * 20 + 12
-    b_bottom = b_y + b_h
-
-    content_bottom = max(b_bottom, legend_y + 60)
+    content_bottom = max(legend_y + 24, b_y + 150)
     hm_h = content_bottom - hm_y
-    b_h = content_bottom - b_y          # stretch event-mix tile to align bottoms
-    summary_y = content_bottom - 36     # footer chips pinned near tile bottom
-    svg_h = content_bottom + 18         # bottom shadow margin
+    height = int(content_bottom + 18)
 
-    # ---- Build SVG body --------------------------------------------------- #
-    parts = [glass_panel(W, svg_h)]
+    parts = [glass_panel(width, height), header_svg, glass_tile(hm_x, hm_y, hm_w, hm_h)]
 
-    # Header: eyebrow + title + timezone chip (top-right).
-    parts.append(eyebrow_text("ACTIVITY RHYTHM", x=hm_x, y=36))
-    parts.append(title_left("When I Code", x=hm_x, y=58, size=18))
-    tz_short = tz_label.rsplit("/", 1)[-1].replace("_", " ") if "/" in tz_label else tz_label
-    cw = chip_width(tz_short, size=11, icon=True)
-    parts.append(
-        chip(W - margin - 12 - cw, 33, tz_short, color=BLUE, icon_name="globe", filled=True)
-    )
-
-    # ---- Left tile: heatmap ---------------------------------------------- #
-    parts.append(glass_tile(hm_x, hm_y, hm_w, hm_h))
-
-    if total_events == 0:
-        parts.append(
-            f'<text x="{hm_x + hm_w / 2:.1f}" y="{hm_y + hm_h / 2:.1f}" fill="{TEXT_DIM}" '
-            f'font-size="11" font-family="{FONT_SANS}" text-anchor="middle">'
-            "No recent public events returned by GitHub API</text>"
-        )
-    else:
-        # Hour axis labels (every 3 hours).
-        for h in range(0, 24, 3):
-            lx = grid_x + h * step + cell / 2
+    # hour axis (every 3h, >=11)
+    for h in range(0, 24, 3):
+        parts.append(_txt(f"{h:02d}", grid_x + h * step + cell / 2, grid_y - 12, size=11, fill=TEXT_DIM, anchor="middle"))
+    # day labels (>=11)
+    for d in range(7):
+        parts.append(_txt(DAY_LABELS[d], grid_x - 12, grid_y + d * step + cell - 3, size=11, fill=TEXT_DIM, anchor="end"))
+    # cells (ramp = data intensity; no decorative halos)
+    for d in range(7):
+        cy = grid_y + d * step
+        for h in range(24):
+            c = grid[d][h]
+            hexc, op = _RAMP[_ramp_level(c, max_count)]
             parts.append(
-                f'<text x="{lx:.1f}" y="{grid_y - 11:.1f}" fill="{TEXT_DIM}" font-size="8.5" '
-                f'font-family="{FONT_SANS}" text-anchor="middle">{h:02d}</text>'
+                f'<rect x="{grid_x + h * step:.1f}" y="{cy:.1f}" width="{cell}" height="{cell}" rx="3" '
+                f'fill="{hexc}" fill-opacity="{op}"><title>{DAY_LABELS[d]} {h:02d}:00 — {c} events</title></rect>'
             )
+    # legend (>=11)
+    parts.append(_txt("Less", grid_x - 12, legend_y + 9, size=11, fill=TEXT_DIM))
+    sx = grid_x + 20
+    for hexc, op in _RAMP:
+        parts.append(f'<rect x="{sx:.1f}" y="{legend_y:.1f}" width="11" height="11" rx="2" fill="{hexc}" fill-opacity="{op}"/>')
+        sx += 15
+    parts.append(_txt("More", sx + 2, legend_y + 9, size=11, fill=TEXT_DIM))
 
-        # Halos behind peak (level-4) cells for a soft cool glow.
-        halos, cells = [], []
-        for d in range(7):
-            cy = grid_y + d * step
-            for h in range(24):
-                cx = grid_x + h * step
-                c = grid[d][h]
-                lvl = _ramp_level(c, max_count)
-                if lvl == 4:
-                    halos.append(
-                        f'<rect x="{cx - 2:.1f}" y="{cy - 2:.1f}" width="{cell + 4}" '
-                        f'height="{cell + 4}" rx="5" fill="{CYAN}" fill-opacity="0.20"/>'
-                    )
-                hexc, op = _RAMP[lvl]
-                cells.append(
-                    f'<rect x="{cx:.1f}" y="{cy:.1f}" width="{cell}" height="{cell}" rx="3.2" '
-                    f'fill="{hexc}" fill-opacity="{op}">'
-                    f"<title>{DAY_LABELS[d]} {h:02d}:00 ({tz_label}) - {c} events</title></rect>"
-                )
-        parts.extend(halos)
-        parts.extend(cells)
+    # right panels
+    _bar_panel(parts, r_x, hm_y, r_w, a_h, "By Time Block",
+               [(n, block_totals.get(n, 0)) for n, _ in TIME_BLOCKS], total_events)
+    _bar_panel(parts, r_x, b_y, r_w, content_bottom - b_y, "Event Mix",
+               event_mix.most_common(5), total_events)
 
-        # Day-of-week labels (right-aligned into the grid).
-        for d in range(7):
-            ly = grid_y + d * step + cell - 2
-            parts.append(
-                f'<text x="{grid_x - 12:.1f}" y="{ly:.1f}" fill="{TEXT}" font-size="10" '
-                f'font-family="{FONT_SANS}" text-anchor="end">{DAY_LABELS[d]}</text>'
-            )
-
-        # Legend: Less -> More ramp swatches.
-        leg_x = grid_x - 12
-        parts.append(
-            f'<text x="{leg_x:.1f}" y="{legend_y + 9:.1f}" fill="{TEXT_DIM}" font-size="9" '
-            f'font-family="{FONT_SANS}">Less</text>'
-        )
-        sx = leg_x + 30
-        for lvl, (hexc, op) in enumerate(_RAMP):
-            parts.append(
-                f'<rect x="{sx:.1f}" y="{legend_y:.1f}" width="11" height="11" rx="2.5" '
-                f'fill="{hexc}" fill-opacity="{op}"/>'
-            )
-            sx += 15
-        parts.append(
-            f'<text x="{sx + 2:.1f}" y="{legend_y + 9:.1f}" fill="{TEXT_DIM}" font-size="9" '
-            f'font-family="{FONT_SANS}">More</text>'
-        )
-
-        # Hairline divider framing the footer chips.
-        parts.append(
-            f'<rect x="{hm_x + 16}" y="{summary_y - 15:.1f}" width="{hm_w - 32}" height="1" '
-            f'fill="{GLASS_HAIRLINE_HEX}" fill-opacity="0.10"/>'
-        )
-
-        # Summary chips: peak slot, busiest block, total events.
-        chips = []
-        if peak_day is not None and peak_hour is not None:
-            chips.append(("clock", f"Peak {DAY_LABELS[peak_day]} {peak_hour:02d}:00", CYAN))
-        if busiest_block:
-            chips.append(("fire", busiest_block, BLUE))
-        chips.append(("workflow", f"{total_events} events", TEXT))
-        chx = hm_x + 16
-        for icon_name, text, col in chips:
-            cwid = chip_width(text, size=10.5, icon=True)
-            parts.append(
-                chip(chx, summary_y, text, color=col, icon_name=icon_name, size=10.5, height=23)
-            )
-            chx += cwid + 10
-
-    # ---- Right tile A: By Time Block ------------------------------------- #
-    parts.append(glass_tile(r_x, a_y, r_w, a_h, accent=BLUE))
-    parts.append(icon("clock", r_x + 16, a_y + 16, size=14, color=BLUE))
-    parts.append(
-        f'<text x="{r_x + 38:.1f}" y="{a_y + 27:.1f}" fill="{TEXT_BRIGHT}" font-size="12.5" '
-        f'font-family="{FONT_SANS}" font-weight="700">By Time Block</text>'
-    )
-    max_block = max(block_totals.values(), default=1)
-    a_label_x = r_x + 16
-    a_bar_x = r_x + 96
-    a_value_x = r_x + r_w - 16
-    a_bar_w = (a_value_x - 70) - a_bar_x
-    a_rows_y = a_y + 46
-    a_rowh = 18
-    for idx, (block_name, _) in enumerate(TIME_BLOCKS):
-        cy = a_rows_y + idx * a_rowh
-        count = block_totals.get(block_name, 0)
-        pct = (count / total_events * 100.0) if total_events else 0.0
-        bar_pct = (count / max(max_block, 1)) * 100.0
-        parts.append(
-            f'<text x="{a_label_x:.1f}" y="{cy + 3.5:.1f}" fill="{TEXT}" font-size="10.5" '
-            f'font-family="{FONT_SANS}">{block_name}</text>'
-        )
-        parts.append(progress_bar(a_bar_x, cy - 4, a_bar_w, 8, bar_pct, color=BLUE))
-        parts.append(
-            f'<text x="{a_value_x - 32:.1f}" y="{cy + 3.5:.1f}" fill="{TEXT_BRIGHT}" '
-            f'font-size="12" font-family="{FONT_SANS}" font-weight="700" '
-            f'text-anchor="end">{count}</text>'
-        )
-        parts.append(
-            f'<text x="{a_value_x:.1f}" y="{cy + 3.5:.1f}" fill="{TEXT_DIM}" font-size="9.5" '
-            f'font-family="{FONT_SANS}" text-anchor="end">{pct:.0f}%</text>'
-        )
-
-    # ---- Right tile B: Event Mix ----------------------------------------- #
-    parts.append(glass_tile(r_x, b_y, r_w, b_h, accent=CYAN))
-    parts.append(icon("workflow", r_x + 16, b_y + 16, size=14, color=CYAN))
-    parts.append(
-        f'<text x="{r_x + 38:.1f}" y="{b_y + 27:.1f}" fill="{TEXT_BRIGHT}" font-size="12.5" '
-        f'font-family="{FONT_SANS}" font-weight="700">Event Mix</text>'
-    )
-    max_mix = max((count for _, count in mix_items), default=1)
-    b_bar_x = r_x + 96
-    b_value_x = r_x + r_w - 16
-    b_bar_w = (b_value_x - 70) - b_bar_x
-    b_rows_y = b_y + 46
-    avail = (b_y + b_h - 14) - b_rows_y
-    b_rowh = max(18.0, min(24.0, avail / max(n_mix, 1)))
-    if total_events == 0:
-        parts.append(
-            f'<text x="{r_x + 16:.1f}" y="{b_rows_y + 6:.1f}" fill="{TEXT_DIM}" font-size="10.5" '
-            f'font-family="{FONT_SANS}">No events yet</text>'
-        )
-    for idx, (label, count) in enumerate(mix_items):
-        cy = b_rows_y + idx * b_rowh
-        pct = (count / total_events * 100.0) if total_events else 0.0
-        bar_pct = (count / max(max_mix, 1)) * 100.0
-        parts.append(
-            f'<text x="{r_x + 16:.1f}" y="{cy + 3.5:.1f}" fill="{TEXT}" font-size="10.5" '
-            f'font-family="{FONT_SANS}">{label}</text>'
-        )
-        parts.append(progress_bar(b_bar_x, cy - 4, b_bar_w, 8, bar_pct, color=CYAN))
-        parts.append(
-            f'<text x="{b_value_x - 32:.1f}" y="{cy + 3.5:.1f}" fill="{TEXT_BRIGHT}" '
-            f'font-size="12" font-family="{FONT_SANS}" font-weight="700" '
-            f'text-anchor="end">{count}</text>'
-        )
-        parts.append(
-            f'<text x="{b_value_x:.1f}" y="{cy + 3.5:.1f}" fill="{TEXT_DIM}" font-size="9.5" '
-            f'font-family="{FONT_SANS}" text-anchor="end">{pct:.0f}%</text>'
-        )
-
-    svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{svg_h}" '
-        f'viewBox="0 0 {W} {svg_h}">{"".join(parts)}</svg>'
-    )
-
+    svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">{"".join(parts)}</svg>'
     with open(output_path, "w") as f:
         f.write(svg)
     return output_path
