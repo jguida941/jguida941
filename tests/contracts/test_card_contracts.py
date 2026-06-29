@@ -20,6 +20,13 @@ def _noop(*a, **k):
     pass
 
 
+def _primary_lang(model: dict) -> str:
+    langs = model.get("top_languages")
+    if isinstance(langs, list) and langs and isinstance(langs[0], dict):
+        return str(langs[0].get("name") or "").strip()
+    return ""
+
+
 def _model():
     payload = json.loads((ROOT / "tests/fixtures/sample_collected_data.json").read_text())
     collected = CollectedProfileData(**payload)
@@ -45,10 +52,11 @@ def _render(card, out):
                         last_year_contributions=c.total_contributions, output_path=out)
     if card == "scorecard":
         from scripts.rendering.generate_builder_scorecard import generate
-        return generate(m["scorecard"], output_path=out, tiles=m["scorecard_cards"])
+        return generate(m["scorecard"], output_path=out, tiles=m["scorecard_cards"],
+                        primary_language=_primary_lang(m))
     if card == "engineering":
         from scripts.rendering.generate_engineering_cadence import generate
-        return generate(m["engineering"], output_path=out)
+        return generate(m["engineering"], output_path=out, primary_language=_primary_lang(m))
     if card == "focus":
         from scripts.rendering.generate_focus_board import generate
         return generate(m["focus"], output_path=out)

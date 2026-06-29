@@ -62,7 +62,12 @@ def _gauge_cell(x: float, y: float, w: float, h: float, *, value: float, detail:
     return "".join(parts)
 
 
-def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg", tiles: list | None = None) -> str:
+def generate(
+    scorecard: dict,
+    output_path: str = "assets/builder_scorecard.svg",
+    tiles: list | None = None,
+    primary_language: str = "",
+) -> str:
     _ = tiles  # back-compat; the card is driven by the scorecard + metric contract
     data = scorecard if isinstance(scorecard, dict) else {}
     width = SVG_WIDTH
@@ -132,15 +137,23 @@ def generate(scorecard: dict, output_path: str = "assets/builder_scorecard.svg",
         y = content_top + row * (tile_h + row_gap)
         defn = _DEFS.get(key, {})
         if key == "ci_coverage_pct":
+            # The gauge cell shares its row with a donut, so its detail line gets a
+            # concise context phrase that fits the cell (the metric's long-form
+            # "repos with pipelines" detail belongs to the wide README table, not here).
             parts.append(
-                _gauge_cell(x, y, col_w, tile_h, value=data.get(key) or 0, detail=str(defn.get("detail", "")))
+                _gauge_cell(x, y, col_w, tile_h, value=data.get(key) or 0, detail="of public repos")
             )
         else:
+            # The primary-language tile reads clearest when the tile names the
+            # language itself ("Python / 50.0%") rather than the generic noun.
+            label = str(defn.get("label", key))
+            if key == "primary_lang_share_pct" and primary_language:
+                label = primary_language
             parts.append(
                 metric_tile(
                     x, y, col_w, tile_h,
                     value=_fmt(data, key),
-                    label=str(defn.get("label", key)),
+                    label=label,
                     icon_name=ICON_BY_KEY.get(key, "code"),
                 )
             )

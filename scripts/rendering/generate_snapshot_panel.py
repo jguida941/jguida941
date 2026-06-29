@@ -46,6 +46,22 @@ _SECONDARY_KEYS = (
     "prs_merged",
 )
 
+# Short, human tile labels that FIT the tile (the snapshot rows carry long
+# audit-grade names like "Public Repo Commits (Owned Non-Fork)"; a tile is a
+# glance, not an audit row, so it gets a concise noun — never a clipped one).
+_TILE_LABEL = {
+    "public_scope_commits": "Commits",
+    "total_repos": "Public Repos",
+    "private_owned_repos": "Private",
+    "total_stars": "Stars",
+    "languages_count": "Languages",
+    "prs_merged": "PRs Merged",
+    "public_forks": "Forks",
+    "ci_repos": "CI Repos",
+    "releases": "Releases",
+    "streak_days": "Streak",
+}
+
 _STATUS_DISPLAY = {
     "ok": "OK", "pass": "OK", "passing": "OK", "healthy": "OK", "complete": "OK",
     "partial": "Partial", "fallback": "Fallback", "degraded": "Degraded", "limited": "Limited",
@@ -82,7 +98,7 @@ def generate(
     rows = [r for r in (snapshot_rows or []) if isinstance(r, dict)]
 
     header_svg, content_top = section_header(
-        pad, 46, "Raw Data Snapshot", width=width, eyebrow="Canonical CLI Snapshot", pad=pad
+        pad, 46, "Raw Data Snapshot", width=width, eyebrow="Live GitHub Data", pad=pad
     )
 
     # Honest empty state: no snapshot rows -> one explanatory line, no fabricated tiles.
@@ -135,8 +151,8 @@ def generate(
             pad,
             kpi_y,
             value=xml_escape(str(kpi_row.get("display_value", "n/a"))),
-            label=truncate(xml_escape(str(kpi_row.get("label", "Metric"))), 28),
-            sublabel="canonical CLI pull",
+            label="contributions",
+            sublabel="last 12 months",
         )
     )
     kpi_w = 244
@@ -159,7 +175,10 @@ def generate(
                 col_w,
                 tile_h,
                 value=xml_escape(str(row.get("display_value", "n/a"))),
-                label=truncate(xml_escape(str(row.get("label", "Metric"))), 16),
+                label=_TILE_LABEL.get(
+                    str(row.get("key", "")),
+                    truncate(xml_escape(str(row.get("label", "Metric"))), 14),
+                ),
                 icon_name=_KEY_ICON.get(str(row.get("key", "")), "code"),
             )
         )

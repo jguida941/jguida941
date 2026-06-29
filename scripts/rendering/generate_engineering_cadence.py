@@ -37,14 +37,17 @@ def _gauge_cell(x: float, y: float, w: float, h: float, *, value: float, detail:
     return "".join(parts)
 
 
-def generate(engineering: dict, output_path: str = "assets/engineering_cadence.svg") -> str:
+def generate(
+    engineering: dict,
+    output_path: str = "assets/engineering_cadence.svg",
+    primary_language: str = "",
+) -> str:
     data = engineering if isinstance(engineering, dict) else {}
     cadence = [float(v) for v in (data.get("weekly_cadence") or []) if v is not None]
     active_days = _int(data.get("active_days_last_year"))
     workflows = _int(data.get("automation_workflows"))
     automation_repos = _int(data.get("automation_repos"))
     primary_share = float(data.get("primary_lang_share_pct") or 0.0)
-    langs_over_5 = _int(data.get("languages_over_5pct"))
     public_total = _int(data.get("public_repos_total"))
     public_nonfork = _int(data.get("public_nonfork_repos"))
     private_total = data.get("private_repos_total")
@@ -130,8 +133,9 @@ def generate(engineering: dict, output_path: str = "assets/engineering_cadence.s
     parts.append(
         metric_tile(
             pad + (col_w + gap) * 3, row2_y, col_w, tile_h,
-            value=f"{round(primary_share)}%", label="primary language",
-            caption=f"{fmt_int(langs_over_5)} langs > 5%", icon_name="code",
+            value=f"{round(primary_share)}%",
+            label=(primary_language or "primary language"),
+            caption="share of code", icon_name="code",
         )
     )
 

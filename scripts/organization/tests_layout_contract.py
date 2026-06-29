@@ -32,6 +32,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_design_contract.py",
             "test_glass_preserved.py",
             "test_icon_system.py",
+            "test_label_legibility.py",
             "test_readme_projection.py",
             "test_scripts_layout_contract.py",
             "test_tests_layout_contract.py",
@@ -121,7 +122,8 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
         "test_glass_preserved.py",
     ),
     "powerbi_ia": (
-        "test_design_contract.py",  # hierarchy / one-dominant-KPI / per-card cards
+        "test_design_contract.py",       # hierarchy / one-dominant-KPI / per-card cards
+        "test_label_legibility.py",      # one metric per tile / no clipped labels
     ),
     "github_svg": (
         "test_card_contracts.py",       # per-SVG safety / title / viewBox / camo bans

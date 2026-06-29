@@ -27,8 +27,21 @@ def ensure_output_dirs() -> None:
     Path("site/data").mkdir(parents=True, exist_ok=True)
 
 
+def _primary_language(model: dict) -> str:
+    """The dominant language NAME (e.g. 'Python') from the shared snapshot, or ''.
+
+    Null-safe: a missing/None name or a non-list top_languages yields '' (never the
+    literal 'None' or a crash), so the tile falls back to its generic noun.
+    """
+    langs = model.get("top_languages")
+    if isinstance(langs, list) and langs and isinstance(langs[0], dict):
+        return str(langs[0].get("name") or "").strip()
+    return ""
+
+
 def generate_assets(collected: CollectedProfileData, model: dict, logger=print) -> None:
     logger("\n[8/8] Generating SVGs...")
+    primary_language = _primary_language(model)
 
     gen_badges(
         public_nonfork_repos=collected.repo_counts["public_owned_nonfork"],
@@ -54,10 +67,10 @@ def generate_assets(collected: CollectedProfileData, model: dict, logger=print) 
     gen_spotlight(model["spotlight_data"])
     logger("  -> assets/repo_spotlight.svg")
 
-    gen_scorecard(model["scorecard"], tiles=model["scorecard_cards"])
+    gen_scorecard(model["scorecard"], tiles=model["scorecard_cards"], primary_language=primary_language)
     logger("  -> assets/builder_scorecard.svg")
 
-    gen_cadence(model["engineering"])
+    gen_cadence(model["engineering"], primary_language=primary_language)
     logger("  -> assets/engineering_cadence.svg")
 
     gen_focus_board(model["focus"])
