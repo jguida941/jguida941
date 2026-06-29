@@ -611,5 +611,84 @@ class EngineeringCadenceContract(unittest.TestCase):
         )
 
 
+class CurrentlyWorkingContract(unittest.TestCase):
+    """DESIGN_SPEC 3.2/3.11/3.12/Part 4: Currently Working On promotes the active-
+    repo count to one display KPI, lists repos as uniform rows (language by dot AND
+    label), drops the gradient ribbon, and renders an honest empty state."""
+
+    SCALE = {46.0, 26.0, 22.0, 20.0, 14.0, 12.0, 11.0}
+
+    def _repos(self):
+        from datetime import datetime, timezone, timedelta
+
+        now = datetime.now(timezone.utc)
+
+        def iso(h):
+            return (now - timedelta(hours=h)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        return [
+            {"name": "ci-cd-hub", "language": "Python", "pushed_at": iso(3),
+             "last_commit_msg": "add deploy gate", "is_private": False,
+             "html_url": "https://github.com/x/ci-cd-hub"},
+            {"name": "voiceterm", "language": "Rust", "pushed_at": iso(20),
+             "last_commit_msg": "fix audio buffer", "is_private": False,
+             "html_url": "https://github.com/x/voiceterm"},
+            {"name": "secret-svc", "language": "Go", "pushed_at": iso(50), "is_private": True},
+        ]
+
+    def _render(self, out: str, *, repos=None) -> str:
+        from scripts.rendering.generate_currently_working import generate
+
+        generate(self._repos() if repos is None else repos, output_path=out)
+        return Path(out).read_text(encoding="utf-8")
+
+    def _sizes(self, svg):
+        return [float(m) for m in _FONT.findall(svg)]
+
+    def test_one_dominant_kpi(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "cw.svg"))
+        sizes = self._sizes(svg)
+        top = max(sizes)
+        self.assertGreaterEqual(top, 40, "needs one display KPI (active repo count)")
+        self.assertEqual(sizes.count(top), 1, "exactly one dominant KPI")
+        self.assertLessEqual(max(s for s in sizes if s < top), 26, "secondaries below KPI")
+
+    def test_sizes_on_scale_and_legible(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "cw.svg"))
+        for s in self._sizes(svg):
+            self.assertIn(s, self.SCALE, f"off-scale font-size {s}")
+            self.assertGreaterEqual(s, 11.0, f"sub-floor font-size {s}")
+
+    def test_no_gradient_ribbon(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "cw.svg"))
+        self.assertNotIn("gk-ribbon", svg, "gradient ribbon must be replaced by a hairline")
+
+    def test_language_color_independence(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "cw.svg"))
+        self.assertIn(">Python</text>", svg, "language must be shown by label, not hue alone")
+        self.assertGreaterEqual(svg.count("<circle"), 1, "each row carries a language dot")
+
+    def test_empty_state(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "cw.svg"), repos=[])
+        self.assertIsNone(
+            re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers"
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

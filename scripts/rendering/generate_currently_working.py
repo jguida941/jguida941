@@ -1,35 +1,28 @@
-"""Generate an Apple/glass SVG card of repos pushed in the last 7 days."""
+"""Build the Currently Working On card.
+
+Power BI information architecture (DESIGN_SPEC): the count of repos pushed in the
+window is the one dominant KPI top-left, and the repos list as uniform repository
+rows (language by dot AND label). An honest empty state renders when nothing was
+pushed in the window.
+"""
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from scripts.core.config import (
-    CYAN,
-    FONT_SANS,
-    GLASS_INSET,
-    SVG_WIDTH,
-    TEXT,
-    TEXT_BRIGHT,
-    TEXT_DIM,
+from scripts.core.config import SPACE, SVG_WIDTH, TEXT_DIM
+from scripts.rendering.components import (
+    empty_state,
+    primary_kpi,
+    repository_row,
+    section_header,
 )
-from scripts.rendering.card_theme import title_left, title_right
-from scripts.rendering.glass_kit import accent_ribbon, glass_panel, glass_tile, icon
-from scripts.rendering.svg_utils import lang_color, truncate, xml_escape
+from scripts.rendering.glass_kit import glass_panel
 
-TITLE = "Currently Working On"
-SUBTITLE = "pushed in the last 7 days"
-
-# --- Layout (px) ---------------------------------------------------------- #
-W = SVG_WIDTH            # 840
-PAD = 30                # text inset from the SVG edge
-TITLE_Y = 44            # title / subtitle baseline
-RIBBON_Y = 58           # accent ribbon
-HEADER_H = 78           # top of the first row tile
-ROW_H = 58              # vertical pitch per repo row
-TILE_H = 48             # row tile height (ROW_H - TILE_H = inter-row gap)
-TILE_X = 28             # row tile left edge (inside the panel inset of 12)
-TILE_W = W - TILE_X * 2  # row tile width
+PAD = 28
+KPI_W = 200
+ROW_PITCH = 56
+ROW_H = 50
 
 
 def _time_ago(iso_str: str) -> str:
@@ -47,112 +40,73 @@ def _time_ago(iso_str: str) -> str:
     return f"{int(hours // 24)}d ago"
 
 
-def _header() -> str:
-    """Header icon + exactly-one title node + subtitle + calm accent ribbon."""
-    return "".join(
-        [
-            icon("code", PAD, 30, size=16, color=CYAN),
-            title_left(TITLE, x=PAD + 24, y=TITLE_Y),
-            title_right(SUBTITLE, width=W, pad=PAD, y=TITLE_Y),
-            accent_ribbon(W, pad=PAD, y=RIBBON_Y),
-        ]
-    )
-
-
-def _row(repo: dict, tile_y: float) -> str:
-    """One frosted row tile for a single repo."""
-    name = truncate(str(repo.get("name", "")), 42)
-    lang = repo.get("language")
-    color = lang_color(lang)
-    is_private = bool(repo.get("is_private"))
-    url = (repo.get("html_url") or "").strip()
-    ago = _time_ago(repo.get("pushed_at", ""))
-    # Private repos carry no commit message; show language + time only.
-    msg = "" if is_private else truncate(str(repo.get("last_commit_msg") or ""), 64)
-
-    name_y = tile_y + 21          # name baseline (line 1, aligned across rows)
-    meta_y = tile_y + 38          # commit / language baseline (line 2)
-    dot_r = 4.5
-    name_x = TILE_X + 36
-    right_x = TILE_X + TILE_W - 18
-
-    parts = [
-        glass_tile(TILE_X, tile_y, TILE_W, TILE_H),
-        # language dot (always), vertically centered on the name line
-        icon("lang_dot", TILE_X + 21 - dot_r, name_y - 4 - dot_r, size=9, color=color),
-    ]
-
-    text_x = name_x
-    if is_private:
-        parts.append(icon("lock", name_x, name_y - 11, size=12, color=TEXT_DIM))
-        text_x = name_x + 18
-
-    name_node = (
-        f'<text x="{text_x}" y="{name_y}" fill="{TEXT_BRIGHT}" font-size="13.5" '
-        f'font-family="{FONT_SANS}" font-weight="700">{xml_escape(name)}</text>'
-    )
-    if url and not is_private:
-        name_node = f'<a href="{xml_escape(url)}">{name_node}</a>'
-    parts.append(name_node)
-
-    if msg:
-        parts.append(
-            f'<text x="{name_x}" y="{meta_y}" fill="{TEXT}" font-size="11.5" '
-            f'font-family="{FONT_SANS}">{xml_escape(msg)}</text>'
-        )
-
-    if ago:
-        parts.append(
-            f'<text x="{right_x}" y="{name_y}" fill="{TEXT_BRIGHT}" font-size="12.5" '
-            f'font-family="{FONT_SANS}" font-weight="700" text-anchor="end">{ago}</text>'
-        )
-    parts.append(
-        f'<text x="{right_x}" y="{meta_y}" fill="{TEXT_DIM}" font-size="10.5" '
-        f'font-family="{FONT_SANS}" text-anchor="end">{xml_escape(lang) if lang else "—"}</text>'
-    )
-    return "".join(parts)
-
-
-def _empty_state() -> str:
-    """Tasteful empty card when nothing was pushed in the window."""
-    h = 152
-    cx = W / 2
-    body = "".join(
-        [
-            glass_panel(W, h),
-            _header(),
-            glass_tile(TILE_X, 86, TILE_W, 46),
-            icon("clock", cx - 150, 99, size=16, color=TEXT_DIM),
-            f'<text x="{cx - 128}" y="114" fill="{TEXT}" font-size="13" '
-            f'font-family="{FONT_SANS}">No repositories pushed in the last 7 days</text>',
-        ]
-    )
-    return (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{h}" '
-        f'viewBox="0 0 {W} {h}">{body}</svg>'
-    )
-
-
 def generate(repos: list, output_path: str = "assets/currently_working.svg"):
-    """repos: list of dicts with keys name, html_url, language, pushed_at,
-    last_commit_msg, is_private."""
+    width = SVG_WIDTH
+    repos = list(repos or [])
+
+    header_svg, content_top = section_header(
+        PAD, 46, "Currently Working On", width=width,
+        eyebrow="Active Development", right_text="Last 7 days", pad=PAD,
+    )
+
     if not repos:
-        svg = _empty_state()
+        empty_header, _ = section_header(
+            PAD, 46, "Currently Working On", width=width, eyebrow="Active Development", pad=PAD
+        )
+        height = int(content_top + 92)
+        body = "".join(
+            [
+                glass_panel(width, height),
+                empty_header,
+                empty_state(width / 2, content_top + 48, "No repositories pushed recently", icon_name="clock"),
+            ]
+        )
+        svg = (
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+            f'viewBox="0 0 {width} {height}">{body}</svg>'
+        )
         with open(output_path, "w") as f:
             f.write(svg)
         return output_path
 
-    # Data-driven height: header + rows (each ROW_H includes its trailing gap) +
-    # a small inner pad + the GLASS_INSET shadow margin so nothing clips.
-    svg_h = HEADER_H + len(repos) * ROW_H + 4 + GLASS_INSET
+    rows_x = PAD + KPI_W + SPACE["xl"]
+    rows_w = width - PAD - rows_x
+    rows_top = content_top + 4
+    rows_bottom = rows_top + len(repos) * ROW_PITCH
+    height = int(max(rows_bottom, content_top + 100) + 22)
 
-    rows = "".join(_row(repo, HEADER_H + i * ROW_H) for i, repo in enumerate(repos))
-    body = "".join([glass_panel(W, svg_h), _header(), rows])
-    svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{svg_h}" '
-        f'viewBox="0 0 {W} {svg_h}">{body}</svg>'
+    parts = [glass_panel(width, height), header_svg]
+    parts.append(
+        primary_kpi(
+            PAD, content_top + 58,
+            value=str(len(repos)), label="active repos", sublabel="last 7 days",
+        )
     )
+    parts.append(
+        f'<rect x="{PAD + KPI_W:g}" y="{content_top + 6:g}" width="1" '
+        f'height="{rows_bottom - content_top - 6:g}" fill="{TEXT_DIM}" fill-opacity="0.16"/>'
+    )
+    for i, repo in enumerate(repos):
+        is_private = bool(repo.get("is_private"))
+        parts.append(
+            repository_row(
+                rows_x,
+                rows_top + i * ROW_PITCH,
+                rows_w,
+                name=str(repo.get("name", "")),
+                language=repo.get("language"),
+                timestamp=_time_ago(repo.get("pushed_at", "")),
+                detail=None if is_private else (repo.get("last_commit_msg") or None),
+                is_private=is_private,
+                url=(repo.get("html_url") or "").strip() or None,
+                row_h=ROW_H,
+            )
+        )
 
+    svg = (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}">{"".join(parts)}</svg>'
+    )
     with open(output_path, "w") as f:
         f.write(svg)
     return output_path

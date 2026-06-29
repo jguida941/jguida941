@@ -179,6 +179,49 @@ def donut_gauge(
     return _progress_ring(cx, cy, radius, pct, color=color, stroke=stroke, label=center, label_size=20)
 
 
+def repository_row(
+    x: float,
+    y: float,
+    w: float,
+    *,
+    name: str,
+    language: str | None = None,
+    timestamp: str | None = None,
+    detail: str | None = None,
+    is_private: bool = False,
+    url: str | None = None,
+    row_h: float = 52,
+) -> str:
+    """One repository row (DESIGN_SPEC 3.11/3.12): leading language dot AND a text
+    language label (color-independent), name at the body token, an optional detail
+    line, and a right-aligned timestamp sharing a common right edge. Uniform row
+    height. Private repos carry a subtle neutral lock (no label, by owner preference).
+    """
+    parts = [glass_tile(x, y, w, row_h)]
+    name_y = y + 21
+    detail_y = y + 38
+    left = x + 18
+    if language:
+        parts.append(
+            f'<circle cx="{_n(left)}" cy="{_n(name_y - 4)}" r="4.5" fill="{_lang_color(language)}"/>'
+        )
+    text_x = left + 14
+    if is_private:
+        parts.append(_icon("lock", text_x, name_y - 11, size=12, color=TEXT_DIM))
+        text_x += 17
+    name_node = text(_xml_escape(_truncate(name, 42)), text_x, name_y, token="body", color=TEXT_BRIGHT)
+    if url and not is_private:
+        name_node = f'<a href="{_xml_escape(url)}">{name_node}</a>'
+    parts.append(name_node)
+    if detail:
+        parts.append(text(_xml_escape(_truncate(detail, 64)), left + 14, detail_y, token="caption", color=TEXT))
+    right = x + w - 16
+    if timestamp:
+        parts.append(text(timestamp, right, name_y, token="caption", color=TEXT_BRIGHT, anchor="end"))
+    parts.append(text(language or "—", right, detail_y, token="caption", color=TEXT_DIM, anchor="end"))
+    return "".join(parts)
+
+
 def trend_panel(
     x: float,
     y: float,
