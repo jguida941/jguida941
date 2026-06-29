@@ -62,6 +62,14 @@ class WebDashboardContract(unittest.TestCase):
         missing = [k for k in required if k not in self.html]
         self.assertEqual([], missing, f"web projection must bind shared metric keys; missing: {missing}")
 
+    def test_renders_calendar_and_rhythm_sections(self):
+        """The web projection covers the same surfaces as the README, including the
+        contribution calendar + activity heatmap (hidden until their data hydrates)."""
+        for needle in ('id="calendar-panel"', 'id="rhythm-panel"',
+                       "contribution_calendar", "activity_rhythm",
+                       "Contribution Calendar", "When I Code"):
+            self.assertIn(needle, self.html, f"web dashboard missing {needle!r}")
+
     def test_material_and_accessibility(self):
         for needle in ("backdrop-filter", ":focus-visible",
                        "prefers-reduced-motion", "prefers-reduced-transparency"):

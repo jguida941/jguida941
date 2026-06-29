@@ -207,6 +207,29 @@ body {
 .chip.warn { background: color-mix(in srgb, var(--status-warning) 16%, transparent); color: color-mix(in srgb, var(--status-warning) 92%, var(--ink-strong)); }
 .chip.bad { background: color-mix(in srgb, var(--status-danger) 16%, transparent); color: color-mix(in srgb, var(--status-danger) 92%, var(--ink-strong)); }
 
+/* --- contribution calendar (intensity = accent opacity; restraint holds) --- */
+.cal-wrap { overflow-x: auto; padding-bottom: 4px; }
+.cal { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 3px; min-width: max-content; }
+.cal i { width: 11px; height: 11px; border-radius: 3px; background: color-mix(in srgb, var(--hairline) 9%, transparent); display: block; }
+.cal-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; font-size: var(--type-caption); color: var(--ink-dim); }
+.cal-scale { display: inline-flex; align-items: center; gap: 7px; }
+.cal-swatches { display: inline-flex; gap: 3px; }
+.cal-swatches i { width: 11px; height: 11px; border-radius: 3px; }
+
+/* --- activity rhythm heatmap (square-ish cells, left-aligned punch card) --- */
+.heat { display: grid; grid-template-columns: 30px 1fr; gap: 4px 8px; align-items: start; max-width: 560px; }
+.heat-days { display: grid; grid-auto-rows: 16px; gap: 4px; }
+.heat-days span { font-size: var(--type-caption); color: var(--ink-dim); line-height: 16px; }
+.heat-grid { display: grid; grid-template-columns: repeat(24, 1fr); grid-auto-rows: 16px; gap: 4px; }
+.heat-grid i { border-radius: 3px; background: color-mix(in srgb, var(--hairline) 9%, transparent); display: block; }
+.heat-hours { grid-column: 2; display: grid; grid-template-columns: repeat(24, 1fr); font-size: var(--type-caption); color: var(--ink-dim); margin-top: 7px; }
+.heat-hours span { grid-row: 1; text-align: center; }
+.mix { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 22px; }
+.mix .m { display: inline-flex; align-items: center; gap: 8px; font-size: var(--type-caption); color: var(--ink); }
+.mix .m b { color: var(--ink-strong); font-weight: 600; }
+.mix .bar { width: 52px; height: 7px; border-radius: 4px; background: color-mix(in srgb, var(--hairline) 12%, transparent); overflow: hidden; }
+.mix .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+
 footer { text-align: center; color: var(--ink-dim); font-size: var(--type-caption); margin-top: 26px; }
 footer a { color: var(--ink); text-decoration: none; }
 
@@ -266,11 +289,23 @@ footer a { color: var(--ink); text-decoration: none; }
       <div class="tile"><div class="l"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg> median freshness</div><div class="v num" data-bind="scorecard.median_days_since_push" data-suffix="d" data-round="0">—</div><div class="c">since last push</div></div>
     </div>
   </section>
+  <section class="panel" id="calendar-panel" hidden>
+    <div class="section-head"><div><p class="eyebrow">Last 12 Months</p><h2 class="title">Contribution Calendar</h2></div><span class="section-meta" id="cal-total">—</span></div>
+    <hr class="hairline">
+    <div class="cal-wrap"><div class="cal" id="cal"></div></div>
+    <div class="cal-foot"><span id="cal-months"></span><span class="cal-scale">Less <span class="cal-swatches" id="cal-scale"></span> More</span></div>
+  </section>
   <section class="panel">
     <div class="section-head"><div><p class="eyebrow">Code Composition</p><h2 class="title">Language Breakdown</h2></div><span class="section-meta" id="lang-count">—</span></div>
     <hr class="hairline">
     <div class="langbar" id="langbar"></div>
     <div class="langlegend" id="langlegend"></div>
+  </section>
+  <section class="panel" id="rhythm-panel" hidden>
+    <div class="section-head"><div><p class="eyebrow">Activity Rhythm</p><h2 class="title">When I Code</h2></div><span class="section-meta" id="rhythm-meta">—</span></div>
+    <hr class="hairline">
+    <div class="heat"><div class="heat-days" id="heat-days"></div><div class="heat-grid" id="heat-grid"></div><div class="heat-hours" id="heat-hours"></div></div>
+    <div class="mix" id="event-mix"></div>
   </section>
   <div class="bento">
     <section class="panel">
@@ -306,7 +341,7 @@ footer a { color: var(--ink); text-decoration: none; }
   };
   const get = (obj, path) => path.split(".").reduce((o,k)=> (o==null?undefined:o[k]), obj);
   const esc = (s) => String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-  const safeUrl = (u) => /^https?:\/\//i.test(String(u||"")) ? esc(u) : "#";
+  const safeUrl = (u) => /^https?:///i.test(String(u||"")) ? esc(u) : "#";
 
   function setTheme(name) {
     document.documentElement.dataset.theme = (name === "liquid-glass") ? "" : name;
@@ -385,6 +420,43 @@ footer a { color: var(--ink); text-decoration: none; }
       const s = q[k] || "unknown";
       return `<span class="chip ${cls(s)}">${nm} · ${s==="ok"?"OK":esc(s[0].toUpperCase()+s.slice(1))}</span>`;
     }).join("");
+    // contribution calendar (intensity = accent opacity by level)
+    const cal = d.contribution_calendar;
+    if (cal && Array.isArray(cal.weeks) && cal.weeks.length && (cal.total || 0) > 0) {
+      const days = cal.weeks.flat().filter(x => x && x.date);
+      const maxc = Math.max(1, ...days.map(x => x.count || 0));
+      const op = [0, 38, 58, 78, 100];
+      const lvl = (c) => c <= 0 ? 0 : (c/maxc <= .25 ? 1 : c/maxc <= .5 ? 2 : c/maxc <= .75 ? 3 : 4);
+      const fill = (l) => l ? `background:color-mix(in srgb, var(--accent) ${op[l]}%, transparent)` : "";
+      const first = new Date(days[0].date + "T00:00:00Z").getUTCDay();
+      let cells = "";
+      for (let i = 0; i < first; i++) cells += "<i></i>";
+      days.forEach(dy => cells += `<i style="${fill(lvl(dy.count))}" title="${esc(dy.date)}: ${fmt(dy.count)}"></i>`);
+      document.getElementById("cal").innerHTML = cells;
+      document.getElementById("cal-total").textContent = fmt(cal.total) + " contributions";
+      const mlabel = (s) => { const t = new Date(s + "T00:00:00Z"); return isNaN(t) ? esc(s) : t.toLocaleString("en-US", {month:"short", year:"numeric"}); };
+      document.getElementById("cal-months").textContent = mlabel(days[0].date) + " – " + mlabel(days[days.length-1].date);
+      document.getElementById("cal-scale").innerHTML = [0,1,2,3,4].map(l => `<i style="${fill(l)}"></i>`).join("");
+      document.getElementById("calendar-panel").hidden = false;
+    }
+    // activity rhythm heatmap (7 weekday rows x 24 hours)
+    const rh = d.activity_rhythm;
+    if (rh && Array.isArray(rh.matrix) && rh.total) {
+      const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+      const maxm = Math.max(1, ...rh.matrix.flat());
+      const hop = [0, 30, 52, 76, 100];
+      const hlvl = (c) => c <= 0 ? 0 : (c/maxm <= .25 ? 1 : c/maxm <= .5 ? 2 : c/maxm <= .75 ? 3 : 4);
+      document.getElementById("heat-days").innerHTML = DAYS.map(x => `<span>${x}</span>`).join("");
+      document.getElementById("heat-grid").innerHTML = rh.matrix.map((row, di) =>
+        row.map((c, hi) => `<i style="${hlvl(c) ? `background:color-mix(in srgb, var(--accent) ${hop[hlvl(c)]}%, transparent)` : ""}" title="${DAYS[di]} ${String(hi).padStart(2,"0")}:00 · ${fmt(c)} events"></i>`).join("")).join("");
+      document.getElementById("heat-hours").innerHTML = [0,6,12,18,23].map(h => `<span style="grid-column:${h+1}">${String(h).padStart(2,"0")}</span>`).join("");
+      document.getElementById("rhythm-meta").textContent = fmt(rh.total) + " events · " + esc(rh.timezone || "");
+      const mix = Object.entries(rh.event_mix || {});
+      const maxmix = Math.max(1, ...mix.map(([,v]) => v));
+      document.getElementById("event-mix").innerHTML = mix.map(([k,v]) =>
+        `<span class="m"><span class="bar"><i style="width:${(v/maxmix*100).toFixed(0)}%"></i></span>${esc(k)} <b>${fmt(v)}</b></span>`).join("");
+      document.getElementById("rhythm-panel").hidden = false;
+    }
   }
 
   fetch(DATA_URL, { cache: "no-store" }).then(r => r.json()).then(hydrate).catch(e => {

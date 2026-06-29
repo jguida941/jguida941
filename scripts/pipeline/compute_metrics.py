@@ -840,6 +840,99 @@ def _build_scorecard_cards(
     return scorecard_cards
 
 
+# --- Public activity aggregations for the web dashboard -------------------------
+# COUNTS ONLY. The published profile_snapshot.json must stay name+metadata (never
+# contents), so these reduce events/calendar to numbers — no repo names, URLs, or
+# payloads ever reach the public JSON.
+_WEB_EVENT_LABELS = {
+    "PushEvent": "push", "PullRequestEvent": "pull request",
+    "PullRequestReviewEvent": "pr review", "IssuesEvent": "issue",
+    "IssueCommentEvent": "comment", "ReleaseEvent": "release", "CreateEvent": "create",
+}
+
+
+def _activity_timezone() -> tuple[Any, str]:
+    name = (os.environ.get("PROFILE_ACTIVITY_TZ") or "America/New_York").strip()
+    try:
+        return ZoneInfo(name), name.rsplit("/", 1)[-1].replace("_", " ")
+    except (ZoneInfoNotFoundError, ValueError):
+        return timezone.utc, "UTC"
+
+
+def _safe_iso_date(value: Any) -> str:
+    """Return value iff it is a clean YYYY-MM-DD date, else '' — so no arbitrary
+    string can ride into the public JSON via the calendar's only text field."""
+    s = str(value or "")
+    if len(s) == 10:
+        try:
+            date.fromisoformat(s)
+            return s
+        except ValueError:
+            pass
+    return ""
+
+
+def _safe_count(value: Any) -> int:
+    try:
+        return max(0, int(value or 0))
+    except (TypeError, ValueError):
+        return 0
+
+
+def _public_contribution_calendar(calendar: Any) -> dict | None:
+    """Trim the contribution calendar to date+count per day for the web grid.
+    Every field is normalized (date validated, count coerced to a non-negative int)
+    so the public JSON carries numbers + clean dates only."""
+    if not isinstance(calendar, dict):
+        return None
+    weeks_out: list[list[dict]] = []
+    for wk in calendar.get("weeks") or []:
+        if not isinstance(wk, dict):
+            continue
+        days = [
+            {"date": iso, "count": _safe_count(d.get("contributionCount"))}
+            for d in (wk.get("contributionDays") or [])
+            if isinstance(d, dict) and (iso := _safe_iso_date(d.get("date")))
+        ]
+        if days:
+            weeks_out.append(days)
+    if not weeks_out:
+        return None
+    try:
+        total = int(calendar.get("totalContributions", 0) or 0)
+    except (TypeError, ValueError):
+        total = 0
+    return {"total": total, "weeks": weeks_out}
+
+
+def _activity_rhythm(events: list) -> dict | None:
+    """Aggregate public events into a 7x24 weekday-hour matrix + event-type mix.
+    Counts ONLY — no repo names/URLs/payloads reach the published JSON."""
+    from collections import Counter
+
+    tz, tz_label = _activity_timezone()
+    matrix = [[0] * 24 for _ in range(7)]
+    mix: Counter = Counter()
+    total = 0
+    for ev in events or []:
+        if not isinstance(ev, dict):
+            continue
+        label = _WEB_EVENT_LABELS.get(str(ev.get("type", "")))
+        ts = str(ev.get("created_at", ""))
+        if not label or not ts:
+            continue
+        try:
+            dt = datetime.fromisoformat(ts.replace("Z", "+00:00")).astimezone(tz)
+        except ValueError:
+            continue
+        matrix[dt.weekday()][dt.hour] += 1
+        mix[label] += 1
+        total += 1
+    if total == 0:
+        return None
+    return {"matrix": matrix, "event_mix": dict(mix.most_common(6)), "total": total, "timezone": tz_label}
+
+
 def _build_dashboard_payload(
     *,
     now_utc: datetime,
@@ -1163,6 +1256,12 @@ def compute_profile_model(
         pr_list=pr_list,
     )
     dashboard_data["engineering"] = engineering
+    calendar_public = _public_contribution_calendar(calendar)
+    if calendar_public:
+        dashboard_data["contribution_calendar"] = calendar_public
+    rhythm = _activity_rhythm(events)
+    if rhythm:
+        dashboard_data["activity_rhythm"] = rhythm
 
     return {
         "now_utc": now_utc,
