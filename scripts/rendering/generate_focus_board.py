@@ -1,151 +1,84 @@
-"""Build a Now/Next/Shipped focus board SVG (Apple glass re-skin)."""
+"""Current Focus board — Now / Next / Shipped lanes (DESIGN_SPEC 3.5/3.11/Part 4).
+
+Three uniform lane columns on the locked type ladder. Lane identity is the LABEL
+(not a per-lane rainbow hue — the old CYAN/ORANGE/GREEN tell is gone); items are
+uniform rows (body title + caption detail, a neutral lock for private). Glass kept.
+"""
 
 from __future__ import annotations
 
-from scripts.core.config import (
-    CYAN,
-    GREEN,
-    ORANGE,
-    FONT_SANS,
-    SVG_WIDTH,
-    TEXT,
-    TEXT_BRIGHT,
-    TEXT_DIM,
-    GLASS_HAIRLINE_HEX,
-    GLASS_HAIRLINE_OP,
-)
-from scripts.rendering.card_theme import title_left
-from scripts.rendering.glass_kit import (
-    accent_ribbon,
-    chip,
-    chip_width,
-    glass_panel,
-    glass_tile,
-    icon,
-)
-from scripts.rendering.svg_utils import xml_escape, truncate
+from scripts.core.config import SPACE, SVG_WIDTH, TEXT, TEXT_BRIGHT, TEXT_DIM
+from scripts.rendering.components import empty_state, section_header, text
+from scripts.rendering.glass_kit import glass_panel, glass_tile, icon
+from scripts.rendering.svg_utils import truncate, xml_escape
 
-# Layout constants -----------------------------------------------------------
-_PAD = 24                 # content margin (sits inside the 12px glass inset)
-_GAP = 14                 # gap between lane columns
-_TITLE_Y = 34
-_RIBBON_Y = 46
-_LANE_Y = 64
-_LANE_H = 188
-_SVG_H = _LANE_Y + _LANE_H + 28   # +28 reserves the glass drop-shadow margin
-
-_SLOT_H = 44              # vertical pitch between item rows
-_ITEM_TOP = 64           # first title baseline, relative to lane top
+PAD = 28
+LANES = (("now", "Now"), ("next", "Next"), ("shipped", "Shipped"))
+MAX_ITEMS = 3
+ITEM_PITCH = 46
 
 
-def _lane(x: float, items: list[dict], label: str, accent: str) -> str:
-    """Render one frosted lane column (header + up to 3 items)."""
-    col_w = (SVG_WIDTH - _PAD * 2 - _GAP * 2) / 3
-    parts: list[str] = [glass_tile(x, _LANE_Y, col_w, _LANE_H)]
-
-    # --- lane header: accent dot + label + count chip ----------------------
-    parts.append(icon("lang_dot", x + 14, _LANE_Y + 16, size=8, color=accent))
+def _lane(focus: dict, key: str, label: str, x: float, y: float, w: float, h: float) -> str:
+    pad = SPACE["md"]
+    items = focus.get(key) if isinstance(focus, dict) else None
+    items = [i for i in (items or []) if isinstance(i, dict)][:MAX_ITEMS]
+    parts = [glass_tile(x, y, w, h)]
+    # lane header: neutral label + count (no rainbow)
+    parts.append(text(label.upper(), x + pad, y + 22, token="eyebrow", color=TEXT_DIM, tracking=1.2))
+    parts.append(text(str(len(items)), x + w - pad, y + 23, token="caption", color=TEXT_DIM, anchor="end"))
     parts.append(
-        f'<text x="{x + 28:.2f}" y="{_LANE_Y + 25}" fill="{accent}" font-size="12" '
-        f'font-family="{FONT_SANS}" font-weight="700" '
-        f'letter-spacing="1.2">{label.upper()}</text>'
+        f'<rect x="{x + pad:g}" y="{y + 32:g}" width="{w - pad * 2:g}" height="1" '
+        f'fill="{TEXT_DIM}" fill-opacity="0.16"/>'
     )
-    count = str(len(items))
-    cw = chip_width(count, size=11)
-    parts.append(
-        chip(
-            x + col_w - 12 - cw,
-            _LANE_Y + 9,
-            count,
-            color=accent,
-            filled=True,
-            size=11,
-            height=22,
-            width=cw,
-        )
-    )
-
-    # --- divider under header ----------------------------------------------
-    parts.append(
-        f'<rect x="{x + 14:.2f}" y="{_LANE_Y + 38}" width="{col_w - 28:.2f}" '
-        f'height="1" fill="{GLASS_HAIRLINE_HEX}" fill-opacity="{GLASS_HAIRLINE_OP}"/>'
-    )
-
-    # --- empty lane --------------------------------------------------------
     if not items:
-        parts.append(
-            f'<text x="{x + col_w / 2:.2f}" y="{_LANE_Y + 118}" fill="{TEXT_DIM}" '
-            f'font-size="11" font-family="{FONT_SANS}" text-anchor="middle">'
-            f'No items in this lane.</text>'
-        )
+        parts.append(text("Nothing here", x + pad, y + 60, token="caption", color=TEXT_DIM))
         return "".join(parts)
-
-    title_x = x + 32
-    for i, item in enumerate(items[:3]):
-        ty = _LANE_Y + _ITEM_TOP + i * _SLOT_H
-        is_private = bool(item.get("is_private"))
-        title = truncate(xml_escape(item.get("title", "item")), 30)
-        detail = truncate(xml_escape(item.get("detail", "")), 36)
-        url = xml_escape(item.get("url", "") or "")
-
-        # leading marker: lock (private) or accent dot (public)
-        if is_private:
-            parts.append(icon("lock", x + 12, ty - 11, size=13, color=accent))
-        else:
-            parts.append(icon("lang_dot", x + 13, ty - 7.5, size=7, color=accent))
-
-        title_node = (
-            f'<text x="{title_x:.2f}" y="{ty}" fill="{TEXT_BRIGHT}" font-size="12" '
-            f'font-family="{FONT_SANS}" font-weight="600">{title}</text>'
-        )
-        # link only non-private items that carry a url
-        if url and not is_private:
-            parts.append(f'<a href="{url}">{title_node}</a>')
-        else:
-            parts.append(title_node)
-
+    iy = y + 56
+    name_max = max(10, int((w - pad * 2) / 8))
+    for item in items:
+        tx = x + pad
+        if item.get("is_private"):
+            parts.append(icon("lock", x + pad, iy - 12, size=14, color=TEXT_DIM))
+            tx = x + pad + 19
+        title = truncate(str(item.get("title") or "item"), name_max)
+        url = str(item.get("url") or "").strip()
+        node = text(xml_escape(title), tx, iy, token="body", color=TEXT_BRIGHT)
+        parts.append(f'<a href="{xml_escape(url)}">{node}</a>' if url and not item.get("is_private") else node)
+        detail = truncate(str(item.get("detail") or "").strip(), name_max + 4)
         if detail:
-            parts.append(
-                f'<text x="{title_x:.2f}" y="{ty + 17}" fill="{TEXT_DIM}" '
-                f'font-size="10.5" font-family="{FONT_SANS}">{detail}</text>'
-            )
-
+            parts.append(text(xml_escape(detail), x + pad, iy + 16, token="caption", color=TEXT_DIM))
+        iy += ITEM_PITCH
     return "".join(parts)
 
 
 def generate(focus: dict, output_path: str = "assets/now_next_shipped.svg") -> str:
-    lanes = [
-        ("now", "Now", CYAN),
-        ("next", "Next", ORANGE),
-        ("shipped", "Shipped", GREEN),
-    ]
-    col_w = (SVG_WIDTH - _PAD * 2 - _GAP * 2) / 3
-
-    parts: list[str] = [glass_panel(SVG_WIDTH, _SVG_H)]
-
-    # header: title + calm ribbon + flow caption
-    parts.append(title_left("Current Focus", x=_PAD, y=_TITLE_Y))
-    parts.append(
-        f'<text x="{SVG_WIDTH - _PAD}" y="{_TITLE_Y}" fill="{TEXT_DIM}" font-size="11" '
-        f'font-family="{FONT_SANS}" text-anchor="end" letter-spacing="0.4">'
-        f'now &#47; next &#47; shipped</text>'
+    width = SVG_WIDTH
+    header_svg, content_top = section_header(
+        PAD, 46, "Current Focus", width=width, eyebrow="Active Focus",
+        right_text="now · next · shipped", pad=PAD,
     )
-    parts.append(accent_ribbon(SVG_WIDTH, pad=_PAD, y=_RIBBON_Y, h=3))
 
-    for idx, (key, label, accent) in enumerate(lanes):
-        x = _PAD + idx * (col_w + _GAP)
-        items = focus.get(key, []) if isinstance(focus, dict) else []
-        if not isinstance(items, list):
-            items = []
-        parts.append(_lane(x, items, label, accent))
+    has_any = isinstance(focus, dict) and any(focus.get(k) for k, _ in LANES)
+    if not has_any:
+        empty_header, _ = section_header(PAD, 46, "Current Focus", width=width, eyebrow="Active Focus", pad=PAD)
+        height = int(content_top + 92)
+        body = "".join([glass_panel(width, height), empty_header,
+                        empty_state(width / 2, content_top + 48, "No focus items yet", icon_name="check")])
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+                    f'viewBox="0 0 {width} {height}">{body}</svg>')
+        return output_path
 
-    svg = (
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{SVG_WIDTH}" '
-        f'height="{_SVG_H}" viewBox="0 0 {SVG_WIDTH} {_SVG_H}">'
-        f'{"".join(parts)}'
-        f'</svg>'
-    )
+    gap = SPACE["md"]
+    lane_w = (width - PAD * 2 - gap * 2) / 3
+    lane_top = content_top + 8
+    lane_h = 56 + MAX_ITEMS * ITEM_PITCH
+    height = int(lane_top + lane_h + 22)
+    parts = [glass_panel(width, height), header_svg]
+    for i, (key, label) in enumerate(LANES):
+        parts.append(_lane(focus, key, label, PAD + i * (lane_w + gap), lane_top, lane_w, lane_h))
 
     with open(output_path, "w", encoding="utf-8") as f:
-        f.write(svg)
+        f.write(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+                f'viewBox="0 0 {width} {height}">{"".join(parts)}</svg>')
     return output_path

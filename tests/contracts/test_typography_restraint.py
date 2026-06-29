@@ -71,12 +71,11 @@ def _calendar(days_back: int = 21, count: int = 3) -> dict:
 class TypographyLadderRestraintContract(unittest.TestCase):
     """Locked type ladder + color restraint across every rendered card."""
 
-    # NOTE: focus_board + repo_spotlight are NOT yet converted to the kit (B3); their
-    # off-ladder sizes are tracked by the global min-font guard until then. They are
-    # added back to this set the moment they're converted.
     def _render_cards(self, d: str) -> dict[str, str]:
         from scripts.rendering.generate_badges import generate as gen_badges
         from scripts.rendering.generate_builder_scorecard import generate as gen_scorecard
+        from scripts.rendering.generate_focus_board import generate as gen_focus
+        from scripts.rendering.generate_repo_spotlight import generate as gen_spotlight
         from scripts.rendering.generate_snapshot_panel import generate as gen_snapshot
         from scripts.rendering.generate_streak_summary import generate as gen_streak
 
@@ -103,6 +102,21 @@ class TypographyLadderRestraintContract(unittest.TestCase):
         gen_badges(output_path=out("badges.svg"), public_nonfork_repos=42, public_forks=8,
                    private_owned_repos=146, ci_count=16, last_year_contributions=8104)
         cards["badges"] = Path(out("badges.svg")).read_text(encoding="utf-8")
+
+        gen_focus({
+            "now": [{"title": "ci pipeline", "detail": "deploy gate", "url": "", "is_private": False}],
+            "next": [{"title": "voice term", "detail": "audio buffer", "url": "", "is_private": False}],
+            "shipped": [{"title": "contact suite", "detail": "spring react", "url": "", "is_private": True}],
+        }, output_path=out("focus.svg"))
+        cards["focus_board"] = Path(out("focus.svg")).read_text(encoding="utf-8")
+
+        gen_spotlight([
+            {"name": "ci-cd-hub", "description": "ci pipeline hub", "language": "Python", "stars": 42, "forks": 8,
+             "html_url": "https://github.com/x/ci-cd-hub", "pushed_ago": "5h ago", "status": "active"},
+            {"name": "voiceterm", "description": "voice terminal", "language": "Rust", "stars": 12, "forks": 2,
+             "html_url": "https://github.com/x/voiceterm", "pushed_ago": "20h ago", "status": "maintained"},
+        ], output_path=out("spot.svg"))
+        cards["repo_spotlight"] = Path(out("spot.svg")).read_text(encoding="utf-8")
         return cards
 
     def test_type_ladder_locked_and_legible(self):
