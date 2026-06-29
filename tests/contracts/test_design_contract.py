@@ -526,5 +526,90 @@ class LanguageBreakdownContract(unittest.TestCase):
         )
 
 
+class EngineeringCadenceContract(unittest.TestCase):
+    """DESIGN_SPEC 3.2/3.8/3.9/Part 4: Engineering Cadence promotes active days to
+    one display KPI, renders the weekly cadence as a TrendPanel (stroke >=1.5) and
+    CI coverage as a labeled DonutGauge, on the type scale, with no gradient ribbon."""
+
+    SCALE = {46.0, 26.0, 22.0, 20.0, 14.0, 12.0, 11.0}
+
+    def _data(self):
+        return {
+            "weekly_cadence": [2, 5, 3, 8, 4, 6, 9, 5, 7, 4, 6, 8],
+            "active_days_last_year": 287,
+            "automation_workflows": 16,
+            "automation_repos": 12,
+            "primary_lang_share_pct": 61.4,
+            "languages_over_5pct": 4,
+            "public_repos_total": 42,
+            "public_nonfork_repos": 30,
+            "private_repos_total": 146,
+        }
+
+    def _render(self, out: str, *, data=None) -> str:
+        from scripts.rendering.generate_engineering_cadence import generate
+
+        generate(self._data() if data is None else data, output_path=out)
+        return Path(out).read_text(encoding="utf-8")
+
+    def _sizes(self, svg):
+        return [float(m) for m in _FONT.findall(svg)]
+
+    def test_one_dominant_kpi(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "eng.svg"))
+        sizes = self._sizes(svg)
+        top = max(sizes)
+        self.assertGreaterEqual(top, 40, "needs one display KPI (active days)")
+        self.assertEqual(sizes.count(top), 1, "exactly one dominant KPI")
+        self.assertLessEqual(max(s for s in sizes if s < top), 26, "secondaries below KPI")
+
+    def test_sizes_on_scale_and_legible(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "eng.svg"))
+        for s in self._sizes(svg):
+            self.assertIn(s, self.SCALE, f"off-scale font-size {s}")
+            self.assertGreaterEqual(s, 11.0, f"sub-floor font-size {s}")
+
+    def test_no_gradient_ribbon(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "eng.svg"))
+        self.assertNotIn("gk-ribbon", svg, "gradient ribbon must be replaced by a hairline")
+
+    def test_trend_stroke_legible(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "eng.svg"))
+        strokes = re.findall(r'<polyline[^>]*stroke-width="([0-9.]+)"', svg)
+        self.assertTrue(strokes, "weekly cadence must render a trend polyline")
+        self.assertTrue(all(float(s) >= 1.5 for s in strokes), "trend stroke must be >=1.5px")
+
+    def test_ci_coverage_is_labeled_gauge(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "eng.svg"))
+        self.assertRegex(
+            svg, r'<text[^>]*font-size="20"[^>]*>[^<]*%</text>',
+            "CI coverage must render as a >=12px labeled gauge",
+        )
+
+    def test_empty_state(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "eng.svg"), data={})
+        self.assertIsNone(
+            re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers"
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

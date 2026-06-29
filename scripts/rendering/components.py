@@ -24,6 +24,7 @@ from scripts.rendering.glass_kit import chip as _chip
 from scripts.rendering.glass_kit import glass_tile
 from scripts.rendering.glass_kit import icon as _icon
 from scripts.rendering.glass_kit import progress_ring as _progress_ring
+from scripts.rendering.glass_kit import sparkline as _sparkline
 from scripts.rendering.svg_utils import lang_color as _lang_color
 from scripts.rendering.svg_utils import truncate as _truncate
 from scripts.rendering.svg_utils import xml_escape as _xml_escape
@@ -176,6 +177,33 @@ def donut_gauge(
     pct = max(0.0, min(100.0, float(value) / mv * 100.0))
     center = label if label is not None else f"{round(pct)}%"
     return _progress_ring(cx, cy, radius, pct, color=color, stroke=stroke, label=center, label_size=20)
+
+
+def trend_panel(
+    x: float,
+    y: float,
+    w: float,
+    h: float,
+    *,
+    series: list[float],
+    axis_label: str | None = None,
+    peak_label: str | None = None,
+    uid: str = "trend",
+    color: str = CYAN,
+) -> str:
+    """A restrained continuous-time trend (DESIGN_SPEC 3.8): a sparkline with
+    stroke >=1.5 and optional axis/peak labels at the caption token (>=12px)."""
+    pts = [float(v) for v in (series or []) if v is not None]
+    top_pad = 16 if axis_label else 0
+    bot_pad = 16 if peak_label else 0
+    parts: list[str] = []
+    if axis_label:
+        parts.append(text(axis_label, x + w, y + 10, token="caption", color=TEXT_DIM, anchor="end"))
+    if pts:
+        parts.append(_sparkline(pts, x, y + top_pad, w, h - top_pad - bot_pad, color=color, uid=uid))
+    if peak_label:
+        parts.append(text(peak_label, x + w, y + h, token="caption", color=TEXT_DIM, anchor="end"))
+    return "".join(parts)
 
 
 def language_bar(
