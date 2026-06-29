@@ -39,7 +39,7 @@ EXPECTED_CARD_TITLES = {
     Path("assets/lang_breakdown.svg"): "Language Breakdown",
     Path("assets/activity_heatmap.svg"): "When I Code",
     Path("assets/repo_spotlight.svg"): "Flagship Projects",
-    Path("assets/raw_snapshot.svg"): "Raw Data Snapshot (Python Pull)",
+    Path("assets/raw_snapshot.svg"): "Raw Data Snapshot",
     Path("assets/streak_summary.svg"): "Streak Summary",
 }
 

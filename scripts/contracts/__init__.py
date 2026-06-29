@@ -101,7 +101,7 @@ DISALLOWED_README_HEADINGS = (
     "### Current Focus",
     "### Currently Working On",
     "### Language Breakdown",
-    "### Raw Data Snapshot (Python Pull)",
+    "### Raw Data Snapshot",
 )
 
 
