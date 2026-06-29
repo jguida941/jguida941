@@ -28,6 +28,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
         "contracts",
         "executable design/output/layout contracts (the binding guards)",
         (
+            "test_bootstrap_red_ref.py",
             "test_card_contracts.py",
             "test_design_contract.py",
             "test_glass_preserved.py",
@@ -141,6 +142,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
         "test_public_data_privacy.py",  # the public snapshot JSON leaks no token/credentials
     ),
     "layout": (
+        "test_bootstrap_red_ref.py",
         "test_scripts_layout_contract.py",
         "test_structural_layout.py",
         "test_tests_layout_contract.py",

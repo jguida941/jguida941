@@ -12,10 +12,16 @@
     (`contracts/repo_layout.json`, zero-literal portable LAW) + the closed-cover
     structural-layout RED (`tests/contracts/test_structural_layout.py`), mutation-proven
     (an undeclared/misplaced file reddens). 150 tests green.
-  - ⏭ **P5-0 next:** add-RED-before-file bootstrap gate (port `check_bootstrap_red_ref.py`)
-    → system-graph connectivity gather (`system_graph_policy.toml`) → docs-currency RED +
-    retire stale docs (`DESIGN_AUDIT`, old plan history → this ledger) → chat→`ClaimIntakeClaim`
-    lowering.
+  - ✅ **P5-0 slice 2 (durable plan)** — moved the plan into the repo (`docs/plans/ACTIVE.md` +
+    `docs/history/PLAN-LEDGER.md`); declared in `repo_layout.json`.
+  - ✅ **P5-0 slice 3 (0c, the keystone)** — the add-RED-before-file gate
+    (`scripts/organization/bootstrap_red_ref.py` + `tests/contracts/test_bootstrap_red_ref.py`):
+    a mutation-capable task with no named RED is rejected; a shape/reorg task's RED must be an
+    executable target-shape contract. Mutation-proven + dogfooded (admits its own slice). 163 green.
+  - ⏭ **P5-0 next:** system-graph connectivity gather (`system_graph_policy.toml`) → docs-currency
+    RED + retire stale docs (`DESIGN_AUDIT`) → chat→`ClaimIntakeClaim` lowering → then SUBSUME the
+    old `MODULE_HOMES`/`TEST_GROUPS` guards into the single `repo_layout.json` cover (kill the
+    transitional double-maintenance).
 - **After P5-0:** P5-1 engine + retire convergence contract (distinctness RED-first) → P5-2
   diverge the 3 themes → P5-3 webkit chart/component library → P5-4 settings page → P5-5
   themes 4–10 via the skill → P5-6 showcase + portability. The `design-language-tdd` skill is

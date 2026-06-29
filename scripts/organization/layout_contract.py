@@ -94,6 +94,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     # --- cli: command-line entrypoint ------------------------------------------
     ModuleHome("scripts/profile_cli.py", "scripts/cli/profile_cli.py", "cli", "profile command-line interface", public_entrypoint=True),
     # --- organization: layout tooling (self-declared) --------------------------
+    ModuleHome("scripts/organization/bootstrap_red_ref.py", "scripts/organization/bootstrap_red_ref.py", "organization", "bootstrap-red-ref gate: no mutation without a named RED"),
     ModuleHome("scripts/organization/layout_audit.py", "scripts/organization/layout_audit.py", "organization", "live scripts layout audit"),
     ModuleHome("scripts/organization/layout_contract.py", "scripts/organization/layout_contract.py", "organization", "semantic scripts layout contract"),
     ModuleHome("scripts/organization/migrate_scripts_layout.py", "scripts/organization/migrate_scripts_layout.py", "organization", "semantic scripts layout migration tool"),

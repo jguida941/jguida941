@@ -51,7 +51,7 @@
         {"id": "contracts", "target_dir": "contracts", "members": ["profile_contract.py"]},
         {"id": "core", "target_dir": "core", "members": ["config.py", "runtime_env.py", "settings.py"]},
         {"id": "github", "target_dir": "github", "members": ["actions_audit.py", "branch_protection.py", "gh_cli.py", "github_cache.py", "github_client.py", "github_graphql.py", "github_transport.py"]},
-        {"id": "organization", "target_dir": "organization", "members": ["layout_audit.py", "layout_contract.py", "migrate_scripts_layout.py", "tests_layout_contract.py"]},
+        {"id": "organization", "target_dir": "organization", "members": ["bootstrap_red_ref.py", "layout_audit.py", "layout_contract.py", "migrate_scripts_layout.py", "tests_layout_contract.py"]},
         {"id": "pipeline", "target_dir": "pipeline", "members": ["collect_data.py", "compute_metrics.py", "profile_helpers.py", "profile_pipeline.py", "render_outputs.py", "web_render.py"]},
         {"id": "quality", "target_dir": "quality", "members": ["diagnostics.py", "metrics_svg.py", "severity.py", "triage.py", "validate_generated_profile.py"]},
         {"id": "rendering", "target_dir": "rendering", "members": ["card_theme.py", "components.py", "design_tokens.py", "generate_activity_heatmap.py", "generate_badges.py", "generate_builder_scorecard.py", "generate_contribution_panel.py", "generate_currently_working.py", "generate_engineering_cadence.py", "generate_focus_board.py", "generate_language_chart.py", "generate_metrics_general.py", "generate_repo_spotlight.py", "generate_snapshot_panel.py", "generate_streak_summary.py", "glass_kit.py", "icons.py", "svg_utils.py"]}
@@ -64,7 +64,7 @@
       "data_dirs": ["fixtures"],
       "root_allowlist": [],
       "groups": [
-        {"id": "contracts", "target_dir": "contracts", "members": ["test_card_contracts.py", "test_design_contract.py", "test_glass_preserved.py", "test_icon_system.py", "test_label_legibility.py", "test_public_data_privacy.py", "test_readme_projection.py", "test_scripts_layout_contract.py", "test_structural_layout.py", "test_tests_layout_contract.py", "test_theme_system.py", "test_tile_composition.py", "test_typography_restraint.py", "test_web_dashboard.py"]},
+        {"id": "contracts", "target_dir": "contracts", "members": ["test_bootstrap_red_ref.py", "test_card_contracts.py", "test_design_contract.py", "test_glass_preserved.py", "test_icon_system.py", "test_label_legibility.py", "test_public_data_privacy.py", "test_readme_projection.py", "test_scripts_layout_contract.py", "test_structural_layout.py", "test_tests_layout_contract.py", "test_theme_system.py", "test_tile_composition.py", "test_typography_restraint.py", "test_web_dashboard.py"]},
         {"id": "core", "target_dir": "core", "members": ["test_profile_cli.py", "test_runtime_env.py"]},
         {"id": "github", "target_dir": "github", "members": ["test_actions_audit.py", "test_branch_protection.py", "test_github_client.py", "test_settings_tokens.py", "test_token_fallback.py"]},
         {"id": "pipeline", "target_dir": "pipeline", "members": ["test_compute_metrics_accuracy.py", "test_compute_metrics_integration.py", "test_profile_pipeline_fixture.py"]},
