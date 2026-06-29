@@ -100,10 +100,26 @@ def generate_assets(collected: CollectedProfileData, model: dict, logger=print) 
     logger("  -> metrics.general.svg")
 
 
+def _public_dashboard_data(dashboard_data: dict) -> dict:
+    """Scrub internal-only fields before publishing. profile_snapshot.json is served
+    on GitHub Pages (one curl away), so it is part of the public profile: the internal
+    token mode (whether the bot ran authenticated) must never leak there. Counts and
+    public-source health stay; only the credential-posture field is stripped."""
+    import copy
+
+    public = copy.deepcopy(dashboard_data)
+    dq = public.get("data_quality")
+    if isinstance(dq, dict):
+        for key in list(dq):
+            if "token" in key.lower():  # token_mode and any future token_* field
+                dq.pop(key, None)
+    return public
+
+
 def write_dashboard_json(model: dict, logger=print) -> None:
     output_path = Path("site/data/profile_snapshot.json")
     output_path.write_text(
-        json.dumps(model["dashboard_data"], indent=2, ensure_ascii=True) + "\n",
+        json.dumps(_public_dashboard_data(model["dashboard_data"]), indent=2, ensure_ascii=True) + "\n",
         encoding="utf-8",
     )
     logger("  -> site/data/profile_snapshot.json")

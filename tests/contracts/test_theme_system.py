@@ -112,16 +112,18 @@ class ThemeSystemContract(unittest.TestCase):
     def test_every_theme_is_legible_AA(self):
         offenders = []
         for name, roles in self.themes.items():
+            # primary/body ink AND the secondary ink-dim/accent are checked on BOTH
+            # surfaces (tiles/rows render ink-dim on surface-raised, not just surface).
             for surf in ("surface", "surface-raised"):
                 bg = roles[surf]
                 if _contrast(roles["ink-strong"], bg) < 4.5:
                     offenders.append(f"{name}: ink-strong on {surf} = {_contrast(roles['ink-strong'], bg):.2f} (<4.5)")
                 if _contrast(roles["ink"], bg) < 4.5:
                     offenders.append(f"{name}: ink on {surf} = {_contrast(roles['ink'], bg):.2f} (<4.5)")
-            if _contrast(roles["ink-dim"], roles["surface"]) < 3.0:
-                offenders.append(f"{name}: ink-dim on surface = {_contrast(roles['ink-dim'], roles['surface']):.2f} (<3.0)")
-            if _contrast(roles["accent"], roles["surface"]) < 3.0:
-                offenders.append(f"{name}: accent on surface = {_contrast(roles['accent'], roles['surface']):.2f} (<3.0)")
+                if _contrast(roles["ink-dim"], bg) < 3.0:
+                    offenders.append(f"{name}: ink-dim on {surf} = {_contrast(roles['ink-dim'], bg):.2f} (<3.0)")
+                if _contrast(roles["accent"], bg) < 3.0:
+                    offenders.append(f"{name}: accent on {surf} = {_contrast(roles['accent'], bg):.2f} (<3.0)")
         self.assertEqual([], offenders, "every theme must clear WCAG AA:\n  " + "\n  ".join(offenders))
 
     def test_every_theme_is_restrained(self):

@@ -6,6 +6,7 @@ on:
     paths:
       - "scripts/**"
       - "tests/**"
+      - "site/**"
       - ".github/workflows/tests.yml"
       - ".github/workflows/analytics.yml"
       - ".github/workflows/metrics.yml"

@@ -1,93 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>jguida941 · Builder Dashboard</title>
-<meta name="description" content="Live GitHub builder analytics — regenerated hourly.">
-<style>
-:root {
-  --ink-strong: #c0caf5;
-  --ink: #a9b1d6;
-  --ink-dim: #8a94bd;
-  --surface: #1b1e2e;
-  --surface-raised: #232843;
-  --backdrop: #0c0e18;
-  --hairline: #c0caf5;
-  --accent: #7dcfff;
-  --status-success: #9ece6a;
-  --status-warning: #e0af68;
-  --status-danger: #f7768e;
-  --glass-blur: 22px;
-  --glass-saturate: 160%;
-  --surface-opacity: 0.55;
-  --raised-opacity: 0.55;
-  --sheen-opacity: 0.07;
-  --radius-panel: 18px;
-  --radius-tile: 13px;
-  --type-display: 46px;
-  --type-display-weight: 600;
-  --type-metric_lg: 26px;
-  --type-metric_lg-weight: 600;
-  --type-metric: 22px;
-  --type-metric-weight: 600;
-  --type-title: 20px;
-  --type-title-weight: 600;
-  --type-body: 14px;
-  --type-body-weight: 400;
-  --type-caption: 12px;
-  --type-caption-weight: 400;
-  --type-eyebrow: 11px;
-  --type-eyebrow-weight: 600;
-  --type-chip: 11px;
-  --type-chip-weight: 500;
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 24px;
-  --space-xxl: 32px;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-}
+"""Generate the web dashboard (site/index.html) — the second projection of the one
+analytics contract, built the SAME way the SVG cards are: from the single design-token
+source (scripts.rendering.design_tokens) + the shared snapshot.
 
-[data-theme="apple-dark"] {
-  --ink-strong: #f5f5f7;
-  --ink: #c7c7cc;
-  --ink-dim: #98989d;
-  --surface: #1c1c1e;
-  --surface-raised: #2c2c2e;
-  --backdrop: #000000;
-  --hairline: #ffffff;
-  --accent: #0a84ff;
-  --status-success: #30d158;
-  --status-warning: #ff9f0a;
-  --status-danger: #ff453a;
-  --glass-blur: 30px;
-  --glass-saturate: 180%;
-  --surface-opacity: 0.6;
-  --raised-opacity: 0.5;
-  --sheen-opacity: 0.1;
-}
+Design laws made literal here:
+  * IA = Power BI: one dominant hero KPI, then a bento of cards; every number has ONE
+    home (no metric repeated across cards); tabular figures everywhere.
+  * Material = governed Liquid Glass: real backdrop-filter frost driven by the per-theme
+    material vars — never ad-hoc blur. A theme switcher swaps colour + material only.
+  * Projection parity: the page hydrates client-side from data/profile_snapshot.json
+    (same source as the README SVGs), so the bot's hourly refresh flows in with no
+    regeneration. The committed index.html is GENERATED — a drift guard forbids hand
+    edits, and a token-parity guard requires emit_css_root() verbatim.
 
-[data-theme="power-bi"] {
-  --ink-strong: #ffffff;
-  --ink: #d9dde3;
-  --ink-dim: #9aa0ab;
-  --surface: #20242b;
-  --surface-raised: #2b303a;
-  --backdrop: #14171c;
-  --hairline: #ffffff;
-  --accent: #2899f5;
-  --status-success: #1aab8a;
-  --status-warning: #f2c811;
-  --status-danger: #e0626d;
-  --glass-blur: 6px;
-  --glass-saturate: 120%;
-  --surface-opacity: 0.92;
-  --raised-opacity: 0.85;
-  --sheen-opacity: 0.03;
-}
+Privacy: token_mode and any private-repo file content are NEVER emitted — only public
+counts/metadata. The page is static (GitHub Pages safe): no inline secrets, no server.
+"""
+from __future__ import annotations
 
+from pathlib import Path
+
+from scripts.rendering.design_tokens import DEFAULT_THEME, THEME_META, THEMES, emit_css_root
+
+DATA_URL = "./data/profile_snapshot.json"
+
+
+def _component_css() -> str:
+    """Component styles — every value resolves from a token var (no raw hex here)."""
+    return """
 *,*::before,*::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
@@ -222,12 +161,33 @@ footer a { color: var(--ink); text-decoration: none; }
   .panel, .switcher, .tile, .rrow { -webkit-backdrop-filter: none; backdrop-filter: none;
     background: var(--surface); }
 }
+"""
 
-</style>
-</head>
-<body>
-<main class="wrap">
 
+def _svg_icon(paths: str) -> str:
+    return f'<svg viewBox="0 0 24 24" aria-hidden="true">{paths}</svg>'
+
+
+# Minimal inline Lucide glyphs (currentColor via CSS stroke) for tile labels.
+_ICONS = {
+    "fire": '<path d="M12 2c1 4 4 5 4 9a4 4 0 0 1-8 0c0-1.5.7-2.4 1.3-3.2C10.5 6.5 11 4 12 2Z"/>',
+    "commit": '<circle cx="12" cy="12" r="3.2"/><path d="M3 12h5.8M15.2 12H21"/>',
+    "ci": '<path d="M20 6 9 17l-5-5"/>',
+    "workflow": '<rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><path d="M9 6h6a3 3 0 0 1 3 3v6"/>',
+    "release": '<path d="M3 11l8-8 10 10-8 8z"/><circle cx="8.5" cy="8.5" r="1.4"/>',
+    "code": '<path d="m8 6-5 6 5 6M16 6l5 6-5 6"/>',
+    "calendar": '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/>',
+    "star": '<path d="m12 3 2.6 5.6L21 9.3l-4.5 4.3 1.1 6.1L12 17l-5.6 2.7 1.1-6.1L3 9.3l6.4-.7z"/>',
+}
+
+
+def _hero() -> str:
+    metas = "".join(
+        f'<button type="button" data-theme-set="{name}" aria-pressed="{str(name == DEFAULT_THEME).lower()}" '
+        f'title="{THEME_META[name]["blurb"]}">{THEME_META[name]["label"]}</button>'
+        for name in THEMES
+    )
+    return f"""
   <header class="panel hero">
     <div class="topline">
       <div>
@@ -235,7 +195,7 @@ footer a { color: var(--ink); text-decoration: none; }
         <h1 id="hero-name">@jguida941</h1>
         <p class="tag" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p>
       </div>
-      <div class="switcher" role="group" aria-label="Theme"><button type="button" data-theme-set="liquid-glass" aria-pressed="true" title="Apple frosted glass · Tokyo Night">Liquid Glass</button><button type="button" data-theme-set="apple-dark" aria-pressed="false" title="System dark · one vivid accent">Apple Dark</button><button type="button" data-theme-set="power-bi" aria-pressed="false" title="Analytical slate · flat data-ink">Power BI</button></div>
+      <div class="switcher" role="group" aria-label="Theme">{metas}</div>
     </div>
     <div class="kpi">
       <div>
@@ -249,7 +209,11 @@ footer a { color: var(--ink); text-decoration: none; }
       </div>
     </div>
     <div class="live"><span class="dot"></span><span>Live · updated <span id="updated">—</span></span></div>
-  </header>
+  </header>"""
+
+
+def _scorecard() -> str:
+    return f"""
   <section class="panel">
     <div class="section-head"><div><p class="eyebrow">GitHub Signals · 12 Months</p><h2 class="title">Builder Scorecard</h2></div></div>
     <hr class="hairline">
@@ -258,20 +222,28 @@ footer a { color: var(--ink); text-decoration: none; }
       <div><div class="tile" style="border:0;background:none;padding:0"><div class="l">CI coverage</div><div class="c">of public repos automated</div></div></div>
     </div>
     <div class="tiles">
-      <div class="tile"><div class="l"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 4 5 4 9a4 4 0 0 1-8 0c0-1.5.7-2.4 1.3-3.2C10.5 6.5 11 4 12 2Z"/></svg> active days</div><div class="v num" data-bind="scorecard.active_days_last_year">—</div><div class="c">last 12 months</div></div>
-      <div class="tile"><div class="l"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M3 12h5.8M15.2 12H21"/></svg> active repos</div><div class="v num" data-bind="scorecard.active_repos_7d">—</div><div class="c">last 7 days</div></div>
-      <div class="tile"><div class="l"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><path d="M9 6h6a3 3 0 0 1 3 3v6"/></svg> workflows</div><div class="v num" data-bind="scorecard.automation_workflows">—</div><div class="c">CI/CD pipelines</div></div>
-      <div class="tile"><div class="l"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l8-8 10 10-8 8z"/><circle cx="8.5" cy="8.5" r="1.4"/></svg> releases</div><div class="v num" data-bind="scorecard.releases_30d">—</div><div class="c">last 30 days</div></div>
-      <div class="tile"><div class="l"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-5 6 5 6M16 6l5 6-5 6"/></svg> <span id="lang-name">primary language</span></div><div class="v num" data-bind="scorecard.primary_lang_share_pct" data-suffix="%" data-round="0">—</div><div class="c">share of code</div></div>
-      <div class="tile"><div class="l"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg> median freshness</div><div class="v num" data-bind="scorecard.median_days_since_push" data-suffix="d" data-round="0">—</div><div class="c">since last push</div></div>
+      <div class="tile"><div class="l">{_svg_icon(_ICONS['fire'])} active days</div><div class="v num" data-bind="scorecard.active_days_last_year">—</div><div class="c">last 12 months</div></div>
+      <div class="tile"><div class="l">{_svg_icon(_ICONS['commit'])} active repos</div><div class="v num" data-bind="scorecard.active_repos_7d">—</div><div class="c">last 7 days</div></div>
+      <div class="tile"><div class="l">{_svg_icon(_ICONS['workflow'])} workflows</div><div class="v num" data-bind="scorecard.automation_workflows">—</div><div class="c">CI/CD pipelines</div></div>
+      <div class="tile"><div class="l">{_svg_icon(_ICONS['release'])} releases</div><div class="v num" data-bind="scorecard.releases_30d">—</div><div class="c">last 30 days</div></div>
+      <div class="tile"><div class="l">{_svg_icon(_ICONS['code'])} <span id="lang-name">primary language</span></div><div class="v num" data-bind="scorecard.primary_lang_share_pct" data-suffix="%" data-round="0">—</div><div class="c">share of code</div></div>
+      <div class="tile"><div class="l">{_svg_icon(_ICONS['calendar'])} median freshness</div><div class="v num" data-bind="scorecard.median_days_since_push" data-suffix="d" data-round="0">—</div><div class="c">since last push</div></div>
     </div>
-  </section>
+  </section>"""
+
+
+def _languages() -> str:
+    return """
   <section class="panel">
     <div class="section-head"><div><p class="eyebrow">Code Composition</p><h2 class="title">Language Breakdown</h2></div><span class="section-meta" id="lang-count">—</span></div>
     <hr class="hairline">
     <div class="langbar" id="langbar"></div>
     <div class="langlegend" id="langlegend"></div>
-  </section>
+  </section>"""
+
+
+def _repos_focus() -> str:
+    return """
   <div class="bento">
     <section class="panel">
       <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
@@ -283,20 +255,26 @@ footer a { color: var(--ink); text-decoration: none; }
       <hr class="hairline">
       <div class="lanes" id="focus"></div>
     </section>
-  </div>
+  </div>"""
+
+
+def _snapshot() -> str:
+    return """
   <section class="panel">
     <div class="section-head"><div><p class="eyebrow">Live GitHub Data</p><h2 class="title">Raw Data Snapshot</h2></div></div>
     <hr class="hairline">
     <div class="tiles" id="snap-tiles"></div>
     <p class="eyebrow" style="margin:20px 0 0">Pipeline Status</p>
     <div class="chips" id="pipeline"></div>
-  </section>
-  <footer>Generated from the GitHub API · <a href="https://github.com/jguida941">@jguida941</a></footer>
-</main>
+  </section>"""
 
+
+def _script() -> str:
+    # Client-side hydration + theme switch. Reads ONLY public fields (no token_mode).
+    return """
   <script>
-  const DATA_URL = "./data/profile_snapshot.json";
-  const LANG_COLORS = {"Python": "#3572A5", "Java": "#b07219", "C++": "#f34b7d", "Rust": "#dea584", "Ruby": "#701516", "HTML": "#e34c26", "JavaScript": "#f1e05a", "TypeScript": "#3178c6", "Go": "#00ADD8", "Kotlin": "#A97BFF", "Swift": "#F05138", "C#": "#178600", "PHP": "#4F5D95", "Vue": "#41b883", "Shell": "#89e051", "C": "#555555", "Makefile": "#427819", "CSS": "#563d7c", "SCSS": "#c6538c", "CMake": "#DA3434", "Dockerfile": "#384d54", "GLSL": "#5686a5", "Batchfile": "#C1F12E", "Jupyter Notebook": "#DA5B0B"};
+  const DATA_URL = "__DATA_URL__";
+  const LANG_COLORS = __LANG_COLORS__;
   const fmt = (n) => {
     if (n == null || isNaN(n)) return "—";
     n = Number(n);
@@ -309,14 +287,14 @@ footer a { color: var(--ink); text-decoration: none; }
   const safeUrl = (u) => /^https?:\/\//i.test(String(u||"")) ? esc(u) : "#";
 
   function setTheme(name) {
-    document.documentElement.dataset.theme = (name === "liquid-glass") ? "" : name;
+    document.documentElement.dataset.theme = (name === "__DEFAULT_THEME__") ? "" : name;
     try { localStorage.setItem("dash-theme", name); } catch (e) {}
     document.querySelectorAll("[data-theme-set]").forEach(b =>
       b.setAttribute("aria-pressed", String(b.dataset.themeSet === name)));
   }
   document.querySelectorAll("[data-theme-set]").forEach(b =>
     b.addEventListener("click", () => setTheme(b.dataset.themeSet)));
-  const THEMES = ["liquid-glass", "apple-dark", "power-bi"];
+  const THEMES = __THEME_NAMES__;
   const urlTheme = new URLSearchParams(location.search).get("theme");
   try {
     const t = urlTheme || localStorage.getItem("dash-theme");
@@ -390,6 +368,52 @@ footer a { color: var(--ink); text-decoration: none; }
   fetch(DATA_URL, { cache: "no-store" }).then(r => r.json()).then(hydrate).catch(e => {
     document.getElementById("hero-tag").textContent = "Could not load profile_snapshot.json";
   });
-  </script>
+  </script>"""
+
+
+def _lang_colors_json() -> str:
+    import json
+    from scripts.core.config import LANG_COLORS
+    return json.dumps(LANG_COLORS)
+
+
+def render_dashboard(default_theme: str = DEFAULT_THEME) -> str:
+    css = emit_css_root() + _component_css()
+    import json
+    script = (
+        _script()
+        .replace("__DATA_URL__", DATA_URL)
+        .replace("__DEFAULT_THEME__", DEFAULT_THEME)
+        .replace("__LANG_COLORS__", _lang_colors_json())
+        .replace("__THEME_NAMES__", json.dumps(list(THEMES)))
+    )
+    body = "".join([_hero(), _scorecard(), _languages(), _repos_focus(), _snapshot()])
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jguida941 · Builder Dashboard</title>
+<meta name="description" content="Live GitHub builder analytics — regenerated hourly.">
+<style>
+{css}
+</style>
+</head>
+<body>
+<main class="wrap">
+{body}
+  <footer>Generated from the GitHub API · <a href="https://github.com/jguida941">@jguida941</a></footer>
+</main>
+{script}
 </body>
 </html>
+"""
+
+
+def write_dashboard(output_path: str = "site/index.html") -> str:
+    Path(output_path).write_text(render_dashboard(), encoding="utf-8")
+    return output_path
+
+
+if __name__ == "__main__":
+    print(write_dashboard())

@@ -33,12 +33,14 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_glass_preserved.py",
             "test_icon_system.py",
             "test_label_legibility.py",
+            "test_public_data_privacy.py",
             "test_readme_projection.py",
             "test_scripts_layout_contract.py",
             "test_tests_layout_contract.py",
             "test_theme_system.py",
             "test_tile_composition.py",
             "test_typography_restraint.py",
+            "test_web_dashboard.py",
         ),
     ),
     TestGroup(
@@ -132,6 +134,10 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "tokens": (
         "test_theme_system.py",         # single token source: themes complete/legible/restrained
+    ),
+    "cross_projection": (
+        "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y
+        "test_public_data_privacy.py",  # the public snapshot JSON leaks no token/credentials
     ),
     "layout": (
         "test_scripts_layout_contract.py",

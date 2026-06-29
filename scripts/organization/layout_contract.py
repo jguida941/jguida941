@@ -65,6 +65,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/analytics/helpers.py", "scripts/pipeline/profile_helpers.py", "pipeline", "profile pipeline helpers"),
     ModuleHome("scripts/profile_pipeline.py", "scripts/pipeline/profile_pipeline.py", "pipeline", "profile pipeline orchestration"),
     ModuleHome("scripts/render/outputs.py", "scripts/pipeline/render_outputs.py", "pipeline", "output rendering orchestration"),
+    ModuleHome("scripts/pipeline/web_render.py", "scripts/pipeline/web_render.py", "pipeline", "web dashboard generator (token-driven, themed)"),
     # --- rendering: SVG theme helpers and card renderers -----------------------
     ModuleHome("scripts/render/card_theme.py", "scripts/rendering/card_theme.py", "rendering", "SVG card theme helpers"),
     ModuleHome("scripts/render/svg_utils.py", "scripts/rendering/svg_utils.py", "rendering", "SVG formatting utilities"),
