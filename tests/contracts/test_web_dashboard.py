@@ -70,6 +70,27 @@ class WebDashboardContract(unittest.TestCase):
                        "Contribution Calendar", "When I Code"):
             self.assertIn(needle, self.html, f"web dashboard missing {needle!r}")
 
+    def test_status_conveyed_by_shape_not_hue_alone(self):
+        """DESIGN_SPEC 3.6 / 10 (and the README status_chip): pipeline status must read
+        by icon-SHAPE AND label, never hue alone — so a desaturated/colour-blind viewer
+        still distinguishes OK from failure. The colour belongs in a small glyph, not a
+        saturated full-hue pill (the old 'green button' AI tell)."""
+        html = self.html
+        self.assertIn("STATUS_ICON", html, "web status must resolve an icon SHAPE per state")
+        icons = re.search(r"STATUS_ICON\s*=\s*\{(.*?)\};", html, re.S)
+        self.assertIsNotNone(icons, "STATUS_ICON map not found")
+        shapes = re.findall(r'<path[^>]*\bd="([^"]+)"', icons.group(1))
+        self.assertGreaterEqual(len(set(shapes)), 3,
+                                "the 3 status states must use 3 DISTINCT shapes (colour-independence)")
+        # restraint: the chip LABEL stays neutral ink — colour lives in the glyph, not a
+        # full-hue text/pill. So .chip.<state> must NOT repaint the label colour.
+        for state in ("ok", "warn", "bad"):
+            rule = re.search(r"\.chip\." + state + r"\s*\{([^}]*)\}", html)
+            if rule:
+                self.assertNotRegex(
+                    rule.group(1), r"(^|;)\s*color\s*:",
+                    f".chip.{state} must not paint the label a status hue — status reads by shape")
+
     def test_material_and_accessibility(self):
         for needle in ("backdrop-filter", ":focus-visible",
                        "prefers-reduced-motion", "prefers-reduced-transparency"):

@@ -201,11 +201,17 @@ body {
 
 /* --- pipeline status chips --- */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-.chip { display: inline-flex; align-items: center; gap: 6px; font-size: var(--type-chip); font-weight: var(--type-chip-weight);
-  padding: 6px 11px; border-radius: 999px; color: var(--ink); }
-.chip.ok { background: color-mix(in srgb, var(--status-success) 16%, transparent); color: color-mix(in srgb, var(--status-success) 92%, var(--ink-strong)); }
-.chip.warn { background: color-mix(in srgb, var(--status-warning) 16%, transparent); color: color-mix(in srgb, var(--status-warning) 92%, var(--ink-strong)); }
-.chip.bad { background: color-mix(in srgb, var(--status-danger) 16%, transparent); color: color-mix(in srgb, var(--status-danger) 92%, var(--ink-strong)); }
+/* Status by SHAPE + label (DESIGN_SPEC 3.6): a neutral pill carries a small status
+   glyph — colour lives in the 13px icon, never a saturated full-hue button. */
+.chip { display: inline-flex; align-items: center; gap: 7px; font-size: var(--type-chip); font-weight: var(--type-chip-weight);
+  padding: 6px 12px; border-radius: 999px; color: var(--ink);
+  background: color-mix(in srgb, var(--surface-raised) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--hairline) 12%, transparent); }
+.chip svg { width: 13px; height: 13px; fill: none; stroke: var(--ink-dim); stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+.chip.ok svg { stroke: var(--status-success); }
+.chip.warn svg { stroke: var(--status-warning); }
+.chip.bad svg { stroke: var(--status-danger); }
 
 /* --- contribution calendar (intensity = accent opacity; restraint holds) --- */
 .cal-wrap { overflow-x: auto; padding-bottom: 4px; }
@@ -341,7 +347,13 @@ footer a { color: var(--ink); text-decoration: none; }
   };
   const get = (obj, path) => path.split(".").reduce((o,k)=> (o==null?undefined:o[k]), obj);
   const esc = (s) => String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-  const safeUrl = (u) => /^https?:///i.test(String(u||"")) ? esc(u) : "#";
+  const safeUrl = (u) => /^https?:\/\//i.test(String(u||"")) ? esc(u) : "#";
+  // Status reads by SHAPE + label, never hue alone (DESIGN_SPEC 3.6): 3 distinct glyphs.
+  const STATUS_ICON = {
+    ok: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+    warn: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 16.5v.01"/></svg>',
+    bad: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  };
 
   function setTheme(name) {
     document.documentElement.dataset.theme = (name === "liquid-glass") ? "" : name;
@@ -418,7 +430,9 @@ footer a { color: var(--ink); text-decoration: none; }
     const PIPE = [["CI","ci_status"],["Commits","commits_status"],["Releases","releases_status"],["Events","events_status"]];
     document.getElementById("pipeline").innerHTML = PIPE.map(([nm,k]) => {
       const s = q[k] || "unknown";
-      return `<span class="chip ${cls(s)}">${nm} · ${s==="ok"?"OK":esc(s[0].toUpperCase()+s.slice(1))}</span>`;
+      const state = cls(s);
+      const label = s === "ok" ? "OK" : esc(s[0].toUpperCase() + s.slice(1));
+      return `<span class="chip ${state}">${STATUS_ICON[state] || STATUS_ICON.warn}${nm} · ${label}</span>`;
     }).join("");
     // contribution calendar (intensity = accent opacity by level)
     const cal = d.contribution_calendar;
