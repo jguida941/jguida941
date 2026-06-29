@@ -83,21 +83,34 @@ THEME_META: dict[str, dict[str, str]] = {
 # (SVG parity). `radius` keys: panel, tile. `type` overrides a subset of the type ladder
 # {token: (size, weight)} — anything omitted inherits config.TYPE_SCALE. All sizes stay
 # >= the 11px legibility floor. (Density/motion/charts are added in later P5 slices.)
+# `density` (web only — the SVG cards don't use CSS padding; doesn't affect SVG parity)
+# carries the per-theme spacing band that makes the BOXES different, not just the paint:
+# panel_pad / tile_pad / gap (px) + a band label, grounded in each design language's docs
+# (Apple HIG Layout: airy 32/24 padding, 24 gap, few large cards; Power BI report design:
+# tight 16/8, dense KPI grid; Liquid Glass: the medium anchor).
 THEME_IA: dict[str, dict] = {
-    "liquid-glass": {  # == config (the anchor)
+    "liquid-glass": {  # type/radius == config (the anchor); medium density
         "radius": {"panel": config.GLASS_RX, "tile": config.GLASS_TILE_RX},
         "type": {},
+        "density": {"band": "medium", "panel_pad": 28, "tile_pad": 14, "gap": 20},
     },
-    "apple-dark": {  # Apple HIG — generous radius + large display type, airy restraint
+    "apple-dark": {  # Apple HIG — generous radius + large display type + AIRY space
         "radius": {"panel": 26, "tile": 18},
         "type": {"display": (54, 600), "metric_lg": (30, 600), "title": (22, 600)},
+        "density": {"band": "airy", "panel_pad": 32, "tile_pad": 24, "gap": 24},
     },
-    "power-bi": {  # Power BI — sharp corners + compact tabular type, data-ink density
-        "radius": {"panel": 8, "tile": 5},
+    "power-bi": {  # Power BI — sharp corners + compact tabular type + TIGHT data-ink density
+        "radius": {"panel": 6, "tile": 4},
         "type": {"display": (38, 700), "metric_lg": (24, 700), "metric": (20, 700),
                  "title": (18, 600), "body": (13, 400)},
+        "density": {"band": "tight", "panel_pad": 16, "tile_pad": 12, "gap": 8},
     },
 }
+
+
+def density(name: str | None = None) -> dict:
+    return dict(THEME_IA.get(name or DEFAULT_THEME, {}).get(
+        "density", {"band": "medium", "panel_pad": 28, "tile_pad": 14, "gap": 20}))
 
 
 def roles() -> tuple[str, ...]:
@@ -144,7 +157,11 @@ def _role_vars(name: str, indent: str = "  ") -> str:
 
 def _ia_vars(name: str, indent: str = "  ") -> str:
     r = radius(name)
+    d = density(name)
     lines = [f"{indent}--radius-panel: {r['panel']}px;", f"{indent}--radius-tile: {r['tile']}px;"]
+    lines.append(f"{indent}--pad-panel: {d['panel_pad']}px;")
+    lines.append(f"{indent}--pad-tile: {d['tile_pad']}px;")
+    lines.append(f"{indent}--gap-grid: {d['gap']}px;")
     for key, (size, weight) in type_scale(name).items():
         lines.append(f"{indent}--type-{key}: {size}px;")
         lines.append(f"{indent}--type-{key}-weight: {weight};")

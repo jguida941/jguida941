@@ -53,8 +53,8 @@ body {
   border: 1px solid color-mix(in srgb, var(--hairline) 16%, transparent);
   border-radius: var(--radius-panel);
   box-shadow: 0 24px 60px -28px rgba(0,0,0,.65), inset 0 1px 0 color-mix(in srgb, white calc(var(--sheen-opacity)*100%), transparent);
-  padding: clamp(20px, 3vw, 30px);
-  margin-bottom: 20px;
+  padding: var(--pad-panel, clamp(20px, 3vw, 30px));
+  margin-bottom: var(--gap-grid, 20px);
 }
 .eyebrow {
   font-size: var(--type-eyebrow); font-weight: var(--type-eyebrow-weight);
@@ -91,16 +91,16 @@ body {
 .switcher button:hover { color: var(--ink); }
 
 /* --- bento grid --- */
-.bento { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.bento { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap-grid, 20px); align-items: start; }
 .bento .panel { margin: 0; }
 .span-2 { grid-column: 1 / -1; }
 
 /* --- metric tiles --- */
-.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap-grid, 12px); }
 .tile {
   background: color-mix(in srgb, var(--surface-raised) calc(var(--raised-opacity)*100%), transparent);
   border: 1px solid color-mix(in srgb, var(--hairline) 12%, transparent);
-  border-radius: var(--radius-tile); padding: 14px 16px; }
+  border-radius: var(--radius-tile); padding: var(--pad-tile, 14px) 16px; }
 .tile .l { display: flex; align-items: center; gap: 7px; font-size: var(--type-caption); color: var(--ink-dim); }
 .tile .v { font-size: var(--type-metric_lg); font-weight: 600; color: var(--ink-strong); margin-top: 6px; }
 .tile .c { font-size: var(--type-caption); color: var(--ink-dim); margin-top: 2px; }

@@ -29,6 +29,21 @@
   `test_design_distinctness` (anti-convergence law: every theme pair differs on a quorum of
   structural signature axes — mutation-proven). Power BI now reads sharp/dense, Apple rounded/large.
   166 green. (Density/motion/charts still to diverge in P5-2/P5-3.)
+- ✅ **P5-1 slice 2 (DENSITY + the CHARACTER law — proper-style invariants)** — researched the 3
+  design languages' PROPER structural characteristics from their docs (a 3-agent workflow:
+  Apple HIG Layout airy 32/24, Power BI report-design tight 16/8, Liquid Glass medium). Added
+  per-theme `density` to THEME_IA; routed the component CSS (panel/tile padding + grid gaps)
+  through `--pad-*`/`--gap-grid` so the BOXES diverge — Power BI packs tight/sharp, Apple breathes.
+  NEW `test_design_character` (design_languages authority): each theme must POSITIVELY express its
+  language (Apple airy + large + rounded; Power BI tight + sharp; ordered + distinct), grounded with
+  doctrine cites — the answer to "where are the invariants for their respective proper styles." It
+  already bit (caught Power BI's radius being too round). 170 green.
+- ⏭ **Next (the real divergence + the SKILL):** per-theme CHART/COMPONENT anatomy (Power BI → a data
+  table + multi-series bars + categorical palette; Apple → big stat-cards + a single ring, no table)
+  via the webkit chart-selection model — that's where each theme becomes a different *website*. Then
+  CODIFY the whole loop (research → character/per-aspect invariants → GENERATE the themed site → prove)
+  as `skills/design-language-tdd/`, dogfooded on these 3 themes — so "add Material/Stripe/..." = run
+  the skill = another full distinct website.
 - **After P5-0:** P5-1 engine + retire convergence contract (distinctness RED-first) → P5-2
   diverge the 3 themes → P5-3 webkit chart/component library → P5-4 settings page → P5-5
   themes 4–10 via the skill → P5-6 showcase + portability. The `design-language-tdd` skill is
