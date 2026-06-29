@@ -36,6 +36,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_public_data_privacy.py",
             "test_readme_projection.py",
             "test_scripts_layout_contract.py",
+            "test_structural_layout.py",
             "test_tests_layout_contract.py",
             "test_theme_system.py",
             "test_tile_composition.py",
@@ -141,6 +142,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "layout": (
         "test_scripts_layout_contract.py",
+        "test_structural_layout.py",
         "test_tests_layout_contract.py",
     ),
 }
