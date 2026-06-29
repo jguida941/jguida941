@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T00:25:13.530224Z",
+  "generated_at": "2026-06-29T02:15:04.905282Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,11 +18,11 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 8137,
-    "public_scope_commits": 4288,
-    "total_repos": 67,
+    "last_year_contributions": 8145,
+    "public_scope_commits": 4290,
+    "total_repos": 68,
     "public_forks": 0,
-    "private_owned_repos": 146,
+    "private_owned_repos": 147,
     "total_stars": 78,
     "languages_count": 24,
     "prs_merged": 35,
@@ -35,22 +35,22 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 8137,
-      "display_value": "8,137"
+      "value": 8145,
+      "display_value": "8,145"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 4288,
-      "display_value": "4,288"
+      "value": 4290,
+      "display_value": "4,290"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 67,
-      "display_value": "67"
+      "value": 68,
+      "display_value": "68"
     },
     {
       "key": "public_forks",
@@ -63,8 +63,8 @@
       "key": "private_owned_repos",
       "label": "Private Owned Repos",
       "dashboard_label": "Private Owned Repos",
-      "value": 146,
-      "display_value": "146"
+      "value": 147,
+      "display_value": "147"
     },
     {
       "key": "total_stars",
@@ -113,20 +113,20 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 8137,
-      "display_value": "8,137"
+      "value": 8145,
+      "display_value": "8,145"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 4288,
-      "display_value": "4,288"
+      "value": 4290,
+      "display_value": "4,290"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 67,
-      "display_value": "67"
+      "value": 68,
+      "display_value": "68"
     },
     {
       "key": "public_forks",
@@ -137,8 +137,8 @@
     {
       "key": "private_owned_repos",
       "label": "Private Owned Repos",
-      "value": 146,
-      "display_value": "146"
+      "value": 147,
+      "display_value": "147"
     },
     {
       "key": "total_stars",
@@ -190,14 +190,14 @@
   },
   "scorecard": {
     "releases_30d": 0,
-    "active_repos_7d": 1,
+    "active_repos_7d": 2,
     "avg_release_gap_days": 0.0,
-    "stars_per_public_repo": 1.164179104477612,
-    "ci_coverage_pct": 23.88059701492537,
-    "last_year_contributions": 8137,
-    "active_days_last_year": 289,
+    "stars_per_public_repo": 1.1470588235294117,
+    "ci_coverage_pct": 23.52941176470588,
+    "last_year_contributions": 8145,
+    "active_days_last_year": 287,
     "automation_workflows": 74,
-    "primary_lang_share_pct": 49.9,
+    "primary_lang_share_pct": 50.0,
     "median_days_since_push": 203.0
   },
   "scorecard_cards": [
@@ -205,32 +205,32 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 8137,
-      "display_value": "8,137",
+      "value": 8145,
+      "display_value": "8,145",
       "accent": "#7dcfff"
     },
     {
       "key": "active_days_last_year",
       "label": "Active Days",
       "detail": "days shipped in last 12mo",
-      "value": 289,
-      "display_value": "289",
+      "value": 287,
+      "display_value": "287",
       "accent": "#9ece6a"
     },
     {
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 1,
-      "display_value": "1",
+      "value": 2,
+      "display_value": "2",
       "accent": "#7dcfff"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with pipelines",
-      "value": 23.88059701492537,
-      "display_value": "23.9%",
+      "value": 23.52941176470588,
+      "display_value": "23.5%",
       "accent": "#ff9e64"
     },
     {
@@ -253,8 +253,8 @@
       "key": "primary_lang_share_pct",
       "label": "Primary Language",
       "detail": "share of code by bytes",
-      "value": 49.9,
-      "display_value": "49.9%",
+      "value": 50.0,
+      "display_value": "50.0%",
       "accent": "#7aa2f7"
     },
     {
@@ -269,10 +269,10 @@
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 67,
+    "public_owned_repos_total": 68,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 67,
-    "private_owned_repos_total": 146
+    "public_owned_nonfork_repos_total": 68,
+    "private_owned_repos_total": 147
   },
   "featured_repo_facts": [
     {
@@ -324,28 +324,28 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 12286987,
-      "percent": 49.93
+      "bytes": 12341142,
+      "percent": 50.04
     },
     {
       "name": "Makefile",
       "bytes": 3931581,
-      "percent": 15.98
+      "percent": 15.94
     },
     {
       "name": "Rust",
       "bytes": 3003018,
-      "percent": 12.2
+      "percent": 12.18
     },
     {
       "name": "C++",
       "bytes": 1824966,
-      "percent": 7.42
+      "percent": 7.4
     },
     {
       "name": "Java",
       "bytes": 1583192,
-      "percent": 6.43
+      "percent": 6.42
     },
     {
       "name": "TypeScript",
@@ -365,7 +365,7 @@
     {
       "name": "HTML",
       "bytes": 244928,
-      "percent": 1.0
+      "percent": 0.99
     },
     {
       "name": "JavaScript",
@@ -430,6 +430,21 @@
       "featured": true
     },
     {
+      "name": "CS-350-Emerging-Systems-Architectures",
+      "full_name": "jguida941/CS-350-Emerging-Systems-Architectures",
+      "url": "https://github.com/jguida941/CS-350-Emerging-Systems-Architectures",
+      "language": "Python",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-06-29",
+      "pushed_at_raw": "2026-06-29T02:02:48Z",
+      "pushed_ago": "today",
+      "created_at": "2026-06-29",
+      "last_commit_msg": "Update Module Eight Journal",
+      "featured": false
+    },
+    {
       "name": "raspberry-pi-smart-thermostat",
       "full_name": "jguida941/raspberry-pi-smart-thermostat",
       "url": "https://github.com/jguida941/raspberry-pi-smart-thermostat",
@@ -439,7 +454,7 @@
       "ci": "no",
       "pushed_at": "2026-06-28",
       "pushed_at_raw": "2026-06-28T19:00:47Z",
-      "pushed_ago": "5 hours ago",
+      "pushed_ago": "7 hours ago",
       "created_at": "2026-06-28",
       "last_commit_msg": "Update README.md",
       "featured": false
@@ -638,24 +653,31 @@
       "created_at": "2026-01-22",
       "last_commit_msg": "Fix image alt text for accessibility",
       "featured": false
-    },
-    {
-      "name": "learn-caesar-cipher",
-      "full_name": "jguida941/learn-caesar-cipher",
-      "url": "https://github.com/jguida941/learn-caesar-cipher",
-      "language": "Python",
-      "stars": 1,
-      "forks": 0,
-      "ci": "yes",
-      "pushed_at": "2026-01-26",
-      "pushed_at_raw": "2026-01-26T07:06:40Z",
-      "pushed_ago": "5 months ago",
-      "created_at": "2025-10-22",
-      "last_commit_msg": "Fix image alt text for accessibility and portfolio captions",
-      "featured": false
     }
   ],
   "recent_created": [
+    {
+      "name": "CS-350-Emerging-Systems-Architectures",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "CS-350 Module Eight Journal and portfolio artifacts: Morse-code Button/LED state machine and Raspberry Pi Smart Thermostat.",
+      "html_url": "https://github.com/jguida941/CS-350-Emerging-Systems-Architectures",
+      "pushed_at": "2026-06-29T02:02:48Z",
+      "created_at": "2026-06-29T01:34:54Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": "Python",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "workflow_file_count": 0,
+      "language_bytes": {
+        "Python": 25927
+      },
+      "latest_commit_message": "Update Module Eight Journal"
+    },
     {
       "name": "raspberry-pi-smart-thermostat",
       "fork": false,
@@ -862,32 +884,16 @@
         "Batchfile": 284
       },
       "latest_commit_message": "Fix image alt text for accessibility"
-    },
-    {
-      "name": "mkgui",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": "Analyze Python code and generate PyQt6 GUI scaffolding. Extracts functions, type hints, and CLI decorators to create spec.json and launcher templates for building interactive forms.",
-      "html_url": "https://github.com/jguida941/mkgui",
-      "pushed_at": "2026-01-21T08:17:27Z",
-      "created_at": "2026-01-20T04:35:40Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "language": "Python",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "Python": 334930
-      },
-      "latest_commit_message": "Add status and improve runtime path handling"
     }
   ],
   "focus": {
     "now": [
+      {
+        "title": "CS-350-Emerging-Systems-Architectures",
+        "detail": "Python \u00b7 pushed today",
+        "url": "https://github.com/jguida941/CS-350-Emerging-Systems-Architectures",
+        "is_private": false
+      },
       {
         "title": "repo-surface-scout",
         "detail": "Python \u00b7 pushed today",
@@ -896,15 +902,9 @@
       },
       {
         "title": "semantic-tdd",
-        "detail": "Python \u00b7 pushed 2 hours ago",
+        "detail": "Python \u00b7 pushed today",
         "url": "",
         "is_private": true
-      },
-      {
-        "title": "raspberry-pi-smart-thermostat",
-        "detail": "Python \u00b7 pushed 5 hours ago",
-        "url": "https://github.com/jguida941/raspberry-pi-smart-thermostat",
-        "is_private": false
       }
     ],
     "next": [
@@ -914,9 +914,25 @@
         "url": "https://github.com/jguida941/semantic-tdd/pull/1"
       }
     ],
-    "shipped": []
+    "shipped": [
+      {
+        "title": "Update README.md",
+        "detail": "raspberry-pi-smart-thermostat \u00b7 7 hours ago",
+        "url": "https://github.com/jguida941/raspberry-pi-smart-thermostat"
+      }
+    ]
   },
   "activity_feed": [
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/CS-350-Emerging-Systems-Architectures",
+      "repo": "jguida941/CS-350-Emerging-Systems-Architectures",
+      "repo_url": "https://github.com/jguida941/CS-350-Emerging-Systems-Architectures",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-06-29T02:02:48Z"
+    },
     {
       "kind": "activity",
       "title": "push",
@@ -924,8 +940,18 @@
       "repo": "jguida941/semantic-tdd",
       "repo_url": "https://github.com/jguida941/semantic-tdd",
       "state": "PUSH",
-      "time_ago": "2 hours ago",
-      "created_at": "2026-06-28T22:20:55Z"
+      "time_ago": "today",
+      "created_at": "2026-06-29T01:59:12Z"
+    },
+    {
+      "kind": "created",
+      "title": "CS-350-Emerging-Systems-Architectures",
+      "url": "https://github.com/jguida941/CS-350-Emerging-Systems-Architectures",
+      "repo": "jguida941/CS-350-Emerging-Systems-Architectures",
+      "repo_url": "https://github.com/jguida941/CS-350-Emerging-Systems-Architectures",
+      "state": "CREATED",
+      "time_ago": "today",
+      "created_at": "2026-06-29T01:34:54Z"
     },
     {
       "kind": "created",
@@ -934,7 +960,7 @@
       "repo": "jguida941/raspberry-pi-smart-thermostat",
       "repo_url": "https://github.com/jguida941/raspberry-pi-smart-thermostat",
       "state": "CREATED",
-      "time_ago": "5 hours ago",
+      "time_ago": "7 hours ago",
       "created_at": "2026-06-28T18:41:28Z"
     },
     {
@@ -966,16 +992,6 @@
       "state": "CREATED",
       "time_ago": "3 months ago",
       "created_at": "2026-03-02T00:25:11Z"
-    },
-    {
-      "kind": "created",
-      "title": "breakout-game-opengl",
-      "url": "https://github.com/jguida941/breakout-game-opengl",
-      "repo": "jguida941/breakout-game-opengl",
-      "repo_url": "https://github.com/jguida941/breakout-game-opengl",
-      "state": "CREATED",
-      "time_ago": "3 months ago",
-      "created_at": "2026-03-01T22:26:47Z"
     }
   ],
   "recent_releases": [],
@@ -991,7 +1007,7 @@
     }
   ],
   "engineering": {
-    "active_days_last_year": 289,
+    "active_days_last_year": 287,
     "weekly_cadence": [
       273,
       294,
@@ -1004,16 +1020,16 @@
       45,
       60,
       34,
-      49
+      59
     ],
     "automation_workflows": 74,
     "automation_repos": 15,
-    "primary_lang_share_pct": 49.9,
+    "primary_lang_share_pct": 50.0,
     "languages_over_5pct": 5,
     "median_days_since_push": 203.0,
-    "public_repos_total": 67,
-    "public_nonfork_repos": 67,
-    "private_repos_total": 146,
+    "public_repos_total": 68,
+    "public_nonfork_repos": 68,
+    "private_repos_total": 147,
     "recent_private_count": 40
   }
 }
