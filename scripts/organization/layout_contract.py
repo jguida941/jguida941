@@ -94,6 +94,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/organization/layout_audit.py", "scripts/organization/layout_audit.py", "organization", "live scripts layout audit"),
     ModuleHome("scripts/organization/layout_contract.py", "scripts/organization/layout_contract.py", "organization", "semantic scripts layout contract"),
     ModuleHome("scripts/organization/migrate_scripts_layout.py", "scripts/organization/migrate_scripts_layout.py", "organization", "semantic scripts layout migration tool"),
+    ModuleHome("scripts/organization/tests_layout_contract.py", "scripts/organization/tests_layout_contract.py", "organization", "semantic test-suite layout contract"),
 )
 
 ROOT_ENTRYPOINT_SHIMS: frozenset[str] = frozenset(

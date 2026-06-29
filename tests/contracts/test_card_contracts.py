@@ -11,7 +11,7 @@ from pathlib import Path
 from scripts.pipeline.collect_data import CollectedProfileData
 from scripts.pipeline.compute_metrics import compute_profile_model
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parents[2]  # tests/<group>/<file>.py -> repo root
 NS = "{http://www.w3.org/2000/svg}"
 
 

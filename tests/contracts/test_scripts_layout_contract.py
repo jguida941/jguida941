@@ -11,7 +11,7 @@ from scripts.organization.layout_contract import (
 from scripts.organization.migrate_scripts_layout import planned_moves
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]  # tests/<group>/<file>.py -> repo root
 
 
 class ScriptsLayoutContractTests(unittest.TestCase):
