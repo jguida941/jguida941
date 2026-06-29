@@ -22,6 +22,13 @@
     RED + retire stale docs (`DESIGN_AUDIT`) → chat→`ClaimIntakeClaim` lowering → then SUBSUME the
     old `MODULE_HOMES`/`TEST_GROUPS` guards into the single `repo_layout.json` cover (kill the
     transitional double-maintenance).
+- ✅ **P5-1 slice 1 (themes diverge — the visible payoff)** — retired the convergence lock
+  (`test_ia_tokens_are_theme_independent` → `test_ia_is_complete_and_bounded`); promoted PER-THEME
+  IA (`design_tokens.THEME_IA`: radius + type ramp; Apple rounder/larger, Power BI sharper/denser,
+  Liquid Glass == config anchor); `emit_css_root` now emits each theme's full axis. New
+  `test_design_distinctness` (anti-convergence law: every theme pair differs on a quorum of
+  structural signature axes — mutation-proven). Power BI now reads sharp/dense, Apple rounded/large.
+  166 green. (Density/motion/charts still to diverge in P5-2/P5-3.)
 - **After P5-0:** P5-1 engine + retire convergence contract (distinctness RED-first) → P5-2
   diverge the 3 themes → P5-3 webkit chart/component library → P5-4 settings page → P5-5
   themes 4–10 via the skill → P5-6 showcase + portability. The `design-language-tdd` skill is

@@ -1,16 +1,19 @@
 """Single design-token source — role-named, theme-able, shared by both projections.
 
 This is the one place the design system's *semantics* live. The README SVG cards read
-their colours from config.py (the default theme's raw values, kept identical here by a
-parity contract); the web dashboard reads `emit_css_root()`. A THEME swaps colour +
-material ONLY — the information architecture (type scale, spacing, radius) is constant,
-sourced from config, so the same layout can wear any skin and stay legible. That
-separation is the doctrine the web theme switcher shows off:
+their colours from config.py; the web dashboard reads `emit_css_root()`. A theme is a
+full design LANGUAGE: it carries colour roles + material AND its own information
+architecture (type ramp + radius — and later density/motion/charts), so each theme can
+genuinely express its design language instead of being a colour swap. The DEFAULT theme's
+IA stays `== config.py` (the SVG parity + portability anchor); other themes diverge.
 
-    IA = Power BI (constant)   x   Material = governed Liquid Glass (per-theme)
+    P5 doctrine: themes must be provably DISTINCT (test_design_distinctness) and each
+    provably EXPRESS its language — Apple is rounder/larger/airier, Power BI is
+    sharper/denser/data-ink. The old convergence rule (IA constant across themes) is
+    RETIRED; the floor is now "complete + bounded + legible" per theme.
 
-Adding a theme is one entry in THEMES (+ MATERIALS); the theme-system contract proves
-it is complete, legible (WCAG AA), and restrained before it can ship.
+Adding a theme is one entry in THEMES (+ MATERIALS + THEME_IA); the theme-system + design
+contracts prove it complete, legible (WCAG AA), restrained, bounded, and distinct.
 """
 from __future__ import annotations
 
@@ -74,6 +77,28 @@ THEME_META: dict[str, dict[str, str]] = {
     "power-bi":     {"label": "Power BI", "blurb": "Analytical slate · flat data-ink"},
 }
 
+# Per-theme INFORMATION ARCHITECTURE — radius + type overrides (over the config defaults).
+# This is what makes each theme a different *website*, not a colour swap: Apple is
+# rounder + larger, Power BI is sharper + denser. The DEFAULT theme MUST equal config
+# (SVG parity). `radius` keys: panel, tile. `type` overrides a subset of the type ladder
+# {token: (size, weight)} — anything omitted inherits config.TYPE_SCALE. All sizes stay
+# >= the 11px legibility floor. (Density/motion/charts are added in later P5 slices.)
+THEME_IA: dict[str, dict] = {
+    "liquid-glass": {  # == config (the anchor)
+        "radius": {"panel": config.GLASS_RX, "tile": config.GLASS_TILE_RX},
+        "type": {},
+    },
+    "apple-dark": {  # Apple HIG — generous radius + large display type, airy restraint
+        "radius": {"panel": 26, "tile": 18},
+        "type": {"display": (54, 600), "metric_lg": (30, 600), "title": (22, 600)},
+    },
+    "power-bi": {  # Power BI — sharp corners + compact tabular type, data-ink density
+        "radius": {"panel": 8, "tile": 5},
+        "type": {"display": (38, 700), "metric_lg": (24, 700), "metric": (20, 700),
+                 "title": (18, 600), "body": (13, 400)},
+    },
+}
+
 
 def roles() -> tuple[str, ...]:
     return ROLES
@@ -87,17 +112,21 @@ def material(name: str | None = None) -> dict[str, float]:
     return dict(MATERIALS[name or DEFAULT_THEME])
 
 
-# --- IA tokens (theme-INDEPENDENT) — one source: config.py ----------------------
-def type_scale() -> dict[str, tuple[int, int]]:
-    return {k: tuple(v) for k, v in config.TYPE_SCALE.items()}
+# --- IA tokens (now PER-THEME: config defaults + the theme's THEME_IA overrides) ----
+def type_scale(name: str | None = None) -> dict[str, tuple[int, int]]:
+    base = {k: tuple(v) for k, v in config.TYPE_SCALE.items()}
+    base.update({k: tuple(v) for k, v in THEME_IA.get(name or DEFAULT_THEME, {}).get("type", {}).items()})
+    return base
 
 
-def space() -> dict[str, int]:
-    return dict(config.SPACE)
+def space(name: str | None = None) -> dict[str, int]:
+    return dict(config.SPACE)  # density/spacing diverges in a later P5 slice
 
 
-def radius() -> dict[str, int]:
-    return {"panel": config.GLASS_RX, "tile": config.GLASS_TILE_RX}
+def radius(name: str | None = None) -> dict[str, int]:
+    default = {"panel": config.GLASS_RX, "tile": config.GLASS_TILE_RX}
+    default.update(THEME_IA.get(name or DEFAULT_THEME, {}).get("radius", {}))
+    return default
 
 
 # --- CSS emission ----------------------------------------------------------------
@@ -113,25 +142,26 @@ def _role_vars(name: str, indent: str = "  ") -> str:
     return "\n".join(lines)
 
 
-def _ia_vars(indent: str = "  ") -> str:
-    r = radius()
+def _ia_vars(name: str, indent: str = "  ") -> str:
+    r = radius(name)
     lines = [f"{indent}--radius-panel: {r['panel']}px;", f"{indent}--radius-tile: {r['tile']}px;"]
-    for key, (size, weight) in type_scale().items():
+    for key, (size, weight) in type_scale(name).items():
         lines.append(f"{indent}--type-{key}: {size}px;")
         lines.append(f"{indent}--type-{key}-weight: {weight};")
-    for key, val in space().items():
+    for key, val in space(name).items():
         lines.append(f"{indent}--space-{key}: {val}px;")
     lines.append(f"{indent}--font-sans: {config.FONT_SANS};")
     return "\n".join(lines)
 
 
 def emit_css_root() -> str:
-    """The web :root carries the DEFAULT theme's roles + the theme-independent IA
-    vars; each other theme gets a [data-theme="name"] override block (colour/material
-    only). Theme switching is a single attribute on <html>."""
-    blocks = [":root {\n" + _role_vars(DEFAULT_THEME) + "\n" + _ia_vars() + "\n}"]
+    """The web :root carries the DEFAULT theme's full axis (roles + material + IA); each
+    other theme gets a [data-theme="name"] block carrying its OWN full axis (colour +
+    material + per-theme radius/type), so flipping the theme reflows the whole page —
+    not just its palette. Theme switching is a single attribute on <html>."""
+    blocks = [":root {\n" + _role_vars(DEFAULT_THEME) + "\n" + _ia_vars(DEFAULT_THEME) + "\n}"]
     for name in THEMES:
         if name == DEFAULT_THEME:
             continue
-        blocks.append(f'[data-theme="{name}"] {{\n' + _role_vars(name) + "\n}")
+        blocks.append(f'[data-theme="{name}"] {{\n' + _role_vars(name) + "\n" + _ia_vars(name) + "\n}")
     return "\n\n".join(blocks) + "\n"

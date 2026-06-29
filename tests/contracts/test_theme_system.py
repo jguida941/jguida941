@@ -143,18 +143,25 @@ class ThemeSystemContract(unittest.TestCase):
                 offenders.append(f"{name}: {len(buckets)} chromatic hue families {sorted(chromatic)} — rainbow")
         self.assertEqual([], offenders, "themes must be restrained (one accent, no rainbow):\n  " + "\n  ".join(offenders))
 
-    def test_ia_tokens_are_theme_independent(self):
-        """Type scale / spacing / radius come from ONE source, not per theme — the IA
-        is constant while only colour/material changes."""
-        self.assertEqual(self.dt.type_scale(), dict(config.TYPE_SCALE))
-        self.assertEqual(self.dt.space(), dict(config.SPACE))
-        radius = self.dt.radius()
-        self.assertEqual(radius["panel"], config.GLASS_RX)
-        self.assertEqual(radius["tile"], config.GLASS_TILE_RX)
-        # themes must NOT redefine IA geometry
-        for name, roles in self.themes.items():
-            self.assertNotIn("radius", roles, f"{name} must not override IA radius")
-            self.assertNotIn("type-scale", roles, f"{name} must not override the type scale")
+    def test_ia_is_complete_and_bounded(self):
+        """P5 (convergence RETIRED): IA is now PER-THEME — a theme is a full design
+        language, not a colour swap — but BOUNDED. The DEFAULT theme's IA equals config
+        (the SVG parity + portability anchor); every theme defines the complete type
+        ladder, every size stays >= the 11px floor, and radii stay within a sane range.
+        That themes actually DIFFER is proven separately (test_design_distinctness)."""
+        # DEFAULT == config (the anchor)
+        self.assertEqual(self.dt.type_scale(self.dt.DEFAULT_THEME), dict(config.TYPE_SCALE))
+        dr = self.dt.radius(self.dt.DEFAULT_THEME)
+        self.assertEqual((dr["panel"], dr["tile"]), (config.GLASS_RX, config.GLASS_TILE_RX))
+        # every theme: complete ladder, legible floor, bounded radii
+        for name in self.themes:
+            ts = self.dt.type_scale(name)
+            self.assertEqual(set(ts), set(config.TYPE_SCALE), f"{name}: incomplete type ladder")
+            for tok, (size, _w) in ts.items():
+                self.assertGreaterEqual(size, 11, f"{name}.{tok}={size} below the 11px floor")
+            r = self.dt.radius(name)
+            for k in ("panel", "tile"):
+                self.assertTrue(2 <= r[k] <= 40, f"{name}.radius.{k}={r[k]} out of bounds")
 
     def test_emit_css_root_carries_every_role_and_theme(self):
         css = self.dt.emit_css_root()

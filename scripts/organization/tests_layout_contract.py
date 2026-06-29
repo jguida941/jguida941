@@ -31,6 +31,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_bootstrap_red_ref.py",
             "test_card_contracts.py",
             "test_design_contract.py",
+            "test_design_distinctness.py",
             "test_glass_preserved.py",
             "test_icon_system.py",
             "test_label_legibility.py",
@@ -136,6 +137,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "tokens": (
         "test_theme_system.py",         # single token source: themes complete/legible/restrained
+    ),
+    "design_languages": (
+        "test_design_distinctness.py",  # P5: themes are DISTINCT design languages (anti-convergence)
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y
