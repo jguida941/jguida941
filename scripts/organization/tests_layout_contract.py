@@ -36,6 +36,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_readme_projection.py",
             "test_scripts_layout_contract.py",
             "test_tests_layout_contract.py",
+            "test_theme_system.py",
             "test_tile_composition.py",
             "test_typography_restraint.py",
         ),
@@ -128,6 +129,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     "github_svg": (
         "test_card_contracts.py",       # per-SVG safety / title / viewBox / camo bans
         "test_readme_projection.py",    # assembled README: uniform <img> sizing policy
+    ),
+    "tokens": (
+        "test_theme_system.py",         # single token source: themes complete/legible/restrained
     ),
     "layout": (
         "test_scripts_layout_contract.py",

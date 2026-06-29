@@ -20,6 +20,10 @@ RENDERING = ROOT / "scripts" / "rendering"
 # Hex colors belong in the token source (scripts/core/config.py / design_tokens),
 # never hard-coded at a rendering call site.
 _HEX = re.compile(r"#[0-9a-fA-F]{3,8}\b")
+# Designated token SOURCES inside scripts/rendering/ — hex legitimately lives here
+# (config.py is the SVG source; design_tokens.py is the web/theme source). Their
+# values are governed by their own contracts (test_theme_system), not this scan.
+_TOKEN_SOURCES = frozenset({"design_tokens.py"})
 # Literal font-size attributes emitted into SVG.
 _FONT = re.compile(r'font-size="([0-9.]+)"')
 # Legibility floor for README SVGs downscaled into the column (DESIGN_SPEC).
@@ -38,6 +42,8 @@ class DesignTokenContract(unittest.TestCase):
     def test_no_raw_hex_in_rendering_code(self):
         offenders = []
         for path in sorted(RENDERING.glob("*.py")):
+            if path.name in _TOKEN_SOURCES:
+                continue
             for lineno, line in _code_lines(path):
                 for hexval in _HEX.findall(line):
                     offenders.append(f"{path.relative_to(ROOT)}:{lineno}  {hexval}")

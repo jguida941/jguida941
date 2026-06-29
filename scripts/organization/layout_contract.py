@@ -70,6 +70,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/render/svg_utils.py", "scripts/rendering/svg_utils.py", "rendering", "SVG formatting utilities"),
     ModuleHome("scripts/render/glass_kit.py", "scripts/rendering/glass_kit.py", "rendering", "glass UI kit helpers"),
     ModuleHome("scripts/rendering/icons.py", "scripts/rendering/icons.py", "rendering", "vendored Lucide icon set"),
+    ModuleHome("scripts/rendering/design_tokens.py", "scripts/rendering/design_tokens.py", "rendering", "single design-token source + themes (SVG values + web CSS)"),
     ModuleHome("scripts/rendering/components.py", "scripts/rendering/components.py", "rendering", "reusable token-driven SVG components"),
     ModuleHome("scripts/render/cards/generate_activity_heatmap.py", "scripts/rendering/generate_activity_heatmap.py", "rendering", "activity heatmap renderer"),
     ModuleHome("scripts/render/cards/generate_badges.py", "scripts/rendering/generate_badges.py", "rendering", "badge renderer"),
