@@ -13,7 +13,10 @@ import unittest
 from pathlib import Path
 
 from scripts.organization.tests_layout_contract import (
+    DESIGN_CONTRACT_GROUPS,
     NON_GROUP_DIRS,
+    TEST_GROUPS,
+    design_contract_authority,
     group_dirs,
     module_home,
 )
@@ -77,6 +80,30 @@ class TestsLayoutContract(unittest.TestCase):
             p.name for p in TESTS.iterdir() if p.is_dir() and p.name not in allowed
         )
         self.assertEqual([], unexpected, f"unexpected dirs under tests/: {unexpected}")
+
+    def test_design_contracts_grouped_by_authority(self):
+        """Every contracts-group test file is assigned to exactly one governing
+        authority in DESIGN_CONTRACT_GROUPS, and each declared file exists — so the
+        design contracts stay organized (and a new one can't drift in undeclared)."""
+        contracts_files = set(dict(((g.name, g.modules) for g in TEST_GROUPS))["contracts"])
+        authority = design_contract_authority()
+        # in sync: the authority axis covers exactly the contracts-group files
+        self.assertEqual(
+            contracts_files,
+            set(authority),
+            "DESIGN_CONTRACT_GROUPS must cover exactly the contracts-group files "
+            f"(missing: {sorted(contracts_files - set(authority))}; "
+            f"stale: {sorted(set(authority) - contracts_files)})",
+        )
+        # no file declared under two authorities
+        seen, dupes = set(), []
+        for mods in DESIGN_CONTRACT_GROUPS.values():
+            for m in mods:
+                (dupes.append(m) if m in seen else seen.add(m))
+        self.assertEqual([], dupes, f"design-contract files declared under >1 authority: {dupes}")
+        # every declared file exists
+        missing = [m for m in authority if not (TESTS / "contracts" / m).is_file()]
+        self.assertEqual([], missing, f"declared design-contract files missing: {missing}")
 
 
 if __name__ == "__main__":

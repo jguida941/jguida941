@@ -39,6 +39,7 @@ from scripts.core.config import (
     BLUE,
     PURPLE,
 )
+from scripts.rendering.icons import render as _render_lucide
 
 # Backdrop blob accent hues (subtle color that bleeds through the frosted panel).
 _BLOB_HUES = (BLUE, PURPLE, CYAN)
@@ -353,7 +354,7 @@ def progress_ring(
         dy = -2 if sublabel else 5
         parts.append(
             f'<text x="{_f(cx)}" y="{_f(cy + dy)}" fill="{label_color}" '
-            f'font-size="{label_size}" font-family="{FONT_SANS}" font-weight="700" '
+            f'font-size="{label_size}" font-family="{FONT_SANS}" font-weight="600" '
             f'text-anchor="middle">{label}</text>'
         )
         if sublabel:
@@ -436,122 +437,10 @@ def metadata(
     return "".join(parts)
 
 
-# --------------------------------------------------------------------------- #
-# Icons (SF-Symbols-like line set, 24x24 grid, scaled)
-# --------------------------------------------------------------------------- #
-# Each entry: (mode, body) where mode is "stroke" or "fill" or "mixed".
-_ICONS: dict[str, tuple[str, str]] = {
-    "star": ("fill", '<path d="M12 17.3 18.2 21l-1.6-7 5.4-4.7-7.2-.6L12 2 9.2 8.7 2 9.3l5.5 4.7L5.8 21z"/>'),
-    "fork": (
-        "mixed",
-        '<circle cx="6" cy="5" r="2.4" fill="C"/><circle cx="18" cy="5" r="2.4" fill="C"/>'
-        '<circle cx="12" cy="19" r="2.4" fill="C"/>'
-        '<path d="M6 7.4V10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7.4M12 12v4.6" '
-        'fill="none" stroke="C" stroke-width="2" stroke-linecap="round"/>',
-    ),
-    "commit": (
-        "stroke",
-        '<circle cx="12" cy="12" r="3.4"/><path d="M2 12h5.2M16.8 12H22"/>',
-    ),
-    "branch": (
-        "mixed",
-        '<circle cx="6" cy="6" r="2.4" fill="none" stroke="C" stroke-width="2"/>'
-        '<circle cx="6" cy="18" r="2.4" fill="none" stroke="C" stroke-width="2"/>'
-        '<circle cx="18" cy="8" r="2.4" fill="none" stroke="C" stroke-width="2"/>'
-        '<path d="M6 8.4v7.2M6 12h7a3 3 0 0 0 3-3v-.6" fill="none" stroke="C" '
-        'stroke-width="2" stroke-linecap="round"/>',
-    ),
-    "lock": (
-        "mixed",
-        '<rect x="5" y="10.5" width="14" height="9.5" rx="2.2" fill="C"/>'
-        '<path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="C" stroke-width="2"/>',
-    ),
-    "ci_check": (
-        "stroke",
-        '<circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.6 2.6L16.4 9"/>',
-    ),
-    "rocket": (
-        "mixed",
-        '<path d="M12 2c2.6 2 4 5.2 4 8.4 0 1.6-.5 3.1-1.4 4.4h-5.2C8.5 13.5 8 12 8 10.4 8 7.2 9.4 4 12 2z" '
-        'fill="C"/><circle cx="12" cy="9" r="1.7" fill="B"/>'
-        '<path d="M9.4 16.4l-1.4 3.6 3.2-1.6M14.6 16.4l1.4 3.6-3.2-1.6" '
-        'fill="none" stroke="C" stroke-width="1.6" stroke-linejoin="round"/>',
-    ),
-    "fire": (
-        "fill",
-        '<path d="M12.5 2c.6 2.8 3.5 4 3.5 7.5a4 4 0 0 1-8 .3c0-1.4.5-2.4 1.2-3.2.1 1 .7 1.7 1.5 1.8'
-        '-.7-2.3.6-4.6 1.8-6.4z"/>',
-    ),
-    "clock": (
-        "stroke",
-        '<circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 1.8"/>',
-    ),
-    "trend_up": (
-        "stroke",
-        '<path d="M3 17l6.5-6.5 3.5 3.5L21 6"/><path d="M15.5 6H21v5.5"/>',
-    ),
-    "trend_down": (
-        "stroke",
-        '<path d="M3 7l6.5 6.5 3.5-3.5L21 18"/><path d="M15.5 18H21v-5.5"/>',
-    ),
-    "pr_merged": (
-        "stroke",
-        '<circle cx="7" cy="6" r="2.4"/><circle cx="7" cy="18" r="2.4"/><circle cx="18" cy="14" r="2.4"/>'
-        '<path d="M7 8.4v7.2M7 9a8 8 0 0 0 8.6 7"/>',
-    ),
-    "release_tag": (
-        "mixed",
-        '<path d="M3.5 11.5V4.5a1 1 0 0 1 1-1h7l8.5 8.5a1.4 1.4 0 0 1 0 2l-6.5 6.5a1.4 1.4 0 0 1-2 0'
-        'l-8-8z" fill="none" stroke="C" stroke-width="2" stroke-linejoin="round"/>'
-        '<circle cx="7.5" cy="7.5" r="1.5" fill="C"/>',
-    ),
-    "workflow": (
-        "fill",
-        '<path d="M13 2L4 14h6.5L9 22l9.5-12.5H12L13 2z"/>',
-    ),
-    "test": (
-        "stroke",
-        '<path d="M9 3h6M10 3v6L5.2 18.4A1.2 1.2 0 0 0 6.3 20h11.4a1.2 1.2 0 0 0 1.1-1.6L14 9V3"/>'
-        '<path d="M7.5 14.5h9"/>',
-    ),
-    "code": ("stroke", '<path d="M9 8l-4 4 4 4M15 8l4 4-4 4"/>'),
-    "globe": ("stroke", '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.4 2.6 15.6 0 18M12 3c-2.6 2.4-2.6 15.6 0 18"/>'),
-    "calendar": (
-        "stroke",
-        '<rect x="3.5" y="5" width="17" height="15.5" rx="2.2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>',
-    ),
-    # --- status shapes (distinct per status: success != danger != warning) ---
-    "check": ("stroke", '<path d="M20 6 9 17l-5-5"/>'),
-    "alert": ("stroke", '<path d="M12 4 2.5 20h19L12 4z"/><path d="M12 10v4.5M12 17.5v.01"/>'),
-    "cross": ("stroke", '<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>'),
-    "dot": ("fill", '<circle cx="12" cy="12" r="5"/>'),
-}
 
 
-def icon(name: str, x: float, y: float, *, size: float = 14, color: str = TEXT, opacity: float = 1.0) -> str:
-    """Render a 24x24-grid icon translated/scaled to (x, y) at the given size."""
-    if name == "lang_dot":
-        r = size / 2
-        return f'<circle cx="{_f(x + r)}" cy="{_f(y + r)}" r="{_f(r)}" fill="{color}"/>'
-    entry = _ICONS.get(name)
-    if not entry:
-        return ""
-    mode, body = entry
-    # "B" = backdrop placeholder (token), "C" = the icon color. Replace B first so a
-    # color hex can never collide with the backdrop marker.
-    body = body.replace("B", SURFACE_BACKDROP).replace("C", color)
-    scale = size / 24.0
-    op = f' opacity="{opacity}"' if opacity < 1.0 else ""
-    if mode == "stroke":
-        attrs = (
-            f'fill="none" stroke="{color}" stroke-width="2" '
-            f'stroke-linecap="round" stroke-linejoin="round"'
-        )
-    elif mode == "fill":
-        attrs = f'fill="{color}"'
-    else:  # mixed: each shape carries its own attrs
-        attrs = ""
-    return (
-        f'<g transform="translate({_f(x)},{_f(y)}) scale({_f(scale)})" {attrs}{op}>'
-        f"{body}</g>"
-    )
+def icon(name: str, x: float, y: float, *, size: float = 16, color: str = TEXT, opacity: float = 1.0) -> str:
+    """Render a canonical Lucide icon at (x, y). Delegates to the vendored Lucide set
+    (`scripts.rendering.icons`): one 24-grid, round caps/joins, one muted color, and a
+    constant ~1.5px on-screen stroke. Replaces the old hand-drawn `_ICONS` registry."""
+    return _render_lucide(name, x, y, size=size, color=color, opacity=opacity)

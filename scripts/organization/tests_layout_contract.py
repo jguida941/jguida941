@@ -30,8 +30,12 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
         (
             "test_card_contracts.py",
             "test_design_contract.py",
+            "test_glass_preserved.py",
+            "test_icon_system.py",
             "test_scripts_layout_contract.py",
             "test_tests_layout_contract.py",
+            "test_tile_composition.py",
+            "test_typography_restraint.py",
         ),
     ),
     TestGroup(
@@ -98,3 +102,36 @@ def module_home() -> dict[str, str]:
 def expected_relpath(module: str) -> str | None:
     home = module_home().get(module)
     return f"tests/{home}/{module}" if home else None
+
+
+# --- Design contracts, grouped by GOVERNING AUTHORITY ------------------------
+# The design-contract files all live FLAT in tests/contracts/ (declared above in
+# the "contracts" group, which the home-guard enforces). This second axis groups
+# them LOGICALLY by the design authority that governs each, so the suite stays
+# organized by Apple-HIG / Power-BI / GitHub-SVG / tokens / cross-projection and a
+# theme change is reasoned about one authority at a time. A guard
+# (test_tests_layout_contract) asserts every design-contract file is declared in
+# exactly one authority below and that each declared file exists.
+DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
+    "apple_hig": (
+        "test_icon_system.py",
+        "test_tile_composition.py",
+        "test_typography_restraint.py",
+        "test_glass_preserved.py",
+    ),
+    "powerbi_ia": (
+        "test_design_contract.py",  # hierarchy / one-dominant-KPI / per-card cards
+    ),
+    "github_svg": (
+        "test_card_contracts.py",  # SVG-safety / title / viewBox / camo bans
+    ),
+    "layout": (
+        "test_scripts_layout_contract.py",
+        "test_tests_layout_contract.py",
+    ),
+}
+
+
+def design_contract_authority() -> dict[str, str]:
+    """Map each design-contract filename to its governing authority."""
+    return {mod: auth for auth, mods in DESIGN_CONTRACT_GROUPS.items() for mod in mods}

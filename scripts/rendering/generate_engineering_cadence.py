@@ -79,7 +79,7 @@ def generate(engineering: dict, output_path: str = "assets/engineering_cadence.s
     # --- geometry ---
     kpi_w = 200
     gap = SPACE["md"]
-    tile_h = 76
+    tile_h = 84
     row2_y = content_top + 116
     height = int(row2_y + tile_h + 30)
 

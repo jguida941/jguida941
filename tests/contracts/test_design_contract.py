@@ -292,8 +292,8 @@ class SnapshotPanelContract(unittest.TestCase):
     ribbon, and renders pipeline status by distinct icon SHAPE + label."""
 
     SCALE = {46.0, 26.0, 22.0, 20.0, 14.0, 12.0, 11.0}
-    CHECK = "M20 6 9 17l-5-5"      # success icon path (status_chip 'check')
-    CROSS = "M6.5 6.5l11 11"        # danger icon path (status_chip 'cross')
+    CHECK = "M20 6 9 17l-5-5"      # success icon path (Lucide 'check')
+    CROSS = "M18 6 6 18"            # danger icon path (Lucide 'x' / 'cross')
 
     def _rows(self):
         return [

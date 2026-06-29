@@ -107,6 +107,16 @@ def primary_kpi(
     return "".join(parts)
 
 
+# Tile content height: label row (top) -> big value -> optional caption. Callers
+# size the tile to >= TILE_MIN_H (or +caption) so nothing clips.
+TILE_LABEL_DY = 23      # label baseline from tile top
+TILE_VALUE_DY = 56      # value baseline from tile top (label_dy + 33)
+TILE_CAPTION_DY = 71    # caption baseline from tile top (value_dy + 15)
+TILE_MIN_H = 66         # label + value (no caption)
+TILE_MIN_H_CAPTION = 82  # label + value + caption
+TILE_ICON_PX = 16
+
+
 def metric_tile(
     x: float,
     y: float,
@@ -117,28 +127,26 @@ def metric_tile(
     label: str,
     icon_name: str | None = None,
     caption: str | None = None,
-    value_token: str = "metric",
+    value_token: str = "metric_lg",
 ) -> str:
-    """A secondary metric cell: neutral icon + value + label (+ optional caption).
-
-    DESIGN_SPEC 3.3/3.4. Value uses a smaller scale token than `primary_kpi` so the
-    KPI always dominates; icon is neutral (tertiary ink) — color is reserved for
-    status, not decoration. The optional third-line `caption` (e.g. a date range)
-    rides at the caption token without scattering raw <text> at call sites.
+    """A secondary metric cell — premium KPI anatomy (DESIGN_SPEC 3.3/3.4):
+    an `[icon inline-left + LABEL]` row on top, then the big VALUE below it. The
+    value (`metric_lg`=26) is >= 2x the caption label (12) so the number leads; the
+    icon is a neutral Lucide glyph inline-left of the label (never stacked above the
+    number). Optional third-line `caption` rides at the caption token.
     """
     pad = SPACE["lg"]
     parts = [glass_tile(x, y, w, h)]
+    label_y = y + TILE_LABEL_DY
+    tx = x + pad
     if icon_name:
-        parts.append(_icon(icon_name, x + pad, y + 13, size=15, color=TEXT_DIM))
+        # inline-left of the label, optically centered on the label's cap height
+        parts.append(_icon(icon_name, x + pad, label_y - 13, size=TILE_ICON_PX, color=TEXT_DIM))
+        tx = x + pad + TILE_ICON_PX + 6
+    parts.append(text(label, tx, label_y, token="caption", color=TEXT_DIM))
+    parts.append(text(value, x + pad, y + TILE_VALUE_DY, token=value_token, color=TEXT_BRIGHT))
     if caption:
-        vy = y + h - 40
-        parts.append(text(value, x + pad, vy, token=value_token, color=TEXT_BRIGHT))
-        parts.append(text(label, x + pad, vy + 16, token="caption", color=TEXT_DIM))
-        parts.append(text(caption, x + pad, vy + 31, token="caption", color=TEXT_DIM))
-    else:
-        vy = y + h - 24
-        parts.append(text(value, x + pad, vy, token=value_token, color=TEXT_BRIGHT))
-        parts.append(text(label, x + pad, vy + 15, token="caption", color=TEXT_DIM))
+        parts.append(text(caption, x + pad, y + TILE_CAPTION_DY, token="caption", color=TEXT_DIM))
     return "".join(parts)
 
 
