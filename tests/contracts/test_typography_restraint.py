@@ -7,8 +7,11 @@ On the RENDERED SVG of the real generators:
   3. A single card carries at most ONE *decorative* accent hue (status-chip pills
      and language dots excluded structurally).
 
-RED on current code: the un-refactored cards (focus_board, repo_spotlight) still emit
-ad-hoc sub-ladder sizes, and focus_board paints lane labels in three accent hues.
+Covers the kit-converted cards (streak, scorecard, snapshot, badges, focus_board,
+repo_spotlight). The two remaining pre-kit calendar cards (activity_heatmap,
+contribution_panel) are deliberately NOT in this set yet — their sub-floor axis
+labels are tracked as an explicit, plan-tagged @unittest.expectedFailure in
+test_design_contract.FontLegibilityContract (Phase-4 B3), not silently dropped.
 """
 from __future__ import annotations
 

@@ -1,11 +1,54 @@
 # DESIGN_SPEC.md — Developer-Analytics Product
 
-**Thesis:** "Power BI information architecture + Apple visual restraint." One analytics *contract*
-(metrics, tiers, status semantics), two *projections*: (1) static GitHub README SVG cards, (2) a
-GitHub Pages web dashboard. A serious analytics surface, not a decorative glass profile.
+**Thesis:** "Power BI information architecture + Apple restraint, on a deliberate frosted-glass
+surface." One analytics *contract* (metrics, tiers, status semantics), two *projections*: (1) static
+GitHub README SVG cards, (2) a GitHub Pages web dashboard.
+
+## DOCTRINE (binding — three separated laws; supersedes contradictory guidance below)
+
+**The doctrine is `PowerBI_IA + Apple_LiquidGlass + shared projection contract`.** Glass is NOT an
+anti-pattern in this system — *uncontrolled* glass is. The per-element guidance further down is read
+subject to these three laws.
+
+1. **Information architecture = Power BI.** One focal metric (largest, top-left), secondary metrics
+   visually subordinate, grid alignment, correct chart for purpose (donut/gauge only part-to-whole or
+   goal; tables/rows when exact comparison matters), section order, and status = icon + label (never
+   colour alone). Enforced by the hierarchy / tile / IA contracts.
+2. **Material = Apple Liquid Glass, GOVERNED (required, not banned).** Glass panels with depth,
+   translucency, rim highlight, and refraction-like backdrop are REQUIRED — but **token-driven**: no
+   ad-hoc blur values, no ad-hoc shadows, no random per-card blobs, no per-card hue drift, and never a
+   glass layer that drops text below the contrast floor. The Part 4 "glass/neon → flat surface" line is
+   **SUPERSEDED** — it is retained ONLY for the genuine AI tells: rainbow per-metric hues, glowing/
+   coloured big numbers, mixed/decorative icons, tiny text, dashboard soup. The glass material resolves
+   from shared `MATERIAL_GLASS` / `ELEVATION` tokens whose NAMES are identical in both projections.
+   **Enforced today:** `tests/contracts/test_glass_preserved.py` (glass survives — 2 representative
+   cards, being extended to the full stack). **PLANNED / RED-pending (Phase-4 C, NOT yet enforced):** a
+   material-governance contract (glass token-driven — no ad-hoc blur/shadow/blob/hue-drift).
+3. **Projection parity = README SVG ⟷ HTML are two renderings of ONE source-of-truth.** They MUST share
+   card IDs, metric IDs + tiers, titles, the primary KPI, status semantics, card order, the layout grid,
+   and the token NAMES (`CARD_WIDTH`, `GRID_COLUMNS`, `CARD_PADDING`, `SECTION_GAP`, `PANEL_RADIUS`,
+   `TILE_RADIUS`, `TYPE_SCALE`, `MATERIAL_GLASS`, `ELEVATION`, `STATUS`). They differ ONLY where the
+   platform requires it: the HTML projection may use CSS variables, `backdrop-filter`, a responsive grid,
+   and hover/live interaction; the README projection must emulate the same material with static,
+   GitHub-safe SVG primitives. Same semantic components + token-resolved visual outcome — NOT identical
+   implementation. **PLANNED / RED-pending (Phase-4 C, NOT yet enforced):** the cross-projection parity
+   contract (shared card IDs / metric tiers / order / token names across README SVG + HTML).
+
+**README image-sizing policy:** every analytics card image uses ONE uniform policy — `width="100%"` —
+so the assembled README is a single aligned column (same width, same left/right edges). The historical
+mixed policy (only hero + streak had `width="100%"`) was the visible offset; it is banned. Canonical
+intrinsic SVG width = `SVG_WIDTH` (840), `viewBox="0 0 840 H"`. Enforced by
+`tests/contracts/test_readme_projection.py` + `test_card_contracts.py`.
+
+**Authority boundary:** DESIGN_SPEC = intended law; `config.py`/`design_tokens`/components =
+implementation; `templates/README.md.tpl` + generated `README.md` + the web generator = projection code;
+the **live GitHub README / HTML render is the rendered receipt** — the truth. Tests are an admissibility
+gate: they prove the projection is *admissible*, not that it *looks right*. The live render is the final
+arbiter, and no card may be dropped from a contract to make the suite green (un-converted cards stay an
+explicit, plan-tagged expected-fail with a receipt).
 
 Each element below carries a **red-first testable invariant** (Part 3 `(e)`). Those invariants are the
-contracts in `tests/test_design_contract.py` (+ IA/A11y/SVG/cross-projection suites). Sources: Part 6.
+contracts in `tests/contracts/` (design/IA/A11y/SVG/projection/cross-projection). Sources: Part 6.
 
 ---
 
@@ -125,7 +168,8 @@ Practical floors: primary text ≥14, secondary ≥12, strokes ≥1.5px, explici
   size; radii ∈ {6,12}.
 
 ## Part 4 — AI-look anti-patterns → professional fix
-Glass/neon backgrounds → flat surface + 1px hairline, ≤1 subtle shadow · glowing big numbers → solid
+Uncontrolled/neon glow backgrounds → governed Liquid-Glass material (tokenized, ≤1 subtle shadow; see
+DOCTRINE — glass itself is REQUIRED, not flattened) · glowing big numbers → solid
 `ink-1`, size+weight emphasis · rainbow per-metric hues → neutral ramp + one accent (color only for
 status) · neon pills / color-only dots → 6px tinted chip, icon+label, ≥4.5:1 · emoji/mixed icons → one
 monochrome `<path>` family · donut-for-everything → part-to-whole/goal only, bars for comparison ·

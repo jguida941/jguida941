@@ -8,6 +8,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from scripts.core.config import SVG_WIDTH
 from scripts.pipeline.collect_data import CollectedProfileData
 from scripts.pipeline.compute_metrics import compute_profile_model
 
@@ -140,8 +141,15 @@ class CardContractTests(unittest.TestCase):
                         self.assertNotIn(bad, svg, f"{card} contains banned '{bad}'")
                     # has sizing
                     self.assertIsNotNone(root.get("viewBox"), f"{card} missing viewBox")
-                    vbw = float(root.get("viewBox").split()[2])
-                    # geometry stays inside the frame (no clipping)
+                    vb = root.get("viewBox").split()
+                    vbw = float(vb[2])
+                    # canonical width: intrinsic root width == viewBox width == SVG_WIDTH,
+                    # so every analytics card renders at ONE width in the README column
+                    # (projection alignment depends on this — see test_readme_projection).
+                    self.assertEqual(root.get("width"), str(SVG_WIDTH), f"{card} root width != {SVG_WIDTH}")
+                    self.assertEqual(vbw, float(SVG_WIDTH), f"{card} viewBox width != {SVG_WIDTH}")
+                    self.assertEqual(float(vb[0]), 0.0, f"{card} viewBox x-origin != 0")
+                    # geometry stays inside the frame (no clipping / no shadow off-canvas)
                     self.assertLessEqual(_right_edge(root), vbw + 1, f"{card} content overflows viewBox")
                     # exactly one title (per validator contract)
                     if title:
