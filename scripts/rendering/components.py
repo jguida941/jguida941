@@ -10,6 +10,7 @@ from scripts.core.config import (
     CYAN,
     FONT_SANS,
     GLASS_HAIRLINE_HEX,
+    GLASS_TILE_SHADE_HEX,
     GREEN,
     RED,
     SPACE,
@@ -23,6 +24,9 @@ from scripts.rendering.glass_kit import chip as _chip
 from scripts.rendering.glass_kit import glass_tile
 from scripts.rendering.glass_kit import icon as _icon
 from scripts.rendering.glass_kit import progress_ring as _progress_ring
+from scripts.rendering.svg_utils import lang_color as _lang_color
+from scripts.rendering.svg_utils import truncate as _truncate
+from scripts.rendering.svg_utils import xml_escape as _xml_escape
 
 
 def _n(v: float) -> str:
@@ -172,6 +176,69 @@ def donut_gauge(
     pct = max(0.0, min(100.0, float(value) / mv * 100.0))
     center = label if label is not None else f"{round(pct)}%"
     return _progress_ring(cx, cy, radius, pct, color=color, stroke=stroke, label=center, label_size=20)
+
+
+def language_bar(
+    x: float,
+    y: float,
+    w: float,
+    *,
+    segments: list[tuple[str, float]],
+    height: float = 14,
+    legend_cols: int = 3,
+    legend_row_h: float = 28,
+) -> tuple[str, float]:
+    """A flat part-to-whole language bar + name+value legend. DESIGN_SPEC 3.10.
+
+    `segments` are pre-aggregated ``(name, percent)`` pairs summing to ~100, already
+    capped at <=6 (+ 'Other'). Renders a flat stacked bar (one 1px hairline rim, no
+    sheen gradient) using each language's identity color, then a uniform legend where
+    every segment carries both a name and a percent. Returns ``(svg, legend_bottom_y)``.
+    """
+    parts: list[str] = [
+        f'<rect x="{_n(x)}" y="{_n(y)}" width="{_n(w)}" height="{_n(height)}" rx="6" '
+        f'fill="{GLASS_HAIRLINE_HEX}" fill-opacity="0.10"/>',
+        f'<clipPath id="langbar"><rect x="{_n(x)}" y="{_n(y)}" width="{_n(w)}" '
+        f'height="{_n(height)}" rx="6"/></clipPath>',
+        '<g clip-path="url(#langbar)">',
+    ]
+    cx = float(x)
+    n = len(segments)
+    for i, (name, pct) in enumerate(segments):
+        end = x + w if i == n - 1 else cx + w * float(pct) / 100.0
+        seg_w = max(0.0, end - cx)
+        parts.append(
+            f'<rect x="{_n(cx)}" y="{_n(y)}" width="{_n(seg_w)}" height="{_n(height)}" '
+            f'fill="{_lang_color(name)}"/>'
+        )
+        if i < n - 1 and seg_w > 0:
+            parts.append(
+                f'<rect x="{_n(end - 0.75)}" y="{_n(y)}" width="1.5" height="{_n(height)}" '
+                f'fill="{GLASS_TILE_SHADE_HEX}" fill-opacity="0.5"/>'
+            )
+        cx = end
+    parts.append("</g>")
+    parts.append(
+        f'<rect x="{_n(x + 0.5)}" y="{_n(y + 0.5)}" width="{_n(w - 1)}" height="{_n(height - 1)}" '
+        f'rx="6" fill="none" stroke="{GLASS_HAIRLINE_HEX}" stroke-opacity="0.18" stroke-width="1"/>'
+    )
+
+    legend_top = y + height + 28
+    col_w = w / legend_cols
+    last_row = 0
+    for i, (name, pct) in enumerate(segments):
+        col, row = i % legend_cols, i // legend_cols
+        last_row = max(last_row, row)
+        cell_x = x + col * col_w
+        base = legend_top + row * legend_row_h
+        parts.append(
+            f'<circle cx="{_n(cell_x + 5)}" cy="{_n(base - 4)}" r="5" fill="{_lang_color(name)}"/>'
+        )
+        parts.append(text(_xml_escape(_truncate(name, 16)), cell_x + 18, base, token="caption", color=TEXT))
+        parts.append(
+            text(f"{float(pct):.1f}%", cell_x + col_w - 16, base, token="caption", color=TEXT_BRIGHT, anchor="end")
+        )
+    return "".join(parts), legend_top + last_row * legend_row_h
 
 
 def empty_state(cx: float, cy: float, message: str, *, icon_name: str | None = None) -> str:

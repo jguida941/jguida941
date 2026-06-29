@@ -58,7 +58,7 @@ HEATMAP_RAMP = [
     ("#7dcfff", 1.00),
 ]
 
-# Language colors (GitHub-style)
+# Language colors (GitHub Linguist palette)
 LANG_COLORS = {
     "Python": "#3572A5",
     "Java": "#b07219",
@@ -67,14 +67,23 @@ LANG_COLORS = {
     "Ruby": "#701516",
     "HTML": "#e34c26",
     "JavaScript": "#f1e05a",
+    "TypeScript": "#3178c6",
+    "Go": "#00ADD8",
+    "Kotlin": "#A97BFF",
+    "Swift": "#F05138",
+    "C#": "#178600",
+    "PHP": "#4F5D95",
+    "Vue": "#41b883",
     "Shell": "#89e051",
     "C": "#555555",
     "Makefile": "#427819",
     "CSS": "#563d7c",
+    "SCSS": "#c6538c",
     "CMake": "#DA3434",
     "Dockerfile": "#384d54",
     "GLSL": "#5686a5",
     "Batchfile": "#C1F12E",
+    "Jupyter Notebook": "#DA5B0B",
 }
 
 # SVG dimensions

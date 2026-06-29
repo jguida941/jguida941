@@ -450,5 +450,81 @@ class BuilderScorecardContract(unittest.TestCase):
         self.assertIsNone(re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers")
 
 
+class LanguageBreakdownContract(unittest.TestCase):
+    """DESIGN_SPEC 3.2/3.10/Part 4: Language Breakdown promotes the leading-language
+    share as the one display KPI, renders a flat part-to-whole LanguageBar capped at
+    <=6 (+Other) with a name+value legend, and drops the glossy sheen gradient."""
+
+    SCALE = {46.0, 26.0, 22.0, 20.0, 14.0, 12.0, 11.0}
+
+    def _bytes(self):
+        return {
+            "Python": 600000, "TypeScript": 250000, "Rust": 120000, "Go": 60000,
+            "C": 30000, "Shell": 15000, "HTML": 9000, "CSS": 5000,
+        }
+
+    def _render(self, out: str, *, language_bytes=None) -> str:
+        from scripts.rendering.generate_language_chart import generate
+
+        generate(self._bytes() if language_bytes is None else language_bytes, output_path=out)
+        return Path(out).read_text(encoding="utf-8")
+
+    def _sizes(self, svg):
+        return [float(m) for m in _FONT.findall(svg)]
+
+    def test_one_dominant_kpi(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "lang.svg"))
+        sizes = self._sizes(svg)
+        top = max(sizes)
+        self.assertGreaterEqual(top, 40, "needs one display KPI (leading-language share)")
+        self.assertEqual(sizes.count(top), 1, "exactly one dominant KPI")
+        self.assertLessEqual(max(s for s in sizes if s < top), 26, "secondaries below KPI")
+
+    def test_sizes_on_scale_and_legible(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "lang.svg"))
+        for s in self._sizes(svg):
+            self.assertIn(s, self.SCALE, f"off-scale font-size {s}")
+            self.assertGreaterEqual(s, 11.0, f"sub-floor font-size {s}")
+
+    def test_no_sheen_gradient(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "lang.svg"))
+        self.assertNotIn("Sheen", svg, "the glossy bar sheen gradient must be removed (flat fill)")
+
+    def test_segments_capped_with_other(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "lang.svg"))
+        # legend renders one dot per segment; cap at <=6 languages + Other
+        self.assertLessEqual(svg.count("<circle"), 7, "cap visible segments at <=6 (+Other)")
+        self.assertIn(">Other</text>", svg, "languages beyond the cap fold into 'Other'")
+
+    def test_segment_has_name_and_value(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "lang.svg"))
+        self.assertIn(">Python</text>", svg, "each segment shows its language name")
+        self.assertRegex(svg, r">[0-9]+(\.[0-9]+)?%</text>", "each segment shows its percent value")
+
+    def test_empty_state(self):
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as d:
+            svg = self._render(str(Path(d) / "lang.svg"), language_bytes={})
+        self.assertIsNone(
+            re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers"
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
