@@ -68,6 +68,18 @@ class DesignCharacterContract(unittest.TestCase):
         self.assertIn('[data-theme="power-bi"] .lang-bars { display: none', html,
                       "Power BI replaces the bar with the table (the matrix look)")
 
+    def test_apple_drops_the_dense_heatmap_grid(self):
+        """Apple HIG is stat/summary-forward and AVOIDS dense data grids (research: 'no heatmaps /
+        small-multiples'). Under [data-theme="apple-dark"] the dense 7x24 activity matrix is hidden,
+        leaving the simpler event-mix summary; Power BI / Liquid Glass keep the matrix."""
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        self.assertRegex(html, r'\[data-theme="apple-dark"\]\s*\.heat\s*\{[^}]*display:\s*none',
+                         "Apple must drop the dense heatmap grid (avoids dense data grids)")
+        # Power BI is the opposite — it does NOT hide the heatmap (it favours dense matrices)
+        self.assertNotRegex(html, r'\[data-theme="power-bi"\]\s*\.heat\s*\{[^}]*display:\s*none',
+                            "Power BI keeps the dense heatmap matrix")
+
     def test_density_is_web_only_and_preserves_svg_parity(self):
         """Density is a web concern; the DEFAULT theme's type/radius still equal config."""
         self.assertEqual(dt.type_scale(dt.DEFAULT_THEME), {k: tuple(v) for k, v in config.TYPE_SCALE.items()})
