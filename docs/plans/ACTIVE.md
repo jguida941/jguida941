@@ -136,6 +136,23 @@ easy to measure (token numbers, string presence), not what actually makes it pro
   honesty (no metric pairs a last-push label with the median key; the dashboard binds the honest metric).
   RED-first (all 3 bit). 183 green. (Next P5-DATA: plausibility + cross-consistency sweep over the rest.)
 
+- ✅ **P5-PATTERN slice 0 (retire a BAD invariant — the empty "When I Code" panel)** — the owner caught
+  Apple Dark's activity-rhythm panel rendering near-empty. Cause: slice 5's `test_apple_drops_the_dense_
+  heatmap_grid` told Apple to HIDE the heatmap ("summary-forward"), which deleted the rhythm visualization
+  and left a content-poor panel — a DISTINCTNESS invariant producing the content-to-chrome anti-pattern it
+  should forbid. Measured (true 390/desktop): panel 181px, heat `display:none`. RETIRED that invariant +
+  its CSS; Apple shows the rhythm like every theme (distinctness comes from colour/type/density/material).
+  After: panel 364px, heat back, filled. 182 green. **Lesson: distinctness never trumps content-to-chrome.**
+- 🔄 **P5-PATTERN (doc-grounded, codex-reviewed) — the de-AI readout slice (giant KPI boxes)** — workflow
+  `w497dsesl` produced the cited Apple HIG doctrine `docs/design/liquid-glass.md` (grouped inset lists,
+  Value-1 rows, 44pt row, 1pt hairline @16pt inset, type ramp; derived numbers marked derived) and codex
+  returned `revise` — it caught two real escapes in a geometric formulation AND that the workflow agents read
+  the STALE `~/Downloads` repo (so its repo-specific must-fixes were false for this repo). Folded: a
+  COLUMN-INDEPENDENT structural gate (per-metric rows bare, only the group chromed) closes both escapes and
+  is browserless-checkable; re-grounded to the real `web_render.py`/`.tiles`. The deterministic RED contract
+  (`test_metric_readout_is_grouped_not_giant_boxes`) + the `.tiles`/`.tile` → `.mgroup`/`.mrow` refactor +
+  the before/after visual receipt + codex-on-the-diff land together in the next slice (doc shipped first).
+
 ### ⟐ ARCHITECTURE (P5-ARCH workflow `wf_8ea0e7d9-544` landed — 11 doc dossiers + synthesis + adversarial critique)
 
 **Decisions adopted:**

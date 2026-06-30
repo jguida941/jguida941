@@ -68,17 +68,13 @@ class DesignCharacterContract(unittest.TestCase):
         self.assertIn('[data-theme="power-bi"] .lang-bars { display: none', html,
                       "Power BI replaces the bar with the table (the matrix look)")
 
-    def test_apple_drops_the_dense_heatmap_grid(self):
-        """Apple HIG is stat/summary-forward and AVOIDS dense data grids (research: 'no heatmaps /
-        small-multiples'). Under [data-theme="apple-dark"] the dense 7x24 activity matrix is hidden,
-        leaving the simpler event-mix summary; Power BI / Liquid Glass keep the matrix."""
-        from scripts.pipeline.web_render import render_dashboard
-        html = render_dashboard()
-        self.assertRegex(html, r'\[data-theme="apple-dark"\]\s*\.heat\s*\{[^}]*display:\s*none',
-                         "Apple must drop the dense heatmap grid (avoids dense data grids)")
-        # Power BI is the opposite — it does NOT hide the heatmap (it favours dense matrices)
-        self.assertNotRegex(html, r'\[data-theme="power-bi"\]\s*\.heat\s*\{[^}]*display:\s*none',
-                            "Power BI keeps the dense heatmap matrix")
+    # RETIRED test_apple_drops_the_dense_heatmap_grid: that invariant told Apple to HIDE the
+    # activity heatmap ("summary-forward, avoids dense grids"), but deleting the rhythm
+    # visualization left a near-empty "When I Code" panel — the content-to-chrome anti-pattern the
+    # owner caught. A distinctness invariant must never trump content-to-chrome. Apple now shows the
+    # rhythm like every theme; its distinctness comes from colour/type/density/material. The
+    # forthcoming GROUPED_DENSE_READOUT pattern invariant (docs/design/liquid-glass.md) is the guard
+    # that forbids under-filled surfaces going forward.
 
     def test_kpi_density_character_survives_on_mobile(self):
         """Mobile must NOT flatten the per-language KPI grid to one column for everyone — that
@@ -122,6 +118,12 @@ class DesignCharacterContract(unittest.TestCase):
             "the KPI grid must clamp its track to the viewport — "
             "minmax(min(var(--tile-min), 100%), 1fr) — or a theme whose tile_min exceeds the screen "
             "(Apple 380px) overflows horizontally on a phone")
+
+    # DEFERRED to its own slice (the de-AI readout refactor): test_metric_readout_is_grouped_not_
+    # giant_boxes — the first PATTERN invariant (grouped .mgroup container of bare hairline-divided
+    # .mrow Value-1 rows; per-metric chrome forbidden, column-independent). Doc-grounded + codex-
+    # reviewed in docs/design/liquid-glass.md §7; it lands RED-first WITH the web_render refactor +
+    # the before/after visual receipt, so it is not committed ahead of the implementation it gates.
 
     def test_density_is_web_only_and_preserves_svg_parity(self):
         """Density is a web concern; the DEFAULT theme's type/radius still equal config."""

@@ -186,10 +186,11 @@ body {
 .mix .m b { color: var(--ink-strong); font-weight: 600; }
 .mix .bar { width: 52px; height: 7px; border-radius: 4px; background: color-mix(in srgb, var(--hairline) 12%, transparent); overflow: hidden; }
 .mix .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
-/* Per-theme chart ANATOMY: Apple avoids dense data grids (HIG, stat/summary-forward) — under Apple
-   the dense 7x24 activity matrix drops to the simpler event-mix summary; Power BI/Liquid keep it. */
-[data-theme="apple-dark"] .heat { display: none; }
-[data-theme="apple-dark"] .mix { margin-top: 4px; }
+/* RETIRED (was: Apple drops the dense heatmap). That distinctness invariant deleted the rhythm
+   visualization and left a near-empty "When I Code" panel — the exact content-to-chrome
+   anti-pattern. Distinctness never trumps content-to-chrome: Apple shows the rhythm like every
+   theme; its distinctness comes from colour/type/density/material. The heatmap is legitimate,
+   filled content (GitHub's own contribution grid is a dense grid). */
 .heat-wrap { overflow-x: auto; }
 
 footer { text-align: center; color: var(--ink-dim); font-size: var(--type-caption); margin-top: 26px; }
