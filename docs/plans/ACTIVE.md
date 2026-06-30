@@ -281,18 +281,17 @@ is baked in (name the RED first; declare the new file's home in `repo_layout.jso
 research→cited doctrine → closed invariant set → RED-first → implement → mutation-prove → GREEN (SVG+web)
 + visual receipts → distinctness/character → codex folds disagreements RED-first → honest receipt.
 
-## Architecture
-- **`scripts/rendering/design/`** (design_tokens.py → thin shim): `schema.py` (`DesignLanguage` over every
-  axis), `languages/<name>.py` (liquid-glass IA `==config`), `registry.py`, `emit.py` (per-`[data-theme]`
-  full-axis CSS incl. `--type-*/--space-*/--radius-*/--dur-*/--bento-cols/--cat-*`), `spec.py` (hex-free
-  `THEME_SPEC` for chart-selection + component-variants).
-- **`scripts/rendering/webkit/`**: `components.py`+`component_css.py` (button/chip/card/kpi/section/nav/row/
-  empty/badge, variant attribute-gated, token-only), `charts_runtime.py` (+ bar/column, line/area, data-table,
-  multi-series, stat-card), `charts_models.py` (SVG↔web parity), `layout.py` (breakpoint + container-query +
-  density — fixes 375px heatmap).
-- **Pages (generated, drift-guarded):** `render_dashboard()` (morphs per theme), `render_settings()` →
-  `site/settings.html` (per-aspect override panel + localStorage/URL + iframe live-preview + component
-  gallery), `render_showcase()` → `site/showcase.html` (languages×variants×charts), `write_site()`.
+## Architecture & contract structure → `docs/plans/DESIGN-SYSTEM.md`
+The full SELF-DEMONSTRATING design-system architecture — the one `PROFILE→render→invariant→receipt`
+data-flow; profile-as-DATA; the conformance runner + predicate library; the showcase + settings as
+PROOF surfaces; the closed-cover organization mirroring scout/semantic-tdd; the phased RED-first build
+order; the codex-folded must-fixes — now lives in **`docs/plans/DESIGN-SYSTEM.md`** (study+design+codex
+workflow `w17p9c4rv`, codex conditional-agree). It SUPERSEDES the earlier typed `design/languages/
+<name>.py` + `emit.py`/`spec.py`-as-source sketch: **a design profile is DATA
+(`contracts/design_profiles/<lang>.json`); the typed loader is a thin VIEW, never the source** — which
+is what makes true single-source, scout-portability, and "new theme = data + zero code" fall out
+together. (TODO cleanup: slim this ACTIVE.md toward its declared 120-line cap by folding finished-slice
+history into `docs/history/PLAN-LEDGER.md`.)
 
 ## Contract structure (~10 themes × ~15 aspects)
 Profile-JSON-as-data + ONE generic conformance runner + a per-aspect predicate library:
