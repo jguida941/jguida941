@@ -122,6 +122,17 @@ body {
 .langlegend .swatch { width: 9px; height: 9px; border-radius: 3px; flex: 0 0 auto; }
 .langlegend .nm { color: var(--ink); }
 .langlegend .pc { margin-left: auto; color: var(--ink-strong); font-weight: 600; }
+/* Per-theme chart ANATOMY (P5): Power BI renders the languages as a DATA TABLE/matrix
+   (bordered, gridlined, data-ink); every other theme keeps the stacked bar + legend.
+   CSS-gated on data-theme so the switcher reflows it with no JS re-render. */
+.lang-table { width: 100%; border-collapse: collapse; display: none; font-size: var(--type-caption); }
+.lang-table th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid color-mix(in srgb, var(--hairline) 22%, transparent); }
+.lang-table td { padding: 6px 8px; border-bottom: 1px solid color-mix(in srgb, var(--hairline) 10%, transparent); color: var(--ink); }
+.lang-table td .num { color: var(--ink-strong); font-weight: 600; }
+.lang-table .tdot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 7px; vertical-align: middle; }
+.lang-table .tbar { display: block; height: 7px; border-radius: 0; }
+[data-theme="power-bi"] .lang-bars { display: none; }
+[data-theme="power-bi"] .lang-table { display: table; }
 
 /* --- list rows (repos / focus) --- */
 .rows { display: flex; flex-direction: column; gap: 8px; }
@@ -266,8 +277,11 @@ def _languages() -> str:
   <section class="panel">
     <div class="section-head"><div><p class="eyebrow">Code Composition</p><h2 class="title">Language Breakdown</h2></div><span class="section-meta" id="lang-count">—</span></div>
     <hr class="hairline">
-    <div class="langbar" id="langbar"></div>
-    <div class="langlegend" id="langlegend"></div>
+    <div class="lang-bars">
+      <div class="langbar" id="langbar"></div>
+      <div class="langlegend" id="langlegend"></div>
+    </div>
+    <table class="lang-table" id="langtable"><thead><tr><th>Language</th><th>Share</th><th></th></tr></thead><tbody></tbody></table>
   </section>"""
 
 
@@ -387,6 +401,11 @@ def _script() -> str:
     document.getElementById("langlegend").innerHTML = top.map(l =>
       `<div class="row"><span class="swatch" style="background:${colorFor(l.name)}"></span>`+
       `<span class="nm">${esc(l.name)}</span><span class="pc num">${(l.percent||0).toFixed(1)}%</span></div>`).join("");
+    // Power BI data-table anatomy (CSS shows it only under [data-theme="power-bi"])
+    document.querySelector("#langtable tbody").innerHTML = top.map(l =>
+      `<tr><td><span class="tdot" style="background:${colorFor(l.name)}"></span>${esc(l.name)}</td>`+
+      `<td class="num">${(l.percent||0).toFixed(1)}%</td>`+
+      `<td><span class="tbar" style="width:${(l.percent||0).toFixed(2)}%;background:${colorFor(l.name)}"></span></td></tr>`).join("");
     // flagship repos
     const repos = (d.featured_repo_facts || []).slice(0, 5);
     document.getElementById("flagship").innerHTML = repos.map(r => {

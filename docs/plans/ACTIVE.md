@@ -38,9 +38,13 @@
   language (Apple airy + large + rounded; Power BI tight + sharp; ordered + distinct), grounded with
   doctrine cites — the answer to "where are the invariants for their respective proper styles." It
   already bit (caught Power BI's radius being too round). 170 green.
-- ⏭ **Next (the real divergence + the SKILL):** per-theme CHART/COMPONENT anatomy (Power BI → a data
-  table + multi-series bars + categorical palette; Apple → big stat-cards + a single ring, no table)
-  via the webkit chart-selection model — that's where each theme becomes a different *website*. Then
+- ✅ **P5-1 slice 3 (per-theme chart ANATOMY begins)** — Power BI now renders the Language Breakdown as
+  a DATA TABLE/matrix (Language | Share | bar, gridlined) while Apple/Liquid Glass keep the stacked bar;
+  CSS-gated on `[data-theme="power-bi"]` so the switcher reflows it. `test_design_character` extended
+  (Power BI table-forward; others bar/stat-forward — grounded in the research). 171 green. Same data,
+  different chart per design language — the start of each theme being a different *website*.
+- ⏭ **Next (more anatomy + the SKILL):** Apple → big stat-cards + single ring (drop the heatmap density);
+  Power BI → multi-series bars + categorical palette + 4-6 KPI/row grid; then
   CODIFY the whole loop (research → character/per-aspect invariants → GENERATE the themed site → prove)
   as `skills/design-language-tdd/`, dogfooded on these 3 themes — so "add Material/Stripe/..." = run
   the skill = another full distinct website.

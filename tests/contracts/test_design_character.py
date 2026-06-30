@@ -47,6 +47,19 @@ class DesignCharacterContract(unittest.TestCase):
         self.assertGreater(pads["liquid-glass"], pads["power-bi"], "Power BI must be tighter than the anchor")
         self.assertEqual(len(set(pads.values())), len(pads), "each theme's density must be distinct")
 
+    def test_power_bi_is_table_forward_apple_is_not(self):
+        """Per the research: Power BI favors a data table/matrix (tabular encoding); Apple is
+        stat/bar-forward and AVOIDS dense tables. So the languages section becomes a DATA TABLE
+        only under [data-theme="power-bi"]; every other theme keeps the bar (table hidden)."""
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        self.assertIn('class="lang-table"', html, "Power BI needs a languages data-table option")
+        self.assertIn('[data-theme="power-bi"] .lang-table', html, "the table is shown under Power BI")
+        self.assertRegex(html, r"\.lang-table\s*\{[^}]*display:\s*none",
+                         "the table is hidden by default — Apple/Liquid Glass stay bar/stat-forward")
+        self.assertIn('[data-theme="power-bi"] .lang-bars { display: none', html,
+                      "Power BI replaces the bar with the table (the matrix look)")
+
     def test_density_is_web_only_and_preserves_svg_parity(self):
         """Density is a web concern; the DEFAULT theme's type/radius still equal config."""
         self.assertEqual(dt.type_scale(dt.DEFAULT_THEME), {k: tuple(v) for k, v in config.TYPE_SCALE.items()})
