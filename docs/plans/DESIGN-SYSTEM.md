@@ -155,3 +155,67 @@ pre-bake/JS-parity → §7-6. 3 split the button → §7-3. 4 reconcile (this do
 typed `design/languages/*.py` source; JSON is the single source) + slim ACTIVE.md toward its 120-line
 cap → ACTIVE.md edit. 5 three-place test registration → §5. 6 edit `_ENUMERATED` for `site_layout` →
 §7-1. 7 defer ceremony → §8.
+
+## 10. Best-practice review (research `wkmog3t63` + codex: **APPROACH-SOUND**) — additive refinements
+
+External web-research (W3C DTCG, Style Dictionary, Storybook/Chromatic/axe-core, contrast-over-
+translucency, living/governed design systems) + adversarial codex both returned **approach-sound, no
+material rethink**: profile-as-data + thin loader = the DTCG/USWDS direction; the gather→decide split
+IS axe-core's checks-vs-rules + the W3C ACT Rules Format; the pass/fail/candidate triad IS axe
+`pass/fail/incomplete` = ACT `passed/failed/cantTell` (the recognized honest posture, not a hack); the
+deterministic slice EXCEEDS Chromatic (machine verdicts vs human pixel-approval); the closed-cover
+roster = Vanilla-Extract `createThemeContract`; the unconstructable-invalid settings = mature
+constraint-based CPQ / make-illegal-states-unrepresentable, correctly kept at the `conform()` RUNTIME
+layer. The refinements below are ADDITIVE and binding; they AMEND the sections noted.
+
+- **R1 — adopt the W3C DTCG FORMAT for the token block (amends §2; high).** Shape each profile's token
+  sub-block to the **W3C Design Tokens Format Module (2025.10)**: `$value`/`$type`/`$description`,
+  group-level `$type` inheritance, `{alias}` curly-brace refs as the mechanism behind `derived_from`,
+  and the closed type vocab (`dimension {value,unit}` for spacing/radius, `duration`+`cubicBezier` for
+  motion, `shadow` composite for elevation, `number` for the ramp, `color` for roles). **It's just JSON
+  — zero node cost** (the no-npm constraint forbids the TOOLS, not the FORMAT). The spec explicitly
+  scopes theming/components/computation OUT, so `invariants[]`/`anatomy`/`fingerprint`/`archetype`/`ia`/
+  roster stay **bespoke at profile TOP-LEVEL** (NEVER buried in `$extensions` — that would hide the
+  load-bearing partition from the tools whose recognition is the only reason to align). `loader.py` is a
+  ~50-line **DTCG-SUBSET** resolver: `{alias}` resolution + typed primitives + only the shadow/motion
+  composites actually needed; **defer** `$ref` JSON-Pointer sub-addressing + chained-alias edge cases so
+  it stays thin (codex). Buys: predicates read already-typed facts, a free `.tokens.json` export path
+  LATER (no tool imported now), and a W3C-citable single-source claim.
+- **R2 — reclaim glass contrast out of blanket-candidate (amends §1/§7-3; high), GATED.** Contrast is
+  DETERMINISTIC when the background stack is statically known + opaque-or-flat-alpha: port axe-core's
+  `flattenColors` alpha-composite + WCAG2 luminance into `design_predicates.py`, PLUS a Lea-Verou
+  contrast-BOUND predicate (composite the translucent stack over pure black AND pure white, assert the
+  guaranteed LOWER bound ≥ threshold — browser-free). It stays **candidate ONLY** for `backdrop-filter`
+  blur over arbitrary content / gradient / image / dynamic stacking — exactly axe-core's own `incomplete`
+  set. **HARD GATE (codex):** deterministic green is claimable only once (a) `_contrast` is promoted to
+  importable source, (b) it gains alpha-compositing (today opaque-6-hex-only), and (c) the adapter emits
+  a statically-known `resolved_bg_stack` fact. Until all three, contrast stays candidate; **liquid-glass
+  WITH blur always stays candidate.** Claiming deterministic green before that would itself be a fake-green.
+- **R3 — promote the proven helpers to source (amends §3; medium).** `_contrast`/`_is_chromatic`/
+  `_signature` currently live in `tests/` (test_theme_system, test_design_distinctness), so the predicate
+  library cannot import them. Move them to `scripts/contracts/` source with a **clean import redirect** so
+  the existing tests keep passing; extend `_contrast` with alpha-compositing (for R2).
+- **R4 — NAME + budget the visual/probe layer; it does NOT exist yet (amends §1/§4/§7-8; high).** The
+  repo is **SVG-only** — no headless, no Playwright, no PNGs (`requirements.txt` = requests+jinja2). The
+  Seam-4 judgment receipts + the probe slice are net-new infra. Adopt **Playwright-for-Python** as the
+  single sanctioned browser tool (pip, bundles its OWN browser, **NOT a node chain — "no node" ≠ "no
+  browser"**) for PNG receipts + the probe (computed contrast on the real render, `responsive_no_clip`,
+  optionally a single vendored `axe.min.js` injected at runtime). **Codex hard pins:** gate it to a
+  **manual/`prove` lane, NEVER the hourly regeneration CI**; keep the probe slice **OPTIONAL** so the
+  portable-to-scout half installs + passes on jinja2/requests/pytest alone; declare **Pillow** in
+  requirements (present in .venv, undeclared) and use a Pillow-only pixel-diff with a tolerance threshold
+  (no numpy); generate PNG baselines in the SAME environment they're diffed against.
+- **R5 — label status with the ACT/axe lineage (amends §1/§4; medium).** Map `InvariantResult.status` to
+  `passed/failed/cantTell`; in the showcase legend, frame the candidate cells as the portion automation
+  "cannot certify" and cite axe-core `incomplete` + its ~57% auto-coverage. Turns candidate from a
+  perceived weakness into a standards-conformant, citable honesty claim.
+- **R6 — settings: PRE-BAKE (amends §7-6; resolves prior must-fix #2).** Pre-bake the admissible combo
+  space from the SAME Python `conform()` (ONE engine; the UI only reflects/disables what it rejects — the
+  canonical CPQ configurator shape). A JS mirror only as a last resort, restricted to deterministic
+  predicates, WITH a committed Python↔JS parity test. The constraint stays at the `conform()` runtime
+  layer, never baked into types.
+- **R7 — `_ENUMERATED` honesty (amends §7-1; codex correction).** `_ENUMERATED=('source_layout',
+  'test_layout')` deliberately omits `contracts_layout`, which is NOT inert (it has its own
+  `test_every_contract_json_has_a_declared_home` over a `group_dirs` shape). So `site_layout` joins the
+  `_ENUMERATED` loop **only if** it shares the `groups`/`target_dir`/`placement_enforced` shape; otherwise
+  it gets a bespoke method like `contracts_layout`. Do not blindly extend the tuple.
