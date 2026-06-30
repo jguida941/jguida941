@@ -774,6 +774,10 @@ def _build_engineering_metrics(
         )
     else:
         median_days_since_push = 0.0
+    # The FRESHEST repo's age = the user's true "last push". gaps is sorted ascending, so
+    # gaps[0] is the minimum. The median across all (incl. archived) repos reads as staleness
+    # and is dishonest as a "since last push" figure; this is the honest one (P5-DATA).
+    days_since_last_push = float(gaps[0]) if gaps else 0.0
 
     counts = collected.repo_counts
     private_count = counts.get("private_owned")
@@ -785,6 +789,7 @@ def _build_engineering_metrics(
         "primary_lang_share_pct": round(primary_lang_share_pct, 1),
         "languages_over_5pct": languages_over_5pct,
         "median_days_since_push": round(median_days_since_push, 1),
+        "days_since_last_push": round(days_since_last_push, 1),
         "public_repos_total": int(counts.get("public_owned_total", 0) or 0),
         "public_nonfork_repos": int(counts.get("public_owned_nonfork", 0) or 0),
         "private_repos_total": int(private_count) if isinstance(private_count, int) else None,
@@ -1100,6 +1105,7 @@ def compute_profile_model(
         "automation_workflows": engineering["automation_workflows"],
         "primary_lang_share_pct": engineering["primary_lang_share_pct"],
         "median_days_since_push": engineering["median_days_since_push"],
+        "days_since_last_push": engineering["days_since_last_push"],
     }
     accent_colors = {
         "BLUE": BLUE,

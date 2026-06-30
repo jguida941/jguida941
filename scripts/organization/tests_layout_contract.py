@@ -30,6 +30,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
         (
             "test_bootstrap_red_ref.py",
             "test_card_contracts.py",
+            "test_data_semantics.py",
             "test_design_character.py",
             "test_design_contract.py",
             "test_design_distinctness.py",
@@ -146,6 +147,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "skill": (
         "test_skill_structure.py",      # P5: the design-language-tdd skill structure (the repeatable engine)
+    ),
+    "data_semantics": (
+        "test_data_semantics.py",       # P5-DATA: the computed metrics are honest (value+label match meaning)
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y

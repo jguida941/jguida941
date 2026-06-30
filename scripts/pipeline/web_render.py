@@ -287,7 +287,7 @@ def _scorecard() -> str:
       <div class="tile"><div class="l">{_svg_icon(_ICONS['workflow'])} workflows</div><div class="v num" data-bind="scorecard.automation_workflows">—</div><div class="c">CI/CD pipelines</div></div>
       <div class="tile"><div class="l">{_svg_icon(_ICONS['release'])} releases</div><div class="v num" data-bind="scorecard.releases_30d">—</div><div class="c">last 30 days</div></div>
       <div class="tile"><div class="l">{_svg_icon(_ICONS['code'])} <span id="lang-name">primary language</span></div><div class="v num" data-bind="scorecard.primary_lang_share_pct" data-suffix="%" data-round="0">—</div><div class="c">share of code</div></div>
-      <div class="tile"><div class="l">{_svg_icon(_ICONS['calendar'])} median freshness</div><div class="v num" data-bind="scorecard.median_days_since_push" data-suffix="d" data-round="0">—</div><div class="c">since last push</div></div>
+      <div class="tile"><div class="l">{_svg_icon(_ICONS['calendar'])} last push</div><div class="v num" data-bind="scorecard.days_since_last_push" data-suffix="d" data-round="0">—</div><div class="c">days since last commit</div></div>
     </div>
   </section>"""
 

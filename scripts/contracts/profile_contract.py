@@ -69,9 +69,9 @@ SCORECARD_METRICS = [
         "icon": "code",
     },
     {
-        "key": "median_days_since_push",
-        "label": "Median Repo Freshness",
-        "detail": "median days since last push",
+        "key": "days_since_last_push",
+        "label": "Last Push",
+        "detail": "days since your most recent commit",
         "format": "fixed",
         "digits": 0,
         "suffix": "d",

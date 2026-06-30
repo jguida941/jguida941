@@ -31,6 +31,7 @@ ICON_BY_KEY = {
     "releases_30d": "release_tag",
     "primary_lang_share_pct": "code",
     "median_days_since_push": "clock",
+    "days_since_last_push": "clock",
 }
 
 # The single dominant KPI, and the curated supporting grid (CI coverage = gauge).

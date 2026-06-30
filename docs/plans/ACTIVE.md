@@ -123,10 +123,60 @@ easy to measure (token numbers, string presence), not what actually makes it pro
   viewport` (RED-first, mutation-proven). 179 green. NOTE: a SEPARATE residual overflow remains (the heatmap;
   see pt2 #3) — tracked, fixed next by measurement.
 
-- **After P5-0:** P5-1 engine + retire convergence contract (distinctness RED-first) → P5-2
-  diverge the 3 themes → **P5-DATA semantic-TDD on the metrics** → P5-3 webkit chart/component library (PATTERN
-  invariants, not token proxies) → P5-4 settings page → P5-5 themes 4–10 via the skill → P5-6 showcase +
-  portability + the runtime/visual receipt gate. The `design-language-tdd` skill dogfoods on the first 3 themes.
+- ✅ **P5-DATA slice 1 (semantic-TDD on the metrics — the 204-day lie)** — the freshness figure was a
+  median across all ~68 public repos presented as "since last push", reading as months of inactivity while
+  pushes happened TODAY. Added `days_since_last_push` (the FRESHEST repo = the true last push) in
+  `compute_metrics`; the scorecard + dashboard now present "Last Push · days since last commit" (honest),
+  median kept in raw data only. NEW `tests/contracts/test_data_semantics.py` (new `data_semantics` authority):
+  a real unit test on `_build_engineering_metrics` (freshest <= median, pushed-today => 0) + presentation-
+  honesty (no metric pairs a last-push label with the median key; the dashboard binds the honest metric).
+  RED-first (all 3 bit). 183 green. (Next P5-DATA: plausibility + cross-consistency sweep over the rest.)
+
+### ⟐ ARCHITECTURE (P5-ARCH workflow `wf_8ea0e7d9-544` landed — 11 doc dossiers + synthesis + adversarial critique)
+
+**Decisions adopted:**
+- **The Builder Scorecard FREEZES to ONE language (liquid-glass) and DROPS the runtime switcher.** It stays the
+  GitHub-data surface (SVG cards + `site/index.html` + README), tokens pinned at build time. The PATTERN
+  invariants (content-to-chrome, grouped composition, no giant empty boxes) ALSO apply to it — so the one
+  liquid-glass scorecard stops looking AI — but no more theme-chasing on it.
+- **Separate design-language system, NO GitHub data in it (synthetic fixtures):** (A) a CLOSED component library
+  (button, chip, card, input, nav, kpi, table, chart, hero, type-specimen — every variant+state); (B) per-theme
+  archetype pages `site/showcase/<lang>.html` where each language renders its OWN kind of website (Apple editorial
+  scroll, Carbon UI-Shell+SideNav+DataTable, Power BI fixed 1280×720 report w/ page-tabs + cross-filter, Stripe
+  gradient marketing, Linear midnight hairline); plus `site/showcase.html` gallery (component-matrix + per-theme).
+- **Packages:** `scripts/rendering/design/<lang>.py` (profiles), `scripts/rendering/webkit/` (portable
+  component+chart emitters — incl. a per-profile component-ANATOMY hook so Carbon's label-left/icon-right is
+  STRUCTURE not a token-swap), `scripts/rendering/showcase/`, `scripts/quality/design_invariants.py` (portable
+  `(surface,profile)->[InvariantResult]` engine, runs on the scorecard AND the showcase). `design_tokens.py`
+  becomes a thin shim **DERIVED from config.py** (single source — must-fix #5).
+- **Invariants are PATTERN/anatomy-level, grounded in cited doc values** (Carbon radius:0 except .cds--tag; Apple
+  zero box-shadow; anti-Material state-mechanic; Stripe angled gradient + `rgba(50,50,93,.25)` shadow; pairwise
+  distinctness fingerprint forbidding near-sibling convergence). Determinism split honest (deterministic predicate
+  vs judgment review-anchor+visual-receipt).
+
+**Critic verdict `revise` — must-fixes folded into the plan (in order):**
+1. **HONESTY: drop the "Rust kernel decides / candidate_only" framing LOCALLY.** Grep proved no kernel / no
+   `semproof` / no `candidate_only` in THIS repo; receipts already self-write "satisfied". Local enforcement =
+   pytest contracts + visual receipts. Kernel-adjudication is the PORTABILITY destination (repo-surface-scout /
+   semantic-tdd), not a current local gate. Stop claiming it operates here.
+2. **Verify every magic constant against a real published-doc URL** in `docs/design/<lang>.md` BEFORE writing the
+   RED (the predicates currently encode unverified numbers: rim `rgba(255,255,255,0.22)`, `saturate>=180%`, spring
+   `cubic-bezier(0.34,1.56,0.64,1)`, Stripe shadow). Spot-verify ≥ liquid-glass materials + Stripe shadow. ← the
+   owner's exact demand: follow the ACTUAL design docs.
+3. **The repo_layout meta-gate is INERT for non-`scripts/**/*.py`** (P5-0 not finished; `layout_audit` only walks
+   `scripts/**/*.py`). Either land the repo_layout-consuming gate or treat P5-0 as a hard precondition before the
+   showcase files' homes mean anything.
+4. **Component ANATOMY deterministic** (above). 5. **liquid-glass DERIVED from config** (above). 6. Make the
+   reusable half repo-literal-free (skill must not hardcode MODULE_HOMES / repo_layout.json / receipt sinks).
+
+**First design slice (after the docs/design verification of #2):** BUTTON across all variants+states for 3
+profiles (liquid-glass, carbon, apple-dark) — character + distinctness deterministic contract + the first visual
+receipt. The loudest "genuinely different component, not a reskin" moment.
+
+- **Roadmap:** **P5-DATA semantic-TDD on the metrics (NOW)** → docs/design verification → P5-3 webkit button slice
+  → showcase scaffold → themes 4–10 via the skill → P5-4 settings/customization → P5-6 showcase polish + the
+  runtime/visual receipt gate. P5-0 org-gate completion gates the showcase-file homes. The `design-language-tdd`
+  skill dogfoods on the first 3 themes.
 
 ## Context
 
