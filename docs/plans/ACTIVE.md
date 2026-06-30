@@ -43,8 +43,14 @@
   CSS-gated on `[data-theme="power-bi"]` so the switcher reflows it. `test_design_character` extended
   (Power BI table-forward; others bar/stat-forward — grounded in the research). 171 green. Same data,
   different chart per design language — the start of each theme being a different *website*.
-- ⏭ **Next (more anatomy + the SKILL):** Apple → big stat-cards + single ring (drop the heatmap density);
-  Power BI → multi-series bars + categorical palette + 4-6 KPI/row grid; then
+- ✅ **P5-SKILL slice 1 (the repeatable engine exists)** — `skills/design-language-tdd/` (SKILL.md +
+  references add-design-language / prove-theme / boundaries) codifies the loop (research → cited
+  doctrine → closed proper-style + character invariant set RED-first → GENERATE the themed
+  anatomy → prove: GREEN both surfaces + mutation + receipts + codex → honest receipt, never "is
+  Apple"). Org gate baked in. Guarded by `test_skill_structure` (new `skill` authority). 175 green.
+  "Add Material / Stripe / a brand guide" = run this skill = another complete distinct website.
+- ⏭ **Next (more anatomy + scale via the skill):** Apple → big stat-cards + single ring (drop the heatmap
+  density); Power BI → multi-series bars + categorical palette + 4-6 KPI/row grid; then
   CODIFY the whole loop (research → character/per-aspect invariants → GENERATE the themed site → prove)
   as `skills/design-language-tdd/`, dogfooded on these 3 themes — so "add Material/Stripe/..." = run
   the skill = another full distinct website.

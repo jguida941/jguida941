@@ -39,6 +39,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_public_data_privacy.py",
             "test_readme_projection.py",
             "test_scripts_layout_contract.py",
+            "test_skill_structure.py",
             "test_structural_layout.py",
             "test_tests_layout_contract.py",
             "test_theme_system.py",
@@ -142,6 +143,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     "design_languages": (
         "test_design_character.py",     # P5: each theme positively EXPRESSES its language (proper style)
         "test_design_distinctness.py",  # P5: themes are DISTINCT design languages (anti-convergence)
+    ),
+    "skill": (
+        "test_skill_structure.py",      # P5: the design-language-tdd skill structure (the repeatable engine)
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y
