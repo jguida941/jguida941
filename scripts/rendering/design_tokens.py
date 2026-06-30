@@ -163,7 +163,9 @@ def _ia_vars(name: str, indent: str = "  ") -> str:
     lines.append(f"{indent}--pad-panel: {d['panel_pad']}px;")
     lines.append(f"{indent}--pad-tile: {d['tile_pad']}px;")
     lines.append(f"{indent}--gap-grid: {d['gap']}px;")
-    lines.append(f"{indent}--tile-min: {d['tile_min']}px;")
+    # NOTE: `tile_min` stays in THEME_IA as a reserved per-theme density spec for the future
+    # showcase GRID layouts, but the scorecard readout is now the grouped inset-LIST (no grid), so
+    # we do NOT emit a dead `--tile-min` CSS var that nothing consumes.
     for key, (size, weight) in type_scale(name).items():
         lines.append(f"{indent}--type-{key}: {size}px;")
         lines.append(f"{indent}--type-{key}-weight: {weight};")

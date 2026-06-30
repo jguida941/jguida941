@@ -47,13 +47,14 @@ class DesignCharacterContract(unittest.TestCase):
         self.assertGreater(pads["liquid-glass"], pads["power-bi"], "Power BI must be tighter than the anchor")
         self.assertEqual(len(set(pads.values())), len(pads), "each theme's density must be distinct")
 
-    def test_kpi_grid_density_is_inverted_from_padding(self):
-        """The KPI grid packs INVERSELY to padding: Power BI's tile_min is smallest (4-6 KPIs/row,
-        Power BI report design), Apple's is largest (few large cards, HIG Layout). Distinct."""
-        mins = {n: dt.density(n)["tile_min"] for n in dt.THEMES}
-        self.assertLess(mins["power-bi"], mins["liquid-glass"], "Power BI packs a denser KPI grid")
-        self.assertGreater(mins["apple-dark"], mins["liquid-glass"], "Apple spreads to few large cards")
-        self.assertEqual(len(set(mins.values())), len(mins), "each theme's KPI-grid density must be distinct")
+    # RETIRED test_kpi_grid_density_is_inverted_from_padding (codex must-fix): it guarded the
+    # per-theme `.tiles` KPI-grid density via dt.density()["tile_min"], but the readout is now the
+    # grouped inset-LIST (single column, no tile_min consumer), so the test guarded an inert value
+    # and gave false confidence a rendered grid invariant existed. The `tile_min` field stays in
+    # THEME_IA as a RESERVED density spec for the future per-theme showcase GRID layouts (where
+    # Power-BI-dense vs Apple-spread will matter again), and `--tile-min` is no longer emitted into
+    # the scorecard CSS. When the showcase grids land, a real rendered-grid density invariant
+    # replaces this — tested against that surface, not as latent data.
 
     def test_power_bi_is_table_forward_apple_is_not(self):
         """Per the research: Power BI favors a data table/matrix (tabular encoding); Apple is
@@ -76,54 +77,41 @@ class DesignCharacterContract(unittest.TestCase):
     # forthcoming GROUPED_DENSE_READOUT pattern invariant (docs/design/liquid-glass.md) is the guard
     # that forbids under-filled surfaces going forward.
 
-    def test_kpi_density_character_survives_on_mobile(self):
-        """Mobile must NOT flatten the per-language KPI grid to one column for everyone — that
-        would erase the density CHARACTER exactly where phones make it matter most. A Power BI
-        report stays multi-column data-dense on a phone (small tile_min => >=2 KPIs/row at ~390px);
-        Apple collapses to one large card (tile_min ~ the viewport). So `.tiles` must keep its
-        auto-fit minmax(var(--tile-min)) grid at EVERY width — only section-level layout
-        (.bento/.lanes/.langlegend) may collapse to a single column on a narrow screen.
-        Mutation-proof: put `.tiles` back in the mobile `grid-template-columns: 1fr` list and
-        Power BI flattens to Apple's single column — this reds."""
+    # RETIRED test_kpi_density_character_survives_on_mobile + test_kpi_grid_never_overflows_a_narrow_
+    # viewport: both governed the `.tiles` auto-fit KPI GRID (per-theme tile_min density + the
+    # minmax(min(),100%) overflow clamp). The de-AI readout refactor replaced that card grid with the
+    # Apple grouped inset-LIST (.mgroup of bare .mrow Value-1 rows) — a single column of dense rows
+    # that has no per-theme tile_min and cannot overflow, so these two invariants no longer have a
+    # subject. They are SUPERSEDED by test_metric_readout_is_grouped_not_giant_boxes below (a stronger
+    # pattern invariant). Not silently dropped: recorded here + in docs/plans/ACTIVE.md.
+
+    def test_metric_readout_is_grouped_not_giant_boxes(self):
+        """PATTERN invariant (docs/design/liquid-glass.md, cited Apple HIG): a readout of >=3 sibling
+        scalar metrics is ONE inset-grouped container of hairline-divided 'Value 1' rows — NOT N
+        independently-chromed cards (the giant-empty-box AI tell: 'huge blocks around stuff … Apple
+        designers and pros don't do this'). The FIRST pattern invariant — composition, not a padding
+        token (a tall rounded card with one number PASSES `panel_pad>=24` while ~70% dead space).
+        The deterministic gate is STRUCTURAL + COLUMN-INDEPENDENT, closing the two escapes codex
+        found: a 2-up grid of chromed tiles AND a short chromed dead-space box both carry per-metric
+        chrome, so both FAIL regardless of columns/height. The geometric ink-fill is the visual-
+        receipt judgment, not faked here. Mutation-proof: re-add border-radius/background to `.mrow`."""
         import re
         from scripts.pipeline.web_render import render_dashboard
         html = render_dashboard()
-        # the base KPI grid stays per-theme: auto-fit on each language's own tile-min
-        self.assertRegex(html, r"\.tiles\s*\{[^}]*minmax\([^}]*var\(--tile-min",
-                         "the KPI grid must remain auto-fit on the per-theme --tile-min")
-        # For every SINGLE-column collapse (`grid-template-columns: 1fr;` — NOT the `1fr 1fr`
-        # bento base), walk back to the selector that owns it; `.tiles` must never be one of them.
-        for hit in re.finditer(r"grid-template-columns:\s*1fr\s*;", html):
-            brace = html.rfind("{", 0, hit.start())          # the { opening this rule's body
-            prev = max(html.rfind("}", 0, brace), html.rfind("{", 0, brace))  # boundary before selector
-            selector = html[prev + 1: brace]
-            self.assertNotRegex(
-                selector, r"\.tiles(\s|,|$)",
-                ".tiles must keep its per-theme auto-fit grid on mobile (Power BI stays dense, "
-                "Apple goes to one card) — it must never collapse to a fixed single column")
-
-    def test_kpi_grid_never_overflows_a_narrow_viewport(self):
-        """A theme's tile_min can legitimately EXCEED a phone's width (Apple's is 380px > a ~390px
-        viewport, and the airy panel padding leaves only ~300px inside). A raw
-        minmax(380px, 1fr) then forces a track WIDER than the screen, so the cards overflow
-        horizontally — exactly the Apple-Dark / iOS-Safari bug. The KPI grid must CLAMP its
-        minimum track to the container: minmax(min(var(--tile-min), 100%), 1fr) keeps the airy
-        large-card density on a wide screen but collapses to one FITTING card on a phone, so NO
-        theme — whatever its tile_min — can overflow. Mutation-proof: drop the `min(...,100%)`
-        clamp and Apple Dark overflows ~390px again."""
-        from scripts.pipeline.web_render import render_dashboard
-        html = render_dashboard()
-        self.assertRegex(
-            html, r"\.tiles\s*\{[^}]*minmax\(\s*min\(\s*var\(--tile-min[^)]*\)\s*,\s*100%\s*\)",
-            "the KPI grid must clamp its track to the viewport — "
-            "minmax(min(var(--tile-min), 100%), 1fr) — or a theme whose tile_min exceeds the screen "
-            "(Apple 380px) overflows horizontally on a phone")
-
-    # DEFERRED to its own slice (the de-AI readout refactor): test_metric_readout_is_grouped_not_
-    # giant_boxes — the first PATTERN invariant (grouped .mgroup container of bare hairline-divided
-    # .mrow Value-1 rows; per-metric chrome forbidden, column-independent). Doc-grounded + codex-
-    # reviewed in docs/design/liquid-glass.md §7; it lands RED-first WITH the web_render refactor +
-    # the before/after visual receipt, so it is not committed ahead of the implementation it gates.
+        self.assertIn('class="mgroup"', html, "the metric readout must be ONE grouped container")
+        self.assertIn('class="mrow"', html, "metrics must be Value-1 rows inside the group, not cards")
+        self.assertRegex(html, r"\.mgroup\s*\{[^}]*border-radius:",
+                         "the group container carries the rounded chrome")
+        mrow = re.search(r"\.mrow\s*\{([^}]*)\}", html)
+        self.assertIsNotNone(mrow, ".mrow rule must exist")
+        body = mrow.group(1)
+        for chrome in ("border-radius", "background", "border:"):
+            self.assertNotIn(chrome, body,
+                             f".mrow must carry NO independent {chrome} — only the group is chromed")
+        self.assertRegex(html, r"\.mrow\s*\+\s*\.mrow\s*\{[^}]*border-top:",
+                         "adjacent metric rows are divided by a hairline, not gapped cards")
+        self.assertRegex(html, r"\.mrow\s*\{[^}]*display:\s*(grid|flex)",
+                         "rows are inline label+value (Value-1), not a tall stacked box")
 
     def test_density_is_web_only_and_preserves_svg_parity(self):
         """Density is a web concern; the DEFAULT theme's type/radius still equal config."""

@@ -97,15 +97,18 @@ body {
 .span-2 { grid-column: 1 / -1; }
 
 /* --- metric tiles --- */
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(var(--tile-min, 200px), 100%), 1fr)); gap: var(--gap-grid, 12px); }
-.tile {
-  background: color-mix(in srgb, var(--surface-raised) calc(var(--raised-opacity)*100%), transparent);
-  border: 1px solid color-mix(in srgb, var(--hairline) 12%, transparent);
-  border-radius: var(--radius-tile); padding: var(--pad-tile, 14px) 16px; }
-.tile .l { display: flex; align-items: center; gap: 7px; font-size: var(--type-caption); color: var(--ink-dim); }
-.tile .v { font-size: var(--type-metric_lg); font-weight: 600; color: var(--ink-strong); margin-top: 6px; }
-.tile .c { font-size: var(--type-caption); color: var(--ink-dim); margin-top: 2px; }
-.tile svg { width: 15px; height: 15px; stroke: var(--ink-dim); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+/* Apple grouped inset-list readout (docs/design/liquid-glass.md, cited HIG): a cluster of >=3
+   scalar metrics is ONE chromed container of BARE, hairline-divided 'Value 1' rows (label left,
+   value right) — never N independently-chromed cards. Only .mgroup carries chrome; rows are
+   divided by a 1px hairline, the value dominates. Closes the giant-empty-box anti-pattern. */
+.mgroup { border: 1px solid color-mix(in srgb, var(--hairline) 12%, transparent); border-radius: var(--radius-tile); background: color-mix(in srgb, var(--surface-raised) calc(var(--raised-opacity)*100%), transparent); overflow: hidden; }
+.mrow { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 11px var(--pad-tile, 16px); min-height: 44px; }
+.mrow + .mrow { border-top: 1px solid color-mix(in srgb, var(--hairline) 9%, transparent); }
+.ml { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.mt { display: flex; align-items: center; gap: 8px; font-size: var(--type-body); font-weight: 600; color: var(--ink); }
+.ms { font-size: var(--type-caption); color: var(--ink-dim); }
+.mv { font-size: var(--type-metric); font-weight: 600; color: var(--ink-strong); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mrow svg { width: 15px; height: 15px; stroke: var(--ink-dim); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
 
 /* --- ring (CI coverage) --- */
 .ring { --p: 0; position: relative; width: 64px; height: 64px; border-radius: 50%; flex: 0 0 auto;
@@ -199,8 +202,8 @@ footer a { color: var(--ink); text-decoration: none; }
 /* --- a11y + responsive --- */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 @media (max-width: 760px) {
-  /* section-level layout collapses to one column; the KPI grid (.tiles) keeps its
-     per-theme auto-fit on --tile-min, so Power BI stays dense and Apple goes to one card */
+  /* section-level layout collapses to one column on a narrow screen; the metric readouts are
+     grouped inset-LISTS (.mgroup of .mrow rows), already a single dense column at every width */
   .bento, .langlegend, .lanes { grid-template-columns: 1fr; }
   .hero .kpi { gap: 18px; }
   .hero .stats { gap: 18px; }
@@ -219,7 +222,7 @@ footer a { color: var(--ink); text-decoration: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 @media (prefers-reduced-transparency: reduce) {
-  .panel, .switcher, .tile, .rrow { -webkit-backdrop-filter: none; backdrop-filter: none;
+  .panel, .switcher, .mgroup, .rrow { -webkit-backdrop-filter: none; backdrop-filter: none;
     background: var(--surface); }
 }
 """
@@ -280,15 +283,15 @@ def _scorecard() -> str:
     <hr class="hairline">
     <div class="ring-row" style="margin-bottom:14px">
       <div class="ring" id="ci-ring"><span class="num" data-bind="scorecard.ci_coverage_pct" data-suffix="%" data-round="0">—</span></div>
-      <div><div class="tile" style="border:0;background:none;padding:0"><div class="l">CI coverage</div><div class="c">of public repos automated</div></div></div>
+      <div><div class="mt">CI coverage</div><div class="ms">of public repos automated</div></div>
     </div>
-    <div class="tiles">
-      <div class="tile"><div class="l">{_svg_icon(_ICONS['fire'])} active days</div><div class="v num" data-bind="scorecard.active_days_last_year">—</div><div class="c">last 12 months</div></div>
-      <div class="tile"><div class="l">{_svg_icon(_ICONS['commit'])} active repos</div><div class="v num" data-bind="scorecard.active_repos_7d">—</div><div class="c">last 7 days</div></div>
-      <div class="tile"><div class="l">{_svg_icon(_ICONS['workflow'])} workflows</div><div class="v num" data-bind="scorecard.automation_workflows">—</div><div class="c">CI/CD pipelines</div></div>
-      <div class="tile"><div class="l">{_svg_icon(_ICONS['release'])} releases</div><div class="v num" data-bind="scorecard.releases_30d">—</div><div class="c">last 30 days</div></div>
-      <div class="tile"><div class="l">{_svg_icon(_ICONS['code'])} <span id="lang-name">primary language</span></div><div class="v num" data-bind="scorecard.primary_lang_share_pct" data-suffix="%" data-round="0">—</div><div class="c">share of code</div></div>
-      <div class="tile"><div class="l">{_svg_icon(_ICONS['calendar'])} last push</div><div class="v num" data-bind="scorecard.days_since_last_push" data-suffix="d" data-round="0">—</div><div class="c">days since last commit</div></div>
+    <div class="mgroup">
+      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['fire'])} active days</span><span class="ms">last 12 months</span></span><span class="mv num" data-bind="scorecard.active_days_last_year">—</span></div>
+      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['commit'])} active repos</span><span class="ms">last 7 days</span></span><span class="mv num" data-bind="scorecard.active_repos_7d">—</span></div>
+      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['workflow'])} workflows</span><span class="ms">CI/CD pipelines</span></span><span class="mv num" data-bind="scorecard.automation_workflows">—</span></div>
+      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['release'])} releases</span><span class="ms">last 30 days</span></span><span class="mv num" data-bind="scorecard.releases_30d">—</span></div>
+      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['code'])} <span id="lang-name">primary language</span></span><span class="ms">share of code</span></span><span class="mv num" data-bind="scorecard.primary_lang_share_pct" data-suffix="%" data-round="0">—</span></div>
+      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['calendar'])} last push</span><span class="ms">days since last commit</span></span><span class="mv num" data-bind="scorecard.days_since_last_push" data-suffix="d" data-round="0">—</span></div>
     </div>
   </section>"""
 
@@ -347,7 +350,7 @@ def _snapshot() -> str:
   <section class="panel">
     <div class="section-head"><div><p class="eyebrow">Live GitHub Data</p><h2 class="title">Raw Data Snapshot</h2></div></div>
     <hr class="hairline">
-    <div class="tiles" id="snap-tiles"></div>
+    <div class="mgroup" id="snap-tiles"></div>
     <p class="eyebrow" style="margin:20px 0 0">Pipeline Status</p>
     <div class="chips" id="pipeline"></div>
   </section>"""
@@ -449,7 +452,7 @@ def _script() -> str:
       total_stars:"Stars", prs_merged:"PRs Merged", ci_repos:"CI Repos"};
     const rows = (d.snapshot_rows || []).filter(r => TILE[r.key]);
     document.getElementById("snap-tiles").innerHTML = rows.slice(0, 6).map(r =>
-      `<div class="tile"><div class="l">${esc(TILE[r.key])}</div><div class="v num">${esc(r.display_value)}</div></div>`).join("");
+      `<div class="mrow"><span class="ml"><span class="mt">${esc(TILE[r.key])}</span></span><span class="mv num">${esc(r.display_value)}</span></div>`).join("");
     // pipeline status — public source health only (never auth/credential fields)
     const q = d.data_quality || {};
     const cls = (s) => s==="ok"?"ok":(["error","failed","missing"].includes(s)?"bad":"warn");

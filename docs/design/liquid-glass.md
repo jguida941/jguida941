@@ -103,9 +103,9 @@ The CI-coverage **ring** and the **hero** are single charts/headers (HIG chartin
 
 ## 7. The deterministic gate (browserless) vs the judgment (visual receipt)
 
-Honest split — this repo's test suite has no headless browser, so (the deterministic gate
-`test_design_character.test_metric_readout_is_grouped_not_giant_boxes` is **forthcoming** — it lands
-RED-first WITH the web_render readout refactor, not ahead of it):
+Honest split — this repo's test suite has no headless browser, so (the deterministic gate is
+`test_design_character.test_metric_readout_is_grouped_not_giant_boxes`, RED-first, mutation-proven,
+codex-agreed):
 - **DETERMINISTIC (red-now/green-after):** the STRUCTURAL composition —
   per-metric rows carry **no** independent border/border-radius/background; the cluster is ONE
   chromed `.mgroup` container; adjacent rows are divided by a 1px hairline; rows are inline

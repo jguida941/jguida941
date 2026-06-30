@@ -143,15 +143,17 @@ easy to measure (token numbers, string presence), not what actually makes it pro
   should forbid. Measured (true 390/desktop): panel 181px, heat `display:none`. RETIRED that invariant +
   its CSS; Apple shows the rhythm like every theme (distinctness comes from colour/type/density/material).
   After: panel 364px, heat back, filled. 182 green. **Lesson: distinctness never trumps content-to-chrome.**
-- 🔄 **P5-PATTERN (doc-grounded, codex-reviewed) — the de-AI readout slice (giant KPI boxes)** — workflow
-  `w497dsesl` produced the cited Apple HIG doctrine `docs/design/liquid-glass.md` (grouped inset lists,
-  Value-1 rows, 44pt row, 1pt hairline @16pt inset, type ramp; derived numbers marked derived) and codex
-  returned `revise` — it caught two real escapes in a geometric formulation AND that the workflow agents read
-  the STALE `~/Downloads` repo (so its repo-specific must-fixes were false for this repo). Folded: a
-  COLUMN-INDEPENDENT structural gate (per-metric rows bare, only the group chromed) closes both escapes and
-  is browserless-checkable; re-grounded to the real `web_render.py`/`.tiles`. The deterministic RED contract
-  (`test_metric_readout_is_grouped_not_giant_boxes`) + the `.tiles`/`.tile` → `.mgroup`/`.mrow` refactor +
-  the before/after visual receipt + codex-on-the-diff land together in the next slice (doc shipped first).
+- ✅ **P5-PATTERN slice 1 (the de-AI readout — giant KPI boxes GONE, codex-agreed)** — the first PATTERN
+  invariant. Doc-grounded via workflow `w497dsesl` (`docs/design/liquid-glass.md`, cited Apple HIG: grouped
+  inset lists, Value-1 rows, 44pt row, 1pt hairline @16pt inset, type ramp; derived numbers marked). Codex
+  caught two escapes in a geometric formulation + that the research agents read the STALE `~/Downloads` repo
+  → folded a COLUMN-INDEPENDENT structural gate (per-metric rows bare, only the group chromed) and re-grounded
+  to the real `web_render.py`/`.tiles`. Refactored both readouts (`.tiles`/`.tile` cards → `.mgroup`/`.mrow`
+  grouped Value-1 rows; ring/hero exempt). New `test_metric_readout_is_grouped_not_giant_boxes` (RED-first,
+  mutation-proven). Retired 3 obsolete `.tiles`-grid invariants + the dead `--tile-min` emission (codex
+  must-fixes folded; codex re-reviewed the diff → **VERDICT: agree**). 180 green; before/after visual receipt
+  captured. The scorecard reads like an Apple grouped list now, not AI boxes. **Lesson: prove composition
+  PATTERNS, not padding tokens.**
 
 ### ⟐ ARCHITECTURE (P5-ARCH workflow `wf_8ea0e7d9-544` landed — 11 doc dossiers + synthesis + adversarial critique)
 
