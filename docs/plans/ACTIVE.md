@@ -49,8 +49,11 @@
   anatomy → prove: GREEN both surfaces + mutation + receipts + codex → honest receipt, never "is
   Apple"). Org gate baked in. Guarded by `test_skill_structure` (new `skill` authority). 175 green.
   "Add Material / Stripe / a brand guide" = run this skill = another complete distinct website.
+- ✅ **P5-1 slice 4 (per-theme KPI-grid density)** — `.tiles` now `auto-fit minmax(var(--tile-min),1fr)`;
+  Power BI tile_min 150 packs a dense 5-6-KPI row, Apple tile_min 380 spreads to 2 large cards, Liquid
+  280 (3-up). `test_design_character` extended (KPI density inverts padding, distinct). 176 green.
 - ⏭ **Next (more anatomy + scale via the skill):** Apple → big stat-cards + single ring (drop the heatmap
-  density); Power BI → multi-series bars + categorical palette + 4-6 KPI/row grid; then
+  density); Power BI → multi-series bars + categorical palette; then
   CODIFY the whole loop (research → character/per-aspect invariants → GENERATE the themed site → prove)
   as `skills/design-language-tdd/`, dogfooded on these 3 themes — so "add Material/Stripe/..." = run
   the skill = another full distinct website.

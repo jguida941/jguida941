@@ -92,25 +92,26 @@ THEME_IA: dict[str, dict] = {
     "liquid-glass": {  # type/radius == config (the anchor); medium density
         "radius": {"panel": config.GLASS_RX, "tile": config.GLASS_TILE_RX},
         "type": {},
-        "density": {"band": "medium", "panel_pad": 28, "tile_pad": 14, "gap": 20},
+        "density": {"band": "medium", "panel_pad": 28, "tile_pad": 14, "gap": 20, "tile_min": 280},
     },
-    "apple-dark": {  # Apple HIG — generous radius + large display type + AIRY space
+    "apple-dark": {  # Apple HIG — generous radius + large display type + AIRY space, few large cards
         "radius": {"panel": 26, "tile": 18},
         "type": {"display": (54, 600), "metric_lg": (30, 600), "title": (22, 600)},
-        "density": {"band": "airy", "panel_pad": 32, "tile_pad": 24, "gap": 24},
+        "density": {"band": "airy", "panel_pad": 32, "tile_pad": 24, "gap": 24, "tile_min": 380},
     },
-    "power-bi": {  # Power BI — sharp corners + compact tabular type + TIGHT data-ink density
+    "power-bi": {  # Power BI — sharp corners + compact tabular type + TIGHT data-ink density, dense KPI grid
         "radius": {"panel": 6, "tile": 4},
         "type": {"display": (38, 700), "metric_lg": (24, 700), "metric": (20, 700),
                  "title": (18, 600), "body": (13, 400)},
-        "density": {"band": "tight", "panel_pad": 16, "tile_pad": 12, "gap": 8},
+        "density": {"band": "tight", "panel_pad": 16, "tile_pad": 12, "gap": 8, "tile_min": 150},
     },
 }
 
+_DENSITY_DEFAULT = {"band": "medium", "panel_pad": 28, "tile_pad": 14, "gap": 20, "tile_min": 280}
+
 
 def density(name: str | None = None) -> dict:
-    return dict(THEME_IA.get(name or DEFAULT_THEME, {}).get(
-        "density", {"band": "medium", "panel_pad": 28, "tile_pad": 14, "gap": 20}))
+    return {**_DENSITY_DEFAULT, **THEME_IA.get(name or DEFAULT_THEME, {}).get("density", {})}
 
 
 def roles() -> tuple[str, ...]:
@@ -162,6 +163,7 @@ def _ia_vars(name: str, indent: str = "  ") -> str:
     lines.append(f"{indent}--pad-panel: {d['panel_pad']}px;")
     lines.append(f"{indent}--pad-tile: {d['tile_pad']}px;")
     lines.append(f"{indent}--gap-grid: {d['gap']}px;")
+    lines.append(f"{indent}--tile-min: {d['tile_min']}px;")
     for key, (size, weight) in type_scale(name).items():
         lines.append(f"{indent}--type-{key}: {size}px;")
         lines.append(f"{indent}--type-{key}-weight: {weight};")

@@ -47,6 +47,14 @@ class DesignCharacterContract(unittest.TestCase):
         self.assertGreater(pads["liquid-glass"], pads["power-bi"], "Power BI must be tighter than the anchor")
         self.assertEqual(len(set(pads.values())), len(pads), "each theme's density must be distinct")
 
+    def test_kpi_grid_density_is_inverted_from_padding(self):
+        """The KPI grid packs INVERSELY to padding: Power BI's tile_min is smallest (4-6 KPIs/row,
+        Power BI report design), Apple's is largest (few large cards, HIG Layout). Distinct."""
+        mins = {n: dt.density(n)["tile_min"] for n in dt.THEMES}
+        self.assertLess(mins["power-bi"], mins["liquid-glass"], "Power BI packs a denser KPI grid")
+        self.assertGreater(mins["apple-dark"], mins["liquid-glass"], "Apple spreads to few large cards")
+        self.assertEqual(len(set(mins.values())), len(mins), "each theme's KPI-grid density must be distinct")
+
     def test_power_bi_is_table_forward_apple_is_not(self):
         """Per the research: Power BI favors a data table/matrix (tabular encoding); Apple is
         stat/bar-forward and AVOIDS dense tables. So the languages section becomes a DATA TABLE
