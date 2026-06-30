@@ -104,6 +104,47 @@ class StructuralLayoutContract(unittest.TestCase):
         self.assertEqual([], sorted(undeclared),
                          "contract JSON with no declared home — add to structural_layout.contracts_layout")
 
+    def test_every_site_html_has_a_declared_home(self):
+        """P5-0-FINISH: closed cover over GENERATED site HTML — an undeclared `site/*.html`
+        reddens, so showcase.html / settings.html are structurally unconstructable until declared
+        in the slice that creates them. Bespoke root_allowlist + group_dirs method (mirrors
+        contracts_layout): `site/` is a root+allowlist shape, NOT a groups/target_dir shape, so it
+        is deliberately NOT in `_ENUMERATED` (codex R7). `site/data/*` is hydrated JSON, not HTML,
+        so the `*.html` glob never matches it."""
+        section = _STRUCT["site_layout"]
+        root = REPO_ROOT / section["root"]
+        allow, group_dirs = set(section["root_allowlist"]), set(section["group_dirs"])
+        undeclared: list[str] = []
+        for path in root.glob(section["glob"]):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(root).parts
+            if (len(rel) == 1 and rel[0] not in allow) or (len(rel) > 1 and rel[0] not in group_dirs):
+                undeclared.append(path.relative_to(root).as_posix())
+        self.assertEqual([], sorted(undeclared),
+                         "site HTML with no declared home — add to structural_layout.site_layout "
+                         "(showcase.html / settings.html land in their own slices)")
+
+    def test_site_cover_fires_on_a_forged_html(self):
+        """Anti-tautology: the site cover CAN redden. Pure cover logic over a hypothetical file
+        set proves a forged top-level OR subdir HTML breaks parity — no tautology."""
+        section = _STRUCT["site_layout"]
+        allow, group_dirs = set(section["root_allowlist"]), set(section["group_dirs"])
+
+        def _undeclared(names: list[str]) -> list[str]:
+            out: list[str] = []
+            for rel in names:
+                parts = Path(rel).parts
+                if (len(parts) == 1 and parts[0] not in allow) or (len(parts) > 1 and parts[0] not in group_dirs):
+                    out.append(rel)
+            return sorted(out)
+
+        self.assertEqual([], _undeclared(["index.html"]), "the declared cover is green now")
+        self.assertEqual(["forged.html"], _undeclared(["index.html", "forged.html"]),
+                         "a forged undeclared top-level site HTML must redden")
+        self.assertEqual(["rogue/x.html"], _undeclared(["index.html", "rogue/x.html"]),
+                         "an undeclared subdir site HTML must redden")
+
     # --- inverse drift: no phantom declarations ---
 
     def test_declared_homes_have_no_phantom_members(self):

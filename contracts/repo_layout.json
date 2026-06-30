@@ -82,6 +82,13 @@
       "placement_enforced": true,
       "root_allowlist": ["repo_layout.json"],
       "group_dirs": ["design_profiles"]
+    },
+    "site_layout": {
+      "purpose": "P5-0-FINISH: closed cover over GENERATED site HTML so an undeclared site/*.html is structurally unconstructable (the precondition for the design-system showcase/settings homes). site/data/* is hydrated JSON, never matched by the *.html glob. Bespoke root_allowlist + group_dirs method (like contracts_layout); site/ is a root+allowlist shape, NOT a groups/target_dir shape, so it is deliberately NOT in the _ENUMERATED loop (codex R7). showcase.html / settings.html join root_allowlist, and a showcase/ subdir joins group_dirs, only in the slice that creates them.",
+      "root": "site",
+      "glob": "**/*.html",
+      "root_allowlist": ["index.html"],
+      "group_dirs": []
     }
   }
 }
