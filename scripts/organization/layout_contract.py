@@ -74,6 +74,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/rendering/design_tokens.py", "scripts/rendering/design_tokens.py", "rendering", "single design-token source + themes (SVG values + web CSS)"),
     ModuleHome("scripts/rendering/components.py", "scripts/rendering/components.py", "rendering", "reusable token-driven SVG components"),
     ModuleHome("scripts/rendering/design/loader.py", "scripts/rendering/design/loader.py", "rendering", "DTCG-subset design-profile loader (the thin VIEW; single-source from config)"),
+    ModuleHome("scripts/rendering/webkit/components.py", "scripts/rendering/webkit/components.py", "rendering", "profile-driven web component library (render_button + anatomy hook)"),
     ModuleHome("scripts/render/cards/generate_activity_heatmap.py", "scripts/rendering/generate_activity_heatmap.py", "rendering", "activity heatmap renderer"),
     ModuleHome("scripts/render/cards/generate_badges.py", "scripts/rendering/generate_badges.py", "rendering", "badge renderer"),
     ModuleHome("scripts/render/cards/generate_builder_scorecard.py", "scripts/rendering/generate_builder_scorecard.py", "rendering", "builder scorecard renderer"),
@@ -122,6 +123,7 @@ PACKAGE_INIT_PATHS: frozenset[str] = frozenset(
         "scripts/quality/__init__.py",
         "scripts/rendering/__init__.py",
         "scripts/rendering/design/__init__.py",
+        "scripts/rendering/webkit/__init__.py",
     }
 )
 

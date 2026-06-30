@@ -38,6 +38,26 @@
       "family": {"$type": "fontFamily", "$value": "{config.font.family}"}
     }
   },
+  "components": {
+    "button": {
+      "$doc": "docs/design/liquid-glass.md — Apple Materials + WWDC25 'Adopting Liquid Glass'. capsule + frosted glass + glass-brightness press (brightness UP). brightness(1.18) is [derived].",
+      "anatomy": "centered-capsule",
+      "radius_px": 999,
+      "height_px": 44,
+      "pad_inline_px": 20,
+      "pad_block_px": 12,
+      "material": "liquid-glass",
+      "state_mechanic": "glass-brightness",
+      "focus_recipe": "capsule-halo",
+      "transition_ms": 320,
+      "easing": "cubic-bezier(0.34,1.56,0.64,1)",
+      "active_css": {"filter": "brightness(1.18) saturate(1.1)", "transform": "scale(0.98)"},
+      "elevation_shadow": "0 8px 24px rgba(0,0,0,0.28)",
+      "variants": ["prominent", "glass", "tinted", "plain", "destructive"],
+      "states": ["rest", "hover", "active", "focus-visible", "disabled"],
+      "fingerprint": {"radius_px": 999, "state_mechanic": "glass-brightness", "focus_recipe": "capsule-halo", "anatomy": "centered-capsule", "material": "liquid-glass", "elevation": "floating"}
+    }
+  },
   "aspect_coverage": {
     "color-roles": "covered-deferred",
     "type-ramp": "covered-deferred",

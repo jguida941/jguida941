@@ -31,6 +31,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_bootstrap_red_ref.py",
             "test_card_contracts.py",
             "test_data_semantics.py",
+            "test_design_button.py",
             "test_design_character.py",
             "test_design_contract.py",
             "test_design_distinctness.py",
@@ -154,6 +155,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "design_profiles": (
         "test_design_profiles_schema.py",  # P5-PROFILE-SPINE: design profiles are DATA w/ a closed aspect cover
+    ),
+    "webkit": (
+        "test_design_button.py",        # P5-WEBKIT-BUTTON: profile-driven rendered components (anatomy hook)
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y
