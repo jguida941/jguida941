@@ -88,10 +88,45 @@ repeatable for all 11 languages.
   `render_showcase()` → `site/showcase.html`; first real component (button across all variants/states) with
   a character+distinctness contract for the 3 existing themes; then add themes 4–10 via the skill, each a
   full distinct archetype page. (Per-language mobile character rides along inside each component contract.)
+### ⟐ DEEPER REFRAME (owner, 2026-06-29 pt2): we've been proving PROXIES, not the things that make it correct
+
+The owner looked at the live mobile site and named three failures that are really ONE: **we prove what's
+easy to measure (token numbers, string presence), not what actually makes it pro and honest.**
+
+1. **The design invariants REWARD the AI look.** They measure tokens (`panel_pad>=24`, `radius>=18`,
+   "airy"). A giant box with one number floating in 70% dead space *passes* "airy" — the invariant pushes
+   us toward the tell. Real Apple = **grouped inset lists** (Settings/Health): related stats share ONE card
+   as hairline-divided rows; type makes the hierarchy; content FILLS the card. No real system gives each
+   metric its own full-width card. **Missing PATTERN invariants:** content-to-chrome ratio (number fills the
+   card, not floats), no single-stat full-width cards on a stat readout, grouped composition,
+   hierarchy-from-type-not-chrome, and the real per-language ARCHETYPE. → These must come out of P5-ARCH
+   (derive from the real docs) and REPLACE/augment the token-only `test_design_character` checks. The
+   token tests that reward emptiness get retired or inverted.
+2. **The DATA isn't under contract (semantic-TDD on data).** `median_days_since_push=204` is a real median
+   across all 68 public repos, but the card label "median freshness · since last push" reads as "no push in
+   204 days" while the same snapshot shows pushes TODAY. The number is honest; the LABEL lies, and nothing
+   tests it. → NEW workstream **P5-DATA**: plausibility + cross-consistency + label-honesty invariants over
+   the computed metrics (RED-first), e.g. "a headline metric's label must match its true semantic" and "no
+   metric may imply staleness contradicting the freshest-repo signal." First fix: the 204 metric (relabel to
+   its true meaning, or replace with a meaningful freshness signal) behind a data contract.
+3. **Tests check STRINGS, not PIXELS.** Slice 5 "Apple drops the heatmap" went green on a CSS-rule
+   string-match, but at runtime the hydration JS sets inline `display:grid` which BEATS the CSS, so the
+   heatmap renders anyway and its 460px min-width overflows the page. A string-green with a wrong render is
+   the same failure class as the lying label. → **Visual/runtime receipts become a REQUIRED gate**, not
+   decoration; judgment invariants must be checked against the actual render. Fix the apple-heat runtime
+   defeat + the residual mobile overflow (MEASURE the overflowing element, don't guess).
+
+- ✅ **P5-1 slice 8 (KPI/snapshot cards stop overflowing the phone)** — Apple's `tile_min` (380px) exceeded a
+  ~390px viewport, so `minmax(380px,1fr)` forced a track wider than the screen (the cards you saw running off
+  the right). Now `minmax(min(var(--tile-min),100%),1fr)` keeps the airy large-card density on desktop but
+  collapses to one FITTING card on a phone. New `test_design_character.test_kpi_grid_never_overflows_a_narrow_
+  viewport` (RED-first, mutation-proven). 179 green. NOTE: a SEPARATE residual overflow remains (the heatmap;
+  see pt2 #3) — tracked, fixed next by measurement.
+
 - **After P5-0:** P5-1 engine + retire convergence contract (distinctness RED-first) → P5-2
-  diverge the 3 themes → P5-3 webkit chart/component library → P5-4 settings page → P5-5
-  themes 4–10 via the skill → P5-6 showcase + portability. The `design-language-tdd` skill is
-  built alongside P5-1 (dogfoods on the first 3 themes).
+  diverge the 3 themes → **P5-DATA semantic-TDD on the metrics** → P5-3 webkit chart/component library (PATTERN
+  invariants, not token proxies) → P5-4 settings page → P5-5 themes 4–10 via the skill → P5-6 showcase +
+  portability + the runtime/visual receipt gate. The `design-language-tdd` skill dogfoods on the first 3 themes.
 
 ## Context
 
