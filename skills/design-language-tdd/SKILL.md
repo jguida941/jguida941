@@ -1,73 +1,75 @@
 ---
 name: design-language-tdd
-description: Turn a named design language (Apple HIG, Power BI, Material, Fluent, a brand guide, ...) into a CLOSED set of red-first, mutation-proven design invariants, then GENERATE the themed components/charts/layout that satisfy them and prove it with receipts. Use when adding or governing a design-language theme — each run produces a complete, structurally distinct themed website from the same data, not a colour swap. Honest claim only: "satisfies the <language> profile vN — here are the receipts", never "is Apple".
+description: Add or govern a design language in the self-demonstrating design system by following the one data-flow — PROFILE (DATA) → RENDER (webkit) → INVARIANT (conform) → RECEIPT — RED-first. Use when adding a theme, a component, or an aspect contract. Each pass is data + only-new predicates that PROVE the result against cited docs, never a colour swap. Honest claim only: "satisfies the <language> profile vN — here are the receipts", never "is Apple".
 ---
 
-# design-language-tdd — the repeatable design-language engine
+# design-language-tdd — the repeatable, self-proving engine
 
-This skill is the engine behind the multi-theme design system. Run it with a design language and it
-does the full loop: **research the docs → derive that language's proper-style invariants → generate
-the components, charts, layout, and density that satisfy them → prove it.** Run it per language and
-each pass produces an **entire distinct website** from the same data. The same engine generalizes to
-"build X to a researched design law" — it is not theme-specific.
+The design system has ONE data-flow, and everything (a theme, a component, an aspect) is added by
+running it RED-first: **PROFILE (DATA) → RENDER (webkit) → INVARIANT (conform/predicate) → RECEIPT.**
+The full architecture is `docs/plans/DESIGN-SYSTEM.md`; this skill is the disciplined loop for
+extending it. It exists because "make it look like Apple / Carbon" is a CLAIM — a model hallucinates
+design compliance as easily as code — so every adjective ("clean", "Apple-like", "dense") must resolve
+to a cited value → a predicate → a passing test or a candidate visual receipt. The skill never trusts
+the adjective; it makes the artifact PROVE it, and the showcase RENDERS that proof.
 
-It exists because "make it look like Apple / Power BI" is a CLAIM, not a fact. A model can hallucinate
-design compliance as easily as code. So every adjective ("clean", "Apple-like", "dense", "professional")
-must resolve to evidence → an invariant → a passing test → a receipt. The skill never trusts the
-adjective; it forces the UI to PROVE it.
+## The data-flow (the four seams)
+
+- **PROFILE (data):** a design profile is DATA — `contracts/design_profiles/<lang>.json` in the W3C
+  **DTCG** format (`$value`/`$type`/`{alias}`); the loader (`scripts/rendering/design/loader.py`) is a
+  thin VIEW. The DEFAULT (liquid-glass) is `derived_from: config` — it ALIASES into `config.py` with no
+  literal copy (single source / the SVG-parity anchor). Component anatomy + the distinctness fingerprint
+  live at the profile TOP-LEVEL.
+- **RENDER (webkit):** `scripts/rendering/webkit/components.py::render_<component>(profile, variant,
+  state)` reads the DATA and emits HTML+CSS, branching on the per-profile **anatomy** so STRUCTURE
+  differs (Carbon label-left/icon-right DOM vs a centered capsule), not just tokens.
+- **INVARIANT (conform / decide):** `conform()` walks the profile's `invariants[]`; deterministic rows
+  dispatch to the closed predicate library and DECIDE pass/fail from the rendered facts; judgment rows
+  (e.g. contrast over translucent glass) demote to `candidate` — a review anchor + visual receipt,
+  **never a fake pass** (ACT/axe `passed`/`failed`/`cantTell`).
+- **RECEIPT:** the `[InvariantResult]` serialized to `assets/receipts/<lang>/` + visual receipts; the
+  showcase + settings READ them to stamp each cell. The proof IS the product.
 
 ## Non-negotiable boundaries (read `references/boundaries.md`)
 
-- **Honest claim, always:** "satisfies the `<language>` profile vN across <aspects> — here are the
-  receipts." NEVER "is Apple" / "100% Apple". Every profile is `candidate_only` + `cannot_mark_done`.
-- **Org gate (this repo's rule):** you may not add/move a file without first naming the failing RED,
-  and a shape/reorg task's RED must be the target-shape contract (`tests/contracts/test_structural_layout.py`).
-  Declare every new file's home in `contracts/repo_layout.json` in the SAME slice. (Run
-  `python -m scripts.organization.bootstrap_red_ref "<task>" "<red>"` to check.)
-- **Determinism split — never a fake RED:** a deterministic invariant (observable from the rendered
-  DOM/CSS/SVG without taste) compiles to a red-now/green-after predicate; a judgment invariant becomes
-  a review anchor + a visual-receipt obligation. Never assert taste.
-- **The kernel decides, this gathers:** emit verdict-free claims; semantic-tdd's Rust kernel
-  (`preflight.rs` / `placement_law.rs`) is the eventual authority. This repo PROVES its own conformance.
+- **Honest claim, always:** "satisfies the `<language>` profile vN — here are the receipts." NEVER "is
+  Apple". Every profile is `candidate_only` + `cannot_mark_done`. Mark empirical numbers `[derived]`.
+- **Enforcement is LOCAL:** there is NO Rust kernel in this repo — pytest contracts + visual receipts
+  are the only authority. (The kernel/relay is the SIBLING repos'; we mirror the discipline, not a
+  phantom adjudicator.)
+- **Determinism split — never a fake RED/green:** static-parseable facts (radius, anatomy, shadow,
+  focus, elevation, token-only colour, contrast over a known opaque background) → deterministic
+  predicate; renderer-dependent facts (contrast over blur, responsive-no-clip, motion feel) → candidate
+  + visual receipt behind a declared headless-probe slice. Never claim deterministic-green you can't
+  compute browserless.
 
-## The loop (lanes A→D)
+## The per-slice SOP (every slice, in order)
 
-**A — research → cited doctrine.** `references/add-design-language.md`. Pull the language's primary
-docs (web + any vendored instructions) into `docs/design-languages/<lang>.md`, every claim numbered +
-sourced. Output measurable values: density (panel/tile padding + grid gap px), shape (radius), material
-(flat/frosted), type (display/body px + weight), component anatomy (button/card/chip/list), and the
-charts it FAVORS vs AVOIDS (e.g. Power BI → tables + multi-series bars; Apple → big stat + one ring,
-no dense table).
+1. **Name the RED first** — the failing contract. A shape/move task's RED is `test_structural_layout`.
+   (`python -m scripts.organization.bootstrap_red_ref "<task>" "<red>"`.)
+2. **Declare every new file's home in the SAME slice** — `contracts/repo_layout.json` (source/test/
+   site/design_profiles) AND a test's THREE places: `repo_layout test_layout.contracts`,
+   `tests_layout_contract TEST_GROUPS.contracts`, AND a `DESIGN_CONTRACT_GROUPS` authority.
+3. **Doc-ground** — cite every magic value to a primary doc URL in `docs/design/<lang>.md`.
+4. **Implement** — DATA (+ only-new predicates / only-new render branches).
+5. **Prove** — GREEN; **mutation-prove** each predicate (revert the cited value → it reddens); capture
+   the visual receipt at the TRUE viewport.
+6. **Codex** — run codex on the DIFF (passed inline so it can't read a stale tree); fold disagreements
+   RED-first; commit only when green + codex agrees.
 
-**B — derive the closed invariant set (RED-first).** `references/add-design-language.md`. Walk the
-closed aspect roster and emit, for each aspect, an invariant: a per-theme value in
-`scripts/rendering/design_tokens.py THEME_IA` (+ a profile entry as the model grows) AND a CHARACTER
-assertion that POSITIVELY expresses the language ("Power BI must be dense/flat/table-forward"; "Apple
-must be airy/large/rounded/stat-forward"). Prove each predicate fails RED for the right reason first.
-
-**C — generate the themed anatomy.** Make the theme render its proper style: per-theme tokens (colour
-+ material + type + radius), density routed through `--pad-*`/`--gap-*`, and the per-theme chart/
-component selection (CSS-gated on `[data-theme="<name>"]`, or the `THEME_SPEC` chart-variant map) so
-the SAME data draws a DIFFERENT chart/layout. The character invariant from B *forbids the same boxes*,
-so generation must produce different ones.
-
-**D — prove.** `references/prove-theme.md`. GREEN on both surfaces (SVG + web), `test_design_character`
-(expresses its language) + `test_design_distinctness` (differs from every other theme) pass, MUTATION-
-PROVE each predicate (revert the theme's value → a test must fail), capture visual receipts per
-breakpoint, then CODEX review folds any disagreement back RED-first. Emit the honest receipt.
-
-## Workflow routing
+## Lanes (workflow routing)
 
 | You want to… | Read |
 |---|---|
-| add a new design language / theme | `references/add-design-language.md` (lanes A+B) |
-| prove a theme + receipts + codex | `references/prove-theme.md` (lane D) |
-| understand the boundaries / honest claim / org gate | `references/boundaries.md` |
+| add a new design language / theme (profile JSON + doctrine + character/distinctness) | `references/add-design-language.md` |
+| add a component (a `components.<name>` block + a render branch + only-new predicates) | `references/add-component.md` |
+| prove a theme/component + receipts + codex | `references/prove-theme.md` |
+| the boundaries / honest claim / determinism split / org gate | `references/boundaries.md` |
 
-## Required end state (per design language)
+## Required end state
 
-Complete closed invariant set (every roster aspect emitted or declared-deferred) · the DEFAULT theme's
-IA still equals `config.py` (SVG parity anchor) · `test_design_character` + `test_design_distinctness`
-green · every predicate mutation-proven · a `docs/design-languages/<lang>.md` doctrine doc with cited
-clauses · visual receipts · codex agrees · the honest receipt recorded. Then "add Material / Fluent /
-Stripe / a brand guide" = run this skill again = another complete, distinct website.
+A new theme = a `contracts/design_profiles/<lang>.json` (DTCG, every roster aspect emitted or
+declared-deferred) + a cited `docs/design/<lang>.md` + usually zero new predicates; the distinctness
+fingerprint pairwise-distinct from every other profile; every predicate mutation-proven; visual
+receipts; **codex agrees**; the honest receipt recorded. Then "add Material / Fluent / Stripe" = run
+this loop = another genuinely distinct, proven component set — DATA + only-new predicates, not a reskin.

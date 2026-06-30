@@ -21,7 +21,7 @@ def _repo_root() -> Path:
 
 ROOT = _repo_root()
 SKILL = ROOT / "skills" / "design-language-tdd"
-REQUIRED_REFERENCES = ("add-design-language.md", "prove-theme.md", "boundaries.md")
+REQUIRED_REFERENCES = ("add-design-language.md", "add-component.md", "prove-theme.md", "boundaries.md")
 
 
 class SkillStructureContract(unittest.TestCase):
@@ -52,6 +52,22 @@ class SkillStructureContract(unittest.TestCase):
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
         for ref in REQUIRED_REFERENCES:
             self.assertIn(ref, text, f"SKILL.md must route to references/{ref}")
+
+    def test_skill_codifies_the_current_architecture_and_is_honest(self):
+        """The skill must reflect the ACTUAL system (docs/plans/DESIGN-SYSTEM.md): the
+        PROFILE(data)->RENDER->INVARIANT->RECEIPT data-flow, profile-as-DATA, and the per-slice
+        SOP I actually run (RED -> declare homes -> doc-ground -> implement -> mutation -> codex).
+        And it must be HONEST: enforcement here is LOCAL pytest + receipts — there is NO Rust
+        kernel in this repo, so the skill must not claim a kernel 'decides' locally (that framing
+        was retired by the architecture + best-practice reviews)."""
+        text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        low = text.lower()
+        for seam in ("profile", "render", "invariant", "receipt", "conform"):
+            self.assertIn(seam, low, f"SKILL.md must name the {seam!r} seam of the data-flow")
+        self.assertIn("design_profiles", low, "SKILL.md must reflect profile-as-DATA (contracts/design_profiles)")
+        self.assertIn("codex", low, "the per-slice loop must include a codex review")
+        self.assertNotRegex(text, r"kernel\s+(decides|is the (eventual )?authority)",
+                            "drop the 'kernel decides' framing — enforcement here is LOCAL pytest + receipts")
 
 
 if __name__ == "__main__":

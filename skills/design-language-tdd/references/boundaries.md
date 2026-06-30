@@ -28,12 +28,15 @@ contract (`tests/contracts/test_structural_layout.py`). Declare every new file's
 `contracts/repo_layout.json` in the SAME slice. Check with
 `python -m scripts.organization.bootstrap_red_ref "<task text>" "<red ref>"`.
 
-## 4. The kernel decides; this gathers/proposes
+## 4. Enforcement is LOCAL here — no Rust kernel in this repo
 
-This skill (and the repo-side guards) are the verdict-free GATHER/PROPOSE half. semantic-tdd's Rust
-kernel is the eventual decider — `preflight.rs` (`MissingRedTestRef`), `plan_graph.rs` (connectivity),
-`claim_intake.rs` (evidence-basis), `placement_law.rs` (homing) — reached via the `semproof` CLI. Never
-re-implement a kernel verdict in Python; emit the claim and relay the verdict fail-closed.
+The authority in THIS repo is **local pytest contracts + visual receipts**, full stop. There is no
+Rust kernel, no `semproof`, no `candidate_only` adjudicator running here — the architecture +
+best-practice reviews retired that framing as inaccurate for this tree. The `candidate_only` /
+"satisfies profile vN" / verdict-free shape is the PORTABILITY DESTINATION: when the reusable half
+(this skill, the predicate library, the profile schema, the conform() runner) lifts to the sibling
+`repo-surface-scout` / `semantic-tdd`, THEIR kernel adjudicates. Locally: the red test is the verdict;
+the receipt is the evidence; codex agrees or it doesn't ship. Do not claim a kernel decides here.
 
 ## Portability
 
