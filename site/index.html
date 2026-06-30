@@ -163,6 +163,7 @@ body {
   -webkit-font-smoothing: antialiased;
   font-feature-settings: "tnum" 1, "cv01" 1;
   min-height: 100vh;
+  overflow-x: hidden;  /* a min-width child (calendar/heatmap) scrolls in its own wrap, never the page */
 }
 .wrap { max-width: 980px; margin: 0 auto; padding: clamp(20px, 4vw, 56px) 20px 72px; }
 .num { font-variant-numeric: tabular-nums; }
@@ -312,6 +313,7 @@ body {
    the dense 7x24 activity matrix drops to the simpler event-mix summary; Power BI/Liquid keep it. */
 [data-theme="apple-dark"] .heat { display: none; }
 [data-theme="apple-dark"] .mix { margin-top: 4px; }
+.heat-wrap { overflow-x: auto; }
 
 footer { text-align: center; color: var(--ink-dim); font-size: var(--type-caption); margin-top: 26px; }
 footer a { color: var(--ink); text-decoration: none; }
@@ -322,6 +324,18 @@ footer a { color: var(--ink); text-decoration: none; }
   .bento, .tiles, .langlegend, .lanes { grid-template-columns: 1fr; }
   .hero .kpi { gap: 18px; }
   .hero .stats { gap: 18px; }
+}
+/* Phone tier (Apple HIG / WCAG 2.5.5): >=44px touch targets, tighter margins, the dense
+   heatmap scrolls inside .heat-wrap (min-width keeps cells square instead of distorting). */
+@media (max-width: 480px) {
+  .wrap { padding: 16px 12px 48px; }
+  .section-head { flex-wrap: wrap; }
+  .hero .stats { flex-wrap: wrap; gap: 14px; }
+  .switcher { width: 100%; }
+  .switcher button { flex: 1; min-height: 44px; }
+  .rrow { min-height: 44px; }
+  .heat { min-width: 460px; }
+  .lang-table th, .lang-table td { padding: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 @media (prefers-reduced-transparency: reduce) {
@@ -390,7 +404,7 @@ footer a { color: var(--ink); text-decoration: none; }
   <section class="panel" id="rhythm-panel" hidden>
     <div class="section-head"><div><p class="eyebrow">Activity Rhythm</p><h2 class="title">When I Code</h2></div><span class="section-meta" id="rhythm-meta">—</span></div>
     <hr class="hairline">
-    <div class="heat"><div class="heat-days" id="heat-days"></div><div class="heat-grid" id="heat-grid"></div><div class="heat-hours" id="heat-hours"></div></div>
+    <div class="heat-wrap"><div class="heat"><div class="heat-days" id="heat-days"></div><div class="heat-grid" id="heat-grid"></div><div class="heat-hours" id="heat-hours"></div></div></div>
     <div class="mix" id="event-mix"></div>
   </section>
   <div class="bento">

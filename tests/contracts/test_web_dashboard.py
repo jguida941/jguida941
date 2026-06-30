@@ -96,6 +96,18 @@ class WebDashboardContract(unittest.TestCase):
                        "prefers-reduced-motion", "prefers-reduced-transparency"):
             self.assertIn(needle, self.html, f"web dashboard must include {needle!r}")
 
+    def test_responsive_mobile_and_touch_targets(self):
+        """Mobile is a first-class design rule (Apple HIG / WCAG 2.5.5), and renders differ on
+        Safari: the page must carry (1) a PHONE breakpoint (<=480px), (2) >=44px touch targets on
+        interactive controls, (3) a scrollable heatmap wrapper so the dense matrix doesn't distort
+        on a narrow screen, and (4) the -webkit- material prefix so frosted glass works on Safari."""
+        html = self.html
+        self.assertRegex(html, r"@media[^{]*max-width:\s*4[0-8]\dpx", "needs a phone breakpoint (<=480px)")
+        self.assertIn("-webkit-backdrop-filter", html, "Safari needs the -webkit-backdrop-filter prefix")
+        self.assertIn("min-height: 44px", html, "interactive controls need >=44px touch targets (Apple/WCAG)")
+        self.assertRegex(html, r"\.heat-wrap\s*\{[^}]*overflow-x:\s*auto",
+                         "the heatmap must scroll on a narrow screen, not squish/distort")
+
     def test_colour_only_from_tokens_no_rainbow(self):
         """Restraint: the component CHROME paints from var(--token)/color-mix, never a
         pile of hand hexes (the old 9-accent tell). Hex legitimately lives in exactly

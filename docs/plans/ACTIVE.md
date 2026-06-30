@@ -55,8 +55,14 @@
 - ✅ **P5-1 slice 5 (Apple drops the dense heatmap)** — under `[data-theme="apple-dark"]` the dense 7x24
   activity matrix is hidden, leaving the simpler event-mix summary (Apple HIG is stat/summary-forward,
   avoids dense grids); Power BI/Liquid keep the matrix. `test_design_character` extended + grounded. 177 green.
-- ⏭ **Next (more anatomy + scale via the skill):** Power BI → multi-series bars + categorical palette;
-  Apple → single hero ring; then
+- ✅ **P5-1 slice 6 (mobile is now a contracted rule)** — phone breakpoint (<=480px), >=44px touch
+  targets (Apple HIG / WCAG 2.5.5), the dense heatmap scrolls inside `.heat-wrap` (no distortion at
+  ~375px), `body overflow-x:hidden` (no page-level horizontal overflow), `-webkit-backdrop-filter`
+  for Safari. New `test_web_dashboard.test_responsive_mobile_and_touch_targets`. Verified at 390px.
+  178 green. (Per-LANGUAGE mobile character — e.g. Apple touch-first sizing vs Power BI grid reflow —
+  is the next responsive layer.)
+- ⏭ **Next (more anatomy + scale via the skill):** per-language MOBILE rules (each design language's
+  own phone behavior); Power BI → multi-series bars + categorical palette; Apple → single hero ring; then
   CODIFY the whole loop (research → character/per-aspect invariants → GENERATE the themed site → prove)
   as `skills/design-language-tdd/`, dogfooded on these 3 themes — so "add Material/Stripe/..." = run
   the skill = another full distinct website.
