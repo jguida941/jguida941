@@ -61,11 +61,33 @@
   for Safari. New `test_web_dashboard.test_responsive_mobile_and_touch_targets`. Verified at 390px.
   178 green. (Per-LANGUAGE mobile character — e.g. Apple touch-first sizing vs Power BI grid reflow —
   is the next responsive layer.)
-- ⏭ **Next (more anatomy + scale via the skill):** per-language MOBILE rules (each design language's
-  own phone behavior); Power BI → multi-series bars + categorical palette; Apple → single hero ring; then
-  CODIFY the whole loop (research → character/per-aspect invariants → GENERATE the themed site → prove)
-  as `skills/design-language-tdd/`, dogfooded on these 3 themes — so "add Material/Stripe/..." = run
-  the skill = another full distinct website.
+- ✅ **P5-1 slice 7 (KPI density stays per-language on mobile)** — fixed a convergence BUG in the mobile
+  CSS: the `<=760px` rule was flattening `.tiles` to one column for EVERY theme, erasing the per-language
+  KPI density on phones. Now only section layout collapses; `.tiles` keeps its per-theme `--tile-min`
+  auto-fit (Power BI stays dense, Apple goes to one card). New `test_design_character.test_kpi_density_
+  character_survives_on_mobile` (RED-first, mutation-proven). 179 green.
+
+### ⟐ REFRAME (owner, 2026-06-29): SEPARATION OF CONCERNS — stop dressing the scorecard, build the design system
+
+The owner's correction, now doctrine: **the Builder Scorecard is ONE concern and it's done.** It mimics a
+GitHub-metrics page because it's bound to GitHub data — that was the constraint; as a *data dashboard* it
+looks good and should be **one frozen style**. We must STOP polishing the scorecard surface. The **design-
+language system is a SEPARATE concern**: a **component library** (buttons, tags, cards, inputs, charts in
+every state) + **per-theme SHOWCASE pages** where each language renders its OWN kind of website (an Apple
+page looks like Apple, a Stripe page like Stripe, a Carbon app like Carbon), each built from that language's
+**actual published design doc**. NOT the scorecard reskinned 10 ways. Clean boundary: **analytics surface ≠
+design-language surface.** Every aspect of every theme follows its definition doc; the skill makes it
+repeatable for all 11 languages.
+
+- 🔄 **P5-ARCH (in progress) — doc-grounded architecture workflow** (`scratchpad/work/design-language-
+  architecture.workflow.js`, run `wf_8ea0e7d9-544`): 11 researchers extract each language's REAL component
+  anatomy + page archetype from its published spec → synthesis derives the separation-of-concerns
+  architecture + closed component roster + **component-level** character/distinctness invariants + the first
+  RED-first slice → adversarial critique. Output folds into this plan + P5-3/P5-6 below.
+- ⏭ **Next (post-workflow), under the gate:** stand up `scripts/rendering/webkit/` component library +
+  `render_showcase()` → `site/showcase.html`; first real component (button across all variants/states) with
+  a character+distinctness contract for the 3 existing themes; then add themes 4–10 via the skill, each a
+  full distinct archetype page. (Per-language mobile character rides along inside each component contract.)
 - **After P5-0:** P5-1 engine + retire convergence contract (distinctness RED-first) → P5-2
   diverge the 3 themes → P5-3 webkit chart/component library → P5-4 settings page → P5-5
   themes 4–10 via the skill → P5-6 showcase + portability. The `design-language-tdd` skill is
