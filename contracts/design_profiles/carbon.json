@@ -1,0 +1,84 @@
+{
+  "contract_id": "DesignLanguageProfile",
+  "profile": "carbon",
+  "profile_version": 1,
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "honest_claim": "satisfies the carbon profile v1 — receipts",
+  "doctrine_doc": "docs/design/carbon.md",
+  "primary_doc_urls": [
+    "https://carbondesignsystem.com/components/button/style/",
+    "https://carbondesignsystem.com/components/button/usage/",
+    "https://carbondesignsystem.com/guidelines/typography/overview/",
+    "https://carbondesignsystem.com/elements/color/tokens/"
+  ],
+  "derived_from": null,
+  "token_format": "w3c-dtcg-2025.10",
+  "tokens": {
+    "$comment": "Carbon ships its OWN role map (no THEMES entry), so values are literal DTCG ($value) Carbon tokens — Blue 60 #0f62fe, Gray 100 #161616, White #ffffff (carbondesignsystem.com/elements/color/tokens). derived_from: null.",
+    "color": {
+      "$type": "color",
+      "accent": {"$value": "#0f62fe"},
+      "ink-strong": {"$value": "#161616"},
+      "ink": {"$value": "#525252"},
+      "ink-dim": {"$value": "#6f6f6f"},
+      "surface": {"$value": "#ffffff"},
+      "surface-raised": {"$value": "#f4f4f4"},
+      "backdrop": {"$value": "#ffffff"},
+      "hairline": {"$value": "#e0e0e0"},
+      "status-success": {"$value": "#198038"},
+      "status-warning": {"$value": "#f1c21b"},
+      "status-danger": {"$value": "#da1e28"}
+    },
+    "radius": {
+      "$type": "dimension",
+      "panel": {"$value": 0},
+      "tile": {"$value": 0}
+    },
+    "font": {
+      "family": {"$type": "fontFamily", "$value": "'IBM Plex Sans', system-ui, sans-serif"}
+    }
+  },
+  "components": {
+    "button": {
+      "$doc": "docs/design/carbon.md — IBM Carbon v11 Button. radius 0, IBM Plex Sans 400, label hard-left + trailing icon hard-right, flat (zero shadow), token-swap states, 2px square focus. easing [derived].",
+      "anatomy": "label-left-icon-right",
+      "radius_px": 0,
+      "height_px": 48,
+      "pad_inline_px": [16, 64],
+      "pad_block_px": 12,
+      "material": "flat-fill",
+      "state_mechanic": "token-swap",
+      "focus_recipe": "square-2px-ring",
+      "transition_ms": 70,
+      "easing": "cubic-bezier(0.2, 0, 0.38, 0.9)",
+      "active_css": {"background-color": "#002d9c"},
+      "hover_css": {"background-color": "#0353e9"},
+      "elevation_shadow": null,
+      "variants": ["primary", "secondary", "tertiary", "ghost", "danger-primary"],
+      "states": ["rest", "hover", "active", "focus-visible", "disabled"],
+      "fingerprint": {"radius_px": 0, "state_mechanic": "token-swap", "focus_recipe": "square-2px-ring", "anatomy": "label-left-icon-right", "material": "flat-fill", "elevation": "none"}
+    }
+  },
+  "aspect_coverage": {
+    "color-roles": "covered-deferred",
+    "type-ramp": "covered-deferred",
+    "spacing-density": "covered-deferred",
+    "radius-elevation-material": "covered-deferred",
+    "motion": "covered-deferred",
+    "component-button": "covered-deferred",
+    "component-chip": "covered-deferred",
+    "component-card": "covered-deferred",
+    "component-kpi": "covered-deferred",
+    "component-input": "covered-deferred",
+    "component-nav": "covered-deferred",
+    "component-table": "covered-deferred",
+    "component-chart": "covered-deferred",
+    "component-hero": "covered-deferred",
+    "component-type-specimen": "covered-deferred",
+    "charts": "covered-deferred",
+    "responsive": "covered-deferred",
+    "touch-target": "covered-deferred"
+  },
+  "invariants": []
+}

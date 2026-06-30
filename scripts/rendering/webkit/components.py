@@ -24,11 +24,9 @@ def render_button(profile: str, variant: str, state: str) -> tuple[str, str]:
     anatomy = btn["anatomy"]
     justify = "space-between" if anatomy == "label-left-icon-right" else "center"
 
-    # variant surface (prominent = filled accent; the rest = quiet/ghost)
-    if variant == "prominent":
-        bg, fg = accent, backdrop
-    else:
-        bg, fg = "transparent", accent
+    # variant surface (the filled/prominent variant = accent fill; the rest = quiet/ghost)
+    filled = variant in ("prominent", "primary", "filled") or variant.endswith("-primary")
+    bg, fg = (accent, backdrop) if filled else ("transparent", accent)
 
     # ANATOMY -> genuinely different DOM (the deterministic structure axis)
     if anatomy == "label-left-icon-right":
@@ -37,11 +35,16 @@ def render_button(profile: str, variant: str, state: str) -> tuple[str, str]:
     else:  # centered-capsule
         html = f'<button class="{cls}">{variant}</button>'
 
+    # padding: scalar inline, OR [leading, trailing] (Carbon's asymmetric 16/64 icon gutter)
+    pi = btn["pad_inline_px"]
+    pad = (f"{btn['pad_block_px']}px {pi[1]}px {btn['pad_block_px']}px {pi[0]}px"
+           if isinstance(pi, (list, tuple)) else f"{btn['pad_block_px']}px {pi}px")
+
     base = [
         f"display: inline-flex; align-items: center; justify-content: {justify};",
         "gap: 6px; border: 0; cursor: pointer;",
         f"border-radius: {btn['radius_px']}px;",
-        f"min-height: {btn['height_px']}px; padding: {btn['pad_block_px']}px {btn['pad_inline_px']}px;",
+        f"min-height: {btn['height_px']}px; padding: {pad};",
         f"background: {bg}; color: {fg};",
         f"font: 600 17px/1.2 {font};",
         f"transition: all {btn['transition_ms']}ms {btn['easing']};",
@@ -51,20 +54,28 @@ def render_button(profile: str, variant: str, state: str) -> tuple[str, str]:
         m = dt.material(profile)
         glass = f"blur({m['blur']:g}px) saturate({m['saturate']:g}%)"
         base.append(f"-webkit-backdrop-filter: {glass}; backdrop-filter: {glass};")
-    if btn.get("elevation_shadow"):
+    if btn.get("elevation_shadow"):  # null/None for flat languages -> no box-shadow at all
         base.append(f"box-shadow: {btn['elevation_shadow']};")
 
     css = f".{cls} {{ {' '.join(base)} }}"
 
-    # per-state recipe (drawn from the profile's declared state mechanic — no fake passing body)
+    # per-state recipe (drawn from the profile's declared mechanic — never a fake passing body)
+    fr = btn.get("focus_recipe")
     if state == "active" and btn.get("active_css"):
         decl = " ".join(f"{k}: {v};" for k, v in btn["active_css"].items())
         css += f"\n.{cls}.is-active {{ {decl} }}"
+    elif state == "hover" and btn.get("hover_css"):
+        decl = " ".join(f"{k}: {v};" for k, v in btn["hover_css"].items())
+        css += f"\n.{cls}.is-hover {{ {decl} }}"
     elif state == "hover" and btn.get("state_mechanic") == "glass-brightness":
         css += f"\n.{cls}.is-hover {{ filter: brightness(1.08); }}"
-    elif state == "focus-visible" and btn.get("focus_recipe") == "capsule-halo":
+    elif state == "focus-visible" and fr == "capsule-halo":
         css += (f"\n.{cls}.is-focus {{ outline: 0; box-shadow: 0 0 0 2px {backdrop}, "
                 f"0 0 0 5px color-mix(in srgb, {accent} 60%, transparent); }}")
+    elif state == "focus-visible" and fr == "square-2px-ring":
+        css += f"\n.{cls}.is-focus {{ outline: 0; box-shadow: inset 0 0 0 1px {accent}, inset 0 0 0 2px {backdrop}; }}"
+    elif state == "focus-visible" and fr == "rounded-system-ring":
+        css += f"\n.{cls}.is-focus {{ outline: 0; box-shadow: 0 0 0 4px color-mix(in srgb, {accent} 50%, transparent); }}"
     elif state == "disabled":
         css += f"\n.{cls}.is-disabled {{ opacity: 0.4; pointer-events: none; }}"
 

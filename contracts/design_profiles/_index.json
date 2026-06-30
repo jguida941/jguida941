@@ -2,11 +2,11 @@
   "contract_id": "DesignProfileIndex",
   "purpose": "The roster of design-language profiles (scout active/reserved pattern). A profile not listed here cannot ship; the schema test pins active_design_profiles == the <lang>.json files on disk (both drift directions). active = built + indexed in the same slice; reserved = named but not yet authored.",
   "active_design_profiles": [
-    "liquid-glass"
+    "liquid-glass",
+    "carbon"
   ],
   "reserved_design_profiles": [
     "apple-dark",
-    "carbon",
     "power-bi",
     "material-3",
     "fluent-2",
