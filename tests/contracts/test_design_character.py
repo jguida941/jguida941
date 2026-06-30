@@ -80,6 +80,32 @@ class DesignCharacterContract(unittest.TestCase):
         self.assertNotRegex(html, r'\[data-theme="power-bi"\]\s*\.heat\s*\{[^}]*display:\s*none',
                             "Power BI keeps the dense heatmap matrix")
 
+    def test_kpi_density_character_survives_on_mobile(self):
+        """Mobile must NOT flatten the per-language KPI grid to one column for everyone — that
+        would erase the density CHARACTER exactly where phones make it matter most. A Power BI
+        report stays multi-column data-dense on a phone (small tile_min => >=2 KPIs/row at ~390px);
+        Apple collapses to one large card (tile_min ~ the viewport). So `.tiles` must keep its
+        auto-fit minmax(var(--tile-min)) grid at EVERY width — only section-level layout
+        (.bento/.lanes/.langlegend) may collapse to a single column on a narrow screen.
+        Mutation-proof: put `.tiles` back in the mobile `grid-template-columns: 1fr` list and
+        Power BI flattens to Apple's single column — this reds."""
+        import re
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        # the base KPI grid stays per-theme: auto-fit on each language's own tile-min
+        self.assertRegex(html, r"\.tiles\s*\{[^}]*minmax\(var\(--tile-min",
+                         "the KPI grid must remain auto-fit on the per-theme --tile-min")
+        # For every SINGLE-column collapse (`grid-template-columns: 1fr;` — NOT the `1fr 1fr`
+        # bento base), walk back to the selector that owns it; `.tiles` must never be one of them.
+        for hit in re.finditer(r"grid-template-columns:\s*1fr\s*;", html):
+            brace = html.rfind("{", 0, hit.start())          # the { opening this rule's body
+            prev = max(html.rfind("}", 0, brace), html.rfind("{", 0, brace))  # boundary before selector
+            selector = html[prev + 1: brace]
+            self.assertNotRegex(
+                selector, r"\.tiles(\s|,|$)",
+                ".tiles must keep its per-theme auto-fit grid on mobile (Power BI stays dense, "
+                "Apple goes to one card) — it must never collapse to a fixed single column")
+
     def test_density_is_web_only_and_preserves_svg_parity(self):
         """Density is a web concern; the DEFAULT theme's type/radius still equal config."""
         self.assertEqual(dt.type_scale(dt.DEFAULT_THEME), {k: tuple(v) for k, v in config.TYPE_SCALE.items()})
