@@ -1,0 +1,40 @@
+{
+  "contract_id": "DesignLanguageProfile",
+  "profile": "liquid-glass",
+  "profile_version": 1,
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "honest_claim": "satisfies the liquid-glass profile v1 — receipts",
+  "doctrine_doc": "docs/design/liquid-glass.md",
+  "primary_doc_urls": [
+    "https://developer.apple.com/design/human-interface-guidelines/materials",
+    "https://developer.apple.com/design/human-interface-guidelines/typography",
+    "https://developer.apple.com/design/human-interface-guidelines/layout"
+  ],
+  "derived_from": "config",
+  "token_format": "w3c-dtcg-2025.10",
+  "tokens": {
+    "$comment": "P5-PROFILE-SPINE-b: the W3C DTCG token block ($value/$type/{alias}) is DERIVED FROM scripts/core/config.py via the loader (derived_from: config) — NO literal copy of config values lives here (single source). The schema test pins resolved tokens == config.py (derived-parity) when the loader lands."
+  },
+  "aspect_coverage": {
+    "color-roles": "covered-deferred",
+    "type-ramp": "covered-deferred",
+    "spacing-density": "covered-deferred",
+    "radius-elevation-material": "covered-deferred",
+    "motion": "covered-deferred",
+    "component-button": "covered-deferred",
+    "component-chip": "covered-deferred",
+    "component-card": "covered-deferred",
+    "component-kpi": "covered-deferred",
+    "component-input": "covered-deferred",
+    "component-nav": "covered-deferred",
+    "component-table": "covered-deferred",
+    "component-chart": "covered-deferred",
+    "component-hero": "covered-deferred",
+    "component-type-specimen": "covered-deferred",
+    "charts": "covered-deferred",
+    "responsive": "covered-deferred",
+    "touch-target": "covered-deferred"
+  },
+  "invariants": []
+}

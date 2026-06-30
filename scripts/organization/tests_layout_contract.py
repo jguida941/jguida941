@@ -34,6 +34,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_design_character.py",
             "test_design_contract.py",
             "test_design_distinctness.py",
+            "test_design_profiles_schema.py",
             "test_glass_preserved.py",
             "test_icon_system.py",
             "test_label_legibility.py",
@@ -150,6 +151,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "data_semantics": (
         "test_data_semantics.py",       # P5-DATA: the computed metrics are honest (value+label match meaning)
+    ),
+    "design_profiles": (
+        "test_design_profiles_schema.py",  # P5-PROFILE-SPINE: design profiles are DATA w/ a closed aspect cover
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y

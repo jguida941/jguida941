@@ -1,0 +1,24 @@
+{
+  "contract_id": "DesignAspectRoster",
+  "purpose": "The CLOSED COVER of design aspects every active profile must address. Each aspect is `emitted` (a deterministic conformance predicate runs against the rendered surface) or a declared `deferred` (+ defer_reason). A profile that omits a roster aspect reddens, exactly like an undeclared file. At the SPINE stage nothing renders yet, so all aspects are `deferred`; each flips to `emitted` in the slice that mechanizes its predicate.",
+  "aspects": [
+    {"id": "color-roles", "emission_status": "deferred", "defer_reason": "token-only at spine; token_only_color + contrast predicates land with the conformance runner"},
+    {"id": "type-ramp", "emission_status": "deferred", "defer_reason": "on_scale_type predicate lands with the conformance runner"},
+    {"id": "spacing-density", "emission_status": "deferred", "defer_reason": "grid_multiple + density_band predicates land with the conformance runner"},
+    {"id": "radius-elevation-material", "emission_status": "deferred", "defer_reason": "radius_band + elevation_material predicates land with the conformance runner"},
+    {"id": "motion", "emission_status": "deferred", "defer_reason": "motion_bounds predicate lands with the first interactive component"},
+    {"id": "component-button", "emission_status": "deferred", "defer_reason": "P5-WEBKIT-BUTTON (instance #1)"},
+    {"id": "component-chip", "emission_status": "deferred", "defer_reason": "P5-COMPONENTS-GROW"},
+    {"id": "component-card", "emission_status": "deferred", "defer_reason": "P5-COMPONENTS-GROW"},
+    {"id": "component-kpi", "emission_status": "deferred", "defer_reason": "P5-COMPONENTS-GROW"},
+    {"id": "component-input", "emission_status": "deferred", "defer_reason": "P5-COMPONENTS-GROW"},
+    {"id": "component-nav", "emission_status": "deferred", "defer_reason": "P5-COMPONENTS-GROW"},
+    {"id": "component-table", "emission_status": "deferred", "defer_reason": "P5-COMPONENTS-GROW"},
+    {"id": "component-chart", "emission_status": "deferred", "defer_reason": "P5-COMPONENTS-GROW"},
+    {"id": "component-hero", "emission_status": "deferred", "defer_reason": "P5-COMPONENTS-GROW"},
+    {"id": "component-type-specimen", "emission_status": "deferred", "defer_reason": "P5-COMPONENTS-GROW"},
+    {"id": "charts", "emission_status": "deferred", "defer_reason": "chart_segment_cap + categorical_palette predicates land with the chart library"},
+    {"id": "responsive", "emission_status": "deferred", "defer_reason": "responsive_no_clip is renderer-dependent — lands behind the declared headless-probe slice (R4)"},
+    {"id": "touch-target", "emission_status": "deferred", "defer_reason": "44px touch-target predicate lands with the first interactive component"}
+  ]
+}
