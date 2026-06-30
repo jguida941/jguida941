@@ -86,6 +86,27 @@ class DesignProfileSpineContract(unittest.TestCase):
                              f"(missing: {sorted(set(self.roster_ids) - covered)}; "
                              f"extra: {sorted(covered - set(self.roster_ids))})")
 
+    # --- SPINE-b: the DTCG token block DERIVES from config (single source, not a copy) ---
+    def test_liquid_glass_tokens_derive_from_config_single_source(self):
+        """The liquid-glass DTCG token block carries NO literal copy of config — every `$value`
+        is an `{alias}` into the loader-injected `config` group, resolved by the DTCG-subset
+        loader. Pins single source: a re-literaled value OR a broken alias reddens, so the DEFAULT
+        language can never drift from the `config.py` SVG-parity anchor."""
+        from scripts.core import config
+        from scripts.rendering.design import loader
+        tok = loader.resolve_tokens("liquid-glass")
+        self.assertEqual(tok["color"]["accent"], config.CYAN)
+        self.assertEqual(tok["color"]["ink-strong"], config.TEXT_BRIGHT)
+        self.assertEqual(tok["color"]["surface"], config.SURFACE_BASE)
+        self.assertEqual(tok["color"]["status-danger"], config.RED)
+        self.assertEqual(tok["radius"]["panel"], config.GLASS_RX)
+        self.assertEqual(tok["radius"]["tile"], config.GLASS_TILE_RX)
+        self.assertEqual(tok["font"]["family"], config.FONT_SANS)
+        # true single-source: the RAW JSON must ALIAS config, never re-literal its hex
+        raw_tokens = json.dumps(loader.load("liquid-glass")["tokens"])
+        self.assertNotIn(config.CYAN, raw_tokens,
+                         "liquid-glass must ALIAS config (single source), never re-literal config.CYAN")
+
     # --- anti-tautology: the cover CAN redden (a coverage gap is caught) ---
     def test_aspect_cover_fires_on_a_gap(self):
         roster = set(self.roster_ids)

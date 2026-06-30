@@ -14,7 +14,29 @@
   "derived_from": "config",
   "token_format": "w3c-dtcg-2025.10",
   "tokens": {
-    "$comment": "P5-PROFILE-SPINE-b: the W3C DTCG token block ($value/$type/{alias}) is DERIVED FROM scripts/core/config.py via the loader (derived_from: config) — NO literal copy of config values lives here (single source). The schema test pins resolved tokens == config.py (derived-parity) when the loader lands."
+    "$comment": "W3C DTCG (2025.10) token block. derived_from: config — every $value is an {alias} into the loader-injected `config` group (built from scripts/core/config.py via design_tokens). NO literal copy of config values lives here (single source); the derived-parity test pins resolved == config.",
+    "color": {
+      "$type": "color",
+      "accent": {"$value": "{config.color.accent}"},
+      "ink-strong": {"$value": "{config.color.ink-strong}"},
+      "ink": {"$value": "{config.color.ink}"},
+      "ink-dim": {"$value": "{config.color.ink-dim}"},
+      "surface": {"$value": "{config.color.surface}"},
+      "surface-raised": {"$value": "{config.color.surface-raised}"},
+      "backdrop": {"$value": "{config.color.backdrop}"},
+      "hairline": {"$value": "{config.color.hairline}"},
+      "status-success": {"$value": "{config.color.status-success}"},
+      "status-warning": {"$value": "{config.color.status-warning}"},
+      "status-danger": {"$value": "{config.color.status-danger}"}
+    },
+    "radius": {
+      "$type": "dimension",
+      "panel": {"$value": "{config.radius.panel}"},
+      "tile": {"$value": "{config.radius.tile}"}
+    },
+    "font": {
+      "family": {"$type": "fontFamily", "$value": "{config.font.family}"}
+    }
   },
   "aspect_coverage": {
     "color-roles": "covered-deferred",
