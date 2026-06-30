@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-30T15:42:48.040071Z",
+  "generated_at": "2026-06-30T18:15:08.752139Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,11 +18,11 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 8168,
-    "public_scope_commits": 4348,
+    "last_year_contributions": 8174,
+    "public_scope_commits": 4352,
     "total_repos": 68,
     "public_forks": 0,
-    "private_owned_repos": 0,
+    "private_owned_repos": 147,
     "total_stars": 78,
     "languages_count": 24,
     "prs_merged": 35,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 8168,
-      "display_value": "8,168"
+      "value": 8174,
+      "display_value": "8,174"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 4348,
-      "display_value": "4,348"
+      "value": 4352,
+      "display_value": "4,352"
     },
     {
       "key": "total_repos",
@@ -63,8 +63,8 @@
       "key": "private_owned_repos",
       "label": "Private Owned Repos",
       "dashboard_label": "Private Owned Repos",
-      "value": 0,
-      "display_value": "0"
+      "value": 147,
+      "display_value": "147"
     },
     {
       "key": "total_stars",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 8168,
-      "display_value": "8,168"
+      "value": 8174,
+      "display_value": "8,174"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 4348,
-      "display_value": "4,348"
+      "value": 4352,
+      "display_value": "4,352"
     },
     {
       "key": "total_repos",
@@ -137,8 +137,8 @@
     {
       "key": "private_owned_repos",
       "label": "Private Owned Repos",
-      "value": 0,
-      "display_value": "0"
+      "value": 147,
+      "display_value": "147"
     },
     {
       "key": "total_stars",
@@ -193,11 +193,11 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.1470588235294117,
     "ci_coverage_pct": 23.52941176470588,
-    "last_year_contributions": 8168,
+    "last_year_contributions": 8174,
     "active_days_last_year": 286,
     "automation_workflows": 74,
     "primary_lang_share_pct": 50.3,
-    "median_days_since_push": 204.0,
+    "median_days_since_push": 205.0,
     "days_since_last_push": 1.0
   },
   "scorecard_cards": [
@@ -205,8 +205,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 8168,
-      "display_value": "8,168",
+      "value": 8174,
+      "display_value": "8,174",
       "accent": "#7dcfff"
     },
     {
@@ -272,7 +272,7 @@
     "public_owned_repos_total": 68,
     "public_owned_forks_total": 0,
     "public_owned_nonfork_repos_total": 68,
-    "private_owned_repos_total": 0
+    "private_owned_repos_total": 147
   },
   "featured_repo_facts": [
     {
@@ -324,8 +324,8 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 12456108,
-      "percent": 50.29
+      "bytes": 12458592,
+      "percent": 50.3
     },
     {
       "name": "Makefile",
@@ -890,7 +890,7 @@
     "now": [
       {
         "title": "repo-surface-scout",
-        "detail": "Python \u00b7 pushed 11 hours ago",
+        "detail": "Python \u00b7 pushed today",
         "url": "",
         "is_private": true
       },
@@ -1020,21 +1020,21 @@
       45,
       60,
       34,
-      132
+      138
     ],
     "automation_workflows": 74,
     "automation_repos": 15,
     "primary_lang_share_pct": 50.3,
     "languages_over_5pct": 5,
-    "median_days_since_push": 204.0,
+    "median_days_since_push": 205.0,
     "days_since_last_push": 1.0,
     "public_repos_total": 68,
     "public_nonfork_repos": 68,
-    "private_repos_total": 0,
+    "private_repos_total": 147,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 8168,
+    "total": 8174,
     "weeks": [
       [
         {
@@ -2599,7 +2599,7 @@
         },
         {
           "date": "2026-06-30",
-          "count": 14
+          "count": 20
         }
       ]
     ]
@@ -2645,8 +2645,8 @@
         0,
         0,
         0,
-        0,
-        0,
+        1,
+        2,
         0,
         0,
         2,
@@ -2790,12 +2790,12 @@
       ]
     ],
     "event_mix": {
-      "push": 53,
+      "push": 56,
       "create": 2,
       "comment": 1,
       "pull request": 1
     },
-    "total": 57,
+    "total": 60,
     "timezone": "New York"
   }
 }
