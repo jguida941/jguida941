@@ -93,7 +93,7 @@ class DesignCharacterContract(unittest.TestCase):
         from scripts.pipeline.web_render import render_dashboard
         html = render_dashboard()
         # the base KPI grid stays per-theme: auto-fit on each language's own tile-min
-        self.assertRegex(html, r"\.tiles\s*\{[^}]*minmax\(var\(--tile-min",
+        self.assertRegex(html, r"\.tiles\s*\{[^}]*minmax\([^}]*var\(--tile-min",
                          "the KPI grid must remain auto-fit on the per-theme --tile-min")
         # For every SINGLE-column collapse (`grid-template-columns: 1fr;` — NOT the `1fr 1fr`
         # bento base), walk back to the selector that owns it; `.tiles` must never be one of them.
@@ -105,6 +105,23 @@ class DesignCharacterContract(unittest.TestCase):
                 selector, r"\.tiles(\s|,|$)",
                 ".tiles must keep its per-theme auto-fit grid on mobile (Power BI stays dense, "
                 "Apple goes to one card) — it must never collapse to a fixed single column")
+
+    def test_kpi_grid_never_overflows_a_narrow_viewport(self):
+        """A theme's tile_min can legitimately EXCEED a phone's width (Apple's is 380px > a ~390px
+        viewport, and the airy panel padding leaves only ~300px inside). A raw
+        minmax(380px, 1fr) then forces a track WIDER than the screen, so the cards overflow
+        horizontally — exactly the Apple-Dark / iOS-Safari bug. The KPI grid must CLAMP its
+        minimum track to the container: minmax(min(var(--tile-min), 100%), 1fr) keeps the airy
+        large-card density on a wide screen but collapses to one FITTING card on a phone, so NO
+        theme — whatever its tile_min — can overflow. Mutation-proof: drop the `min(...,100%)`
+        clamp and Apple Dark overflows ~390px again."""
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        self.assertRegex(
+            html, r"\.tiles\s*\{[^}]*minmax\(\s*min\(\s*var\(--tile-min[^)]*\)\s*,\s*100%\s*\)",
+            "the KPI grid must clamp its track to the viewport — "
+            "minmax(min(var(--tile-min), 100%), 1fr) — or a theme whose tile_min exceeds the screen "
+            "(Apple 380px) overflows horizontally on a phone")
 
     def test_density_is_web_only_and_preserves_svg_parity(self):
         """Density is a web concern; the DEFAULT theme's type/radius still equal config."""

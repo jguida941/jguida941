@@ -220,7 +220,7 @@ body {
 .span-2 { grid-column: 1 / -1; }
 
 /* --- metric tiles --- */
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(var(--tile-min, 200px), 1fr)); gap: var(--gap-grid, 12px); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(var(--tile-min, 200px), 100%), 1fr)); gap: var(--gap-grid, 12px); }
 .tile {
   background: color-mix(in srgb, var(--surface-raised) calc(var(--raised-opacity)*100%), transparent);
   border: 1px solid color-mix(in srgb, var(--hairline) 12%, transparent);
