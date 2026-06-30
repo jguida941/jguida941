@@ -120,8 +120,12 @@ easy to measure (token numbers, string presence), not what actually makes it pro
   ~390px viewport, so `minmax(380px,1fr)` forced a track wider than the screen (the cards you saw running off
   the right). Now `minmax(min(var(--tile-min),100%),1fr)` keeps the airy large-card density on desktop but
   collapses to one FITTING card on a phone. New `test_design_character.test_kpi_grid_never_overflows_a_narrow_
-  viewport` (RED-first, mutation-proven). 179 green. NOTE: a SEPARATE residual overflow remains (the heatmap;
-  see pt2 #3) — tracked, fixed next by measurement.
+  viewport` (RED-first, mutation-proven). 179 green. VERIFIED by a headless DOM probe at a TRUE 390px
+  viewport (iframe — Chrome headless otherwise clamps to 500px and skips the phone breakpoint):
+  `documentElement.scrollWidth == clientWidth`, **PAGE_OVERFLOW=0, zero uncontained culprits**, and
+  apple-dark correctly drops the heatmap. The "residual overflow" + "apple-heat runtime defeat" I feared
+  were both 500px-clamp ARTIFACTS, not real bugs — measuring at the true width avoided two wrong fixes
+  (unnecessary `!important` + min-width:0 containment). Receipt: `scratchpad/receipts/apple390_clean.png`.
 
 - ✅ **P5-DATA slice 1 (semantic-TDD on the metrics — the 204-day lie)** — the freshness figure was a
   median across all ~68 public repos presented as "since last push", reading as months of inactivity while
