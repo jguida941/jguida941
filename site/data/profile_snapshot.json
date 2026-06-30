@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-30T01:04:06.368612Z",
+  "generated_at": "2026-06-30T01:16:25.277248Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 8163,
-    "public_scope_commits": 4336,
+    "last_year_contributions": 8165,
+    "public_scope_commits": 4338,
     "total_repos": 68,
     "public_forks": 0,
     "private_owned_repos": 147,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 8163,
-      "display_value": "8,163"
+      "value": 8165,
+      "display_value": "8,165"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 4336,
-      "display_value": "4,336"
+      "value": 4338,
+      "display_value": "4,338"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 8163,
-      "display_value": "8,163"
+      "value": 8165,
+      "display_value": "8,165"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 4336,
-      "display_value": "4,336"
+      "value": 4338,
+      "display_value": "4,338"
     },
     {
       "key": "total_repos",
@@ -193,19 +193,20 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.1470588235294117,
     "ci_coverage_pct": 23.52941176470588,
-    "last_year_contributions": 8163,
+    "last_year_contributions": 8165,
     "active_days_last_year": 287,
     "automation_workflows": 74,
     "primary_lang_share_pct": 50.3,
-    "median_days_since_push": 204.0
+    "median_days_since_push": 204.0,
+    "days_since_last_push": 0.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 8163,
-      "display_value": "8,163",
+      "value": 8165,
+      "display_value": "8,165",
       "accent": "#7dcfff"
     },
     {
@@ -257,11 +258,11 @@
       "accent": "#7aa2f7"
     },
     {
-      "key": "median_days_since_push",
-      "label": "Median Repo Freshness",
-      "detail": "median days since last push",
-      "value": 204.0,
-      "display_value": "204d",
+      "key": "days_since_last_push",
+      "label": "Last Push",
+      "detail": "days since your most recent commit",
+      "value": 0.0,
+      "display_value": "0d",
       "accent": "#9ece6a"
     }
   ],
@@ -323,13 +324,13 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 12450950,
-      "percent": 50.28
+      "bytes": 12455540,
+      "percent": 50.29
     },
     {
       "name": "Makefile",
       "bytes": 3931581,
-      "percent": 15.88
+      "percent": 15.87
     },
     {
       "name": "Rust",
@@ -363,7 +364,7 @@
     },
     {
       "name": "HTML",
-      "bytes": 232780,
+      "bytes": 232778,
       "percent": 0.94
     },
     {
@@ -498,7 +499,7 @@
       "ci": "no",
       "pushed_at": "2026-03-02",
       "pushed_at_raw": "2026-03-02T01:14:07Z",
-      "pushed_ago": "3 months ago",
+      "pushed_ago": "4 months ago",
       "created_at": "2026-02-23",
       "last_commit_msg": "chore: remove legacy final project and fix language stats",
       "featured": false
@@ -1019,20 +1020,21 @@
       45,
       60,
       34,
-      118
+      120
     ],
     "automation_workflows": 74,
     "automation_repos": 15,
     "primary_lang_share_pct": 50.3,
     "languages_over_5pct": 5,
     "median_days_since_push": 204.0,
+    "days_since_last_push": 0.0,
     "public_repos_total": 68,
     "public_nonfork_repos": 68,
     "private_repos_total": 147,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 8163,
+    "total": 8165,
     "weeks": [
       [
         {
@@ -2597,11 +2599,11 @@
         },
         {
           "date": "2026-06-29",
-          "count": 47
+          "count": 48
         },
         {
           "date": "2026-06-30",
-          "count": 6
+          "count": 7
         }
       ]
     ]
@@ -2630,7 +2632,7 @@
         2,
         3,
         7,
-        1,
+        2,
         0,
         0
       ],
@@ -2792,12 +2794,12 @@
       ]
     ],
     "event_mix": {
-      "push": 49,
+      "push": 50,
       "create": 2,
       "comment": 1,
       "pull request": 1
     },
-    "total": 53,
+    "total": 54,
     "timezone": "New York"
   }
 }
