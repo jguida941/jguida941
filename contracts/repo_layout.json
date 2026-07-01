@@ -68,7 +68,8 @@
         {"id": "design", "target_dir": "rendering/design", "members": ["loader.py"]},
         {"id": "webkit", "target_dir": "rendering/webkit", "members": ["archetype.py", "components.py", "design_render_adapter.py"]},
         {"id": "showcase", "target_dir": "rendering/showcase", "members": ["showcase.py"]},
-        {"id": "settings", "target_dir": "rendering/settings", "members": ["settings.py"]}
+        {"id": "settings", "target_dir": "rendering/settings", "members": ["settings.py"]},
+        {"id": "studio", "target_dir": "rendering/studio", "members": ["studio.py"]}
       ]
     },
     "test_layout": {
@@ -97,7 +98,7 @@
       "purpose": "P5-0-FINISH: closed cover over GENERATED site HTML so an undeclared site/*.html is structurally unconstructable (the precondition for the design-system showcase/settings homes). site/data/* is hydrated JSON, never matched by the *.html glob. Bespoke root_allowlist + group_dirs method (like contracts_layout); site/ is a root+allowlist shape, NOT a groups/target_dir shape, so it is deliberately NOT in the _ENUMERATED loop (codex R7). showcase.html / settings.html join root_allowlist, and a showcase/ subdir joins group_dirs, only in the slice that creates them.",
       "root": "site",
       "glob": "**/*.html",
-      "root_allowlist": ["index.html", "settings.html", "showcase.html"],
+      "root_allowlist": ["index.html", "settings.html", "showcase.html", "studio.html"],
       "group_dirs": []
     },
     "receipts_layout": {

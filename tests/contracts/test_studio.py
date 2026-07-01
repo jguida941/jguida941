@@ -57,5 +57,52 @@ class StudioArchetypeContract(unittest.TestCase):
         self.assertGreaterEqual(html.count('"btn-liquid-glass-'), 2, "a primary + secondary button")
 
 
+def _repo_root():
+    from pathlib import Path
+    for p in Path(__file__).resolve().parents:
+        if (p / "scripts").is_dir() and (p / "site").is_dir():
+            return p
+    raise RuntimeError("repo root not found")
+
+
+class StudioPageContract(unittest.TestCase):
+    def test_studio_page_is_generated_not_handwritten(self):
+        """Drift guard: site/studio.html bytes == render_studio() — a hand edit reddens; the page
+        can only change by changing the generator + regenerating."""
+        from scripts.rendering.studio.studio import render_studio
+        page = _repo_root() / "site" / "studio.html"
+        self.assertTrue(page.is_file(), "site/studio.html must be generated + committed")
+        self.assertEqual(page.read_text(encoding="utf-8"), render_studio(),
+                         "studio drift — regenerate via scripts.rendering.studio.studio.write_studio")
+
+    def test_studio_has_a_pure_css_language_switcher_over_every_active_language(self):
+        """A live switcher (radio + tab) for EVERY active language, each language's archetype
+        embedded — and it is PURE CSS (no <script>), so there is no verdict logic to audit and every
+        visible byte is drift-guarded."""
+        from scripts.rendering.studio.studio import render_studio
+        html = render_studio()
+        self.assertNotIn("<script", html, "slice 2 is pure-CSS: no JS on the studio page")
+        for name in _active():
+            self.assertIn(f'id="lang-{name}"', html, f"{name}: a switcher radio")
+            self.assertIn(f'for="lang-{name}"', html, f"{name}: a switcher tab")
+            self.assertIn(f'data-lang="{name}"', html, f"{name}: its archetype stage is embedded")
+            self.assertIn(f'#lang-{name}:checked ~ .stages', html, f"{name}: pure-CSS reveal rule")
+
+    def test_studio_page_carries_no_decider_logic(self):
+        """The studio DISPLAYS; it never re-decides. The generated page contains no admissibility /
+        conformance verdict logic (that stays in Python; the governed swap slice embeds DATA + looks
+        it up, never recomputes)."""
+        from scripts.rendering.studio.studio import render_studio
+        html = render_studio()
+        for banned in ("is_admissible", "def conform", "compose(", "matching_languages", "admissible_space("):
+            self.assertNotIn(banned, html, f"studio page must not carry decider logic: {banned}")
+
+    def test_index_links_to_the_studio(self):
+        """The studio must be REACHABLE — the generated front page links to it (else the design
+        system stays invisible, the operator's exact complaint)."""
+        from scripts.pipeline.web_render import render_dashboard
+        self.assertIn("studio.html", render_dashboard(), "index.html must link to the studio")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -245,6 +245,7 @@ def _hero() -> str:
         <p class="eyebrow">GitHub Analytics · Live</p>
         <h1 id="hero-name">@jguida941</h1>
         <p class="tag" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p>
+        <p class="tag nav-links"><a href="studio.html">Design-language studio →</a> · <a href="showcase.html">showcase</a> · <a href="settings.html">settings</a></p>
       </div>
       <div class="switcher" role="group" aria-label="Theme">{metas}</div>
     </div>

@@ -80,6 +80,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/rendering/webkit/design_render_adapter.py", "scripts/rendering/webkit/design_render_adapter.py", "rendering", "verdict-free fact-gatherer over rendered button HTML/CSS (the portability seam)"),
     ModuleHome("scripts/rendering/showcase/showcase.py", "scripts/rendering/showcase/showcase.py", "rendering", "render_showcase: the conformance receipts rendered to site/showcase.html (design-language surface)"),
     ModuleHome("scripts/rendering/settings/settings.py", "scripts/rendering/settings/settings.py", "rendering", "render_settings: the governed control-plane view -> site/settings.html (displays the Python decision)"),
+    ModuleHome("scripts/rendering/studio/studio.py", "scripts/rendering/studio/studio.py", "rendering", "render_studio: the interactive design-language studio -> site/studio.html (pure-CSS language switcher + archetypes)"),
     ModuleHome("scripts/render/cards/generate_activity_heatmap.py", "scripts/rendering/generate_activity_heatmap.py", "rendering", "activity heatmap renderer"),
     ModuleHome("scripts/render/cards/generate_badges.py", "scripts/rendering/generate_badges.py", "rendering", "badge renderer"),
     ModuleHome("scripts/render/cards/generate_builder_scorecard.py", "scripts/rendering/generate_builder_scorecard.py", "rendering", "builder scorecard renderer"),
@@ -134,6 +135,7 @@ PACKAGE_INIT_PATHS: frozenset[str] = frozenset(
         "scripts/rendering/webkit/__init__.py",
         "scripts/rendering/showcase/__init__.py",
         "scripts/rendering/settings/__init__.py",
+        "scripts/rendering/studio/__init__.py",
     }
 )
 
