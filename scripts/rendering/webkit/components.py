@@ -10,6 +10,19 @@ candidate_only.
 from __future__ import annotations
 
 
+def _is_light(hex_color: str) -> bool:
+    """Perceived-brightness default (light accent → dark text, dark accent → light text) matching
+    each platform's filled-button convention — Apple/Carbon put LIGHT text on their saturated
+    accents. This is NOT a WCAG contrast gate: for a saturated mid-tone accent the FAITHFUL choice
+    can sit below AA (Apple's own white-on-#0a84ff is ~3.65:1). The real contrast verdict is a
+    DEFERRED/candidate concern (the headless-probe slice), never claimed here (codex 1a-ii-B #1)."""
+    h = hex_color.lstrip("#")
+    if len(h) != 6:
+        return False
+    r, g, b = (int(h[i:i + 2], 16) for i in (0, 2, 4))
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 150
+
+
 def render_button(profile: str, variant: str, state: str) -> tuple[str, str]:
     from scripts.rendering import design_tokens as dt
     from scripts.rendering.design import loader
@@ -24,9 +37,10 @@ def render_button(profile: str, variant: str, state: str) -> tuple[str, str]:
     anatomy = btn["anatomy"]
     justify = "space-between" if anatomy == "label-left-icon-right" else "center"
 
-    # variant surface (the filled/prominent variant = accent fill; the rest = quiet/ghost)
+    # variant surface (the filled/prominent variant = accent fill; the rest = quiet/ghost).
+    # Filled text contrasts the accent (dark text on a light accent, light text on a dark one).
     filled = variant in ("prominent", "primary", "filled") or variant.endswith("-primary")
-    bg, fg = (accent, backdrop) if filled else ("transparent", accent)
+    bg, fg = (accent, (backdrop if _is_light(accent) else "#ffffff")) if filled else ("transparent", accent)
 
     # ANATOMY -> genuinely different DOM (the deterministic structure axis)
     if anatomy == "label-left-icon-right":

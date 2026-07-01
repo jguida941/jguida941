@@ -107,6 +107,25 @@ class DesignProfileSpineContract(unittest.TestCase):
         self.assertNotIn(config.CYAN, raw_tokens,
                          "liquid-glass must ALIAS config (single source), never re-literal config.CYAN")
 
+    def test_apple_dark_tokens_derive_from_the_theme_not_a_hand_typed_copy(self):
+        """codex H1: apple-dark ALREADY exists in `design_tokens.THEMES['apple-dark']` (unlike
+        carbon, which owns its palette). So the apple-dark profile must ALIAS that theme
+        (`derived_from: theme:apple-dark`), NOT hand-type a duplicate hex map that could silently
+        drift. Pins single source: resolved apple-dark tokens == `THEMES['apple-dark']`, and the raw
+        JSON re-literals nothing."""
+        if "apple-dark" not in self.index["active_design_profiles"]:
+            self.skipTest("apple-dark not active yet")
+        from scripts.rendering import design_tokens as dt
+        from scripts.rendering.design import loader
+        tok = loader.resolve_tokens("apple-dark")
+        theme = dt.THEMES["apple-dark"]
+        self.assertEqual(tok["color"]["accent"], theme["accent"])
+        self.assertEqual(tok["color"]["ink-strong"], theme["ink-strong"])
+        self.assertEqual(tok["color"]["surface"], theme["surface"])
+        raw_tokens = json.dumps(loader.load("apple-dark")["tokens"])
+        self.assertNotIn(theme["accent"], raw_tokens,
+                         "apple-dark must ALIAS THEMES['apple-dark'] (single source), never re-literal its hex")
+
     # --- anti-tautology: the cover CAN redden (a coverage gap is caught) ---
     def test_aspect_cover_fires_on_a_gap(self):
         roster = set(self.roster_ids)

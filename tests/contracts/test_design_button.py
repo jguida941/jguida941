@@ -58,6 +58,25 @@ class DesignButtonContract(unittest.TestCase):
         _, focus_css = render_button("carbon", "primary", "focus-visible")
         self.assertIn("inset", focus_css, "carbon focus is a 2px square inset ring (not a rounded halo)")
 
+    def test_apple_dark_button_is_a_capsule_that_dims_not_glows(self):
+        """Cited apple-dark button (docs/design/apple-dark.md — Apple HIG Buttons + Materials): a
+        capsule (`border-radius:999px`) on an OPAQUE fill (NO `backdrop-filter` — apple-dark is not
+        glass), ZERO box-shadow, a rounded system focus ring (NOT a square inset), and an
+        opacity-DIM press (`opacity:0.4` + scale — dims DOWN), NOT liquid's brightness-UP nor
+        carbon's token-swap. It SHARES the capsule with liquid-glass but is a distinct COMPONENT via
+        material + mechanic + elevation + focus (codex H2 — clears the quorum with margin)."""
+        from scripts.rendering.webkit.components import render_button
+        _, rest = render_button("apple-dark", "filled", "rest")
+        self.assertIn("border-radius: 999px", rest, "apple-dark button is a capsule")
+        self.assertNotIn("backdrop-filter", rest, "apple-dark is OPAQUE, not frosted glass")
+        self.assertNotIn("box-shadow", rest, "apple-dark button has ZERO elevation")
+        _, active = render_button("apple-dark", "filled", "active")
+        self.assertIn("opacity: 0.4", active, "apple-dark press is an opacity-dim (dims DOWN)")
+        self.assertNotIn("brightness", active, "NOT the liquid-glass brightness-UP mechanic")
+        self.assertNotIn("background-color", active, "NOT the carbon token-swap mechanic")
+        _, focus = render_button("apple-dark", "filled", "focus-visible")
+        self.assertNotIn("inset", focus, "apple-dark focus is a rounded ring, not a square inset")
+
     def test_button_fingerprints_are_pairwise_distinct(self):
         """The component-level distinctness law: each active profile's button `fingerprint`
         ({radius_px, state_mechanic, focus_recipe, anatomy, material, elevation}) must differ from

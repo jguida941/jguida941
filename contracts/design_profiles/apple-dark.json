@@ -1,0 +1,82 @@
+{
+  "contract_id": "DesignLanguageProfile",
+  "profile": "apple-dark",
+  "profile_version": 1,
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "honest_claim": "satisfies the apple-dark profile v1 — receipts",
+  "doctrine_doc": "docs/design/apple-dark.md",
+  "primary_doc_urls": [
+    "https://developer.apple.com/design/human-interface-guidelines/buttons",
+    "https://developer.apple.com/design/human-interface-guidelines/materials",
+    "https://developer.apple.com/design/human-interface-guidelines/color"
+  ],
+  "derived_from": "theme:apple-dark",
+  "token_format": "w3c-dtcg-2025.10",
+  "tokens": {
+    "$comment": "codex H1: apple-dark already exists in design_tokens.THEMES['apple-dark'], so every $value is an {alias} into the loader-injected `theme` group (built from THEMES['apple-dark'] + THEME_IA) — NO literal copy (single source). derived_from: theme:apple-dark.",
+    "color": {
+      "$type": "color",
+      "accent": {"$value": "{theme.color.accent}"},
+      "ink-strong": {"$value": "{theme.color.ink-strong}"},
+      "ink": {"$value": "{theme.color.ink}"},
+      "ink-dim": {"$value": "{theme.color.ink-dim}"},
+      "surface": {"$value": "{theme.color.surface}"},
+      "surface-raised": {"$value": "{theme.color.surface-raised}"},
+      "backdrop": {"$value": "{theme.color.backdrop}"},
+      "hairline": {"$value": "{theme.color.hairline}"},
+      "status-success": {"$value": "{theme.color.status-success}"},
+      "status-warning": {"$value": "{theme.color.status-warning}"},
+      "status-danger": {"$value": "{theme.color.status-danger}"}
+    },
+    "radius": {
+      "$type": "dimension",
+      "panel": {"$value": "{theme.radius.panel}"},
+      "tile": {"$value": "{theme.radius.tile}"}
+    },
+    "font": {
+      "family": {"$type": "fontFamily", "$value": "{theme.font.family}"}
+    }
+  },
+  "components": {
+    "button": {
+      "$doc": "docs/design/apple-dark.md — Apple HIG Buttons + Materials. Capsule, OPAQUE fill (not glass), ZERO box-shadow, rounded system focus ring, opacity-dim press (opacity 0.4 [derived] + scale 0.97 [derived]).",
+      "anatomy": "centered-capsule",
+      "radius_px": 999,
+      "height_px": 50,
+      "pad_inline_px": 20,
+      "pad_block_px": 14,
+      "material": "opaque-fill",
+      "state_mechanic": "opacity-dim",
+      "focus_recipe": "rounded-system-ring",
+      "transition_ms": 250,
+      "easing": "ease-in-out",
+      "active_css": {"opacity": "0.4", "transform": "scale(0.97)"},
+      "elevation_shadow": null,
+      "variants": ["plain", "gray", "tinted", "filled", "destructive"],
+      "states": ["rest", "hover", "active", "focus-visible", "disabled"],
+      "fingerprint": {"radius_px": 999, "state_mechanic": "opacity-dim", "focus_recipe": "rounded-system-ring", "anatomy": "centered-capsule", "material": "opaque-fill", "elevation": "none"}
+    }
+  },
+  "aspect_coverage": {
+    "color-roles": "covered-deferred",
+    "type-ramp": "covered-deferred",
+    "spacing-density": "covered-deferred",
+    "radius-elevation-material": "covered-deferred",
+    "motion": "covered-deferred",
+    "component-button": "covered-deferred",
+    "component-chip": "covered-deferred",
+    "component-card": "covered-deferred",
+    "component-kpi": "covered-deferred",
+    "component-input": "covered-deferred",
+    "component-nav": "covered-deferred",
+    "component-table": "covered-deferred",
+    "component-chart": "covered-deferred",
+    "component-hero": "covered-deferred",
+    "component-type-specimen": "covered-deferred",
+    "charts": "covered-deferred",
+    "responsive": "covered-deferred",
+    "touch-target": "covered-deferred"
+  },
+  "invariants": []
+}
