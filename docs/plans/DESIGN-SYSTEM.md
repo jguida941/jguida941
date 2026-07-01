@@ -188,8 +188,13 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
    (DEFERRED to a follow-up: the interactive URL/localStorage UI + persistence; the visual "looks
    right" verdict stays candidate → the receipt gate.)
 7. **P5-THEMES-4-10** — via the skill: Material 3, Fluent 2, Polaris, Atlassian, Linear, Geist, Stripe
-   — each a profile JSON + cited doctrine doc + usually zero new predicates + an archetype page;
-   distinctness fingerprint forbids convergence.
+   — each a profile JSON + cited doctrine doc + usually zero new predicates + an archetype page.
+   **Pre-theme hardening now folded:** button focus uses the same mutually-exclusive signal counting
+   as chip focus (ambiguous rings → None), and the anti-convergence gate is bound to RENDERED
+   button/chip/card fingerprints, with declared `components.*.fingerprint` checked only for
+   consistency. A model can still propose profile data, but distinctness is decided by observed
+   rendered facts, not JSON self-reporting. NEXT gap before broad theme generation: P5-RECEIPT-GATE
+   for visual/runtime claims that static parsing must not fake-green.
 8. **P5-RECEIPT-GATE** — make the true-viewport visual/runtime receipt a REQUIRED prove-lane step
    (the apple-heat 500px-clamp lesson); one `prove` lane = runner + pytest + regen + coverage + drift.
 

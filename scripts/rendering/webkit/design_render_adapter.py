@@ -48,18 +48,13 @@ def button_facts(html: str, css: str) -> dict:
         signals.append("token-swap")
     mechanic = signals[0] if len(signals) == 1 else None
 
-    # focus recipe: keyed on the SPECIFIC ring geometry, not "any inset" (codex 1b-ii #3) — a
-    # mutated `inset 0 0 0 999px` is no longer a 2px square ring, so the deterministic invariant bites.
-    focus = re.search(r"\.is-focus\s*\{([^}]*)\}", css)
-    focus_css = focus.group(1) if focus else ""
-    if "inset 0 0 0 2px" in focus_css:             # carbon: inset 1px+2px square ring
-        focus_recipe = "square-2px-ring"
-    elif "0 0 0 5px" in focus_css:                 # liquid: 2px backdrop + 5px accent halo
-        focus_recipe = "capsule-halo"
-    elif "0 0 0 4px" in focus_css:                 # apple: single 4px rounded system ring
-        focus_recipe = "rounded-system-ring"
-    else:
-        focus_recipe = None
+    # focus recipe: keyed on SPECIFIC ring geometry AND mutually exclusive (same discipline as the
+    # chip). A rule with both a square inset and a halo is ambiguous -> None, never priority-picked.
+    focus_recipe = _focus_recipe(css, (
+        ("inset 0 0 0 2px", "square-2px-ring"),    # carbon: inset 1px+2px square ring
+        ("0 0 0 5px", "capsule-halo"),             # liquid: 2px backdrop + 5px accent halo
+        ("0 0 0 4px", "rounded-system-ring"),      # apple: single 4px rounded system ring
+    ))
 
     return {
         "radius_px": radius_px,
@@ -113,6 +108,18 @@ def _mechanic(css: str):
     return signals[0] if len(signals) == 1 else None
 
 
+def _focus_recipe(css: str, recipes: tuple[tuple[str, str], ...]):
+    """The MUTUALLY-EXCLUSIVE focus recipe read from `.is-focus`.
+
+    `recipes` is `(literal_signature, recipe_name)`. A missing focus rule OR multiple matching ring
+    signatures returns None, so predicates fail closed instead of taking a priority branch.
+    """
+    focus = re.search(r"\.is-focus\s*\{([^}]*)\}", css)
+    focus_css = focus.group(1) if focus else ""
+    signals = [name for needle, name in recipes if needle in focus_css]
+    return signals[0] if len(signals) == 1 else None
+
+
 def chip_facts(html: str, css: str) -> dict:
     """Verdict-free facts for the chip/tag (instance #2). Same fail-closed / mutually-exclusive
     discipline as `button_facts`; chip-specific: `label-dismiss` anatomy (a trailing `×` close
@@ -137,16 +144,11 @@ def chip_facts(html: str, css: str) -> dict:
 
     # focus recipe: MUTUALLY EXCLUSIVE — count signals, None on zero or >1 (same discipline as the
     # mechanic; codex chip N1 — `outline: 2px` + a halo can't both resolve to outline-2px).
-    focus = re.search(r"\.is-focus\s*\{([^}]*)\}", css)
-    focus_css = focus.group(1) if focus else ""
-    fsignals = []
-    if "outline: 2px" in focus_css:                # carbon Tag: 2px solid outline + 1px offset
-        fsignals.append("outline-2px")
-    if "0 0 0 5px" in focus_css:                   # liquid: capsule halo
-        fsignals.append("capsule-halo")
-    if "0 0 0 4px" in focus_css:                   # apple: rounded system ring
-        fsignals.append("rounded-system-ring")
-    focus_recipe = fsignals[0] if len(fsignals) == 1 else None
+    focus_recipe = _focus_recipe(css, (
+        ("outline: 2px", "outline-2px"),            # carbon Tag: 2px solid outline + 1px offset
+        ("0 0 0 5px", "capsule-halo"),             # liquid: capsule halo
+        ("0 0 0 4px", "rounded-system-ring"),      # apple: rounded system ring
+    ))
 
     return {
         "radius_px": radius_px,

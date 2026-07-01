@@ -78,14 +78,16 @@ class DesignButtonContract(unittest.TestCase):
         self.assertNotIn("inset", focus, "apple-dark focus is a rounded ring, not a square inset")
 
     def test_button_fingerprints_are_pairwise_distinct(self):
-        """The component-level distinctness law: each active profile's button `fingerprint`
-        ({radius_px, state_mechanic, focus_recipe, anatomy, material, elevation}) must differ from
-        every other on a QUORUM of >=3 axes — so two languages can never render the same button.
-        (Extends the web-IA test_design_distinctness quorum to the component granularity.)"""
+        """The component-level distinctness law is RENDER-derived: each active profile's rendered
+        button fingerprint ({radius_px, state_mechanic, focus_recipe, anatomy, material,
+        elevation}) must differ from every other on a QUORUM of >=3 axes. A declared JSON
+        fingerprint alone is not authority, because it could claim distinctness while the renderer
+        converges."""
         from scripts.rendering.design import loader
+        from scripts.quality.design_invariants import rendered_component_fingerprint
         active = loader.load("_index")["active_design_profiles"]
         self.assertGreaterEqual(len(active), 2, "need >=2 active profiles to prove distinctness")
-        fps = {p: loader.load(p)["components"]["button"]["fingerprint"] for p in active}
+        fps = {p: rendered_component_fingerprint(p, "button") for p in active}
         names = sorted(fps)
         for i in range(len(names)):
             for j in range(i + 1, len(names)):
@@ -95,6 +97,30 @@ class DesignButtonContract(unittest.TestCase):
                 self.assertGreaterEqual(
                     differing, 3,
                     f"{names[i]} vs {names[j]}: button fingerprints must differ on >=3 axes (got {differing})")
+
+    def test_declared_button_fingerprints_match_rendered_facts(self):
+        """The committed `components.button.fingerprint` is documentation, not the decider. It must
+        stay consistent with the rendered facts on every facts-observable axis."""
+        from scripts.rendering.design import loader
+        from scripts.quality.design_invariants import fingerprint_matches_rendered, rendered_component_fingerprint
+        for name in loader.load("_index")["active_design_profiles"]:
+            declared = loader.load(name)["components"]["button"]["fingerprint"]
+            rendered = rendered_component_fingerprint(name, "button")
+            self.assertTrue(fingerprint_matches_rendered(declared, rendered, "button"),
+                            f"{name}: declared button fingerprint drifted from rendered facts: {rendered}")
+
+    def test_rendered_button_fingerprint_ignores_declared_fingerprint_field(self):
+        """Mutation proof: corrupting only the declared fingerprint must not change the rendered
+        fingerprint. The renderer/fact path, not JSON self-reporting, drives distinctness."""
+        import copy
+        from scripts.rendering.design import loader
+        from scripts.quality.design_invariants import rendered_component_fingerprint
+        prof = copy.deepcopy(loader.load("liquid-glass"))
+        prof["components"]["button"]["fingerprint"] = {"radius_px": 0, "state_mechanic": "token-swap"}
+        self.assertEqual(
+            rendered_component_fingerprint("liquid-glass", "button"),
+            rendered_component_fingerprint("liquid-glass", "button", profile_data=prof),
+        )
 
 
 if __name__ == "__main__":

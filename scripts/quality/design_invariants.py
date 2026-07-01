@@ -19,29 +19,29 @@ def _root() -> Path:
     raise RuntimeError("repo root not found")
 
 
-def _button_facts(profile: str, variant: str) -> dict:
+def _button_facts(profile: str, variant: str, profile_data: dict | None = None) -> dict:
     from scripts.rendering.webkit import design_render_adapter as adapter
     from scripts.rendering.webkit.components import render_button
-    _, base_css = render_button(profile, variant, "rest")   # rest = the base rule (material/radius source)
-    _, active = render_button(profile, variant, "active")
-    html, focus = render_button(profile, variant, "focus-visible")
+    _, base_css = render_button(profile, variant, "rest", profile_data=profile_data)   # rest = the base rule
+    _, active = render_button(profile, variant, "active", profile_data=profile_data)
+    html, focus = render_button(profile, variant, "focus-visible", profile_data=profile_data)
     # base rule sourced explicitly from `rest`; the `.is-*` recipes come from the state renders
     return adapter.button_facts(html, "\n".join([base_css, active, focus]))
 
 
-def _chip_facts(profile: str, variant: str) -> dict:
+def _chip_facts(profile: str, variant: str, profile_data: dict | None = None) -> dict:
     from scripts.rendering.webkit import design_render_adapter as adapter
     from scripts.rendering.webkit.components import render_chip
-    _, base_css = render_chip(profile, variant, "rest")
-    _, active = render_chip(profile, variant, "active")
-    html, focus = render_chip(profile, variant, "focus-visible")
+    _, base_css = render_chip(profile, variant, "rest", profile_data=profile_data)
+    _, active = render_chip(profile, variant, "active", profile_data=profile_data)
+    html, focus = render_chip(profile, variant, "focus-visible", profile_data=profile_data)
     return adapter.chip_facts(html, "\n".join([base_css, active, focus]))
 
 
-def _card_facts(profile: str, variant: str) -> dict:
+def _card_facts(profile: str, variant: str, profile_data: dict | None = None) -> dict:
     from scripts.rendering.webkit import design_render_adapter as adapter
     from scripts.rendering.webkit.components import render_card
-    html, css = render_card(profile, variant, "rest")   # a card is a static container
+    html, css = render_card(profile, variant, "rest", profile_data=profile_data)   # a card is static
     return adapter.card_facts(html, css)
 
 
@@ -51,6 +51,111 @@ _COMPONENT_FACTS = {
     "component-chip": ("chip", _chip_facts),
     "component-card": ("card", _card_facts),
 }
+
+
+def _material_axis(facts: dict) -> str | None:
+    if facts.get("has_backdrop_filter") is True:
+        return "liquid-glass"
+    if facts.get("has_backdrop_filter") is False:
+        return "non-glass"
+    return None
+
+
+def _elevation_axis(facts: dict) -> str | None:
+    if facts.get("has_box_shadow") is True:
+        return "floating"
+    if facts.get("has_box_shadow") is False:
+        return "none"
+    return None
+
+
+def fingerprint_from_facts(component: str, facts: dict) -> dict:
+    """Render-derived fingerprint axes. These are observations, not profile self-reporting.
+
+    `material` intentionally collapses `flat-fill` and `opaque-fill` to `non-glass`: the static
+    facts seam can prove glass-vs-not-glass, while the Carbon-vs-Apple split is carried by rendered
+    radius/anatomy/mechanic/focus axes.
+    """
+    if component in ("button", "chip"):
+        return {
+            "radius_px": facts.get("radius_px"),
+            "state_mechanic": facts.get("state_mechanic"),
+            "focus_recipe": facts.get("focus_recipe"),
+            "anatomy": facts.get("anatomy"),
+            "material": _material_axis(facts),
+            "elevation": _elevation_axis(facts),
+        }
+    if component == "card":
+        radius = facts.get("radius_px")
+        return {
+            "radius_px": radius,
+            "material": _material_axis(facts),
+            "divider": "visible-1px" if facts.get("divider_1px") is True else None,
+            "shape": ("square" if radius == 0 else ("rounded" if isinstance(radius, int) and radius > 0 else None)),
+            "elevation": _elevation_axis(facts),
+        }
+    raise KeyError(f"unknown component: {component}")
+
+
+def rendered_component_fingerprint(
+    profile: str,
+    component: str,
+    variant: str | None = None,
+    profile_data: dict | None = None,
+) -> dict:
+    """Render a component, gather facts, and return its observed fingerprint.
+
+    The optional `profile_data` path exists for mutation proofs and settings composition: changing
+    only `components.<component>.fingerprint` must not change this value.
+    """
+    from scripts.rendering.design import loader
+
+    prof = profile_data if profile_data is not None else loader.load(profile)
+    if variant is None:
+        variant = prof["components"][component]["variants"][0]
+    gather = _COMPONENT_FACTS[f"component-{component}"][1]
+    return fingerprint_from_facts(component, gather(profile, variant, profile_data=profile_data))
+
+
+def _material_matches(declared: str | None, rendered: str | None) -> bool:
+    if declared == "liquid-glass":
+        return rendered == "liquid-glass"
+    if declared in ("flat-fill", "opaque-fill"):
+        return rendered == "non-glass"
+    return declared == rendered
+
+
+def _divider_matches(declared: str | None, rendered: str | None) -> bool:
+    if declared in ("hairline", "gridline"):
+        return rendered == "visible-1px"
+    return declared == rendered
+
+
+def fingerprint_matches_rendered(declared: dict, rendered: dict, component: str) -> bool:
+    """True iff a declared fingerprint is consistent with the rendered fingerprint on every
+    facts-observable axis. Declared fingerprints document the design language; rendered facts decide.
+    """
+    for key in ("radius_px",):
+        if declared.get(key) != rendered.get(key):
+            return False
+    if not _material_matches(declared.get("material"), rendered.get("material")):
+        return False
+    if component in ("button", "chip"):
+        for key in ("state_mechanic", "focus_recipe", "anatomy", "elevation"):
+            if declared.get(key) != rendered.get(key):
+                return False
+        return True
+    if component == "card":
+        if declared.get("shape") != rendered.get("shape"):
+            return False
+        if not _divider_matches(declared.get("divider"), rendered.get("divider")):
+            return False
+        return True
+    raise KeyError(f"unknown component: {component}")
+
+
+def fingerprint_matches_facts(declared: dict, facts: dict, component: str) -> bool:
+    return fingerprint_matches_rendered(declared, fingerprint_from_facts(component, facts), component)
 
 
 # The receipt claim is HONEST per status (codex 1b-ii #4): a `fail`/`candidate` row must not read

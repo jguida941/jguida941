@@ -73,14 +73,13 @@ class DesignChipContract(unittest.TestCase):
         self.assertNotIn("brightness", active, "NOT the liquid-glass brightness mechanic")
 
     def test_chip_fingerprints_are_pairwise_distinct(self):
-        """The component-level distinctness law for the chip: each active profile's chip
-        `fingerprint` ({radius_px, state_mechanic, focus_recipe, anatomy, material, elevation}) must
-        differ from every other on a QUORUM of >=3 axes — two languages can never render the same
-        chip. (liquid-glass vs apple-dark is the near-pair: material+mechanic+focus+elevation carry
-        it, same honest basis as the button.)"""
+        """The component-level distinctness law for the chip is RENDER-derived: each active
+        profile's rendered chip fingerprint must differ from every other on a QUORUM of >=3 axes —
+        two languages can never render the same chip even if the declared JSON claims otherwise."""
         from scripts.rendering.design import loader
+        from scripts.quality.design_invariants import rendered_component_fingerprint
         active = loader.load("_index")["active_design_profiles"]
-        fps = {p: loader.load(p)["components"]["chip"]["fingerprint"] for p in active}
+        fps = {p: rendered_component_fingerprint(p, "chip") for p in active}
         names = sorted(fps)
         for i in range(len(names)):
             for j in range(i + 1, len(names)):
@@ -90,6 +89,28 @@ class DesignChipContract(unittest.TestCase):
                 self.assertGreaterEqual(
                     differing, 3,
                     f"{names[i]} vs {names[j]}: chip fingerprints must differ on >=3 axes (got {differing})")
+
+    def test_declared_chip_fingerprints_match_rendered_facts(self):
+        """The committed `components.chip.fingerprint` must stay consistent with rendered facts on
+        every facts-observable axis; it is not allowed to self-certify distinctness."""
+        from scripts.rendering.design import loader
+        from scripts.quality.design_invariants import fingerprint_matches_rendered, rendered_component_fingerprint
+        for name in loader.load("_index")["active_design_profiles"]:
+            declared = loader.load(name)["components"]["chip"]["fingerprint"]
+            rendered = rendered_component_fingerprint(name, "chip")
+            self.assertTrue(fingerprint_matches_rendered(declared, rendered, "chip"),
+                            f"{name}: declared chip fingerprint drifted from rendered facts: {rendered}")
+
+    def test_rendered_chip_fingerprint_ignores_declared_fingerprint_field(self):
+        import copy
+        from scripts.rendering.design import loader
+        from scripts.quality.design_invariants import rendered_component_fingerprint
+        prof = copy.deepcopy(loader.load("carbon"))
+        prof["components"]["chip"]["fingerprint"] = {"radius_px": 999, "anatomy": "centered-label"}
+        self.assertEqual(
+            rendered_component_fingerprint("carbon", "chip"),
+            rendered_component_fingerprint("carbon", "chip", profile_data=prof),
+        )
 
 
 if __name__ == "__main__":

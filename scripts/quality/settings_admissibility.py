@@ -55,24 +55,10 @@ def _composed_facts(base: str, composed: dict, component: str) -> dict:
 
 def _facts_match_fingerprint(facts: dict, fp: dict, component: str) -> bool:
     """The composed component's RENDERED facts must be consistent with `fp` (the candidate profile's
-    declared fingerprint) on every facts-observable axis. This closes the uncovered-axis hole (codex
-    settings #5): an override on an axis NOT covered by an emitted invariant — e.g. anatomy on a
-    profile that declares no anatomy invariant — still cannot slip, because the rendered anatomy must
-    match the fingerprint of the language it claims to be."""
-    if facts.get("radius_px") != fp.get("radius_px"):
-        return False
-    if facts.get("has_backdrop_filter") is not (fp.get("material") == "liquid-glass"):
-        return False
-    if component in ("button", "chip"):
-        if facts.get("anatomy") != fp.get("anatomy"):
-            return False
-        if facts.get("state_mechanic") != fp.get("state_mechanic"):
-            return False
-        if facts.get("focus_recipe") != fp.get("focus_recipe"):
-            return False
-        if facts.get("has_box_shadow") is not (fp.get("elevation") == "floating"):
-            return False
-    return True
+    declared fingerprint) on every facts-observable axis. Shared with the distinctness contracts so
+    the settings gate and anti-convergence gate cannot drift apart."""
+    from scripts.quality.design_invariants import fingerprint_matches_facts
+    return fingerprint_matches_facts(fp, facts, component)
 
 
 def _satisfies_all(facts: dict, profile_name: str, component: str) -> bool:

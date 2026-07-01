@@ -177,6 +177,19 @@ class AdapterFailsClosed(unittest.TestCase):
         self.assertFalse(button_focus_recipe(facts, expected="square-2px-ring"),
                          "an oversized inset must not pass the 2px-square-ring invariant")
 
+    def test_button_focus_recipe_is_mutually_exclusive_ambiguous_is_none(self):
+        """The button focus gatherer must match the chip's discipline: if one focus rule contains
+        two ring recipes, it is ambiguous -> None -> every focus predicate fails. No priority-pick."""
+        from scripts.contracts.design_predicates import button_focus_recipe
+        from scripts.rendering.webkit.design_render_adapter import button_facts
+        css = (".btn-x { border-radius: 0px; }\n"
+               ".btn-x.is-focus { box-shadow: inset 0 0 0 2px #000, 0 0 0 5px #0af; }")
+        facts = button_facts("<button>x</button>", css)
+        self.assertIsNone(facts["focus_recipe"], "ambiguous focus recipe must be None")
+        for expected in ("square-2px-ring", "capsule-halo", "rounded-system-ring"):
+            self.assertFalse(button_focus_recipe(facts, expected=expected),
+                             f"ambiguous focus must not pass as {expected}")
+
 
 class ReceiptClaimIsHonest(unittest.TestCase):
     def test_candidate_and_fail_rows_do_not_read_satisfies(self):

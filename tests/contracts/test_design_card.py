@@ -106,6 +106,18 @@ class DesignCardContract(unittest.TestCase):
         self.assertNotEqual((cb["glass"], cb["radius"] == 0), (ad["glass"], ad["radius"] == 0),
                             "carbon and apple-dark must differ (shape wall)")
 
+    def test_declared_card_fingerprints_match_rendered_facts(self):
+        """Card fingerprints are also bound to rendered facts. The static seam can prove material
+        glass-vs-not-glass, radius/shape, and visible 1px divider; declared terms like
+        `hairline`/`gridline` must map to that rendered evidence."""
+        from scripts.rendering.design import loader
+        from scripts.quality.design_invariants import fingerprint_matches_rendered, rendered_component_fingerprint
+        for name in loader.load("_index")["active_design_profiles"]:
+            declared = loader.load(name)["components"]["card"]["fingerprint"]
+            rendered = rendered_component_fingerprint(name, "card")
+            self.assertTrue(fingerprint_matches_rendered(declared, rendered, "card"),
+                            f"{name}: declared card fingerprint drifted from rendered facts: {rendered}")
+
 
 class CardAdapterFailsClosed(unittest.TestCase):
     """codex card fold: the STATIC card parser must not manufacture a pass on the exact evasions the
