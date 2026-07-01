@@ -112,9 +112,10 @@ to a `doc_cite`. Adding theme 4 adds zero predicates; adding a component adds on
 
 ## 6. The skill (repeatable RED-first driver, portable in DISCIPLINE)
 
-`skills/design-language-tdd/` gains lanes: `add-design-language` (research→cited doctrine
-`docs/design/<lang>.md`→profile JSON→RED), `add-component` (DONE), `add-aspect-contract`, and
-`prove-theme` (GREEN + mutation + true-viewport receipts + codex). Org gate baked in. The portable
+`skills/design-language-tdd/` gains lanes: `doctrine-ingest` (docs/examples/screenshots→candidate
+obligation packet: typed axes + negative_cases + refute_by + receipt_obligation), `add-design-language`
+(obligations→`docs/design/<lang>.md`→profile JSON→RED), `add-component` (DONE), `add-aspect-contract`,
+and `prove-theme` (GREEN + mutation + true-viewport receipts + codex). Org gate baked in. The portable
 half (predicate LOGIC, profile schema, roster shape, runner, LAW shapes) is portable in DISCIPLINE.
 **(codex must-fix #6: "zero repo literals" is NOT literally true today — the skill/boundaries TEXT
 names this repo's paths (`repo_layout.json`, `DESIGN_CONTRACT_GROUPS`, `bootstrap_red_ref`,
@@ -192,9 +193,11 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
    **Pre-theme hardening now folded:** button focus uses the same mutually-exclusive signal counting
    as chip focus (ambiguous rings → None), and the anti-convergence gate is bound to RENDERED
    button/chip/card fingerprints, with declared `components.*.fingerprint` checked only for
-   consistency. A model can still propose profile data, but distinctness is decided by observed
-   rendered facts, not JSON self-reporting. NEXT gap before broad theme generation: P5-RECEIPT-GATE
-   for visual/runtime claims that static parsing must not fake-green.
+   consistency. The skill now begins with `doctrine-ingest.md`, so Scout emits obligations (typed axes,
+   negative cases, `refute_by`, visual receipt obligations), not summaries. A model can still propose
+   profile data, but distinctness is decided by observed rendered facts, not JSON self-reporting. NEXT
+   gap before broad theme generation: P5-RECEIPT-GATE for visual/runtime claims that static parsing
+   must not fake-green.
 8. **P5-RECEIPT-GATE** — make the true-viewport visual/runtime receipt a REQUIRED prove-lane step
    (the apple-heat 500px-clamp lesson); one `prove` lane = runner + pytest + regen + coverage + drift.
 

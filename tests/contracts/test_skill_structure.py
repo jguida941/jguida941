@@ -21,7 +21,13 @@ def _repo_root() -> Path:
 
 ROOT = _repo_root()
 SKILL = ROOT / "skills" / "design-language-tdd"
-REQUIRED_REFERENCES = ("add-design-language.md", "add-component.md", "prove-theme.md", "boundaries.md")
+REQUIRED_REFERENCES = (
+    "doctrine-ingest.md",
+    "add-design-language.md",
+    "add-component.md",
+    "prove-theme.md",
+    "boundaries.md",
+)
 
 
 class SkillStructureContract(unittest.TestCase):
@@ -52,6 +58,32 @@ class SkillStructureContract(unittest.TestCase):
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
         for ref in REQUIRED_REFERENCES:
             self.assertIn(ref, text, f"SKILL.md must route to references/{ref}")
+
+    def test_doctrine_ingest_lane_emits_obligations_not_vibes(self):
+        """The design-language skill must encode the owner's core architecture: Scout is a
+        doctrine-to-contract compiler front-end. It emits typed axes, negative cases, refutation
+        handles, and visual receipt obligations; it does not merely summarize design docs."""
+        text = (SKILL / "references" / "doctrine-ingest.md").read_text(encoding="utf-8")
+        low = text.lower()
+        for token in (
+            "typed axes",
+            "negative_cases",
+            "refute_by",
+            "receipt_obligation",
+            "candidate_only",
+            "cannot_mark_done",
+            "deterministic",
+            "visual",
+        ):
+            self.assertIn(token, low, f"doctrine-ingest.md must require {token}")
+        self.assertIn("docs/design/<lang>.md", text, "doctrine docs live under docs/design/, not a stale path")
+
+    def test_skill_references_current_design_doc_path(self):
+        """The repo's doctrine docs live in docs/design/*.md; stale docs/design-languages paths would
+        send future theme slices to the wrong home."""
+        for path in [SKILL / "SKILL.md", *(SKILL / "references").glob("*.md")]:
+            text = path.read_text(encoding="utf-8")
+            self.assertNotIn("docs/design-languages", text, f"{path.name}: stale doctrine-doc path")
 
     def test_skill_codifies_the_current_architecture_and_is_honest(self):
         """The skill must reflect the ACTUAL system (docs/plans/DESIGN-SYSTEM.md): the

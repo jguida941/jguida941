@@ -10,8 +10,8 @@ running it RED-first: **PROFILE (DATA) → RENDER (webkit) → INVARIANT (confor
 The full architecture is `docs/plans/DESIGN-SYSTEM.md`; this skill is the disciplined loop for
 extending it. It exists because "make it look like Apple / Carbon" is a CLAIM — a model hallucinates
 design compliance as easily as code — so every adjective ("clean", "Apple-like", "dense") must resolve
-to a cited value → a predicate → a passing test or a candidate visual receipt. The skill never trusts
-the adjective; it makes the artifact PROVE it, and the showcase RENDERS that proof.
+to a cited value → a typed axis → a predicate or receipt obligation → rendered facts. The skill never
+trusts the adjective; it makes the artifact PROVE it, and the showcase RENDERS that proof.
 
 ## The data-flow (the four seams)
 
@@ -29,6 +29,14 @@ the adjective; it makes the artifact PROVE it, and the showcase RENDERS that pro
   **never a fake pass** (ACT/axe `passed`/`failed`/`cantTell`).
 - **RECEIPT:** the `[InvariantResult]` serialized to `assets/receipts/<lang>/` + visual receipts; the
   showcase + settings READ them to stamp each cell. The proof IS the product.
+
+## Doctrine ingest comes first
+
+Before adding a language, read `references/doctrine-ingest.md`. The scout/research pass is a
+doctrine-to-contract compiler front-end: it emits candidate-only obligations, not authority. Its
+output must include typed axes, negative cases, `refute_by`, and `receipt_obligation` rows that can
+lower into profile fields, render examples, facts, predicates, and receipts. A design doc plus JSON
+profile is not enough; the rendered artifact must satisfy the doctrine-derived obligations.
 
 ## Non-negotiable boundaries (read `references/boundaries.md`)
 
@@ -61,6 +69,7 @@ the adjective; it makes the artifact PROVE it, and the showcase RENDERS that pro
 
 | You want to… | Read |
 |---|---|
+| turn docs/examples/screenshots into typed obligations before implementation | `references/doctrine-ingest.md` |
 | add a new design language / theme (profile JSON + doctrine + character/distinctness) | `references/add-design-language.md` |
 | add a component (a `components.<name>` block + a render branch + only-new predicates) | `references/add-component.md` |
 | prove a theme/component + receipts + codex | `references/prove-theme.md` |

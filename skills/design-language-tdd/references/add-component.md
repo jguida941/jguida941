@@ -7,10 +7,10 @@ per-theme template. Follow the per-slice SOP in `SKILL.md`; this lane is the com
 ## What a component is, across the four seams
 
 1. **PROFILE (data):** each profile gains a `components.<name>` block carrying the cited anatomy +
-   geometry + state mechanic + focus recipe + a per-component **`fingerprint`** (the distinctness
-   substrate), e.g. the button's `{radius_px, state_mechanic, focus_recipe, anatomy, material,
-   elevation}`. Structural axes (e.g. Carbon `label-left-icon-right` vs `centered-capsule`) are DATA,
-   not code.
+   geometry + state mechanic + focus recipe + a per-component **`fingerprint`** documenting the
+   intended distinctness axes, e.g. the button's `{radius_px, state_mechanic, focus_recipe, anatomy,
+   material, elevation}`. Structural axes (e.g. Carbon `label-left-icon-right` vs
+   `centered-capsule`) are DATA, not code.
 2. **RENDER:** add `render_<name>(profile, variant, state) -> (html, css)` in
    `scripts/rendering/webkit/components.py`, **branching on `anatomy`** so two languages emit different
    DOM. Colour is token-only (resolved via the loader); material is single-sourced (no literals).
@@ -19,9 +19,11 @@ per-theme template. Follow the per-slice SOP in `SKILL.md`; this lane is the com
    - **character** (per profile): the rendered output carries the cited values AND excludes the OTHER
      languages' mechanics (a mutually-exclusive triple — e.g. carbon press is a token-swap AND not a
      filter AND not an opacity-dim).
-   - **distinctness** (across profiles): the per-component `fingerprint` is pairwise-distinct on a
-     QUORUM (≥3 axes). Flip the roster aspect `component-<name>` from `deferred` → `emitted` only when
-     a real deterministic predicate exists.
+   - **distinctness** (across profiles): the RENDERED component fingerprint from
+     `rendered_component_fingerprint()` is pairwise-distinct on a QUORUM (>=3 axes). The declared
+     `components.<name>.fingerprint` must match rendered facts, but it cannot self-certify
+     distinctness. Flip the roster aspect `component-<name>` from `deferred` -> `emitted` only when a
+     real deterministic predicate exists.
 4. **RECEIPT:** the component's `{variant × state}` cells render into the showcase matrix, each stamped
    with its `InvariantResult`; renderer-dependent rows (contrast/responsive) ship `candidate` + a PNG.
 
@@ -34,9 +36,9 @@ per-theme template. Follow the per-slice SOP in `SKILL.md`; this lane is the com
    a deterministic predicate.
 3. **Implement** — add `components.<name>` to each profile + the `render_<name>` anatomy branches +
    only-new predicates.
-4. **Prove** — character (cited values, mutually-exclusive mechanic) + distinctness (fingerprint
-   quorum) GREEN; **mutation-prove** (collapse a signature axis — e.g. carbon radius 0→999 → reds
-   character AND distinctness); capture the matrix receipt at the true viewport.
+4. **Prove** — character (cited values, mutually-exclusive mechanic) + render-derived distinctness
+   GREEN; **mutation-prove** (collapse a signature axis — e.g. carbon radius 0→999 → reds character
+   AND distinctness); capture the matrix receipt at the true viewport.
 5. **Codex** on the diff (inline) → fold RED-first → commit when green + codex agrees.
 
 ## Worked example (the button, instance #1)
