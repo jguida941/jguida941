@@ -76,6 +76,17 @@
       "variants": ["regular", "tinted", "gray"],
       "states": ["rest", "hover", "active", "focus-visible", "disabled"],
       "fingerprint": {"radius_px": 999, "state_mechanic": "opacity-dim", "focus_recipe": "rounded-system-ring", "anatomy": "centered-label", "material": "opaque-fill", "elevation": "none"}
+    },
+    "card": {
+      "$doc": "docs/design/apple-dark.md — Apple grouped inset list on an OPAQUE dark surface (the material wall vs liquid-glass's frosted glass): rounded container, chrome-less rows, 1px hairline dividers, NO blur, hierarchy from TYPE. Single-container + inline-rows LITERAL (insetGrouped); radius 14 + 1px divider [derived].",
+      "radius_px": 14,
+      "material": "opaque-fill",
+      "row_pad": "12px 16px",
+      "font_size_px": 14,
+      "value_weight": 600,
+      "elevation_shadow": null,
+      "variants": ["metrics"],
+      "fingerprint": {"radius_px": 14, "material": "opaque-fill", "divider": "hairline", "shape": "rounded"}
     }
   },
   "aspect_coverage": {
@@ -86,7 +97,7 @@
     "motion": "covered-deferred",
     "component-button": "covered-emitted",
     "component-chip": "covered-emitted",
-    "component-card": "covered-deferred",
+    "component-card": "covered-emitted",
     "component-kpi": "covered-deferred",
     "component-input": "covered-deferred",
     "component-nav": "covered-deferred",
@@ -111,6 +122,13 @@
     {"invariant_id": "ap-chip-mechanic", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "opacity-dim press (dims DOWN)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "state_mechanic", "params": {"expected": "opacity-dim", "variant": "regular"}}},
     {"invariant_id": "ap-chip-focus", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "rounded system ring focus", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "focus_recipe", "params": {"expected": "rounded-system-ring", "variant": "regular"}}},
     {"invariant_id": "ap-chip-case", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "SF sentence case (never ALL-CAPS)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "chip_sentence_case", "params": {"variant": "regular"}}},
-    {"invariant_id": "ap-chip-contrast", "aspect": "component-chip", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "Apple's own white-on-accent can sit ~3.65:1 — contrast is a candidate/probe concern", "law": "chip label contrast on the actual fill", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}}
+    {"invariant_id": "ap-chip-contrast", "aspect": "component-chip", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "Apple's own white-on-accent can sit ~3.65:1 — contrast is a candidate/probe concern", "law": "chip label contrast on the actual fill", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}},
+    {"invariant_id": "ap-card-container", "aspect": "component-card", "determinism": "deterministic", "emission_status": "emitted", "law": "ONE container; rows carry no independent chrome (anti grid-of-tiles)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "card_single_container", "params": {"variant": "metrics"}}},
+    {"invariant_id": "ap-card-rows", "aspect": "component-card", "determinism": "deterministic", "emission_status": "emitted", "law": "groups >=2 metrics as rows (not one box per stat)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "card_multi_row", "params": {"variant": "metrics", "min_rows": 2}}},
+    {"invariant_id": "ap-card-divider", "aspect": "component-card", "determinism": "deterministic", "emission_status": "emitted", "law": "adjacent rows divided by a 1px hairline", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "card_hairline_divided", "params": {"variant": "metrics"}}},
+    {"invariant_id": "ap-card-inline", "aspect": "component-card", "determinism": "deterministic", "emission_status": "emitted", "law": "row axis is horizontal label+value (not stacked column)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "card_rows_inline", "params": {"variant": "metrics"}}},
+    {"invariant_id": "ap-card-material", "aspect": "component-card", "determinism": "deterministic", "emission_status": "emitted", "law": "OPAQUE container (not frosted glass) — the material wall vs liquid-glass", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "material_opaque", "params": {"variant": "metrics"}}},
+    {"invariant_id": "ap-card-rounded", "aspect": "component-card", "determinism": "deterministic", "emission_status": "emitted", "law": "rounded inset container (radius 14)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "radius", "params": {"expected_px": 14, "variant": "metrics"}}},
+    {"invariant_id": "ap-card-fills", "aspect": "component-card", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "content-to-chrome / dead-space ratio is an emergent LAYOUT property — static parse sees declared boxes, not rendered ink; candidate until a visual receipt", "law": "content fills the card (no giant dead space)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "content_fills"}}
   ]
 }

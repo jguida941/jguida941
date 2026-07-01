@@ -254,6 +254,151 @@
       "law": "chip label contrast on the actual fill",
       "profile": "apple-dark",
       "status": "candidate"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 14,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "ap-card-container",
+      "law": "ONE container; rows carry no independent chrome (anti grid-of-tiles)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 14,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "ap-card-rows",
+      "law": "groups >=2 metrics as rows (not one box per stat)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 14,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "ap-card-divider",
+      "law": "adjacent rows divided by a 1px hairline",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 14,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "ap-card-inline",
+      "law": "row axis is horizontal label+value (not stacked column)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 14,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "ap-card-material",
+      "law": "OPAQUE container (not frosted glass) \u2014 the material wall vs liquid-glass",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 14,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "ap-card-rounded",
+      "law": "rounded inset container (radius 14)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "'component-card' of the apple-dark profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "determinism": "judgment",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {},
+      "invariant_id": "ap-card-fills",
+      "law": "content fills the card (no giant dead space)",
+      "profile": "apple-dark",
+      "status": "candidate"
     }
   ]
 }

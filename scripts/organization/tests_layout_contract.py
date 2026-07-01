@@ -32,6 +32,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_card_contracts.py",
             "test_data_semantics.py",
             "test_design_button.py",
+            "test_design_card.py",
             "test_design_character.py",
             "test_design_chip.py",
             "test_design_conformance.py",
@@ -161,6 +162,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "webkit": (
         "test_design_button.py",        # P5-WEBKIT-BUTTON: profile-driven rendered components (anatomy hook)
+        "test_design_card.py",          # P5-COMPONENTS-GROW: the CARD grouped-metric PATTERN (single-container, chrome-less rows)
         "test_design_chip.py",          # P5-COMPONENTS-GROW: the chip/tag (2nd component; reuses the runner + only-new predicate)
     ),
     "conformance": (

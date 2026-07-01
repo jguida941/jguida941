@@ -41,6 +41,7 @@ class DesignConformanceContract(unittest.TestCase):
             aspects = {r["aspect"] for r in emitted}
             self.assertIn("component-button", aspects, f"{name}: must have emitted button invariants")
             self.assertIn("component-chip", aspects, f"{name}: must have emitted chip invariants")
+            self.assertIn("component-card", aspects, f"{name}: must have emitted card invariants")
             for r in emitted:
                 self.assertEqual(r["status"], "pass",
                                  f"{name}/{r['invariant_id']} FAILED — evidence={r['evidence']}")

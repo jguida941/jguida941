@@ -50,6 +50,31 @@ def material_flat(facts: dict, **_) -> bool:
     return facts.get("has_backdrop_filter") is False and facts.get("has_box_shadow") is False
 
 
+# --- card / grouped-metric PATTERN predicates (deterministic structural composition) --------------
+def card_single_container(facts: dict, **_) -> bool:
+    """The anti-'grid of chromed tiles' law: exactly ONE container element (codex card #1 — not two
+    single-row groups) AND its rows carry NO independent background/radius. Fail-closed (both facts
+    False on unparseable CSS). The DEEPER-REFRAME 'no giant box per stat' encoded structurally."""
+    return facts.get("container_count") == 1 and facts.get("rows_chromeless") is True
+
+
+def card_multi_row(facts: dict, min_rows: int = 2, **_) -> bool:
+    """A metric card GROUPS >=min_rows related rows (anti 'one number per full-width card')."""
+    return facts.get("row_count", 0) >= min_rows
+
+
+def card_hairline_divided(facts: dict, **_) -> bool:
+    """Adjacent rows divided by a <=1px hairline (a grouped list), NOT a 4-side box per stat."""
+    return facts.get("divider_1px") is True
+
+
+def card_rows_inline(facts: dict, **_) -> bool:
+    """The row AXIS is horizontal (label + value inline), NOT stacked column. Scoped to the axis —
+    it does NOT (and must not) claim the label+value visually render on one unwrapped line; that is
+    a layout/judgment concern, gathered by a visual receipt."""
+    return facts.get("rows_horizontal") is True
+
+
 # The closed registry the conform() runner dispatches into. `predicate_class` in a profile's
 # invariants[] must resolve here (test_design_conformance enforces it). The button_* predicates are
 # GENERIC over facts (radius/anatomy/material/mechanic/elevation/focus); a second component (the
@@ -74,4 +99,9 @@ PREDICATES = {
     "material_flat": material_flat,
     # chip-only
     "chip_sentence_case": chip_sentence_case,
+    # card / grouped-metric pattern
+    "card_single_container": card_single_container,
+    "card_multi_row": card_multi_row,
+    "card_hairline_divided": card_hairline_divided,
+    "card_rows_inline": card_rows_inline,
 }

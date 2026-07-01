@@ -50,3 +50,24 @@ materials). Chip px are **[derived]** (Apple publishes no chip metric).
 axes**, the same honest basis as the button (radius + anatomy shared; material is the one strongly
 doc-grounded axis, the others [derived] but consistently rendered). vs carbon: radius-token,
 anatomy (× dismiss), state, focus, font all differ.
+
+## Card / grouped metrics (component-card)
+
+The Apple **inset grouped list** on an OPAQUE dark surface — the deliberate material contrast to
+liquid-glass. Same grouped composition (ONE rounded container, chrome-less hairline-divided rows),
+no frosted blur.
+
+| Property | Value | Source |
+|---|---|---|
+| Composition | **ONE container, chrome-less rows** — LITERAL `insetGrouped` (rows are section content) | https://developer.apple.com/documentation/uikit/uitableview/style-swift.enum/insetgrouped |
+| Material | **OPAQUE** elevated dark surface — NO blur (the wall vs liquid-glass); grouped background is a solid system fill | https://developer.apple.com/design/human-interface-guidelines/dark-mode · https://developer.apple.com/design/human-interface-guidelines/color |
+| Container | rounded + inset (literal); radius ~14px **[derived]** | https://developer.apple.com/documentation/uikit/uitableview/style-swift.enum/insetgrouped |
+| Divider | separator lines between rows (literal); ~1px **[derived]** | https://developer.apple.com/design/human-interface-guidelines/layout |
+| Hierarchy | from TYPE — `label`/`secondaryLabel` vibrancy, not per-stat boxes (literal) | https://developer.apple.com/design/human-interface-guidelines/materials |
+
+**Distinctness vs liquid-glass (the honest wall):** BOTH are rounded, hairline-divided Apple
+grouped lists — radius and divider are **shared, not distinguishing**. The ONE honest deterministic
+separator is **material**: `material_opaque` (no backdrop-filter) here vs `material_glass` there.
+Per the research, we do NOT invent a second axis to pad a quorum. vs carbon: the SHAPE wall
+(rounded vs square radius 0) + gridline-vs-hairline character. **"Content fills the card"** is
+JUDGMENT → `candidate` + visual receipt, never fake-green.

@@ -56,14 +56,18 @@ def _stage_block(profile: str) -> tuple[str, str, str]:
     always for known profiles, but stay resilient)."""
     try:
         from scripts.rendering.design import loader
-        from scripts.rendering.webkit.components import render_button, render_chip
+        from scripts.rendering.webkit.components import render_button, render_card, render_chip
         prof = loader.load(profile)
         bvar = _signature_variant(prof["components"]["button"])
         btn_html, btn_css = render_button(profile, bvar, "rest")
         cvar = prof["components"]["chip"]["variants"][0]
         chip_html, chip_css = render_chip(profile, cvar, "rest")
+        dvar = prof["components"]["card"]["variants"][0]
+        card_html, card_css = render_card(profile, dvar, "rest")
         backdrop = loader.resolve_tokens(profile).get("color", {}).get("backdrop", "#000000")
-        return f"{btn_css}\n{chip_css}", f"{btn_html}{chip_html}", backdrop
+        stage = (f'<div class="stage-row">{btn_html}{chip_html}</div>'
+                 f'<div class="stage-row">{card_html}</div>')
+        return f"{btn_css}\n{chip_css}\n{card_css}", stage, backdrop
     except Exception:
         return "", '<span class="no-render">[[component-not-rendered]]</span>', "#111111"
 
@@ -131,8 +135,10 @@ h1 { font-size: 26px; margin: 0 0 4px; }
 .lang header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
 .lang h2 { margin: 0 0 12px; font-size: 19px; }
 .tally { color: #9a9aa6; font-size: 13px; margin: 0; }
-.stage { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;
+.stage { display: flex; flex-direction: column; align-items: center; gap: 18px;
   min-height: 96px; padding: 24px; margin: 8px 0 20px; border-radius: 12px; }
+.stage-row { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.card-group { min-width: 260px; }
 .chip-dismiss { background: transparent; border: 0; color: inherit; cursor: pointer;
   font-size: 15px; line-height: 1; padding: 0 0 0 2px; }
 .no-render { color: #9a9aa6; font-style: italic; }

@@ -127,3 +127,49 @@ def chip_facts(html: str, css: str) -> dict:
         "typography_case": (None if base is None
                             else ("upper" if "text-transform: uppercase" in base else "sentence")),
     }
+
+
+def card_facts(html: str, css: str) -> dict:
+    """Verdict-free STRUCTURAL facts for the card / grouped metric surface (instance #3). Only the
+    composition is gathered here — declared box structure, NOT rendered ink (the 'content fills the
+    card' verdict is a JUDGMENT concern, gathered by a visual receipt, never faked from a static
+    parse). Fail-closed: a missing container/row rule -> the pattern facts are False/None so the
+    predicate fails."""
+    container = _base_rule(css)              # first rule = the `.card-<cls>` container
+    m = re.search(r"border-radius:\s*(\d+)px", container) if container is not None else None
+    radius_px = int(m.group(1)) if m else None
+
+    container_count = html.count("card-group")     # each container carries the `card-group` marker
+    row_count = html.count('class="card-row"')
+
+    row_m = re.search(r"\.card-row\s*\{([^}]*)\}", css)   # the row base rule (not the `+` divider)
+    row_body = row_m.group(1) if row_m else None
+    # rows carry NO independent background (incl. -color/-image longhands, codex card #2) and NO
+    # radius (incl. any `*-radius` longhand). A row with its own chrome IS the grid-of-tiles AI look.
+    row_has_own_bg = bool(row_body is not None and any(
+        v.strip() not in ("transparent", "none")
+        for v in re.findall(r"background(?:-color|-image)?:\s*([^;]+)", row_body)))
+    rows_chromeless = bool(
+        row_body is not None
+        and "-radius" not in row_body
+        and not row_has_own_bg)
+    # horizontal AXIS: flex, and no `column` in flex-direction OR the flex-flow shorthand (codex card #3)
+    rows_horizontal = bool(
+        row_body is not None
+        and "display: flex" in row_body
+        and not re.search(r"flex-(?:direction|flow):[^;]*column", row_body))
+
+    # a VISIBLE 1px divider — `border-top: 1px solid …`; `1px none/transparent` is NOT a divider (codex card #3)
+    div_m = re.search(r"\.card-row\s*\+\s*\.card-row\s*\{([^}]*)\}", css)
+    divider_1px = bool(div_m and re.search(r"border-top:\s*1px\s+solid", div_m.group(1)))
+
+    return {
+        "radius_px": radius_px,
+        "container_count": container_count,
+        "row_count": row_count,
+        "rows_chromeless": rows_chromeless,
+        "rows_horizontal": rows_horizontal,
+        "divider_1px": divider_1px,
+        "has_backdrop_filter": ("backdrop-filter" in container) if container is not None else None,
+        "has_box_shadow": ("box-shadow" in container) if container is not None else None,
+    }

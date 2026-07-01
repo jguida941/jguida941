@@ -137,3 +137,23 @@ small **frosted capsule pill**. Chip px are **[derived]** (Apple publishes no ch
 apple-dark (near-sibling) — the SAME honest wall as the button: **material** (frosted-glass vs
 opaque-fill, the load-bearing doc axis) + state (glass-brightness vs opacity-dim) + focus
 (capsule-halo vs rounded ring) + elevation (floating vs none) = 4 fingerprint axes.
+
+## Card / grouped metrics (component-card)
+
+The Apple **inset grouped list** (UIKit `insetGrouped`; Settings/Health) — related metrics share
+ONE rounded frosted container as hairline-divided rows, NOT one box per number.
+
+| Property | Value | Source |
+|---|---|---|
+| Composition | **ONE container, chrome-less rows** — LITERAL: `insetGrouped` = *"grouped sections are inset with rounded corners"*; rows are the section's *content* (`UIListContentConfiguration`) | https://developer.apple.com/documentation/uikit/uitableview/style-swift.enum/insetgrouped · https://developer.apple.com/design/human-interface-guidelines/lists-and-tables |
+| Row anatomy | LITERAL: leading label *"followed by"* a trailing accessory/detail on one line | https://developer.apple.com/design/human-interface-guidelines/lists-and-tables |
+| Container | rounded + inset (literal); radius ~10–14px **[derived]** | https://developer.apple.com/documentation/uikit/uitableview/style-swift.enum/insetgrouped |
+| Divider | *"separator lines"* between rows (literal); ~1px, inset **[derived]** | https://developer.apple.com/design/human-interface-guidelines/layout |
+| Material | Liquid Glass frosted (single-sourced blur/saturate) | https://developer.apple.com/design/human-interface-guidelines/materials |
+| Hierarchy | from TYPE — `label` / `secondaryLabel` vibrancy levels carry emphasis, not per-stat boxes (literal) | https://developer.apple.com/design/human-interface-guidelines/materials |
+
+**Deterministic invariants:** single container (chrome-less rows), ≥2 rows, 1px divider, horizontal
+row axis, `material_glass`, radius 14. **Anti-pattern (the AI tell):** one full-width card per stat,
+or a grid of chromed tiles — both fail `card_single_container` / `card_multi_row`. **"Content fills
+the card"** is JUDGMENT (ink-to-chrome is an emergent layout property) → `candidate` + visual
+receipt, never a static fake-green (the exact string-green trap to avoid).

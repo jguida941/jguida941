@@ -47,3 +47,23 @@ theme, carries shape: the Tag radius is a fixed **16px token** while the button 
 *fixed-token-vs-dynamic-capsule*; the load-bearing separators are the **dismissible `×` anatomy**,
 **token-swap** state, **2px outline** focus (vs a halo/ring), and **IBM Plex** (vs SF) — four solid
 axes independent of radius.
+
+## Card / grouped metrics (component-card)
+
+Carbon's answer to a multi-metric surface is a **flat, square Tile / structured list**, NOT a
+rounded Apple grouped list and NOT one floating box per number.
+
+| Property | Value | Source |
+|---|---|---|
+| Container radius | **0 (square)** — Carbon's brand signature; the Tile has no rounded corners | https://carbondesignsystem.com/components/tile/style/ |
+| Elevation | **NONE — literal:** *"Do not add a drop shadow to tiles... Tiles reside on the same plane as the page background layer and do not have elevation."* | https://carbondesignsystem.com/components/tile/usage/ |
+| Composition | **ONE shared container** — structured list = *"column header + data row"*; rows are content, not individual boxes | https://carbondesignsystem.com/components/structured-list/usage/ |
+| Row divider | full-bleed **1px `$border-subtle`** gridline between rows | https://carbondesignsystem.com/components/data-table/style/ · https://carbondesignsystem.com/elements/color/tokens/ |
+| Row anatomy | label/header cell + value/data cell on one line (horizontal), left-aligned | https://carbondesignsystem.com/components/structured-list/usage/ |
+| Type | IBM Plex Sans; header `heading-compact-01` 14px semibold, value `body-compact-01` 14px regular | https://carbondesignsystem.com/components/data-table/style/ |
+| Row height | structured list default **48px**, condensed 32px; padding `$spacing-05` 16px **[derived]** | https://carbondesignsystem.com/components/structured-list/style/ |
+
+**The deterministic invariants** assert: single container (rows carry no independent chrome),
+≥2 rows, 1px divider, horizontal row axis, `material_flat` (no blur AND no shadow), radius 0. The
+**"content fills the Tile / no dead space"** law is JUDGMENT — a static parser sees declared boxes,
+not rendered ink, so it ships `candidate` + a visual receipt, never a fake-green number.

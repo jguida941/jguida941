@@ -254,6 +254,151 @@
       "law": "chip label contrast >= WCAG AA",
       "profile": "carbon",
       "status": "candidate"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "cb-card-container",
+      "law": "ONE Tile/list container; rows carry no independent chrome",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "cb-card-rows",
+      "law": "groups >=2 metrics as rows (not one Tile per stat)",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "cb-card-divider",
+      "law": "rows split by a 1px gridline",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "cb-card-inline",
+      "law": "row axis is horizontal label+value (not stacked column)",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "cb-card-flat",
+      "law": "flat Tile \u2014 no blur AND no shadow (do not add a drop shadow to tiles)",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-card' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "container_count": 1,
+        "divider_1px": true,
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "row_count": 3,
+        "rows_chromeless": true,
+        "rows_horizontal": true
+      },
+      "invariant_id": "cb-card-square",
+      "law": "square Tile (radius 0) \u2014 the Carbon signature vs Apple's rounded list",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-card",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "'component-card' of the carbon profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "determinism": "judgment",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {},
+      "invariant_id": "cb-card-fills",
+      "law": "content fills the Tile (no giant dead space)",
+      "profile": "carbon",
+      "status": "candidate"
     }
   ]
 }

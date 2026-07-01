@@ -38,10 +38,18 @@ def _chip_facts(profile: str, variant: str) -> dict:
     return adapter.chip_facts(html, "\n".join([base_css, active, focus]))
 
 
+def _card_facts(profile: str, variant: str) -> dict:
+    from scripts.rendering.webkit import design_render_adapter as adapter
+    from scripts.rendering.webkit.components import render_card
+    html, css = render_card(profile, variant, "rest")   # a card is a static container
+    return adapter.card_facts(html, css)
+
+
 # aspect -> (component key in profile["components"], the fact-gatherer). Adding a component = one row.
 _COMPONENT_FACTS = {
     "component-button": ("button", _button_facts),
     "component-chip": ("chip", _chip_facts),
+    "component-card": ("card", _card_facts),
 }
 
 

@@ -172,3 +172,61 @@ def render_chip(profile: str, variant: str, state: str) -> tuple[str, str]:
         css += f"\n.{cls}.is-disabled {{ opacity: 0.4; pointer-events: none; }}"
 
     return html, css
+
+
+# A card GROUPS related metrics as rows (never one box per number). Fixed sample rows for the
+# showcase specimen; the composition — not the data — is what the invariants test.
+_CARD_ROWS = (("Commits", "1,240"), ("Current streak", "23 days"), ("Languages", "12"))
+
+
+def render_card(profile: str, variant: str, state: str) -> tuple[str, str]:
+    """The CARD / grouped metric surface (instance #3) — the DEEPER-REFRAME answer to "giant KPI
+    boxes". Emits ONE container holding N chrome-less rows (label + value inline, hierarchy from
+    TYPE), rows divided by a 1px hairline — an Apple inset grouped list (rounded, frosted/opaque) or
+    a Carbon flat square Tile (gridlined). The rows carry NO independent background/radius — that is
+    the deterministic anti-'grid of chromed tiles' law. Token-only; glass single-sourced. `state`
+    is accepted for signature parity (a card is a static container). candidate_only."""
+    from scripts.rendering import design_tokens as dt
+    from scripts.rendering.design import loader
+
+    prof = loader.load(profile)
+    color = loader.resolve_tokens(profile)["color"]
+    font = loader.resolve_tokens(profile).get("font", {}).get("family", "sans-serif")
+    card = prof["components"]["card"]
+    surface = color.get("surface-raised", color.get("surface", "#1c1c1e"))
+    ink_strong = color.get("ink-strong", "#111111")
+    ink_dim = color.get("ink-dim", color.get("ink", "#888888"))
+    hairline = color.get("hairline", "#333333")
+    cls = f"card-{profile}-{variant}"
+
+    rows_html = "".join(
+        f'<div class="card-row"><span class="card-label">{_escape(lbl)}</span>'
+        f'<span class="card-value">{_escape(val)}</span></div>'
+        for lbl, val in _CARD_ROWS)
+    html = f'<div class="{cls} card-group">{rows_html}</div>'
+
+    container = [
+        f"background: {surface};",
+        f"border-radius: {card['radius_px']}px;",
+        f"border: 1px solid {hairline}; overflow: hidden;",
+    ]
+    if card.get("material") == "liquid-glass" and profile in dt.MATERIALS:
+        m = dt.material(profile)
+        glass = f"blur({m['blur']:g}px) saturate({m['saturate']:g}%)"
+        container.append(f"-webkit-backdrop-filter: {glass}; backdrop-filter: {glass};")
+    if card.get("elevation_shadow"):  # null for the flat grouped-list/Tile languages -> no shadow
+        container.append(f"box-shadow: {card['elevation_shadow']};")
+
+    css = (
+        f".{cls} {{ {' '.join(container)} }}\n"
+        # rows are CHROME-LESS content (no independent background / radius) — the single-container law
+        f".{cls} .card-row {{ display: flex; align-items: center; justify-content: space-between; "
+        f"padding: {card['row_pad']}; background: transparent; }}\n"
+        # a 1px hairline divides adjacent rows (NOT a 4-side box per stat)
+        f".{cls} .card-row + .card-row {{ border-top: 1px solid {hairline}; }}\n"
+        # hierarchy from TYPE: value is prominent, label is the quiet secondary role
+        f".{cls} .card-label {{ color: {ink_dim}; font: 400 {card['font_size_px']}px/1.3 {font}; }}\n"
+        f".{cls} .card-value {{ color: {ink_strong}; "
+        f"font: {card.get('value_weight', 600)} {card['font_size_px']}px/1.3 {font}; }}"
+    )
+    return html, css
