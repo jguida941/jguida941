@@ -9,6 +9,8 @@ candidate_only.
 """
 from __future__ import annotations
 
+from html import escape as _escape
+
 
 def _is_light(hex_color: str) -> bool:
     """Perceived-brightness default (light accent → dark text, dark accent → light text) matching
@@ -88,6 +90,82 @@ def render_button(profile: str, variant: str, state: str) -> tuple[str, str]:
                 f"0 0 0 5px color-mix(in srgb, {accent} 60%, transparent); }}")
     elif state == "focus-visible" and fr == "square-2px-ring":
         css += f"\n.{cls}.is-focus {{ outline: 0; box-shadow: inset 0 0 0 1px {accent}, inset 0 0 0 2px {backdrop}; }}"
+    elif state == "focus-visible" and fr == "rounded-system-ring":
+        css += f"\n.{cls}.is-focus {{ outline: 0; box-shadow: 0 0 0 4px color-mix(in srgb, {accent} 50%, transparent); }}"
+    elif state == "disabled":
+        css += f"\n.{cls}.is-disabled {{ opacity: 0.4; pointer-events: none; }}"
+
+    return html, css
+
+
+def render_chip(profile: str, variant: str, state: str) -> tuple[str, str]:
+    """The chip/tag component (instance #2). Reads `components.chip` and branches on ANATOMY:
+    a Carbon *dismissible Tag* emits `label + trailing × close button` (label-dismiss), an Apple
+    pill emits a centered label. Token-only colour; glass material single-sourced from
+    design_tokens; sentence case (no text-transform). candidate_only."""
+    from scripts.rendering import design_tokens as dt
+    from scripts.rendering.design import loader
+
+    prof = loader.load(profile)
+    color = loader.resolve_tokens(profile)["color"]
+    font = loader.resolve_tokens(profile).get("font", {}).get("family", "sans-serif")
+    chip = prof["components"]["chip"]
+    accent = color["accent"]
+    ink_strong = color.get("ink-strong", "#111111")
+    raised = color.get("surface-raised", color.get("surface", "#1c1c1e"))
+    backdrop = color.get("backdrop", "#000000")
+    cls = f"chip-{profile}-{variant}"
+    anatomy = chip["anatomy"]
+    fr = chip.get("focus_recipe")
+
+    # chip fill: a QUIET tinted surface (metadata pill, not a primary action), token-only.
+    # liquid-glass = a translucent accent tint over the frosted material; carbon/apple = an opaque
+    # fill (a flat palette-step for Carbon, a raised system surface for apple-dark).
+    if chip.get("material") == "liquid-glass":
+        bg = f"color-mix(in srgb, {accent} 16%, transparent)"
+    else:
+        bg = raised
+    fg = ink_strong
+
+    # ANATOMY -> genuinely different DOM
+    label = _escape(variant)  # variant is controlled profile DATA; escape at the text/attr boundary
+    if anatomy == "label-dismiss":  # Carbon dismissible Tag: label + trailing × close button
+        html = (f'<span class="{cls}"><span class="chip-label">{label}</span>'
+                f'<button class="chip-dismiss" aria-label="Remove {label}">&times;</button></span>')
+    else:  # centered-label (Apple pill)
+        html = f'<span class="{cls}">{label}</span>'
+
+    base = [
+        "display: inline-flex; align-items: center; gap: 6px;",
+        "border: 0; cursor: default;",
+        f"border-radius: {chip['radius_px']}px;",
+        f"min-height: {chip['height_px']}px; padding: {chip['pad_block_px']}px {chip['pad_inline_px']}px;",
+        f"background: {bg}; color: {fg};",
+        f"font: {chip.get('font_weight', 500)} {chip['font_size_px']}px/1.33 {font};",
+        f"transition: all {chip['transition_ms']}ms {chip['easing']};",
+    ]
+    if chip.get("material") == "liquid-glass" and profile in dt.MATERIALS:
+        m = dt.material(profile)
+        glass = f"blur({m['blur']:g}px) saturate({m['saturate']:g}%)"
+        base.append(f"-webkit-backdrop-filter: {glass}; backdrop-filter: {glass};")
+    if chip.get("elevation_shadow"):  # null for flat languages -> no box-shadow at all
+        base.append(f"box-shadow: {chip['elevation_shadow']};")
+
+    css = f".{cls} {{ {' '.join(base)} }}"
+
+    if state == "active" and chip.get("active_css"):
+        decl = " ".join(f"{k}: {v};" for k, v in chip["active_css"].items())
+        css += f"\n.{cls}.is-active {{ {decl} }}"
+    elif state == "hover" and chip.get("hover_css"):
+        decl = " ".join(f"{k}: {v};" for k, v in chip["hover_css"].items())
+        css += f"\n.{cls}.is-hover {{ {decl} }}"
+    elif state == "hover" and chip.get("state_mechanic") == "glass-brightness":
+        css += f"\n.{cls}.is-hover {{ filter: brightness(1.06); }}"
+    elif state == "focus-visible" and fr == "capsule-halo":
+        css += (f"\n.{cls}.is-focus {{ outline: 0; box-shadow: 0 0 0 2px {backdrop}, "
+                f"0 0 0 5px color-mix(in srgb, {accent} 60%, transparent); }}")
+    elif state == "focus-visible" and fr == "outline-2px":  # Carbon Tag: 2px outline + 1px offset
+        css += f"\n.{cls}.is-focus {{ outline: 2px solid {accent}; outline-offset: 1px; }}"
     elif state == "focus-visible" and fr == "rounded-system-ring":
         css += f"\n.{cls}.is-focus {{ outline: 0; box-shadow: 0 0 0 4px color-mix(in srgb, {accent} 50%, transparent); }}"
     elif state == "disabled":

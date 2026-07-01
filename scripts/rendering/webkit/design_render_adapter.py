@@ -63,3 +63,67 @@ def button_facts(html: str, css: str) -> dict:
         "has_box_shadow": ("box-shadow" in base) if base is not None else None,
         "focus_recipe": focus_recipe,
     }
+
+
+def _base_rule(css: str):
+    """The base `.cls { … }` body (first non-state rule), or None if unparseable — shared by the
+    component fact-gatherers so material/shadow facts fail closed (None) on empty CSS."""
+    m = re.search(r"\.[\w-]+\s*\{([^}]*)\}", css)
+    return m.group(1) if m else None
+
+
+def _mechanic(css: str):
+    """The MUTUALLY-EXCLUSIVE press mechanic read from `.is-active` (None if zero or >1 signals)."""
+    active = re.search(r"\.is-active\s*\{([^}]*)\}", css)
+    active_css = active.group(1) if active else ""
+    signals = []
+    if "brightness(" in active_css:
+        signals.append("glass-brightness")
+    if re.search(r"\bopacity:", active_css):
+        signals.append("opacity-dim")
+    if "background-color" in active_css:
+        signals.append("token-swap")
+    return signals[0] if len(signals) == 1 else None
+
+
+def chip_facts(html: str, css: str) -> dict:
+    """Verdict-free facts for the chip/tag (instance #2). Same fail-closed / mutually-exclusive
+    discipline as `button_facts`; chip-specific: `label-dismiss` anatomy (a trailing `×` close
+    button), an `outline: 2px` focus recipe (Carbon Tag, distinct from the button's inset ring),
+    and `typography_case` (sentence unless a `text-transform: uppercase` is emitted)."""
+    base = _base_rule(css)
+    m = re.search(r"border-radius:\s*(\d+)px", base) if base is not None else None
+    radius_px = int(m.group(1)) if m else None
+
+    # label-dismiss: a label node FOLLOWED BY a trailing dismiss <button> (codex chip #3 — a bare
+    # `chip-dismiss` substring anywhere is not enough; it must be the close BUTTON after the label).
+    dismiss = '<button class="chip-dismiss"'
+    anatomy = ("label-dismiss"
+               if ("chip-label" in html and dismiss in html
+                   and html.index("chip-label") < html.index(dismiss))
+               else "centered-label")
+
+    # focus recipe: MUTUALLY EXCLUSIVE — count signals, None on zero or >1 (same discipline as the
+    # mechanic; codex chip N1 — `outline: 2px` + a halo can't both resolve to outline-2px).
+    focus = re.search(r"\.is-focus\s*\{([^}]*)\}", css)
+    focus_css = focus.group(1) if focus else ""
+    fsignals = []
+    if "outline: 2px" in focus_css:                # carbon Tag: 2px solid outline + 1px offset
+        fsignals.append("outline-2px")
+    if "0 0 0 5px" in focus_css:                   # liquid: capsule halo
+        fsignals.append("capsule-halo")
+    if "0 0 0 4px" in focus_css:                   # apple: rounded system ring
+        fsignals.append("rounded-system-ring")
+    focus_recipe = fsignals[0] if len(fsignals) == 1 else None
+
+    return {
+        "radius_px": radius_px,
+        "anatomy": anatomy,
+        "state_mechanic": _mechanic(css),
+        "has_backdrop_filter": ("backdrop-filter" in base) if base is not None else None,
+        "has_box_shadow": ("box-shadow" in base) if base is not None else None,
+        "focus_recipe": focus_recipe,
+        # fail-closed (codex chip #2): None (not "sentence") when no base rule -> chip_sentence_case fails
+        "typography_case": (None if base is None
+                            else ("upper" if "text-transform: uppercase" in base else "sentence")),
+    }

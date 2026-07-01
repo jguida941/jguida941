@@ -29,15 +29,18 @@ def _active() -> list[str]:
 
 
 class DesignConformanceContract(unittest.TestCase):
-    def test_conform_stamps_the_button_pass_for_every_active_profile(self):
-        """Every active profile's emitted deterministic button invariants PASS against its own
-        rendered button (radius, material glass/opaque, mechanic, flat, focus). Mutation-proof: flip
-        a cited value in the profile and the corresponding result flips to fail."""
+    def test_conform_stamps_every_component_pass_for_every_active_profile(self):
+        """Every active profile's emitted deterministic invariants for EVERY component (button AND
+        chip — codex chip #1) PASS against its own rendered component. A broken _COMPONENT_FACTS
+        dispatch or adapter that emitted a chip `fail` reddens here, not just at receipt regen.
+        Mutation-proof: flip a cited value in the profile and the corresponding result flips to fail."""
         from scripts.quality.design_invariants import conform
         for name in _active():
             emitted = [r for r in conform(name)
-                       if r["determinism"] == "deterministic" and r["aspect"] == "component-button"]
-            self.assertTrue(emitted, f"{name}: must have emitted button invariants")
+                       if r["determinism"] == "deterministic" and str(r["aspect"]).startswith("component-")]
+            aspects = {r["aspect"] for r in emitted}
+            self.assertIn("component-button", aspects, f"{name}: must have emitted button invariants")
+            self.assertIn("component-chip", aspects, f"{name}: must have emitted chip invariants")
             for r in emitted:
                 self.assertEqual(r["status"], "pass",
                                  f"{name}/{r['invariant_id']} FAILED — evidence={r['evidence']}")
@@ -117,6 +120,16 @@ class AdapterFailsClosed(unittest.TestCase):
         for expected in ("token-swap", "opacity-dim", "glass-brightness"):
             self.assertFalse(button_state_mechanic(facts, expected=expected),
                              f"ambiguous mechanic must not pass as {expected}")
+
+    def test_chip_sentence_case_and_material_flat_fail_closed_on_unparsable_css(self):
+        """codex chip #2/#4: `chip_sentence_case` and `material_flat` must not pass on empty CSS —
+        typography_case is None (not 'sentence') and the material facts are None (not False)."""
+        from scripts.contracts.design_predicates import chip_sentence_case, material_flat
+        from scripts.rendering.webkit.design_render_adapter import chip_facts
+        facts = chip_facts("", "")
+        self.assertIsNone(facts["typography_case"])
+        self.assertFalse(chip_sentence_case(facts), "sentence-case must not pass on empty CSS")
+        self.assertFalse(material_flat(facts), "material_flat must not pass on empty CSS")
 
     def test_square_2px_ring_requires_the_2px_inset_geometry(self):
         """#3: `square-2px-ring` keys on the 2px inset ring, not merely 'has an inset' — a mutated

@@ -33,6 +33,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_data_semantics.py",
             "test_design_button.py",
             "test_design_character.py",
+            "test_design_chip.py",
             "test_design_conformance.py",
             "test_design_contract.py",
             "test_design_distinctness.py",
@@ -160,6 +161,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "webkit": (
         "test_design_button.py",        # P5-WEBKIT-BUTTON: profile-driven rendered components (anatomy hook)
+        "test_design_chip.py",          # P5-COMPONENTS-GROW: the chip/tag (2nd component; reuses the runner + only-new predicate)
     ),
     "conformance": (
         "test_design_conformance.py",   # P5-CONFORM: the generic conform() runner (predicate dispatch + honest verdict split + receipt seam)

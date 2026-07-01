@@ -56,6 +56,26 @@
       "variants": ["prominent", "glass", "tinted", "plain", "destructive"],
       "states": ["rest", "hover", "active", "focus-visible", "disabled"],
       "fingerprint": {"radius_px": 999, "state_mechanic": "glass-brightness", "focus_recipe": "capsule-halo", "anatomy": "centered-capsule", "material": "liquid-glass", "elevation": "floating"}
+    },
+    "chip": {
+      "$doc": "docs/design/liquid-glass.md — Apple pill (Labels/search-token) in Liquid Glass: capsule (radius = half height), frosted material, CENTERED label (no dismiss), SF sentence case (Footnote 13pt), illuminate-from-within (glass-brightness) press, capsule halo focus. Chip px sizes [derived] (Apple publishes no chip metric); blur/saturate single-sourced from design_tokens.",
+      "anatomy": "centered-label",
+      "radius_px": 999,
+      "height_px": 26,
+      "pad_inline_px": 12,
+      "pad_block_px": 5,
+      "font_size_px": 13,
+      "font_weight": 500,
+      "material": "liquid-glass",
+      "state_mechanic": "glass-brightness",
+      "focus_recipe": "capsule-halo",
+      "transition_ms": 260,
+      "easing": "cubic-bezier(0.34,1.56,0.64,1)",
+      "active_css": {"filter": "brightness(1.12)"},
+      "elevation_shadow": "0 2px 8px rgba(0,0,0,0.20)",
+      "variants": ["regular", "prominent", "tinted"],
+      "states": ["rest", "hover", "active", "focus-visible", "disabled"],
+      "fingerprint": {"radius_px": 999, "state_mechanic": "glass-brightness", "focus_recipe": "capsule-halo", "anatomy": "centered-label", "material": "liquid-glass", "elevation": "floating"}
     }
   },
   "aspect_coverage": {
@@ -65,7 +85,7 @@
     "radius-elevation-material": "covered-deferred",
     "motion": "covered-deferred",
     "component-button": "covered-emitted",
-    "component-chip": "covered-deferred",
+    "component-chip": "covered-emitted",
     "component-card": "covered-deferred",
     "component-kpi": "covered-deferred",
     "component-input": "covered-deferred",
@@ -82,6 +102,12 @@
     {"invariant_id": "lg-btn-radius", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "liquid-glass button is a 999px capsule", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "button_radius", "params": {"expected_px": 999, "variant": "prominent"}}},
     {"invariant_id": "lg-btn-material", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "frosted-glass material on the button", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "button_material_glass", "params": {"variant": "prominent"}}},
     {"invariant_id": "lg-btn-mechanic", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "glass-brightness press (brightness UP)", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "button_state_mechanic", "params": {"expected": "glass-brightness", "variant": "prominent"}}},
-    {"invariant_id": "lg-btn-contrast", "aspect": "component-button", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "contrast over translucent glass is renderer-dependent — candidate until the headless-probe slice (never fake-green)", "law": "button label contrast >= WCAG AA on the actual glass surface", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}}
+    {"invariant_id": "lg-btn-contrast", "aspect": "component-button", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "contrast over translucent glass is renderer-dependent — candidate until the headless-probe slice (never fake-green)", "law": "button label contrast >= WCAG AA on the actual glass surface", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}},
+    {"invariant_id": "lg-chip-radius", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "liquid-glass chip is a capsule pill (radius 999)", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "radius", "params": {"expected_px": 999, "variant": "regular"}}},
+    {"invariant_id": "lg-chip-material", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "frosted-glass material on the chip", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "material_glass", "params": {"variant": "regular"}}},
+    {"invariant_id": "lg-chip-mechanic", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "glass-brightness press (illuminate-from-within)", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "state_mechanic", "params": {"expected": "glass-brightness", "variant": "regular"}}},
+    {"invariant_id": "lg-chip-focus", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "capsule halo focus", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "focus_recipe", "params": {"expected": "capsule-halo", "variant": "regular"}}},
+    {"invariant_id": "lg-chip-case", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "sentence case (never ALL-CAPS)", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "chip_sentence_case", "params": {"variant": "regular"}}},
+    {"invariant_id": "lg-chip-contrast", "aspect": "component-chip", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "contrast over translucent glass is renderer-dependent — candidate until the headless-probe slice", "law": "chip label contrast on the actual glass surface", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}}
   ]
 }

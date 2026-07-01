@@ -153,10 +153,17 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
      geometry/radius/shadow/focus/elevation static-parse deterministic; contrast/responsive candidate.
    - **1c (showcase):** verdicts from receipt-JSON only; `candidate` cells rendered with the R5 "cannot
      certify" label — do NOT couple to the nonexistent Playwright/PNG probe (codex H4).
-4. **P5-SHOWCASE** — `test_showcase_coverage` RED; `render_showcase` reads receipts + badges cells;
-   drift-guarded.
+4. **P5-SHOWCASE** ✅ — `test_showcase_coverage` RED-first; `render_showcase` reads the receipts +
+   badges each cell (per-section multiset closed cover + drift guard + honest "cannot certify");
+   the stage renders each language's real button + chip. (Remaining under this head: per-language
+   ARCHETYPE pages `site/showcase/<lang>.html`.)
 5. **P5-COMPONENTS-GROW** — one component per slice via the skill (chip, card, kpi, input, nav, table,
-   chart, hero, type-specimen): data rows + only-new predicates + cells.
+   chart, hero, type-specimen): data rows + only-new predicates + cells. **chip ✅** (instance #2:
+   render_chip anatomy branch [Carbon dismissible Tag vs Apple centered pill], chip_facts adapter,
+   conform() generalized via `_COMPONENT_FACTS`, chip_sentence_case + neutral predicate aliases,
+   component-chip emitted in all 3 profiles, doc-grounded from primary docs, fingerprint pairwise
+   ≥3-distinct, mutation-proven, codex-reviewed). NEXT component: card/kpi (the grouped-inset-list
+   PATTERN invariant — the DEEPER-REFRAME "content-fills-the-card, not giant AI boxes").
 6. **P5-SETTINGS** — `test_settings_composition` RED; compose→conform→reject-invalid→persist. **Decide
    pre-bake-vs-JS-mirror (codex must-fix #2):** pre-bake the admissible combo space (one Python source)
    OR a JS mirror of only the deterministic predicates WITH a committed parity test — never a second

@@ -56,6 +56,26 @@
       "variants": ["plain", "gray", "tinted", "filled", "destructive"],
       "states": ["rest", "hover", "active", "focus-visible", "disabled"],
       "fingerprint": {"radius_px": 999, "state_mechanic": "opacity-dim", "focus_recipe": "rounded-system-ring", "anatomy": "centered-capsule", "material": "opaque-fill", "elevation": "none"}
+    },
+    "chip": {
+      "$doc": "docs/design/apple-dark.md — Apple pill on an OPAQUE system fill (elevated dark surface + system fill role, NO blur — the deliberate contrast to liquid-glass's translucency), CENTERED label (no dismiss), SF sentence case, opacity-dim press, rounded system ring focus. Chip px sizes [derived] (Apple publishes no chip metric).",
+      "anatomy": "centered-label",
+      "radius_px": 999,
+      "height_px": 28,
+      "pad_inline_px": 12,
+      "pad_block_px": 5,
+      "font_size_px": 13,
+      "font_weight": 500,
+      "material": "opaque-fill",
+      "state_mechanic": "opacity-dim",
+      "focus_recipe": "rounded-system-ring",
+      "transition_ms": 200,
+      "easing": "ease-in-out",
+      "active_css": {"opacity": "0.5"},
+      "elevation_shadow": null,
+      "variants": ["regular", "tinted", "gray"],
+      "states": ["rest", "hover", "active", "focus-visible", "disabled"],
+      "fingerprint": {"radius_px": 999, "state_mechanic": "opacity-dim", "focus_recipe": "rounded-system-ring", "anatomy": "centered-label", "material": "opaque-fill", "elevation": "none"}
     }
   },
   "aspect_coverage": {
@@ -65,7 +85,7 @@
     "radius-elevation-material": "covered-deferred",
     "motion": "covered-deferred",
     "component-button": "covered-emitted",
-    "component-chip": "covered-deferred",
+    "component-chip": "covered-emitted",
     "component-card": "covered-deferred",
     "component-kpi": "covered-deferred",
     "component-input": "covered-deferred",
@@ -84,6 +104,13 @@
     {"invariant_id": "ap-btn-mechanic", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "opacity-dim press (dims DOWN)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_state_mechanic", "params": {"expected": "opacity-dim", "variant": "filled"}}},
     {"invariant_id": "ap-btn-flat", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "ZERO box-shadow (depth via material only)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_zero_elevation", "params": {"variant": "filled"}}},
     {"invariant_id": "ap-btn-focus", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "rounded system focus ring (not a square inset)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_focus_recipe", "params": {"expected": "rounded-system-ring", "variant": "filled"}}},
-    {"invariant_id": "ap-btn-contrast", "aspect": "component-button", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "Apple's own white-on-#0a84ff is ~3.65:1 — the contrast verdict is a candidate/probe concern, never fake-green", "law": "button label contrast on the actual fill", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}}
+    {"invariant_id": "ap-btn-contrast", "aspect": "component-button", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "Apple's own white-on-#0a84ff is ~3.65:1 — the contrast verdict is a candidate/probe concern, never fake-green", "law": "button label contrast on the actual fill", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}},
+    {"invariant_id": "ap-chip-radius", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "apple-dark chip is a capsule (radius 999)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "radius", "params": {"expected_px": 999, "variant": "regular"}}},
+    {"invariant_id": "ap-chip-material", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "OPAQUE fill (not frosted glass)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "material_opaque", "params": {"variant": "regular"}}},
+    {"invariant_id": "ap-chip-anatomy", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "centered label (no dismiss ×)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "anatomy", "params": {"expected": "centered-label", "variant": "regular"}}},
+    {"invariant_id": "ap-chip-mechanic", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "opacity-dim press (dims DOWN)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "state_mechanic", "params": {"expected": "opacity-dim", "variant": "regular"}}},
+    {"invariant_id": "ap-chip-focus", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "rounded system ring focus", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "focus_recipe", "params": {"expected": "rounded-system-ring", "variant": "regular"}}},
+    {"invariant_id": "ap-chip-case", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "SF sentence case (never ALL-CAPS)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "chip_sentence_case", "params": {"variant": "regular"}}},
+    {"invariant_id": "ap-chip-contrast", "aspect": "component-chip", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "Apple's own white-on-accent can sit ~3.65:1 — contrast is a candidate/probe concern", "law": "chip label contrast on the actual fill", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}}
   ]
 }

@@ -116,3 +116,24 @@ codex-agreed):
   geometric ink-fill / "reads dense like Settings/Health, not a template." Rendered line-box
   heights need a real layout engine, so that residue is proven by the visual receipt, not asserted
   as a deterministic number we cannot compute in the suite.
+
+## Chip / pill (component-chip)
+
+Apple's HIG has **no dedicated "chip"**; the closest primitives are **Labels** (static text +
+optional leading SF Symbol) and **search tokens** (removable capsules). The Liquid-Glass chip is a
+small **frosted capsule pill**. Chip px are **[derived]** (Apple publishes no chip metric).
+
+| Property | Value | Source |
+|---|---|---|
+| Radius | **capsule** (radius = ½ height) — rendered 999px | https://developer.apple.com/videos/play/wwdc2025/219/ |
+| Material | **Liquid Glass** frosted; blur/saturate single-sourced from `design_tokens.material('liquid-glass')`, adapts luminosity | https://developer.apple.com/design/human-interface-guidelines/materials |
+| Anatomy | **centered label**, optional leading SF Symbol; **no trailing dismiss ×** (that belongs to search tokens only) | https://developer.apple.com/design/human-interface-guidelines/components/layout-and-organization/labels/ |
+| Type | **SF, sentence case** (Footnote 13pt / Caption 12pt), never ALL-CAPS | https://developer.apple.com/design/human-interface-guidelines/typography |
+| State mechanic | **glass-brightness** (illuminate-from-within) press — brightness UP, NOT opacity-dim | https://developer.apple.com/videos/play/wwdc2025/219/ |
+| Focus | **capsule halo** (accent ring hugging the pill) **[derived]** | https://developer.apple.com/design/human-interface-guidelines/accessibility |
+
+**Distinctness:** vs carbon — radius (capsule vs 16px token), material (glass vs flat), anatomy
+(centered vs dismissible ×), state (brightness vs token-swap), focus (halo vs outline). vs
+apple-dark (near-sibling) — the SAME honest wall as the button: **material** (frosted-glass vs
+opaque-fill, the load-bearing doc axis) + state (glass-brightness vs opacity-dim) + focus
+(capsule-halo vs rounded ring) + elevation (floating vs none) = 4 fingerprint axes.

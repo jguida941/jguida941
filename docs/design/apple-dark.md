@@ -28,3 +28,25 @@ floating shadow), `focus_recipe` rounded-system-ring (vs capsule-halo) — **4 d
 axes** — it clears the ≥3 quorum by exactly 1 (the **TIGHTEST** pair in the set, since it shares
 `radius_px` + `anatomy` with liquid-glass; codex 1a-ii-B). vs carbon: radius, anatomy, mechanic,
 focus, font all differ (5 axes).
+
+## Chip / pill (component-chip)
+
+An Apple pill on an **OPAQUE system fill** — the deliberate contrast to liquid-glass's translucency
+(HIG reserves Liquid Glass for the floating layer; the content layer uses standard/opaque
+materials). Chip px are **[derived]** (Apple publishes no chip metric).
+
+| Property | Value | Source |
+|---|---|---|
+| Radius | **capsule** (radius = ½ height) — rendered 999px | https://developer.apple.com/design/human-interface-guidelines/ |
+| Material | **opaque system fill** on an elevated dark surface — **no blur** (the glass contrast) | https://developer.apple.com/design/human-interface-guidelines/dark-mode · https://developer.apple.com/design/human-interface-guidelines/color |
+| Anatomy | **centered label**, optional leading SF Symbol; no dismiss × | https://developer.apple.com/design/human-interface-guidelines/ |
+| Type | **SF, sentence case**, never ALL-CAPS | https://developer.apple.com/design/human-interface-guidelines/typography |
+| State mechanic | **opacity-dim** press (matches the apple-dark button) **[derived]** | https://developer.apple.com/design/human-interface-guidelines/buttons |
+| Focus | **rounded system ring** (halo infers the capsule contour) | https://developer.apple.com/design/human-interface-guidelines/accessibility |
+
+**Distinctness vs liquid-glass (near-sibling, both Apple capsules):** the load-bearing wall is
+**material** (opaque-fill vs frosted glass), reinforced by **state** (opacity-dim vs glass-brightness),
+**focus** (rounded ring vs capsule-halo), and **elevation** (none vs floating) — **4 fingerprint
+axes**, the same honest basis as the button (radius + anatomy shared; material is the one strongly
+doc-grounded axis, the others [derived] but consistently rendered). vs carbon: radius-token,
+anatomy (× dismiss), state, focus, font all differ.

@@ -50,18 +50,20 @@ def _signature_variant(btn: dict) -> str:
     return variants[0] if variants else "default"
 
 
-def _button_block(profile: str) -> tuple[str, str, str]:
-    """Return (scoped_css, button_html, backdrop) for a profile's signature button, or a graceful
-    placeholder if the profile isn't loadable (receipts are always for known profiles, but stay
-    resilient)."""
+def _stage_block(profile: str) -> tuple[str, str, str]:
+    """Return (scoped_css, stage_html, backdrop) for a profile's signature button + chip rendered
+    on its own backdrop, or a graceful placeholder if the profile isn't loadable (receipts are
+    always for known profiles, but stay resilient)."""
     try:
         from scripts.rendering.design import loader
-        from scripts.rendering.webkit.components import render_button
+        from scripts.rendering.webkit.components import render_button, render_chip
         prof = loader.load(profile)
-        variant = _signature_variant(prof["components"]["button"])
-        html, css = render_button(profile, variant, "rest")
+        bvar = _signature_variant(prof["components"]["button"])
+        btn_html, btn_css = render_button(profile, bvar, "rest")
+        cvar = prof["components"]["chip"]["variants"][0]
+        chip_html, chip_css = render_chip(profile, cvar, "rest")
         backdrop = loader.resolve_tokens(profile).get("color", {}).get("backdrop", "#000000")
-        return css, html, backdrop
+        return f"{btn_css}\n{chip_css}", f"{btn_html}{chip_html}", backdrop
     except Exception:
         return "", '<span class="no-render">[[component-not-rendered]]</span>', "#111111"
 
@@ -96,7 +98,7 @@ def render_showcase(receipts: dict) -> str:
     sections = []
     for name in sorted(receipts):
         rc = receipts[name]
-        css, btn_html, backdrop = _button_block(name)
+        css, stage_html, backdrop = _stage_block(name)
         if css:
             button_css.append(css)
         claim = _html.escape(str(rc.get("profile", name)))
@@ -107,7 +109,7 @@ def render_showcase(receipts: dict) -> str:
             f'<section class="lang" data-profile="{_html.escape(name)}">'
             f'<header><h2>{claim}</h2>'
             f'<p class="tally">{n_pass} pass · {n_fail} fail · {n_cand} cannot certify</p></header>'
-            f'<div class="stage" style="background:{backdrop}">{btn_html}</div>'
+            f'<div class="stage" style="background:{backdrop}">{stage_html}</div>'
             f'<table class="invariants"><thead><tr>'
             f'<th>invariant</th><th>law</th><th>doc</th><th>verdict</th></tr></thead>'
             f'<tbody>\n{_rows(rc.get("results", []))}\n</tbody></table>'
@@ -129,8 +131,10 @@ h1 { font-size: 26px; margin: 0 0 4px; }
 .lang header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
 .lang h2 { margin: 0 0 12px; font-size: 19px; }
 .tally { color: #9a9aa6; font-size: 13px; margin: 0; }
-.stage { display: flex; align-items: center; justify-content: center; min-height: 96px;
-  padding: 24px; margin: 8px 0 20px; border-radius: 12px; }
+.stage { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap;
+  min-height: 96px; padding: 24px; margin: 8px 0 20px; border-radius: 12px; }
+.chip-dismiss { background: transparent; border: 0; color: inherit; cursor: pointer;
+  font-size: 15px; line-height: 1; padding: 0 0 0 2px; }
 .no-render { color: #9a9aa6; font-style: italic; }
 table.invariants { width: 100%; border-collapse: collapse; font-size: 13px; }
 .invariants th { text-align: left; color: #9a9aa6; font-weight: 600; padding: 6px 10px;

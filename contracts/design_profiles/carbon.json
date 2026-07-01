@@ -58,6 +58,27 @@
       "variants": ["primary", "secondary", "tertiary", "ghost", "danger-primary"],
       "states": ["rest", "hover", "active", "focus-visible", "disabled"],
       "fingerprint": {"radius_px": 0, "state_mechanic": "token-swap", "focus_recipe": "square-2px-ring", "anatomy": "label-left-icon-right", "material": "flat-fill", "elevation": "none"}
+    },
+    "chip": {
+      "$doc": "docs/design/carbon.md — IBM Carbon v11 Tag: fixed 16px radius token (LITERAL, from tag SCSS — DISTINCT from the Carbon button's 0, proof the component carries shape), flat fill (no blur/shadow), IBM Plex label-01 12px/400 sentence case, DISMISSIBLE (label + trailing × close button), token-swap hover/active, outline:2px focus + 1px offset. sizes literal (18/24/32 heights, $spacing-03 8px, label-01 12px); hover step [derived].",
+      "anatomy": "label-dismiss",
+      "radius_px": 16,
+      "height_px": 24,
+      "pad_inline_px": 8,
+      "pad_block_px": 2,
+      "font_size_px": 12,
+      "font_weight": 400,
+      "material": "flat-fill",
+      "state_mechanic": "token-swap",
+      "focus_recipe": "outline-2px",
+      "transition_ms": 70,
+      "easing": "cubic-bezier(0.2, 0, 0.38, 0.9)",
+      "active_css": {"background-color": "#c6c6c6"},
+      "hover_css": {"background-color": "#c6c6c6"},
+      "elevation_shadow": null,
+      "variants": ["gray", "blue", "red"],
+      "states": ["rest", "hover", "active", "focus-visible", "disabled"],
+      "fingerprint": {"radius_px": 16, "state_mechanic": "token-swap", "focus_recipe": "outline-2px", "anatomy": "label-dismiss", "material": "flat-fill", "elevation": "none"}
     }
   },
   "aspect_coverage": {
@@ -67,7 +88,7 @@
     "radius-elevation-material": "covered-deferred",
     "motion": "covered-deferred",
     "component-button": "covered-emitted",
-    "component-chip": "covered-deferred",
+    "component-chip": "covered-emitted",
     "component-card": "covered-deferred",
     "component-kpi": "covered-deferred",
     "component-input": "covered-deferred",
@@ -86,6 +107,13 @@
     {"invariant_id": "cb-btn-mechanic", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "token-swap press (no filter/opacity/state-layer)", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_state_mechanic", "params": {"expected": "token-swap", "variant": "primary"}}},
     {"invariant_id": "cb-btn-flat", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "flat — zero box-shadow", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_zero_elevation", "params": {"variant": "primary"}}},
     {"invariant_id": "cb-btn-focus", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "2px square inset focus ring", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_focus_recipe", "params": {"expected": "square-2px-ring", "variant": "primary"}}},
-    {"invariant_id": "cb-btn-contrast", "aspect": "component-button", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "contrast verdict is a candidate/probe concern", "law": "button label contrast >= WCAG AA", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}}
+    {"invariant_id": "cb-btn-contrast", "aspect": "component-button", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "contrast verdict is a candidate/probe concern", "law": "button label contrast >= WCAG AA", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}},
+    {"invariant_id": "cb-chip-radius", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "carbon Tag is the fixed 16px radius token (NOT the button's 0)", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "radius", "params": {"expected_px": 16, "variant": "gray"}}},
+    {"invariant_id": "cb-chip-anatomy", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "dismissible: label + trailing × close button", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "anatomy", "params": {"expected": "label-dismiss", "variant": "gray"}}},
+    {"invariant_id": "cb-chip-flat", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "flat — no blur AND zero box-shadow", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "material_flat", "params": {"variant": "gray"}}},
+    {"invariant_id": "cb-chip-mechanic", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "token-swap hover/active (no filter/opacity)", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "state_mechanic", "params": {"expected": "token-swap", "variant": "gray"}}},
+    {"invariant_id": "cb-chip-focus", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "2px outline focus (offset) — NOT the button's inset square ring", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "focus_recipe", "params": {"expected": "outline-2px", "variant": "gray"}}},
+    {"invariant_id": "cb-chip-case", "aspect": "component-chip", "determinism": "deterministic", "emission_status": "emitted", "law": "IBM Plex sentence case (never ALL-CAPS)", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "chip_sentence_case", "params": {"variant": "gray"}}},
+    {"invariant_id": "cb-chip-contrast", "aspect": "component-chip", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "contrast verdict is a candidate/probe concern", "law": "chip label contrast >= WCAG AA", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}}
   ]
 }

@@ -115,6 +115,145 @@
       "law": "button label contrast on the actual fill",
       "profile": "apple-dark",
       "status": "candidate"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "ap-chip-radius",
+      "law": "apple-dark chip is a capsule (radius 999)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "ap-chip-material",
+      "law": "OPAQUE fill (not frosted glass)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "ap-chip-anatomy",
+      "law": "centered label (no dismiss \u00d7)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "ap-chip-mechanic",
+      "law": "opacity-dim press (dims DOWN)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "ap-chip-focus",
+      "law": "rounded system ring focus",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "ap-chip-case",
+      "law": "SF sentence case (never ALL-CAPS)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "'component-chip' of the apple-dark profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "determinism": "judgment",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {},
+      "invariant_id": "ap-chip-contrast",
+      "law": "chip label contrast on the actual fill",
+      "profile": "apple-dark",
+      "status": "candidate"
     }
   ]
 }

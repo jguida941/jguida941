@@ -26,3 +26,24 @@ asymmetric**, the opposite of a centered frosted pill.
 (vs centered), token-swap press (vs glass-brightness / opacity-dim), 2px **square** focus (vs a
 rounded halo/ring), flat zero-shadow, IBM Plex 400 (vs SF 600). The `distinctness_fingerprint`
 over `{radius, state_mechanic, focus_recipe, anatomy, elevation}` forbids any convergence.
+
+## Tag / chip (component-chip)
+
+The Carbon **Tag** is the system's ONE rounded control — proof the *component*, not just the
+theme, carries shape: the Tag radius is a fixed **16px token** while the button radius is **0**.
+
+| Property | Value | Source |
+|---|---|---|
+| Corner radius | **16px** fixed token (`border-radius` in the Tag SCSS; on the 18/24/32px heights it clamps to a pill, but it is a *fixed token*, NOT a dynamic capsule) | https://carbondesignsystem.com/components/tag/style/ |
+| Heights | **sm 18 / md 24 (default) / lg 32px** | https://carbondesignsystem.com/components/tag/style/ |
+| Inline padding | **`$spacing-03` = 8px** (lg `$spacing-04` 12px) **[derived from @carbon/styles tag SCSS]** | https://carbondesignsystem.com/components/tag/usage/ |
+| Material | **flat — no blur, no shadow**; fill from component tokens (light: step-20 bg / step-70 text) | https://carbondesignsystem.com/components/tag/style/ · https://carbondesignsystem.com/elements/color/tokens/ |
+| Anatomy | **dismissible**: optional leading 16px icon → label → **trailing `×` close button** (`label-dismiss`) | https://carbondesignsystem.com/components/tag/usage/ |
+| Type | **IBM Plex Sans `label-01` = 12px / lh 16px / weight 400**, **sentence case** (Carbon never uppercases tags) | https://carbondesignsystem.com/elements/typography/type-sets/ |
+| State mechanic | **background token-swap** (hover token, e.g. `$tag-hover-gray`) — NO filter / opacity | https://carbondesignsystem.com/components/tag/style/ |
+| Focus | **`outline: 2px solid $focus` + `outline-offset: 1px`** — an OUTLINE, distinct from the button's `inset` square ring | https://carbondesignsystem.com/components/tag/style/ |
+
+**Distinctness vs the Apple pills:** the fixed 16px token reads pill-like but is framed as
+*fixed-token-vs-dynamic-capsule*; the load-bearing separators are the **dismissible `×` anatomy**,
+**token-swap** state, **2px outline** focus (vs a halo/ring), and **IBM Plex** (vs SF) — four solid
+axes independent of radius.

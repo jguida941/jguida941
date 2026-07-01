@@ -29,6 +29,22 @@ def _button_facts(profile: str, variant: str) -> dict:
     return adapter.button_facts(html, "\n".join([base_css, active, focus]))
 
 
+def _chip_facts(profile: str, variant: str) -> dict:
+    from scripts.rendering.webkit import design_render_adapter as adapter
+    from scripts.rendering.webkit.components import render_chip
+    _, base_css = render_chip(profile, variant, "rest")
+    _, active = render_chip(profile, variant, "active")
+    html, focus = render_chip(profile, variant, "focus-visible")
+    return adapter.chip_facts(html, "\n".join([base_css, active, focus]))
+
+
+# aspect -> (component key in profile["components"], the fact-gatherer). Adding a component = one row.
+_COMPONENT_FACTS = {
+    "component-button": ("button", _button_facts),
+    "component-chip": ("chip", _chip_facts),
+}
+
+
 # The receipt claim is HONEST per status (codex 1b-ii #4): a `fail`/`candidate` row must not read
 # "satisfies". Pass = satisfies; fail = VIOLATES; candidate = judgment/deferred, needs a receipt.
 _CLAIM = {
@@ -71,9 +87,14 @@ def conform(profile: str) -> list[dict]:
         pred = inv.get("predicate", {})
         fn = predicates.PREDICATES.get(pred.get("predicate_class"))
         params = dict(pred.get("params", {}))
-        if inv.get("aspect") == "component-button":
-            variant = params.pop("variant", prof["components"]["button"]["variants"][0])
-            facts = facts_cache.setdefault(variant, _button_facts(profile, variant))
+        component = _COMPONENT_FACTS.get(inv.get("aspect"))
+        if component is not None:
+            key, gather = component
+            variant = params.pop("variant", prof["components"][key]["variants"][0])
+            cache_key = (key, variant)
+            if cache_key not in facts_cache:       # gather ONCE per (component, variant), not eagerly
+                facts_cache[cache_key] = gather(profile, variant)
+            facts = facts_cache[cache_key]
         else:
             facts = {}
         ok = bool(fn(facts, **params)) if fn else False

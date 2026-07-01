@@ -115,6 +115,145 @@
       "law": "button label contrast >= WCAG AA",
       "profile": "carbon",
       "status": "candidate"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-dismiss",
+        "focus_recipe": "outline-2px",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 16,
+        "state_mechanic": "token-swap",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "cb-chip-radius",
+      "law": "carbon Tag is the fixed 16px radius token (NOT the button's 0)",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-dismiss",
+        "focus_recipe": "outline-2px",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 16,
+        "state_mechanic": "token-swap",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "cb-chip-anatomy",
+      "law": "dismissible: label + trailing \u00d7 close button",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-dismiss",
+        "focus_recipe": "outline-2px",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 16,
+        "state_mechanic": "token-swap",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "cb-chip-flat",
+      "law": "flat \u2014 no blur AND zero box-shadow",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-dismiss",
+        "focus_recipe": "outline-2px",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 16,
+        "state_mechanic": "token-swap",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "cb-chip-mechanic",
+      "law": "token-swap hover/active (no filter/opacity)",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-dismiss",
+        "focus_recipe": "outline-2px",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 16,
+        "state_mechanic": "token-swap",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "cb-chip-focus",
+      "law": "2px outline focus (offset) \u2014 NOT the button's inset square ring",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-dismiss",
+        "focus_recipe": "outline-2px",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 16,
+        "state_mechanic": "token-swap",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "cb-chip-case",
+      "law": "IBM Plex sentence case (never ALL-CAPS)",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "'component-chip' of the carbon profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "determinism": "judgment",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {},
+      "invariant_id": "cb-chip-contrast",
+      "law": "chip label contrast >= WCAG AA",
+      "profile": "carbon",
+      "status": "candidate"
     }
   ]
 }

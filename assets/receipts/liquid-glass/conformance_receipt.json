@@ -75,6 +75,124 @@
       "law": "button label contrast >= WCAG AA on the actual glass surface",
       "profile": "liquid-glass",
       "status": "candidate"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/liquid-glass.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "capsule-halo",
+        "has_backdrop_filter": true,
+        "has_box_shadow": true,
+        "radius_px": 999,
+        "state_mechanic": "glass-brightness",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "lg-chip-radius",
+      "law": "liquid-glass chip is a capsule pill (radius 999)",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/liquid-glass.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "capsule-halo",
+        "has_backdrop_filter": true,
+        "has_box_shadow": true,
+        "radius_px": 999,
+        "state_mechanic": "glass-brightness",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "lg-chip-material",
+      "law": "frosted-glass material on the chip",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/liquid-glass.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "capsule-halo",
+        "has_backdrop_filter": true,
+        "has_box_shadow": true,
+        "radius_px": 999,
+        "state_mechanic": "glass-brightness",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "lg-chip-mechanic",
+      "law": "glass-brightness press (illuminate-from-within)",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/liquid-glass.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "capsule-halo",
+        "has_backdrop_filter": true,
+        "has_box_shadow": true,
+        "radius_px": 999,
+        "state_mechanic": "glass-brightness",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "lg-chip-focus",
+      "law": "capsule halo focus",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-chip' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/liquid-glass.md",
+      "evidence": {
+        "anatomy": "centered-label",
+        "focus_recipe": "capsule-halo",
+        "has_backdrop_filter": true,
+        "has_box_shadow": true,
+        "radius_px": 999,
+        "state_mechanic": "glass-brightness",
+        "typography_case": "sentence"
+      },
+      "invariant_id": "lg-chip-case",
+      "law": "sentence case (never ALL-CAPS)",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-chip",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "'component-chip' of the liquid-glass profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "determinism": "judgment",
+      "doc_cite": "docs/design/liquid-glass.md",
+      "evidence": {},
+      "invariant_id": "lg-chip-contrast",
+      "law": "chip label contrast on the actual glass surface",
+      "profile": "liquid-glass",
+      "status": "candidate"
     }
   ]
 }
