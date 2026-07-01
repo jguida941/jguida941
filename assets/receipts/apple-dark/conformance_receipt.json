@@ -114,7 +114,7 @@
       "evidence": {
         "receipt_artifact": "assets/receipts/apple-dark/ap-btn-contrast.json",
         "receipt_kind": "headless-contrast-probe",
-        "receipt_status": "pending"
+        "receipt_status": "present"
       },
       "invariant_id": "ap-btn-contrast",
       "law": "button label contrast on the actual fill",
@@ -125,7 +125,7 @@
         "reason": "the contrast claim must be measured against the rendered fill before promotion",
         "required": true
       },
-      "receipt_status": "pending",
+      "receipt_status": "present",
       "refute_by": "a headless contrast probe over the rendered button measures below the claimed threshold",
       "status": "candidate"
     },
@@ -266,7 +266,7 @@
       "evidence": {
         "receipt_artifact": "assets/receipts/apple-dark/ap-chip-contrast.json",
         "receipt_kind": "headless-contrast-probe",
-        "receipt_status": "pending"
+        "receipt_status": "present"
       },
       "invariant_id": "ap-chip-contrast",
       "law": "chip label contrast on the actual fill",
@@ -277,7 +277,7 @@
         "reason": "the contrast claim must be measured against the rendered fill before promotion",
         "required": true
       },
-      "receipt_status": "pending",
+      "receipt_status": "present",
       "refute_by": "a headless contrast probe over the rendered chip measures below the claimed threshold",
       "status": "candidate"
     },
@@ -424,7 +424,7 @@
       "evidence": {
         "receipt_artifact": "assets/receipts/apple-dark/ap-card-fills.png",
         "receipt_kind": "viewport-visual-receipt",
-        "receipt_status": "pending"
+        "receipt_status": "present"
       },
       "invariant_id": "ap-card-fills",
       "law": "content fills the card (no giant dead space)",
@@ -435,7 +435,7 @@
         "reason": "ink-to-chrome fill is a rendered layout property that requires a viewport screenshot",
         "required": true
       },
-      "receipt_status": "pending",
+      "receipt_status": "present",
       "refute_by": "a viewport screenshot shows the Apple grouped card has large dead space or per-row chrome",
       "status": "candidate"
     }

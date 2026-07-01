@@ -96,6 +96,54 @@ class DesignConformanceContract(unittest.TestCase):
                     self.assertTrue(str(obligation.get("artifact", "")).startswith(f"assets/receipts/{name}/"),
                                     f"{name}/{inv['invariant_id']}: artifact must stay under assets/receipts/{name}/")
 
+    def test_visual_receipt_artifacts_are_committed_and_candidate_only(self):
+        """P5-RECEIPT-GATE: required visual/probe obligations must have real artifacts, but those
+        artifacts do NOT promote the row to pass. The conformance result stays `candidate`; only
+        `receipt_status` moves from pending to present."""
+        from scripts.quality.design_invariants import conform
+        from scripts.quality.visual_receipts import (
+            contrast_receipt_payload,
+            expected_visual_receipts,
+            png_summary,
+        )
+
+        expected = expected_visual_receipts()
+        declared = {(r.profile, r.invariant_id, r.kind, r.artifact) for r in expected}
+        observed = set()
+        for name in _active():
+            for row in conform(name):
+                if row["status"] != "candidate":
+                    continue
+                obligation = row["receipt_obligation"]
+                observed.add((name, row["invariant_id"], obligation["kind"], obligation["artifact"]))
+                self.assertEqual(row["receipt_status"], "present",
+                                 f"{name}/{row['invariant_id']}: visual receipt artifact must be present")
+        self.assertEqual(declared, observed, "visual receipt producer must cover every active candidate row")
+
+        for receipt in expected:
+            artifact = ROOT / receipt.artifact
+            self.assertTrue(artifact.is_file(), f"{receipt.artifact}: missing committed receipt artifact")
+            if receipt.kind == "headless-contrast-probe":
+                data = json.loads(artifact.read_text(encoding="utf-8"))
+                self.assertEqual(data, contrast_receipt_payload(receipt),
+                                 f"{receipt.artifact}: contrast receipt drift")
+                self.assertEqual(data["authority_status"], "candidate_only")
+                self.assertIs(data["cannot_mark_done"], True)
+                self.assertEqual(data["status"], "present")
+                self.assertEqual(data["claim_status"], "measured-candidate")
+                self.assertIsInstance(data["contrast_ratio"], (int, float))
+                self.assertGreater(data["contrast_ratio"], 1.0)
+                self.assertTrue(data["foreground"].startswith("#"))
+                self.assertTrue(data["background"].startswith("#"))
+            elif receipt.kind == "viewport-visual-receipt":
+                summary = png_summary(artifact)
+                self.assertEqual(summary["format"], "PNG", f"{receipt.artifact}: must be a PNG")
+                self.assertGreaterEqual(summary["width"], 300, f"{receipt.artifact}: width too small")
+                self.assertGreaterEqual(summary["height"], 200, f"{receipt.artifact}: height too small")
+                self.assertTrue(summary["nonblank"], f"{receipt.artifact}: PNG must be nonblank")
+            else:
+                self.fail(f"{receipt.artifact}: unsupported receipt kind {receipt.kind}")
+
     def test_committed_receipts_are_current_and_write_receipt_targets_the_governed_tree(self):
         """The RECEIPT seam: as of 1c EVERY active profile's receipt is a COMMITTED artifact the
         showcase reads. Drift guard via the PURE `receipt_json` (no disk write, so a drift never
