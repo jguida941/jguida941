@@ -60,8 +60,11 @@ profile is not enough; the rendered artifact must satisfy the doctrine-derived o
    `tests_layout_contract TEST_GROUPS.contracts`, AND a `DESIGN_CONTRACT_GROUPS` authority.
 3. **Doc-ground** — cite every magic value to a primary doc URL in `docs/design/<lang>.md`.
 4. **Implement** — DATA (+ only-new predicates / only-new render branches).
-5. **Prove** — GREEN; **mutation-prove** each predicate (revert the cited value → it reddens); capture
-   the visual receipt at the TRUE viewport.
+5. **Prove** — GREEN; **mutation-prove** each predicate (revert the cited value → it reddens); materialize
+   each declared `receipt_obligation` via `scripts/quality/visual_receipts.py` — a DETERMINISTIC
+   token-derived reconstruction (PIL) or rendered-CSS measurement whose `kind` NAMES its real producer,
+   NOT a browser screenshot. The true headless/viewport probe is a deferred R4 aspect; never label a
+   reconstruction as a screenshot.
 6. **Codex** — run codex on the DIFF (passed inline so it can't read a stale tree); fold disagreements
    RED-first; commit only when green + codex agrees.
 

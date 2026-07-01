@@ -156,13 +156,17 @@ class StructuralLayoutContract(unittest.TestCase):
         idx = json.loads((REPO_ROOT / "contracts" / "design_profiles" / "_index.json").read_text(encoding="utf-8"))
         known = set(idx["active_design_profiles"]) | set(idx["reserved_design_profiles"])
         undeclared: list[str] = []
+        # pathlib does NOT brace-expand, so `**/*.{json,png}` would silently match NOTHING — iterate
+        # an explicit `globs` list (JSON receipts + PNG reconstructions) so both are governed.
+        globs = section.get("globs") or [section["glob"]]
         if root.is_dir():
-            for path in root.glob(section["glob"]):
-                if not path.is_file():
-                    continue
-                parts = path.relative_to(root).parts
-                if not parts or parts[0] not in known:
-                    undeclared.append(path.relative_to(root).as_posix())
+            for glob in globs:
+                for path in root.glob(glob):
+                    if not path.is_file():
+                        continue
+                    parts = path.relative_to(root).parts
+                    if not parts or parts[0] not in known:
+                        undeclared.append(path.relative_to(root).as_posix())
         self.assertEqual([], sorted(undeclared),
                          "conformance receipt under an unknown-profile dir — index the profile in _index.json")
 

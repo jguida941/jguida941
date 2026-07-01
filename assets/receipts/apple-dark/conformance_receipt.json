@@ -113,7 +113,7 @@
       "doc_cite": "docs/design/apple-dark.md",
       "evidence": {
         "receipt_artifact": "assets/receipts/apple-dark/ap-btn-contrast.json",
-        "receipt_kind": "headless-contrast-probe",
+        "receipt_kind": "rendered-css-contrast-probe",
         "receipt_status": "present"
       },
       "invariant_id": "ap-btn-contrast",
@@ -121,12 +121,12 @@
       "profile": "apple-dark",
       "receipt_obligation": {
         "artifact": "assets/receipts/apple-dark/ap-btn-contrast.json",
-        "kind": "headless-contrast-probe",
+        "kind": "rendered-css-contrast-probe",
         "reason": "the contrast claim must be measured against the rendered fill before promotion",
         "required": true
       },
       "receipt_status": "present",
-      "refute_by": "a headless contrast probe over the rendered button measures below the claimed threshold",
+      "refute_by": "a rendered-CSS contrast measurement over the rendered button measures below the claimed threshold",
       "status": "candidate"
     },
     {
@@ -265,7 +265,7 @@
       "doc_cite": "docs/design/apple-dark.md",
       "evidence": {
         "receipt_artifact": "assets/receipts/apple-dark/ap-chip-contrast.json",
-        "receipt_kind": "headless-contrast-probe",
+        "receipt_kind": "rendered-css-contrast-probe",
         "receipt_status": "present"
       },
       "invariant_id": "ap-chip-contrast",
@@ -273,12 +273,12 @@
       "profile": "apple-dark",
       "receipt_obligation": {
         "artifact": "assets/receipts/apple-dark/ap-chip-contrast.json",
-        "kind": "headless-contrast-probe",
+        "kind": "rendered-css-contrast-probe",
         "reason": "the contrast claim must be measured against the rendered fill before promotion",
         "required": true
       },
       "receipt_status": "present",
-      "refute_by": "a headless contrast probe over the rendered chip measures below the claimed threshold",
+      "refute_by": "a rendered-CSS contrast measurement over the rendered chip measures below the claimed threshold",
       "status": "candidate"
     },
     {
@@ -423,7 +423,7 @@
       "doc_cite": "docs/design/apple-dark.md",
       "evidence": {
         "receipt_artifact": "assets/receipts/apple-dark/ap-card-fills.png",
-        "receipt_kind": "viewport-visual-receipt",
+        "receipt_kind": "token-derived-reconstruction",
         "receipt_status": "present"
       },
       "invariant_id": "ap-card-fills",
@@ -431,12 +431,12 @@
       "profile": "apple-dark",
       "receipt_obligation": {
         "artifact": "assets/receipts/apple-dark/ap-card-fills.png",
-        "kind": "viewport-visual-receipt",
-        "reason": "ink-to-chrome fill is a rendered layout property that requires a viewport screenshot",
+        "kind": "token-derived-reconstruction",
+        "reason": "ink-to-chrome fill is a rendered layout property verified by a token-derived card reconstruction (deterministic redraw, drift-guarded)",
         "required": true
       },
       "receipt_status": "present",
-      "refute_by": "a viewport screenshot shows the Apple grouped card has large dead space or per-row chrome",
+      "refute_by": "a token-derived card reconstruction shows the Apple grouped card has large dead space or per-row chrome",
       "status": "candidate"
     }
   ]

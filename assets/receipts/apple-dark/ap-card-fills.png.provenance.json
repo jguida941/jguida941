@@ -1,0 +1,13 @@
+{
+  "artifact": "assets/receipts/apple-dark/ap-card-fills.png",
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "claim_status": "reconstruction-candidate",
+  "contract_id": "DesignReceiptProvenance",
+  "invariant_id": "ap-card-fills",
+  "kind": "token-derived-reconstruction",
+  "note": "a deterministic token-derived PIL redraw of the card structure (radius, rows, hairlines) from the profile tokens; NOT a browser render. The real headless-render probe is a deferred R4 aspect, authored live-wired RED-first when it lands.",
+  "probe_backend": "pil-reconstruction",
+  "producer": "scripts/quality/visual_receipts.py",
+  "profile": "apple-dark"
+}

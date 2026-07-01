@@ -38,7 +38,9 @@ per-theme template. Follow the per-slice SOP in `SKILL.md`; this lane is the com
    only-new predicates.
 4. **Prove** — character (cited values, mutually-exclusive mechanic) + render-derived distinctness
    GREEN; **mutation-prove** (collapse a signature axis — e.g. carbon radius 0→999 → reds character
-   AND distinctness); capture the matrix receipt at the true viewport.
+   AND distinctness); materialize any `receipt_obligation` via `scripts/quality/visual_receipts.py`
+   (a deterministic reconstruction / rendered-CSS measurement whose `kind` names its real producer —
+   never a reconstruction mislabeled a screenshot; the true headless probe is deferred R4).
 5. **Codex** on the diff (inline) → fold RED-first → commit when green + codex agrees.
 
 ## Worked example (the button, instance #1)

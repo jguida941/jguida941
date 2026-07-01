@@ -54,6 +54,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_theme_system.py",
             "test_tile_composition.py",
             "test_typography_restraint.py",
+            "test_visual_receipt_provenance.py",
             "test_web_dashboard.py",
         ),
     ),
@@ -176,6 +177,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "settings": (
         "test_settings_composition.py", # P5-SETTINGS: the governed control plane — compose->conform->reject-invalid, ONE Python decider
+    ),
+    "receipts": (
+        "test_visual_receipt_provenance.py",  # P5-RECEIPT-PROVENANCE: a receipt kind must name its real producer (no proxy wearing a pixel-truth label)
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y

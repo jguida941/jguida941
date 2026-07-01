@@ -113,7 +113,7 @@
       "doc_cite": "docs/design/carbon.md",
       "evidence": {
         "receipt_artifact": "assets/receipts/carbon/cb-btn-contrast.json",
-        "receipt_kind": "headless-contrast-probe",
+        "receipt_kind": "rendered-css-contrast-probe",
         "receipt_status": "present"
       },
       "invariant_id": "cb-btn-contrast",
@@ -121,12 +121,12 @@
       "profile": "carbon",
       "receipt_obligation": {
         "artifact": "assets/receipts/carbon/cb-btn-contrast.json",
-        "kind": "headless-contrast-probe",
+        "kind": "rendered-css-contrast-probe",
         "reason": "the contrast claim must be measured against the rendered component background before promotion",
         "required": true
       },
       "receipt_status": "present",
-      "refute_by": "a headless contrast probe over the rendered button measures below the claimed WCAG threshold",
+      "refute_by": "a rendered-CSS contrast measurement over the rendered button measures below the claimed WCAG threshold",
       "status": "candidate"
     },
     {
@@ -265,7 +265,7 @@
       "doc_cite": "docs/design/carbon.md",
       "evidence": {
         "receipt_artifact": "assets/receipts/carbon/cb-chip-contrast.json",
-        "receipt_kind": "headless-contrast-probe",
+        "receipt_kind": "rendered-css-contrast-probe",
         "receipt_status": "present"
       },
       "invariant_id": "cb-chip-contrast",
@@ -273,12 +273,12 @@
       "profile": "carbon",
       "receipt_obligation": {
         "artifact": "assets/receipts/carbon/cb-chip-contrast.json",
-        "kind": "headless-contrast-probe",
+        "kind": "rendered-css-contrast-probe",
         "reason": "the contrast claim must be measured against the rendered component background before promotion",
         "required": true
       },
       "receipt_status": "present",
-      "refute_by": "a headless contrast probe over the rendered chip measures below the claimed WCAG threshold",
+      "refute_by": "a rendered-CSS contrast measurement over the rendered chip measures below the claimed WCAG threshold",
       "status": "candidate"
     },
     {
@@ -423,7 +423,7 @@
       "doc_cite": "docs/design/carbon.md",
       "evidence": {
         "receipt_artifact": "assets/receipts/carbon/cb-card-fills.png",
-        "receipt_kind": "viewport-visual-receipt",
+        "receipt_kind": "token-derived-reconstruction",
         "receipt_status": "present"
       },
       "invariant_id": "cb-card-fills",
@@ -431,12 +431,12 @@
       "profile": "carbon",
       "receipt_obligation": {
         "artifact": "assets/receipts/carbon/cb-card-fills.png",
-        "kind": "viewport-visual-receipt",
-        "reason": "ink-to-chrome fill is a rendered layout property that requires a viewport screenshot",
+        "kind": "token-derived-reconstruction",
+        "reason": "ink-to-chrome fill is a rendered layout property verified by a token-derived card reconstruction (deterministic redraw, drift-guarded)",
         "required": true
       },
       "receipt_status": "present",
-      "refute_by": "a viewport screenshot shows the Carbon Tile has large dead space or per-row chrome",
+      "refute_by": "a token-derived card reconstruction shows the Carbon Tile has large dead space or per-row chrome",
       "status": "candidate"
     }
   ]

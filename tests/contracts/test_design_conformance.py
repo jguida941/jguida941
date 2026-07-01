@@ -72,8 +72,9 @@ class DesignConformanceContract(unittest.TestCase):
                     obligation = r.get("receipt_obligation") or {}
                     self.assertIs(obligation.get("required"), True,
                                   f"{name}/{r['invariant_id']}: candidate must carry a required receipt obligation")
-                    self.assertIn(obligation.get("kind"), {"headless-contrast-probe", "viewport-visual-receipt"},
-                                  f"{name}/{r['invariant_id']}: receipt obligation must name the probe kind")
+                    from scripts.quality.visual_receipts import HONEST_KINDS
+                    self.assertIn(obligation.get("kind"), HONEST_KINDS,
+                                  f"{name}/{r['invariant_id']}: receipt obligation must name its real producer kind")
                     self.assertTrue(str(obligation.get("artifact", "")).startswith(f"assets/receipts/{name}/"),
                                     f"{name}/{r['invariant_id']}: receipt artifact must live in that profile's receipt home")
                     self.assertIn(r.get("receipt_status"), {"pending", "present"},
@@ -102,6 +103,8 @@ class DesignConformanceContract(unittest.TestCase):
         `receipt_status` moves from pending to present."""
         from scripts.quality.design_invariants import conform
         from scripts.quality.visual_receipts import (
+            CARD_KIND,
+            CONTRAST_KIND,
             contrast_receipt_payload,
             expected_visual_receipts,
             png_summary,
@@ -123,7 +126,7 @@ class DesignConformanceContract(unittest.TestCase):
         for receipt in expected:
             artifact = ROOT / receipt.artifact
             self.assertTrue(artifact.is_file(), f"{receipt.artifact}: missing committed receipt artifact")
-            if receipt.kind == "headless-contrast-probe":
+            if receipt.kind == CONTRAST_KIND:
                 data = json.loads(artifact.read_text(encoding="utf-8"))
                 self.assertEqual(data, contrast_receipt_payload(receipt),
                                  f"{receipt.artifact}: contrast receipt drift")
@@ -135,7 +138,7 @@ class DesignConformanceContract(unittest.TestCase):
                 self.assertGreater(data["contrast_ratio"], 1.0)
                 self.assertTrue(data["foreground"].startswith("#"))
                 self.assertTrue(data["background"].startswith("#"))
-            elif receipt.kind == "viewport-visual-receipt":
+            elif receipt.kind == CARD_KIND:
                 summary = png_summary(artifact)
                 self.assertEqual(summary["format"], "PNG", f"{receipt.artifact}: must be a PNG")
                 self.assertGreaterEqual(summary["width"], 300, f"{receipt.artifact}: width too small")

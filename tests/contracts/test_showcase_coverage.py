@@ -96,7 +96,7 @@ class ShowcaseCoverageContract(unittest.TestCase):
         synthetic = {"carbon": {"profile": "carbon", "results": [
             {"invariant_id": "syn-cand", "status": "candidate", "law": "L", "doc_cite": "d",
              "aspect": "component-button", "determinism": "judgment", "receipt_status": "pending",
-             "receipt_obligation": {"required": True, "kind": "viewport-visual-receipt",
+             "receipt_obligation": {"required": True, "kind": "token-derived-reconstruction",
                                     "artifact": "assets/receipts/carbon/syn-cand.png"}}]}}
         html = render_showcase(synthetic)
         row = re.search(r'data-invariant="syn-cand".*?</tr>', html, re.S)

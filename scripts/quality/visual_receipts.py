@@ -11,11 +11,17 @@ from __future__ import annotations
 import json
 import math
 import re
-import shutil
-import subprocess
-import tempfile
 from dataclasses import dataclass
 from pathlib import Path
+
+# The ONLY honest receipt kinds — each NAMES its real producer (no capability it does not have).
+# `rendered-css-contrast-probe` computes sRGB contrast from the rendered component CSS (NOT a
+# headless browser). `token-derived-reconstruction` is a deterministic PIL redraw of the card
+# structure from the profile tokens (NOT a viewport screenshot). The real headless-render probe is
+# a deferred R4 aspect (declared-deferred in the roster), never faked here.
+CONTRAST_KIND = "rendered-css-contrast-probe"
+CARD_KIND = "token-derived-reconstruction"
+HONEST_KINDS = frozenset({CONTRAST_KIND, CARD_KIND})
 
 
 def _root() -> Path:
@@ -23,6 +29,11 @@ def _root() -> Path:
         if (p / "contracts" / "design_profiles").is_dir():
             return p
     raise RuntimeError("repo root not found")
+
+
+def provenance_path(artifact: str) -> str:
+    """The provenance sidecar path for a reconstruction artifact: `<artifact>.provenance.json`."""
+    return f"{artifact}.provenance.json"
 
 
 @dataclass(frozen=True)
@@ -242,84 +253,21 @@ def write_contrast_receipt(receipt: VisualReceipt) -> Path:
     return out
 
 
-def _html_doc(profile: str, html: str, css: str) -> str:
-    from scripts.rendering.design import loader
-
-    color = loader.resolve_tokens(profile).get("color", {})
-    backdrop = color.get("backdrop", "#ffffff")
-    return f"""<!doctype html>
-<html><head><meta charset="utf-8"><style>
-* {{ box-sizing: border-box; }}
-body {{ margin: 0; width: 640px; height: 360px; background: {backdrop};
-  display: grid; place-items: center; font-family: -apple-system, system-ui, sans-serif; }}
-.receipt-stage {{ width: 380px; padding: 28px; }}
-.card-group {{ width: 100%; }}
-{css}
-</style></head><body><main class="receipt-stage">{html}</main></body></html>
-"""
-
-
-def _chrome_path() -> str | None:
-    chrome = Path("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
-    if chrome.is_file():
-        return str(chrome)
-    return shutil.which("google-chrome") or shutil.which("chromium") or shutil.which("chromium-browser")
-
-
-def _try_chrome_screenshot(html_file: Path, out: Path) -> bool:
-    chrome = _chrome_path()
-    if not chrome:
-        return False
-    with tempfile.TemporaryDirectory(prefix="visual-receipt-chrome-") as profile:
-        cmd = [
-            chrome,
-            "--headless=new",
-            "--disable-gpu",
-            "--disable-dev-shm-usage",
-            "--no-first-run",
-            "--no-default-browser-check",
-            f"--user-data-dir={profile}",
-            "--window-size=640,360",
-            f"--screenshot={out}",
-            html_file.as_uri(),
-        ]
-        try:
-            subprocess.run(cmd, capture_output=True, text=True, timeout=10, check=False)
-        except (OSError, subprocess.TimeoutExpired):
-            return False
-    return out.is_file() and out.stat().st_size > 0
-
-
-def _try_qlmanage_screenshot(html_file: Path, out: Path) -> bool:
-    qlmanage = shutil.which("qlmanage")
-    if not qlmanage:
-        return False
-    with tempfile.TemporaryDirectory(prefix="visual-receipt-ql-") as tmp:
-        tmpdir = Path(tmp)
-        try:
-            subprocess.run(
-                [qlmanage, "-t", "-s", "640", "-o", str(tmpdir), str(html_file)],
-                capture_output=True,
-                text=True,
-                timeout=15,
-                check=False,
-            )
-        except (OSError, subprocess.TimeoutExpired):
-            return False
-        generated = tmpdir / f"{html_file.name}.png"
-        if generated.is_file() and generated.stat().st_size > 0:
-            shutil.copyfile(generated, out)
-            return True
-    return False
+_CARD_ROW_COUNT = 3  # a grouped card holds N metric rows (>=2) — the anti "one box per stat" structure
 
 
 def _draw_card_png(receipt: VisualReceipt, out: Path) -> None:
-    from PIL import Image, ImageDraw, ImageFont
+    """A DETERMINISTIC token-derived reconstruction of the card STRUCTURE — one container (radius
+    from the profile) holding N hairline-divided rows, each with a quiet label bar + a prominent
+    value bar (ink lands ACROSS the row, not floating in a giant box). Deliberately TEXT-FREE:
+    PIL's default-font text rendering is non-deterministic across process invocations, which would
+    make a committed, drift-guarded PNG unreliable; the row ink-bars carry the same 'content fills
+    the row' evidence without a font dependency. NOT a browser render."""
+    from PIL import Image, ImageDraw
     from scripts.rendering.design import loader
 
     tokens = loader.resolve_tokens(receipt.profile).get("color", {})
-    profile = loader.load(receipt.profile)
-    card = profile["components"]["card"]
+    card = loader.load(receipt.profile)["components"]["card"]
     bg = _composite(_parse_color(tokens.get("backdrop", "#ffffff")), (255, 255, 255, 1))
     surface = _composite(_parse_color(tokens.get("surface-raised", tokens.get("surface", "#ffffff"))), (*bg, 1))
     hairline = _composite(_parse_color(tokens.get("hairline", "#cccccc")), (*surface, 1))
@@ -331,18 +279,33 @@ def _draw_card_png(receipt: VisualReceipt, out: Path) -> None:
     x0, y0, x1, y1 = 20, 34, 400, 186
     radius = int(card.get("radius_px", 0))
     draw.rounded_rectangle([x0, y0, x1, y1], radius=radius, fill=surface, outline=hairline, width=1)
-    rows = (("Commits", "1,240"), ("Current streak", "23 days"), ("Languages", "12"))
-    row_h = (y1 - y0) // len(rows)
-    font = ImageFont.load_default()
-    for idx, (left, right) in enumerate(rows):
+    row_h = (y1 - y0) // _CARD_ROW_COUNT
+    bar_h = 8
+    for idx in range(_CARD_ROW_COUNT):
         y = y0 + idx * row_h
-        if idx:
+        if idx:                                     # 1px hairline between adjacent rows
             draw.line([(x0, y), (x1, y)], fill=hairline, width=1)
-        ty = y + (row_h // 2) - 6
-        draw.text((x0 + 16, ty), left, fill=label, font=font)
-        bbox = draw.textbbox((0, 0), right, font=font)
-        draw.text((x1 - 16 - (bbox[2] - bbox[0]), ty), right, fill=value, font=font)
+        by = y + (row_h - bar_h) // 2
+        draw.rectangle([x0 + 16, by, x0 + 16 + 128, by + bar_h], fill=label)   # label ink (left)
+        draw.rectangle([x1 - 16 - 72, by, x1 - 16, by + bar_h], fill=value)    # value ink (right)
     img.save(out)
+
+
+def png_tile_digest(path: Path, grid: int = 6) -> list:
+    """Per-tile per-channel mean over a `grid`×`grid` tiling — a SPATIAL summary (codex): a layout
+    change that preserves the GLOBAL mean (e.g. a bar moved left<->right) still shifts specific
+    tiles, so the drift guard reddens. Decoded-pixel means (not file bytes) stay portable across
+    PIL/zlib builds; a small per-tile tolerance absorbs any sub-pixel AA jitter."""
+    from PIL import Image, ImageStat
+    with Image.open(path) as img:
+        rgb = img.convert("RGB")
+        w, h = rgb.size
+        tiles = []
+        for gy in range(grid):
+            for gx in range(grid):
+                box = (gx * w // grid, gy * h // grid, (gx + 1) * w // grid, (gy + 1) * h // grid)
+                tiles.append([round(v, 2) for v in ImageStat.Stat(rgb.crop(box)).mean])
+    return tiles
 
 
 def png_summary(path: Path) -> dict:
@@ -362,6 +325,32 @@ def png_summary(path: Path) -> dict:
     }
 
 
+def _card_provenance_payload(receipt: VisualReceipt) -> dict:
+    return {
+        "contract_id": "DesignReceiptProvenance",
+        "profile": receipt.profile,
+        "invariant_id": receipt.invariant_id,
+        "artifact": receipt.artifact,
+        "kind": receipt.kind,
+        "probe_backend": "pil-reconstruction",
+        "producer": "scripts/quality/visual_receipts.py",
+        "authority_status": "candidate_only",
+        "cannot_mark_done": True,
+        "claim_status": "reconstruction-candidate",
+        "note": ("a deterministic token-derived PIL redraw of the card structure (radius, rows, "
+                 "hairlines) from the profile tokens; NOT a browser render. The real headless-render "
+                 "probe is a deferred R4 aspect, authored live-wired RED-first when it lands."),
+    }
+
+
+def write_card_provenance(receipt: VisualReceipt) -> Path:
+    out = _root() / provenance_path(receipt.artifact)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(_card_provenance_payload(receipt), indent=2, sort_keys=True) + "\n",
+                   encoding="utf-8")
+    return out
+
+
 def write_card_receipt(receipt: VisualReceipt) -> Path:
     out = _root() / receipt.artifact
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -369,13 +358,14 @@ def write_card_receipt(receipt: VisualReceipt) -> Path:
     summary = png_summary(out)
     if not summary["nonblank"] or summary["width"] <= 0 or summary["height"] <= 0:
         raise RuntimeError(f"{receipt.artifact}: generated PNG is blank/invalid")
+    write_card_provenance(receipt)   # every reconstruction carries its honest provenance sidecar
     return out
 
 
 def write_visual_receipt(receipt: VisualReceipt) -> Path:
-    if receipt.kind == "headless-contrast-probe":
+    if receipt.kind == CONTRAST_KIND:
         return write_contrast_receipt(receipt)
-    if receipt.kind == "viewport-visual-receipt":
+    if receipt.kind == CARD_KIND:
         return write_card_receipt(receipt)
     raise KeyError(f"unsupported receipt kind: {receipt.kind}")
 

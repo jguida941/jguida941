@@ -13,10 +13,16 @@ review.
 2. **Mutation-prove every deterministic obligation.** For each predicate or rendered-fingerprint axis,
    revert the driving value or render output and confirm a test MUST fail. If nothing fails, the
    invariant is vacuous -> strengthen it. One killed mutant per independent obligation.
-3. **Visual receipts.** For every `receipt_obligation.required: true`, render the relevant page or
-   specimen in headless Chrome at the declared viewport(s); capture before/after for judgment rows.
-   Receipts are the proof for visual rows and confirmation for deterministic rows. No screenshot-only
-   claim can be promoted without a committed receipt or explicit candidate-only deferral.
+3. **Visual receipts (honest producer).** For every `receipt_obligation.required: true`, materialize
+   the declared artifact via `scripts/quality/visual_receipts.py`, and make the obligation `kind` NAME
+   its real producer — today `rendered-css-contrast-probe` (sRGB contrast computed from the rendered
+   component CSS) and `token-derived-reconstruction` (a DETERMINISTIC, text-free PIL redraw of the
+   component structure). Do NOT label a reconstruction as a "viewport screenshot" or a CSS-parse as
+   "headless": a proxy wearing a pixel-truth label is the exact honesty defect to avoid. Each card
+   reconstruction carries a `<artifact>.provenance.json` sidecar. The genuine headless/viewport probe
+   (true rendered ink, `responsive_no_clip`, contrast over live blur) is a **deferred R4 aspect** —
+   authored live-wired RED-first when it lands; until then those rows stay candidate. Receipts confirm
+   candidate rows; they NEVER promote a row to `pass`.
 4. **Codex review (cross-provider), folded RED-first.** An independent reviewer (a) re-derives the
    obligation set from `docs/design/<lang>.md` and flags missing axes; (b) probes each predicate for
    vacuity (would it pass on a blank/placeholder render?); (c) checks the determinism split is honest
