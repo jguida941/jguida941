@@ -16,8 +16,9 @@
 Four seams, three instances (scorecard / showcase / settings-preview) share the SAME pipeline.
 
 - **Seam 1 — PROFILE (data):** `contracts/design_profiles/<lang>.json` is the source of truth (scout
-  `design_profiles.json` style). `scripts/rendering/design/loader.py` validates + hydrates a frozen
-  typed VIEW. No design values live in Python; `design_tokens.py` becomes a config-derived shim and
+  `design_profiles.json` style). `scripts/rendering/design/loader.py` resolves it into a VIEW (plain
+  resolved dicts today — codex #7; a frozen typed view is a later hardening, not claimed now). No design
+  values live in Python; `design_tokens.py` becomes a config-derived shim and
   the liquid-glass profile is `derived_from: "config"` (single source — the SVG-parity anchor).
 - **Seam 2 — RENDER (webkit):** `scripts/rendering/webkit/components.py::render_<component>(profile,
   variant, state) -> (html, css)`, token-only, reading the profile's per-component **ANATOMY** block
@@ -55,8 +56,11 @@ cannot_mark_done:true, claim:"satisfies <lang> profile v<N> — receipts"}`.
    demotes to review-anchor + visual receipt and NEVER compiles a fake passing body.
 
 The DATA itself is tested before any render: `test_design_profiles_schema.py` pins the closed cover
-(schema validity, aspect-roster set-equality, emitted/deferred counts, index↔files parity both
-directions) + a DERIVED-PARITY assertion (liquid-glass tokens/IA == `config.py`).
+(per-profile **ENVELOPE** validity, aspect-roster set-equality, index↔files parity both directions) +
+a DERIVED-PARITY assertion (liquid-glass tokens == `config.py`). **(codex D1: today this is ENVELOPE
+validity — `contract_id`/`authority_status`/`derived_from`/`aspect_coverage` shape; a GENERIC
+`$value/$type` DTCG-shape + `components`/`fingerprint`-shape assertion lands with the conformance
+runner in 1b, so a malformed token block can't pass silently.)**
 
 ## 3. One generic runner + one predicate library (new theme = data + zero code)
 
@@ -90,9 +94,12 @@ to a `doc_cite`. Adding theme 4 adds zero predicates; adding a component adds on
 - **Homes (`repo_layout.json` `source_layout`):** new groups `design` (`rendering/design`: loader,
   schema, registry), `webkit` (`rendering/webkit`: components, component_css, charts, layout,
   design_render_adapter), `showcase` (`rendering/showcase`: render_showcase, render_settings);
-  `quality` gains `design_invariants.py`; `contracts` gains `design_predicates.py`. NEW `site_layout`
-  closed cover gates `site/*.html` (allowlist index/showcase/settings) + an `assets/receipts/<lang>/`
-  home — closing the gap that the meta-gate was inert for non-`scripts/**/*.py`.
+  `quality` gains `design_invariants.py`; `contracts` gains `design_predicates.py`. The NEW `site_layout`
+  closed cover (DONE in P5-0-FINISH) gates `site/*.html` (allowlist index/showcase/settings) — closing
+  the gap that the meta-gate was inert for non-`scripts/**/*.py`. **(codex must-fix #1: `assets/` is
+  STILL ungoverned — the `assets/receipts/<lang>/` closed cover is NOT yet declared; it lands RED-first
+  in the 1b slice that first WRITES a receipt, so an undeclared receipt reddens. P5-0-FINISH gated ONLY
+  `site/`.)**
 - **3-PLACE test registration (codex must-fix #5)** for every new design test: (a) `repo_layout.json`
   `test_layout.contracts.members`, (b) `tests_layout_contract.py` `TEST_GROUPS['contracts']`, AND
   (c) a governing authority in `DESIGN_CONTRACT_GROUPS` — `test_tests_layout_contract` enforces
@@ -103,30 +110,44 @@ to a `doc_cite`. Adding theme 4 adds zero predicates; adding a component adds on
 - **Cuts (right-sized for this repo):** NO 45-lane sprawl, NO claim_intake/authority_leak/relay
   plumbing, NO Rust subprocess. One runner, one predicate library, one schema, one prove lane.
 
-## 6. The skill (repeatable RED-first driver, repo-literal-free)
+## 6. The skill (repeatable RED-first driver, portable in DISCIPLINE)
 
 `skills/design-language-tdd/` gains lanes: `add-design-language` (research→cited doctrine
-`docs/design/<lang>.md`→profile JSON→RED), `add-component`, `add-aspect-contract`, and `prove-theme`
-(GREEN both surfaces + mutation + true-viewport receipts + codex). Org gate baked in. The portable
-half (skill, predicates, schema, roster, runner, templates) carries **zero repo literals** so it
-lifts to scout; the profile-specific half (`design_render_adapter`, token values, receipts) stays.
+`docs/design/<lang>.md`→profile JSON→RED), `add-component` (DONE), `add-aspect-contract`, and
+`prove-theme` (GREEN + mutation + true-viewport receipts + codex). Org gate baked in. The portable
+half (predicate LOGIC, profile schema, roster shape, runner, LAW shapes) is portable in DISCIPLINE.
+**(codex must-fix #6: "zero repo literals" is NOT literally true today — the skill/boundaries TEXT
+names this repo's paths (`repo_layout.json`, `DESIGN_CONTRACT_GROUPS`, `bootstrap_red_ref`,
+`design_predicates.py`). On lift to scout those paths get templated / isolated into a "this-repo
+bindings" section; the governance shape lifts, the paths don't — reword, don't overclaim.)** The
+profile-specific half (`design_render_adapter`, token values, receipts) stays.
 
 ## 7. Phased build order (RED-first; each: name RED → declare homes+authority → implement → prove+mutation → receipt → codex)
 
-1. **P5-0-FINISH** — gate `site/`: extend `test_structural_layout._ENUMERATED` to include a new
-   `site_layout` section (editing the LAW, not just data — codex must-fix #6) + `assets/receipts/`;
-   prove a forged undeclared `site/*.html` reddens; green over the existing single `index.html`.
-2. **P5-PROFILE-SPINE** (data, no render) — `test_design_profiles_schema` RED; schema + roster
-   (button emitted, rest deferred) + liquid-glass profile `derived_from: config`; DERIVED-PARITY test.
-3. **P5-WEBKIT-BUTTON** (instance #1, **split into 3 greens** — codex must-fix #3): (3a) `render_button`
-   emits visible HTML (RED=ModuleNotFoundError) with the anatomy hook; (3b) runner + button predicates
-   stamp it (carbon radius:0+token-swap+2px-square-focus+zero-shadow; liquid capsule+glass+spring;
-   apple capsule+opacity-dim+zero-shadow); (3c) the first showcase cells + receipt. Verify carbon +
-   apple + liquid constants against PRIMARY doc URLs first → `docs/design/<lang>.md` cites; mark
-   `[derived]`. distinctness_fingerprint over {radius, state_mechanic, focus_recipe, anatomy,
-   **elevation**}. **Gather boundary pinned (codex must-fix #1):** geometry/radius/shadow/focus/
-   elevation are static-parse deterministic; `contrast_on_actual_bg` + `responsive_no_clip` ship as
-   **judgment/candidate** until a declared headless-probe slice — never fake-green over glass.
+1. **P5-0-FINISH** ✅ — gated `site/` with a NEW `site_layout` closed cover (a BESPOKE root+allowlist
+   method, NOT an `_ENUMERATED` extension — codex R7, since `site/` isn't a groups shape) + an
+   anti-tautology forge test; green over `index.html`. (Did NOT add an assets/receipts home — 1b.)
+2. **P5-PROFILE-SPINE** ✅ (split: SPINE-a data-skeleton + SPINE-b DTCG loader) — `test_design_profiles_
+   schema` RED; `_index`/roster/liquid-glass envelope + closed 18-aspect cover; the DTCG-subset loader
+   aliases liquid-glass into config (single source, no literal copy) + DERIVED-PARITY (resolved==config).
+3. **P5-WEBKIT-BUTTON** (instance #1, split greens): 1a-i ✅ `render_button` seam + liquid-glass
+   character; 1a-ii-A ✅ carbon (label-left/icon-right DOM, radius 0, token-swap, square focus, flat) +
+   pairwise distinctness fingerprint. **NEXT — 1a-ii-B apple-dark → 1b conform+predicates → 1c showcase.**
+   Constants doc-grounded against PRIMARY URLs first (`docs/design/<lang>.md`); `[derived]` marked.
+   fingerprint over {radius, state_mechanic, focus_recipe, anatomy, **material**, **elevation**}.
+   **Codex audit guards (must land in the named slice):**
+   - **1a-ii-B (apple-dark):** apple-dark IS in `design_tokens.THEMES` (carbon is NOT) → do NOT hand-type
+     a duplicate palette; generalize the loader to alias `THEMES['apple-dark']`
+     (`derived_from: "theme:apple-dark"`) OR add an apple-dark derived-parity test (codex H1). Give it a
+     DISTINCT `material` so its button fingerprint clears the ≥3 quorum with MARGIN vs liquid-glass, not
+     exactly 3 (codex H2). No new render branch needed (rounded-system-ring + opacity-dim already exist).
+   - **1b (conform):** flip roster `component-button` deferred→emitted ONLY in the same commit that lands
+     a mutation-proven deterministic predicate (codex H3); keep `contrast`/`responsive` `candidate`
+     (never fake-green over glass); AND add the `assets/receipts/<lang>/` closed cover RED-first BEFORE
+     writing the first receipt (codex must-fix #1 — `assets/` is currently ungoverned). Gather boundary:
+     geometry/radius/shadow/focus/elevation static-parse deterministic; contrast/responsive candidate.
+   - **1c (showcase):** verdicts from receipt-JSON only; `candidate` cells rendered with the R5 "cannot
+     certify" label — do NOT couple to the nonexistent Playwright/PNG probe (codex H4).
 4. **P5-SHOWCASE** — `test_showcase_coverage` RED; `render_showcase` reads receipts + badges cells;
    drift-guarded.
 5. **P5-COMPONENTS-GROW** — one component per slice via the skill (chip, card, kpi, input, nav, table,
