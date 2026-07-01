@@ -22,10 +22,17 @@ def button_facts(html: str, css: str) -> dict:
     radius_px = int(m.group(1)) if m else None
 
     # anatomy: Carbon emits a label node THEN a trailing icon sibling; the Apple capsules a
-    # centered label (icon leading). Structural, read off the DOM.
-    anatomy = "centered-capsule"
-    if "btn-label" in html and "btn-icon" in html and html.index("btn-label") < html.index("btn-icon"):
+    # centered label (icon leading). Requires POSITIVE evidence of a rendered <button>, else None
+    # (fail-closed) — an empty render must not pass an anatomy invariant.
+    # label-left-icon-right requires a btn-label WITH text (codex: an empty-label Carbon DOM is not
+    # positive evidence) BEFORE the btn-icon; centered-capsule requires a <button> with text.
+    if (re.search(r'class="btn-label">[^<]*\w', html) and "btn-icon" in html
+            and html.index("btn-label") < html.index("btn-icon")):
         anatomy = "label-left-icon-right"
+    elif re.search(r"<button[^>]*>[^<]*\w", html):   # a <button> with actual text (empty <button></button> -> None)
+        anatomy = "centered-capsule"
+    else:
+        anatomy = None
 
     # state mechanic: MUTUALLY EXCLUSIVE (codex 1b-ii #2). Count every press signal in `.is-active`;
     # resolve a mechanic ONLY when exactly one is present. Two signals (e.g. brightness + a token
@@ -58,9 +65,9 @@ def button_facts(html: str, css: str) -> dict:
         "radius_px": radius_px,
         "anatomy": anatomy,
         "state_mechanic": mechanic,
-        # None (not False) when no base rule parsed -> `is False` material/elevation predicates fail closed
-        "has_backdrop_filter": ("backdrop-filter" in base) if base is not None else None,
-        "has_box_shadow": ("box-shadow" in base) if base is not None else None,
+        # None (not False) when no base rule; a `none` value is NOT presence (codex) -> fail closed
+        "has_backdrop_filter": _has_prop(base, "backdrop-filter"),
+        "has_box_shadow": _has_prop(base, "box-shadow"),
         "focus_recipe": focus_recipe,
     }
 
@@ -70,6 +77,26 @@ def _base_rule(css: str):
     component fact-gatherers so material/shadow facts fail closed (None) on empty CSS."""
     m = re.search(r"\.[\w-]+\s*\{([^}]*)\}", css)
     return m.group(1) if m else None
+
+
+def _invisible_color(value: str) -> bool:
+    """A colour that paints nothing: the `transparent`/`none` keywords OR a 0-alpha rgba/hsla."""
+    v = value.strip()
+    return (v in ("transparent", "none")
+            or re.search(r"(?:rgba|hsla)\([^)]*,\s*0(?:\.0+)?\s*\)$", v) is not None)
+
+
+def _has_prop(base, prop: str):
+    """True iff `base` declares `prop` with a value that actually renders — NOT `none` (incl.
+    `none !important`) and not empty. None if there is no base rule (fail-closed). codex:
+    `backdrop-filter: none` / `box-shadow: none !important` must NOT read as present."""
+    if base is None:
+        return None
+    for v in re.findall(rf"{prop}:\s*([^;]+)", base):
+        v = v.replace("!important", "").strip()
+        if v not in ("none", ""):
+            return True
+    return False
 
 
 def _mechanic(css: str):
@@ -97,11 +124,16 @@ def chip_facts(html: str, css: str) -> dict:
 
     # label-dismiss: a label node FOLLOWED BY a trailing dismiss <button> (codex chip #3 — a bare
     # `chip-dismiss` substring anywhere is not enough; it must be the close BUTTON after the label).
+    # Requires POSITIVE evidence of a rendered chip pill, else None (fail-closed on an empty render).
     dismiss = '<button class="chip-dismiss"'
-    anatomy = ("label-dismiss"
-               if ("chip-label" in html and dismiss in html
-                   and html.index("chip-label") < html.index(dismiss))
-               else "centered-label")
+    # label-dismiss requires a chip-label WITH text (codex: empty label span is not evidence)
+    if (re.search(r'class="chip-label">[^<]*\w', html) and dismiss in html
+            and html.index("chip-label") < html.index(dismiss)):
+        anatomy = "label-dismiss"
+    elif re.search(r'<span class="chip-[^"]*">[^<]*\w', html):   # a chip pill with actual text (empty span -> None)
+        anatomy = "centered-label"
+    else:
+        anatomy = None
 
     # focus recipe: MUTUALLY EXCLUSIVE — count signals, None on zero or >1 (same discipline as the
     # mechanic; codex chip N1 — `outline: 2px` + a halo can't both resolve to outline-2px).
@@ -120,8 +152,8 @@ def chip_facts(html: str, css: str) -> dict:
         "radius_px": radius_px,
         "anatomy": anatomy,
         "state_mechanic": _mechanic(css),
-        "has_backdrop_filter": ("backdrop-filter" in base) if base is not None else None,
-        "has_box_shadow": ("box-shadow" in base) if base is not None else None,
+        "has_backdrop_filter": _has_prop(base, "backdrop-filter"),
+        "has_box_shadow": _has_prop(base, "box-shadow"),
         "focus_recipe": focus_recipe,
         # fail-closed (codex chip #2): None (not "sentence") when no base rule -> chip_sentence_case fails
         "typography_case": (None if base is None
@@ -159,9 +191,11 @@ def card_facts(html: str, css: str) -> dict:
         and "display: flex" in row_body
         and not re.search(r"flex-(?:direction|flow):[^;]*column", row_body))
 
-    # a VISIBLE 1px divider — `border-top: 1px solid …`; `1px none/transparent` is NOT a divider (codex card #3)
+    # a VISIBLE 1px divider — `border-top: 1px solid <color>` with a colour that actually paints
+    # (codex: `1px solid transparent` AND `1px solid rgba(0,0,0,0)` are invisible, not a hairline).
     div_m = re.search(r"\.card-row\s*\+\s*\.card-row\s*\{([^}]*)\}", css)
-    divider_1px = bool(div_m and re.search(r"border-top:\s*1px\s+solid", div_m.group(1)))
+    div_color = re.search(r"border-top:\s*1px\s+solid\s+([^;]+)", div_m.group(1)) if div_m else None
+    divider_1px = bool(div_color and not _invisible_color(div_color.group(1)))
 
     return {
         "radius_px": radius_px,
@@ -170,6 +204,6 @@ def card_facts(html: str, css: str) -> dict:
         "rows_chromeless": rows_chromeless,
         "rows_horizontal": rows_horizontal,
         "divider_1px": divider_1px,
-        "has_backdrop_filter": ("backdrop-filter" in container) if container is not None else None,
-        "has_box_shadow": ("box-shadow" in container) if container is not None else None,
+        "has_backdrop_filter": _has_prop(container, "backdrop-filter"),
+        "has_box_shadow": _has_prop(container, "box-shadow"),
     }

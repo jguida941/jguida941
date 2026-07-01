@@ -78,6 +78,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/rendering/webkit/components.py", "scripts/rendering/webkit/components.py", "rendering", "profile-driven web component library (render_button + anatomy hook)"),
     ModuleHome("scripts/rendering/webkit/design_render_adapter.py", "scripts/rendering/webkit/design_render_adapter.py", "rendering", "verdict-free fact-gatherer over rendered button HTML/CSS (the portability seam)"),
     ModuleHome("scripts/rendering/showcase/showcase.py", "scripts/rendering/showcase/showcase.py", "rendering", "render_showcase: the conformance receipts rendered to site/showcase.html (design-language surface)"),
+    ModuleHome("scripts/rendering/settings/settings.py", "scripts/rendering/settings/settings.py", "rendering", "render_settings: the governed control-plane view -> site/settings.html (displays the Python decision)"),
     ModuleHome("scripts/render/cards/generate_activity_heatmap.py", "scripts/rendering/generate_activity_heatmap.py", "rendering", "activity heatmap renderer"),
     ModuleHome("scripts/render/cards/generate_badges.py", "scripts/rendering/generate_badges.py", "rendering", "badge renderer"),
     ModuleHome("scripts/render/cards/generate_builder_scorecard.py", "scripts/rendering/generate_builder_scorecard.py", "rendering", "builder scorecard renderer"),
@@ -94,6 +95,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/render/metrics_svg.py", "scripts/quality/metrics_svg.py", "quality", "metrics SVG parser and checks"),
     ModuleHome("scripts/render/validate.py", "scripts/quality/validate_generated_profile.py", "quality", "generated profile validator", public_entrypoint=True),
     ModuleHome("scripts/quality/design_invariants.py", "scripts/quality/design_invariants.py", "quality", "conform() runner: walks profile invariants, gathers facts, dispatches predicates, writes receipts"),
+    ModuleHome("scripts/quality/settings_admissibility.py", "scripts/quality/settings_admissibility.py", "quality", "the ONE Python decider for the settings control plane (compose + is_admissible)"),
     ModuleHome("scripts/diagnostics/diagnostics.py", "scripts/quality/diagnostics.py", "quality", "runtime diagnostics"),
     ModuleHome("scripts/diagnostics/severity.py", "scripts/quality/severity.py", "quality", "severity comparisons"),
     ModuleHome("scripts/diagnostics/triage.py", "scripts/quality/triage.py", "quality", "profile health triage"),
@@ -129,6 +131,7 @@ PACKAGE_INIT_PATHS: frozenset[str] = frozenset(
         "scripts/rendering/design/__init__.py",
         "scripts/rendering/webkit/__init__.py",
         "scripts/rendering/showcase/__init__.py",
+        "scripts/rendering/settings/__init__.py",
     }
 )
 

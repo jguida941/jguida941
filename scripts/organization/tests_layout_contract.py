@@ -45,6 +45,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_public_data_privacy.py",
             "test_readme_projection.py",
             "test_scripts_layout_contract.py",
+            "test_settings_composition.py",
             "test_showcase_coverage.py",
             "test_skill_structure.py",
             "test_structural_layout.py",
@@ -170,6 +171,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "showcase": (
         "test_showcase_coverage.py",    # P5-SHOWCASE: the conformance receipts rendered — closed cover, drift-guarded, honest verdicts
+    ),
+    "settings": (
+        "test_settings_composition.py", # P5-SETTINGS: the governed control plane — compose->conform->reject-invalid, ONE Python decider
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y

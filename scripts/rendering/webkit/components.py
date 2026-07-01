@@ -25,11 +25,11 @@ def _is_light(hex_color: str) -> bool:
     return (0.299 * r + 0.587 * g + 0.114 * b) > 150
 
 
-def render_button(profile: str, variant: str, state: str) -> tuple[str, str]:
+def render_button(profile: str, variant: str, state: str, profile_data: dict | None = None) -> tuple[str, str]:
     from scripts.rendering import design_tokens as dt
     from scripts.rendering.design import loader
 
-    prof = loader.load(profile)
+    prof = profile_data if profile_data is not None else loader.load(profile)
     color = loader.resolve_tokens(profile)["color"]
     font = loader.resolve_tokens(profile).get("font", {}).get("family", "sans-serif")
     btn = prof["components"]["button"]
@@ -98,7 +98,7 @@ def render_button(profile: str, variant: str, state: str) -> tuple[str, str]:
     return html, css
 
 
-def render_chip(profile: str, variant: str, state: str) -> tuple[str, str]:
+def render_chip(profile: str, variant: str, state: str, profile_data: dict | None = None) -> tuple[str, str]:
     """The chip/tag component (instance #2). Reads `components.chip` and branches on ANATOMY:
     a Carbon *dismissible Tag* emits `label + trailing × close button` (label-dismiss), an Apple
     pill emits a centered label. Token-only colour; glass material single-sourced from
@@ -106,7 +106,7 @@ def render_chip(profile: str, variant: str, state: str) -> tuple[str, str]:
     from scripts.rendering import design_tokens as dt
     from scripts.rendering.design import loader
 
-    prof = loader.load(profile)
+    prof = profile_data if profile_data is not None else loader.load(profile)
     color = loader.resolve_tokens(profile)["color"]
     font = loader.resolve_tokens(profile).get("font", {}).get("family", "sans-serif")
     chip = prof["components"]["chip"]
@@ -179,7 +179,7 @@ def render_chip(profile: str, variant: str, state: str) -> tuple[str, str]:
 _CARD_ROWS = (("Commits", "1,240"), ("Current streak", "23 days"), ("Languages", "12"))
 
 
-def render_card(profile: str, variant: str, state: str) -> tuple[str, str]:
+def render_card(profile: str, variant: str, state: str, profile_data: dict | None = None) -> tuple[str, str]:
     """The CARD / grouped metric surface (instance #3) — the DEEPER-REFRAME answer to "giant KPI
     boxes". Emits ONE container holding N chrome-less rows (label + value inline, hierarchy from
     TYPE), rows divided by a 1px hairline — an Apple inset grouped list (rounded, frosted/opaque) or
@@ -189,7 +189,7 @@ def render_card(profile: str, variant: str, state: str) -> tuple[str, str]:
     from scripts.rendering import design_tokens as dt
     from scripts.rendering.design import loader
 
-    prof = loader.load(profile)
+    prof = profile_data if profile_data is not None else loader.load(profile)
     color = loader.resolve_tokens(profile)["color"]
     font = loader.resolve_tokens(profile).get("font", {}).get("family", "sans-serif")
     card = prof["components"]["card"]

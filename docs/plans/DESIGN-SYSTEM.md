@@ -172,10 +172,21 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
    drop shadow to tiles" LITERAL]. Distinctness = two HONEST walls (material glass↔opaque; shape
    square↔rounded), NOT a padded quorum — the near-pair rests on material alone, per the research.
    Mutation-proven, codex-reviewed). NEXT: kpi / input / nav via the skill, then P5-SETTINGS.
-6. **P5-SETTINGS** — `test_settings_composition` RED; compose→conform→reject-invalid→persist. **Decide
-   pre-bake-vs-JS-mirror (codex must-fix #2):** pre-bake the admissible combo space (one Python source)
-   OR a JS mirror of only the deterministic predicates WITH a committed parity test — never a second
-   verdict source that can disagree with Python.
+6. **P5-SETTINGS** ✅ — the governed control plane (picked next by an ultracode judge-panel + codex
+   cross-check, over P5-DATA — the owner froze the scorecard). `compose(base, overrides)` +
+   `is_admissible()` (`scripts/quality/settings_admissibility.py`) are the ONE Python decider;
+   `render_settings()` → `site/settings.html` DISPLAYS the computed admissible space with NO verdict
+   JS. An INVALID combination is UNCONSTRUCTABLE: a composed component is admissible only if, AS
+   RENDERED, it satisfies some active language's emitted invariants AND matches that language's full
+   fingerprint (so an override on an axis with no invariant can't slip). Honest, not a rubber stamp —
+   `admissible_space()` COMPUTES 25 admissible + 2 unconstructable (frosted button/chip can't
+   transplant onto a non-glass base). Routed through the real render→conform path, which required the
+   **enabling first RED: the anatomy gatherer hardened fail-closed** (empty render → anatomy None).
+   Codex cross-check REVISE folded (5 fail-open holes: empty-element anatomy, `backdrop-filter:none`,
+   `1px solid transparent` divider, conform-by-name avoided, uncovered-axis fingerprint completeness).
+   Mutation-proven; the render_* seams gained a `profile_data` injection for in-memory composed profiles.
+   (DEFERRED to a follow-up: the interactive URL/localStorage UI + persistence; the visual "looks
+   right" verdict stays candidate → the receipt gate.)
 7. **P5-THEMES-4-10** — via the skill: Material 3, Fluent 2, Polaris, Atlassian, Linear, Geist, Stripe
    — each a profile JSON + cited doctrine doc + usually zero new predicates + an archetype page;
    distinctness fingerprint forbids convergence.

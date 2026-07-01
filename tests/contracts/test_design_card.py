@@ -146,6 +146,15 @@ class CardAdapterFailsClosed(unittest.TestCase):
                         ".card-x .card-row + .card-row { border-top: 1px none transparent; }")
         self.assertFalse(f["divider_1px"], "border-top: 1px none transparent is not a visible hairline")
 
+    def test_solid_transparent_border_is_not_a_divider(self):
+        """codex: `border-top: 1px solid transparent` (and a 0-alpha rgba, 2nd pass) HAS `solid` but
+        an invisible colour — not a hairline. The gatherer requires a colour that actually paints."""
+        for color in ("transparent", "rgba(0,0,0,0)"):
+            f = self._facts('<div class="card-x card-group"><div class="card-row"></div><div class="card-row"></div></div>',
+                            ".card-x { }\n.card-x .card-row { display: flex; }\n"
+                            ".card-x .card-row + .card-row { border-top: 1px solid %s; }" % color)
+            self.assertFalse(f["divider_1px"], f"an invisible 1px solid {color} border is not a hairline")
+
     def test_empty_css_fails_every_card_predicate(self):
         from scripts.contracts.design_predicates import (
             card_single_container, card_hairline_divided, card_rows_inline)

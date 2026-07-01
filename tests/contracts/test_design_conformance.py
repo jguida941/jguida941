@@ -110,6 +110,40 @@ class AdapterFailsClosed(unittest.TestCase):
         self.assertFalse(button_material_glass(facts), "glass must not pass on empty CSS")
         self.assertFalse(button_zero_elevation(facts), "flat must not pass on empty CSS")
 
+    def test_anatomy_fails_closed_on_empty_render(self):
+        """The anatomy gatherer must require POSITIVE DOM evidence (a rendered <button> / chip pill),
+        not default from ABSENCE — else a component that renders NOTHING silently passes its anatomy
+        invariant. This is the precondition for an honest reject-gate (P5-SETTINGS): `conform` must
+        never pass a law on an empty render."""
+        from scripts.contracts.design_predicates import button_anatomy
+        from scripts.rendering.webkit.design_render_adapter import button_facts, chip_facts
+        self.assertIsNone(button_facts("", "")["anatomy"], "no <button> DOM -> anatomy None")
+        self.assertIsNone(chip_facts("", "")["anatomy"], "no chip DOM -> anatomy None")
+        # codex: an EMPTY element (no text content) is not positive anatomy evidence either
+        self.assertIsNone(button_facts("<button></button>", "")["anatomy"], "empty <button> -> None")
+        self.assertIsNone(chip_facts('<span class="chip-x"></span>', "")["anatomy"], "empty chip span -> None")
+        # codex (2nd pass): an empty-LABEL structured DOM is not evidence either
+        self.assertIsNone(button_facts('<button><span class="btn-label"></span><svg class="btn-icon"></svg></button>', "")["anatomy"],
+                          "empty-label Carbon button DOM -> None")
+        self.assertIsNone(chip_facts('<span class="chip-x"><span class="chip-label"></span><button class="chip-dismiss">x</button></span>', "")["anatomy"],
+                          "empty-label dismiss chip DOM -> None")
+        self.assertFalse(button_anatomy(button_facts("", ""), expected="centered-capsule"),
+                         "button anatomy must NOT pass on an empty render")
+        self.assertFalse(button_anatomy(chip_facts("", ""), expected="centered-label"),
+                         "chip anatomy must NOT pass on an empty render")
+
+    def test_backdrop_filter_none_is_not_glass(self):
+        """codex: `backdrop-filter: none` is NOT frosted glass — a substring check would fake-green
+        `button_material_glass`. The gatherer requires a non-`none` value."""
+        from scripts.contracts.design_predicates import button_material_glass
+        from scripts.rendering.webkit.design_render_adapter import button_facts, chip_facts
+        for facts in (button_facts("<button>x</button>", ".b { backdrop-filter: none; }"),
+                      chip_facts('<span class="chip-x">x</span>', ".c { backdrop-filter: none; }"),
+                      # codex (2nd pass): `none !important` must not read as present either
+                      button_facts("<button>x</button>", ".b { backdrop-filter: none !important; }")):
+            self.assertFalse(facts["has_backdrop_filter"], "backdrop-filter: none is not glass")
+            self.assertFalse(button_material_glass(facts), "material_glass must not pass on `none`")
+
     def test_state_mechanic_is_mutually_exclusive_ambiguous_is_none(self):
         """#2: two press signals in one .is-active is ambiguous -> None -> the mechanic predicate
         fails for EVERY expected value (no priority-picked pass)."""
