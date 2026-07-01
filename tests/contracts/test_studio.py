@@ -76,12 +76,11 @@ class StudioPageContract(unittest.TestCase):
                          "studio drift — regenerate via scripts.rendering.studio.studio.write_studio")
 
     def test_studio_has_a_pure_css_language_switcher_over_every_active_language(self):
-        """A live switcher (radio + tab) for EVERY active language, each language's archetype
-        embedded — and it is PURE CSS (no <script>), so there is no verdict logic to audit and every
-        visible byte is drift-guarded."""
+        """The LANGUAGE switch is PURE CSS (radio :checked reveal rules) — no JS decides which
+        language shows; a live switcher radio + tab for EVERY active language, its archetype
+        embedded. (The component SWAP adds a frozen, verdict-free toggle script, tested separately.)"""
         from scripts.rendering.studio.studio import render_studio
         html = render_studio()
-        self.assertNotIn("<script", html, "slice 2 is pure-CSS: no JS on the studio page")
         for name in _active():
             self.assertIn(f'id="lang-{name}"', html, f"{name}: a switcher radio")
             self.assertIn(f'for="lang-{name}"', html, f"{name}: a switcher tab")
@@ -102,6 +101,100 @@ class StudioPageContract(unittest.TestCase):
         system stays invisible, the operator's exact complaint)."""
         from scripts.pipeline.web_render import render_dashboard
         self.assertIn("studio.html", render_dashboard(), "index.html must link to the studio")
+
+
+class StudioSwapContract(unittest.TestCase):
+    """The governed component swap: ONE Python decider embedded + looked up; fragments only for
+    admissible cells; inadmissible sources disabled; no property-level controls; the JS re-indexes,
+    never re-decides."""
+
+    def test_studio_embeds_the_admissible_space_verbatim(self):
+        """STUDIO_SPACE in the page is EXACTLY admissible_space() — the one decider embedded (the JS
+        only looks it up)."""
+        import json
+        import re as _re
+        from scripts.quality.settings_admissibility import admissible_space
+        from scripts.rendering.studio.studio import render_studio
+        m = _re.search(r"window\.STUDIO_SPACE = (\[.*?\]);", render_studio(), _re.S)
+        self.assertIsNotNone(m, "the studio must embed STUDIO_SPACE")
+        self.assertEqual(json.loads(m.group(1)), admissible_space(),
+                         "embedded space must equal the Python admissible_space() verbatim")
+
+    def test_swap_variants_exist_only_for_admissible_cells(self):
+        """A pre-rendered archetype variant exists for a swap IFF that cell is admissible; an
+        inadmissible source is rendered disabled (no variant target) — no fake-green construction."""
+        from scripts.quality.settings_admissibility import admissible_space
+        from scripts.rendering.studio.studio import render_studio
+        html = render_studio()
+        for c in admissible_space():
+            if c["source"] == c["base"]:
+                continue
+            key = f'data-variant="{c["base"]}-{c["component"]}-{c["source"]}"'
+            if c["admissible"]:
+                self.assertIn(key, html, f"admissible {c} must have a rendered swap variant")
+            else:
+                self.assertNotIn(key, html, f"inadmissible {c} must NOT have a swap variant")
+
+    def test_inadmissible_swap_is_disabled_and_marked_unconstructable(self):
+        """The live proof it's honest: base=carbon, button/chip <- liquid-glass are DISABLED with an
+        'unconstructable' reason (a frosted component in a flat Carbon base is a valid instance of no
+        language — the 2 inadmissible cells of the space)."""
+        from scripts.rendering.studio.studio import render_studio
+        html = render_studio()
+        for comp in ("button", "chip"):
+            self.assertRegex(
+                html,
+                rf'data-base="carbon"\s+data-component="{comp}"\s+data-source="liquid-glass"\s+disabled\s+title="unconstructable',
+                f"carbon {comp} <- liquid-glass must be a disabled/unconstructable option")
+
+    def test_studio_has_no_property_level_or_token_controls(self):
+        """codex: the composer offers ONLY wholesale component swaps (base/button/chip/card named by
+        active-profile id). It must carry NO property-level or token controls — a partial property
+        mix is exactly what the decider rejects, so it is never exposed."""
+        import re as _re
+        from scripts.rendering.studio.studio import render_studio
+        html = render_studio()
+        # the ONLY inputs are the language-switch radios — no text/number/range property editors
+        for m in _re.finditer(r'<input[^>]*type="([^"]+)"', html):
+            self.assertEqual(m.group(1), "radio", "the studio has only language-switch radios, no property editors")
+        self.assertNotIn("data-token", html)
+        self.assertNotIn("data-property", html)
+        # swap options name ONLY a known component + an active profile id (never a raw property value)
+        actives = set(_active())
+        for m in _re.finditer(r'data-component="([^"]+)"\s+data-source="([^"]+)"', html):
+            self.assertIn(m.group(1), ("button", "chip", "card"), "swap targets a known component")
+            self.assertIn(m.group(2), actives, f"swap source {m.group(2)!r} must be an active profile id")
+
+    def test_studio_swap_script_is_frozen_and_carries_no_verdict(self):
+        """The toggle is a FROZEN blob (== the committed _STUDIO_JS) and re-indexes STUDIO_SPACE by
+        lookup — never a second verdict (no is_admissible/conform/compose/matching_languages/
+        admissible_space arithmetic)."""
+        from scripts.rendering.studio.studio import _STUDIO_JS, render_studio
+        html = render_studio()
+        self.assertIn(_STUDIO_JS, html, "the swap script must be the committed frozen blob")
+        for banned in ("is_admissible", "conform(", "compose(", "matching_languages", "admissible_space("):
+            self.assertNotIn(banned, html, f"the studio must carry no decider arithmetic: {banned}")
+
+    def test_composition_admissibility_is_the_AND_of_the_per_slot_cells(self):
+        """The honesty pin: whole-composition admissibility == the AND of the per-slot admissible
+        cells, over ALL base/source tuples — so the studio ANDing per-slot booleans is RE-INDEXING
+        the one Python decider, not a second verdict (and if a cross-component rule is ever added,
+        this reddens)."""
+        import copy
+        from scripts.quality.settings_admissibility import admissible_space, is_admissible
+        from scripts.rendering.design import loader
+        import itertools
+        cell = {(c["base"], c["component"], c["source"]): c["admissible"] for c in admissible_space()}
+        actives = _active()
+        for base in actives:
+            for b_src, c_src, d_src in itertools.product(actives, actives, actives):
+                overrides, srcs = {}, {"button": b_src, "chip": c_src, "card": d_src}
+                for comp, src in srcs.items():
+                    if src != base:
+                        overrides[comp] = copy.deepcopy(loader.load(src)["components"][comp])
+                expected = all(cell[(base, comp, src)] for comp, src in srcs.items())
+                self.assertEqual(is_admissible(base, overrides), bool(expected),
+                                 f"AND-decomposition broke: base={base} button<-{b_src} chip<-{c_src} card<-{d_src}")
 
 
 if __name__ == "__main__":
