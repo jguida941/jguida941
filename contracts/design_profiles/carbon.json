@@ -66,7 +66,7 @@
     "spacing-density": "covered-deferred",
     "radius-elevation-material": "covered-deferred",
     "motion": "covered-deferred",
-    "component-button": "covered-deferred",
+    "component-button": "covered-emitted",
     "component-chip": "covered-deferred",
     "component-card": "covered-deferred",
     "component-kpi": "covered-deferred",
@@ -80,5 +80,12 @@
     "responsive": "covered-deferred",
     "touch-target": "covered-deferred"
   },
-  "invariants": []
+  "invariants": [
+    {"invariant_id": "cb-btn-radius", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "carbon button is square (radius 0)", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_radius", "params": {"expected_px": 0, "variant": "primary"}}},
+    {"invariant_id": "cb-btn-anatomy", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "label hard-left + trailing icon hard-right (space-between DOM)", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_anatomy", "params": {"expected": "label-left-icon-right", "variant": "primary"}}},
+    {"invariant_id": "cb-btn-mechanic", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "token-swap press (no filter/opacity/state-layer)", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_state_mechanic", "params": {"expected": "token-swap", "variant": "primary"}}},
+    {"invariant_id": "cb-btn-flat", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "flat — zero box-shadow", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_zero_elevation", "params": {"variant": "primary"}}},
+    {"invariant_id": "cb-btn-focus", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "2px square inset focus ring", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_focus_recipe", "params": {"expected": "square-2px-ring", "variant": "primary"}}},
+    {"invariant_id": "cb-btn-contrast", "aspect": "component-button", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "contrast verdict is a candidate/probe concern", "law": "button label contrast >= WCAG AA", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}}
+  ]
 }

@@ -51,6 +51,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     # --- contracts: profile data and metric definitions ------------------------
     ModuleHome("scripts/contracts/schema.py", "scripts/contracts/__init__.py", "contracts", "profile data and README contracts"),
     ModuleHome("scripts/contracts/metrics.py", "scripts/contracts/profile_contract.py", "contracts", "metric definitions and formatting rules"),
+    ModuleHome("scripts/contracts/design_predicates.py", "scripts/contracts/design_predicates.py", "contracts", "pure design-conformance predicates (button radius/anatomy/material/mechanic/focus)"),
     # --- github: API facade, transports and repo auditing ----------------------
     ModuleHome("scripts/github/client.py", "scripts/github/github_client.py", "github", "GitHub API facade"),
     ModuleHome("scripts/github/transport.py", "scripts/github/github_transport.py", "github", "GitHub HTTP transport"),
@@ -75,6 +76,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/rendering/components.py", "scripts/rendering/components.py", "rendering", "reusable token-driven SVG components"),
     ModuleHome("scripts/rendering/design/loader.py", "scripts/rendering/design/loader.py", "rendering", "DTCG-subset design-profile loader (the thin VIEW; single-source from config)"),
     ModuleHome("scripts/rendering/webkit/components.py", "scripts/rendering/webkit/components.py", "rendering", "profile-driven web component library (render_button + anatomy hook)"),
+    ModuleHome("scripts/rendering/webkit/design_render_adapter.py", "scripts/rendering/webkit/design_render_adapter.py", "rendering", "verdict-free fact-gatherer over rendered button HTML/CSS (the portability seam)"),
     ModuleHome("scripts/render/cards/generate_activity_heatmap.py", "scripts/rendering/generate_activity_heatmap.py", "rendering", "activity heatmap renderer"),
     ModuleHome("scripts/render/cards/generate_badges.py", "scripts/rendering/generate_badges.py", "rendering", "badge renderer"),
     ModuleHome("scripts/render/cards/generate_builder_scorecard.py", "scripts/rendering/generate_builder_scorecard.py", "rendering", "builder scorecard renderer"),
@@ -90,6 +92,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     # --- quality: validation, diagnostics and triage ---------------------------
     ModuleHome("scripts/render/metrics_svg.py", "scripts/quality/metrics_svg.py", "quality", "metrics SVG parser and checks"),
     ModuleHome("scripts/render/validate.py", "scripts/quality/validate_generated_profile.py", "quality", "generated profile validator", public_entrypoint=True),
+    ModuleHome("scripts/quality/design_invariants.py", "scripts/quality/design_invariants.py", "quality", "conform() runner: walks profile invariants, gathers facts, dispatches predicates, writes receipts"),
     ModuleHome("scripts/diagnostics/diagnostics.py", "scripts/quality/diagnostics.py", "quality", "runtime diagnostics"),
     ModuleHome("scripts/diagnostics/severity.py", "scripts/quality/severity.py", "quality", "severity comparisons"),
     ModuleHome("scripts/diagnostics/triage.py", "scripts/quality/triage.py", "quality", "profile health triage"),

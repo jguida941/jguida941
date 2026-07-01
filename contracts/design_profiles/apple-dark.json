@@ -64,7 +64,7 @@
     "spacing-density": "covered-deferred",
     "radius-elevation-material": "covered-deferred",
     "motion": "covered-deferred",
-    "component-button": "covered-deferred",
+    "component-button": "covered-emitted",
     "component-chip": "covered-deferred",
     "component-card": "covered-deferred",
     "component-kpi": "covered-deferred",
@@ -78,5 +78,12 @@
     "responsive": "covered-deferred",
     "touch-target": "covered-deferred"
   },
-  "invariants": []
+  "invariants": [
+    {"invariant_id": "ap-btn-radius", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "apple-dark button is a 999px capsule", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_radius", "params": {"expected_px": 999, "variant": "filled"}}},
+    {"invariant_id": "ap-btn-material", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "OPAQUE fill (not frosted glass)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_material_opaque", "params": {"variant": "filled"}}},
+    {"invariant_id": "ap-btn-mechanic", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "opacity-dim press (dims DOWN)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_state_mechanic", "params": {"expected": "opacity-dim", "variant": "filled"}}},
+    {"invariant_id": "ap-btn-flat", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "ZERO box-shadow (depth via material only)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_zero_elevation", "params": {"variant": "filled"}}},
+    {"invariant_id": "ap-btn-focus", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "rounded system focus ring (not a square inset)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_focus_recipe", "params": {"expected": "rounded-system-ring", "variant": "filled"}}},
+    {"invariant_id": "ap-btn-contrast", "aspect": "component-button", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "Apple's own white-on-#0a84ff is ~3.65:1 — the contrast verdict is a candidate/probe concern, never fake-green", "law": "button label contrast on the actual fill", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}}
+  ]
 }

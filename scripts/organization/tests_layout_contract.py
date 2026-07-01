@@ -33,6 +33,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_data_semantics.py",
             "test_design_button.py",
             "test_design_character.py",
+            "test_design_conformance.py",
             "test_design_contract.py",
             "test_design_distinctness.py",
             "test_design_profiles_schema.py",
@@ -158,6 +159,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "webkit": (
         "test_design_button.py",        # P5-WEBKIT-BUTTON: profile-driven rendered components (anatomy hook)
+    ),
+    "conformance": (
+        "test_design_conformance.py",   # P5-CONFORM: the generic conform() runner (predicate dispatch + honest verdict split + receipt seam)
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y

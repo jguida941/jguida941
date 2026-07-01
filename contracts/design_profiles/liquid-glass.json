@@ -64,7 +64,7 @@
     "spacing-density": "covered-deferred",
     "radius-elevation-material": "covered-deferred",
     "motion": "covered-deferred",
-    "component-button": "covered-deferred",
+    "component-button": "covered-emitted",
     "component-chip": "covered-deferred",
     "component-card": "covered-deferred",
     "component-kpi": "covered-deferred",
@@ -78,5 +78,10 @@
     "responsive": "covered-deferred",
     "touch-target": "covered-deferred"
   },
-  "invariants": []
+  "invariants": [
+    {"invariant_id": "lg-btn-radius", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "liquid-glass button is a 999px capsule", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "button_radius", "params": {"expected_px": 999, "variant": "prominent"}}},
+    {"invariant_id": "lg-btn-material", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "frosted-glass material on the button", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "button_material_glass", "params": {"variant": "prominent"}}},
+    {"invariant_id": "lg-btn-mechanic", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "glass-brightness press (brightness UP)", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "button_state_mechanic", "params": {"expected": "glass-brightness", "variant": "prominent"}}},
+    {"invariant_id": "lg-btn-contrast", "aspect": "component-button", "determinism": "judgment", "emission_status": "deferred", "defer_reason": "contrast over translucent glass is renderer-dependent — candidate until the headless-probe slice (never fake-green)", "law": "button label contrast >= WCAG AA on the actual glass surface", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "contrast_on_actual_bg"}}
+  ]
 }
