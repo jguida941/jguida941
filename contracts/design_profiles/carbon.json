@@ -15,7 +15,7 @@
   "derived_from": null,
   "token_format": "w3c-dtcg-2025.10",
   "tokens": {
-    "$comment": "Carbon ships its OWN role map (no THEMES entry), so values are literal DTCG ($value) Carbon tokens — Blue 60 #0f62fe, Gray 100 #161616, White #ffffff (carbondesignsystem.com/elements/color/tokens). derived_from: null.",
+    "$comment": "Carbon ships its OWN role map; values are literal DTCG ($value) Carbon tokens — Blue 60 #0f62fe, Gray 100 #161616, White #ffffff (carbondesignsystem.com/elements/color/tokens). The public web THEMES bridge projects these profile-owned values; derived_from: null.",
     "color": {
       "$type": "color",
       "accent": {"$value": "#0f62fe"},

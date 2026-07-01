@@ -108,8 +108,8 @@ class DesignProfileSpineContract(unittest.TestCase):
                          "liquid-glass must ALIAS config (single source), never re-literal config.CYAN")
 
     def test_apple_dark_tokens_derive_from_the_theme_not_a_hand_typed_copy(self):
-        """codex H1: apple-dark ALREADY exists in `design_tokens.THEMES['apple-dark']` (unlike
-        carbon, which owns its palette). So the apple-dark profile must ALIAS that theme
+        """codex H1: apple-dark ALREADY exists in `design_tokens.THEMES['apple-dark']`.
+        So the apple-dark profile must ALIAS that theme
         (`derived_from: theme:apple-dark`), NOT hand-type a duplicate hex map that could silently
         drift. Pins single source: resolved apple-dark tokens == `THEMES['apple-dark']`, and the raw
         JSON re-literals nothing."""
@@ -125,6 +125,17 @@ class DesignProfileSpineContract(unittest.TestCase):
         raw_tokens = json.dumps(loader.load("apple-dark")["tokens"])
         self.assertNotIn(theme["accent"], raw_tokens,
                          "apple-dark must ALIAS THEMES['apple-dark'] (single source), never re-literal its hex")
+
+    def test_carbon_web_bridge_projects_profile_owned_tokens(self):
+        """Carbon owns literal profile tokens (`derived_from: null`). Its public web theme bridge
+        must project those resolved profile tokens, not invent a second Carbon palette/radius set."""
+        if "carbon" not in self.index["active_design_profiles"]:
+            self.skipTest("carbon not active yet")
+        from scripts.rendering import design_tokens as dt
+        from scripts.rendering.design import loader
+        tok = loader.resolve_tokens("carbon")
+        self.assertEqual(tok["color"], dt.THEMES["carbon"])
+        self.assertEqual(tok["radius"], dt.radius("carbon"))
 
     # --- anti-tautology: the cover CAN redden (a coverage gap is caught) ---
     def test_aspect_cover_fires_on_a_gap(self):

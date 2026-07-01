@@ -22,6 +22,11 @@
     RED + retire stale docs (`DESIGN_AUDIT`) → chat→`ClaimIntakeClaim` lowering → then SUBSUME the
     old `MODULE_HOMES`/`TEST_GROUPS` guards into the single `repo_layout.json` cover (kill the
     transitional double-maintenance).
+- ✅ **P5-THEME-ROSTER-AUTHORITY (supersedes the old public Power BI theme experiment)** —
+  `contracts/design_profiles/_index.json.active_design_profiles` is the public roster authority;
+  `site/index.html` remains the one canonical public surface with one selector exposing exactly
+  `liquid-glass`, `carbon`, and `apple-dark`. `power-bi` is reserved-only until it has an active
+  profile; no `[data-theme="power-bi"]` public switch path or `lang-table` branch ships now.
 - ✅ **P5-1 slice 1 (themes diverge — the visible payoff)** — retired the convergence lock
   (`test_ia_tokens_are_theme_independent` → `test_ia_is_complete_and_bounded`); promoted PER-THEME
   IA (`design_tokens.THEME_IA`: radius + type ramp; Apple rounder/larger, Power BI sharper/denser,
@@ -73,8 +78,8 @@ The owner's correction, now doctrine: **the Builder Scorecard is ONE concern and
 GitHub-metrics page because it's bound to GitHub data — that was the constraint; as a *data dashboard* it
 looks good and should be **one frozen style**. We must STOP polishing the scorecard surface. The **design-
 language system is a SEPARATE concern**: a **component library** (buttons, tags, cards, inputs, charts in
-every state) + **per-theme SHOWCASE pages** where each language renders its OWN kind of website (an Apple
-page looks like Apple, a Stripe page like Stripe, a Carbon app like Carbon), each built from that language's
+every state) + proof/receipt surfaces where each language renders its OWN components (an Apple
+component looks like Apple, a Stripe component like Stripe, a Carbon component like Carbon), each built from that language's
 **actual published design doc**. NOT the scorecard reskinned 10 ways. Clean boundary: **analytics surface ≠
 design-language surface.** Every aspect of every theme follows its definition doc; the skill makes it
 repeatable for all 11 languages.

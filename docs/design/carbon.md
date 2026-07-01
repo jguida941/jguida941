@@ -1,9 +1,10 @@
 # Carbon — design doctrine (IBM Carbon Design System v11, cited)
 
 > Design-system profile `carbon` (`contracts/design_profiles/carbon.json`). Carbon is IBM's
-> open-source system; it ships its OWN role map (no entry in the repo's web `THEMES`), so the
-> profile carries literal Carbon token values (`derived_from: null`). Every value below carries
-> its `carbondesignsystem.com` URL; UIKit/empirical anchors are marked **[derived]**.
+> open-source system; it ships its OWN role map, so the profile carries literal Carbon token
+> values (`derived_from: null`). The public web `THEMES` bridge projects those profile-owned
+> values because Carbon is an active design profile. Every value below carries its
+> `carbondesignsystem.com` URL; UIKit/empirical anchors are marked **[derived]**.
 
 ## Button (component-button)
 

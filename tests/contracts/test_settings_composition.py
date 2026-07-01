@@ -45,6 +45,16 @@ class SettingsCompositionContract(unittest.TestCase):
             is_admissible("liquid-glass", {"button": {"anatomy": "label-left-icon-right"}}),
             "a glass capsule with Carbon's anatomy is a Frankenstein on an uncovered axis")
 
+    def test_public_flat_theme_bridge_does_not_grant_glass_capability(self):
+        """Carbon is now a public web theme, so it has a `design_tokens.MATERIALS` bridge row.
+        That row must NOT make Carbon glass-capable: a liquid-glass button/chip cannot be
+        transplanted into a flat Carbon base and still count as valid liquid glass."""
+        from scripts.quality.settings_admissibility import is_admissible
+        from scripts.rendering.design import loader
+        liquid = loader.load("liquid-glass")["components"]
+        self.assertFalse(is_admissible("carbon", {"button": copy.deepcopy(liquid["button"])}))
+        self.assertFalse(is_admissible("carbon", {"chip": copy.deepcopy(liquid["chip"])}))
+
     def test_admissible_wholesale_swap_composes_and_conforms(self):
         """Swapping Carbon's WHOLE card into a liquid-glass base is admissible — the composed card is
         a real Carbon instance (it satisfies Carbon's full card invariant set as rendered)."""

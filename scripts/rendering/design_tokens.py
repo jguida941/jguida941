@@ -1,21 +1,17 @@
-"""Single design-token source — role-named, theme-able, shared by both projections.
+"""Web token bridge for the active design-profile roster.
 
-This is the one place the design system's *semantics* live. The README SVG cards read
-their colours from config.py; the web dashboard reads `emit_css_root()`. A theme is a
-full design LANGUAGE: it carries colour roles + material AND its own information
-architecture (type ramp + radius — and later density/motion/charts), so each theme can
-genuinely express its design language instead of being a colour swap. The DEFAULT theme's
-IA stays `== config.py` (the SVG parity + portability anchor); other themes diverge.
+The roster authority is `contracts/design_profiles/_index.json` (`active_design_profiles`).
+This module is the legacy web projection bridge: it exposes the active roster as CSS
+variables for `site/index.html`, while profile JSON remains the design-language source.
 
-    P5 doctrine: themes must be provably DISTINCT (test_design_distinctness) and each
-    provably EXPRESS its language — Apple is rounder/larger/airier, Power BI is
-    sharper/denser/data-ink. The old convergence rule (IA constant across themes) is
-    RETIRED; the floor is now "complete + bounded + legible" per theme.
-
-Adding a theme is one entry in THEMES (+ MATERIALS + THEME_IA); the theme-system + design
-contracts prove it complete, legible (WCAG AA), restrained, bounded, and distinct.
+Adding a public theme means adding an active design profile and then adding its web bridge
+projection here in the same slice. A reserved profile may not appear in these maps; the
+theme-roster authority contract fails import if this bridge drifts from the active roster.
 """
 from __future__ import annotations
+
+import json
+from pathlib import Path
 
 from scripts.core import config
 
@@ -30,9 +26,53 @@ ROLES = (
 
 DEFAULT_THEME = "liquid-glass"
 
+def _profiles_dir() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        candidate = parent / "contracts" / "design_profiles"
+        if candidate.is_dir():
+            return candidate
+    raise RuntimeError("contracts/design_profiles not found")
+
+
+def _active_design_profiles() -> tuple[str, ...]:
+    index = json.loads((_profiles_dir() / "_index.json").read_text(encoding="utf-8"))
+    return tuple(index["active_design_profiles"])
+
+
+ACTIVE_THEME_NAMES = _active_design_profiles()
+
+
+def _literal_profile_tokens(profile: str, group: str) -> dict:
+    """Read literal DTCG `$value` leaves for self-owned profile token groups.
+
+    Carbon owns its profile palette (`derived_from: null`), so the web bridge imports
+    the profile literals instead of retyping a duplicate palette in Python.
+    """
+    prof = json.loads((_profiles_dir() / f"{profile}.json").read_text(encoding="utf-8"))
+    values = {}
+    for key, leaf in prof["tokens"][group].items():
+        if key.startswith("$"):
+            continue
+        values[key] = leaf["$value"]
+    return values
+
+
+def _active_bridge_map(kind: str, rows: dict[str, dict]) -> dict[str, dict]:
+    active = set(ACTIVE_THEME_NAMES)
+    declared = set(rows)
+    missing = sorted(active - declared)
+    extra = sorted(declared - active)
+    if missing or extra:
+        raise KeyError(
+            f"{kind} must match active_design_profiles exactly; "
+            f"missing={missing}, extra={extra}"
+        )
+    return {name: rows[name] for name in ACTIVE_THEME_NAMES}
+
+
 # Each theme maps EXACTLY the role schema to a hex value. The default theme's core
 # roles equal config.py so the SVG and web default cannot drift (Law 3, token half).
-THEMES: dict[str, dict[str, str]] = {
+THEMES: dict[str, dict[str, str]] = _active_bridge_map("THEMES", {
     # Governed Liquid Glass — the shipped Tokyo-Night dark glass (== config.py).
     "liquid-glass": {
         "ink-strong": config.TEXT_BRIGHT, "ink": config.TEXT, "ink-dim": config.TEXT_DIM,
@@ -41,6 +81,8 @@ THEMES: dict[str, dict[str, str]] = {
         "accent": config.CYAN,
         "status-success": config.GREEN, "status-warning": config.YELLOW, "status-danger": config.RED,
     },
+    # IBM Carbon — profile-owned literal DTCG tokens projected into the public web bridge.
+    "carbon": _literal_profile_tokens("carbon", "color"),
     # Apple system dark — neutral near-black surfaces, one vivid system-blue accent,
     # heavier frost. SF-style restraint: colour only where it carries meaning.
     "apple-dark": {
@@ -50,62 +92,52 @@ THEMES: dict[str, dict[str, str]] = {
         "accent": "#0a84ff",
         "status-success": "#30d158", "status-warning": "#ff9f0a", "status-danger": "#ff453a",
     },
-    # Power BI dark — analytical slate, the Power BI blue accent, flatter material
-    # (data-ink forward). Same IA, different material — proving the axes are separable.
-    "power-bi": {
-        "ink-strong": "#ffffff", "ink": "#d9dde3", "ink-dim": "#9aa0ab",
-        "surface": "#20242b", "surface-raised": "#2b303a",
-        "backdrop": "#14171c", "hairline": "#ffffff",
-        "accent": "#2899f5",
-        "status-success": "#1aab8a", "status-warning": "#f2c811", "status-danger": "#e0626d",
-    },
-}
+})
 
 # Material (governed glass) per theme — the blur/opacity/sheen that make the surface
 # read as frosted glass. NOT a colour role (kept out of THEMES so the role schema stays
 # exact); this is the "Material = Liquid Glass (governed)" axis varying per skin.
-MATERIALS: dict[str, dict[str, float]] = {
+MATERIALS: dict[str, dict[str, float]] = _active_bridge_map("MATERIALS", {
     "liquid-glass": {"blur": 22, "saturate": 160, "surface_opacity": 0.55, "raised_opacity": 0.55, "sheen": 0.07},
+    "carbon":       {"blur": 0,  "saturate": 100, "surface_opacity": 1.00, "raised_opacity": 1.00, "sheen": 0.00},
     "apple-dark":   {"blur": 30, "saturate": 180, "surface_opacity": 0.60, "raised_opacity": 0.50, "sheen": 0.10},
-    "power-bi":     {"blur": 6,  "saturate": 120, "surface_opacity": 0.92, "raised_opacity": 0.85, "sheen": 0.03},
-}
+})
 
 # Human metadata for the theme switcher UI (label + one-line doctrine blurb).
-THEME_META: dict[str, dict[str, str]] = {
+THEME_META: dict[str, dict[str, str]] = _active_bridge_map("THEME_META", {
     "liquid-glass": {"label": "Liquid Glass", "blurb": "Apple frosted glass · Tokyo Night"},
+    "carbon":       {"label": "Carbon", "blurb": "IBM Carbon · flat structured UI"},
     "apple-dark":   {"label": "Apple Dark", "blurb": "System dark · one vivid accent"},
-    "power-bi":     {"label": "Power BI", "blurb": "Analytical slate · flat data-ink"},
-}
+})
 
 # Per-theme INFORMATION ARCHITECTURE — radius + type overrides (over the config defaults).
 # This is what makes each theme a different *website*, not a colour swap: Apple is
-# rounder + larger, Power BI is sharper + denser. The DEFAULT theme MUST equal config
+# rounder + larger, Carbon is square/structured/compact. The DEFAULT theme MUST equal config
 # (SVG parity). `radius` keys: panel, tile. `type` overrides a subset of the type ladder
 # {token: (size, weight)} — anything omitted inherits config.TYPE_SCALE. All sizes stay
 # >= the 11px legibility floor. (Density/motion/charts are added in later P5 slices.)
 # `density` (web only — the SVG cards don't use CSS padding; doesn't affect SVG parity)
 # carries the per-theme spacing band that makes the BOXES different, not just the paint:
 # panel_pad / tile_pad / gap (px) + a band label, grounded in each design language's docs
-# (Apple HIG Layout: airy 32/24 padding, 24 gap, few large cards; Power BI report design:
-# tight 16/8, dense KPI grid; Liquid Glass: the medium anchor).
-THEME_IA: dict[str, dict] = {
+# (Apple HIG Layout: airy 32/24 padding, 24 gap, few large cards; Carbon: compact
+# structured-list rhythm; Liquid Glass: the medium anchor).
+THEME_IA: dict[str, dict] = _active_bridge_map("THEME_IA", {
     "liquid-glass": {  # type/radius == config (the anchor); medium density
         "radius": {"panel": config.GLASS_RX, "tile": config.GLASS_TILE_RX},
         "type": {},
         "density": {"band": "medium", "panel_pad": 28, "tile_pad": 14, "gap": 20, "tile_min": 280},
+    },
+    "carbon": {  # IBM Carbon — square surfaces, compact spacing, restrained body scale
+        "radius": _literal_profile_tokens("carbon", "radius"),
+        "type": {"display": (40, 600), "metric_lg": (24, 600), "title": (18, 600), "body": (14, 400)},
+        "density": {"band": "compact", "panel_pad": 20, "tile_pad": 12, "gap": 12, "tile_min": 180},
     },
     "apple-dark": {  # Apple HIG — generous radius + large display type + AIRY space, few large cards
         "radius": {"panel": 26, "tile": 18},
         "type": {"display": (54, 600), "metric_lg": (30, 600), "title": (22, 600)},
         "density": {"band": "airy", "panel_pad": 32, "tile_pad": 24, "gap": 24, "tile_min": 380},
     },
-    "power-bi": {  # Power BI — sharp corners + compact tabular type + TIGHT data-ink density, dense KPI grid
-        "radius": {"panel": 6, "tile": 4},
-        "type": {"display": (38, 700), "metric_lg": (24, 700), "metric": (20, 700),
-                 "title": (18, 600), "body": (13, 400)},
-        "density": {"band": "tight", "panel_pad": 16, "tile_pad": 12, "gap": 8, "tile_min": 150},
-    },
-}
+})
 
 _DENSITY_DEFAULT = {"band": "medium", "panel_pad": 28, "tile_pad": 14, "gap": 20, "tile_min": 280}
 

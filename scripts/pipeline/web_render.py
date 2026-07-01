@@ -5,8 +5,8 @@ source (scripts.rendering.design_tokens) + the shared snapshot.
 Design laws made literal here:
   * IA = Power BI: one dominant hero KPI, then a bento of cards; every number has ONE
     home (no metric repeated across cards); tabular figures everywhere.
-  * Material = governed Liquid Glass: real backdrop-filter frost driven by the per-theme
-    material vars — never ad-hoc blur. A theme switcher swaps colour + material only.
+  * Public theme roster = active design profiles. The switcher exposes only governed
+    active profiles; reserved profiles stay out of the canonical site surface.
   * Projection parity: the page hydrates client-side from data/profile_snapshot.json
     (same source as the README SVGs), so the bot's hourly refresh flows in with no
     regeneration. The committed index.html is GENERATED — a drift guard forbids hand
@@ -126,18 +126,6 @@ body {
 .langlegend .swatch { width: 9px; height: 9px; border-radius: 3px; flex: 0 0 auto; }
 .langlegend .nm { color: var(--ink); }
 .langlegend .pc { margin-left: auto; color: var(--ink-strong); font-weight: 600; }
-/* Per-theme chart ANATOMY (P5): Power BI renders the languages as a DATA TABLE/matrix
-   (bordered, gridlined, data-ink); every other theme keeps the stacked bar + legend.
-   CSS-gated on data-theme so the switcher reflows it with no JS re-render. */
-.lang-table { width: 100%; border-collapse: collapse; display: none; font-size: var(--type-caption); }
-.lang-table th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid color-mix(in srgb, var(--hairline) 22%, transparent); }
-.lang-table td { padding: 6px 8px; border-bottom: 1px solid color-mix(in srgb, var(--hairline) 10%, transparent); color: var(--ink); }
-.lang-table td .num { color: var(--ink-strong); font-weight: 600; }
-.lang-table .tdot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 7px; vertical-align: middle; }
-.lang-table .tbar { display: block; height: 7px; border-radius: 0; }
-[data-theme="power-bi"] .lang-bars { display: none; }
-[data-theme="power-bi"] .lang-table { display: table; }
-
 /* --- list rows (repos / focus) --- */
 .rows { display: flex; flex-direction: column; gap: 8px; }
 .rrow { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--radius-tile);
@@ -218,7 +206,6 @@ footer a { color: var(--ink); text-decoration: none; }
   .switcher button { flex: 1; min-height: 44px; }
   .rrow { min-height: 44px; }
   .heat { min-width: 460px; }
-  .lang-table th, .lang-table td { padding: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 @media (prefers-reduced-transparency: reduce) {
@@ -305,7 +292,6 @@ def _languages() -> str:
       <div class="langbar" id="langbar"></div>
       <div class="langlegend" id="langlegend"></div>
     </div>
-    <table class="lang-table" id="langtable"><thead><tr><th>Language</th><th>Share</th><th></th></tr></thead><tbody></tbody></table>
   </section>"""
 
 
@@ -425,11 +411,6 @@ def _script() -> str:
     document.getElementById("langlegend").innerHTML = top.map(l =>
       `<div class="row"><span class="swatch" style="background:${colorFor(l.name)}"></span>`+
       `<span class="nm">${esc(l.name)}</span><span class="pc num">${(l.percent||0).toFixed(1)}%</span></div>`).join("");
-    // Power BI data-table anatomy (CSS shows it only under [data-theme="power-bi"])
-    document.querySelector("#langtable tbody").innerHTML = top.map(l =>
-      `<tr><td><span class="tdot" style="background:${colorFor(l.name)}"></span>${esc(l.name)}</td>`+
-      `<td class="num">${(l.percent||0).toFixed(1)}%</td>`+
-      `<td><span class="tbar" style="width:${(l.percent||0).toFixed(2)}%;background:${colorFor(l.name)}"></span></td></tr>`).join("");
     // flagship repos
     const repos = (d.featured_repo_facts || []).slice(0, 5);
     document.getElementById("flagship").innerHTML = repos.map(r => {

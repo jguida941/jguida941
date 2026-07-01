@@ -25,6 +25,23 @@ def _is_light(hex_color: str) -> bool:
     return (0.299 * r + 0.587 * g + 0.114 * b) > 150
 
 
+def _liquid_glass_material(dt, profile: str) -> dict | None:
+    """Return the profile's glass material only if it actually renders as glass.
+
+    `design_tokens.MATERIALS` is now a public web bridge for every active profile, including
+    flat systems like Carbon. A row in that bridge is not a glass capability: blur(0) +
+    opaque surfaces must not make a liquid-glass component transplant admissible.
+    """
+    if profile not in dt.MATERIALS:
+        return None
+    material = dt.material(profile)
+    if float(material.get("blur", 0)) <= 0:
+        return None
+    if float(material.get("surface_opacity", 1)) >= 1 and float(material.get("raised_opacity", 1)) >= 1:
+        return None
+    return material
+
+
 def render_button(profile: str, variant: str, state: str, profile_data: dict | None = None) -> tuple[str, str]:
     from scripts.rendering import design_tokens as dt
     from scripts.rendering.design import loader
@@ -66,8 +83,7 @@ def render_button(profile: str, variant: str, state: str, profile_data: dict | N
         f"transition: all {btn['transition_ms']}ms {btn['easing']};",
     ]
     # frosted-glass material on the button — blur/saturate single-sourced from design_tokens
-    if btn.get("material") == "liquid-glass" and profile in dt.MATERIALS:
-        m = dt.material(profile)
+    if btn.get("material") == "liquid-glass" and (m := _liquid_glass_material(dt, profile)):
         glass = f"blur({m['blur']:g}px) saturate({m['saturate']:g}%)"
         base.append(f"-webkit-backdrop-filter: {glass}; backdrop-filter: {glass};")
     if btn.get("elevation_shadow"):  # null/None for flat languages -> no box-shadow at all
@@ -144,8 +160,7 @@ def render_chip(profile: str, variant: str, state: str, profile_data: dict | Non
         f"font: {chip.get('font_weight', 500)} {chip['font_size_px']}px/1.33 {font};",
         f"transition: all {chip['transition_ms']}ms {chip['easing']};",
     ]
-    if chip.get("material") == "liquid-glass" and profile in dt.MATERIALS:
-        m = dt.material(profile)
+    if chip.get("material") == "liquid-glass" and (m := _liquid_glass_material(dt, profile)):
         glass = f"blur({m['blur']:g}px) saturate({m['saturate']:g}%)"
         base.append(f"-webkit-backdrop-filter: {glass}; backdrop-filter: {glass};")
     if chip.get("elevation_shadow"):  # null for flat languages -> no box-shadow at all
@@ -210,8 +225,7 @@ def render_card(profile: str, variant: str, state: str, profile_data: dict | Non
         f"border-radius: {card['radius_px']}px;",
         f"border: 1px solid {hairline}; overflow: hidden;",
     ]
-    if card.get("material") == "liquid-glass" and profile in dt.MATERIALS:
-        m = dt.material(profile)
+    if card.get("material") == "liquid-glass" and (m := _liquid_glass_material(dt, profile)):
         glass = f"blur({m['blur']:g}px) saturate({m['saturate']:g}%)"
         container.append(f"-webkit-backdrop-filter: {glass}; backdrop-filter: {glass};")
     if card.get("elevation_shadow"):  # null for the flat grouped-list/Tile languages -> no shadow

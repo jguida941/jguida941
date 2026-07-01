@@ -79,8 +79,10 @@ to a `doc_cite`. Adding theme 4 adds zero predicates; adding a component adds on
   rows=components, cols=themes, sub-cells=states; each cell renders the REAL webkit component AND a
   verdict badge read from the receipt (`pass` / `candidate`+thumbnail / `fail` — a cell may ship
   visibly failing, the honest state); hover shows invariant_id/law/doc_cite/refute_by. Per-theme
-  archetype pages `site/showcase/<lang>.html` (each a different *kind* of website). Closed-cover
-  guard `test_showcase_coverage.py`: declared cells == rendered cells (both directions); drift-guarded.
+  pages, if added later, are INTERNAL receipt/proof fixtures only — never the public theme
+  architecture. The canonical public product surface remains `site/index.html` with one
+  active-profile theme selector. Closed-cover guard `test_showcase_coverage.py`: declared cells ==
+  rendered cells (both directions); drift-guarded.
 - **Settings (`render_settings() -> site/settings.html`):** the governed control plane — the design
   twin of the bootstrap-RED gate. Compose base theme + per-aspect overrides (the control space IS the
   roster/profile allowlists), live-preview re-renders, the SAME `conform(composed_profile)` runs, and
@@ -142,9 +144,10 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
    Constants doc-grounded against PRIMARY URLs first (`docs/design/<lang>.md`); `[derived]` marked.
    fingerprint over {radius, state_mechanic, focus_recipe, anatomy, **material**, **elevation**}.
    **Codex audit guards (must land in the named slice):**
-   - **1a-ii-B (apple-dark):** apple-dark IS in `design_tokens.THEMES` (carbon is NOT) → do NOT hand-type
-     a duplicate palette; generalize the loader to alias `THEMES['apple-dark']`
-     (`derived_from: "theme:apple-dark"`) OR add an apple-dark derived-parity test (codex H1). Give it a
+   - **1a-ii-B (apple-dark):** apple-dark aliases `design_tokens.THEMES['apple-dark']`; Carbon owns
+     literal profile tokens and the public web bridge projects them now that Carbon is active. Do NOT
+     hand-type a duplicate apple-dark palette; the loader aliases `THEMES['apple-dark']`
+     (`derived_from: "theme:apple-dark"`) with a derived-parity test (codex H1). Give it a
      DISTINCT `material` so its button fingerprint clears the ≥3 quorum with MARGIN vs liquid-glass, not
      exactly 3 (codex H2). No new render branch needed (rounded-system-ring + opacity-dim already exist).
    - **1b (conform):** flip roster `component-button` deferred→emitted ONLY in the same commit that lands
@@ -156,8 +159,8 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
      certify" label — do NOT couple to the nonexistent Playwright/PNG probe (codex H4).
 4. **P5-SHOWCASE** ✅ — `test_showcase_coverage` RED-first; `render_showcase` reads the receipts +
    badges each cell (per-section multiset closed cover + drift guard + honest "cannot certify");
-   the stage renders each language's real button + chip. (Remaining under this head: per-language
-   ARCHETYPE pages `site/showcase/<lang>.html`.)
+   the stage renders each language's real button + chip. (Per-language pages are demoted to internal
+   receipt fixtures only; public theme options stay on `site/index.html`.)
 5. **P5-COMPONENTS-GROW** — one component per slice via the skill (chip, card, kpi, input, nav, table,
    chart, hero, type-specimen): data rows + only-new predicates + cells. **chip ✅** (instance #2:
    render_chip anatomy branch [Carbon dismissible Tag vs Apple centered pill], chip_facts adapter,
@@ -188,8 +191,15 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
    Mutation-proven; the render_* seams gained a `profile_data` injection for in-memory composed profiles.
    (DEFERRED to a follow-up: the interactive URL/localStorage UI + persistence; the visual "looks
    right" verdict stays candidate → the receipt gate.)
-7. **P5-THEMES-4-10** — via the skill: Material 3, Fluent 2, Polaris, Atlassian, Linear, Geist, Stripe
-   — each a profile JSON + cited doctrine doc + usually zero new predicates + an archetype page.
+7. **P5-THEME-ROSTER-AUTHORITY** ✅ — `_index.json.active_design_profiles` is the ONE public roster
+   authority. `design_tokens.py` is now the web projection bridge keyed exactly to active profiles, and
+   `site/index.html` exposes exactly that set (`liquid-glass`, `carbon`, `apple-dark`) from one canonical
+   theme selector. Reserved profiles (including `power-bi`) cannot leak into the public switcher; the RED
+   contract binds `THEMES` / `THEME_META` / `MATERIALS` / `THEME_IA` + generated HTML to the active roster.
+   Carbon is now a public option, but its palette/radius remain profile-owned and projected into the bridge.
+8. **P5-THEMES-4-10** — via the skill: Material 3, Fluent 2, Polaris, Atlassian, Linear, Geist, Stripe
+   — each a profile JSON + cited doctrine doc + usually zero new predicates + optional internal receipt
+   fixture, NOT a separate public product page.
    **Pre-theme hardening now folded:** button focus uses the same mutually-exclusive signal counting
    as chip focus (ambiguous rings → None), and the anti-convergence gate is bound to RENDERED
    button/chip/card fingerprints, with declared `components.*.fingerprint` checked only for
@@ -198,7 +208,7 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
    profile data, but distinctness is decided by observed rendered facts, not JSON self-reporting. NEXT
    gap before broad theme generation: P5-RECEIPT-GATE for visual/runtime claims that static parsing
    must not fake-green.
-8. **P5-RECEIPT-GATE** — make the true-viewport visual/runtime receipt a REQUIRED prove-lane step
+9. **P5-RECEIPT-GATE** — make the true-viewport visual/runtime receipt a REQUIRED prove-lane step
    (the apple-heat 500px-clamp lesson); one `prove` lane = runner + pytest + regen + coverage + drift.
 
 ## 8. Deferred until instance #1 + one archetype actually ship (codex must-fix #7)

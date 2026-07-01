@@ -1,10 +1,7 @@
-"""Red-first THEME SYSTEM contract — authority: governed Liquid Glass material +
-Power BI information-architecture separation.
+"""Red-first THEME SYSTEM contract — authority: active design-profile theme bridge.
 
-The doctrine made executable: a THEME swaps COLOUR + MATERIAL only; the information
-architecture (type scale, spacing, radius geometry) is theme-INDEPENDENT. So the same
-layout can wear Liquid Glass, Apple, or Power BI skins and stay legible — proving the
-three laws are separable, which is the whole point of the theme switcher.
+The doctrine made executable: the public web theme bridge exposes exactly the active
+design profiles, and each bridge entry carries colour roles + material + IA tokens.
 
 Every theme must therefore be:
   1. COMPLETE   — defines every role token (a missing role = a broken swap).
@@ -147,7 +144,8 @@ class ThemeSystemContract(unittest.TestCase):
         """P5 (convergence RETIRED): IA is now PER-THEME — a theme is a full design
         language, not a colour swap — but BOUNDED. The DEFAULT theme's IA equals config
         (the SVG parity + portability anchor); every theme defines the complete type
-        ladder, every size stays >= the 11px floor, and radii stay within a sane range.
+        ladder, every size stays >= the 11px floor, and radii stay within a sane range
+        that includes square-zero systems like Carbon.
         That themes actually DIFFER is proven separately (test_design_distinctness)."""
         # DEFAULT == config (the anchor)
         self.assertEqual(self.dt.type_scale(self.dt.DEFAULT_THEME), dict(config.TYPE_SCALE))
@@ -161,7 +159,7 @@ class ThemeSystemContract(unittest.TestCase):
                 self.assertGreaterEqual(size, 11, f"{name}.{tok}={size} below the 11px floor")
             r = self.dt.radius(name)
             for k in ("panel", "tile"):
-                self.assertTrue(2 <= r[k] <= 40, f"{name}.radius.{k}={r[k]} out of bounds")
+                self.assertTrue(0 <= r[k] <= 40, f"{name}.radius.{k}={r[k]} out of bounds")
 
     def test_emit_css_root_carries_every_role_and_theme(self):
         css = self.dt.emit_css_root()

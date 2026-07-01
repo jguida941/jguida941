@@ -50,6 +50,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_skill_structure.py",
             "test_structural_layout.py",
             "test_tests_layout_contract.py",
+            "test_theme_roster_authority.py",
             "test_theme_system.py",
             "test_tile_composition.py",
             "test_typography_restraint.py",
@@ -146,6 +147,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
         "test_readme_projection.py",    # assembled README: uniform <img> sizing policy
     ),
     "tokens": (
+        "test_theme_roster_authority.py", # public web theme roster == active design-profile roster
         "test_theme_system.py",         # single token source: themes complete/legible/restrained
     ),
     "design_languages": (

@@ -53,6 +53,53 @@
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
 
+[data-theme="carbon"] {
+  --ink-strong: #161616;
+  --ink: #525252;
+  --ink-dim: #6f6f6f;
+  --surface: #ffffff;
+  --surface-raised: #f4f4f4;
+  --backdrop: #ffffff;
+  --hairline: #e0e0e0;
+  --accent: #0f62fe;
+  --status-success: #198038;
+  --status-warning: #f1c21b;
+  --status-danger: #da1e28;
+  --glass-blur: 0px;
+  --glass-saturate: 100%;
+  --surface-opacity: 1;
+  --raised-opacity: 1;
+  --sheen-opacity: 0;
+  --radius-panel: 0px;
+  --radius-tile: 0px;
+  --pad-panel: 20px;
+  --pad-tile: 12px;
+  --gap-grid: 12px;
+  --type-display: 40px;
+  --type-display-weight: 600;
+  --type-metric_lg: 24px;
+  --type-metric_lg-weight: 600;
+  --type-metric: 22px;
+  --type-metric-weight: 600;
+  --type-title: 18px;
+  --type-title-weight: 600;
+  --type-body: 14px;
+  --type-body-weight: 400;
+  --type-caption: 12px;
+  --type-caption-weight: 400;
+  --type-eyebrow: 11px;
+  --type-eyebrow-weight: 600;
+  --type-chip: 11px;
+  --type-chip-weight: 500;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+}
+
 [data-theme="apple-dark"] {
   --ink-strong: #f5f5f7;
   --ink: #c7c7cc;
@@ -84,53 +131,6 @@
   --type-title: 22px;
   --type-title-weight: 600;
   --type-body: 14px;
-  --type-body-weight: 400;
-  --type-caption: 12px;
-  --type-caption-weight: 400;
-  --type-eyebrow: 11px;
-  --type-eyebrow-weight: 600;
-  --type-chip: 11px;
-  --type-chip-weight: 500;
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 24px;
-  --space-xxl: 32px;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-}
-
-[data-theme="power-bi"] {
-  --ink-strong: #ffffff;
-  --ink: #d9dde3;
-  --ink-dim: #9aa0ab;
-  --surface: #20242b;
-  --surface-raised: #2b303a;
-  --backdrop: #14171c;
-  --hairline: #ffffff;
-  --accent: #2899f5;
-  --status-success: #1aab8a;
-  --status-warning: #f2c811;
-  --status-danger: #e0626d;
-  --glass-blur: 6px;
-  --glass-saturate: 120%;
-  --surface-opacity: 0.92;
-  --raised-opacity: 0.85;
-  --sheen-opacity: 0.03;
-  --radius-panel: 6px;
-  --radius-tile: 4px;
-  --pad-panel: 16px;
-  --pad-tile: 12px;
-  --gap-grid: 8px;
-  --type-display: 38px;
-  --type-display-weight: 700;
-  --type-metric_lg: 24px;
-  --type-metric_lg-weight: 700;
-  --type-metric: 20px;
-  --type-metric-weight: 700;
-  --type-title: 18px;
-  --type-title-weight: 600;
-  --type-body: 13px;
   --type-body-weight: 400;
   --type-caption: 12px;
   --type-caption-weight: 400;
@@ -246,18 +246,6 @@ body {
 .langlegend .swatch { width: 9px; height: 9px; border-radius: 3px; flex: 0 0 auto; }
 .langlegend .nm { color: var(--ink); }
 .langlegend .pc { margin-left: auto; color: var(--ink-strong); font-weight: 600; }
-/* Per-theme chart ANATOMY (P5): Power BI renders the languages as a DATA TABLE/matrix
-   (bordered, gridlined, data-ink); every other theme keeps the stacked bar + legend.
-   CSS-gated on data-theme so the switcher reflows it with no JS re-render. */
-.lang-table { width: 100%; border-collapse: collapse; display: none; font-size: var(--type-caption); }
-.lang-table th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid color-mix(in srgb, var(--hairline) 22%, transparent); }
-.lang-table td { padding: 6px 8px; border-bottom: 1px solid color-mix(in srgb, var(--hairline) 10%, transparent); color: var(--ink); }
-.lang-table td .num { color: var(--ink-strong); font-weight: 600; }
-.lang-table .tdot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 7px; vertical-align: middle; }
-.lang-table .tbar { display: block; height: 7px; border-radius: 0; }
-[data-theme="power-bi"] .lang-bars { display: none; }
-[data-theme="power-bi"] .lang-table { display: table; }
-
 /* --- list rows (repos / focus) --- */
 .rows { display: flex; flex-direction: column; gap: 8px; }
 .rrow { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--radius-tile);
@@ -338,7 +326,6 @@ footer a { color: var(--ink); text-decoration: none; }
   .switcher button { flex: 1; min-height: 44px; }
   .rrow { min-height: 44px; }
   .heat { min-width: 460px; }
-  .lang-table th, .lang-table td { padding: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 @media (prefers-reduced-transparency: reduce) {
@@ -358,7 +345,7 @@ footer a { color: var(--ink); text-decoration: none; }
         <h1 id="hero-name">@jguida941</h1>
         <p class="tag" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p>
       </div>
-      <div class="switcher" role="group" aria-label="Theme"><button type="button" data-theme-set="liquid-glass" aria-pressed="true" title="Apple frosted glass · Tokyo Night">Liquid Glass</button><button type="button" data-theme-set="apple-dark" aria-pressed="false" title="System dark · one vivid accent">Apple Dark</button><button type="button" data-theme-set="power-bi" aria-pressed="false" title="Analytical slate · flat data-ink">Power BI</button></div>
+      <div class="switcher" role="group" aria-label="Theme"><button type="button" data-theme-set="liquid-glass" aria-pressed="true" title="Apple frosted glass · Tokyo Night">Liquid Glass</button><button type="button" data-theme-set="carbon" aria-pressed="false" title="IBM Carbon · flat structured UI">Carbon</button><button type="button" data-theme-set="apple-dark" aria-pressed="false" title="System dark · one vivid accent">Apple Dark</button></div>
     </div>
     <div class="kpi">
       <div>
@@ -402,7 +389,6 @@ footer a { color: var(--ink); text-decoration: none; }
       <div class="langbar" id="langbar"></div>
       <div class="langlegend" id="langlegend"></div>
     </div>
-    <table class="lang-table" id="langtable"><thead><tr><th>Language</th><th>Share</th><th></th></tr></thead><tbody></tbody></table>
   </section>
   <section class="panel" id="rhythm-panel" hidden>
     <div class="section-head"><div><p class="eyebrow">Activity Rhythm</p><h2 class="title">When I Code</h2></div><span class="section-meta" id="rhythm-meta">—</span></div>
@@ -460,7 +446,7 @@ footer a { color: var(--ink); text-decoration: none; }
   }
   document.querySelectorAll("[data-theme-set]").forEach(b =>
     b.addEventListener("click", () => setTheme(b.dataset.themeSet)));
-  const THEMES = ["liquid-glass", "apple-dark", "power-bi"];
+  const THEMES = ["liquid-glass", "carbon", "apple-dark"];
   const urlTheme = new URLSearchParams(location.search).get("theme");
   try {
     const t = urlTheme || localStorage.getItem("dash-theme");
@@ -498,11 +484,6 @@ footer a { color: var(--ink); text-decoration: none; }
     document.getElementById("langlegend").innerHTML = top.map(l =>
       `<div class="row"><span class="swatch" style="background:${colorFor(l.name)}"></span>`+
       `<span class="nm">${esc(l.name)}</span><span class="pc num">${(l.percent||0).toFixed(1)}%</span></div>`).join("");
-    // Power BI data-table anatomy (CSS shows it only under [data-theme="power-bi"])
-    document.querySelector("#langtable tbody").innerHTML = top.map(l =>
-      `<tr><td><span class="tdot" style="background:${colorFor(l.name)}"></span>${esc(l.name)}</td>`+
-      `<td class="num">${(l.percent||0).toFixed(1)}%</td>`+
-      `<td><span class="tbar" style="width:${(l.percent||0).toFixed(2)}%;background:${colorFor(l.name)}"></span></td></tr>`).join("");
     // flagship repos
     const repos = (d.featured_repo_facts || []).slice(0, 5);
     document.getElementById("flagship").innerHTML = repos.map(r => {

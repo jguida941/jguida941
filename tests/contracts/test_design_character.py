@@ -1,17 +1,17 @@
-"""P5-1 — the CHARACTER law: each theme must POSITIVELY express its design language.
+"""P5-1 — the CHARACTER law: each public theme must express its active design profile.
 
 test_design_distinctness proves themes DIFFER; CHARACTER proves each is unmistakably ITS
 language — the answer to "where are the invariants for their respective proper styles."
 Measured on the per-theme IA (design_tokens density/radius/type), grounded in the design-
-language research (the workflow that read Apple HIG Layout + Power BI report-design docs):
+language research:
 
   * Apple HIG: AIRY — generous card padding + gaps, large soft corners, large display type.
-  * Power BI: TIGHT — compact data-ink density, small padding/gaps, sharp bordered tiles.
+  * Carbon: COMPACT/STRUCTURED — square surfaces, compact spacing, IBM Plex/body scale.
   * Liquid Glass: the MEDIUM anchor between them.
 
 These are the structural (box) invariants. The richer rendered-DOM signals (≤1 table for
-Apple, multi-series bars + a data table for Power BI, the categorical palette, the 8px snap
-grid) + the per-component anatomy land in P5-2/P5-3 as the chart/component library grows.
+Apple, data-table/matrix anatomy for a future active Power BI profile, categorical palettes)
+and the per-component anatomy land in P5-2/P5-3 as the chart/component library grows.
 Mutation-proven: collapsing a theme's density to another's reddens the ordering law.
 """
 from __future__ import annotations
@@ -32,19 +32,21 @@ class DesignCharacterContract(unittest.TestCase):
         self.assertGreaterEqual(dt.radius("apple-dark")["panel"], 18, "Apple: large soft corners")
         self.assertGreaterEqual(dt.type_scale("apple-dark")["display"][0], 48, "Apple: large-title hero")
 
-    def test_power_bi_is_tight_and_sharp(self):
-        """Power BI report design: dense data-ink grid, sharp bordered tiles, tabular type."""
-        d = dt.density("power-bi")
-        self.assertEqual("tight", d["band"])
-        self.assertLessEqual(d["panel_pad"], 18, "Power BI: dense data-ink panels")
-        self.assertLessEqual(d["gap"], 10, "Power BI: tight snap grid")
-        self.assertLessEqual(dt.radius("power-bi")["panel"], 6, "Power BI: sharp, near-square tiles")
+    def test_carbon_is_compact_and_square(self):
+        """IBM Carbon: square Tile surfaces, compact structured-list rhythm, restrained type."""
+        d = dt.density("carbon")
+        self.assertEqual("compact", d["band"])
+        self.assertLessEqual(d["panel_pad"], 20, "Carbon: compact structured surfaces")
+        self.assertLessEqual(d["gap"], 12, "Carbon: tighter grid rhythm than the glass anchor")
+        self.assertEqual(dt.radius("carbon")["panel"], 0, "Carbon: square panels")
+        self.assertEqual(dt.radius("carbon")["tile"], 0, "Carbon: square tiles")
+        self.assertLessEqual(dt.type_scale("carbon")["display"][0], 42, "Carbon: restrained display type")
 
     def test_density_bands_are_ordered_and_distinct(self):
-        """Airy > Medium > Tight, all distinct (mutation-proof: collapse one and this reds)."""
+        """Airy > Medium > Compact, all distinct (mutation-proof: collapse one and this reds)."""
         pads = {n: dt.density(n)["panel_pad"] for n in dt.THEMES}
         self.assertGreater(pads["apple-dark"], pads["liquid-glass"], "Apple must be airier than the anchor")
-        self.assertGreater(pads["liquid-glass"], pads["power-bi"], "Power BI must be tighter than the anchor")
+        self.assertGreater(pads["liquid-glass"], pads["carbon"], "Carbon must be more compact than the anchor")
         self.assertEqual(len(set(pads.values())), len(pads), "each theme's density must be distinct")
 
     # RETIRED test_kpi_grid_density_is_inverted_from_padding (codex must-fix): it guarded the
@@ -56,18 +58,14 @@ class DesignCharacterContract(unittest.TestCase):
     # the scorecard CSS. When the showcase grids land, a real rendered-grid density invariant
     # replaces this — tested against that surface, not as latent data.
 
-    def test_power_bi_is_table_forward_apple_is_not(self):
-        """Per the research: Power BI favors a data table/matrix (tabular encoding); Apple is
-        stat/bar-forward and AVOIDS dense tables. So the languages section becomes a DATA TABLE
-        only under [data-theme="power-bi"]; every other theme keeps the bar (table hidden)."""
+    def test_reserved_power_bi_chart_anatomy_is_not_on_the_public_surface(self):
+        """Power BI remains a reserved profile. Until it has an active design profile, its
+        table-forward chart anatomy cannot leak into the canonical public dashboard."""
         from scripts.pipeline.web_render import render_dashboard
         html = render_dashboard()
-        self.assertIn('class="lang-table"', html, "Power BI needs a languages data-table option")
-        self.assertIn('[data-theme="power-bi"] .lang-table', html, "the table is shown under Power BI")
-        self.assertRegex(html, r"\.lang-table\s*\{[^}]*display:\s*none",
-                         "the table is hidden by default — Apple/Liquid Glass stay bar/stat-forward")
-        self.assertIn('[data-theme="power-bi"] .lang-bars { display: none', html,
-                      "Power BI replaces the bar with the table (the matrix look)")
+        self.assertNotIn('[data-theme="power-bi"]', html)
+        self.assertNotIn('data-theme-set="power-bi"', html)
+        self.assertNotIn('class="lang-table"', html)
 
     # RETIRED test_apple_drops_the_dense_heatmap_grid: that invariant told Apple to HIDE the
     # activity heatmap ("summary-forward, avoids dense grids"), but deleting the rhythm
