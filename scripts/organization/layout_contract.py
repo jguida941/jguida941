@@ -76,6 +76,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/rendering/components.py", "scripts/rendering/components.py", "rendering", "reusable token-driven SVG components"),
     ModuleHome("scripts/rendering/design/loader.py", "scripts/rendering/design/loader.py", "rendering", "DTCG-subset design-profile loader (the thin VIEW; single-source from config)"),
     ModuleHome("scripts/rendering/webkit/components.py", "scripts/rendering/webkit/components.py", "rendering", "profile-driven web component library (render_button + anatomy hook)"),
+    ModuleHome("scripts/rendering/webkit/archetype.py", "scripts/rendering/webkit/archetype.py", "rendering", "render_archetype: a full mini-website (nav+hero+card+buttons+chips) in one design language"),
     ModuleHome("scripts/rendering/webkit/design_render_adapter.py", "scripts/rendering/webkit/design_render_adapter.py", "rendering", "verdict-free fact-gatherer over rendered button HTML/CSS (the portability seam)"),
     ModuleHome("scripts/rendering/showcase/showcase.py", "scripts/rendering/showcase/showcase.py", "rendering", "render_showcase: the conformance receipts rendered to site/showcase.html (design-language surface)"),
     ModuleHome("scripts/rendering/settings/settings.py", "scripts/rendering/settings/settings.py", "rendering", "render_settings: the governed control-plane view -> site/settings.html (displays the Python decision)"),

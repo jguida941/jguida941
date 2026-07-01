@@ -49,6 +49,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_showcase_coverage.py",
             "test_skill_structure.py",
             "test_structural_layout.py",
+            "test_studio.py",
             "test_tests_layout_contract.py",
             "test_theme_roster_authority.py",
             "test_theme_system.py",
@@ -180,6 +181,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "receipts": (
         "test_visual_receipt_provenance.py",  # P5-RECEIPT-PROVENANCE: a receipt kind must name its real producer (no proxy wearing a pixel-truth label)
+    ),
+    "studio": (
+        "test_studio.py",               # P5-STUDIO: the interactive design-system studio — archetype + governed swap (one Python decider) + drift-guarded page
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y
