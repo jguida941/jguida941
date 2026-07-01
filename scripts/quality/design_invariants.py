@@ -45,11 +45,31 @@ def _card_facts(profile: str, variant: str, profile_data: dict | None = None) ->
     return adapter.card_facts(html, css)
 
 
+def _pageshell_facts(profile: str, variant: str | None = None, profile_data: dict | None = None) -> dict:
+    """Gather facts for the page CHROME (P5-CHROME). Unlike a component, the page-shell has no per-
+    variant block in profile["components"] — the whole shell IS the specimen — so `variant` is ignored
+    and the canonical shell is rendered."""
+    from scripts.rendering.pageshell.pageshell import render_page_shell
+    from scripts.rendering.webkit import design_render_adapter as adapter
+    html, css = render_page_shell(
+        profile,
+        title="Design-language surface",
+        intro="Every part of this page follows the design-language process.",
+        breadcrumbs=[("home", "index.html")],
+        sections=[],
+        profile_data=profile_data,
+    )
+    return adapter.pageshell_facts(html, css)
+
+
 # aspect -> (component key in profile["components"], the fact-gatherer). Adding a component = one row.
+# `page-shell` is an ASPECT with a fact-gatherer but NOT a component (no components[] block, not in the
+# distinctness signature) — the whole page is the rendered instance.
 _COMPONENT_FACTS = {
     "component-button": ("button", _button_facts),
     "component-chip": ("chip", _chip_facts),
     "component-card": ("card", _card_facts),
+    "page-shell": ("page-shell", _pageshell_facts),
 }
 
 
@@ -229,7 +249,8 @@ def conform(profile: str) -> list[dict]:
         component = _COMPONENT_FACTS.get(inv.get("aspect"))
         if component is not None:
             key, gather = component
-            variant = params.pop("variant", prof["components"][key]["variants"][0])
+            comp = prof["components"].get(key)   # page-shell has no components[] block -> variant None
+            variant = params.pop("variant", comp["variants"][0] if comp else None)
             cache_key = (key, variant)
             if cache_key not in facts_cache:       # gather ONCE per (component, variant), not eagerly
                 facts_cache[cache_key] = gather(profile, variant)

@@ -4,6 +4,86 @@
   "profile_version": 1,
   "results": [
     {
+      "aspect": "page-shell",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'page-shell' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/pageshell.md",
+      "evidence": {
+        "body_offtoken_count": 0,
+        "has_breadcrumb_link": true,
+        "has_title": true,
+        "root_rule_count": 1,
+        "shell_closed": true,
+        "uses_backdrop_var": true
+      },
+      "invariant_id": "lg-page-backdrop",
+      "law": "the page chrome paints the language backdrop token",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "page-shell",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'page-shell' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/pageshell.md",
+      "evidence": {
+        "body_offtoken_count": 0,
+        "has_breadcrumb_link": true,
+        "has_title": true,
+        "root_rule_count": 1,
+        "shell_closed": true,
+        "uses_backdrop_var": true
+      },
+      "invariant_id": "lg-page-closed",
+      "law": "chrome CSS is a closed simple structure (one root rule, no @-rules/attribute/pseudo)",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "page-shell",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'page-shell' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/pageshell.md",
+      "evidence": {
+        "body_offtoken_count": 0,
+        "has_breadcrumb_link": true,
+        "has_title": true,
+        "root_rule_count": 1,
+        "shell_closed": true,
+        "uses_backdrop_var": true
+      },
+      "invariant_id": "lg-page-tokenonly",
+      "law": "host-chrome CSS references tokens only (no raw hex/px)",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "page-shell",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'page-shell' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/pageshell.md",
+      "evidence": {
+        "body_offtoken_count": 0,
+        "has_breadcrumb_link": true,
+        "has_title": true,
+        "root_rule_count": 1,
+        "shell_closed": true,
+        "uses_backdrop_var": true
+      },
+      "invariant_id": "lg-page-orient",
+      "law": "the page carries a title + breadcrumb orientation",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
       "aspect": "component-button",
       "authority_status": "candidate_only",
       "cannot_mark_done": true,

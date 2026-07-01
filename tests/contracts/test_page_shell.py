@@ -1,0 +1,198 @@
+"""P5-CHROME WS-A (authority: page_chrome) — the switchable governed page-shell.
+
+The site that shows off design languages must ITSELF be a rendered instance of a governed design
+language — not hand-written dark CSS. `render_page_shell(profile, ...)` builds the page CHROME (bg,
+header, breadcrumb, section panels) token-only from `loader.resolve_tokens(profile)` + a documented
+shell IA scale (`SHELL_SCALE`), so the frame around every specimen is itself governed and switchable.
+
+The honest gate is **provenance + mutation, not merely "no hex"** (codex): every host-chrome value is
+a `var(--role)`; the `:root` token vars equal `resolve_tokens(profile)` EXACTLY (no arbitrary hex
+smuggled behind a token name) and the IA-scale vars equal `SHELL_SCALE`; and a moved token moves the
+rendered chrome (so a hardcoded copy of a token value fails). Deterministic claims are `emitted`
+(conform's `page-shell` aspect: backdrop-is-token / host-chrome-token-only / has-orientation); visual
+hierarchy / no-camouflage / responsive stay `candidate` with a visual receipt. candidate_only.
+"""
+from __future__ import annotations
+
+import copy
+import re
+import unittest
+
+
+def _active():
+    from scripts.rendering.design import loader
+    return loader.load("_index")["active_design_profiles"]
+
+
+def _strip_root_blocks(css: str) -> str:
+    """Host chrome AFTER the declared `:root { … }` token blocks are removed — what remains must carry
+    no design literal (every colour/space/size is a var())."""
+    return re.sub(r":root\s*\{[^}]*\}", "", css)
+
+
+def _shell(name: str, **kw):
+    from scripts.rendering.pageshell.pageshell import render_page_shell
+    args = dict(title="Governed surface", intro="Every part follows the process.",
+                breadcrumbs=[("home", "index.html")], sections=[])
+    args.update(kw)
+    return render_page_shell(name, **args)
+
+
+class PageShellTokenOnlyContract(unittest.TestCase):
+    def test_render_page_shell_host_chrome_is_token_only(self):
+        """After stripping the declared `:root` token blocks + the legit `var(--…)` refs, the host-chrome
+        CSS has NO colour literal of ANY form (hex / rgb() / hsl() / named / currentColor) and no bare
+        design px (only a 1px hairline width) — every decision is a var()."""
+        for name in _active():
+            _, css = _shell(name)
+            scan = re.sub(r"var\(--[\w-]+\)", "", _strip_root_blocks(css))
+            self.assertNotRegex(scan, r"#[0-9a-fA-F]{3,8}\b", f"{name}: no raw hex in host chrome")
+            self.assertNotRegex(scan, r"\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\s*\(",
+                                f"{name}: no colour-function literal in host chrome")
+            self.assertNotRegex(scan, r"\bcurrentColor\b", f"{name}: no currentColor in host chrome")
+            self.assertNotRegex(scan, r"\b(?:black|white|red|green|blue|gray|grey|purple|orange|yellow"
+                                      r"|teal|navy|silver|gold)\b", f"{name}: no named colour in host chrome")
+            stray = [px for px in re.findall(r"(?<![\w.-])(\d+)px", scan) if px != "1"]
+            self.assertEqual(stray, [], f"{name}: host-chrome spacing/size must be var(), not bare px: {stray}")
+
+    def test_root_values_have_provenance_exactly(self):
+        """The anti-vibe-code core (codex A1 #3): the `:root` var map is EXACTLY the profile's resolved
+        tokens + `SHELL_SCALE` — no missing var, and NO EXTRA arbitrary var. So `--accent: #7dcfff`
+        cannot be smuggled in through a token name; every var traces to a declared source."""
+        from scripts.rendering.design import loader
+        from scripts.rendering.pageshell.pageshell import SHELL_SCALE, _ROLES, _px
+        for name in _active():
+            _, css = _shell(name)
+            root_block = re.search(r":root\s*\{([^}]*)\}", css).group(1)
+            root = dict(re.findall(r"(--[\w-]+):\s*([^;]+);", root_block))
+            tok = loader.resolve_tokens(name)
+            expected = {f"--{role}": tok["color"][role] for role in _ROLES}
+            expected["--radius-panel"] = _px(tok["radius"]["panel"])
+            expected["--radius-tile"] = _px(tok["radius"]["tile"])
+            expected["--font-sans"] = tok["font"]["family"]
+            expected.update(SHELL_SCALE)
+            self.assertEqual(root, expected,
+                             f"{name}: :root must be EXACTLY resolve_tokens + SHELL_SCALE (no missing/extra var)")
+
+    def test_shell_spacing_scale_is_on_the_4px_grid(self):
+        """docs/design/pageshell.md §3: the shell SPACING constants are 4px multiples (the type ramp is
+        exempt). Pins the doctrine claim so it can't drift off-grid (codex A1 #5)."""
+        from scripts.rendering.pageshell.pageshell import SHELL_SCALE
+        for var in ("--ps-pad", "--ps-pad-tight", "--ps-gap", "--ps-gap-tight"):
+            px = int(SHELL_SCALE[var].removesuffix("px"))
+            self.assertEqual(px % 4, 0, f"{var}={px}px must be a 4px multiple")
+
+    def test_page_shell_has_orientation(self):
+        """A user can figure out what the page is: the title + breadcrumb are present (the glossary
+        lands in A6). Explainability is structural, not vibes."""
+        for name in _active():
+            html, _ = _shell(name, title="Design-language studio")
+            self.assertIn("Design-language studio", html, f"{name}: the page title is present")
+            self.assertRegex(html, r'class="ps-crumbs"', f"{name}: a breadcrumb/orientation row is present")
+            self.assertIn("index.html", html, f"{name}: the breadcrumb links back")
+
+    def test_page_background_is_the_language_backdrop(self):
+        """The page IS the language: the shell root paints `var(--backdrop)` (== the profile's backdrop
+        token), so switching language switches the whole page's ground."""
+        from scripts.rendering.design import loader
+        for name in _active():
+            _, css = _shell(name)
+            self.assertRegex(css, r"\.ps-[\w-]+\s*\{[^}]*background:\s*var\(--backdrop\)",
+                             f"{name}: the shell root must paint var(--backdrop)")
+            root = dict(re.findall(r"(--[\w-]+):\s*([^;]+);", css))
+            self.assertEqual(root.get("--backdrop"), loader.resolve_tokens(name)["color"]["backdrop"])
+
+
+_GATE_HTML = ('<div class="ps-x"><h1 class="ps-title">T</h1>'
+              '<p class="ps-crumbs"><a href="index.html">home</a></p></div>')
+_GATE_CLEAN = (":root { --backdrop: #000; --accent: #fff; }\n"
+               ".ps-x { background: var(--backdrop); color: var(--accent); padding: var(--ps-pad); }\n"
+               ".ps-x .ps-panel { background: var(--surface); border: 1px solid var(--hairline); }")
+
+
+class PageShellGateContract(unittest.TestCase):
+    """The anti-vibe-code gate, pinned on CRAFTED inputs (codex A1b/A1c) — so every off-token colour/px
+    form AND every exotic-selector spoof is caught durably in the suite, not just by ephemeral mutation.
+    Token-only is decided per declaration VALUE (prop-independent); the chrome must be a CLOSED structure."""
+
+    def _facts(self, css, html=_GATE_HTML):
+        from scripts.rendering.webkit.design_render_adapter import pageshell_facts
+        return pageshell_facts(html, css)
+
+    def test_a_clean_shell_is_closed_token_only_and_backdrop(self):
+        from scripts.contracts.design_predicates import (backdrop_is_token, host_chrome_is_closed,
+                                                         host_chrome_token_only)
+        f = self._facts(_GATE_CLEAN)
+        self.assertTrue(host_chrome_is_closed(f), "a simple .ps-x structure is closed")
+        self.assertTrue(host_chrome_token_only(f), "a var()-only shell is token-only")
+        self.assertTrue(backdrop_is_token(f), "the shell root paints var(--backdrop)")
+
+    def test_every_off_token_colour_and_px_form_is_caught(self):
+        """Prop-INDEPENDENT: a colour in ANY property (incl. an obscure one like stop-color) or hidden
+        after a comment is caught, no property list (codex A1c #2/#3)."""
+        from scripts.contracts.design_predicates import host_chrome_token_only
+        vectors = {
+            "hex": "color: #abcdef",
+            "rgb()": "color: rgb(1,2,3)",
+            "hsl()": "color: hsl(200, 50%, 50%)",
+            "named": "color: rebeccapurple",
+            "named-in-fallback": "color: var(--x, aliceblue)",
+            "currentColor": "color: currentColor",
+            "color-mix()": "background: color-mix(in srgb, var(--a), var(--b))",
+            "var-fallback-hex": "color: var(--x, #fff)",
+            "decimal-px": "padding: 1.5px",
+            "negative-px": "margin: -8px",
+            "uppercase-PX": "padding: 8PX",
+            "obscure-colour-prop": "stop-color: red",
+            "colour-after-a-comment": "color: var(--accent); /* ok */ border-color: teal",
+            "initial": "color: initial",       # escapes the token system → browser default (codex A1d)
+            "inherit": "color: inherit",
+            "unset": "color: unset",
+            "system-colour": "color: CanvasText",
+        }
+        for label, decl in vectors.items():
+            css = _GATE_CLEAN.replace("color: var(--accent);", decl + ";")
+            self.assertFalse(host_chrome_token_only(self._facts(css)),
+                             f"vibe-coded {label} must redden the token-only gate")
+
+    def test_named_colour_word_in_a_SELECTOR_is_not_a_false_positive(self):
+        """The scan reads declaration VALUES, never selector text: a class named `.ps-red-team` (contains
+        'red') is token-only + closed (codex A1b #4)."""
+        from scripts.contracts.design_predicates import host_chrome_is_closed, host_chrome_token_only
+        html = _GATE_HTML.replace("ps-x", "ps-red-team")
+        css = _GATE_CLEAN.replace("ps-x", "ps-red-team")
+        f = self._facts(css, html)
+        self.assertTrue(host_chrome_token_only(f), "a colour word in a SELECTOR must not false-positive")
+        self.assertTrue(host_chrome_is_closed(f), "the renamed shell is still closed")
+
+    def test_closure_makes_specificity_atrule_and_attribute_spoofs_unconstructable(self):
+        """codex A1c: rather than out-parse adversarial CSS, exotic selectors are UNCONSTRUCTABLE — a
+        @media block, an attribute+specificity override of the root, a pseudo-class, or a child combinator
+        all redden host_chrome_is_closed, so the backdrop/token-only checks never reason over trick CSS."""
+        from scripts.contracts.design_predicates import host_chrome_is_closed
+        for label, extra in {
+            "@media": "@media (min-width: 0px) { .ps-x { background: var(--surface); } }",
+            "attribute+specificity": '[class~="ps-x"].ps-x { background: var(--surface); }',
+            "pseudo-class": ".ps-x:hover { background: var(--surface); }",
+            "child-combinator": ".ps-x > .ps-panel { background: var(--surface); }",
+        }.items():
+            self.assertFalse(host_chrome_is_closed(self._facts(_GATE_CLEAN + "\n" + extra)),
+                             f"{label} must redden host_chrome_is_closed (unconstructable chrome)")
+
+
+class PageShellConformanceContract(unittest.TestCase):
+    def test_conform_governs_the_page_shell_aspect(self):
+        """The page shell is governed by the SAME conform() runner as the specimens: every active
+        profile emits `page-shell` rows and each PASSES (deterministic) — the chrome is proven, not
+        asserted."""
+        from scripts.quality.design_invariants import conform
+        for name in _active():
+            ps = [r for r in conform(name) if r["aspect"] == "page-shell"]
+            self.assertTrue(ps, f"{name}: conform() must include page-shell rows")
+            for r in ps:
+                self.assertEqual(r["status"], "pass",
+                                 f"{name}: page-shell invariant {r['invariant_id']} must pass, got {r['status']}")
+
+
+if __name__ == "__main__":
+    unittest.main()

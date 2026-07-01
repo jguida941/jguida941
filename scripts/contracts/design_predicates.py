@@ -75,6 +75,34 @@ def card_rows_inline(facts: dict, **_) -> bool:
     return facts.get("rows_horizontal") is True
 
 
+# --- page-shell (the site's own chrome as a governed language instance) ---------------------------
+def backdrop_is_token(facts: dict, **_) -> bool:
+    """The page ground is the language's backdrop token: the shell root paints `var(--backdrop)`.
+    Switching language switches the whole page's ground (fail-closed: False if absent)."""
+    return facts.get("uses_backdrop_var") is True
+
+
+def host_chrome_is_closed(facts: dict, **_) -> bool:
+    """The chrome CSS is a CLOSED, simple structure: exactly ONE `.ps-<lang>` root rule + descendant
+    rules of it only — no @-rules / attribute / pseudo selectors / combinators. This makes specificity
+    conflicts, @media overrides, and attribute-selector spoofs UNCONSTRUCTABLE, so the token-only +
+    backdrop checks reason over a clean structure (fail-closed on anything exotic)."""
+    return facts.get("shell_closed") is True and facts.get("root_rule_count") == 1
+
+
+def host_chrome_token_only(facts: dict, **_) -> bool:
+    """The anti-vibe-code core: after the `:root` token blocks + legit `var(--…)` refs are removed, no
+    declaration value carries a colour literal of ANY form (hex / rgb() / hsl() / color-mix() / named /
+    currentColor) or a bare design px — every decision is a var(). A single hand-literal reddens."""
+    return facts.get("body_offtoken_count") == 0
+
+
+def page_has_orientation(facts: dict, **_) -> bool:
+    """A user can tell what the page is + GET BACK: a title WITH text AND a real breadcrumb link (non-
+    empty href + text) are present (fail-closed on an empty render / an empty crumbs row)."""
+    return facts.get("has_title") is True and facts.get("has_breadcrumb_link") is True
+
+
 # The closed registry the conform() runner dispatches into. `predicate_class` in a profile's
 # invariants[] must resolve here (test_design_conformance enforces it). The button_* predicates are
 # GENERIC over facts (radius/anatomy/material/mechanic/elevation/focus); a second component (the
@@ -104,4 +132,9 @@ PREDICATES = {
     "card_multi_row": card_multi_row,
     "card_hairline_divided": card_hairline_divided,
     "card_rows_inline": card_rows_inline,
+    # page-shell / chrome (P5-CHROME) — the site's own frame as a governed language instance
+    "backdrop_is_token": backdrop_is_token,
+    "host_chrome_is_closed": host_chrome_is_closed,
+    "host_chrome_token_only": host_chrome_token_only,
+    "page_has_orientation": page_has_orientation,
 }

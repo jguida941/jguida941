@@ -98,6 +98,7 @@
     "spacing-density": "covered-deferred",
     "radius-elevation-material": "covered-deferred",
     "motion": "covered-deferred",
+    "page-shell": "covered-emitted",
     "component-button": "covered-emitted",
     "component-chip": "covered-emitted",
     "component-card": "covered-emitted",
@@ -113,6 +114,10 @@
     "touch-target": "covered-deferred"
   },
   "invariants": [
+    {"invariant_id": "cb-page-backdrop", "aspect": "page-shell", "determinism": "deterministic", "emission_status": "emitted", "law": "the page chrome paints the language backdrop token", "doc_cite": "docs/design/pageshell.md", "predicate": {"predicate_class": "backdrop_is_token"}},
+    {"invariant_id": "cb-page-closed", "aspect": "page-shell", "determinism": "deterministic", "emission_status": "emitted", "law": "chrome CSS is a closed simple structure (one root rule, no @-rules/attribute/pseudo)", "doc_cite": "docs/design/pageshell.md", "predicate": {"predicate_class": "host_chrome_is_closed"}},
+    {"invariant_id": "cb-page-tokenonly", "aspect": "page-shell", "determinism": "deterministic", "emission_status": "emitted", "law": "host-chrome CSS references tokens only (no raw hex/px)", "doc_cite": "docs/design/pageshell.md", "predicate": {"predicate_class": "host_chrome_token_only"}},
+    {"invariant_id": "cb-page-orient", "aspect": "page-shell", "determinism": "deterministic", "emission_status": "emitted", "law": "the page carries a title + breadcrumb orientation", "doc_cite": "docs/design/pageshell.md", "predicate": {"predicate_class": "page_has_orientation"}},
     {"invariant_id": "cb-btn-radius", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "carbon button is square (radius 0)", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_radius", "params": {"expected_px": 0, "variant": "primary"}}},
     {"invariant_id": "cb-btn-anatomy", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "label hard-left + trailing icon hard-right (space-between DOM)", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_anatomy", "params": {"expected": "label-left-icon-right", "variant": "primary"}}},
     {"invariant_id": "cb-btn-mechanic", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "token-swap press (no filter/opacity/state-layer)", "doc_cite": "docs/design/carbon.md", "predicate": {"predicate_class": "button_state_mechanic", "params": {"expected": "token-swap", "variant": "primary"}}},

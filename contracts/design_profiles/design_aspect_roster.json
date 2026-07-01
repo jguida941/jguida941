@@ -7,6 +7,7 @@
     {"id": "spacing-density", "emission_status": "deferred", "defer_reason": "grid_multiple + density_band predicates land with the conformance runner"},
     {"id": "radius-elevation-material", "emission_status": "deferred", "defer_reason": "radius_band + elevation_material predicates land with the conformance runner"},
     {"id": "motion", "emission_status": "deferred", "defer_reason": "motion_bounds predicate lands with the first interactive component"},
+    {"id": "page-shell", "emission_status": "emitted"},
     {"id": "component-button", "emission_status": "emitted"},
     {"id": "component-chip", "emission_status": "emitted"},
     {"id": "component-card", "emission_status": "emitted"},

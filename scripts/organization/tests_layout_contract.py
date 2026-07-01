@@ -42,6 +42,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_glass_preserved.py",
             "test_icon_system.py",
             "test_label_legibility.py",
+            "test_page_shell.py",
             "test_public_data_privacy.py",
             "test_readme_projection.py",
             "test_scripts_layout_contract.py",
@@ -184,6 +185,9 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "studio": (
         "test_studio.py",               # P5-STUDIO: the interactive design-system studio — archetype + governed swap (one Python decider) + drift-guarded page
+    ),
+    "page_chrome": (
+        "test_page_shell.py",           # P5-CHROME: the switchable governed page-shell — the site's own chrome is a rendered instance of a language (token-only + provenance + conform)
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y

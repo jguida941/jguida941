@@ -95,6 +95,7 @@
     "spacing-density": "covered-deferred",
     "radius-elevation-material": "covered-deferred",
     "motion": "covered-deferred",
+    "page-shell": "covered-emitted",
     "component-button": "covered-emitted",
     "component-chip": "covered-emitted",
     "component-card": "covered-emitted",
@@ -110,6 +111,10 @@
     "touch-target": "covered-deferred"
   },
   "invariants": [
+    {"invariant_id": "ap-page-backdrop", "aspect": "page-shell", "determinism": "deterministic", "emission_status": "emitted", "law": "the page chrome paints the language backdrop token", "doc_cite": "docs/design/pageshell.md", "predicate": {"predicate_class": "backdrop_is_token"}},
+    {"invariant_id": "ap-page-closed", "aspect": "page-shell", "determinism": "deterministic", "emission_status": "emitted", "law": "chrome CSS is a closed simple structure (one root rule, no @-rules/attribute/pseudo)", "doc_cite": "docs/design/pageshell.md", "predicate": {"predicate_class": "host_chrome_is_closed"}},
+    {"invariant_id": "ap-page-tokenonly", "aspect": "page-shell", "determinism": "deterministic", "emission_status": "emitted", "law": "host-chrome CSS references tokens only (no raw hex/px)", "doc_cite": "docs/design/pageshell.md", "predicate": {"predicate_class": "host_chrome_token_only"}},
+    {"invariant_id": "ap-page-orient", "aspect": "page-shell", "determinism": "deterministic", "emission_status": "emitted", "law": "the page carries a title + breadcrumb orientation", "doc_cite": "docs/design/pageshell.md", "predicate": {"predicate_class": "page_has_orientation"}},
     {"invariant_id": "ap-btn-radius", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "apple-dark button is a 999px capsule", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_radius", "params": {"expected_px": 999, "variant": "filled"}}},
     {"invariant_id": "ap-btn-material", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "OPAQUE fill (not frosted glass)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_material_opaque", "params": {"variant": "filled"}}},
     {"invariant_id": "ap-btn-mechanic", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "opacity-dim press (dims DOWN)", "doc_cite": "docs/design/apple-dark.md", "predicate": {"predicate_class": "button_state_mechanic", "params": {"expected": "opacity-dim", "variant": "filled"}}},

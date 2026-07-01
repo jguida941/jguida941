@@ -163,6 +163,101 @@ def chip_facts(html: str, css: str) -> dict:
     }
 
 
+# Token-only is decided within a CLOSED shell structure (codex A1c). Rather than defensively out-parse
+# arbitrary CSS (specificity, @media, comments, obscure colour props), the gatherer requires the host
+# chrome to be a CLOSED, SIMPLE structure — one root rule `.ps-<lang>` + descendant `.ps-<lang> .child`
+# rules, no @-rules / attribute / pseudo selectors / combinators — so specificity conflicts, @media
+# nesting, and attribute-selector overrides are UNCONSTRUCTABLE. Then every declaration VALUE must be
+# composed ONLY of var(--…) refs + structural keywords + a 1px hairline: any colour of any form
+# (hex / rgb() / hsl() / color-mix() / named / currentColor) in ANY property is caught, no hand list.
+_VAR_REF = re.compile(r"var\(--[\w-]+\)")
+_PX = re.compile(r"-?\d*\.?\d+px", re.I)
+_DIM = re.compile(r"-?\d*\.?\d+[a-z%]*", re.I)
+# NB: `inherit`/`initial`/`unset` are deliberately NOT here (codex A1d) — `color: initial` would paint the
+# browser default, escaping the token system; a token-only shell states every value explicitly. System
+# colours (CanvasText / ButtonText / AccentColor …) are likewise not here, so they redden.
+_SAFE_VALUE_WORDS = frozenset("""
+ solid dashed dotted double groove ridge inset outset none hidden transparent auto
+ normal bold bolder lighter italic oblique underline overline line-through uppercase lowercase capitalize
+ center left right start end justify flex block inline grid wrap nowrap visible collapse pointer default
+ middle top bottom baseline stretch content-box border-box relative absolute fixed sticky static
+""".split())
+
+
+def _strip_noise(css: str) -> str:
+    """The host-chrome CSS with comments + the declared `:root { … }` token blocks removed (so a colour
+    hidden after a `/* … */` comment or inside `:root` cannot slip past the value scan)."""
+    css = re.sub(r"/\*.*?\*/", " ", css, flags=re.S)
+    return re.sub(r":root\s*\{[^}]*\}", " ", css)
+
+
+def _css_rules(css: str):
+    """(selector, [(prop, value), …]) per rule."""
+    for m in re.finditer(r"([^{}]+)\{([^{}]*)\}", css):
+        decls = [(p.strip().lower(), v.strip())
+                 for d in m.group(2).split(";") if ":" in d
+                 for p, _, v in [d.partition(":")]]
+        yield m.group(1).strip(), decls
+
+
+def _value_offtokens(value: str) -> int:
+    """Off-token literals in ONE declaration VALUE (prop-INDEPENDENT). Drop var(--…) refs + dimensions,
+    then every leftover WHOLE word must be a structural keyword — so a named colour / currentColor in ANY
+    property (incl. obscure ones: stop-color, -webkit-text-fill-color, …) is caught with no property list.
+    Also flags any hex, any non-var function `(`, and any px other than the 1px hairline."""
+    resid = _VAR_REF.sub(" ", value)
+    bad = 0
+    if "#" in resid:
+        bad += 1
+    if "(" in resid:                                         # any NON-var function: rgb()/color-mix()/calc()…
+        bad += 1
+    bad += sum(1 for px in _PX.findall(resid) if px.lower() != "1px")
+    resid = _DIM.sub(" ", resid)                             # drop numbers/dimensions; only keywords remain
+    bad += sum(1 for w in re.findall(r"(?<![\w.])[A-Za-z][\w-]*", resid)
+               if w.lower() not in _SAFE_VALUE_WORDS)
+    return bad
+
+
+def pageshell_facts(html: str, css: str) -> dict:
+    """Verdict-free facts for the page CHROME (`render_page_shell`). The host chrome must be CLOSED (one
+    `.ps-<lang>` root rule + descendant `.ps-<lang> .child`/element rules only; no @-rules / attribute /
+    pseudo selectors) AND token-only per value. With a closed structure the single root rule's background
+    is unambiguous (no specificity/@media games). Fail-closed: presence facts default False. The `:root`
+    VALUE provenance (== resolve_tokens) is pinned by test_page_shell, not decided here."""
+    shell_m = re.search(r'<div class="(ps-[\w-]+)"', html)
+    shell_cls = shell_m.group(1) if shell_m else None
+    body = _strip_noise(css)
+    has_atrule = "@" in body
+    rules = list(_css_rules(body))
+    offtoken = sum(_value_offtokens(v) for _, decls in rules for _, v in decls)
+
+    root_sel = f".{shell_cls}" if shell_cls else None
+    # closed: every selector is the root or a descendant `.ps-<lang> <simple>` chain (class or element),
+    # no commas / attribute / pseudo / child-sibling combinators, and no @-rule anywhere.
+    allowed = re.compile(rf"^\.{re.escape(shell_cls)}(?:\s+\.?[\w-]+)*$") if shell_cls else None
+    selectors = [sel.strip() for sel, _ in rules]
+    root_rule_count = sum(1 for s in selectors if s == root_sel)
+    shell_closed = bool(shell_cls) and not has_atrule and bool(selectors) \
+        and all(allowed.match(s) for s in selectors)
+
+    root_bg = [v for sel, decls in rules if sel.strip() == root_sel
+               for p, v in decls if p in ("background", "background-color")]
+    uses_backdrop_var = (bool(root_bg) and _value_offtokens(root_bg[-1]) == 0
+                         and _VAR_REF.findall(root_bg[-1]) == ["var(--backdrop)"])
+
+    has_title = bool(re.search(r'class="ps-title"[^>]*>[^<]*\w', html))
+    crumbs_m = re.search(r'class="ps-crumbs"[^>]*>(.*?)</p>', html, re.S)
+    has_breadcrumb_link = bool(crumbs_m and re.search(r'<a[^>]+href="[^"]+"[^>]*>[^<]*\w', crumbs_m.group(1)))
+    return {
+        "body_offtoken_count": offtoken,
+        "shell_closed": shell_closed,
+        "root_rule_count": root_rule_count,
+        "uses_backdrop_var": uses_backdrop_var,
+        "has_title": has_title,
+        "has_breadcrumb_link": has_breadcrumb_link,
+    }
+
+
 def card_facts(html: str, css: str) -> dict:
     """Verdict-free STRUCTURAL facts for the card / grouped metric surface (instance #3). Only the
     composition is gathered here — declared box structure, NOT rendered ink (the 'content fills the
