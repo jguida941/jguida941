@@ -95,12 +95,17 @@ class ShowcaseCoverageContract(unittest.TestCase):
         from scripts.rendering.showcase.showcase import render_showcase
         synthetic = {"carbon": {"profile": "carbon", "results": [
             {"invariant_id": "syn-cand", "status": "candidate", "law": "L", "doc_cite": "d",
-             "aspect": "component-button", "determinism": "judgment"}]}}
+             "aspect": "component-button", "determinism": "judgment", "receipt_status": "pending",
+             "receipt_obligation": {"required": True, "kind": "viewport-visual-receipt",
+                                    "artifact": "assets/receipts/carbon/syn-cand.png"}}]}}
         html = render_showcase(synthetic)
         row = re.search(r'data-invariant="syn-cand".*?</tr>', html, re.S)
         self.assertIsNotNone(row, "the candidate invariant must render a row")
         self.assertIn("cannot certify", row.group(0).lower())
         self.assertNotIn("badge-pass", row.group(0), "a candidate must never show a pass badge")
+        self.assertIn("pending", row.group(0), "a candidate must surface receipt status")
+        self.assertIn("assets/receipts/carbon/syn-cand.png", row.group(0),
+                      "a candidate must surface its required receipt artifact")
 
     def test_a_failing_receipt_cannot_be_forged_into_a_pass(self):
         """Anti-tautology / forge: a `fail` receipt renders a FAIL cell, not a pass — the

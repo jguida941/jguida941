@@ -205,11 +205,13 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
    button/chip/card fingerprints, with declared `components.*.fingerprint` checked only for
    consistency. The skill now begins with `doctrine-ingest.md`, so Scout emits obligations (typed axes,
    negative cases, `refute_by`, visual receipt obligations), not summaries. A model can still propose
-   profile data, but distinctness is decided by observed rendered facts, not JSON self-reporting. NEXT
-   gap before broad theme generation: P5-RECEIPT-GATE for visual/runtime claims that static parsing
-   must not fake-green.
-9. **P5-RECEIPT-GATE** — make the true-viewport visual/runtime receipt a REQUIRED prove-lane step
-   (the apple-heat 500px-clamp lesson); one `prove` lane = runner + pytest + regen + coverage + drift.
+   profile data, but distinctness is decided by observed rendered facts, not JSON self-reporting.
+9. **P5-RECEIPT-GATE** ✅ (obligation layer) — every deferred/judgment row now carries structured
+   `receipt_obligation` + `refute_by`; `conform()` serializes those into the committed receipts with
+   `receipt_status: pending|present`, and `showcase.html` surfaces the pending artifact path beside
+   "cannot certify". This makes visual/runtime claims executable debt instead of prose. NEXT: build the
+   actual headless contrast probes + viewport PNG producers so pending obligations become present
+   receipts without promoting fake static greens.
 
 ## 8. Deferred until instance #1 + one archetype actually ship (codex must-fix #7)
 

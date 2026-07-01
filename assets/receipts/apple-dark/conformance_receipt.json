@@ -108,12 +108,25 @@
       "authority_status": "candidate_only",
       "cannot_mark_done": true,
       "claim": "'component-button' of the apple-dark profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "defer_reason": "Apple's own white-on-#0a84ff is ~3.65:1 \u2014 the contrast verdict is a candidate/probe concern, never fake-green",
       "determinism": "judgment",
       "doc_cite": "docs/design/apple-dark.md",
-      "evidence": {},
+      "evidence": {
+        "receipt_artifact": "assets/receipts/apple-dark/ap-btn-contrast.json",
+        "receipt_kind": "headless-contrast-probe",
+        "receipt_status": "pending"
+      },
       "invariant_id": "ap-btn-contrast",
       "law": "button label contrast on the actual fill",
       "profile": "apple-dark",
+      "receipt_obligation": {
+        "artifact": "assets/receipts/apple-dark/ap-btn-contrast.json",
+        "kind": "headless-contrast-probe",
+        "reason": "the contrast claim must be measured against the rendered fill before promotion",
+        "required": true
+      },
+      "receipt_status": "pending",
+      "refute_by": "a headless contrast probe over the rendered button measures below the claimed threshold",
       "status": "candidate"
     },
     {
@@ -247,12 +260,25 @@
       "authority_status": "candidate_only",
       "cannot_mark_done": true,
       "claim": "'component-chip' of the apple-dark profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "defer_reason": "Apple's own white-on-accent can sit ~3.65:1 \u2014 contrast is a candidate/probe concern",
       "determinism": "judgment",
       "doc_cite": "docs/design/apple-dark.md",
-      "evidence": {},
+      "evidence": {
+        "receipt_artifact": "assets/receipts/apple-dark/ap-chip-contrast.json",
+        "receipt_kind": "headless-contrast-probe",
+        "receipt_status": "pending"
+      },
       "invariant_id": "ap-chip-contrast",
       "law": "chip label contrast on the actual fill",
       "profile": "apple-dark",
+      "receipt_obligation": {
+        "artifact": "assets/receipts/apple-dark/ap-chip-contrast.json",
+        "kind": "headless-contrast-probe",
+        "reason": "the contrast claim must be measured against the rendered fill before promotion",
+        "required": true
+      },
+      "receipt_status": "pending",
+      "refute_by": "a headless contrast probe over the rendered chip measures below the claimed threshold",
       "status": "candidate"
     },
     {
@@ -392,12 +418,25 @@
       "authority_status": "candidate_only",
       "cannot_mark_done": true,
       "claim": "'component-card' of the apple-dark profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "defer_reason": "content-to-chrome / dead-space ratio is an emergent LAYOUT property \u2014 static parse sees declared boxes, not rendered ink; candidate until a visual receipt",
       "determinism": "judgment",
       "doc_cite": "docs/design/apple-dark.md",
-      "evidence": {},
+      "evidence": {
+        "receipt_artifact": "assets/receipts/apple-dark/ap-card-fills.png",
+        "receipt_kind": "viewport-visual-receipt",
+        "receipt_status": "pending"
+      },
       "invariant_id": "ap-card-fills",
       "law": "content fills the card (no giant dead space)",
       "profile": "apple-dark",
+      "receipt_obligation": {
+        "artifact": "assets/receipts/apple-dark/ap-card-fills.png",
+        "kind": "viewport-visual-receipt",
+        "reason": "ink-to-chrome fill is a rendered layout property that requires a viewport screenshot",
+        "required": true
+      },
+      "receipt_status": "pending",
+      "refute_by": "a viewport screenshot shows the Apple grouped card has large dead space or per-row chrome",
       "status": "candidate"
     }
   ]

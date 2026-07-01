@@ -167,9 +167,20 @@ _CLAIM = {
 }
 
 
+def _receipt_status(obligation: dict | None) -> str | None:
+    if not obligation or not obligation.get("required"):
+        return None
+    artifact = obligation.get("artifact")
+    if not artifact:
+        return "pending"
+    return "present" if (_root() / artifact).is_file() else "pending"
+
+
 def _result(inv: dict, profile: str, status: str, evidence: dict) -> dict:
     aspect = inv.get("aspect")
-    return {
+    obligation = inv.get("receipt_obligation")
+    receipt_status = _receipt_status(obligation)
+    payload = {
         "invariant_id": inv.get("invariant_id"),
         "profile": profile,
         "aspect": aspect,
@@ -182,6 +193,21 @@ def _result(inv: dict, profile: str, status: str, evidence: dict) -> dict:
         "cannot_mark_done": True,
         "claim": _CLAIM[status].format(aspect=aspect, profile=profile),
     }
+    if inv.get("defer_reason"):
+        payload["defer_reason"] = inv["defer_reason"]
+    if inv.get("refute_by"):
+        payload["refute_by"] = inv["refute_by"]
+    if obligation:
+        payload["receipt_obligation"] = obligation
+    if receipt_status:
+        payload["receipt_status"] = receipt_status
+        payload["evidence"] = {
+            **payload["evidence"],
+            "receipt_status": receipt_status,
+            "receipt_artifact": obligation.get("artifact"),
+            "receipt_kind": obligation.get("kind"),
+        }
+    return payload
 
 
 def conform(profile: str) -> list[dict]:

@@ -68,12 +68,25 @@
       "authority_status": "candidate_only",
       "cannot_mark_done": true,
       "claim": "'component-button' of the liquid-glass profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "defer_reason": "contrast over translucent glass is renderer-dependent \u2014 candidate until the headless-probe slice (never fake-green)",
       "determinism": "judgment",
       "doc_cite": "docs/design/liquid-glass.md",
-      "evidence": {},
+      "evidence": {
+        "receipt_artifact": "assets/receipts/liquid-glass/lg-btn-contrast.json",
+        "receipt_kind": "headless-contrast-probe",
+        "receipt_status": "pending"
+      },
       "invariant_id": "lg-btn-contrast",
       "law": "button label contrast >= WCAG AA on the actual glass surface",
       "profile": "liquid-glass",
+      "receipt_obligation": {
+        "artifact": "assets/receipts/liquid-glass/lg-btn-contrast.json",
+        "kind": "headless-contrast-probe",
+        "reason": "actual contrast depends on rendered translucent glass compositing, not static token pairs",
+        "required": true
+      },
+      "receipt_status": "pending",
+      "refute_by": "a headless contrast probe over the rendered button measures below the claimed WCAG threshold",
       "status": "candidate"
     },
     {
@@ -186,12 +199,25 @@
       "authority_status": "candidate_only",
       "cannot_mark_done": true,
       "claim": "'component-chip' of the liquid-glass profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "defer_reason": "contrast over translucent glass is renderer-dependent \u2014 candidate until the headless-probe slice",
       "determinism": "judgment",
       "doc_cite": "docs/design/liquid-glass.md",
-      "evidence": {},
+      "evidence": {
+        "receipt_artifact": "assets/receipts/liquid-glass/lg-chip-contrast.json",
+        "receipt_kind": "headless-contrast-probe",
+        "receipt_status": "pending"
+      },
       "invariant_id": "lg-chip-contrast",
       "law": "chip label contrast on the actual glass surface",
       "profile": "liquid-glass",
+      "receipt_obligation": {
+        "artifact": "assets/receipts/liquid-glass/lg-chip-contrast.json",
+        "kind": "headless-contrast-probe",
+        "reason": "actual contrast depends on rendered translucent glass compositing, not static token pairs",
+        "required": true
+      },
+      "receipt_status": "pending",
+      "refute_by": "a headless contrast probe over the rendered chip measures below the claimed WCAG threshold",
       "status": "candidate"
     },
     {
@@ -331,12 +357,25 @@
       "authority_status": "candidate_only",
       "cannot_mark_done": true,
       "claim": "'component-card' of the liquid-glass profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "defer_reason": "content-to-chrome / dead-space ratio is an emergent LAYOUT property \u2014 a static parser sees declared boxes, not rendered ink; candidate until a visual receipt (never fake-green)",
       "determinism": "judgment",
       "doc_cite": "docs/design/liquid-glass.md",
-      "evidence": {},
+      "evidence": {
+        "receipt_artifact": "assets/receipts/liquid-glass/lg-card-fills.png",
+        "receipt_kind": "viewport-visual-receipt",
+        "receipt_status": "pending"
+      },
       "invariant_id": "lg-card-fills",
       "law": "content fills the card (no giant dead space)",
       "profile": "liquid-glass",
+      "receipt_obligation": {
+        "artifact": "assets/receipts/liquid-glass/lg-card-fills.png",
+        "kind": "viewport-visual-receipt",
+        "reason": "ink-to-chrome fill is a rendered layout property that requires a viewport screenshot",
+        "required": true
+      },
+      "receipt_status": "pending",
+      "refute_by": "a viewport screenshot shows the grouped card has large dead space or one-box-per-stat chrome",
       "status": "candidate"
     }
   ]

@@ -68,6 +68,33 @@ class DesignConformanceContract(unittest.TestCase):
                 if r["determinism"] == "judgment":
                     self.assertEqual(r["status"], "candidate",
                                      f"{name}/{r['invariant_id']}: a judgment row must be candidate, not {r['status']}")
+                    self.assertTrue(r.get("refute_by"), f"{name}/{r['invariant_id']}: candidate must say how to refute it")
+                    obligation = r.get("receipt_obligation") or {}
+                    self.assertIs(obligation.get("required"), True,
+                                  f"{name}/{r['invariant_id']}: candidate must carry a required receipt obligation")
+                    self.assertIn(obligation.get("kind"), {"headless-contrast-probe", "viewport-visual-receipt"},
+                                  f"{name}/{r['invariant_id']}: receipt obligation must name the probe kind")
+                    self.assertTrue(str(obligation.get("artifact", "")).startswith(f"assets/receipts/{name}/"),
+                                    f"{name}/{r['invariant_id']}: receipt artifact must live in that profile's receipt home")
+                    self.assertIn(r.get("receipt_status"), {"pending", "present"},
+                                  f"{name}/{r['invariant_id']}: receipt status must be explicit")
+
+    def test_profile_candidate_rows_have_structured_receipt_obligations(self):
+        """P5-RECEIPT-GATE: visual/runtime rows are allowed to remain candidate, but not as loose
+        prose. The profile row must declare a `receipt_obligation` and `refute_by` before the
+        conformance receipt can serialize it."""
+        from scripts.rendering.design import loader
+        for name in _active():
+            for inv in loader.load(name).get("invariants", []):
+                if inv.get("determinism") == "judgment" or inv.get("emission_status") == "deferred":
+                    self.assertTrue(inv.get("defer_reason"), f"{name}/{inv['invariant_id']}: missing defer_reason")
+                    self.assertTrue(inv.get("refute_by"), f"{name}/{inv['invariant_id']}: missing refute_by")
+                    obligation = inv.get("receipt_obligation") or {}
+                    self.assertIs(obligation.get("required"), True,
+                                  f"{name}/{inv['invariant_id']}: receipt_obligation.required must be true")
+                    self.assertTrue(obligation.get("reason"), f"{name}/{inv['invariant_id']}: missing obligation reason")
+                    self.assertTrue(str(obligation.get("artifact", "")).startswith(f"assets/receipts/{name}/"),
+                                    f"{name}/{inv['invariant_id']}: artifact must stay under assets/receipts/{name}/")
 
     def test_committed_receipts_are_current_and_write_receipt_targets_the_governed_tree(self):
         """The RECEIPT seam: as of 1c EVERY active profile's receipt is a COMMITTED artifact the

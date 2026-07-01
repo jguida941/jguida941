@@ -108,12 +108,25 @@
       "authority_status": "candidate_only",
       "cannot_mark_done": true,
       "claim": "'component-button' of the carbon profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "defer_reason": "contrast verdict is a candidate/probe concern",
       "determinism": "judgment",
       "doc_cite": "docs/design/carbon.md",
-      "evidence": {},
+      "evidence": {
+        "receipt_artifact": "assets/receipts/carbon/cb-btn-contrast.json",
+        "receipt_kind": "headless-contrast-probe",
+        "receipt_status": "pending"
+      },
       "invariant_id": "cb-btn-contrast",
       "law": "button label contrast >= WCAG AA",
       "profile": "carbon",
+      "receipt_obligation": {
+        "artifact": "assets/receipts/carbon/cb-btn-contrast.json",
+        "kind": "headless-contrast-probe",
+        "reason": "the contrast claim must be measured against the rendered component background before promotion",
+        "required": true
+      },
+      "receipt_status": "pending",
+      "refute_by": "a headless contrast probe over the rendered button measures below the claimed WCAG threshold",
       "status": "candidate"
     },
     {
@@ -247,12 +260,25 @@
       "authority_status": "candidate_only",
       "cannot_mark_done": true,
       "claim": "'component-chip' of the carbon profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "defer_reason": "contrast verdict is a candidate/probe concern",
       "determinism": "judgment",
       "doc_cite": "docs/design/carbon.md",
-      "evidence": {},
+      "evidence": {
+        "receipt_artifact": "assets/receipts/carbon/cb-chip-contrast.json",
+        "receipt_kind": "headless-contrast-probe",
+        "receipt_status": "pending"
+      },
       "invariant_id": "cb-chip-contrast",
       "law": "chip label contrast >= WCAG AA",
       "profile": "carbon",
+      "receipt_obligation": {
+        "artifact": "assets/receipts/carbon/cb-chip-contrast.json",
+        "kind": "headless-contrast-probe",
+        "reason": "the contrast claim must be measured against the rendered component background before promotion",
+        "required": true
+      },
+      "receipt_status": "pending",
+      "refute_by": "a headless contrast probe over the rendered chip measures below the claimed WCAG threshold",
       "status": "candidate"
     },
     {
@@ -392,12 +418,25 @@
       "authority_status": "candidate_only",
       "cannot_mark_done": true,
       "claim": "'component-card' of the carbon profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "defer_reason": "content-to-chrome / dead-space ratio is an emergent LAYOUT property \u2014 static parse sees declared boxes, not rendered ink; candidate until a visual receipt",
       "determinism": "judgment",
       "doc_cite": "docs/design/carbon.md",
-      "evidence": {},
+      "evidence": {
+        "receipt_artifact": "assets/receipts/carbon/cb-card-fills.png",
+        "receipt_kind": "viewport-visual-receipt",
+        "receipt_status": "pending"
+      },
       "invariant_id": "cb-card-fills",
       "law": "content fills the Tile (no giant dead space)",
       "profile": "carbon",
+      "receipt_obligation": {
+        "artifact": "assets/receipts/carbon/cb-card-fills.png",
+        "kind": "viewport-visual-receipt",
+        "reason": "ink-to-chrome fill is a rendered layout property that requires a viewport screenshot",
+        "required": true
+      },
+      "receipt_status": "pending",
+      "refute_by": "a viewport screenshot shows the Carbon Tile has large dead space or per-row chrome",
       "status": "candidate"
     }
   ]

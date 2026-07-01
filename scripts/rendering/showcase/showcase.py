@@ -84,12 +84,22 @@ def _rows(results: list[dict]) -> str:
         inv = _html.escape(str(r.get("invariant_id", "")))
         law = _html.escape(str(r.get("law", "")))
         cite = _html.escape(str(r.get("doc_cite", "")))
+        obligation = r.get("receipt_obligation") or {}
+        if r.get("status") == "candidate" and obligation:
+            receipt = (
+                f'{_html.escape(str(r.get("receipt_status", "pending")))} · '
+                f'{_html.escape(str(obligation.get("kind", "")))}<br>'
+                f'<code>{_html.escape(str(obligation.get("artifact", "")))}</code>'
+            )
+        else:
+            receipt = "—"
         out.append(
             f'<tr data-invariant="{inv}" data-status="{status}">'
             f'<td class="inv">{inv}</td>'
             f'<td class="law">{law}</td>'
             f'<td class="cite">{cite}</td>'
             f'<td class="verdict"><span class="badge badge-{status}">{badge}</span></td>'
+            f'<td class="receipt">{receipt}</td>'
             f'</tr>'
         )
     return "\n".join(out)
@@ -115,7 +125,7 @@ def render_showcase(receipts: dict) -> str:
             f'<p class="tally">{n_pass} pass · {n_fail} fail · {n_cand} cannot certify</p></header>'
             f'<div class="stage" style="background:{backdrop}">{stage_html}</div>'
             f'<table class="invariants"><thead><tr>'
-            f'<th>invariant</th><th>law</th><th>doc</th><th>verdict</th></tr></thead>'
+            f'<th>invariant</th><th>law</th><th>doc</th><th>verdict</th><th>receipt</th></tr></thead>'
             f'<tbody>\n{_rows(rc.get("results", []))}\n</tbody></table>'
             f'</section>'
         )
@@ -148,6 +158,8 @@ table.invariants { width: 100%; border-collapse: collapse; font-size: 13px; }
 .invariants td { padding: 8px 10px; border-bottom: 1px solid #1a1a24; vertical-align: top; }
 .inv { font-family: ui-monospace, 'SF Mono', monospace; color: #c9c9d6; white-space: nowrap; }
 .cite { color: #7f7f8c; font-family: ui-monospace, monospace; }
+.receipt { color: #9a9aa6; font-size: 12px; }
+.receipt code { color: #c9c9d6; font-family: ui-monospace, 'SF Mono', monospace; }
 .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 600;
   font-size: 12px; white-space: nowrap; }
 .badge-pass { background: #0f3d2e; color: #55e0a8; border: 1px solid #1c6b4f; }

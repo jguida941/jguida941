@@ -27,6 +27,10 @@
   `site/index.html` remains the one canonical public surface with one selector exposing exactly
   `liquid-glass`, `carbon`, and `apple-dark`. `power-bi` is reserved-only until it has an active
   profile; no `[data-theme="power-bi"]` public switch path or `lang-table` branch ships now.
+- ✅ **P5-RECEIPT-GATE (obligation layer)** — visual/runtime candidate rows are no longer loose
+  prose. Each deferred invariant now declares `receipt_obligation` + `refute_by`; conformance
+  receipts serialize `receipt_status: pending|present`, and `showcase.html` displays the pending
+  proof artifact beside "cannot certify". Actual headless probes/screenshots are the next layer.
 - ✅ **P5-1 slice 1 (themes diverge — the visible payoff)** — retired the convergence lock
   (`test_ia_tokens_are_theme_independent` → `test_ia_is_complete_and_bounded`); promoted PER-THEME
   IA (`design_tokens.THEME_IA`: radius + type ramp; Apple rounder/larger, Power BI sharper/denser,
