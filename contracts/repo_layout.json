@@ -95,6 +95,11 @@
       "glob": "**/*.html",
       "root_allowlist": ["index.html"],
       "group_dirs": []
+    },
+    "receipts_layout": {
+      "purpose": "1b (codex must-fix #1): closed cover over design-system conformance receipts so `assets/` is no longer ungoverned. Every receipt lives under `assets/receipts/<lang>/` where `<lang>` is a KNOWN design profile (active OR reserved) — the allowlist is `design_profiles/_index.json` (single source, read by the guard, NOT hardcoded here). A receipt for an unknown profile reddens, so `conform()` can't drop one into an ungoverned tree. Only `assets/receipts/` is gated (the bot-regenerated `assets/*.svg` cards are a separate concern).",
+      "root": "assets/receipts",
+      "glob": "**/*.json"
     }
   }
 }

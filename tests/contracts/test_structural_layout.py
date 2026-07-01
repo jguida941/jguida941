@@ -145,6 +145,39 @@ class StructuralLayoutContract(unittest.TestCase):
         self.assertEqual(["rogue/x.html"], _undeclared(["index.html", "rogue/x.html"]),
                          "an undeclared subdir site HTML must redden")
 
+    def test_every_receipt_is_under_a_known_profile_dir(self):
+        """1b: conformance receipts live under `assets/receipts/<lang>/`; `<lang>` must be a KNOWN
+        design profile (active OR reserved, from `_index.json` — the single source, not hardcoded
+        here). A receipt for an unknown profile reddens, so `conform()` can't drop one into an
+        ungoverned tree (codex must-fix #1: `assets/` was ungoverned). Vacuously green until 1b
+        writes the first receipt."""
+        section = _STRUCT["receipts_layout"]
+        root = REPO_ROOT / section["root"]
+        idx = json.loads((REPO_ROOT / "contracts" / "design_profiles" / "_index.json").read_text(encoding="utf-8"))
+        known = set(idx["active_design_profiles"]) | set(idx["reserved_design_profiles"])
+        undeclared: list[str] = []
+        if root.is_dir():
+            for path in root.glob(section["glob"]):
+                if not path.is_file():
+                    continue
+                parts = path.relative_to(root).parts
+                if not parts or parts[0] not in known:
+                    undeclared.append(path.relative_to(root).as_posix())
+        self.assertEqual([], sorted(undeclared),
+                         "conformance receipt under an unknown-profile dir — index the profile in _index.json")
+
+    def test_receipts_cover_fires_on_a_rogue_profile_dir(self):
+        """Anti-tautology: a forged receipt under an unknown-profile dir breaks the cover."""
+        idx = json.loads((REPO_ROOT / "contracts" / "design_profiles" / "_index.json").read_text(encoding="utf-8"))
+        known = set(idx["active_design_profiles"]) | set(idx["reserved_design_profiles"])
+
+        def _bad(names: list[str]) -> list[str]:
+            return sorted(n for n in names if Path(n).parts[0] not in known)
+
+        self.assertEqual([], _bad(["liquid-glass/conformance_receipt.json"]), "a known-profile receipt is green")
+        self.assertEqual(["rogue/x.json"], _bad(["liquid-glass/conformance_receipt.json", "rogue/x.json"]),
+                         "a receipt under an unknown-profile dir must redden the cover")
+
     # --- inverse drift: no phantom declarations ---
 
     def test_declared_homes_have_no_phantom_members(self):
