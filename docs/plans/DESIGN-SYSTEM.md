@@ -132,7 +132,12 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
    aliases liquid-glass into config (single source, no literal copy) + DERIVED-PARITY (resolved==config).
 3. **P5-WEBKIT-BUTTON** (instance #1, split greens): 1a-i ✅ `render_button` seam + liquid-glass
    character; 1a-ii-A ✅ carbon (label-left/icon-right DOM, radius 0, token-swap, square focus, flat) +
-   pairwise distinctness fingerprint. **NEXT — 1a-ii-B apple-dark → 1b conform+predicates → 1c showcase.**
+   pairwise distinctness fingerprint; 1a-ii-B ✅ apple-dark (aliases `THEMES['apple-dark']`, opaque-fill,
+   opacity-dim, rounded-system-ring); **1b ✅** conform()+predicate library+adapter+receipts (codex folded
+   4 honesty must-fixes: adapter fails-closed on empty CSS, mutually-exclusive mechanic, 2px-inset focus
+   geometry, per-status honest claim — each RED-proven); **1c ✅** `render_showcase()` → `site/showcase.html`
+   renders the committed receipts (real button per language + receipt-driven verdict table; `candidate`
+   stamped "cannot certify", never fake-green), closed-cover + drift-guarded + mutation-proven. 210 green.
    Constants doc-grounded against PRIMARY URLs first (`docs/design/<lang>.md`); `[derived]` marked.
    fingerprint over {radius, state_mechanic, focus_recipe, anatomy, **material**, **elevation**}.
    **Codex audit guards (must land in the named slice):**

@@ -1,0 +1,120 @@
+{
+  "authority_status": "candidate_only",
+  "profile": "apple-dark",
+  "profile_version": 1,
+  "results": [
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-capsule",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim"
+      },
+      "invariant_id": "ap-btn-radius",
+      "law": "apple-dark button is a 999px capsule",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-capsule",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim"
+      },
+      "invariant_id": "ap-btn-material",
+      "law": "OPAQUE fill (not frosted glass)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-capsule",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim"
+      },
+      "invariant_id": "ap-btn-mechanic",
+      "law": "opacity-dim press (dims DOWN)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-capsule",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim"
+      },
+      "invariant_id": "ap-btn-flat",
+      "law": "ZERO box-shadow (depth via material only)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the apple-dark profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {
+        "anatomy": "centered-capsule",
+        "focus_recipe": "rounded-system-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 999,
+        "state_mechanic": "opacity-dim"
+      },
+      "invariant_id": "ap-btn-focus",
+      "law": "rounded system focus ring (not a square inset)",
+      "profile": "apple-dark",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "'component-button' of the apple-dark profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "determinism": "judgment",
+      "doc_cite": "docs/design/apple-dark.md",
+      "evidence": {},
+      "invariant_id": "ap-btn-contrast",
+      "law": "button label contrast on the actual fill",
+      "profile": "apple-dark",
+      "status": "candidate"
+    }
+  ]
+}

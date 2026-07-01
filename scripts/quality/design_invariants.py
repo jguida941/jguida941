@@ -81,13 +81,19 @@ def conform(profile: str) -> list[dict]:
     return results
 
 
+def receipt_json(profile: str) -> str:
+    """PURE: the serialized conformance receipt for a profile (no disk write). The drift guard
+    compares the committed bytes against THIS, so it never mutates the committed fixture (codex
+    1c #1)."""
+    payload = {"profile": profile, "profile_version": 1, "authority_status": "candidate_only",
+               "results": conform(profile)}
+    return json.dumps(payload, indent=2, sort_keys=True) + "\n"
+
+
 def write_receipt(profile: str) -> Path:
     """Serialize conform(profile) to assets/receipts/<profile>/conformance_receipt.json (the
     RECEIPT seam) — the artifact the showcase + settings read to stamp each cell."""
-    results = conform(profile)
     out = _root() / "assets" / "receipts" / profile / "conformance_receipt.json"
     out.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"profile": profile, "profile_version": 1, "authority_status": "candidate_only",
-               "results": results}
-    out.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    out.write_text(receipt_json(profile), encoding="utf-8")
     return out

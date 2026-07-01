@@ -1,0 +1,80 @@
+{
+  "authority_status": "candidate_only",
+  "profile": "liquid-glass",
+  "profile_version": 1,
+  "results": [
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/liquid-glass.md",
+      "evidence": {
+        "anatomy": "centered-capsule",
+        "focus_recipe": "capsule-halo",
+        "has_backdrop_filter": true,
+        "has_box_shadow": true,
+        "radius_px": 999,
+        "state_mechanic": "glass-brightness"
+      },
+      "invariant_id": "lg-btn-radius",
+      "law": "liquid-glass button is a 999px capsule",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/liquid-glass.md",
+      "evidence": {
+        "anatomy": "centered-capsule",
+        "focus_recipe": "capsule-halo",
+        "has_backdrop_filter": true,
+        "has_box_shadow": true,
+        "radius_px": 999,
+        "state_mechanic": "glass-brightness"
+      },
+      "invariant_id": "lg-btn-material",
+      "law": "frosted-glass material on the button",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/liquid-glass.md",
+      "evidence": {
+        "anatomy": "centered-capsule",
+        "focus_recipe": "capsule-halo",
+        "has_backdrop_filter": true,
+        "has_box_shadow": true,
+        "radius_px": 999,
+        "state_mechanic": "glass-brightness"
+      },
+      "invariant_id": "lg-btn-mechanic",
+      "law": "glass-brightness press (brightness UP)",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "'component-button' of the liquid-glass profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "determinism": "judgment",
+      "doc_cite": "docs/design/liquid-glass.md",
+      "evidence": {},
+      "invariant_id": "lg-btn-contrast",
+      "law": "button label contrast >= WCAG AA on the actual glass surface",
+      "profile": "liquid-glass",
+      "status": "candidate"
+    }
+  ]
+}

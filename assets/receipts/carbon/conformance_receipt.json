@@ -1,0 +1,120 @@
+{
+  "authority_status": "candidate_only",
+  "profile": "carbon",
+  "profile_version": 1,
+  "results": [
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-left-icon-right",
+        "focus_recipe": "square-2px-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "state_mechanic": "token-swap"
+      },
+      "invariant_id": "cb-btn-radius",
+      "law": "carbon button is square (radius 0)",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-left-icon-right",
+        "focus_recipe": "square-2px-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "state_mechanic": "token-swap"
+      },
+      "invariant_id": "cb-btn-anatomy",
+      "law": "label hard-left + trailing icon hard-right (space-between DOM)",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-left-icon-right",
+        "focus_recipe": "square-2px-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "state_mechanic": "token-swap"
+      },
+      "invariant_id": "cb-btn-mechanic",
+      "law": "token-swap press (no filter/opacity/state-layer)",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-left-icon-right",
+        "focus_recipe": "square-2px-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "state_mechanic": "token-swap"
+      },
+      "invariant_id": "cb-btn-flat",
+      "law": "flat \u2014 zero box-shadow",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-button' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {
+        "anatomy": "label-left-icon-right",
+        "focus_recipe": "square-2px-ring",
+        "has_backdrop_filter": false,
+        "has_box_shadow": false,
+        "radius_px": 0,
+        "state_mechanic": "token-swap"
+      },
+      "invariant_id": "cb-btn-focus",
+      "law": "2px square inset focus ring",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
+      "aspect": "component-button",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "'component-button' of the carbon profile v1 is a candidate (judgment/deferred) \u2014 needs a visual/probe receipt",
+      "determinism": "judgment",
+      "doc_cite": "docs/design/carbon.md",
+      "evidence": {},
+      "invariant_id": "cb-btn-contrast",
+      "law": "button label contrast >= WCAG AA",
+      "profile": "carbon",
+      "status": "candidate"
+    }
+  ]
+}

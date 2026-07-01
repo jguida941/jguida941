@@ -65,24 +65,28 @@ class DesignConformanceContract(unittest.TestCase):
                     self.assertEqual(r["status"], "candidate",
                                      f"{name}/{r['invariant_id']}: a judgment row must be candidate, not {r['status']}")
 
-    def test_write_receipt_lands_under_the_governed_receipts_tree(self):
-        """The RECEIPT seam: `write_receipt` serializes conform() under
-        `assets/receipts/<profile>/` (governed by receipts_layout) with `candidate_only`. Cleaned
-        up — this slice ships no committed receipt (the showcase writes + commits them in 1c)."""
-        from scripts.quality.design_invariants import write_receipt
-        out = write_receipt("liquid-glass")
-        try:
-            self.assertTrue(out.is_file(), "write_receipt must write the file")
-            self.assertEqual(out.parent.name, "liquid-glass", "receipt lives under assets/receipts/<profile>/")
-            data = json.loads(out.read_text(encoding="utf-8"))
+    def test_committed_receipts_are_current_and_write_receipt_targets_the_governed_tree(self):
+        """The RECEIPT seam: as of 1c EVERY active profile's receipt is a COMMITTED artifact the
+        showcase reads. Drift guard via the PURE `receipt_json` (no disk write, so a drift never
+        mutates the committed fixture — codex 1c #1); `write_receipt` is then exercised leak-safely
+        (restored in `finally`) to prove it targets `assets/receipts/<profile>/` (receipts_layout)."""
+        from scripts.quality.design_invariants import receipt_json, write_receipt
+        for name in _active():
+            committed = ROOT / "assets" / "receipts" / name / "conformance_receipt.json"
+            self.assertTrue(committed.is_file(), f"{name}: committed receipt must exist")
+            before = committed.read_text(encoding="utf-8")   # committed baseline
+            expected = receipt_json(name)                    # PURE — no disk write
+            data = json.loads(expected)
             self.assertEqual(data["authority_status"], "candidate_only")
-            self.assertTrue(any(r["status"] == "pass" for r in data["results"]), "a real pass is recorded")
-        finally:
-            out.unlink(missing_ok=True)
-            try:
-                out.parent.rmdir()
-            except OSError:
-                pass
+            self.assertTrue(any(r["status"] == "pass" for r in data["results"]),
+                            f"{name}: a real pass is recorded")
+            self.assertEqual(before, expected,
+                             f"{name}: receipt drift — regenerate via showcase.write_showcase")
+            try:  # the disk seam writes to the governed tree; restore regardless (no leaked state)
+                out = write_receipt(name)
+                self.assertEqual(out, committed, "write_receipt writes to assets/receipts/<profile>/")
+            finally:
+                committed.write_text(before, encoding="utf-8")
 
 
 class AdapterFailsClosed(unittest.TestCase):
