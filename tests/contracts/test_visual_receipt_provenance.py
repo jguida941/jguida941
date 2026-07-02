@@ -120,8 +120,12 @@ class ReceiptProvenanceContract(unittest.TestCase):
 
     def test_committed_headless_page_receipts_are_real_and_provenanced(self):
         """MF1: committed page receipts are real Chrome-headless artifacts. This test reads only
-        committed files: screenshots are nonempty PNGs, sidecars name the honest kind/command, and the
-        390px DOM probes for the three design pages report no horizontal overflow."""
+        committed files: screenshots are nonempty PNGs, sidecars name the honest kind/command, the
+        probes MEASURED the viewport they claim (stand-in MF-1: a bare --window-size=390 silently
+        measures at Chrome's ~500 minimum — the iframe probe must report client_width == 390), the
+        sidecar pins the exact page bytes it captured (stand-in SF-2: a stale or hand-authored
+        receipt reddens), and the design pages report no horizontal overflow at true 390."""
+        import hashlib
         from scripts.quality.headless_receipts import (
             DESIGN_PAGES,
             DOM_PROBE_KIND,
@@ -142,20 +146,28 @@ class ReceiptProvenanceContract(unittest.TestCase):
             self.assertGreater(summary["height"], 0, f"{page}: screenshot height")
             self.assertTrue(summary["nonblank"], f"{page}: screenshot must be nonblank")
 
+            page_sha = hashlib.sha256(
+                (ROOT / PAGE_ROUTES[page]).read_bytes()).hexdigest()
             screenshot_sidecar = json.loads(provenance_path(screenshot).read_text(encoding="utf-8"))
             self.assertEqual(screenshot_sidecar["kind"], SCREENSHOT_KIND)
             self.assertIn("--headless=new", screenshot_sidecar["command"])
             self.assertTrue(screenshot_sidecar["chrome_version"].startswith("Google Chrome "))
             self.assertEqual(screenshot_sidecar["viewport"]["width"], 1280)
+            self.assertEqual(screenshot_sidecar["page_sha256"], page_sha,
+                             f"{page}: screenshot receipt is stale — reproduce via headless_receipts")
 
             probe = dom_probe_artifact(page)
             self.assertTrue(probe.is_file(), f"{page}: missing DOM probe receipt")
             data = json.loads(probe.read_text(encoding="utf-8"))
             self.assertEqual(data["kind"], DOM_PROBE_KIND)
             self.assertEqual(data["viewport"]["width"], 390)
+            self.assertEqual(data["client_width"], 390,
+                             f"{page}: the probe must MEASURE 390, not merely claim it")
             probe_sidecar = json.loads(provenance_path(probe).read_text(encoding="utf-8"))
             self.assertEqual(probe_sidecar["kind"], DOM_PROBE_KIND)
             self.assertIn("--headless=new", probe_sidecar["command"])
+            self.assertEqual(probe_sidecar["page_sha256"], page_sha,
+                             f"{page}: probe receipt is stale — reproduce via headless_receipts")
             if page in DESIGN_PAGES:
                 self.assertIs(data["horizontal_overflow"], False,
                               f"{page}: 390px DOM probe overflowed: {data.get('offenders')}")

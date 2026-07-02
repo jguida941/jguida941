@@ -8,14 +8,16 @@
     "--headless=new",
     "--no-first-run",
     "--no-default-browser-check",
-    "--window-size=390,1000",
-    "--virtual-time-budget=1500",
+    "--allow-file-access-from-files",
+    "--window-size=800,1000",
+    "--virtual-time-budget=2500",
     "--dump-dom",
-    "file:///var/folders/6_/_15pvmxd7yq5qrnmzr92dkr00000gn/T/settings-probe-nlnxw8au/settings.html"
+    "file:///var/folders/6_/_15pvmxd7yq5qrnmzr92dkr00000gn/T/settings-probe-ubrxfa9u/settings.html"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-dom-probe",
   "page": "settings",
+  "page_sha256": "6b9879ed28899df0f8a73917f548207d2f4a00916857050f56262af46c08259f",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/settings.html",
   "viewport": {

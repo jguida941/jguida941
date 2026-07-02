@@ -85,6 +85,26 @@ class DesignProfileSpineContract(unittest.TestCase):
                              f"{name}: aspect_coverage must cover EXACTLY the roster aspects "
                              f"(missing: {sorted(set(self.roster_ids) - covered)}; "
                              f"extra: {sorted(covered - set(self.roster_ids))})")
+            # stand-in SF-4: the coverage VALUE is a governance claim — cross-check it against the
+            # roster's emission_status AND against the profile actually emitting invariants for the
+            # aspect, so "covered-emitted" can never be a label without a law behind it.
+            roster_status = {a["id"]: a["emission_status"] for a in self.roster["aspects"]}
+            emitted_aspects = {inv["aspect"] for inv in prof["invariants"]
+                               if inv.get("emission_status") == "emitted"}
+            for aspect, claim in prof["aspect_coverage"].items():
+                if roster_status[aspect] == "deferred":
+                    self.assertEqual(claim, "covered-deferred",
+                                     f"{name}/{aspect}: roster defers this aspect — a profile may "
+                                     f"not claim {claim!r}")
+                    self.assertNotIn(aspect, emitted_aspects,
+                                     f"{name}/{aspect}: deferred aspect must not emit invariants")
+                else:
+                    self.assertEqual(claim, "covered-emitted",
+                                     f"{name}/{aspect}: roster emits this aspect — a profile may "
+                                     f"not quietly defer it (the flip-hole)")
+                    self.assertIn(aspect, emitted_aspects,
+                                  f"{name}/{aspect}: 'covered-emitted' requires >=1 emitted "
+                                  f"invariant for the aspect — a label is not a law")
 
     # --- SPINE-b: the DTCG token block DERIVES from config (single source, not a copy) ---
     def test_liquid_glass_tokens_derive_from_config_single_source(self):

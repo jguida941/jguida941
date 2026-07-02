@@ -6,6 +6,7 @@ Chrome binary directly and fails closed if Chrome is unavailable.
 """
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import re
@@ -95,10 +96,14 @@ def _write_provenance(
     chrome_version: str,
     viewport: dict,
 ) -> Path:
+    route = _root() / PAGE_ROUTES[page]
     payload = {
         "contract_id": "PageHeadlessReceiptProvenance",
         "page": page,
         "route": PAGE_ROUTES[page],
+        # the receipt is PINNED to the exact page bytes it was captured from (stand-in SF-2):
+        # a stale or hand-authored artifact reddens the hermetic guard without needing Chrome.
+        "page_sha256": hashlib.sha256(route.read_bytes()).hexdigest(),
         "artifact": _rel(artifact),
         "kind": kind,
         "producer": "scripts/quality/headless_receipts.py",
@@ -148,12 +153,18 @@ def screenshot_page(page: str, width: int = 1280) -> Path:
 
 
 def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
-    source = route.read_text(encoding="utf-8")
-    base = f'<base href="{(_root() / "site").as_uri()}/">'
-    if re.search(r"<head[^>]*>", source, flags=re.I):
-        source = re.sub(r"(<head[^>]*>)", r"\1" + base, source, count=1, flags=re.I)
-    else:
-        source = base + source
+    """A HOST page embedding the REAL site page in an iframe of exactly `viewport` CSS px —
+    Chrome's CLI window has a ~500px minimum width, so a bare --window-size=390 silently measures
+    at 500 (stand-in MF-1). The iframe gives a true 390 layout viewport; the probe measures the
+    iframe's contentDocument and the producer FAILS CLOSED if the measured client width differs
+    from the declared viewport."""
+    host = f"""<!doctype html>
+<html><head><title>probe host</title></head>
+<body style="margin:0">
+<iframe id="target" src="{route.as_uri()}"
+        style="width:{viewport}px;height:{height}px;border:0" scrolling="no"></iframe>
+{{script}}
+</body></html>"""
     script = f"""
 <script>
 (function () {{
@@ -163,15 +174,18 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
   }}
   function probe() {{
     if (done) return;
+    var frame = document.getElementById("target");
+    var doc = frame && frame.contentDocument;
+    if (!doc || !doc.body) {{ window.setTimeout(probe, 100); return; }}
     done = true;
-    var root = document.documentElement;
-    var body = document.body;
-    var clientWidth = root.clientWidth || window.innerWidth || {viewport};
+    var root = doc.documentElement;
+    var body = doc.body;
+    var clientWidth = root.clientWidth || {viewport};
     var bodyScrollWidth = body ? body.scrollWidth : 0;
     var scrollWidth = Math.max(root.scrollWidth || 0, bodyScrollWidth);
     var offenders = [];
-    Array.prototype.forEach.call(document.querySelectorAll("*"), function (el) {{
-      var style = window.getComputedStyle(el);
+    Array.prototype.forEach.call(doc.querySelectorAll("*"), function (el) {{
+      var style = frame.contentWindow.getComputedStyle(el);
       if (style.display === "none" || style.visibility === "hidden") return;
       var rect = el.getBoundingClientRect();
       if (!rect || (rect.width === 0 && rect.height === 0)) return;
@@ -208,18 +222,15 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
     document.documentElement.innerHTML = "<head><title>probe</title></head><body><pre id=\\"headless-probe-json\\"></pre></body>";
     document.getElementById("headless-probe-json").textContent = JSON.stringify(result);
   }}
-  window.addEventListener("load", function () {{
+  var frame0 = document.getElementById("target");
+  frame0.addEventListener("load", function () {{
     requestAnimationFrame(function () {{ requestAnimationFrame(probe); }});
   }});
-  window.setTimeout(probe, 500);
+  window.setTimeout(probe, 800);
 }}());
 </script>
 """
-    if re.search(r"</body\s*>", source, flags=re.I):
-        # lambda replacement: the script body contains backslash escapes (e.g. /\s+/) that would
-        # be misread as template escapes by a plain-string repl
-        return re.sub(r"</body\s*>", lambda _m: script + "</body>", source, count=1, flags=re.I)
-    return source + script
+    return host.replace("{script}", script)
 
 
 def _parse_probe_dump(dump: str) -> dict:
@@ -245,13 +256,18 @@ def dom_probe(page: str, viewport: int = 390) -> Path:
             "--headless=new",
             "--no-first-run",
             "--no-default-browser-check",
-            f"--window-size={viewport},{height}",
-            "--virtual-time-budget=1500",
+            "--allow-file-access-from-files",   # the host page reads its file:// iframe's document
+            f"--window-size=800,{height}",      # HOST window (> iframe); the iframe IS the viewport
+            "--virtual-time-budget=2500",
             "--dump-dom",
             probe_file.as_uri(),
         ]
         proc = _run(command)
     payload = _parse_probe_dump(proc.stdout)
+    if payload.get("client_width") != viewport:
+        raise RuntimeError(
+            f"{page}: probe measured client_width={payload.get('client_width')} != declared "
+            f"viewport {viewport} — refusing to write an overclaiming receipt (stand-in MF-1)")
     artifact.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     _write_provenance(
         page=page,
