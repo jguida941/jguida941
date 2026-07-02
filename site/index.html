@@ -345,6 +345,9 @@ footer a { color: var(--ink); text-decoration: none; }
   .rrow { min-height: 44px; }
   .heat { min-width: 460px; }
 }
+.nav-liquid-glass { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.nav-liquid-glass a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
+.nav-liquid-glass a[aria-current] { background: var(--accent); color: var(--backdrop); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 @media (prefers-reduced-transparency: reduce) {
   .panel, .switcher, .mgroup, .rrow { -webkit-backdrop-filter: none; backdrop-filter: none;
@@ -362,7 +365,7 @@ footer a { color: var(--ink); text-decoration: none; }
         <p class="eyebrow">GitHub Analytics · Live</p>
         <h1 id="hero-name">@jguida941</h1>
         <p class="tag" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p>
-        <p class="tag nav-links"><a href="studio.html">Design-language studio →</a> · <a href="showcase.html">showcase</a> · <a href="settings.html">settings</a></p>
+        <nav class="site-nav nav-liquid-glass" aria-label="Site"><a href="index.html" aria-current="page">home</a><a href="showcase.html">showcase</a><a href="studio.html">studio</a><a href="settings.html">settings</a></nav>
       </div>
       <div class="switcher" role="group" aria-label="Theme"><button type="button" data-theme-set="liquid-glass" aria-pressed="true" title="Apple frosted glass · Tokyo Night">Liquid Glass</button><button type="button" data-theme-set="carbon" aria-pressed="false" title="IBM Carbon · flat structured UI">Carbon</button><button type="button" data-theme-set="apple-dark" aria-pressed="false" title="System dark · one vivid accent">Apple Dark</button></div>
     </div>

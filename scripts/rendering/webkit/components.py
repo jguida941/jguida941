@@ -244,3 +244,33 @@ def render_card(profile: str, variant: str, state: str, profile_data: dict | Non
         f"font: {card.get('value_weight', 600)} {card['font_size_px']}px/1.3 {font}; }}"
     )
     return html, css
+
+
+def render_nav(profile: str, links: list, active: str, profile_data: dict | None = None) -> tuple[str, str]:
+    """The site NAV band (P5-BOARD B-1b, docs/design/board.md §1 / test_design_nav). Anatomy from
+    `components.nav` profile DATA (carbon: underline-tabs, square; capsule languages: pills with a
+    filled active). CSS is VAR-BASED (var(--accent)/var(--ink…)) — portable across the dashboard's
+    emit_css_root and the shell's root_block, which expose the same role vars — so the band passes
+    the no-hex law on every page while the ANATOMY still branches per language."""
+    from scripts.rendering.design import loader
+
+    prof = profile_data if profile_data is not None else loader.load(profile)
+    nav = prof["components"]["nav"]
+    cls = f"nav-{profile}"
+    items = "".join(
+        f'<a href="{_escape(href)}"' + (' aria-current="page"' if href == active else "")
+        + f'>{_escape(label)}</a>'
+        for label, href in links)
+    html = f'<nav class="site-nav {cls}" aria-label="Site">{items}</nav>'
+    base = [
+        f".{cls} {{ display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }}",
+        f".{cls} a {{ color: var(--ink-dim); text-decoration: none; padding: 6px 14px;"
+        f" border-radius: {nav['radius_px']}px; font-weight: 600; font-size: 13px;"
+        f" transition: color var(--motion-fast) var(--ease-standard); }}",
+    ]
+    if nav["anatomy"] == "underline-tabs":
+        base.append(f".{cls} a[aria-current] {{ color: var(--ink); border-bottom: 2px solid var(--accent);"
+                    f" border-radius: 0; }}")
+    else:  # capsule-pills
+        base.append(f".{cls} a[aria-current] {{ background: var(--accent); color: var(--backdrop); }}")
+    return html, "\n".join(base)

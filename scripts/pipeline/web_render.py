@@ -207,6 +207,7 @@ footer a { color: var(--ink); text-decoration: none; }
   .rrow { min-height: 44px; }
   .heat { min-width: 460px; }
 }
+""" + _nav_parts()[1] + """
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 @media (prefers-reduced-transparency: reduce) {
   .panel, .switcher, .mgroup, .rrow { -webkit-backdrop-filter: none; backdrop-filter: none;
@@ -232,6 +233,21 @@ _ICONS = {
 }
 
 
+
+_NAV_LINKS = [("home", "index.html"), ("showcase", "showcase.html"),
+              ("studio", "studio.html"), ("settings", "settings.html")]
+
+
+def _nav_parts() -> tuple[str, str]:
+    """The governed site-nav band (P5-BOARD B-1b) rendered in the page's own language."""
+    from scripts.rendering.webkit.components import render_nav
+    return render_nav("liquid-glass", _NAV_LINKS, active="index.html")
+
+
+def _nav_band_html() -> str:
+    return _nav_parts()[0]
+
+
 def _hero() -> str:
     metas = "".join(
         f'<button type="button" data-theme-set="{name}" aria-pressed="{str(name == DEFAULT_THEME).lower()}" '
@@ -245,7 +261,7 @@ def _hero() -> str:
         <p class="eyebrow">GitHub Analytics · Live</p>
         <h1 id="hero-name">@jguida941</h1>
         <p class="tag" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p>
-        <p class="tag nav-links"><a href="studio.html">Design-language studio →</a> · <a href="showcase.html">showcase</a> · <a href="settings.html">settings</a></p>
+        {_nav_band_html()}
       </div>
       <div class="switcher" role="group" aria-label="Theme">{metas}</div>
     </div>

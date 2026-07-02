@@ -39,6 +39,7 @@
     }
   },
   "components": {
+    "nav": {"variants": ["band"], "anatomy": "capsule-pills", "radius_px": 999, "doc_cite": "docs/design/board.md"},
     "button": {
       "$doc": "docs/design/liquid-glass.md — Apple Materials + WWDC25 'Adopting Liquid Glass'. capsule + frosted glass + glass-brightness press (brightness UP). brightness(1.18) is [derived].",
       "anatomy": "centered-capsule",
@@ -110,7 +111,7 @@
     "component-card": "covered-emitted",
     "component-kpi": "covered-deferred",
     "component-input": "covered-deferred",
-    "component-nav": "covered-deferred",
+    "component-nav": "covered-emitted",
     "component-table": "covered-deferred",
     "component-chart": "covered-deferred",
     "component-hero": "covered-deferred",
@@ -129,6 +130,7 @@
     {"invariant_id": "lg-rhythm-density", "aspect": "page-spacing-rhythm", "determinism": "deterministic", "emission_status": "emitted", "law": "panel padding follows the language's cited density band", "doc_cite": "docs/design/pageshell.md", "predicate": {"predicate_class": "shell_density_from_profile"}},
     {"invariant_id": "lg-grouping-depth", "aspect": "page-section-grouping", "determinism": "deterministic", "emission_status": "emitted", "law": "the shell composes one chrome level (no chromed box inside a chromed box)", "doc_cite": "docs/design/pageshell.md", "predicate": {"predicate_class": "section_grouping_flat"}},
     {"invariant_id": "lg-motion-band", "aspect": "motion", "determinism": "deterministic", "emission_status": "emitted", "law": "motion tokens trace to the cited per-language block and sit in the 70-700ms band", "doc_cite": "docs/design/motion.md", "predicate": {"predicate_class": "motion_tokens_cited"}},
+    {"invariant_id": "lg-nav-anatomy", "aspect": "component-nav", "determinism": "deterministic", "emission_status": "emitted", "law": "the site nav band links every surface with a marked active page, token-only", "doc_cite": "docs/design/board.md", "predicate": {"predicate_class": "nav_anatomy"}},
     {"invariant_id": "lg-btn-radius", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "liquid-glass button is a 999px capsule", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "button_radius", "params": {"expected_px": 999, "variant": "prominent"}}},
     {"invariant_id": "lg-btn-material", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "frosted-glass material on the button", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "button_material_glass", "params": {"variant": "prominent"}}},
     {"invariant_id": "lg-btn-mechanic", "aspect": "component-button", "determinism": "deterministic", "emission_status": "emitted", "law": "glass-brightness press (brightness UP)", "doc_cite": "docs/design/liquid-glass.md", "predicate": {"predicate_class": "button_state_mechanic", "params": {"expected": "glass-brightness", "variant": "prominent"}}},

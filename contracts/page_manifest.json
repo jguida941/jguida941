@@ -2,9 +2,14 @@
   "contract_id": "PageManifest",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "purpose": "D-SHELL-2 (MF2, ratified): every generated page declares WHAT IT IS — intent, archetype (closed enum), and the regions its archetype requires. A page absent from this manifest, an archetype outside the enum, or a required region missing from the COMMITTED page bytes reddens tests/contracts/test_page_manifest.py. Aliases use the closed grammar '.class-token' | '[data-attr]' only, written from the actual renders.",
+  "purpose": "D-SHELL-2 (MF2, ratified): every generated page declares WHAT IT IS \u2014 intent, archetype (closed enum), and the regions its archetype requires. A page absent from this manifest, an archetype outside the enum, or a required region missing from the COMMITTED page bytes reddens tests/contracts/test_page_manifest.py. Aliases use the closed grammar '.class-token' | '[data-attr]' only, written from the actual renders.",
   "doc_cite": "docs/design/pageshell.md",
-  "archetypes": ["landing", "proof-report", "control-plane", "workbench"],
+  "archetypes": [
+    "landing",
+    "proof-report",
+    "control-plane",
+    "workbench"
+  ],
   "pages": [
     {
       "id": "index",
@@ -12,11 +17,23 @@
       "render_source": "scripts/pipeline/web_render.py::render_dashboard",
       "intent": "prove the builder ships and route visitors to every design surface",
       "archetype": "landing",
-      "required_regions": ["content-column", "surface-links"],
-      "region_aliases": {"content-column": ".wrap", "surface-links": ".nav-links"},
+      "required_regions": [
+        "content-column",
+        "site-nav"
+      ],
+      "region_aliases": {
+        "content-column": ".wrap",
+        "site-nav": ".site-nav"
+      },
       "receipt_obligations": [
-        {"kind": "chrome-headless-screenshot", "viewport": 1280},
-        {"kind": "chrome-headless-dom-probe", "viewport": 390}
+        {
+          "kind": "chrome-headless-screenshot",
+          "viewport": 1280
+        },
+        {
+          "kind": "chrome-headless-dom-probe",
+          "viewport": 390
+        }
       ]
     },
     {
@@ -25,11 +42,31 @@
       "render_source": "scripts/rendering/showcase/showcase.py::render_showcase",
       "intent": "render every active language's conformance receipts as a legible proof report",
       "archetype": "proof-report",
-      "required_regions": ["orientation", "legend", "language-section", "verdict-table", "specimen-stage"],
-      "region_aliases": {"orientation": ".ps-crumbs", "legend": ".legend", "language-section": ".lang", "verdict-table": ".invariants", "specimen-stage": ".stage"},
+      "required_regions": [
+        "orientation",
+        "legend",
+        "language-section",
+        "verdict-table",
+        "specimen-stage",
+        "site-nav"
+      ],
+      "region_aliases": {
+        "orientation": ".ps-crumbs",
+        "legend": ".legend",
+        "language-section": ".lang",
+        "verdict-table": ".invariants",
+        "specimen-stage": ".stage",
+        "site-nav": ".site-nav"
+      },
       "receipt_obligations": [
-        {"kind": "chrome-headless-screenshot", "viewport": 1280},
-        {"kind": "chrome-headless-dom-probe", "viewport": 390}
+        {
+          "kind": "chrome-headless-screenshot",
+          "viewport": 1280
+        },
+        {
+          "kind": "chrome-headless-dom-probe",
+          "viewport": 390
+        }
       ]
     },
     {
@@ -38,11 +75,27 @@
       "render_source": "scripts/rendering/settings/settings.py::render_settings",
       "intent": "display the governed control plane: which component swaps are admissible per base language",
       "archetype": "control-plane",
-      "required_regions": ["orientation", "law", "control-groups"],
-      "region_aliases": {"orientation": ".ps-crumbs", "law": ".law", "control-groups": ".base"},
+      "required_regions": [
+        "orientation",
+        "law",
+        "control-groups",
+        "site-nav"
+      ],
+      "region_aliases": {
+        "orientation": ".ps-crumbs",
+        "law": ".law",
+        "control-groups": ".base",
+        "site-nav": ".site-nav"
+      },
       "receipt_obligations": [
-        {"kind": "chrome-headless-screenshot", "viewport": 1280},
-        {"kind": "chrome-headless-dom-probe", "viewport": 390}
+        {
+          "kind": "chrome-headless-screenshot",
+          "viewport": 1280
+        },
+        {
+          "kind": "chrome-headless-dom-probe",
+          "viewport": 390
+        }
       ]
     },
     {
@@ -51,11 +104,29 @@
       "render_source": "scripts/rendering/studio/studio.py::render_studio",
       "intent": "let a visitor try each language as a full mini-site and swap components under the admissibility law",
       "archetype": "workbench",
-      "required_regions": ["orientation", "language-switcher", "swap-controls", "archetype-stage"],
-      "region_aliases": {"orientation": ".ps-crumbs", "language-switcher": ".switcher", "swap-controls": ".swap-controls", "archetype-stage": ".stages"},
+      "required_regions": [
+        "orientation",
+        "language-switcher",
+        "swap-controls",
+        "archetype-stage",
+        "site-nav"
+      ],
+      "region_aliases": {
+        "orientation": ".ps-crumbs",
+        "language-switcher": ".switcher",
+        "swap-controls": ".swap-controls",
+        "archetype-stage": ".stages",
+        "site-nav": ".site-nav"
+      },
       "receipt_obligations": [
-        {"kind": "chrome-headless-screenshot", "viewport": 1280},
-        {"kind": "chrome-headless-dom-probe", "viewport": 390}
+        {
+          "kind": "chrome-headless-screenshot",
+          "viewport": 1280
+        },
+        {
+          "kind": "chrome-headless-dom-probe",
+          "viewport": 390
+        }
       ]
     }
   ]

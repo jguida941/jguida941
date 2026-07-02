@@ -86,6 +86,23 @@ def _motion_facts(profile: str, variant: str | None = None, profile_data: dict |
     return {"motion_vars_provenance": provenance, "motion_in_band": in_band}
 
 
+def _nav_facts(profile: str, variant: str | None = None, profile_data: dict | None = None) -> dict:
+    """Nav facts (test_design_nav laws): the canonical band renders a .site-nav container, one
+    link per surface, an aria-current active marker, and token-only CSS (var refs, no raw hex).
+    Fail-closed on a missing components.nav block (KeyError -> conform marks fail)."""
+    import re as _re
+    from scripts.rendering.webkit.components import render_nav
+    links = [("home", "index.html"), ("showcase", "showcase.html"),
+             ("studio", "studio.html"), ("settings", "settings.html")]
+    html, css = render_nav(profile, links, active="index.html", profile_data=profile_data)
+    return {
+        "nav_has_band": 'class="site-nav' in html,
+        "nav_links_all": html.count("<a ") == len(links),
+        "nav_has_active": 'aria-current="page"' in html,
+        "nav_token_only": not _re.search(r"#[0-9a-fA-F]{3,8}\b", css),
+    }
+
+
 # aspect -> (component key in profile["components"], the fact-gatherer). Adding a component = one row.
 # `page-shell` is an ASPECT with a fact-gatherer but NOT a component (no components[] block, not in the
 # distinctness signature) — the whole page is the rendered instance.
@@ -97,6 +114,7 @@ _COMPONENT_FACTS = {
     "page-layout": ("page-layout", _pageshell_facts),
     "page-section-grouping": ("page-section-grouping", _pageshell_facts),
     "motion": ("motion", _motion_facts),
+    "component-nav": ("nav", _nav_facts),
     "page-type-ramp": ("page-type-ramp", _pageshell_facts),
     "page-spacing-rhythm": ("page-spacing-rhythm", _pageshell_facts),
 }

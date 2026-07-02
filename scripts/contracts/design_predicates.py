@@ -113,6 +113,13 @@ def motion_tokens_cited(facts: dict, **_) -> bool:
     return facts.get("motion_vars_provenance") is True and facts.get("motion_in_band") is True
 
 
+def nav_anatomy(facts: dict, **_) -> bool:
+    """P5-BOARD B-1b: the nav band renders a .site-nav container linking every surface with an
+    aria-current active marker, token-only CSS. Fail-closed."""
+    return all(facts.get(k) is True for k in
+               ("nav_has_band", "nav_links_all", "nav_has_active", "nav_token_only"))
+
+
 def page_has_orientation(facts: dict, **_) -> bool:
     """A user can tell what the page is + GET BACK: a title WITH text AND a real breadcrumb link (non-
     empty href + text) are present (fail-closed on an empty render / an empty crumbs row)."""
@@ -181,4 +188,5 @@ PREDICATES = {
     "shell_density_from_profile": shell_density_from_profile,
     "section_grouping_flat": section_grouping_flat,
     "motion_tokens_cited": motion_tokens_cited,
+    "nav_anatomy": nav_anatomy,
 }

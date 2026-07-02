@@ -85,6 +85,7 @@ def render_settings() -> str:
     apple-dark page-shell (deterministic; no JS)."""
     from scripts.quality.settings_admissibility import active_profiles, admissible_space
     from scripts.rendering.pageshell.pageshell import render_page_shell
+    from scripts.rendering.webkit.components import render_nav
 
     actives = sorted(active_profiles())
     space = {(c["base"], c["component"], c["source"]): c["admissible"] for c in admissible_space()}
@@ -113,11 +114,15 @@ def render_settings() -> str:
             f'<thead><tr><th>component ↓ / source →</th>{head}</tr></thead>'
             f'<tbody>{"".join(rows)}</tbody></table></div></section>')
 
+    _nav_links = [("home", "index.html"), ("showcase", "showcase.html"),
+                  ("studio", "studio.html"), ("settings", "settings.html")]
+    nav_html, nav_css = render_nav(HOUSE, _nav_links, active="settings.html")
     shell_html, shell_style = render_page_shell(
         HOUSE,
         title="Governed control plane",
         intro=_INTRO,
         breadcrumbs=[("home", "index.html"), ("showcase", "showcase.html"), ("studio", "studio.html")],
+        prefix_html=nav_html,
         sections=[("The law", _LAW_HTML)],
         body_html="\n".join(base_sections),
     )
@@ -127,7 +132,7 @@ def render_settings() -> str:
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         "<title>Design-language settings — governed control plane</title>\n"
         f"<style>:root {{ color-scheme: dark; }}\n* {{ box-sizing: border-box; }}\n"
-        f"html, body {{ height: 100%; margin: 0; }}\n{shell_style}\n{_CONTENT_CSS}\n"
+        f"html, body {{ height: 100%; margin: 0; }}\n{shell_style}\n{nav_css}\n{_CONTENT_CSS}\n"
         "</style>\n"
         "</head><body>\n"
         + shell_html
