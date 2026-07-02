@@ -13,42 +13,49 @@ html, body { height: 100%; margin: 0; }
   --ink: #c7c7cc;
   --ink-dim: #98989d;
   --accent: #0a84ff;
-  --hairline: #ffffff;
+  --hairline: #38383a;
   --status-success: #30d158;
   --status-warning: #ff9f0a;
   --status-danger: #ff453a;
-  --radius-panel: 26px;
-  --radius-tile: 18px;
+  --radius-panel: 14px;
+  --radius-tile: 12px;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  --ps-pad: 24px;
+  --ps-pad: 32px;
+  --ps-measure-page: 980px;
+  --ps-gutter: clamp(20px, 4vw, 56px);
   --ps-pad-tight: 12px;
-  --ps-gap: 16px;
+  --ps-gap: 24px;
   --ps-gap-tight: 8px;
-  --ps-type-title: 26px;
+  --ps-gap-section: 32px;
+  --ps-type-title: 28px;
+  --ps-type-h2: 20px;
   --ps-type-body: 15px;
   --ps-type-sub: 13px;
   --ps-measure: 76ch;
 }
 .ps-apple-dark { background: var(--backdrop); color: var(--ink); font-family: var(--font-sans);
-  margin: 0; min-height: 100%; padding: var(--ps-pad); }
+  margin: 0; min-height: 100%; }
+.ps-apple-dark .ps-main { max-width: var(--ps-measure-page); margin: 0 auto;
+  padding: var(--ps-gutter); }
 .ps-apple-dark .ps-title { margin: 0 0 var(--ps-gap-tight); color: var(--ink-strong);
   font-size: var(--ps-type-title); font-weight: 700; line-height: 1.2; }
 .ps-apple-dark .ps-intro { margin: 0 0 var(--ps-gap-tight); color: var(--ink-dim);
   font-size: var(--ps-type-body); line-height: 1.5; max-width: var(--ps-measure); }
-.ps-apple-dark .ps-crumbs { margin: 0 0 var(--ps-pad); color: var(--ink-dim);
+.ps-apple-dark .ps-crumbs { margin: 0 0 var(--ps-gap-section); color: var(--ink-dim);
   font-size: var(--ps-type-sub); }
 .ps-apple-dark .ps-crumbs a { color: var(--accent); text-decoration: none; }
 .ps-apple-dark .ps-panel { background: var(--surface); border: 1px solid var(--hairline);
   border-radius: var(--radius-panel); padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }
 .ps-apple-dark .ps-panel-h { margin: 0 0 var(--ps-pad-tight); color: var(--ink-strong);
-  font-size: var(--ps-type-body); font-weight: 600; }
+  font-size: var(--ps-type-h2); font-weight: 600; }
 .law { color: var(--ink); font-size: var(--ps-type-sub); }
 .law b { color: var(--accent); }
 .base { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-panel);
   padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }
-.base h2 { margin: 0 0 var(--ps-gap-tight); font-size: var(--ps-type-body); color: var(--ink-strong); }
+.base h2 { margin: 0 0 var(--ps-gap-tight); font-size: var(--ps-type-h2); color: var(--ink-strong); }
 .hint { color: var(--ink-dim); font-size: var(--ps-type-sub); margin: 0 0 var(--ps-gap); }
-table.grid { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub); }
+table.grid { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub);
+  display: block; overflow-x: auto; }
 .grid th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: var(--ps-gap-tight) var(--ps-pad-tight);
   border-bottom: 1px solid var(--hairline); }
 .grid td { padding: var(--ps-pad-tight); border-bottom: 1px solid var(--hairline); vertical-align: top; }
@@ -60,7 +67,7 @@ table.grid { width: 100%; border-collapse: collapse; font-size: var(--ps-type-su
 .verdict.no { background: var(--status-danger); color: var(--backdrop); }
 </style>
 </head><body>
-<div class="ps-apple-dark"><h1 class="ps-title">Governed control plane</h1><p class="ps-intro">Compose a design language: pick a base, then swap any component to another language. This is the design surface — separate from the builder scorecard.</p><p class="ps-crumbs"><a href="index.html">home</a> · <a href="showcase.html">showcase</a> · <a href="studio.html">studio</a></p><section class="ps-panel"><h2 class="ps-panel-h">The law</h2><div class="law">An <b>invalid combination is unconstructable</b>. A swap is admissible ONLY if the composed component, as rendered, is a FULL valid instance of some active design language — a partial mix that belongs to no language (e.g. a frosted material on a square 0-radius card) is refused. The verdict below is computed by ONE Python source (<code>scripts/quality/settings_admissibility.py</code>), routed through the real render → conform path; this page only displays it (no verdict JS).</div></section><section class="base" data-base="apple-dark"><h2>base: apple-dark</h2><p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p><table class="grid"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp">button</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">chip</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">card</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr></tbody></table></section>
+<div class="ps-apple-dark"><div class="ps-main"><h1 class="ps-title">Governed control plane</h1><p class="ps-intro">Compose a design language: pick a base, then swap any component to another language. This is the design surface — separate from the builder scorecard.</p><p class="ps-crumbs"><a href="index.html">home</a> · <a href="showcase.html">showcase</a> · <a href="studio.html">studio</a></p><section class="ps-panel"><h2 class="ps-panel-h">The law</h2><div class="law">An <b>invalid combination is unconstructable</b>. A swap is admissible ONLY if the composed component, as rendered, is a FULL valid instance of some active design language — a partial mix that belongs to no language (e.g. a frosted material on a square 0-radius card) is refused. The verdict below is computed by ONE Python source (<code>scripts/quality/settings_admissibility.py</code>), routed through the real render → conform path; this page only displays it (no verdict JS).</div></section><section class="base" data-base="apple-dark"><h2>base: apple-dark</h2><p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p><table class="grid"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp">button</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">chip</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">card</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr></tbody></table></section>
 <section class="base" data-base="carbon"><h2>base: carbon</h2><p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p><table class="grid"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp">button</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon (base)</span><span class="verdict ok">admissible</span></td><td class="cell no"><span class="src">liquid-glass</span><span class="verdict no">unconstructable</span></td></tr><tr><th class="comp">chip</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon (base)</span><span class="verdict ok">admissible</span></td><td class="cell no"><span class="src">liquid-glass</span><span class="verdict no">unconstructable</span></td></tr><tr><th class="comp">card</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr></tbody></table></section>
-<section class="base" data-base="liquid-glass"><h2>base: liquid-glass</h2><p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p><table class="grid"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp">button</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass (base)</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">chip</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass (base)</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">card</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass (base)</span><span class="verdict ok">admissible</span></td></tr></tbody></table></section></div>
+<section class="base" data-base="liquid-glass"><h2>base: liquid-glass</h2><p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p><table class="grid"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp">button</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass (base)</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">chip</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass (base)</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">card</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass (base)</span><span class="verdict ok">admissible</span></td></tr></tbody></table></section></div></div>
 </body></html>

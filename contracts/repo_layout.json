@@ -65,7 +65,7 @@
         {"id": "github", "target_dir": "github", "members": ["actions_audit.py", "branch_protection.py", "gh_cli.py", "github_cache.py", "github_client.py", "github_graphql.py", "github_transport.py"]},
         {"id": "organization", "target_dir": "organization", "members": ["bootstrap_red_ref.py", "layout_audit.py", "layout_contract.py", "migrate_scripts_layout.py", "tests_layout_contract.py"]},
         {"id": "pipeline", "target_dir": "pipeline", "members": ["collect_data.py", "compute_metrics.py", "profile_helpers.py", "profile_pipeline.py", "render_outputs.py", "web_render.py"]},
-        {"id": "quality", "target_dir": "quality", "members": ["design_invariants.py", "diagnostics.py", "metrics_svg.py", "settings_admissibility.py", "severity.py", "triage.py", "validate_generated_profile.py", "visual_receipts.py"]},
+        {"id": "quality", "target_dir": "quality", "members": ["design_invariants.py", "diagnostics.py", "headless_receipts.py", "metrics_svg.py", "settings_admissibility.py", "severity.py", "triage.py", "validate_generated_profile.py", "visual_receipts.py"]},
         {"id": "rendering", "target_dir": "rendering", "members": ["card_theme.py", "components.py", "design_tokens.py", "generate_activity_heatmap.py", "generate_badges.py", "generate_builder_scorecard.py", "generate_contribution_panel.py", "generate_currently_working.py", "generate_engineering_cadence.py", "generate_focus_board.py", "generate_language_chart.py", "generate_metrics_general.py", "generate_repo_spotlight.py", "generate_snapshot_panel.py", "generate_streak_summary.py", "glass_kit.py", "icons.py", "svg_utils.py"]},
         {"id": "design", "target_dir": "rendering/design", "members": ["loader.py"]},
         {"id": "webkit", "target_dir": "rendering/webkit", "members": ["archetype.py", "components.py", "design_render_adapter.py"]},
@@ -105,9 +105,11 @@
       "group_dirs": []
     },
     "receipts_layout": {
-      "purpose": "1b (codex must-fix #1): closed cover over design-system conformance receipts so `assets/` is no longer ungoverned. Every receipt lives under `assets/receipts/<lang>/` where `<lang>` is a KNOWN design profile (active OR reserved) — the allowlist is `design_profiles/_index.json` (single source, read by the guard, NOT hardcoded here). A receipt for an unknown profile reddens, so `conform()` can't drop one into an ungoverned tree. Only `assets/receipts/` is gated (the bot-regenerated `assets/*.svg` cards are a separate concern).",
+      "purpose": "1b (codex must-fix #1) + D-SHELL MF1: closed cover over design-system conformance and page receipts so `assets/` is no longer ungoverned. Profile receipts live under `assets/receipts/<lang>/` where `<lang>` is a KNOWN design profile (active OR reserved) — the allowlist is `design_profiles/_index.json` (single source, read by the guard, NOT hardcoded here). Page layout receipts live under `assets/receipts/pages/<page>/`, where page is declared here. A receipt for an unknown profile or page reddens, so producers can't drop artifacts into an ungoverned tree. Only `assets/receipts/` is gated (the bot-regenerated `assets/*.svg` cards are a separate concern).",
       "root": "assets/receipts",
-      "globs": ["**/*.json", "**/*.png"]
+      "globs": ["**/*.json", "**/*.png"],
+      "page_dir": "pages",
+      "page_allowlist": ["index", "settings", "showcase", "studio"]
     }
   }
 }

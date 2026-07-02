@@ -5,6 +5,16 @@
 > that theme (`derived_from: "theme:apple-dark"`) — no hand-typed duplicate (codex H1). Values below
 > carry their `developer.apple.com` URL; UIKit/empirical numbers are marked **[derived]**.
 
+## Page chrome tokens
+
+These tokens back the governed page shell as well as the component specimens:
+
+| Property | Value | Source |
+|---|---|---|
+| Separator / hairline | `#38383a`, the dark-mode `opaqueSeparator` value; a quiet 1px separator, never pure white graph-paper chrome | https://developer.apple.com/design/human-interface-guidelines/color |
+| Panel radius | `14px` **[derived]**, matching the rounded inset grouped-list container below; shell panels use the same restrained card radius, not the old uncited 26px bubbly radius | https://developer.apple.com/documentation/uikit/uitableview/style-swift.enum/insetgrouped |
+| Tile radius | `12px`, aligned to `docs/DESIGN_SPEC.md` Part 0 card radius for smaller grouped surfaces | `docs/DESIGN_SPEC.md` Part 0 |
+
 ## Button (component-button)
 
 apple-dark shares the **capsule** with liquid-glass but is a distinct COMPONENT: it is OPAQUE (not

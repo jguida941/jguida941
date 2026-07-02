@@ -100,6 +100,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/quality/design_invariants.py", "scripts/quality/design_invariants.py", "quality", "conform() runner: walks profile invariants, gathers facts, dispatches predicates, writes receipts"),
     ModuleHome("scripts/quality/settings_admissibility.py", "scripts/quality/settings_admissibility.py", "quality", "the ONE Python decider for the settings control plane (compose + is_admissible)"),
     ModuleHome("scripts/quality/visual_receipts.py", "scripts/quality/visual_receipts.py", "quality", "visual/probe receipt producer for deferred design-language candidate rows"),
+    ModuleHome("scripts/quality/headless_receipts.py", "scripts/quality/headless_receipts.py", "quality", "Chrome-headless page receipt producer for screenshots and DOM overflow probes"),
     ModuleHome("scripts/diagnostics/diagnostics.py", "scripts/quality/diagnostics.py", "quality", "runtime diagnostics"),
     ModuleHome("scripts/diagnostics/severity.py", "scripts/quality/severity.py", "quality", "severity comparisons"),
     ModuleHome("scripts/diagnostics/triage.py", "scripts/quality/triage.py", "quality", "profile health triage"),

@@ -16,15 +16,21 @@ import html as _html
 import re as _re
 
 
-# The shared shell IA scale — the chrome's spacing + type rhythm (docs/design/pageshell.md §3, cited to
-# DESIGN_SPEC Part 0's 4px grid + type ramp). Consistent across languages so the site reads as ONE
-# product; per-language variation is carried by the COLOUR + RADIUS tokens, not the rhythm.
+# The shell IA scale — every value CITED (design-audit D-SHELL; docs/design/pageshell.md §3):
+# the page column + gutters replicate the proven index `.wrap` (DESIGN_SPEC Part 6's 980px column);
+# gaps come from DESIGN_SPEC Part 0's step set {4,8,12,16,24,32} with section gap >= 24; the type
+# ramp gains a real HEADING TIER (HIG Title-1 28 / Title-3 20 / body 15 / footnote 13) — the audit
+# found body-sized section headers, i.e. no hierarchy. Panel PADDING is deliberately NOT here: it is
+# per-language (the profile's cited density band via `design_tokens.density`), emitted by root_block.
 SHELL_SCALE = {
-    "--ps-pad": "24px",
+    "--ps-measure-page": "980px",              # DESIGN_SPEC Part 6 / index.html .wrap
+    "--ps-gutter": "clamp(20px, 4vw, 56px)",   # index.html .wrap fluid gutters
     "--ps-pad-tight": "12px",
-    "--ps-gap": "16px",
+    "--ps-gap": "24px",                        # DESIGN_SPEC Part 0: section gap 24
     "--ps-gap-tight": "8px",
-    "--ps-type-title": "26px",
+    "--ps-gap-section": "32px",                # top step of the Part 0 gap set — language sections
+    "--ps-type-title": "28px",                 # HIG Title 1 tier
+    "--ps-type-h2": "20px",                    # HIG Title 3 — the missing heading tier
     "--ps-type-body": "15px",
     "--ps-type-sub": "13px",
     "--ps-measure": "76ch",
@@ -52,6 +58,11 @@ def root_block(profile: str, profile_data: dict | None = None) -> str:
     decls["--radius-panel"] = _px(radius.get("panel", 12))
     decls["--radius-tile"] = _px(radius.get("tile", 8))
     decls["--font-sans"] = tok.get("font", {}).get("family", "sans-serif")
+    # panel padding is the LANGUAGE'S OWN cited density band (apple-dark 'airy' 32 / carbon
+    # 'compact' 20 / liquid-glass 'medium' 28 — design_tokens.THEME_IA, grounded per language),
+    # not a minted constant (design-audit #7). Provenance-pinned like every other :root var.
+    from scripts.rendering import design_tokens as _dt
+    decls["--ps-pad"] = _px(_dt.density(profile)["panel_pad"])
     decls.update(SHELL_SCALE)
     body = "\n".join(f"  {k}: {v};" for k, v in decls.items())
     return f":root {{\n{body}\n}}"
@@ -65,18 +76,22 @@ def shell_css(profile: str) -> str:
     return "\n".join([
         root_block(profile),
         f".{ns} {{ background: var(--backdrop); color: var(--ink); font-family: var(--font-sans);",
-        f"  margin: 0; min-height: 100%; padding: var(--ps-pad); }}",
+        f"  margin: 0; min-height: 100%; }}",
+        # ONE centered content column — the audit's root cause was full-bleed sprawl (no container).
+        # Measure + gutters are the cited index .wrap values (DESIGN_SPEC Part 6).
+        f".{ns} .ps-main {{ max-width: var(--ps-measure-page); margin: 0 auto;",
+        f"  padding: var(--ps-gutter); }}",
         f".{ns} .ps-title {{ margin: 0 0 var(--ps-gap-tight); color: var(--ink-strong);",
         f"  font-size: var(--ps-type-title); font-weight: 700; line-height: 1.2; }}",
         f".{ns} .ps-intro {{ margin: 0 0 var(--ps-gap-tight); color: var(--ink-dim);",
         f"  font-size: var(--ps-type-body); line-height: 1.5; max-width: var(--ps-measure); }}",
-        f".{ns} .ps-crumbs {{ margin: 0 0 var(--ps-pad); color: var(--ink-dim);",
+        f".{ns} .ps-crumbs {{ margin: 0 0 var(--ps-gap-section); color: var(--ink-dim);",
         f"  font-size: var(--ps-type-sub); }}",
         f".{ns} .ps-crumbs a {{ color: var(--accent); text-decoration: none; }}",
         f".{ns} .ps-panel {{ background: var(--surface); border: 1px solid var(--hairline);",
         f"  border-radius: var(--radius-panel); padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }}",
         f".{ns} .ps-panel-h {{ margin: 0 0 var(--ps-pad-tight); color: var(--ink-strong);",
-        f"  font-size: var(--ps-type-body); font-weight: 600; }}",
+        f"  font-size: var(--ps-type-h2); font-weight: 600; }}",
     ])
 
 
@@ -120,12 +135,14 @@ def render_page_shell(
         for heading, body in (sections or []))
     html = (
         f'<div class="{ns}">'
+        f'<div class="ps-main">'
         f'{prefix_html}'
         f'<h1 class="ps-title">{_html.escape(title)}</h1>'
         f'<p class="ps-intro">{_html.escape(intro)}</p>'
         f'<p class="ps-crumbs">{crumbs}</p>'
         f'{panels}'
         f'{body_html}'
+        f'</div>'
         f'</div>'
     )
     return html, shell_css(profile)
