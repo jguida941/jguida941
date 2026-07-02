@@ -23,3 +23,13 @@ Output: numbered findings with file:line + severity, then BOTH machine-checkable
 VERDICT: approve | revise
 ADVERSARIAL-VERDICT: clean | holes-found
 Merge to main happens only on approve+clean.
+
+
+## SCOPE UPDATE (post B-1, 2026-07-02): the session scratchpad is gone — derive diffs from git.
+Review `git diff f004d184..main` in these units: (1) D-SHELL-1 (747d54cd + c6c5f3bf), (2) D-SHELL-2
+(346a71d1 — POST-BUILD-UNREVIEWED, priority), (3) P5-BOARD B-0 docs (0cc65c81), (4) B-1a motion
+(b42704f6), (5) B-1b nav (a3ff6ad3). Ratified laws: docs/design/{motion,board,charts,pageshell}.md
++ docs/plans/handoff/{d-shell-0-design,d-shell-2-design,b-0-design}.md. Attack notably: the motion
+band/provenance facts, nav var-portability claim (shell pages lack --motion-* — known debt), the
+iframe-390 probe, manifest alias grammar, grouping nesting parser, and the B-1 interim self-review
+rulings. Findings fold RED-first before B-2 merges.
