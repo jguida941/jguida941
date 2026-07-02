@@ -12,6 +12,8 @@
       "doc_cite": "docs/design/pageshell.md",
       "evidence": {
         "body_offtoken_count": 0,
+        "chrome_nesting_depth": 1,
+        "chromed_box_count": 1,
         "has_breadcrumb_link": true,
         "has_content_column": true,
         "has_title": true,
@@ -36,6 +38,8 @@
       "doc_cite": "docs/design/pageshell.md",
       "evidence": {
         "body_offtoken_count": 0,
+        "chrome_nesting_depth": 1,
+        "chromed_box_count": 1,
         "has_breadcrumb_link": true,
         "has_content_column": true,
         "has_title": true,
@@ -60,6 +64,8 @@
       "doc_cite": "docs/design/pageshell.md",
       "evidence": {
         "body_offtoken_count": 0,
+        "chrome_nesting_depth": 1,
+        "chromed_box_count": 1,
         "has_breadcrumb_link": true,
         "has_content_column": true,
         "has_title": true,
@@ -84,6 +90,8 @@
       "doc_cite": "docs/design/pageshell.md",
       "evidence": {
         "body_offtoken_count": 0,
+        "chrome_nesting_depth": 1,
+        "chromed_box_count": 1,
         "has_breadcrumb_link": true,
         "has_content_column": true,
         "has_title": true,
@@ -108,6 +116,8 @@
       "doc_cite": "docs/design/pageshell.md",
       "evidence": {
         "body_offtoken_count": 0,
+        "chrome_nesting_depth": 1,
+        "chromed_box_count": 1,
         "has_breadcrumb_link": true,
         "has_content_column": true,
         "has_title": true,
@@ -132,6 +142,8 @@
       "doc_cite": "docs/design/pageshell.md",
       "evidence": {
         "body_offtoken_count": 0,
+        "chrome_nesting_depth": 1,
+        "chromed_box_count": 1,
         "has_breadcrumb_link": true,
         "has_content_column": true,
         "has_title": true,
@@ -156,6 +168,8 @@
       "doc_cite": "docs/design/pageshell.md",
       "evidence": {
         "body_offtoken_count": 0,
+        "chrome_nesting_depth": 1,
+        "chromed_box_count": 1,
         "has_breadcrumb_link": true,
         "has_content_column": true,
         "has_title": true,
@@ -168,6 +182,32 @@
       },
       "invariant_id": "lg-rhythm-density",
       "law": "panel padding follows the language's cited density band",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "page-section-grouping",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'page-section-grouping' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/pageshell.md",
+      "evidence": {
+        "body_offtoken_count": 0,
+        "chrome_nesting_depth": 1,
+        "chromed_box_count": 1,
+        "has_breadcrumb_link": true,
+        "has_content_column": true,
+        "has_title": true,
+        "pad_matches_density_band": true,
+        "pad_px": 28.0,
+        "root_rule_count": 1,
+        "shell_closed": true,
+        "type_ramp_tiered": true,
+        "uses_backdrop_var": true
+      },
+      "invariant_id": "lg-grouping-depth",
+      "law": "the shell composes one chrome level (no chromed box inside a chromed box)",
       "profile": "liquid-glass",
       "status": "pass"
     },

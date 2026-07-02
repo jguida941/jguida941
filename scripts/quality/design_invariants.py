@@ -56,7 +56,7 @@ def _pageshell_facts(profile: str, variant: str | None = None, profile_data: dic
         title="Design-language surface",
         intro="Every part of this page follows the design-language process.",
         breadcrumbs=[("home", "index.html")],
-        sections=[],
+        sections=[("Section", "content")],   # >=1 panel so grouping depth is OBSERVED, not vacuous
         profile_data=profile_data,
     )
     facts = adapter.pageshell_facts(html, css)
@@ -76,6 +76,7 @@ _COMPONENT_FACTS = {
     "component-card": ("card", _card_facts),
     "page-shell": ("page-shell", _pageshell_facts),
     "page-layout": ("page-layout", _pageshell_facts),
+    "page-section-grouping": ("page-section-grouping", _pageshell_facts),
     "page-type-ramp": ("page-type-ramp", _pageshell_facts),
     "page-spacing-rhythm": ("page-spacing-rhythm", _pageshell_facts),
 }

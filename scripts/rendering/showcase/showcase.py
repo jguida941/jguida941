@@ -73,8 +73,31 @@ def _stage_block(profile: str) -> tuple[str, str, str]:
 
 
 def _rows(results: list[dict]) -> str:
-    out = []
+    """One <tbody class="aspect-group"> per aspect (D-SHELL-2 L-SHOW-1): rows group by their
+    aspect field in FIRST-APPEARANCE order (receipt order preserved within a group), each group
+    headed by a subheader th[scope=colgroup] carrying the group's SINGLE hoisted doc cite — the
+    per-row doc column died (it repeated one path ~17×). Fail-closed: a row without an aspect is
+    a KeyError; a group with MIXED cites raises (hoisting must never silently drop provenance)."""
+    groups: dict[str, list[dict]] = {}
     for r in results:
+        groups.setdefault(r["aspect"], []).append(r)
+    out = []
+    for aspect, rows in groups.items():
+        cites = sorted({str(r.get("doc_cite", "")) for r in rows})
+        if len(cites) != 1:
+            raise ValueError(f"aspect group {aspect!r} carries mixed doc cites {cites} — "
+                             f"hoisting would lose provenance (regroup or split the aspect)")
+        out.append(f'<tbody class="aspect-group" data-aspect="{_html.escape(aspect)}">')
+        out.append(f'<tr class="aspect-head"><th colspan="4" scope="colgroup">'
+                   f'{_html.escape(aspect)} · <span class="cite">{_html.escape(cites[0])}</span>'
+                   f'</th></tr>')
+        out.extend(_row(r) for r in rows)
+        out.append('</tbody>')
+    return "\n".join(out)
+
+
+def _row(r: dict) -> str:
+    if True:
         status = r.get("status")
         if status not in _BADGE_TEXT:               # closed enum — fail closed (codex 1c #3): a
             raise ValueError(                       # malformed status can't inject an attr/class
@@ -92,17 +115,15 @@ def _rows(results: list[dict]) -> str:
                 f'<code>{_html.escape(str(obligation.get("artifact", "")))}</code>'
             )
         else:
-            receipt = "—"
-        out.append(
+            receipt = ""                            # an empty cell renders EMPTY (L-SHOW-5), never a dash
+        return (
             f'<tr data-invariant="{inv}" data-status="{status}">'
             f'<td class="inv">{inv}</td>'
             f'<td class="law">{law}</td>'
-            f'<td class="cite">{cite}</td>'
             f'<td class="verdict"><span class="badge badge-{status}">{badge}</span></td>'
             f'<td class="receipt">{receipt}</td>'
             f'</tr>'
         )
-    return "\n".join(out)
 
 
 # The showcase CHROME is the governed page-shell (apple-dark house); its CONTENT palette (legend / verdict
@@ -138,9 +159,13 @@ table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-t
 .receipt code { color: var(--ink); font-family: ui-monospace, monospace; }
 .badge { display: inline-block; padding: 2px var(--ps-pad-tight); border-radius: 999px; font-weight: 600;
   font-size: var(--ps-type-sub); white-space: nowrap; }
-.badge-pass { background: var(--status-success); color: var(--backdrop); }
+.badge-pass { background: transparent; color: var(--status-success); border: 1px solid var(--status-success); }
 .badge-fail { background: var(--status-danger); color: var(--backdrop); }
 .badge-candidate { background: var(--status-warning); color: var(--backdrop); }
+.aspect-head th { text-align: left; color: var(--ink-strong); font-weight: 600;
+  font-size: var(--ps-type-sub); padding: var(--ps-gap) var(--ps-pad-tight) var(--ps-gap-tight);
+  border-bottom: 1px solid var(--hairline); }
+.aspect-head .cite { font-weight: 400; }
 """.strip()
 
 # The CLOSED structural allowlist for _CONTENT_CSS (codex A3 #1): the ONLY non-token literals the
@@ -184,8 +209,8 @@ def render_showcase(receipts: dict) -> str:
             f'<p class="tally">{n_pass} pass · {n_fail} fail · {n_cand} cannot certify</p></header>'
             f'<div class="stage" style="background:{backdrop}">{stage_html}</div>'
             f'<div class="table-scroll"><table class="invariants"><thead><tr>'
-            f'<th>invariant</th><th>law</th><th>doc</th><th>verdict</th><th>receipt</th></tr></thead>'
-            f'<tbody>\n{_rows(rc.get("results", []))}\n</tbody></table></div>'
+            f'<th>invariant</th><th>law</th><th>verdict</th><th>receipt</th></tr></thead>'
+            f'\n{_rows(rc.get("results", []))}\n</table></div>'
             f'</section>'
         )
 

@@ -301,6 +301,41 @@ def pageshell_facts(html: str, css: str) -> dict:
     t_title, t_h2, t_body = (_root_px("--ps-type-title"), _root_px("--ps-type-h2"),
                              _root_px("--ps-type-body"))
     type_ramp_tiered = (None not in (t_title, t_h2, t_body)) and t_title > t_h2 > t_body
+
+    # D-SHELL-2 grouping facts (gate MF-A, precise definition): a CHROMED class = the rightmost
+    # class of a shell rule declaring a painting background AND (a border or border-radius).
+    # Depth over a balanced tag stack; an unbalanced parse -> None (fail-closed). The count fact
+    # kills vacuity: "flat" is only claimable when >=1 chromed box actually rendered.
+    chromed: set = set()
+    for sel, decls in rules:
+        props = dict(decls)
+        bg = props.get("background") or props.get("background-color") or ""
+        painted = bg.strip() not in ("", "transparent", "none", "0")
+        if painted and ("border" in props or "border-radius" in props):
+            classes = re.findall(r"\.([\w-]+)", sel)
+            if classes:
+                chromed.add(classes[-1])
+
+    def _nesting(text: str):
+        depth_max, count, stack = 0, 0, []
+        for m in re.finditer(r"<(/?)([a-zA-Z][\w-]*)((?:[^>\"']|\"[^\"]*\"|'[^']*')*)>", text):
+            close, tag, attrs = m.group(1), m.group(2).lower(), m.group(3)
+            if tag in ("input", "br", "img", "hr", "meta", "link") or attrs.rstrip().endswith("/"):
+                continue
+            if close:
+                if not stack or stack[-1][0] != tag:
+                    return None, None
+                stack.pop()
+            else:
+                cm = re.search(r'class="([^"]*)"', attrs)
+                is_chr = bool(cm and chromed & set(cm.group(1).split()))
+                if is_chr:
+                    count += 1
+                    depth_max = max(depth_max, 1 + sum(1 for _, c in stack if c))
+                stack.append((tag, is_chr))
+        return (None, None) if stack else (depth_max, count)
+
+    chrome_nesting_depth, chromed_box_count = _nesting(html)
     return {
         "body_offtoken_count": offtoken,
         "shell_closed": shell_closed,
@@ -311,6 +346,8 @@ def pageshell_facts(html: str, css: str) -> dict:
         "has_content_column": has_content_column,
         "type_ramp_tiered": type_ramp_tiered,
         "pad_px": _root_px("--ps-pad"),
+        "chrome_nesting_depth": chrome_nesting_depth,
+        "chromed_box_count": chromed_box_count,
     }
 
 
