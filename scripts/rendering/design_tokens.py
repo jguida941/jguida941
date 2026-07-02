@@ -128,11 +128,19 @@ THEME_IA: dict[str, dict] = _active_bridge_map("THEME_IA", {
         "radius": {"panel": config.GLASS_RX, "tile": config.GLASS_TILE_RX},
         "type": {},
         "density": {"band": "medium", "panel_pad": 28, "tile_pad": 14, "gap": 20, "tile_min": 280},
+        # motion (docs/design/motion.md §2): the medium anchor, [derived]
+        "motion": {"fast": 120, "base": 200, "slow": 400,
+                   "ease-standard": "ease-in-out", "ease-enter": "ease-out", "ease-exit": "ease-in"},
     },
     "carbon": {  # IBM Carbon — square surfaces, compact spacing, restrained body scale
         "radius": _literal_profile_tokens("carbon", "radius"),
         "type": {"display": (40, 600), "metric_lg": (24, 600), "title": (18, 600), "body": (14, 400)},
         "density": {"band": "compact", "panel_pad": 20, "tile_pad": 12, "gap": 12, "tile_min": 180},
+        # motion: Carbon Motion productive tokens fast-01/fast-02/moderate-02 + productive easings
+        "motion": {"fast": 70, "base": 110, "slow": 240,
+                   "ease-standard": "cubic-bezier(0.2, 0, 0.38, 0.9)",
+                   "ease-enter": "cubic-bezier(0, 0, 0.38, 0.9)",
+                   "ease-exit": "cubic-bezier(0.2, 0, 1, 0.9)"},
     },
     "apple-dark": {  # Apple HIG — generous radius + large display type + AIRY space, few large cards
         # panel 14 == the profile's own cited card radius (apple-dark.md "~14"); tile 12 ==
@@ -140,6 +148,9 @@ THEME_IA: dict[str, dict] = _active_bridge_map("THEME_IA", {
         "radius": {"panel": 14, "tile": 12},
         "type": {"display": (54, 600), "metric_lg": (30, 600), "title": (22, 600)},
         "density": {"band": "airy", "panel_pad": 32, "tile_pad": 24, "gap": 24, "tile_min": 380},
+        # motion (motion.md §2): fluid, [derived] from the ~0.3s platform transition convention
+        "motion": {"fast": 150, "base": 300, "slow": 500,
+                   "ease-standard": "ease-out", "ease-enter": "ease-out", "ease-exit": "ease-in"},
     },
 })
 
@@ -207,6 +218,12 @@ def _ia_vars(name: str, indent: str = "  ") -> str:
         lines.append(f"{indent}--type-{key}-weight: {weight};")
     for key, val in space(name).items():
         lines.append(f"{indent}--space-{key}: {val}px;")
+    m = THEME_IA.get(name, {}).get("motion", {})
+    if m:
+        for key in ("fast", "base", "slow"):
+            lines.append(f"{indent}--motion-{key}: {m[key]}ms;")
+        for key in ("standard", "enter", "exit"):
+            lines.append(f"{indent}--ease-{key}: {m['ease-' + key]};")
     lines.append(f"{indent}--font-sans: {config.FONT_SANS};")
     return "\n".join(lines)
 

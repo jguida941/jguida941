@@ -67,6 +67,25 @@ def _pageshell_facts(profile: str, variant: str | None = None, profile_data: dic
     return facts
 
 
+def _motion_facts(profile: str, variant: str | None = None, profile_data: dict | None = None) -> dict:
+    """Motion facts (docs/design/motion.md): the emitted --motion-*/--ease-* vars EQUAL the
+    theme's declared THEME_IA motion block (provenance) and durations sit in the cited
+    [70, 700]ms band, ordered fast<base<slow. Fail-closed: missing block/vars -> False."""
+    import re as _re
+    from scripts.rendering import design_tokens as dt
+    m = dt.THEME_IA.get(profile, {}).get("motion")
+    css = dt.emit_css_root()
+    pat = (r":root\s*\{([^}]*)\}" if profile == dt.DEFAULT_THEME
+           else rf'\[data-theme="{profile}"\]\s*\{{([^}}]*)\}}')
+    b = _re.search(pat, css)
+    body = b.group(1) if b else ""
+    provenance = bool(m) and all(f"--motion-{k}: {m[k]}ms" in body for k in ("fast", "base", "slow")) \
+        and all(f"--ease-{k}: {m['ease-' + k]}" in body for k in ("standard", "enter", "exit"))
+    in_band = bool(m) and all(70 <= m[k] <= 700 for k in ("fast", "base", "slow")) \
+        and m["fast"] < m["base"] < m["slow"]
+    return {"motion_vars_provenance": provenance, "motion_in_band": in_band}
+
+
 # aspect -> (component key in profile["components"], the fact-gatherer). Adding a component = one row.
 # `page-shell` is an ASPECT with a fact-gatherer but NOT a component (no components[] block, not in the
 # distinctness signature) — the whole page is the rendered instance.
@@ -77,6 +96,7 @@ _COMPONENT_FACTS = {
     "page-shell": ("page-shell", _pageshell_facts),
     "page-layout": ("page-layout", _pageshell_facts),
     "page-section-grouping": ("page-section-grouping", _pageshell_facts),
+    "motion": ("motion", _motion_facts),
     "page-type-ramp": ("page-type-ramp", _pageshell_facts),
     "page-spacing-rhythm": ("page-spacing-rhythm", _pageshell_facts),
 }
