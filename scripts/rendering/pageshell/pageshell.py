@@ -94,6 +94,7 @@ def render_page_shell(
     breadcrumbs: list[tuple[str, str]],
     sections: list[tuple[str, str]] | None = None,
     body_html: str = "",
+    prefix_html: str = "",
     glossary=None,
     profile_data: dict | None = None,
 ) -> tuple[str, str]:
@@ -101,10 +102,12 @@ def render_page_shell(
 
     `breadcrumbs` = `[(label, href), …]` (the orientation row). `sections` = `[(heading, body), …]`
     (each a token-only `.ps-panel`); `body_html` = raw content a page structures itself (rendered with the
-    shell's tokens) — a page uses one or the other. The chrome (bg/header/crumbs/panels) is token-only +
-    governed; the injected content is the caller's specimens, rendered in their own languages."""
+    shell's tokens) — a page uses one or the other. `prefix_html` = content a page needs as the FIRST
+    children inside the shell root, before the title (the studio's pure-CSS switcher radios, whose
+    `:checked ~` sibling selectors must precede the stages they reveal). The chrome (bg/header/crumbs/
+    panels) is token-only + governed; all injected content is guarded (no shell-reserved ps-* classes)."""
     ns = f"ps-{profile}"
-    for blob in (body_html, *(body for _, body in (sections or []))):
+    for blob in (prefix_html, body_html, *(body for _, body in (sections or []))):
         if blob and _INJECTED_PS.search(blob):
             raise ValueError(
                 "injected content carries a shell-reserved ps-* class — the shell anatomy "
@@ -117,6 +120,7 @@ def render_page_shell(
         for heading, body in (sections or []))
     html = (
         f'<div class="{ns}">'
+        f'{prefix_html}'
         f'<h1 class="ps-title">{_html.escape(title)}</h1>'
         f'<p class="ps-intro">{_html.escape(intro)}</p>'
         f'<p class="ps-crumbs">{crumbs}</p>'

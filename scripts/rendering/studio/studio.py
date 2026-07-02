@@ -5,7 +5,15 @@ full website archetype (`render_archetype`) and a live LANGUAGE SWITCHER impleme
 (radio `:checked` reveals the matching archetype) — ZERO JavaScript, so there is no verdict logic to
 audit and every visible byte is committed + drift-guarded. Slice 2 = see + live-switch the languages;
 the governed component swap (one Python decider embedded + looked-up) lands in the next slice. This is
-the design-language surface — separate from the builder scorecard. candidate_only.
+the design-language surface — separate from the builder scorecard.
+
+P5-CHROME A5: the studio's own CHROME is the governed apple-dark page-shell (`render_page_shell`), not
+hand-written dark CSS — the design surface is itself a rendered instance of a design language, and its
+switcher tabs / swap options derive from that language's tokens (so it follows the same process it
+showcases). The pure-CSS switcher radios ride in as the shell root's FIRST children (`prefix_html`) so
+their `:checked ~` sibling selectors keep reaching the switcher + stages that follow; the switcher/swap
+CONTENT palette is token-only beyond a CLOSED structural allowlist (codex A3 #1). Pure + deterministic
+(drift-guarded). candidate_only.
 """
 from __future__ import annotations
 
@@ -77,6 +85,61 @@ _STUDIO_JS = """
 """.strip()
 
 
+# The studio CHROME is the governed page-shell (apple-dark house); its CONTENT palette (the switcher tabs +
+# the component-swap controls) derives from that shell's tokens — so the design surface follows the same
+# process it showcases (the twin of the showcase/settings adoptions).
+HOUSE = "apple-dark"
+
+# Content CSS (the pure-CSS switcher + the swap controls live INSIDE the governed shell). Every colour is a
+# shell token var(): the tabs/options take var(--surface)/var(--ink) on a var(--hairline) hairline; the
+# active tab/option flips to var(--accent) bg + var(--backdrop) ink; a disabled (unconstructable) option is
+# var(--status-danger) ink on var(--surface), kept line-through; hints/labels are var(--ink-dim). Only
+# structural non-colour px/keywords remain — pinned in the allowlist below and scanned by content_offtokens
+# (the same machinery as the shell gate). The per-language `:checked ~` reveal + active-tab rules stay in the
+# generated switch_css (the switch MECHANISM, in the specimens' own DOM) — not this scanned chrome.
+_CONTENT_CSS = """
+.lang-radio { position: absolute; opacity: 0; pointer-events: none; }
+.switcher { display: flex; gap: var(--ps-gap-tight); flex-wrap: wrap; margin: 0 0 var(--ps-gap); }
+.lang-tab { padding: var(--ps-gap-tight) var(--ps-pad); border: 1px solid var(--hairline);
+  border-radius: 999px; cursor: pointer; font-weight: 600; font-size: var(--ps-type-sub);
+  color: var(--ink); background: var(--surface); user-select: none; }
+.lang-radio:focus-visible ~ .switcher .lang-tab { outline: 2px solid var(--accent); }
+.stages { position: relative; }
+.stage { display: none; }
+.swap-controls { margin: 0 0 var(--ps-gap); padding: var(--ps-pad-tight) var(--ps-pad);
+  border: 1px solid var(--hairline); border-radius: var(--radius-panel); background: var(--surface); }
+.swap-hint { margin: 0 0 var(--ps-gap-tight); color: var(--ink-dim); font-size: var(--ps-type-sub); }
+.swap-row { display: flex; align-items: center; gap: var(--ps-gap-tight); flex-wrap: wrap; margin: 0 0 var(--ps-gap-tight); }
+.swap-label { width: 64px; color: var(--ink-dim); font-family: ui-monospace, monospace; font-size: var(--ps-type-sub); }
+.swap-opts { display: flex; gap: var(--ps-gap-tight); flex-wrap: wrap; }
+.swap-opt { padding: var(--ps-gap-tight) var(--ps-pad-tight); border: 1px solid var(--hairline);
+  border-radius: 999px; cursor: pointer; font-weight: 600; font-size: var(--ps-type-sub);
+  color: var(--ink); background: var(--surface); }
+.swap-opt.active { background: var(--accent); color: var(--backdrop); border-color: var(--accent); }
+.swap-opt[disabled] { color: var(--status-danger); background: var(--surface); cursor: not-allowed;
+  text-decoration: line-through; }
+.variant[hidden] { display: none; }
+""".strip()
+
+# The CLOSED structural allowlist for _CONTENT_CSS (codex A3 #1): the ONLY non-token literals the content may
+# carry, each a LAYOUT (never colour) decision. Anything else — a colour in any form, an off-list px — reddens
+# StudioChromeContract; the allowlist is the scan's only escape and it can never admit a colour.
+_CONTENT_ALLOWED_PX = frozenset({
+    "2px",      # .lang-tab focus-visible outline width — the keyboard focus ring (not a scale step)
+    "64px",     # .swap-label fixed column width — aligns the button/chip/card option rows
+    "999px",    # .lang-tab / .swap-opt pill radius — structural "fully round", not a scale step
+})
+_CONTENT_ALLOWED_WORDS = frozenset({
+    "ui-monospace", "monospace",   # the code-face stack for .swap-label (no colour choice)
+    "not-allowed",                 # .swap-opt[disabled] cursor — the unconstructable affordance
+})
+
+# The intro (the pre-shell `.sub` text, verbatim) — framed by the shell as `.ps-intro`.
+_INTRO = ("Pick a design language and see a real website built entirely in it — nav, hero, tag chips, "
+          "buttons, and a grouped metric card, each from that language's own cited design doc. This is "
+          "the design-language surface, separate from the builder scorecard.")
+
+
 def render_studio() -> str:
     """Pure + deterministic: the active languages, their archetypes, AND the governed component swap.
     Per base, a default archetype + a pre-rendered (CSS-namespaced) archetype variant for each
@@ -101,7 +164,7 @@ def render_studio() -> str:
         tabs.append(f'<label for="lang-{safe}" class="lang-tab">{safe}</label>')
         switch_css.append(f'#lang-{safe}:checked ~ .stages .stage[data-lang="{safe}"] {{ display: block; }}')
         switch_css.append(f'#lang-{safe}:checked ~ .switcher label[for="lang-{safe}"] '
-                          f'{{ background: #e8e8ee; color: #0a0a0f; border-color: #e8e8ee; }}')
+                          f'{{ background: var(--accent); color: var(--backdrop); border-color: var(--accent); }}')
 
         variants, rows = [], []
         bh, bc = render_archetype(base)                       # the base default (no swap)
@@ -136,57 +199,38 @@ def render_studio() -> str:
             f'{"".join(rows)}</div>'
             f'<div class="variants">{"".join(variants)}</div></section>')
 
-    page_css = """
-:root { color-scheme: dark; }
-* { box-sizing: border-box; }
-body { margin: 0; padding: 28px; background: #08080c; color: #e8e8ee;
-  font: 15px/1.5 -apple-system, system-ui, 'Segoe UI', sans-serif; }
-h1 { font-size: 26px; margin: 0 0 4px; }
-.sub { color: #9a9aa6; margin: 0 0 6px; max-width: 76ch; }
-.crumbs { color: #7f7f8c; font-size: 13px; margin: 0 0 20px; }
-.crumbs a { color: #7dcfff; text-decoration: none; }
-.lang-radio { position: absolute; opacity: 0; pointer-events: none; }
-.switcher { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 20px; }
-.lang-tab { padding: 8px 16px; border: 1px solid #23232e; border-radius: 999px; cursor: pointer;
-  font-weight: 600; font-size: 13px; color: #c9c9d6; background: #12121a; user-select: none; }
-.lang-radio:focus-visible + .switcher .lang-tab { outline: 2px solid #7dcfff; }
-.stages { position: relative; }
-.stage { display: none; }
-.swap-controls { margin: 0 0 18px; padding: 14px 16px; border: 1px solid #23232e; border-radius: 12px;
-  background: #101018; }
-.swap-hint { margin: 0 0 10px; color: #9a9aa6; font-size: 12px; }
-.swap-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 8px; }
-.swap-label { width: 64px; color: #c9c9d6; font-family: ui-monospace, monospace; font-size: 12px; }
-.swap-opts { display: flex; gap: 6px; flex-wrap: wrap; }
-.swap-opt { padding: 5px 12px; border: 1px solid #23232e; border-radius: 999px; cursor: pointer;
-  font: 600 12px/1 -apple-system, system-ui, sans-serif; color: #c9c9d6; background: #16161c; }
-.swap-opt.active { background: #7dcfff; color: #08080c; border-color: #7dcfff; }
-.swap-opt[disabled] { color: #6b1f2b; background: #1a1013; border-color: #3a1a20; cursor: not-allowed;
-  text-decoration: line-through; }
-.variant[hidden] { display: none; }
-""".strip()
+    from scripts.rendering.pageshell.pageshell import render_page_shell
 
+    # The switcher + stages + the (verdict-free) scripts are the page's structured content; the radios ride
+    # in as the shell root's FIRST children so their `:checked ~` sibling selectors keep reaching them.
+    body_html = (
+        f'<div class="switcher">{"".join(tabs)}</div>'
+        f'<div class="stages">{"".join(stages)}</div>'
+        # the ONE decider, embedded verbatim; the frozen toggle only looks it up
+        f'<script>window.STUDIO_SPACE = {json.dumps(space, sort_keys=True)};</script>'
+        f'<script>{_STUDIO_JS}</script>'
+    )
+    shell_html, shell_style = render_page_shell(
+        HOUSE,
+        title="Design-language studio",
+        intro=_INTRO,
+        breadcrumbs=[("home", "index.html"), ("showcase", "showcase.html"), ("settings", "settings.html")],
+        prefix_html="".join(radios),
+        body_html=body_html,
+    )
     return (
         "<!doctype html>\n"
         '<html lang="en"><head><meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         "<title>Design-language studio</title>\n"
-        f"<style>{page_css}\n" + "\n".join(switch_css) + "\n" + "\n".join(arch_css) + "</style>\n"
+        f"<style>:root {{ color-scheme: dark; }}\n* {{ box-sizing: border-box; }}\n"
+        f"html, body {{ height: 100%; margin: 0; }}\n{shell_style}\n{_CONTENT_CSS}\n"
+        # the switch MECHANISM (pure-CSS reveal + active-tab) and the pre-rendered specimen archetypes,
+        # in the specimens' own languages — NOT the scanned page chrome
+        + "\n".join(switch_css) + "\n" + "\n".join(arch_css) + "</style>\n"
         "</head><body>\n"
-        # radios FIRST so the pure-CSS `~` sibling selectors reach the switcher + stages
-        + "".join(radios) + "\n"
-        "<h1>Design-language studio</h1>\n"
-        '<p class="sub">Pick a design language and see a real website built entirely in it — nav, '
-        "hero, tag chips, buttons, and a grouped metric card, each from that language's own cited "
-        "design doc. This is the design-language surface, separate from the builder scorecard.</p>\n"
-        '<p class="crumbs">proof tables: <a href="showcase.html">conformance showcase</a> · '
-        '<a href="settings.html">governed settings</a></p>\n'
-        f'<div class="switcher">{"".join(tabs)}</div>\n'
-        f'<div class="stages">{"".join(stages)}</div>\n'
-        # the ONE decider, embedded verbatim; the frozen toggle only looks it up
-        f'<script>window.STUDIO_SPACE = {json.dumps(space, sort_keys=True)};</script>\n'
-        f"<script>{_STUDIO_JS}</script>\n"
-        "</body></html>\n"
+        + shell_html
+        + "\n</body></html>\n"
     )
 
 

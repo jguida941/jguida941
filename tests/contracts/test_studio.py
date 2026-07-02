@@ -197,5 +197,133 @@ class StudioSwapContract(unittest.TestCase):
                                  f"AND-decomposition broke: base={base} button<-{b_src} chip<-{c_src} card<-{d_src}")
 
 
+class StudioChromeContract(unittest.TestCase):
+    """P5-CHROME A5: the studio CHROME is the governed page-shell (apple-dark house), not hand CSS.
+    The design-language studio is itself a rendered instance of a design language, and its switcher
+    tabs / swap options derive from that language's tokens — so the design surface follows the same
+    process it showcases (the design twin of A3/A4's showcase- and settings-frame-themselves). The
+    pure-CSS switcher radios move INSIDE the shell root as its first children (prefix_html) so their
+    `:checked ~` sibling selectors keep reaching the switcher + stages that follow."""
+
+    HOUSE = "apple-dark"
+
+    def test_studio_chrome_is_the_governed_page_shell(self):
+        """The page frame is render_page_shell(apple-dark): the shell root class + its exact host-chrome
+        CSS are present (so the studio is drift-tied to the governed shell, not a hand copy)."""
+        from scripts.rendering.pageshell.pageshell import shell_css
+        from scripts.rendering.studio.studio import render_studio
+        html = render_studio()
+        self.assertIn(f'class="ps-{self.HOUSE}"', html, "studio must frame itself in the governed shell")
+        self.assertIn(shell_css(self.HOUSE), html, "studio must embed the exact governed shell CSS")
+
+    def test_studio_carries_no_hand_chrome_palette(self):
+        """The old hand-written dark chrome (body/h1/.sub/.crumbs) + the copied switcher/swap palette are
+        GONE — the frame + the switcher tabs + swap options derive from the shell's tokens
+        (var(--surface)/var(--hairline)/var(--accent)/var(--status-danger)), no raw chrome hex. The one
+        exception is a hand hex that COINCIDES with a real active design token (the old chrome had
+        borrowed liquid-glass's accent #7dcfff as its link colour): that colour is skipped here, because
+        the specimen archetypes legitimately render each language's OWN tokens (arch_css, which the brief
+        does NOT scan) — banning it would forbid liquid-glass from rendering itself. Every OTHER hand hex
+        is not any active token, so it must be gone from the entire page (chrome, switcher, and specimens)."""
+        from scripts.rendering.design import loader
+        from scripts.rendering.studio.studio import render_studio
+        html = render_studio()
+        tokens = {v.lower() for name in _active()
+                  for v in loader.resolve_tokens(name).get("color", {}).values()}
+        for banned in ("#08080c", "#e8e8ee", "#9a9aa6", "#7f7f8c", "#7dcfff", "#23232e", "#c9c9d6",
+                       "#12121a", "#101018", "#16161c", "#6b1f2b", "#1a1013", "#3a1a20"):
+            if banned.lower() in tokens:                 # a genuine design-language token, not hand chrome
+                continue
+            self.assertNotIn(banned, html, f"the hand chrome literal {banned} must be gone")
+        for tok in ("var(--accent)", "var(--surface)", "var(--status-danger)"):
+            self.assertIn(tok, html, f"the studio chrome must derive from {tok}")
+
+    def test_studio_breadcrumb_orients_across_the_surfaces(self):
+        """Explainability/IA: the shell breadcrumb links the sibling surfaces so a viewer can navigate —
+        the studio previously carried no link home + no showcase/settings orientation via the shell row."""
+        from scripts.rendering.studio.studio import render_studio
+        html = render_studio()
+        self.assertRegex(html, r'class="ps-crumbs"')
+        for href in ("index.html", "showcase.html", "settings.html"):
+            self.assertIn(href, html, f"the studio page must link {href}")
+
+    def test_studio_radios_render_inside_the_shell_root_before_the_title(self):
+        """The pure-CSS switcher constraint: the radios are the shell root's FIRST children (prefix_html),
+        rendered BEFORE ps-title, so the generated `#lang-*:checked ~ .switcher`/`~ .stages` sibling
+        selectors keep reaching the switcher + stages that follow inside the same root."""
+        from scripts.rendering.studio.studio import render_studio
+        html = render_studio()
+        self.assertRegex(
+            html,
+            rf'<div class="ps-{self.HOUSE}">(?:<input type="radio"[^>]*class="lang-radio"[^>]*>)+'
+            r'<h1 class="ps-title">',
+            "the switcher radios must render inside the shell root as its first children, before ps-title")
+
+    def test_studio_content_css_is_token_only_beyond_the_explicit_allowlist(self):
+        """codex A3 #1: `_CONTENT_CSS` is page CONTENT (the switcher + swap surfaces), so the A1 shell
+        gate never sees it — without its own scan it is a laundering hole for chrome-like decisions.
+        Every colour is a var(); the ONLY bare literals are the module's DECLARED structural allowlist
+        (layout px + layout keywords, no colour of any form)."""
+        from scripts.rendering.studio.studio import (_CONTENT_ALLOWED_PX,
+                                                     _CONTENT_ALLOWED_WORDS, _CONTENT_CSS)
+        from scripts.rendering.webkit.design_render_adapter import content_offtokens
+        self.assertEqual(
+            content_offtokens(_CONTENT_CSS, _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS), [],
+            "studio content CSS must be token-only beyond its declared structural allowlist")
+
+    def test_content_scanner_catches_a_smuggled_decision(self):
+        """Non-vacuity: a colour in ANY form (hex / colour fn / named / system) or an off-allowlist px
+        pushed into `_CONTENT_CSS` is flagged — the allowlist is the only escape, and it admits no colour."""
+        from scripts.rendering.studio.studio import (_CONTENT_ALLOWED_PX,
+                                                     _CONTENT_ALLOWED_WORDS, _CONTENT_CSS)
+        from scripts.rendering.webkit.design_render_adapter import content_offtokens
+        target = "color: var(--status-danger);"
+        self.assertIn(target, _CONTENT_CSS, "the mutation target must exist")
+        for smuggle in ("color: #ff0000", "background: rgb(1,2,3)", "color: rebeccapurple",
+                        "padding: 8px", "border-color: CanvasText", "color: initial"):
+            css = _CONTENT_CSS.replace(target, smuggle + ";")
+            self.assertTrue(
+                content_offtokens(css, _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS),
+                f"a smuggled {smuggle!r} must be flagged")
+
+    def test_content_cannot_mint_or_override_tokens(self):
+        """codex A3b #1: token DECLARATION belongs to the shell (`root_block`, provenance-pinned) —
+        content may only REFERENCE vars. A `:root` block in content (which would OVERRIDE shell tokens,
+        since content CSS loads after the shell's) or a custom-property declaration in any content rule
+        is flagged — even a non-colour one (minting a token is itself the violation)."""
+        from scripts.rendering.studio.studio import (_CONTENT_ALLOWED_PX,
+                                                     _CONTENT_ALLOWED_WORDS, _CONTENT_CSS)
+        from scripts.rendering.webkit.design_render_adapter import content_offtokens
+        for mint in (":root { --evil: #ff0000; }\n" + _CONTENT_CSS,
+                     _CONTENT_CSS + "\n.swap-opt { --backdrop: #ff0000; }",
+                     _CONTENT_CSS + "\n.swap-opt { --pad: 31px; }"):
+            self.assertTrue(
+                content_offtokens(mint, _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS),
+                "content minting/overriding a token must be flagged")
+
+    def test_content_css_is_atrule_free(self):
+        """codex A3c: an at-rule PRELUDE is CSS the body-scan never reads — `@media (min-width: 8px)`
+        or `@supports (background: #ff0000)` would smuggle literals past the allowlist. Content CSS is
+        therefore @-rule-free entirely (the same closed-structure law as the shell)."""
+        from scripts.rendering.studio.studio import (_CONTENT_ALLOWED_PX,
+                                                     _CONTENT_ALLOWED_WORDS, _CONTENT_CSS)
+        from scripts.rendering.webkit.design_render_adapter import content_offtokens
+        for atrule in ("@media (min-width: 8px) { .swap-opt { color: var(--ink); } }",
+                       "@supports (background: #ff0000) { .swap-opt { color: var(--ink); } }"):
+            self.assertTrue(
+                content_offtokens(_CONTENT_CSS + "\n" + atrule,
+                                  _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS),
+                f"an at-rule ({atrule.split(' ')[0]}) in content CSS must be flagged")
+
+    def test_content_allowlists_are_pinned_exactly(self):
+        """codex A3b #2: the allowlist is the scan's ONLY escape, so it is DATA with a second key —
+        widening it (e.g. adding a colour word like `blue`) reddens HERE until this pin is also edited,
+        making every widening a visible, reviewed act. Neither set may ever name a colour."""
+        from scripts.rendering.studio.studio import _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS
+        self.assertEqual(_CONTENT_ALLOWED_PX, frozenset({"2px", "64px", "999px"}))
+        self.assertEqual(_CONTENT_ALLOWED_WORDS,
+                         frozenset({"ui-monospace", "monospace", "not-allowed"}))
+
+
 if __name__ == "__main__":
     unittest.main()

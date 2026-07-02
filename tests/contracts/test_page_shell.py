@@ -202,6 +202,24 @@ class PageShellInjectionContract(unittest.TestCase):
         with self.assertRaises(ValueError):
             self._shell(sections=[("h", '<span class="ps-title">fake</span>')])
 
+    def test_prefix_html_renders_first_inside_the_shell_root(self):
+        """P5-CHROME A5 seam: `prefix_html` is content a page needs as the FIRST children INSIDE the
+        shell root (before ps-title) — the studio's pure-CSS switcher radios, whose `:checked ~`
+        sibling selectors must reach the stages that follow. Placement is structural: root div,
+        then prefix, then title."""
+        html, _ = self._shell(prefix_html='<input type="radio" id="lang-x" class="lang-radio">')
+        self.assertRegex(
+            html, r'<div class="ps-apple-dark"><input type="radio" id="lang-x"[^>]*>'
+                  r'<h1 class="ps-title">',
+            "prefix_html must render as the shell root's first children, before ps-title")
+
+    def test_reserved_class_in_prefix_html_is_unconstructable(self):
+        """The ps-* injection guard covers prefix_html like body_html/sections — a prefix is the
+        FIRST thing pageshell_facts' global regexes would meet, so a spoof there is the most
+        dangerous of all."""
+        with self.assertRaises(ValueError):
+            self._shell(prefix_html='<h1 class="ps-title">fake</h1>')
+
     def test_legit_content_classes_render(self):
         """The guard bans only the shell's own `ps-*` anatomy — ordinary content classes (incl. a
         word that merely CONTAINS "ps-", like `caps-lock`) pass untouched."""
