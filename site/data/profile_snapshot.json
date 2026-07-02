@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T18:02:10.170520Z",
+  "generated_at": "2026-07-02T19:52:35.082137Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,13 +18,13 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 8257,
-    "public_scope_commits": 4416,
-    "total_repos": 68,
+    "last_year_contributions": 8261,
+    "public_scope_commits": 4418,
+    "total_repos": 69,
     "public_forks": 0,
     "private_owned_repos": 147,
     "total_stars": 79,
-    "languages_count": 24,
+    "languages_count": 25,
     "prs_merged": 35,
     "releases": 0,
     "ci_repos": 16,
@@ -35,22 +35,22 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 8257,
-      "display_value": "8,257"
+      "value": 8261,
+      "display_value": "8,261"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 4416,
-      "display_value": "4,416"
+      "value": 4418,
+      "display_value": "4,418"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 68,
-      "display_value": "68"
+      "value": 69,
+      "display_value": "69"
     },
     {
       "key": "public_forks",
@@ -77,8 +77,8 @@
       "key": "languages_count",
       "label": "Languages Detected",
       "dashboard_label": "Languages Detected",
-      "value": 24,
-      "display_value": "24"
+      "value": 25,
+      "display_value": "25"
     },
     {
       "key": "prs_merged",
@@ -113,20 +113,20 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 8257,
-      "display_value": "8,257"
+      "value": 8261,
+      "display_value": "8,261"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 4416,
-      "display_value": "4,416"
+      "value": 4418,
+      "display_value": "4,418"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 68,
-      "display_value": "68"
+      "value": 69,
+      "display_value": "69"
     },
     {
       "key": "public_forks",
@@ -149,8 +149,8 @@
     {
       "key": "languages_count",
       "label": "Languages Detected",
-      "value": 24,
-      "display_value": "24"
+      "value": 25,
+      "display_value": "25"
     },
     {
       "key": "prs_merged",
@@ -189,24 +189,24 @@
   },
   "scorecard": {
     "releases_30d": 0,
-    "active_repos_7d": 2,
+    "active_repos_7d": 3,
     "avg_release_gap_days": 0.0,
-    "stars_per_public_repo": 1.161764705882353,
-    "ci_coverage_pct": 23.52941176470588,
-    "last_year_contributions": 8257,
+    "stars_per_public_repo": 1.144927536231884,
+    "ci_coverage_pct": 23.18840579710145,
+    "last_year_contributions": 8261,
     "active_days_last_year": 287,
     "automation_workflows": 74,
     "primary_lang_share_pct": 50.5,
-    "median_days_since_push": 207.0,
-    "days_since_last_push": 3.0
+    "median_days_since_push": 205.0,
+    "days_since_last_push": 0.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 8257,
-      "display_value": "8,257",
+      "value": 8261,
+      "display_value": "8,261",
       "accent": "#7dcfff"
     },
     {
@@ -221,16 +221,16 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 2,
-      "display_value": "2",
+      "value": 3,
+      "display_value": "3",
       "accent": "#7dcfff"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with pipelines",
-      "value": 23.52941176470588,
-      "display_value": "23.5%",
+      "value": 23.18840579710145,
+      "display_value": "23.2%",
       "accent": "#ff9e64"
     },
     {
@@ -261,17 +261,17 @@
       "key": "days_since_last_push",
       "label": "Last Push",
       "detail": "days since your most recent commit",
-      "value": 3.0,
-      "display_value": "3d",
+      "value": 0.0,
+      "display_value": "0d",
       "accent": "#9ece6a"
     }
   ],
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 68,
+    "public_owned_repos_total": 69,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 68,
+    "public_owned_nonfork_repos_total": 69,
     "private_owned_repos_total": 147
   },
   "featured_repo_facts": [
@@ -325,21 +325,21 @@
     {
       "name": "Python",
       "bytes": 12723873,
-      "percent": 50.49
+      "percent": 50.47
     },
     {
       "name": "Makefile",
       "bytes": 3931581,
-      "percent": 15.6
+      "percent": 15.59
     },
     {
       "name": "Rust",
       "bytes": 3003018,
-      "percent": 11.92
+      "percent": 11.91
     },
     {
       "name": "C++",
-      "bytes": 1824966,
+      "bytes": 1825242,
       "percent": 7.24
     },
     {
@@ -360,7 +360,7 @@
     {
       "name": "Shell",
       "bytes": 283578,
-      "percent": 1.13
+      "percent": 1.12
     },
     {
       "name": "C",
@@ -430,6 +430,21 @@
       "featured": true
     },
     {
+      "name": "cpp-to-assembly",
+      "full_name": "jguida941/cpp-to-assembly",
+      "url": "https://github.com/jguida941/cpp-to-assembly",
+      "language": "Assembly",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-07-02",
+      "pushed_at_raw": "2026-07-02T19:10:20Z",
+      "pushed_ago": "today",
+      "created_at": "2026-07-02",
+      "last_commit_msg": "Add C++ to assembly activity",
+      "featured": false
+    },
+    {
       "name": "CS-350-Emerging-Systems-Architectures",
       "full_name": "jguida941/CS-350-Emerging-Systems-Architectures",
       "url": "https://github.com/jguida941/CS-350-Emerging-Systems-Architectures",
@@ -454,7 +469,7 @@
       "ci": "no",
       "pushed_at": "2026-06-28",
       "pushed_at_raw": "2026-06-28T19:00:47Z",
-      "pushed_ago": "3 days ago",
+      "pushed_ago": "4 days ago",
       "created_at": "2026-06-28",
       "last_commit_msg": "Update README.md",
       "featured": false
@@ -638,24 +653,32 @@
       "created_at": "2025-09-18",
       "last_commit_msg": "Fix image alt text for accessibility and portfolio captions",
       "featured": false
-    },
-    {
-      "name": "OpenGL-Hourglass",
-      "full_name": "jguida941/OpenGL-Hourglass",
-      "url": "https://github.com/jguida941/OpenGL-Hourglass",
-      "language": "C++",
-      "stars": 0,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-01-26",
-      "pushed_at_raw": "2026-01-26T07:06:42Z",
-      "pushed_ago": "5 months ago",
-      "created_at": "2026-01-22",
-      "last_commit_msg": "Fix image alt text for accessibility",
-      "featured": false
     }
   ],
   "recent_created": [
+    {
+      "name": "cpp-to-assembly",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "Simple CS 410 project showing how to convert a C++ program into assembly using g++.",
+      "html_url": "https://github.com/jguida941/cpp-to-assembly",
+      "pushed_at": "2026-07-02T19:10:20Z",
+      "created_at": "2026-07-02T19:09:11Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": "Assembly",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "workflow_file_count": 0,
+      "language_bytes": {
+        "Assembly": 8635,
+        "C++": 276
+      },
+      "latest_commit_message": "Add C++ to assembly activity"
+    },
     {
       "name": "CS-350-Emerging-Systems-Architectures",
       "fork": false,
@@ -860,34 +883,16 @@
         "Ruby": 1180
       },
       "latest_commit_message": "Update to v1.1.1"
-    },
-    {
-      "name": "OpenGL-Hourglass",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": "OpenGL hourglass scene (CS-330) with run.bat and shaders included.",
-      "html_url": "https://github.com/jguida941/OpenGL-Hourglass",
-      "pushed_at": "2026-01-26T07:06:42Z",
-      "created_at": "2026-01-22T03:32:41Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "language": "C++",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "C++": 22938,
-        "GLSL": 16418,
-        "Batchfile": 284
-      },
-      "latest_commit_message": "Fix image alt text for accessibility"
     }
   ],
   "focus": {
     "now": [
+      {
+        "title": "cpp-to-assembly",
+        "detail": "Assembly \u00b7 pushed today",
+        "url": "https://github.com/jguida941/cpp-to-assembly",
+        "is_private": false
+      },
       {
         "title": "repo-surface-scout",
         "detail": "Python \u00b7 pushed today",
@@ -896,13 +901,7 @@
       },
       {
         "title": "semantic-tdd",
-        "detail": "Python \u00b7 pushed today",
-        "url": "",
-        "is_private": true
-      },
-      {
-        "title": "cs-340-project-two",
-        "detail": "Python \u00b7 pushed 3 days ago",
+        "detail": "Python \u00b7 pushed 2 hours ago",
         "url": "",
         "is_private": true
       }
@@ -922,12 +921,32 @@
       },
       {
         "title": "Update README.md",
-        "detail": "raspberry-pi-smart-thermostat \u00b7 3 days ago",
+        "detail": "raspberry-pi-smart-thermostat \u00b7 4 days ago",
         "url": "https://github.com/jguida941/raspberry-pi-smart-thermostat"
       }
     ]
   },
   "activity_feed": [
+    {
+      "kind": "activity",
+      "title": "create",
+      "url": "https://github.com/jguida941/cpp-to-assembly",
+      "repo": "jguida941/cpp-to-assembly",
+      "repo_url": "https://github.com/jguida941/cpp-to-assembly",
+      "state": "CREATE",
+      "time_ago": "today",
+      "created_at": "2026-07-02T19:10:20Z"
+    },
+    {
+      "kind": "created",
+      "title": "cpp-to-assembly",
+      "url": "https://github.com/jguida941/cpp-to-assembly",
+      "repo": "jguida941/cpp-to-assembly",
+      "repo_url": "https://github.com/jguida941/cpp-to-assembly",
+      "state": "CREATED",
+      "time_ago": "today",
+      "created_at": "2026-07-02T19:09:11Z"
+    },
     {
       "kind": "activity",
       "title": "push",
@@ -965,7 +984,7 @@
       "repo": "jguida941/raspberry-pi-smart-thermostat",
       "repo_url": "https://github.com/jguida941/raspberry-pi-smart-thermostat",
       "state": "CREATED",
-      "time_ago": "3 days ago",
+      "time_ago": "4 days ago",
       "created_at": "2026-06-28T18:41:28Z"
     },
     {
@@ -987,16 +1006,6 @@
       "state": "CREATE",
       "time_ago": "2 weeks ago",
       "created_at": "2026-06-15T00:07:02Z"
-    },
-    {
-      "kind": "created",
-      "title": "SNHU-CS-330",
-      "url": "https://github.com/jguida941/SNHU-CS-330",
-      "repo": "jguida941/SNHU-CS-330",
-      "repo_url": "https://github.com/jguida941/SNHU-CS-330",
-      "state": "CREATED",
-      "time_ago": "4 months ago",
-      "created_at": "2026-03-02T00:25:11Z"
     }
   ],
   "recent_releases": [],
@@ -1025,21 +1034,21 @@
       45,
       60,
       34,
-      238
+      243
     ],
     "automation_workflows": 74,
     "automation_repos": 15,
     "primary_lang_share_pct": 50.5,
     "languages_over_5pct": 5,
-    "median_days_since_push": 207.0,
-    "days_since_last_push": 3.0,
-    "public_repos_total": 68,
-    "public_nonfork_repos": 68,
+    "median_days_since_push": 205.0,
+    "days_since_last_push": 0.0,
+    "public_repos_total": 69,
+    "public_nonfork_repos": 69,
     "private_repos_total": 147,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 8257,
+    "total": 8261,
     "weeks": [
       [
         {
@@ -1358,7 +1367,7 @@
       [
         {
           "date": "2025-09-14",
-          "count": 6
+          "count": 5
         },
         {
           "date": "2025-09-15",
@@ -2604,7 +2613,7 @@
         },
         {
           "date": "2026-07-02",
-          "count": 21
+          "count": 26
         }
       ]
     ]
@@ -2705,7 +2714,7 @@
         0,
         0,
         0,
-        0,
+        1,
         0,
         0,
         0,
@@ -2796,11 +2805,11 @@
     ],
     "event_mix": {
       "push": 80,
-      "create": 2,
+      "create": 3,
       "comment": 1,
       "pull request": 1
     },
-    "total": 84,
+    "total": 85,
     "timezone": "New York"
   }
 }
