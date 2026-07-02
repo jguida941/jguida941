@@ -213,6 +213,40 @@ class ShowcaseChromeContract(unittest.TestCase):
                                   _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS),
                 f"an at-rule ({atrule.split(' ')[0]}) in content CSS must be flagged")
 
+    def test_verdict_table_is_grouped_by_aspect_with_hoisted_cites(self):
+        """D-SHELL-2 L-SHOW-1: rows group into one tbody per aspect (first-appearance order) with
+        a subheader th[scope=colgroup] carrying the group's SINGLE hoisted doc cite — the per-row
+        doc column dies. Fail-closed: a missing aspect is a KeyError; mixed cites in a group raise."""
+        from scripts.rendering.showcase.showcase import _rows, render_showcase
+        html = render_showcase(_committed_receipts())
+        self.assertRegex(html, r'<tbody class="aspect-group" data-aspect="page-shell">')
+        self.assertRegex(html, r'<tr class="aspect-head"><th colspan="4" scope="colgroup">')
+        self.assertNotIn("<th>doc</th>", html, "the per-row doc column must be gone")
+        self.assertNotIn('<td class="cite">', html)
+        base = {"invariant_id": "a", "status": "pass", "law": "l", "aspect": "s"}
+        with self.assertRaises(ValueError):
+            _rows([{**base, "doc_cite": "x"}, {**base, "invariant_id": "b", "doc_cite": "y"}])
+        with self.assertRaises(KeyError):
+            _rows([{"invariant_id": "a", "status": "pass", "law": "l", "doc_cite": "x"}])
+
+    def test_pass_is_quiet_and_exceptions_are_loud(self):
+        """D-SHELL-2 L-SHOW-2 (exception-first scanning): the pass pill is QUIET (transparent fill,
+        status ink, 1px status border) while fail/candidate stay SOLID — two-directional, so a wall
+        of loud greens can never drown the two rows that matter."""
+        from scripts.rendering.showcase.showcase import _CONTENT_CSS
+        pass_rule = re.search(r"\.badge-pass \{([^}]*)\}", _CONTENT_CSS).group(1)
+        self.assertIn("background: transparent", pass_rule, "pass must be quiet")
+        self.assertIn("color: var(--status-success)", pass_rule)
+        for cls, tok in (("badge-fail", "--status-danger"), ("badge-candidate", "--status-warning")):
+            rule = re.search(rf"\.{cls} \{{([^}}]*)\}}", _CONTENT_CSS).group(1)
+            self.assertIn(f"background: var({tok})", rule, f"{cls} must stay loud/solid")
+
+    def test_empty_receipt_cells_render_empty_not_dash(self):
+        """D-SHELL-2 L-SHOW-5: an absent receipt is an EMPTY cell — a placeholder dash fakes
+        content and made 90% of the column noise."""
+        from scripts.rendering.showcase.showcase import render_showcase
+        self.assertNotIn(">—<", render_showcase(_committed_receipts()))
+
     def test_content_allowlists_are_pinned_exactly(self):
         """codex A3b #2: the allowlist is the scan's ONLY escape, so it is DATA with a second key —
         widening it (e.g. adding a colour word like `blue`) reddens HERE until this pin is also

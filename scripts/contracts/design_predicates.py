@@ -97,6 +97,16 @@ def host_chrome_token_only(facts: dict, **_) -> bool:
     return facts.get("body_offtoken_count") == 0
 
 
+def section_grouping_flat(facts: dict, **_) -> bool:
+    """D-SHELL-2 (gate MF-A): the SHELL composes ONE chrome level — no chromed box inside another
+    chromed box (the audit's box-in-box). Fail-closed AND non-vacuous: an unbalanced parse (None)
+    fails, and 'flat' is only claimable when >=1 chromed box actually rendered. SHELL-scoped; the
+    page-level check (e.g. the showcase stage) lands with D-SHELL-3's recomposition."""
+    depth = facts.get("chrome_nesting_depth")
+    count = facts.get("chromed_box_count")
+    return depth is not None and (count or 0) >= 1 and depth <= 1
+
+
 def page_has_orientation(facts: dict, **_) -> bool:
     """A user can tell what the page is + GET BACK: a title WITH text AND a real breadcrumb link (non-
     empty href + text) are present (fail-closed on an empty render / an empty crumbs row)."""
@@ -163,4 +173,5 @@ PREDICATES = {
     "page_has_content_column": page_has_content_column,
     "shell_type_ramp_tiered": shell_type_ramp_tiered,
     "shell_density_from_profile": shell_density_from_profile,
+    "section_grouping_flat": section_grouping_flat,
 }

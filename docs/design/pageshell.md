@@ -89,3 +89,15 @@ Visual hierarchy is good; a dark specimen does not camouflage into a dark chrome
 contrast of chrome text over the actual ground. These are **judgment** aspects — a headless/visual receipt
 decides them, per `docs/design/settings.md` §… (the live render is the final arbiter), never a static
 string-match. They stay `candidate` until receipt-backed.
+
+## §6 — Page archetypes (D-SHELL-2)
+
+Every shipped page declares WHAT IT IS in `contracts/page_manifest.json`: intent + archetype
+(CLOSED enum: landing / proof-report / control-plane / workbench) + the regions its archetype
+requires — enforced fail-closed against the COMMITTED page bytes by
+`tests/contracts/test_page_manifest.py` (site-scoped law; the roster's `page-archetype` aspect
+stays deferred pointing there — a site fact surfaced per profile would fake per-language proof).
+The SHELL-scoped grouping law is emitted per profile (`*-grouping-depth`,
+`section_grouping_flat`): one chrome level, no chromed box inside a chromed box.
+**Declared gap:** the PAGE-level nesting check (e.g. the showcase specimen stage, chromed inside a
+chromed language panel today) lands with D-SHELL-3's stage shrink-wrap/recomposition.
