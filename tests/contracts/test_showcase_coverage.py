@@ -120,5 +120,109 @@ class ShowcaseCoverageContract(unittest.TestCase):
         self.assertNotIn("badge-pass", row, "a fail row must not carry a pass badge")
 
 
+class ShowcaseChromeContract(unittest.TestCase):
+    """P5-CHROME A3: the showcase CHROME is the governed page-shell (apple-dark house), not hand CSS.
+    Its own frame is a rendered instance of a design language, and its verdict palette derives from the
+    language's status tokens — so the proof page follows the same process it displays."""
+
+    HOUSE = "apple-dark"
+
+    def test_showcase_chrome_is_the_governed_page_shell(self):
+        """The page frame is render_page_shell(apple-dark): the shell root class + its exact host-chrome
+        CSS are present (so the showcase is drift-tied to the governed shell, not a hand copy)."""
+        from scripts.rendering.pageshell.pageshell import shell_css
+        from scripts.rendering.showcase.showcase import render_showcase
+        html = render_showcase(_committed_receipts())
+        self.assertIn(f'class="ps-{self.HOUSE}"', html, "showcase must frame itself in the governed shell")
+        self.assertIn(shell_css(self.HOUSE), html, "showcase must embed the exact governed shell CSS")
+
+    def test_showcase_carries_no_hand_chrome_palette(self):
+        """The old hand-written dark chrome + copied verdict palette are GONE — the frame + badges derive
+        from the shell's tokens (var(--surface)/var(--hairline)/var(--status-*)), no raw chrome hex."""
+        from scripts.rendering.showcase.showcase import render_showcase
+        html = render_showcase(_committed_receipts())
+        for banned in ("#0a0a0f", "#101018", "#12121a", "#0f3d2e", "#451118", "#3a3410", "#1a1a24"):
+            self.assertNotIn(banned, html, f"the hand chrome literal {banned} must be gone")
+        for tok in ("var(--status-success)", "var(--status-danger)", "var(--status-warning)"):
+            self.assertIn(tok, html, f"the verdict palette must derive from {tok}")
+
+    def test_showcase_breadcrumb_orients_across_the_surfaces(self):
+        """Explainability/IA: the shell breadcrumb links the sibling surfaces so a viewer can navigate."""
+        from scripts.rendering.showcase.showcase import render_showcase
+        html = render_showcase(_committed_receipts())
+        self.assertRegex(html, r'class="ps-crumbs"')
+        for href in ("index.html", "studio.html", "settings.html"):
+            self.assertIn(href, html, f"the showcase must link {href}")
+
+    def test_content_css_is_token_only_beyond_the_explicit_allowlist(self):
+        """codex A3 #1: `_CONTENT_CSS` is page CONTENT (not host chrome), so the A1 shell gate never
+        sees it — without its own scan it is a laundering hole for chrome-like decisions. Every
+        colour is a var(); the ONLY bare literals are the module's DECLARED structural allowlist
+        (layout px + layout keywords, no colour of any form). The per-language specimen CSS
+        (`button_css`) is deliberately NOT scanned — specimens render in their OWN languages."""
+        from scripts.rendering.showcase.showcase import (_CONTENT_ALLOWED_PX,
+                                                         _CONTENT_ALLOWED_WORDS, _CONTENT_CSS)
+        from scripts.rendering.webkit.design_render_adapter import content_offtokens
+        self.assertEqual(
+            content_offtokens(_CONTENT_CSS, _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS), [],
+            "showcase content CSS must be token-only beyond its declared structural allowlist")
+
+    def test_content_scanner_catches_a_smuggled_decision(self):
+        """Non-vacuity: a colour in ANY form (hex / colour fn / named / system) or an off-allowlist
+        px pushed into `_CONTENT_CSS` is flagged — the allowlist is the only escape, and it admits
+        no colour."""
+        from scripts.rendering.showcase.showcase import (_CONTENT_ALLOWED_PX,
+                                                         _CONTENT_ALLOWED_WORDS, _CONTENT_CSS)
+        from scripts.rendering.webkit.design_render_adapter import content_offtokens
+        target = "color: var(--ink-dim); font-style: italic;"
+        self.assertIn(target, _CONTENT_CSS, "the mutation target must exist")
+        for smuggle in ("color: #ff0000", "background: rgb(1,2,3)", "color: rebeccapurple",
+                        "padding: 8px", "border-color: CanvasText", "color: initial"):
+            css = _CONTENT_CSS.replace(target, smuggle + ";")
+            self.assertTrue(
+                content_offtokens(css, _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS),
+                f"a smuggled {smuggle!r} must be flagged")
+
+    def test_content_cannot_mint_or_override_tokens(self):
+        """codex A3b #1: token DECLARATION belongs to the shell (`root_block`, provenance-pinned) —
+        content may only REFERENCE vars. A `:root` block in content (which would OVERRIDE shell
+        tokens, since content CSS loads after the shell's) or a custom-property declaration in any
+        content rule is flagged — even a non-colour one (minting a token is itself the violation)."""
+        from scripts.rendering.showcase.showcase import (_CONTENT_ALLOWED_PX,
+                                                         _CONTENT_ALLOWED_WORDS, _CONTENT_CSS)
+        from scripts.rendering.webkit.design_render_adapter import content_offtokens
+        for mint in (":root { --evil: #ff0000; }\n" + _CONTENT_CSS,
+                     _CONTENT_CSS + "\n.badge { --backdrop: #ff0000; }",
+                     _CONTENT_CSS + "\n.badge { --pad: 31px; }"):
+            self.assertTrue(
+                content_offtokens(mint, _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS),
+                "content minting/overriding a token must be flagged")
+
+    def test_content_css_is_atrule_free(self):
+        """codex A3c: an at-rule PRELUDE is CSS the body-scan never reads — `@media (min-width: 8px)`
+        or `@supports (background: #ff0000)` would smuggle literals past the allowlist. Content CSS
+        is therefore @-rule-free entirely (the same closed-structure law as the shell); a genuine
+        future need (responsive content) is a deliberate, reviewed widening — not a prelude escape."""
+        from scripts.rendering.showcase.showcase import (_CONTENT_ALLOWED_PX,
+                                                         _CONTENT_ALLOWED_WORDS, _CONTENT_CSS)
+        from scripts.rendering.webkit.design_render_adapter import content_offtokens
+        for atrule in ("@media (min-width: 8px) { .badge { color: var(--ink); } }",
+                       "@supports (background: #ff0000) { .badge { color: var(--ink); } }"):
+            self.assertTrue(
+                content_offtokens(_CONTENT_CSS + "\n" + atrule,
+                                  _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS),
+                f"an at-rule ({atrule.split(' ')[0]}) in content CSS must be flagged")
+
+    def test_content_allowlists_are_pinned_exactly(self):
+        """codex A3b #2: the allowlist is the scan's ONLY escape, so it is DATA with a second key —
+        widening it (e.g. adding a colour word like `blue`) reddens HERE until this pin is also
+        edited, making every widening a visible, reviewed act. Neither set may ever name a colour."""
+        from scripts.rendering.showcase.showcase import _CONTENT_ALLOWED_PX, _CONTENT_ALLOWED_WORDS
+        self.assertEqual(_CONTENT_ALLOWED_PX, frozenset({"96px", "260px", "2px", "999px"}))
+        self.assertEqual(_CONTENT_ALLOWED_WORDS,
+                         frozenset({"column", "space-between", "inline-block",
+                                    "ui-monospace", "monospace", "inherit"}))
+
+
 if __name__ == "__main__":
     unittest.main()

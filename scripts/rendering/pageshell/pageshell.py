@@ -13,6 +13,7 @@ chrome. Governed by conform()'s `page-shell` aspect + tests/contracts/test_page_
 from __future__ import annotations
 
 import html as _html
+import re as _re
 
 
 # The shared shell IA scale — the chrome's spacing + type rhythm (docs/design/pageshell.md §3, cited to
@@ -79,33 +80,48 @@ def shell_css(profile: str) -> str:
     ])
 
 
+# codex A3 #2: injected content (body_html / section bodies) must never carry the shell's own
+# reserved classes — a fake `ps-title` could spoof the global-regex shell facts. `\bps-` inside a
+# class attribute only (a word merely containing "ps-", e.g. `caps-lock`, is untouched).
+_INJECTED_PS = _re.compile(r'class\s*=\s*["\'][^"\']*\bps-')
+
+
 def render_page_shell(
     profile: str,
     *,
     title: str,
     intro: str,
     breadcrumbs: list[tuple[str, str]],
-    sections: list[tuple[str, str]],
+    sections: list[tuple[str, str]] | None = None,
+    body_html: str = "",
     glossary=None,
     profile_data: dict | None = None,
 ) -> tuple[str, str]:
     """Return `(html, css)` for a page framed in `profile`'s design language.
 
-    `breadcrumbs` = `[(label, href), …]` (the orientation row); `sections` = `[(heading, body_html), …]`
-    (each a token-only panel wrapping pre-rendered specimen/content HTML). The chrome is token-only +
-    governed; the section bodies are the caller's specimens (rendered in their own languages)."""
+    `breadcrumbs` = `[(label, href), …]` (the orientation row). `sections` = `[(heading, body), …]`
+    (each a token-only `.ps-panel`); `body_html` = raw content a page structures itself (rendered with the
+    shell's tokens) — a page uses one or the other. The chrome (bg/header/crumbs/panels) is token-only +
+    governed; the injected content is the caller's specimens, rendered in their own languages."""
     ns = f"ps-{profile}"
+    for blob in (body_html, *(body for _, body in (sections or []))):
+        if blob and _INJECTED_PS.search(blob):
+            raise ValueError(
+                "injected content carries a shell-reserved ps-* class — the shell anatomy "
+                "(ps-title/ps-crumbs/ps-panel/…) may only be rendered by render_page_shell itself "
+                "(codex A3 #2: an injected ps-title could spoof the page-shell facts)")
     crumbs = " · ".join(f'<a href="{_html.escape(href)}">{_html.escape(label)}</a>'
                         for label, href in breadcrumbs)
     panels = "".join(
         f'<section class="ps-panel"><h2 class="ps-panel-h">{_html.escape(heading)}</h2>{body}</section>'
-        for heading, body in sections)
+        for heading, body in (sections or []))
     html = (
         f'<div class="{ns}">'
         f'<h1 class="ps-title">{_html.escape(title)}</h1>'
         f'<p class="ps-intro">{_html.escape(intro)}</p>'
         f'<p class="ps-crumbs">{crumbs}</p>'
         f'{panels}'
+        f'{body_html}'
         f'</div>'
     )
     return html, shell_css(profile)

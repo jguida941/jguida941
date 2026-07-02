@@ -180,6 +180,36 @@ class PageShellGateContract(unittest.TestCase):
                              f"{label} must redden host_chrome_is_closed (unconstructable chrome)")
 
 
+class PageShellInjectionContract(unittest.TestCase):
+    """codex A3 #2: `body_html`/section bodies are RAW page content injected inside the shell root.
+    A shell-reserved `ps-*` class in that content could spoof the global-regex shell facts (a fake
+    `ps-title` flips has_title), so the GENERATOR refuses it — the spoof is unconstructable,
+    fail-closed at the seam, not detected downstream."""
+
+    def _shell(self, **kw):
+        from scripts.rendering.pageshell.pageshell import render_page_shell
+        return render_page_shell("apple-dark", title="T", intro="i",
+                                 breadcrumbs=[("home", "index.html")], **kw)
+
+    def test_reserved_class_in_body_html_is_unconstructable(self):
+        for spoof in ('<h1 class="ps-title">fake</h1>',
+                      '<p class="ps-crumbs"><a href="x.html">fake</a></p>',
+                      "<div class='ps-apple-dark'>nested shell root</div>"):
+            with self.assertRaises(ValueError, msg=f"injected {spoof!r} must be refused"):
+                self._shell(body_html=spoof)
+
+    def test_reserved_class_in_a_section_body_is_unconstructable(self):
+        with self.assertRaises(ValueError):
+            self._shell(sections=[("h", '<span class="ps-title">fake</span>')])
+
+    def test_legit_content_classes_render(self):
+        """The guard bans only the shell's own `ps-*` anatomy — ordinary content classes (incl. a
+        word that merely CONTAINS "ps-", like `caps-lock`) pass untouched."""
+        html, _ = self._shell(
+            body_html='<section class="lang"><div class="stage caps-lock">x</div></section>')
+        self.assertIn('class="lang"', html)
+
+
 class PageShellConformanceContract(unittest.TestCase):
     def test_conform_governs_the_page_shell_aspect(self):
         """The page shell is governed by the SAME conform() runner as the specimens: every active

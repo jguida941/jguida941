@@ -105,9 +105,67 @@ def _rows(results: list[dict]) -> str:
     return "\n".join(out)
 
 
+# The showcase CHROME is the governed page-shell (apple-dark house); its CONTENT palette (legend / verdict
+# badges / table) derives from that shell's tokens — so the proof page follows the same process it displays.
+HOUSE = "apple-dark"
+
+# Content CSS (the specimen stages + verdict table live INSIDE the governed shell). Every colour is a shell
+# token var(); the verdict palette is the language's own status roles. Only structural non-colour px remain.
+_CONTENT_CSS = """
+.legend { display: flex; gap: var(--ps-gap); flex-wrap: wrap; font-size: var(--ps-type-sub); color: var(--ink); }
+.legend b { font-weight: 600; }
+.lang { margin: 0 0 var(--ps-gap); padding: var(--ps-pad); border: 1px solid var(--hairline);
+  border-radius: var(--radius-panel); background: var(--surface); }
+.lang header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ps-gap); }
+.lang h2 { margin: 0 0 var(--ps-pad-tight); font-size: var(--ps-type-body); color: var(--ink-strong); }
+.tally { color: var(--ink-dim); font-size: var(--ps-type-sub); margin: 0; }
+.stage { display: flex; flex-direction: column; align-items: center; gap: var(--ps-gap);
+  min-height: 96px; padding: var(--ps-pad); margin: var(--ps-gap-tight) 0 var(--ps-gap);
+  border-radius: var(--radius-tile); }
+.stage-row { display: flex; align-items: center; justify-content: center; gap: var(--ps-gap); flex-wrap: wrap; }
+.card-group { min-width: 260px; }
+.chip-dismiss { background: transparent; border: 0; color: inherit; cursor: pointer;
+  font-size: var(--ps-type-body); line-height: 1; padding: 0 0 0 2px; }
+.no-render { color: var(--ink-dim); font-style: italic; }
+table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub); }
+.invariants th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: var(--ps-gap-tight) var(--ps-pad-tight);
+  border-bottom: 1px solid var(--hairline); }
+.invariants td { padding: var(--ps-pad-tight); border-bottom: 1px solid var(--hairline); vertical-align: top; }
+.inv { font-family: ui-monospace, monospace; color: var(--ink); white-space: nowrap; }
+.cite { color: var(--ink-dim); font-family: ui-monospace, monospace; }
+.receipt { color: var(--ink-dim); font-size: var(--ps-type-sub); }
+.receipt code { color: var(--ink); font-family: ui-monospace, monospace; }
+.badge { display: inline-block; padding: 2px var(--ps-pad-tight); border-radius: 999px; font-weight: 600;
+  font-size: var(--ps-type-sub); white-space: nowrap; }
+.badge-pass { background: var(--status-success); color: var(--backdrop); }
+.badge-fail { background: var(--status-danger); color: var(--backdrop); }
+.badge-candidate { background: var(--status-warning); color: var(--backdrop); }
+""".strip()
+
+# The CLOSED structural allowlist for _CONTENT_CSS (codex A3 #1): the ONLY non-token literals the
+# content may carry, each a LAYOUT (never colour) decision. Anything else — a colour in any form,
+# an off-list px — reddens ShowcaseChromeContract; the scan is content_offtokens (same machinery as
+# the shell gate, with this explicit escape hatch instead of the shell's none).
+_CONTENT_ALLOWED_PX = frozenset({
+    "96px",     # .stage min-height — the specimen stage floor
+    "260px",    # .card-group min-width — the card specimen's natural measure
+    "2px",      # .chip-dismiss padding nudge
+    "999px",    # .badge pill radius — structural "fully round", not a scale step
+})
+_CONTENT_ALLOWED_WORDS = frozenset({
+    "column", "space-between", "inline-block",   # flex/display structure
+    "ui-monospace", "monospace",                 # the code-face stack (no colour choice)
+    "inherit",                                   # .chip-dismiss color: inherit — takes the parent
+                                                 # CHIP's own ink (content), unlike chrome where
+                                                 # inherit would escape the token system
+})
+
+
 def render_showcase(receipts: dict) -> str:
-    """Pure: committed receipts -> the showcase HTML. Deterministic (profiles sorted; receipt
-    order preserved). No timestamps, no probe coupling."""
+    """Pure: committed receipts -> the showcase HTML, framed in the governed apple-dark page-shell.
+    Deterministic (profiles sorted; receipt order preserved). No timestamps, no probe coupling."""
+    from scripts.rendering.pageshell.pageshell import render_page_shell
+
     button_css = []
     sections = []
     for name in sorted(receipts):
@@ -130,62 +188,35 @@ def render_showcase(receipts: dict) -> str:
             f'</section>'
         )
 
-    page_css = """
-:root { color-scheme: dark; }
-* { box-sizing: border-box; }
-body { margin: 0; padding: 32px; background: #0a0a0f; color: #e8e8ee;
-  font: 15px/1.5 -apple-system, system-ui, 'Segoe UI', sans-serif; }
-h1 { font-size: 26px; margin: 0 0 4px; }
-.sub { color: #9a9aa6; margin: 0 0 8px; max-width: 70ch; }
-.legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0 32px; padding: 12px 16px;
-  border: 1px solid #23232e; border-radius: 12px; background: #12121a; font-size: 13px; }
-.legend b { font-weight: 600; }
-.lang { margin: 0 0 40px; padding: 20px; border: 1px solid #23232e; border-radius: 16px;
-  background: #101018; }
-.lang header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
-.lang h2 { margin: 0 0 12px; font-size: 19px; }
-.tally { color: #9a9aa6; font-size: 13px; margin: 0; }
-.stage { display: flex; flex-direction: column; align-items: center; gap: 18px;
-  min-height: 96px; padding: 24px; margin: 8px 0 20px; border-radius: 12px; }
-.stage-row { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
-.card-group { min-width: 260px; }
-.chip-dismiss { background: transparent; border: 0; color: inherit; cursor: pointer;
-  font-size: 15px; line-height: 1; padding: 0 0 0 2px; }
-.no-render { color: #9a9aa6; font-style: italic; }
-table.invariants { width: 100%; border-collapse: collapse; font-size: 13px; }
-.invariants th { text-align: left; color: #9a9aa6; font-weight: 600; padding: 6px 10px;
-  border-bottom: 1px solid #23232e; }
-.invariants td { padding: 8px 10px; border-bottom: 1px solid #1a1a24; vertical-align: top; }
-.inv { font-family: ui-monospace, 'SF Mono', monospace; color: #c9c9d6; white-space: nowrap; }
-.cite { color: #7f7f8c; font-family: ui-monospace, monospace; }
-.receipt { color: #9a9aa6; font-size: 12px; }
-.receipt code { color: #c9c9d6; font-family: ui-monospace, 'SF Mono', monospace; }
-.badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 600;
-  font-size: 12px; white-space: nowrap; }
-.badge-pass { background: #0f3d2e; color: #55e0a8; border: 1px solid #1c6b4f; }
-.badge-fail { background: #451118; color: #ff8a9b; border: 1px solid #7a1f2b; }
-.badge-candidate { background: #3a3410; color: #f2d06b; border: 1px solid #6b5f1c; }
-""".strip()
-
-    return (
-        "<!doctype html>\n"
-        '<html lang="en"><head><meta charset="utf-8">\n'
-        '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        "<title>Design-language conformance — showcase</title>\n"
-        f"<style>{page_css}\n" + "\n".join(button_css) + "</style>\n"
-        "</head><body>\n"
-        "<h1>Design-language conformance</h1>\n"
-        '<p class="sub">Every active design language, rendered from its own cited doctrine, with the '
-        "conformance receipt for each invariant. This is the design-language surface — separate from "
-        "the builder scorecard.</p>\n"
+    legend = (
         '<div class="legend">'
         '<span><b class="badge badge-pass">pass</b> a deterministic invariant the render satisfies</span>'
         '<span><b class="badge badge-fail">fail</b> a deterministic invariant the render violates '
         "(shown honestly)</span>"
         '<span><b class="badge badge-candidate">cannot certify</b> a judgment/deferred aspect '
         "(e.g. contrast over glass) — automation cannot decide it; a human/visual receipt does</span>"
-        "</div>\n"
-        + "\n".join(sections)
+        "</div>"
+    )
+    shell_html, shell_style = render_page_shell(
+        HOUSE,
+        title="Design-language conformance",
+        intro="Every active design language, rendered from its own cited doctrine, with the conformance "
+              "receipt for each invariant. The page's own frame is the apple-dark design language — the "
+              "proof surface follows the very process it displays.",
+        breadcrumbs=[("home", "index.html"), ("studio", "studio.html"), ("settings", "settings.html")],
+        sections=[("How to read this", legend)],
+        body_html="\n".join(sections),
+    )
+    return (
+        "<!doctype html>\n"
+        '<html lang="en"><head><meta charset="utf-8">\n'
+        '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        "<title>Design-language conformance — showcase</title>\n"
+        f"<style>:root {{ color-scheme: dark; }}\n* {{ box-sizing: border-box; }}\n"
+        f"html, body {{ height: 100%; margin: 0; }}\n{shell_style}\n{_CONTENT_CSS}\n"
+        + "\n".join(button_css) + "</style>\n"
+        "</head><body>\n"
+        + shell_html
         + "\n</body></html>\n"
     )
 

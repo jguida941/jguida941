@@ -218,6 +218,43 @@ def _value_offtokens(value: str) -> int:
     return bad
 
 
+def content_offtokens(css: str, allowed_px: frozenset = frozenset(),
+                      allowed_words: frozenset = frozenset()) -> list[str]:
+    """Verdict-free scan of page CONTENT CSS — the styles a page ships INSIDE a governed shell
+    (verdict tables, legends, stages; codex A3 #1). Content may lay itself out, but a COLOUR
+    decision of any form (hex / colour function / named / system / initial-inherit-unset escape)
+    or a px outside the page's EXPLICIT structural allowlist is off-token — colour and scale
+    belong to the shell's tokens. Returns the offending literals (empty == token-only content),
+    so a page's declared allowlist is the ONLY escape and it can never admit a colour.
+
+    Unlike the chrome scan, `:root` is NOT stripped here (codex A3b #1): token DECLARATION belongs
+    to the shell's provenance-pinned `root_block` — content may only REFERENCE vars, so a `:root`
+    block (which would override shell tokens, loading after them) or ANY custom-property
+    declaration in content is itself flagged, colour or not."""
+    bad: list[str] = []
+    css = re.sub(r"/\*.*?\*/", " ", css, flags=re.S)     # comments only — :root stays visible
+    if "@" in css:                                       # codex A3c: an at-rule PRELUDE is never seen by
+        bad.append("@-rule: content CSS is @-rule-free"  # the body scan (`@media (min-width: 8px)` /
+                   " (a prelude could smuggle literals)")  # `@supports (background: #f00)`) — closed out
+    for sel, decls in _css_rules(css):
+        if ":root" in sel.lower():
+            bad.append(f"{sel}: content may not declare a :root block")
+        for prop, val in decls:
+            if prop.startswith("--"):
+                bad.append(f"{prop}: content may not mint/override a token")
+                continue
+            resid = _VAR_REF.sub(" ", val)
+            bad += re.findall(r"#[0-9a-fA-F]{3,8}\b", resid)
+            if "(" in resid:                                 # any NON-var function: rgb()/color-mix()/calc()…
+                bad.append(f"{prop}: non-var function")
+            bad += [px for px in _PX.findall(resid)
+                    if px.lower() != "1px" and px.lower() not in allowed_px]
+            resid = _DIM.sub(" ", resid)
+            bad += [w for w in re.findall(r"(?<![\w.])[A-Za-z][\w-]*", resid)
+                    if w.lower() not in _SAFE_VALUE_WORDS and w.lower() not in allowed_words]
+    return bad
+
+
 def pageshell_facts(html: str, css: str) -> dict:
     """Verdict-free facts for the page CHROME (`render_page_shell`). The host chrome must be CLOSED (one
     `.ps-<lang>` root rule + descendant `.ps-<lang> .child`/element rules only; no @-rules / attribute /
