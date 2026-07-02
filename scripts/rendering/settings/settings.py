@@ -38,9 +38,10 @@ _CONTENT_CSS = """
 .law b { color: var(--accent); }
 .base { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-panel);
   padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }
-.base h2 { margin: 0 0 var(--ps-gap-tight); font-size: var(--ps-type-body); color: var(--ink-strong); }
+.base h2 { margin: 0 0 var(--ps-gap-tight); font-size: var(--ps-type-h2); color: var(--ink-strong); }
 .hint { color: var(--ink-dim); font-size: var(--ps-type-sub); margin: 0 0 var(--ps-gap); }
-table.grid { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub); }
+table.grid { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub);
+  display: block; overflow-x: auto; }
 .grid th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: var(--ps-gap-tight) var(--ps-pad-tight);
   border-bottom: 1px solid var(--hairline); }
 .grid td { padding: var(--ps-pad-tight); border-bottom: 1px solid var(--hairline); vertical-align: top; }

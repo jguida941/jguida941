@@ -37,14 +37,30 @@ Every host-chrome colour references one of the profile's resolved role tokens
 `--accent` (links + focus), `--hairline` (borders), `--status-success|warning|danger` (verdicts),
 `--radius-panel` / `--radius-tile`, `--font-sans`. Cited: the same DTCG token blocks the specimens use.
 
-## §3 — The shell IA scale (`SHELL_SCALE`, shared)
+## §3 — The shell IA scale (`SHELL_SCALE` + per-profile density)
 
-The chrome's **rhythm** is consistent across languages so the site reads as one product; only colour +
-radius vary per language. The IA scale is a small set of named constants, cited to
-`docs/DESIGN_SPEC.md` Part 0 (4px spacing grid; the type ramp): spacing `--ps-pad` 24 · `--ps-pad-tight` 12 ·
-`--ps-gap` 16 · `--ps-gap-tight` 8 (**all 4px multiples**, pinned by `test_page_shell`); type ramp
-`--ps-type-title` 26 · `--ps-type-body` 15 · `--ps-type-sub` 13; measure `--ps-measure` 76ch. `[derived]` — the shell IA is this project's own scale,
-not a third-party doc; per-language type ramps are a later slice (`type-ramp` aspect).
+The chrome's **layout rhythm** is shared so the proof surfaces read as one product; language
+character still comes from each profile's colour, radius, font, and density band. Every literal below
+has a cited source:
+
+| Variable | Value | Source |
+|---|---:|---|
+| `--ps-measure-page` | `980px` | `docs/DESIGN_SPEC.md` Part 6 flags the 980px column as the de-facto web column; `scripts/pipeline/web_render.py` / `site/index.html` `.wrap` already ship `max-width: 980px`. |
+| `--ps-gutter` | `clamp(20px, 4vw, 56px)` | The same index `.wrap` gutter pattern; it preserves the Part 6 column while giving mobile room. |
+| `--ps-pad-tight` | `12px` | `docs/DESIGN_SPEC.md` Part 0 spacing set `{4,8,12,16,24,32}`. |
+| `--ps-gap-tight` | `8px` | `docs/DESIGN_SPEC.md` Part 0 spacing set. |
+| `--ps-gap` | `24px` | `docs/DESIGN_SPEC.md` Part 0 spacing set and section gap 24. |
+| `--ps-gap-section` | `32px` | `docs/DESIGN_SPEC.md` Part 0 spacing set; the larger cross-section step. |
+| `--ps-type-title` | `28px` | Apple HIG typography Title 1 tier, mapped to the shell H1. |
+| `--ps-type-h2` | `20px` | Apple HIG typography Title 3 tier, mapped to section headings so h2 cannot collapse to body. |
+| `--ps-type-body` | `15px` | Apple HIG body tier and `docs/DESIGN_SPEC.md` Part 0 body scale. |
+| `--ps-type-sub` | `13px` | Apple HIG footnote tier and `docs/DESIGN_SPEC.md` Part 0 caption scale. |
+| `--ps-measure` | `76ch` | Text measure for readable intro copy; derived from the same restrained-column law as Part 6. |
+
+`--ps-pad` is deliberately **not** in `SHELL_SCALE`: `root_block()` emits it from
+`design_tokens.density(profile)["panel_pad"]`. That pins padding to the language's cited density
+band (`liquid-glass` medium 28, `carbon` compact 20, `apple-dark` airy 32) instead of a minted
+constant.
 
 ## §4 — Emitted invariants (deterministic → pass/fail on the showcase)
 
@@ -59,6 +75,13 @@ not a third-party doc; per-language type ramps are a later slice (`type-ramp` as
   property reddens (prop-independent, no hand list).
 - **`*-page-orient`** (`page_has_orientation`) — the page carries a title + a breadcrumb (a user can tell
   what the page is + get back). The shared glossary joins this in the explainability slice.
+- **`*-layout-column`** (`page_has_content_column`, aspect `page-layout`) — all page content sits in
+  one centered `.ps-main` column with `max-width: var(--ps-measure-page)` and auto margins; no
+  full-bleed sprawl.
+- **`*-type-tiered`** (`shell_type_ramp_tiered`, aspect `page-type-ramp`) — the shell exposes a real
+  heading tier: title > h2 > body. Body-sized section headers redden.
+- **`*-rhythm-density`** (`shell_density_from_profile`, aspect `page-spacing-rhythm`) — panel padding
+  equals the profile's density band. A constant `--ps-pad` across languages reddens.
 
 ## §5 — Deferred / candidate (never fake-green; visual receipt required)
 

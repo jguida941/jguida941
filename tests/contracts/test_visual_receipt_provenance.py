@@ -99,18 +99,66 @@ class ReceiptProvenanceContract(unittest.TestCase):
                         self.assertAlmostEqual(cm, gm, delta=0.5,
                                                msg=f"{receipt.artifact}: tile {i} ch {ch} drift {cm} vs {gm} — regenerate")
 
-    def test_every_committed_png_is_under_a_known_profile_dir(self):
-        """Closed cover over the PNG receipts (debt c): every assets/receipts/**/*.png lives under a
-        KNOWN design profile; a rogue-profile PNG would redden (anti-tautology below)."""
+    def test_every_committed_png_is_under_a_known_profile_or_page_dir(self):
+        """Closed cover over PNG receipts: component PNGs live under a known profile; MF1 page
+        screenshots live under the declared pages subtree."""
+        from scripts.quality.headless_receipts import PAGE_ROUTES
         known = set(_active())
         idx = json.loads((ROOT / "contracts" / "design_profiles" / "_index.json").read_text(encoding="utf-8"))
         known |= set(idx.get("reserved_design_profiles", []))
         pngs = list((ROOT / "assets" / "receipts").glob("**/*.png"))
         self.assertTrue(pngs, "there must be committed PNG receipts to govern")
         for png in pngs:
-            self.assertIn(png.parent.name, known, f"{png}: PNG under an unknown profile dir")
+            parts = png.relative_to(ROOT / "assets" / "receipts").parts
+            if parts[0] == "pages":
+                self.assertIn(parts[1], PAGE_ROUTES, f"{png}: PNG under an unknown page receipt dir")
+            else:
+                self.assertIn(parts[0], known, f"{png}: PNG under an unknown profile dir")
         # anti-tautology: a rogue-profile dir is NOT known
         self.assertNotIn("rogue-profile", known)
+        self.assertNotIn("rogue-page", PAGE_ROUTES)
+
+    def test_committed_headless_page_receipts_are_real_and_provenanced(self):
+        """MF1: committed page receipts are real Chrome-headless artifacts. This test reads only
+        committed files: screenshots are nonempty PNGs, sidecars name the honest kind/command, and the
+        390px DOM probes for the three design pages report no horizontal overflow."""
+        from scripts.quality.headless_receipts import (
+            DESIGN_PAGES,
+            DOM_PROBE_KIND,
+            PAGE_ROUTES,
+            SCREENSHOT_KIND,
+            dom_probe_artifact,
+            provenance_path,
+            screenshot_artifact,
+        )
+        from scripts.quality.visual_receipts import png_summary
+
+        for page in PAGE_ROUTES:
+            screenshot = screenshot_artifact(page)
+            self.assertTrue(screenshot.is_file(), f"{page}: missing page screenshot receipt")
+            summary = png_summary(screenshot)
+            self.assertEqual(summary["format"], "PNG", f"{page}: screenshot must be a PNG")
+            self.assertGreater(summary["width"], 0, f"{page}: screenshot width")
+            self.assertGreater(summary["height"], 0, f"{page}: screenshot height")
+            self.assertTrue(summary["nonblank"], f"{page}: screenshot must be nonblank")
+
+            screenshot_sidecar = json.loads(provenance_path(screenshot).read_text(encoding="utf-8"))
+            self.assertEqual(screenshot_sidecar["kind"], SCREENSHOT_KIND)
+            self.assertIn("--headless=new", screenshot_sidecar["command"])
+            self.assertTrue(screenshot_sidecar["chrome_version"].startswith("Google Chrome "))
+            self.assertEqual(screenshot_sidecar["viewport"]["width"], 1280)
+
+            probe = dom_probe_artifact(page)
+            self.assertTrue(probe.is_file(), f"{page}: missing DOM probe receipt")
+            data = json.loads(probe.read_text(encoding="utf-8"))
+            self.assertEqual(data["kind"], DOM_PROBE_KIND)
+            self.assertEqual(data["viewport"]["width"], 390)
+            probe_sidecar = json.loads(provenance_path(probe).read_text(encoding="utf-8"))
+            self.assertEqual(probe_sidecar["kind"], DOM_PROBE_KIND)
+            self.assertIn("--headless=new", probe_sidecar["command"])
+            if page in DESIGN_PAGES:
+                self.assertIs(data["horizontal_overflow"], False,
+                              f"{page}: 390px DOM probe overflowed: {data.get('offenders')}")
 
 
 if __name__ == "__main__":

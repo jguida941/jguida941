@@ -70,6 +70,10 @@ class PageShellTokenOnlyContract(unittest.TestCase):
             expected["--radius-panel"] = _px(tok["radius"]["panel"])
             expected["--radius-tile"] = _px(tok["radius"]["tile"])
             expected["--font-sans"] = tok["font"]["family"]
+            # D-SHELL: panel padding traces to the LANGUAGE'S declared density band (THEME_IA),
+            # exactly like every colour/radius var traces to resolve_tokens.
+            from scripts.rendering import design_tokens as dt
+            expected["--ps-pad"] = _px(dt.density(name)["panel_pad"])
             expected.update(SHELL_SCALE)
             self.assertEqual(root, expected,
                              f"{name}: :root must be EXACTLY resolve_tokens + SHELL_SCALE (no missing/extra var)")
@@ -77,10 +81,15 @@ class PageShellTokenOnlyContract(unittest.TestCase):
     def test_shell_spacing_scale_is_on_the_4px_grid(self):
         """docs/design/pageshell.md §3: the shell SPACING constants are 4px multiples (the type ramp is
         exempt). Pins the doctrine claim so it can't drift off-grid (codex A1 #5)."""
+        from scripts.rendering import design_tokens as dt
         from scripts.rendering.pageshell.pageshell import SHELL_SCALE
-        for var in ("--ps-pad", "--ps-pad-tight", "--ps-gap", "--ps-gap-tight"):
+        for var in ("--ps-pad-tight", "--ps-gap", "--ps-gap-tight", "--ps-gap-section"):
             px = int(SHELL_SCALE[var].removesuffix("px"))
             self.assertEqual(px % 4, 0, f"{var}={px}px must be a 4px multiple")
+        # D-SHELL: --ps-pad moved out of SHELL_SCALE — it is the profile's density band, still 4px-grid
+        for name in _active():
+            self.assertEqual(dt.density(name)["panel_pad"] % 4, 0,
+                             f"{name}: density panel_pad must be a 4px multiple")
 
     def test_page_shell_has_orientation(self):
         """A user can figure out what the page is: the title + breadcrumb are present (the glossary
@@ -209,9 +218,9 @@ class PageShellInjectionContract(unittest.TestCase):
         then prefix, then title."""
         html, _ = self._shell(prefix_html='<input type="radio" id="lang-x" class="lang-radio">')
         self.assertRegex(
-            html, r'<div class="ps-apple-dark"><input type="radio" id="lang-x"[^>]*>'
-                  r'<h1 class="ps-title">',
-            "prefix_html must render as the shell root's first children, before ps-title")
+            html, r'<div class="ps-apple-dark"><div class="ps-main">'
+                  r'<input type="radio" id="lang-x"[^>]*><h1 class="ps-title">',
+            "prefix_html must render as the content column's first children, before ps-title")
 
     def test_reserved_class_in_prefix_html_is_unconstructable(self):
         """The ps-* injection guard covers prefix_html like body_html/sections — a prefix is the
@@ -226,6 +235,51 @@ class PageShellInjectionContract(unittest.TestCase):
         html, _ = self._shell(
             body_html='<section class="lang"><div class="stage caps-lock">x</div></section>')
         self.assertIn('class="lang"', html)
+
+
+class PageLayoutContract(unittest.TestCase):
+    """P5 D-SHELL (design-audit #1/#6/#7): LAYOUT is a governed aspect, not vibe. The shell must
+    (a) constrain ALL content to ONE centered page column (max-width = the cited 980px measure,
+    auto-centered, fluid gutters — the index .wrap precedent, DESIGN_SPEC Part 6), (b) carry a real
+    heading tier between title and body (title > h2 > body — the audit found body-sized section
+    headers), and (c) consume the LANGUAGE'S OWN cited density band (apple-dark is 'airy'
+    panel_pad 32 — THEME_IA, grounded in HIG Layout) instead of one minted constant."""
+
+    def test_shell_renders_one_centered_content_column(self):
+        for name in _active():
+            html, css = _shell(name)
+            self.assertIn('class="ps-main"', html, f"{name}: content must sit in the .ps-main column")
+            self.assertRegex(
+                css, r"\.ps-" + name + r"\s+\.ps-main\s*\{[^}]*max-width:\s*var\(--ps-measure-page\)",
+                f"{name}: the column must be bound to the measure token")
+            self.assertRegex(css, r"\.ps-main\s*\{[^}]*margin:\s*0\s+auto", f"{name}: centered")
+
+    def test_layout_facts_are_gathered_fail_closed(self):
+        from scripts.quality.design_invariants import _pageshell_facts
+        for name in _active():
+            f = _pageshell_facts(name)
+            self.assertTrue(f.get("has_content_column"), f"{name}: has_content_column fact")
+            self.assertTrue(f.get("type_ramp_tiered"), f"{name}: title > h2 > body tiering fact")
+            self.assertTrue(f.get("pad_matches_density_band"),
+                            f"{name}: --ps-pad must equal the language's declared density panel_pad")
+
+    def test_a_columnnless_shell_reddens_fail_closed(self):
+        """Crafted vector: shell CSS WITHOUT a .ps-main column (yesterday's sprawl) must fail the
+        page_has_content_column predicate — the audit's #1 becomes unconstructable."""
+        from scripts.contracts.design_predicates import page_has_content_column
+        from scripts.rendering.webkit.design_render_adapter import pageshell_facts
+        f = pageshell_facts(_GATE_HTML, _GATE_CLEAN)   # the A1 gate fixture has no column
+        self.assertFalse(page_has_content_column(f), "a shell without the column must redden")
+
+    def test_conform_emits_passing_ratified_page_aspect_rows(self):
+        from scripts.quality.design_invariants import conform
+        for name in _active():
+            rows = {r["aspect"]: r for r in conform(name)
+                    if r["aspect"] in {"page-layout", "page-type-ramp", "page-spacing-rhythm"}}
+            self.assertEqual(set(rows), {"page-layout", "page-type-ramp", "page-spacing-rhythm"},
+                             f"{name}: D-SHELL-1 emits the three ratified page aspects")
+            for aspect, row in rows.items():
+                self.assertEqual(row["status"], "pass", f"{name}: {aspect}/{row['invariant_id']} must pass")
 
 
 class PageShellConformanceContract(unittest.TestCase):

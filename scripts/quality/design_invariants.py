@@ -59,7 +59,12 @@ def _pageshell_facts(profile: str, variant: str | None = None, profile_data: dic
         sections=[],
         profile_data=profile_data,
     )
-    return adapter.pageshell_facts(html, css)
+    facts = adapter.pageshell_facts(html, css)
+    # D-SHELL layout fact: the shell's panel padding equals the LANGUAGE'S declared density band
+    # (design_tokens.THEME_IA density.panel_pad — cited per language) — provenance, not taste.
+    from scripts.rendering import design_tokens as dt
+    facts["pad_matches_density_band"] = (facts.get("pad_px") == float(dt.density(profile)["panel_pad"]))
+    return facts
 
 
 # aspect -> (component key in profile["components"], the fact-gatherer). Adding a component = one row.
@@ -70,6 +75,9 @@ _COMPONENT_FACTS = {
     "component-chip": ("chip", _chip_facts),
     "component-card": ("card", _card_facts),
     "page-shell": ("page-shell", _pageshell_facts),
+    "page-layout": ("page-layout", _pageshell_facts),
+    "page-type-ramp": ("page-type-ramp", _pageshell_facts),
+    "page-spacing-rhythm": ("page-spacing-rhythm", _pageshell_facts),
 }
 
 

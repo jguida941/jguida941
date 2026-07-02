@@ -117,7 +117,7 @@ _CONTENT_CSS = """
 .lang { margin: 0 0 var(--ps-gap); padding: var(--ps-pad); border: 1px solid var(--hairline);
   border-radius: var(--radius-panel); background: var(--surface); }
 .lang header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ps-gap); }
-.lang h2 { margin: 0 0 var(--ps-pad-tight); font-size: var(--ps-type-body); color: var(--ink-strong); }
+.lang h2 { margin: 0 0 var(--ps-pad-tight); font-size: var(--ps-type-h2); color: var(--ink-strong); }
 .tally { color: var(--ink-dim); font-size: var(--ps-type-sub); margin: 0; }
 .stage { display: flex; flex-direction: column; align-items: center; gap: var(--ps-gap);
   min-height: 96px; padding: var(--ps-pad); margin: var(--ps-gap-tight) 0 var(--ps-gap);
@@ -127,7 +127,8 @@ _CONTENT_CSS = """
 .chip-dismiss { background: transparent; border: 0; color: inherit; cursor: pointer;
   font-size: var(--ps-type-body); line-height: 1; padding: 0 0 0 2px; }
 .no-render { color: var(--ink-dim); font-style: italic; }
-table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub); }
+table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub);
+  display: block; overflow-x: auto; }
 .invariants th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: var(--ps-gap-tight) var(--ps-pad-tight);
   border-bottom: 1px solid var(--hairline); }
 .invariants td { padding: var(--ps-pad-tight); border-bottom: 1px solid var(--hairline); vertical-align: top; }

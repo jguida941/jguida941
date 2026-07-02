@@ -13,41 +13,47 @@ html, body { height: 100%; margin: 0; }
   --ink: #c7c7cc;
   --ink-dim: #98989d;
   --accent: #0a84ff;
-  --hairline: #ffffff;
+  --hairline: #38383a;
   --status-success: #30d158;
   --status-warning: #ff9f0a;
   --status-danger: #ff453a;
-  --radius-panel: 26px;
-  --radius-tile: 18px;
+  --radius-panel: 14px;
+  --radius-tile: 12px;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  --ps-pad: 24px;
+  --ps-pad: 32px;
+  --ps-measure-page: 980px;
+  --ps-gutter: clamp(20px, 4vw, 56px);
   --ps-pad-tight: 12px;
-  --ps-gap: 16px;
+  --ps-gap: 24px;
   --ps-gap-tight: 8px;
-  --ps-type-title: 26px;
+  --ps-gap-section: 32px;
+  --ps-type-title: 28px;
+  --ps-type-h2: 20px;
   --ps-type-body: 15px;
   --ps-type-sub: 13px;
   --ps-measure: 76ch;
 }
 .ps-apple-dark { background: var(--backdrop); color: var(--ink); font-family: var(--font-sans);
-  margin: 0; min-height: 100%; padding: var(--ps-pad); }
+  margin: 0; min-height: 100%; }
+.ps-apple-dark .ps-main { max-width: var(--ps-measure-page); margin: 0 auto;
+  padding: var(--ps-gutter); }
 .ps-apple-dark .ps-title { margin: 0 0 var(--ps-gap-tight); color: var(--ink-strong);
   font-size: var(--ps-type-title); font-weight: 700; line-height: 1.2; }
 .ps-apple-dark .ps-intro { margin: 0 0 var(--ps-gap-tight); color: var(--ink-dim);
   font-size: var(--ps-type-body); line-height: 1.5; max-width: var(--ps-measure); }
-.ps-apple-dark .ps-crumbs { margin: 0 0 var(--ps-pad); color: var(--ink-dim);
+.ps-apple-dark .ps-crumbs { margin: 0 0 var(--ps-gap-section); color: var(--ink-dim);
   font-size: var(--ps-type-sub); }
 .ps-apple-dark .ps-crumbs a { color: var(--accent); text-decoration: none; }
 .ps-apple-dark .ps-panel { background: var(--surface); border: 1px solid var(--hairline);
   border-radius: var(--radius-panel); padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }
 .ps-apple-dark .ps-panel-h { margin: 0 0 var(--ps-pad-tight); color: var(--ink-strong);
-  font-size: var(--ps-type-body); font-weight: 600; }
+  font-size: var(--ps-type-h2); font-weight: 600; }
 .legend { display: flex; gap: var(--ps-gap); flex-wrap: wrap; font-size: var(--ps-type-sub); color: var(--ink); }
 .legend b { font-weight: 600; }
 .lang { margin: 0 0 var(--ps-gap); padding: var(--ps-pad); border: 1px solid var(--hairline);
   border-radius: var(--radius-panel); background: var(--surface); }
 .lang header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ps-gap); }
-.lang h2 { margin: 0 0 var(--ps-pad-tight); font-size: var(--ps-type-body); color: var(--ink-strong); }
+.lang h2 { margin: 0 0 var(--ps-pad-tight); font-size: var(--ps-type-h2); color: var(--ink-strong); }
 .tally { color: var(--ink-dim); font-size: var(--ps-type-sub); margin: 0; }
 .stage { display: flex; flex-direction: column; align-items: center; gap: var(--ps-gap);
   min-height: 96px; padding: var(--ps-pad); margin: var(--ps-gap-tight) 0 var(--ps-gap);
@@ -57,7 +63,8 @@ html, body { height: 100%; margin: 0; }
 .chip-dismiss { background: transparent; border: 0; color: inherit; cursor: pointer;
   font-size: var(--ps-type-body); line-height: 1; padding: 0 0 0 2px; }
 .no-render { color: var(--ink-dim); font-style: italic; }
-table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub); }
+table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub);
+  display: block; overflow-x: auto; }
 .invariants th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: var(--ps-gap-tight) var(--ps-pad-tight);
   border-bottom: 1px solid var(--hairline); }
 .invariants td { padding: var(--ps-pad-tight); border-bottom: 1px solid var(--hairline); vertical-align: top; }
@@ -72,9 +79,9 @@ table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-t
 .badge-candidate { background: var(--status-warning); color: var(--backdrop); }
 .btn-apple-dark-filled { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; cursor: pointer; border-radius: 999px; min-height: 50px; padding: 14px 20px; background: #0a84ff; color: #ffffff; font: 600 17px/1.2 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; transition: all 250ms ease-in-out; }
 .chip-apple-dark-regular { display: inline-flex; align-items: center; gap: 6px; border: 0; cursor: default; border-radius: 999px; min-height: 28px; padding: 5px 12px; background: #2c2c2e; color: #f5f5f7; font: 500 13px/1.33 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; transition: all 200ms ease-in-out; }
-.card-apple-dark-metrics { background: #2c2c2e; border-radius: 14px; border: 1px solid #ffffff; overflow: hidden; }
+.card-apple-dark-metrics { background: #2c2c2e; border-radius: 14px; border: 1px solid #38383a; overflow: hidden; }
 .card-apple-dark-metrics .card-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: transparent; }
-.card-apple-dark-metrics .card-row + .card-row { border-top: 1px solid #ffffff; }
+.card-apple-dark-metrics .card-row + .card-row { border-top: 1px solid #38383a; }
 .card-apple-dark-metrics .card-label { color: #98989d; font: 400 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
 .card-apple-dark-metrics .card-value { color: #f5f5f7; font: 600 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
 .btn-carbon-primary { display: inline-flex; align-items: center; justify-content: space-between; gap: 6px; border: 0; cursor: pointer; border-radius: 0px; min-height: 48px; padding: 12px 64px 12px 16px; background: #0f62fe; color: #ffffff; font: 600 17px/1.2 'IBM Plex Sans', system-ui, sans-serif; transition: all 70ms cubic-bezier(0.2, 0, 0.38, 0.9); }
@@ -92,11 +99,14 @@ table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-t
 .card-liquid-glass-metrics .card-label { color: #8a94bd; font: 400 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
 .card-liquid-glass-metrics .card-value { color: #c0caf5; font: 600 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }</style>
 </head><body>
-<div class="ps-apple-dark"><h1 class="ps-title">Design-language conformance</h1><p class="ps-intro">Every active design language, rendered from its own cited doctrine, with the conformance receipt for each invariant. The page&#x27;s own frame is the apple-dark design language — the proof surface follows the very process it displays.</p><p class="ps-crumbs"><a href="index.html">home</a> · <a href="studio.html">studio</a> · <a href="settings.html">settings</a></p><section class="ps-panel"><h2 class="ps-panel-h">How to read this</h2><div class="legend"><span><b class="badge badge-pass">pass</b> a deterministic invariant the render satisfies</span><span><b class="badge badge-fail">fail</b> a deterministic invariant the render violates (shown honestly)</span><span><b class="badge badge-candidate">cannot certify</b> a judgment/deferred aspect (e.g. contrast over glass) — automation cannot decide it; a human/visual receipt does</span></div></section><section class="lang" data-profile="apple-dark"><header><h2>apple-dark</h2><p class="tally">21 pass · 0 fail · 3 cannot certify</p></header><div class="stage" style="background:#000000"><div class="stage-row"><button class="btn-apple-dark-filled">filled</button><span class="chip-apple-dark-regular">regular</span></div><div class="stage-row"><div class="card-apple-dark-metrics card-group"><div class="card-row"><span class="card-label">Commits</span><span class="card-value">1,240</span></div><div class="card-row"><span class="card-label">Current streak</span><span class="card-value">23 days</span></div><div class="card-row"><span class="card-label">Languages</span><span class="card-value">12</span></div></div></div></div><table class="invariants"><thead><tr><th>invariant</th><th>law</th><th>doc</th><th>verdict</th><th>receipt</th></tr></thead><tbody>
+<div class="ps-apple-dark"><div class="ps-main"><h1 class="ps-title">Design-language conformance</h1><p class="ps-intro">Every active design language, rendered from its own cited doctrine, with the conformance receipt for each invariant. The page&#x27;s own frame is the apple-dark design language — the proof surface follows the very process it displays.</p><p class="ps-crumbs"><a href="index.html">home</a> · <a href="studio.html">studio</a> · <a href="settings.html">settings</a></p><section class="ps-panel"><h2 class="ps-panel-h">How to read this</h2><div class="legend"><span><b class="badge badge-pass">pass</b> a deterministic invariant the render satisfies</span><span><b class="badge badge-fail">fail</b> a deterministic invariant the render violates (shown honestly)</span><span><b class="badge badge-candidate">cannot certify</b> a judgment/deferred aspect (e.g. contrast over glass) — automation cannot decide it; a human/visual receipt does</span></div></section><section class="lang" data-profile="apple-dark"><header><h2>apple-dark</h2><p class="tally">24 pass · 0 fail · 3 cannot certify</p></header><div class="stage" style="background:#000000"><div class="stage-row"><button class="btn-apple-dark-filled">filled</button><span class="chip-apple-dark-regular">regular</span></div><div class="stage-row"><div class="card-apple-dark-metrics card-group"><div class="card-row"><span class="card-label">Commits</span><span class="card-value">1,240</span></div><div class="card-row"><span class="card-label">Current streak</span><span class="card-value">23 days</span></div><div class="card-row"><span class="card-label">Languages</span><span class="card-value">12</span></div></div></div></div><table class="invariants"><thead><tr><th>invariant</th><th>law</th><th>doc</th><th>verdict</th><th>receipt</th></tr></thead><tbody>
 <tr data-invariant="ap-page-backdrop" data-status="pass"><td class="inv">ap-page-backdrop</td><td class="law">the page chrome paints the language backdrop token</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="ap-page-closed" data-status="pass"><td class="inv">ap-page-closed</td><td class="law">chrome CSS is a closed simple structure (one root rule, no @-rules/attribute/pseudo)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="ap-page-tokenonly" data-status="pass"><td class="inv">ap-page-tokenonly</td><td class="law">host-chrome CSS references tokens only (no raw hex/px)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="ap-page-orient" data-status="pass"><td class="inv">ap-page-orient</td><td class="law">the page carries a title + breadcrumb orientation</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
+<tr data-invariant="ap-layout-column" data-status="pass"><td class="inv">ap-layout-column</td><td class="law">all content sits in one centered page column (no full-bleed sprawl)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
+<tr data-invariant="ap-type-tiered" data-status="pass"><td class="inv">ap-type-tiered</td><td class="law">the shell type ramp carries a heading tier (title &gt; h2 &gt; body)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
+<tr data-invariant="ap-rhythm-density" data-status="pass"><td class="inv">ap-rhythm-density</td><td class="law">panel padding follows the language&#x27;s cited density band</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="ap-btn-radius" data-status="pass"><td class="inv">ap-btn-radius</td><td class="law">apple-dark button is a 999px capsule</td><td class="cite">docs/design/apple-dark.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="ap-btn-material" data-status="pass"><td class="inv">ap-btn-material</td><td class="law">OPAQUE fill (not frosted glass)</td><td class="cite">docs/design/apple-dark.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="ap-btn-mechanic" data-status="pass"><td class="inv">ap-btn-mechanic</td><td class="law">opacity-dim press (dims DOWN)</td><td class="cite">docs/design/apple-dark.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
@@ -118,11 +128,14 @@ table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-t
 <tr data-invariant="ap-card-rounded" data-status="pass"><td class="inv">ap-card-rounded</td><td class="law">rounded inset container (radius 14)</td><td class="cite">docs/design/apple-dark.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="ap-card-fills" data-status="candidate"><td class="inv">ap-card-fills</td><td class="law">content fills the card (no giant dead space)</td><td class="cite">docs/design/apple-dark.md</td><td class="verdict"><span class="badge badge-candidate">cannot certify</span></td><td class="receipt">present · token-derived-reconstruction<br><code>assets/receipts/apple-dark/ap-card-fills.png</code></td></tr>
 </tbody></table></section>
-<section class="lang" data-profile="carbon"><header><h2>carbon</h2><p class="tally">21 pass · 0 fail · 3 cannot certify</p></header><div class="stage" style="background:#ffffff"><div class="stage-row"><button class="btn-carbon-primary"><span class="btn-label">primary</span><svg class="btn-icon" aria-hidden="true" width="16" height="16"></svg></button><span class="chip-carbon-gray"><span class="chip-label">gray</span><button class="chip-dismiss" aria-label="Remove gray">&times;</button></span></div><div class="stage-row"><div class="card-carbon-metrics card-group"><div class="card-row"><span class="card-label">Commits</span><span class="card-value">1,240</span></div><div class="card-row"><span class="card-label">Current streak</span><span class="card-value">23 days</span></div><div class="card-row"><span class="card-label">Languages</span><span class="card-value">12</span></div></div></div></div><table class="invariants"><thead><tr><th>invariant</th><th>law</th><th>doc</th><th>verdict</th><th>receipt</th></tr></thead><tbody>
+<section class="lang" data-profile="carbon"><header><h2>carbon</h2><p class="tally">24 pass · 0 fail · 3 cannot certify</p></header><div class="stage" style="background:#ffffff"><div class="stage-row"><button class="btn-carbon-primary"><span class="btn-label">primary</span><svg class="btn-icon" aria-hidden="true" width="16" height="16"></svg></button><span class="chip-carbon-gray"><span class="chip-label">gray</span><button class="chip-dismiss" aria-label="Remove gray">&times;</button></span></div><div class="stage-row"><div class="card-carbon-metrics card-group"><div class="card-row"><span class="card-label">Commits</span><span class="card-value">1,240</span></div><div class="card-row"><span class="card-label">Current streak</span><span class="card-value">23 days</span></div><div class="card-row"><span class="card-label">Languages</span><span class="card-value">12</span></div></div></div></div><table class="invariants"><thead><tr><th>invariant</th><th>law</th><th>doc</th><th>verdict</th><th>receipt</th></tr></thead><tbody>
 <tr data-invariant="cb-page-backdrop" data-status="pass"><td class="inv">cb-page-backdrop</td><td class="law">the page chrome paints the language backdrop token</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="cb-page-closed" data-status="pass"><td class="inv">cb-page-closed</td><td class="law">chrome CSS is a closed simple structure (one root rule, no @-rules/attribute/pseudo)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="cb-page-tokenonly" data-status="pass"><td class="inv">cb-page-tokenonly</td><td class="law">host-chrome CSS references tokens only (no raw hex/px)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="cb-page-orient" data-status="pass"><td class="inv">cb-page-orient</td><td class="law">the page carries a title + breadcrumb orientation</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
+<tr data-invariant="cb-layout-column" data-status="pass"><td class="inv">cb-layout-column</td><td class="law">all content sits in one centered page column (no full-bleed sprawl)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
+<tr data-invariant="cb-type-tiered" data-status="pass"><td class="inv">cb-type-tiered</td><td class="law">the shell type ramp carries a heading tier (title &gt; h2 &gt; body)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
+<tr data-invariant="cb-rhythm-density" data-status="pass"><td class="inv">cb-rhythm-density</td><td class="law">panel padding follows the language&#x27;s cited density band</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="cb-btn-radius" data-status="pass"><td class="inv">cb-btn-radius</td><td class="law">carbon button is square (radius 0)</td><td class="cite">docs/design/carbon.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="cb-btn-anatomy" data-status="pass"><td class="inv">cb-btn-anatomy</td><td class="law">label hard-left + trailing icon hard-right (space-between DOM)</td><td class="cite">docs/design/carbon.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="cb-btn-mechanic" data-status="pass"><td class="inv">cb-btn-mechanic</td><td class="law">token-swap press (no filter/opacity/state-layer)</td><td class="cite">docs/design/carbon.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
@@ -144,11 +157,14 @@ table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-t
 <tr data-invariant="cb-card-square" data-status="pass"><td class="inv">cb-card-square</td><td class="law">square Tile (radius 0) — the Carbon signature vs Apple&#x27;s rounded list</td><td class="cite">docs/design/carbon.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="cb-card-fills" data-status="candidate"><td class="inv">cb-card-fills</td><td class="law">content fills the Tile (no giant dead space)</td><td class="cite">docs/design/carbon.md</td><td class="verdict"><span class="badge badge-candidate">cannot certify</span></td><td class="receipt">present · token-derived-reconstruction<br><code>assets/receipts/carbon/cb-card-fills.png</code></td></tr>
 </tbody></table></section>
-<section class="lang" data-profile="liquid-glass"><header><h2>liquid-glass</h2><p class="tally">18 pass · 0 fail · 3 cannot certify</p></header><div class="stage" style="background:#0c0e18"><div class="stage-row"><button class="btn-liquid-glass-prominent">prominent</button><span class="chip-liquid-glass-regular">regular</span></div><div class="stage-row"><div class="card-liquid-glass-metrics card-group"><div class="card-row"><span class="card-label">Commits</span><span class="card-value">1,240</span></div><div class="card-row"><span class="card-label">Current streak</span><span class="card-value">23 days</span></div><div class="card-row"><span class="card-label">Languages</span><span class="card-value">12</span></div></div></div></div><table class="invariants"><thead><tr><th>invariant</th><th>law</th><th>doc</th><th>verdict</th><th>receipt</th></tr></thead><tbody>
+<section class="lang" data-profile="liquid-glass"><header><h2>liquid-glass</h2><p class="tally">21 pass · 0 fail · 3 cannot certify</p></header><div class="stage" style="background:#0c0e18"><div class="stage-row"><button class="btn-liquid-glass-prominent">prominent</button><span class="chip-liquid-glass-regular">regular</span></div><div class="stage-row"><div class="card-liquid-glass-metrics card-group"><div class="card-row"><span class="card-label">Commits</span><span class="card-value">1,240</span></div><div class="card-row"><span class="card-label">Current streak</span><span class="card-value">23 days</span></div><div class="card-row"><span class="card-label">Languages</span><span class="card-value">12</span></div></div></div></div><table class="invariants"><thead><tr><th>invariant</th><th>law</th><th>doc</th><th>verdict</th><th>receipt</th></tr></thead><tbody>
 <tr data-invariant="lg-page-backdrop" data-status="pass"><td class="inv">lg-page-backdrop</td><td class="law">the page chrome paints the language backdrop token</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="lg-page-closed" data-status="pass"><td class="inv">lg-page-closed</td><td class="law">chrome CSS is a closed simple structure (one root rule, no @-rules/attribute/pseudo)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="lg-page-tokenonly" data-status="pass"><td class="inv">lg-page-tokenonly</td><td class="law">host-chrome CSS references tokens only (no raw hex/px)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="lg-page-orient" data-status="pass"><td class="inv">lg-page-orient</td><td class="law">the page carries a title + breadcrumb orientation</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
+<tr data-invariant="lg-layout-column" data-status="pass"><td class="inv">lg-layout-column</td><td class="law">all content sits in one centered page column (no full-bleed sprawl)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
+<tr data-invariant="lg-type-tiered" data-status="pass"><td class="inv">lg-type-tiered</td><td class="law">the shell type ramp carries a heading tier (title &gt; h2 &gt; body)</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
+<tr data-invariant="lg-rhythm-density" data-status="pass"><td class="inv">lg-rhythm-density</td><td class="law">panel padding follows the language&#x27;s cited density band</td><td class="cite">docs/design/pageshell.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="lg-btn-radius" data-status="pass"><td class="inv">lg-btn-radius</td><td class="law">liquid-glass button is a 999px capsule</td><td class="cite">docs/design/liquid-glass.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="lg-btn-material" data-status="pass"><td class="inv">lg-btn-material</td><td class="law">frosted-glass material on the button</td><td class="cite">docs/design/liquid-glass.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="lg-btn-mechanic" data-status="pass"><td class="inv">lg-btn-mechanic</td><td class="law">glass-brightness press (brightness UP)</td><td class="cite">docs/design/liquid-glass.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
@@ -166,5 +182,5 @@ table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-t
 <tr data-invariant="lg-card-material" data-status="pass"><td class="inv">lg-card-material</td><td class="law">frosted-glass container</td><td class="cite">docs/design/liquid-glass.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="lg-card-rounded" data-status="pass"><td class="inv">lg-card-rounded</td><td class="law">rounded inset container (radius 14)</td><td class="cite">docs/design/liquid-glass.md</td><td class="verdict"><span class="badge badge-pass">pass</span></td><td class="receipt">—</td></tr>
 <tr data-invariant="lg-card-fills" data-status="candidate"><td class="inv">lg-card-fills</td><td class="law">content fills the card (no giant dead space)</td><td class="cite">docs/design/liquid-glass.md</td><td class="verdict"><span class="badge badge-candidate">cannot certify</span></td><td class="receipt">present · token-derived-reconstruction<br><code>assets/receipts/liquid-glass/lg-card-fills.png</code></td></tr>
-</tbody></table></section></div>
+</tbody></table></section></div></div>
 </body></html>

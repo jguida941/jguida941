@@ -1,0 +1,25 @@
+{
+  "artifact": "assets/receipts/pages/showcase/screenshot-1280.png",
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "chrome_version": "Google Chrome 149.0.7827.200",
+  "command": [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "--headless=new",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--hide-scrollbars",
+    "--window-size=1280,1536",
+    "--screenshot=/Users/jguida941/Dev/jguida941/assets/receipts/pages/showcase/screenshot-1280.png",
+    "file:///Users/jguida941/Dev/jguida941/site/showcase.html"
+  ],
+  "contract_id": "PageHeadlessReceiptProvenance",
+  "kind": "chrome-headless-screenshot",
+  "page": "showcase",
+  "producer": "scripts/quality/headless_receipts.py",
+  "route": "site/showcase.html",
+  "viewport": {
+    "height": 1536,
+    "width": 1280
+  }
+}

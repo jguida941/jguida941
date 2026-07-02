@@ -25,6 +25,7 @@ REQUIRED_REFERENCES = (
     "doctrine-ingest.md",
     "add-design-language.md",
     "add-component.md",
+    "add-page-aspect.md",
     "prove-theme.md",
     "boundaries.md",
 )

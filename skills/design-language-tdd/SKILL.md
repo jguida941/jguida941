@@ -75,6 +75,7 @@ profile is not enough; the rendered artifact must satisfy the doctrine-derived o
 | turn docs/examples/screenshots into typed obligations before implementation | `references/doctrine-ingest.md` |
 | add a new design language / theme (profile JSON + doctrine + character/distinctness) | `references/add-design-language.md` |
 | add a component (a `components.<name>` block + a render branch + only-new predicates) | `references/add-component.md` |
+| add or split a governed page aspect from rendered surface evidence | `references/add-page-aspect.md` |
 | prove a theme/component + receipts + codex | `references/prove-theme.md` |
 | the boundaries / honest claim / determinism split / org gate | `references/boundaries.md` |
 
