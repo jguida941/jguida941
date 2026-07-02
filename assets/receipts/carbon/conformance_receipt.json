@@ -228,6 +228,24 @@
       "status": "pass"
     },
     {
+      "aspect": "component-nav",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'component-nav' of the carbon profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/board.md",
+      "evidence": {
+        "nav_has_active": true,
+        "nav_has_band": true,
+        "nav_links_all": true,
+        "nav_token_only": true
+      },
+      "invariant_id": "cb-nav-anatomy",
+      "law": "the site nav band links every surface with a marked active page, token-only",
+      "profile": "carbon",
+      "status": "pass"
+    },
+    {
       "aspect": "component-button",
       "authority_status": "candidate_only",
       "cannot_mark_done": true,

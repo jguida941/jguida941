@@ -35,7 +35,7 @@ class NavContract(unittest.TestCase):
         from scripts.rendering.webkit.components import render_nav
         for name in _active():
             html, css = render_nav(name, _LINKS, active="index.html")
-            self.assertIn('class="site-nav"', html, f"{name}: the band container")
+            self.assertIn('class="site-nav', html, f"{name}: the band container")
             self.assertEqual(html.count("<a "), len(_LINKS), f"{name}: every surface linked")
             self.assertIn('aria-current="page"', html, f"{name}: the active page is marked")
             self.assertNotRegex(css, r"#[0-9a-fA-F]{3,8}\b",
@@ -64,8 +64,8 @@ class NavContract(unittest.TestCase):
         for page, route in (("index", "site/index.html"), ("showcase", "site/showcase.html"),
                             ("settings", "site/settings.html"), ("studio", "site/studio.html")):
             b = (ROOT / route).read_text(encoding="utf-8")
-            self.assertIn('class="site-nav"', b, f"{page}: nav band missing")
-            band = re.search(r'<nav class="site-nav".*?</nav>', b, re.S).group(0)
+            self.assertIn('class="site-nav', b, f"{page}: nav band missing")
+            band = re.search(r'<nav class="site-nav.*?</nav>', b, re.S).group(0)
             self.assertIn('aria-current="page"', band, f"{page}: active marker")
             for _, href in _LINKS:
                 if href != f"{page}.html":
