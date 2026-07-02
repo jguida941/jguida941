@@ -2,7 +2,13 @@
 visible: it DISPLAYS the admissible combo-space that `scripts/quality/settings_admissibility.py`
 COMPUTES (the ONE Python decider) — per base language, which component swaps are admissible and
 which are UNCONSTRUCTABLE. The page carries NO verdict JS of its own (no `<script>`); the Python
-module is the single source of the decision. Pure + deterministic (drift-guarded). candidate_only."""
+module is the single source of the decision.
+
+P5-CHROME A4: the page's own CHROME is the governed apple-dark page-shell (`render_page_shell`), not
+hand-written dark CSS — the control plane is itself a rendered instance of a design language, and its
+verdict pills derive from that language's status tokens (so it follows the very process it governs).
+Its CONTENT palette (the law panel body, the per-base grids, the pills) is token-only beyond a CLOSED
+structural allowlist (codex A3 #1). Pure + deterministic (drift-guarded). candidate_only."""
 from __future__ import annotations
 
 import html as _html
@@ -18,14 +24,71 @@ def _root() -> Path:
 
 _COMPONENTS = ("button", "chip", "card")
 
+# The settings CHROME is the governed page-shell (apple-dark house); its CONTENT palette (the law panel,
+# the per-base grids, the verdict pills) derives from that shell's tokens — so the control plane follows
+# the same process it governs.
+HOUSE = "apple-dark"
+
+# Content CSS (the law panel body + admissibility grids + verdict pills live INSIDE the governed shell).
+# Every colour is a shell token var(); the verdict pills reuse the language's own status roles (drop the
+# extra hand border, like the showcase badges). Only structural non-colour px/keywords remain — pinned in
+# the allowlist below and scanned by content_offtokens (the same machinery as the shell gate).
+_CONTENT_CSS = """
+.law { color: var(--ink); font-size: var(--ps-type-sub); }
+.law b { color: var(--accent); }
+.base { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-panel);
+  padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }
+.base h2 { margin: 0 0 var(--ps-gap-tight); font-size: var(--ps-type-body); color: var(--ink-strong); }
+.hint { color: var(--ink-dim); font-size: var(--ps-type-sub); margin: 0 0 var(--ps-gap); }
+table.grid { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub); }
+.grid th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: var(--ps-gap-tight) var(--ps-pad-tight);
+  border-bottom: 1px solid var(--hairline); }
+.grid td { padding: var(--ps-pad-tight); border-bottom: 1px solid var(--hairline); vertical-align: top; }
+.comp { font-family: ui-monospace, monospace; color: var(--ink); white-space: nowrap; }
+.cell .src { display: block; color: var(--ink); font-family: ui-monospace, monospace; margin-bottom: var(--ps-gap-tight); }
+.verdict { display: inline-block; padding: 2px var(--ps-pad-tight); border-radius: 999px; font-weight: 600;
+  font-size: var(--ps-type-sub); white-space: nowrap; }
+.verdict.ok { background: var(--status-success); color: var(--backdrop); }
+.verdict.no { background: var(--status-danger); color: var(--backdrop); }
+""".strip()
+
+# The CLOSED structural allowlist for _CONTENT_CSS (codex A3 #1): the ONLY non-token literals the content
+# may carry, each a LAYOUT (never colour) decision. Anything else — a colour in any form, an off-list px —
+# reddens SettingsChromeContract; the allowlist is the scan's only escape and it can never admit a colour.
+_CONTENT_ALLOWED_PX = frozenset({
+    "2px",      # .verdict pill vertical padding nudge (mirrors the showcase .badge)
+    "999px",    # .verdict pill radius — structural "fully round", not a scale step
+})
+_CONTENT_ALLOWED_WORDS = frozenset({
+    "ui-monospace", "monospace",   # the code-face stack for .comp / .cell .src (no colour choice)
+    "inline-block",                # the .verdict pill display box
+})
+
+# The intro (the pre-shell `.sub` text, verbatim) — framed by the shell as `.ps-intro`.
+_INTRO = ("Compose a design language: pick a base, then swap any component to another language. "
+          "This is the design surface — separate from the builder scorecard.")
+
+# The law text (the pre-shell `.law` inner HTML, verbatim) — rendered as a governed shell panel; only its
+# emphasised term is re-tinted to the shell's accent token via `.law b`.
+_LAW_HTML = (
+    '<div class="law">An <b>invalid combination is unconstructable</b>. A swap is admissible '
+    "ONLY if the composed component, as rendered, is a FULL valid instance of some active design "
+    "language — a partial mix that belongs to no language (e.g. a frosted material on a square "
+    "0-radius card) is refused. The verdict below is computed by ONE Python source "
+    "(<code>scripts/quality/settings_admissibility.py</code>), routed through the real "
+    "render → conform path; this page only displays it (no verdict JS).</div>")
+
 
 def render_settings() -> str:
-    """Pure: the computed admissible space -> the governed control-plane HTML (deterministic; no JS)."""
+    """Pure: the computed admissible space -> the governed control-plane HTML, framed in the governed
+    apple-dark page-shell (deterministic; no JS)."""
     from scripts.quality.settings_admissibility import active_profiles, admissible_space
+    from scripts.rendering.pageshell.pageshell import render_page_shell
+
     actives = sorted(active_profiles())
     space = {(c["base"], c["component"], c["source"]): c["admissible"] for c in admissible_space()}
 
-    sections = []
+    base_sections = []
     for base in actives:
         rows = []
         for comp in _COMPONENTS:
@@ -41,53 +104,31 @@ def render_settings() -> str:
                     f'<span class="verdict {cls}">{mark}</span></td>')
             rows.append(f'<tr><th class="comp">{comp}</th>{"".join(cells)}</tr>')
         head = "".join(f"<th>{_html.escape(s)}</th>" for s in actives)
-        sections.append(
+        base_sections.append(
             f'<section class="base" data-base="{_html.escape(base)}">'
             f'<h2>base: {_html.escape(base)}</h2>'
             f'<p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p>'
             f'<table class="grid"><thead><tr><th>component ↓ / source →</th>{head}</tr></thead>'
             f'<tbody>{"".join(rows)}</tbody></table></section>')
 
-    page_css = """
-:root { color-scheme: dark; }
-* { box-sizing: border-box; }
-body { margin: 0; padding: 32px; background: #0a0a0f; color: #e8e8ee;
-  font: 15px/1.5 -apple-system, system-ui, 'Segoe UI', sans-serif; }
-h1 { font-size: 26px; margin: 0 0 4px; }
-.sub { color: #9a9aa6; margin: 0 0 8px; max-width: 74ch; }
-.law { margin: 16px 0 28px; padding: 12px 16px; border: 1px solid #23232e; border-radius: 12px;
-  background: #12121a; font-size: 13px; color: #c9c9d6; max-width: 90ch; }
-.law b { color: #f2d06b; }
-.base { margin: 0 0 32px; padding: 20px; border: 1px solid #23232e; border-radius: 16px; background: #101018; }
-.base h2 { margin: 0 0 2px; font-size: 18px; }
-.hint { color: #9a9aa6; font-size: 12px; margin: 0 0 14px; }
-table.grid { width: 100%; border-collapse: collapse; font-size: 13px; }
-.grid th { text-align: left; color: #9a9aa6; font-weight: 600; padding: 8px 10px; border-bottom: 1px solid #23232e; }
-.grid td { padding: 8px 10px; border-bottom: 1px solid #1a1a24; vertical-align: top; }
-.comp { font-family: ui-monospace, 'SF Mono', monospace; color: #c9c9d6; white-space: nowrap; }
-.cell .src { display: block; color: #c9c9d6; font-family: ui-monospace, monospace; margin-bottom: 4px; }
-.verdict { display: inline-block; padding: 2px 8px; border-radius: 999px; font-weight: 600; font-size: 11px; }
-.verdict.ok { background: #0f3d2e; color: #55e0a8; border: 1px solid #1c6b4f; }
-.verdict.no { background: #451118; color: #ff8a9b; border: 1px solid #7a1f2b; }
-""".strip()
-
+    shell_html, shell_style = render_page_shell(
+        HOUSE,
+        title="Governed control plane",
+        intro=_INTRO,
+        breadcrumbs=[("home", "index.html"), ("showcase", "showcase.html"), ("studio", "studio.html")],
+        sections=[("The law", _LAW_HTML)],
+        body_html="\n".join(base_sections),
+    )
     return (
         "<!doctype html>\n"
         '<html lang="en"><head><meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         "<title>Design-language settings — governed control plane</title>\n"
-        f"<style>{page_css}</style>\n"
+        f"<style>:root {{ color-scheme: dark; }}\n* {{ box-sizing: border-box; }}\n"
+        f"html, body {{ height: 100%; margin: 0; }}\n{shell_style}\n{_CONTENT_CSS}\n"
+        "</style>\n"
         "</head><body>\n"
-        "<h1>Governed control plane</h1>\n"
-        '<p class="sub">Compose a design language: pick a base, then swap any component to another '
-        "language. This is the design surface — separate from the builder scorecard.</p>\n"
-        '<div class="law">An <b>invalid combination is unconstructable</b>. A swap is admissible '
-        "ONLY if the composed component, as rendered, is a FULL valid instance of some active design "
-        "language — a partial mix that belongs to no language (e.g. a frosted material on a square "
-        "0-radius card) is refused. The verdict below is computed by ONE Python source "
-        "(<code>scripts/quality/settings_admissibility.py</code>), routed through the real "
-        "render → conform path; this page only displays it (no verdict JS).</div>\n"
-        + "\n".join(sections)
+        + shell_html
         + "\n</body></html>\n"
     )
 
