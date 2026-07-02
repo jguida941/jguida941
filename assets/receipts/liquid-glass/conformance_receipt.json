@@ -212,6 +212,22 @@
       "status": "pass"
     },
     {
+      "aspect": "motion",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'motion' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/motion.md",
+      "evidence": {
+        "motion_in_band": true,
+        "motion_vars_provenance": true
+      },
+      "invariant_id": "lg-motion-band",
+      "law": "motion tokens trace to the cited per-language block and sit in the 70-700ms band",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
       "aspect": "component-button",
       "authority_status": "candidate_only",
       "cannot_mark_done": true,

@@ -87,7 +87,7 @@ body {
 .switcher button {
   font: inherit; font-size: var(--type-chip); font-weight: var(--type-chip-weight); color: var(--ink-dim);
   background: transparent; border: 0; border-radius: 999px; padding: 7px 13px; cursor: pointer; white-space: nowrap;
-  transition: color .18s, background .18s; }
+  transition: color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard); }
 .switcher button[aria-pressed="true"] { color: var(--ink-strong); background: color-mix(in srgb, var(--accent) 22%, transparent); }
 .switcher button:hover { color: var(--ink); }
 
