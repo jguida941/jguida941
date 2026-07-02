@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T19:52:35.082137Z",
+  "generated_at": "2026-07-02T21:13:27.810818Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 8261,
-    "public_scope_commits": 4418,
+    "last_year_contributions": 8269,
+    "public_scope_commits": 4423,
     "total_repos": 69,
     "public_forks": 0,
     "private_owned_repos": 147,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 8261,
-      "display_value": "8,261"
+      "value": 8269,
+      "display_value": "8,269"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 4418,
-      "display_value": "4,418"
+      "value": 4423,
+      "display_value": "4,423"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 8261,
-      "display_value": "8,261"
+      "value": 8269,
+      "display_value": "8,269"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 4418,
-      "display_value": "4,418"
+      "value": 4423,
+      "display_value": "4,423"
     },
     {
       "key": "total_repos",
@@ -193,7 +193,7 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.144927536231884,
     "ci_coverage_pct": 23.18840579710145,
-    "last_year_contributions": 8261,
+    "last_year_contributions": 8269,
     "active_days_last_year": 287,
     "automation_workflows": 74,
     "primary_lang_share_pct": 50.5,
@@ -205,8 +205,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 8261,
-      "display_value": "8,261",
+      "value": 8269,
+      "display_value": "8,269",
       "accent": "#7dcfff"
     },
     {
@@ -324,28 +324,28 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 12723873,
-      "percent": 50.47
+      "bytes": 12763080,
+      "percent": 50.53
     },
     {
       "name": "Makefile",
       "bytes": 3931581,
-      "percent": 15.59
+      "percent": 15.57
     },
     {
       "name": "Rust",
       "bytes": 3003018,
-      "percent": 11.91
+      "percent": 11.89
     },
     {
       "name": "C++",
       "bytes": 1825242,
-      "percent": 7.24
+      "percent": 7.23
     },
     {
       "name": "Java",
       "bytes": 1583192,
-      "percent": 6.28
+      "percent": 6.27
     },
     {
       "name": "TypeScript",
@@ -354,8 +354,8 @@
     },
     {
       "name": "HTML",
-      "bytes": 400743,
-      "percent": 1.59
+      "bytes": 406831,
+      "percent": 1.61
     },
     {
       "name": "Shell",
@@ -365,7 +365,7 @@
     {
       "name": "C",
       "bytes": 268582,
-      "percent": 1.07
+      "percent": 1.06
     },
     {
       "name": "JavaScript",
@@ -439,7 +439,7 @@
       "ci": "no",
       "pushed_at": "2026-07-02",
       "pushed_at_raw": "2026-07-02T19:10:20Z",
-      "pushed_ago": "today",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-07-02",
       "last_commit_msg": "Add C++ to assembly activity",
       "featured": false
@@ -888,10 +888,10 @@
   "focus": {
     "now": [
       {
-        "title": "cpp-to-assembly",
-        "detail": "Assembly \u00b7 pushed today",
-        "url": "https://github.com/jguida941/cpp-to-assembly",
-        "is_private": false
+        "title": "semantic-tdd",
+        "detail": "Python \u00b7 pushed today",
+        "url": "",
+        "is_private": true
       },
       {
         "title": "repo-surface-scout",
@@ -900,10 +900,10 @@
         "is_private": true
       },
       {
-        "title": "semantic-tdd",
-        "detail": "Python \u00b7 pushed 2 hours ago",
-        "url": "",
-        "is_private": true
+        "title": "cpp-to-assembly",
+        "detail": "Assembly \u00b7 pushed 2 hours ago",
+        "url": "https://github.com/jguida941/cpp-to-assembly",
+        "is_private": false
       }
     ],
     "next": [
@@ -934,7 +934,7 @@
       "repo": "jguida941/cpp-to-assembly",
       "repo_url": "https://github.com/jguida941/cpp-to-assembly",
       "state": "CREATE",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-07-02T19:10:20Z"
     },
     {
@@ -944,7 +944,7 @@
       "repo": "jguida941/cpp-to-assembly",
       "repo_url": "https://github.com/jguida941/cpp-to-assembly",
       "state": "CREATED",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-07-02T19:09:11Z"
     },
     {
@@ -996,16 +996,6 @@
       "state": "OPEN",
       "time_ago": "2 weeks ago",
       "created_at": "2026-06-16T20:26:59Z"
-    },
-    {
-      "kind": "activity",
-      "title": "create",
-      "url": "https://github.com/jguida941/repo-surface-scout",
-      "repo": "jguida941/repo-surface-scout",
-      "repo_url": "https://github.com/jguida941/repo-surface-scout",
-      "state": "CREATE",
-      "time_ago": "2 weeks ago",
-      "created_at": "2026-06-15T00:07:02Z"
     }
   ],
   "recent_releases": [],
@@ -1034,7 +1024,7 @@
       45,
       60,
       34,
-      243
+      251
     ],
     "automation_workflows": 74,
     "automation_repos": 15,
@@ -1048,7 +1038,7 @@
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 8261,
+    "total": 8269,
     "weeks": [
       [
         {
@@ -2613,7 +2603,7 @@
         },
         {
           "date": "2026-07-02",
-          "count": 26
+          "count": 34
         }
       ]
     ]
@@ -2716,7 +2706,7 @@
         0,
         1,
         0,
-        0,
+        3,
         0,
         0,
         0,
@@ -2797,19 +2787,19 @@
         3,
         3,
         6,
-        5,
+        4,
         7,
         6,
         1
       ]
     ],
     "event_mix": {
-      "push": 80,
-      "create": 3,
+      "push": 81,
+      "create": 4,
       "comment": 1,
       "pull request": 1
     },
-    "total": 85,
+    "total": 87,
     "timezone": "New York"
   }
 }
