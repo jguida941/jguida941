@@ -45,6 +45,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_page_shell.py",
             "test_page_manifest.py",
             "test_design_motion.py",
+            "test_design_nav.py",
             "test_public_data_privacy.py",
             "test_readme_projection.py",
             "test_scripts_layout_contract.py",
@@ -189,6 +190,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
         "test_studio.py",               # P5-STUDIO: the interactive design-system studio — archetype + governed swap (one Python decider) + drift-guarded page
     ),
     "page_chrome": (
+        "test_design_nav.py",           # P5-BOARD B-1b: the governed nav component — per-language anatomy, every page connected
         "test_design_motion.py",        # P5-BOARD B-1: motion is DATA — cited duration/easing tokens, band law, token-only page motion
         "test_page_manifest.py",        # D-SHELL-2: every page declares intent + archetype + required regions (fail-closed, committed-bytes primary)
         "test_page_shell.py",           # P5-CHROME: the switchable governed page-shell — the site's own chrome is a rendered instance of a language (token-only + provenance + conform)
