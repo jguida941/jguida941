@@ -285,6 +285,22 @@ def pageshell_facts(html: str, css: str) -> dict:
     has_title = bool(re.search(r'class="ps-title"[^>]*>[^<]*\w', html))
     crumbs_m = re.search(r'class="ps-crumbs"[^>]*>(.*?)</p>', html, re.S)
     has_breadcrumb_link = bool(crumbs_m and re.search(r'<a[^>]+href="[^"]+"[^>]*>[^<]*\w', crumbs_m.group(1)))
+
+    # LAYOUT facts (design-audit D-SHELL) — fail-closed: absent column/ramp vars -> False/None.
+    main_m = (re.search(rf"\.{re.escape(shell_cls)}\s+\.ps-main\s*\{{([^}}]*)\}}", css)
+              if shell_cls else None)
+    has_content_column = bool(
+        main_m and "max-width: var(--ps-measure-page)" in main_m.group(1)
+        and re.search(r"margin:\s*0 auto", main_m.group(1))
+        and '<div class="ps-main">' in html)
+
+    def _root_px(var: str):
+        m = re.search(rf"{re.escape(var)}:\s*(-?\d+(?:\.\d+)?)px", css)
+        return float(m.group(1)) if m else None
+
+    t_title, t_h2, t_body = (_root_px("--ps-type-title"), _root_px("--ps-type-h2"),
+                             _root_px("--ps-type-body"))
+    type_ramp_tiered = (None not in (t_title, t_h2, t_body)) and t_title > t_h2 > t_body
     return {
         "body_offtoken_count": offtoken,
         "shell_closed": shell_closed,
@@ -292,6 +308,9 @@ def pageshell_facts(html: str, css: str) -> dict:
         "uses_backdrop_var": uses_backdrop_var,
         "has_title": has_title,
         "has_breadcrumb_link": has_breadcrumb_link,
+        "has_content_column": has_content_column,
+        "type_ramp_tiered": type_ramp_tiered,
+        "pad_px": _root_px("--ps-pad"),
     }
 
 

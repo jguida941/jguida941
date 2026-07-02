@@ -103,6 +103,28 @@ def page_has_orientation(facts: dict, **_) -> bool:
     return facts.get("has_title") is True and facts.get("has_breadcrumb_link") is True
 
 
+def page_has_content_column(facts: dict, **_) -> bool:
+    """D-SHELL (design-audit #1, the root cause): ALL page content sits in ONE centered column —
+    `.ps-main` bound to the cited page measure (`var(--ps-measure-page)`, the index .wrap 980px
+    precedent) and auto-centered. Full-bleed sprawl is unconstructable (fail-closed: False if the
+    column rule or the wrapping div is absent)."""
+    return facts.get("has_content_column") is True
+
+
+def shell_type_ramp_tiered(facts: dict, **_) -> bool:
+    """D-SHELL (design-audit #6): the shell ramp carries a real HEADING TIER — title > h2 > body
+    as rendered :root values (HIG Title-1/Title-3/body). A flat ramp (body-sized section headers)
+    reddens (fail-closed on any missing tier)."""
+    return facts.get("type_ramp_tiered") is True
+
+
+def shell_density_from_profile(facts: dict, **_) -> bool:
+    """D-SHELL (design-audit #7): the shell's panel padding IS the language's own cited density
+    band (apple-dark 'airy' 32 / carbon 'compact' 20 / liquid-glass 'medium' 28 — THEME_IA) — a
+    minted constant that ignores the profile reddens (fail-closed: False if the pad var is absent)."""
+    return facts.get("pad_matches_density_band") is True
+
+
 # The closed registry the conform() runner dispatches into. `predicate_class` in a profile's
 # invariants[] must resolve here (test_design_conformance enforces it). The button_* predicates are
 # GENERIC over facts (radius/anatomy/material/mechanic/elevation/focus); a second component (the
@@ -137,4 +159,8 @@ PREDICATES = {
     "host_chrome_is_closed": host_chrome_is_closed,
     "host_chrome_token_only": host_chrome_token_only,
     "page_has_orientation": page_has_orientation,
+    # page-layout (D-SHELL) — layout/hierarchy/density as governed aspects, not vibe
+    "page_has_content_column": page_has_content_column,
+    "shell_type_ramp_tiered": shell_type_ramp_tiered,
+    "shell_density_from_profile": shell_density_from_profile,
 }

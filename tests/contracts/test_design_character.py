@@ -29,7 +29,10 @@ class DesignCharacterContract(unittest.TestCase):
         self.assertEqual("airy", d["band"])
         self.assertGreaterEqual(d["panel_pad"], 24, "Apple: generous card padding (HIG Layout)")
         self.assertGreaterEqual(d["gap"], 20, "Apple: comfortable spacing between cards")
-        self.assertGreaterEqual(dt.radius("apple-dark")["panel"], 18, "Apple: large soft corners")
+        # soft corners, at the CITED scale: apple-dark.md pins the card radius "~14" and DESIGN_SPEC
+        # Part 0 uses 12 — the old >=18 floor enshrined the uncited 26px "bubbly" inflation the
+        # design audit (#5) flagged. Soft-vs-square distinctness vs carbon (0) is preserved.
+        self.assertGreaterEqual(dt.radius("apple-dark")["panel"], 12, "Apple: soft corners (cited scale)")
         self.assertGreaterEqual(dt.type_scale("apple-dark")["display"][0], 48, "Apple: large-title hero")
 
     def test_carbon_is_compact_and_square(self):

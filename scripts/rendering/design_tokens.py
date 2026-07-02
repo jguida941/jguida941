@@ -88,7 +88,9 @@ THEMES: dict[str, dict[str, str]] = _active_bridge_map("THEMES", {
     "apple-dark": {
         "ink-strong": "#f5f5f7", "ink": "#c7c7cc", "ink-dim": "#98989d",
         "surface": "#1c1c1e", "surface-raised": "#2c2c2e",
-        "backdrop": "#000000", "hairline": "#ffffff",
+        # hairline = HIG opaqueSeparator (dark) — a SUBTLE separator, never pure white at 100%
+        # (design-audit #2: #ffffff read as graph-paper; no doctrine clause supported it)
+        "backdrop": "#000000", "hairline": "#38383a",
         "accent": "#0a84ff",
         "status-success": "#30d158", "status-warning": "#ff9f0a", "status-danger": "#ff453a",
     },
@@ -133,7 +135,9 @@ THEME_IA: dict[str, dict] = _active_bridge_map("THEME_IA", {
         "density": {"band": "compact", "panel_pad": 20, "tile_pad": 12, "gap": 12, "tile_min": 180},
     },
     "apple-dark": {  # Apple HIG — generous radius + large display type + AIRY space, few large cards
-        "radius": {"panel": 26, "tile": 18},
+        # panel 14 == the profile's own cited card radius (apple-dark.md "~14"); tile 12 ==
+        # DESIGN_SPEC Part 0 card radius. 26/18 were uncited "bubbly" inflation (design-audit #5).
+        "radius": {"panel": 14, "tile": 12},
         "type": {"display": (54, 600), "metric_lg": (30, 600), "title": (22, 600)},
         "density": {"band": "airy", "panel_pad": 32, "tile_pad": 24, "gap": 24, "tile_min": 380},
     },
