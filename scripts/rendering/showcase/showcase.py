@@ -127,8 +127,8 @@ _CONTENT_CSS = """
 .chip-dismiss { background: transparent; border: 0; color: inherit; cursor: pointer;
   font-size: var(--ps-type-body); line-height: 1; padding: 0 0 0 2px; }
 .no-render { color: var(--ink-dim); font-style: italic; }
-table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub);
-  display: block; overflow-x: auto; }
+.table-scroll { overflow-x: auto; }
+table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub); }
 .invariants th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: var(--ps-gap-tight) var(--ps-pad-tight);
   border-bottom: 1px solid var(--hairline); }
 .invariants td { padding: var(--ps-pad-tight); border-bottom: 1px solid var(--hairline); vertical-align: top; }
@@ -183,9 +183,9 @@ def render_showcase(receipts: dict) -> str:
             f'<header><h2>{claim}</h2>'
             f'<p class="tally">{n_pass} pass · {n_fail} fail · {n_cand} cannot certify</p></header>'
             f'<div class="stage" style="background:{backdrop}">{stage_html}</div>'
-            f'<table class="invariants"><thead><tr>'
+            f'<div class="table-scroll"><table class="invariants"><thead><tr>'
             f'<th>invariant</th><th>law</th><th>doc</th><th>verdict</th><th>receipt</th></tr></thead>'
-            f'<tbody>\n{_rows(rc.get("results", []))}\n</tbody></table>'
+            f'<tbody>\n{_rows(rc.get("results", []))}\n</tbody></table></div>'
             f'</section>'
         )
 

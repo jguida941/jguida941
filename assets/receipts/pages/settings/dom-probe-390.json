@@ -1,17 +1,179 @@
 {
   "authority_status": "candidate_only",
-  "body_scroll_width": 500,
+  "body_scroll_width": 390,
   "cannot_mark_done": true,
-  "client_width": 500,
+  "client_width": 390,
   "contract_id": "PageHeadlessDomProbe",
   "horizontal_overflow": false,
   "kind": "chrome-headless-dom-probe",
   "offenders": [
     {
+      "class": "grid",
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "table",
+      "width": 443.28
+    },
+    {
       "class": "",
       "id": "",
       "left": 53,
-      "overflow_px": 32.14,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "thead",
+      "width": 443.28
+    },
+    {
+      "class": "",
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "tr",
+      "width": 443.28
+    },
+    {
+      "class": "",
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "th",
+      "width": 115.91
+    },
+    {
+      "class": "",
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "tbody",
+      "width": 443.28
+    },
+    {
+      "class": "",
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "tr",
+      "width": 443.28
+    },
+    {
+      "class": "cell ok",
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "td",
+      "width": 115.91
+    },
+    {
+      "class": "src",
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "verdict ok",
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "",
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "tr",
+      "width": 443.28
+    },
+    {
+      "class": "cell ok",
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "td",
+      "width": 115.91
+    },
+    {
+      "class": "src",
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "verdict ok",
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "",
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "tr",
+      "width": 443.28
+    },
+    {
+      "class": "cell ok",
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "tag": "td",
+      "width": 115.91
+    },
+    {
+      "class": "src",
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "verdict ok",
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "grid",
+      "id": "",
+      "left": 53,
+      "overflow_px": 142.14,
+      "right": 532.14,
+      "tag": "table",
+      "width": 479.14
+    },
+    {
+      "class": "",
+      "id": "",
+      "left": 53,
+      "overflow_px": 142.14,
       "right": 532.14,
       "tag": "thead",
       "width": 479.14
@@ -20,133 +182,16 @@
       "class": "",
       "id": "",
       "left": 53,
-      "overflow_px": 32.14,
+      "overflow_px": 142.14,
       "right": 532.14,
       "tag": "tr",
       "width": 479.14
-    },
-    {
-      "class": "",
-      "id": "",
-      "left": 380.38,
-      "overflow_px": 32.14,
-      "right": 532.14,
-      "tag": "th",
-      "width": 151.77
-    },
-    {
-      "class": "",
-      "id": "",
-      "left": 53,
-      "overflow_px": 32.14,
-      "right": 532.14,
-      "tag": "tbody",
-      "width": 479.14
-    },
-    {
-      "class": "",
-      "id": "",
-      "left": 53,
-      "overflow_px": 32.14,
-      "right": 532.14,
-      "tag": "tr",
-      "width": 479.14
-    },
-    {
-      "class": "cell no",
-      "id": "",
-      "left": 380.38,
-      "overflow_px": 32.14,
-      "right": 532.14,
-      "tag": "td",
-      "width": 151.77
-    },
-    {
-      "class": "src",
-      "id": "",
-      "left": 392.38,
-      "overflow_px": 20.14,
-      "right": 520.14,
-      "tag": "span",
-      "width": 127.77
-    },
-    {
-      "class": "verdict no",
-      "id": "",
-      "left": 392.38,
-      "overflow_px": 20.14,
-      "right": 520.14,
-      "tag": "span",
-      "width": 127.77
-    },
-    {
-      "class": "",
-      "id": "",
-      "left": 53,
-      "overflow_px": 32.14,
-      "right": 532.14,
-      "tag": "tr",
-      "width": 479.14
-    },
-    {
-      "class": "cell no",
-      "id": "",
-      "left": 380.38,
-      "overflow_px": 32.14,
-      "right": 532.14,
-      "tag": "td",
-      "width": 151.77
-    },
-    {
-      "class": "src",
-      "id": "",
-      "left": 392.38,
-      "overflow_px": 20.14,
-      "right": 520.14,
-      "tag": "span",
-      "width": 127.77
-    },
-    {
-      "class": "verdict no",
-      "id": "",
-      "left": 392.38,
-      "overflow_px": 20.14,
-      "right": 520.14,
-      "tag": "span",
-      "width": 127.77
-    },
-    {
-      "class": "",
-      "id": "",
-      "left": 53,
-      "overflow_px": 32.14,
-      "right": 532.14,
-      "tag": "tr",
-      "width": 479.14
-    },
-    {
-      "class": "cell ok",
-      "id": "",
-      "left": 380.38,
-      "overflow_px": 32.14,
-      "right": 532.14,
-      "tag": "td",
-      "width": 151.77
-    },
-    {
-      "class": "src",
-      "id": "",
-      "left": 392.38,
-      "overflow_px": 20.14,
-      "right": 520.14,
-      "tag": "span",
-      "width": 127.77
     }
   ],
   "overflow_px": 0,
   "page": "settings",
   "route": "site/settings.html",
-  "scroll_width": 500,
+  "scroll_width": 390,
   "viewport": {
     "height": 1000,
     "width": 390

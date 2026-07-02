@@ -40,8 +40,8 @@ _CONTENT_CSS = """
   padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }
 .base h2 { margin: 0 0 var(--ps-gap-tight); font-size: var(--ps-type-h2); color: var(--ink-strong); }
 .hint { color: var(--ink-dim); font-size: var(--ps-type-sub); margin: 0 0 var(--ps-gap); }
-table.grid { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub);
-  display: block; overflow-x: auto; }
+.table-scroll { overflow-x: auto; }
+table.grid { width: 100%; border-collapse: collapse; font-size: var(--ps-type-sub); }
 .grid th { text-align: left; color: var(--ink-dim); font-weight: 600; padding: var(--ps-gap-tight) var(--ps-pad-tight);
   border-bottom: 1px solid var(--hairline); }
 .grid td { padding: var(--ps-pad-tight); border-bottom: 1px solid var(--hairline); vertical-align: top; }
@@ -109,8 +109,9 @@ def render_settings() -> str:
             f'<section class="base" data-base="{_html.escape(base)}">'
             f'<h2>base: {_html.escape(base)}</h2>'
             f'<p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p>'
-            f'<table class="grid"><thead><tr><th>component ↓ / source →</th>{head}</tr></thead>'
-            f'<tbody>{"".join(rows)}</tbody></table></section>')
+            f'<div class="table-scroll"><table class="grid">'
+            f'<thead><tr><th>component ↓ / source →</th>{head}</tr></thead>'
+            f'<tbody>{"".join(rows)}</tbody></table></div></section>')
 
     shell_html, shell_style = render_page_shell(
         HOUSE,
