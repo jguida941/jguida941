@@ -192,6 +192,28 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       var overLeft = Math.max(0, -rect.left);
       var overRight = Math.max(0, rect.right - clientWidth);
       if (overLeft > 1 || overRight > 1) {{
+        var scroller = el.closest ? el.closest(".table-scroll") : null;
+        var scrollInfo = null;
+        var contained = false;
+        if (scroller && scroller !== el) {{
+          var scrollStyle = frame.contentWindow.getComputedStyle(scroller);
+          var scrollRect = scroller.getBoundingClientRect();
+          var inViewport = scrollRect.left >= -1 && scrollRect.right <= clientWidth + 1;
+          scrollInfo = {{
+            "tag": scroller.tagName.toLowerCase(),
+            "id": scroller.id || "",
+            "class": cls(scroller),
+            "left": Math.round(scrollRect.left * 100) / 100,
+            "right": Math.round(scrollRect.right * 100) / 100,
+            "width": Math.round(scrollRect.width * 100) / 100,
+            "overflow_x": scrollStyle.overflowX,
+            "in_viewport": inViewport
+          }};
+          contained = cls(scroller).split(" ").indexOf("table-scroll") !== -1
+            && scrollStyle.overflowX === "auto"
+            && inViewport
+            && scrollRect.width > 1;
+        }}
         offenders.push({{
           "tag": el.tagName.toLowerCase(),
           "id": el.id || "",
@@ -199,11 +221,14 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
           "left": Math.round(rect.left * 100) / 100,
           "right": Math.round(rect.right * 100) / 100,
           "width": Math.round(rect.width * 100) / 100,
-          "overflow_px": Math.round(Math.max(overLeft, overRight) * 100) / 100
+          "overflow_px": Math.round(Math.max(overLeft, overRight) * 100) / 100,
+          "contained_by_table_scroll": contained,
+          "scroll_container": scrollInfo
         }});
       }}
     }});
     var overflowPx = Math.max(0, scrollWidth - clientWidth);
+    var uncontained = offenders.filter(function (o) {{ return o.contained_by_table_scroll !== true; }});
     var result = {{
       "contract_id": "PageHeadlessDomProbe",
       "page": "{page}",
@@ -213,8 +238,10 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       "client_width": clientWidth,
       "scroll_width": scrollWidth,
       "body_scroll_width": bodyScrollWidth,
-      "horizontal_overflow": overflowPx > 1,
+      "horizontal_overflow": overflowPx > 1 || uncontained.length > 0,
       "overflow_px": overflowPx,
+      "offender_count": offenders.length,
+      "uncontained_offender_count": uncontained.length,
       "offenders": offenders.slice(0, 20),
       "authority_status": "candidate_only",
       "cannot_mark_done": true

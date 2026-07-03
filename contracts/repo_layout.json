@@ -60,7 +60,7 @@
       "root_allowlist": ["__init__.py", "build_readme.py", "profile_cli.py", "validate_generated_profile.py"],
       "groups": [
         {"id": "cli", "target_dir": "cli", "members": ["profile_cli.py"]},
-        {"id": "contracts", "target_dir": "contracts", "members": ["design_predicates.py", "profile_contract.py"]},
+        {"id": "contracts", "target_dir": "contracts", "members": ["design_predicates.py", "page_manifest.py", "profile_contract.py"]},
         {"id": "core", "target_dir": "core", "members": ["config.py", "runtime_env.py", "settings.py"]},
         {"id": "github", "target_dir": "github", "members": ["actions_audit.py", "branch_protection.py", "gh_cli.py", "github_cache.py", "github_client.py", "github_graphql.py", "github_transport.py"]},
         {"id": "organization", "target_dir": "organization", "members": ["bootstrap_red_ref.py", "layout_audit.py", "layout_contract.py", "migrate_scripts_layout.py", "tests_layout_contract.py"]},

@@ -38,6 +38,46 @@ def _obligations():
                 yield name, inv, ob
 
 
+def _uncontained_dom_offenders(data: dict) -> list[dict]:
+    """Committed DOM probes are acceptance facts. An element-level offender is acceptable only
+    when the browser producer proved it is inside the measured horizontal table scroller."""
+    out = []
+    for offender in data.get("offenders", []):
+        scroll = offender.get("scroll_container") or {}
+        if (
+            offender.get("contained_by_table_scroll") is True
+            and scroll.get("class") == "table-scroll"
+            and scroll.get("overflow_x") == "auto"
+            and scroll.get("in_viewport") is True
+            # the zero-width gaming vector (adversarial gate, live-probed): a width:0 wrapper
+            # "contains" any child; containment demands a meaningfully positive measured width.
+            and isinstance(scroll.get("width"), (int, float))
+            and scroll.get("width") > 1
+        ):
+            continue
+        out.append(offender)
+    return out
+
+
+class ZeroWidthContainmentGaming(unittest.TestCase):
+    def test_zero_width_table_scroll_does_not_contain(self):
+        """A width:0 overflow-x:auto wrapper swallows any child visually while 'containing' it —
+        the adversarial gate proved a 500px child inside width:0 evaluates contained=true in the
+        browser; the acceptance predicate must refuse non-positive wrapper widths."""
+        gamed = {"offenders": [{
+            "contained_by_table_scroll": True,
+            "scroll_container": {"class": "table-scroll", "overflow_x": "auto",
+                                 "in_viewport": True, "width": 0},
+        }]}
+        self.assertEqual(len(_uncontained_dom_offenders(gamed)), 1)
+        real = {"offenders": [{
+            "contained_by_table_scroll": True,
+            "scroll_container": {"class": "table-scroll", "overflow_x": "auto",
+                                 "in_viewport": True, "width": 284},
+        }]}
+        self.assertEqual(_uncontained_dom_offenders(real), [])
+
+
 class ReceiptProvenanceContract(unittest.TestCase):
     def test_obligation_kinds_name_their_actual_producer(self):
         """No obligation may claim a capability its producer lacks: the reconstruction kind must not
@@ -171,6 +211,11 @@ class ReceiptProvenanceContract(unittest.TestCase):
             if page in DESIGN_PAGES:
                 self.assertIs(data["horizontal_overflow"], False,
                               f"{page}: 390px DOM probe overflowed: {data.get('offenders')}")
+                self.assertEqual(data.get("uncontained_offender_count", 0), 0,
+                                 f"{page}: uncontained overflow offender count must be zero")
+                self.assertEqual(
+                    _uncontained_dom_offenders(data), [],
+                    f"{page}: 390px DOM probe has uncontained overflowing elements: {data.get('offenders')}")
 
 
 if __name__ == "__main__":

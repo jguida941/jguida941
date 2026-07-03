@@ -8,6 +8,7 @@ candidate_only.
 """
 from __future__ import annotations
 
+import json
 import re
 import unittest
 from pathlib import Path
@@ -66,6 +67,18 @@ class MotionTokensContract(unittest.TestCase):
         offenders = [d for d in re.findall(r"(?:transition|animation)[^;}]*[;}]", html)
                      if re.search(r"\d+\.?\d*m?s", d) and "var(--motion-" not in d]
         self.assertEqual(offenders, [], f"literal motion durations must be tokens: {offenders}")
+
+    def test_render_nav_insertion_contexts_define_consumed_motion_vars(self):
+        """`render_nav()` consumes --motion-fast/--ease-standard, so every committed page that embeds
+        that nav CSS must define those vars in the same page context — not only site/index.html."""
+        manifest = json.loads((ROOT / "contracts" / "page_manifest.json").read_text(encoding="utf-8"))
+        required = ("--motion-fast", "--ease-standard")
+        for page in manifest["pages"]:
+            html = (ROOT / page["route"]).read_text(encoding="utf-8")
+            if all(f"var({name})" not in html for name in required):
+                continue
+            for name in required:
+                self.assertIn(f"{name}:", html, f"{page['id']}: render_nav consumes {name} but the page does not define it")
 
     def test_conform_emits_passing_motion_rows(self):
         from scripts.quality.design_invariants import conform

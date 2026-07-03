@@ -63,6 +63,11 @@ def root_block(profile: str, profile_data: dict | None = None) -> str:
     # not a minted constant (design-audit #7). Provenance-pinned like every other :root var.
     from scripts.rendering import design_tokens as _dt
     decls["--ps-pad"] = _px(_dt.density(profile)["panel_pad"])
+    motion = _dt.THEME_IA[profile]["motion"]
+    for key in ("fast", "base", "slow"):
+        decls[f"--motion-{key}"] = f"{motion[key]}ms"
+    for key in ("standard", "enter", "exit"):
+        decls[f"--ease-{key}"] = motion[f"ease-{key}"]
     decls.update(SHELL_SCALE)
     body = "\n".join(f"  {k}: {v};" for k, v in decls.items())
     return f":root {{\n{body}\n}}"

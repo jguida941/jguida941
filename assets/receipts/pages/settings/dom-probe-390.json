@@ -6,184 +6,405 @@
   "contract_id": "PageHeadlessDomProbe",
   "horizontal_overflow": false,
   "kind": "chrome-headless-dom-probe",
+  "offender_count": 51,
   "offenders": [
     {
       "class": "grid",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "table",
       "width": 443.28
     },
     {
       "class": "",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "thead",
       "width": 443.28
     },
     {
       "class": "",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "tr",
       "width": 443.28
     },
     {
       "class": "",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 380.38,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "th",
       "width": 115.91
     },
     {
       "class": "",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "tbody",
       "width": 443.28
     },
     {
       "class": "",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "tr",
       "width": 443.28
     },
     {
       "class": "cell ok",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 380.38,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "td",
       "width": 115.91
     },
     {
       "class": "src",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 392.38,
       "overflow_px": 94.28,
       "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "span",
       "width": 91.91
     },
     {
       "class": "verdict ok",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 392.38,
       "overflow_px": 94.28,
       "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "span",
       "width": 91.91
     },
     {
       "class": "",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "tr",
       "width": 443.28
     },
     {
       "class": "cell ok",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 380.38,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "td",
       "width": 115.91
     },
     {
       "class": "src",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 392.38,
       "overflow_px": 94.28,
       "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "span",
       "width": 91.91
     },
     {
       "class": "verdict ok",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 392.38,
       "overflow_px": 94.28,
       "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "span",
       "width": 91.91
     },
     {
       "class": "",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "tr",
       "width": 443.28
     },
     {
       "class": "cell ok",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 380.38,
       "overflow_px": 106.28,
       "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "td",
       "width": 115.91
     },
     {
       "class": "src",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 392.38,
       "overflow_px": 94.28,
       "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "span",
       "width": 91.91
     },
     {
       "class": "verdict ok",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 392.38,
       "overflow_px": 94.28,
       "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "span",
       "width": 91.91
     },
     {
       "class": "grid",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 142.14,
       "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "table",
       "width": 479.14
     },
     {
       "class": "",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 142.14,
       "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "thead",
       "width": 479.14
     },
     {
       "class": "",
+      "contained_by_table_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 142.14,
       "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "right": 337,
+        "tag": "div",
+        "width": 284
+      },
       "tag": "tr",
       "width": 479.14
     }
@@ -192,6 +413,7 @@
   "page": "settings",
   "route": "site/settings.html",
   "scroll_width": 390,
+  "uncontained_offender_count": 0,
   "viewport": {
     "height": 1000,
     "width": 390

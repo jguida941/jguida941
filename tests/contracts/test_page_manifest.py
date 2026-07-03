@@ -79,14 +79,29 @@ class PageManifestContract(unittest.TestCase):
                 self.assertTrue(_region_present(alias, page_bytes),
                                 f"{p['id']}: required region {region!r} ({alias}) not in shipped bytes")
 
+    def test_render_source_imports_and_reproduces_committed_route_bytes(self):
+        """The manifest's producer field is executable authority: parse/import `module.py::function`,
+        render the page, and compare it to the committed route bytes."""
+        from scripts.contracts.page_manifest import render_manifest_page
+        for p in _manifest()["pages"]:
+            page = ROOT / p["route"]
+            self.assertEqual(
+                render_manifest_page(p, ROOT), page.read_text(encoding="utf-8"),
+                f"{p['id']}: render_source drift or invalid producer {p.get('render_source')!r}")
+
     def test_bogus_archetype_and_missing_region_redden(self):
         """Negative vectors (in-memory): the enum refuses an invented archetype; a region whose
-        alias is absent from the html fails; an off-grammar alias raises."""
+        alias is absent from the html fails; an off-grammar alias raises; a bogus producer is not
+        admissible metadata."""
         enum = _manifest()["archetypes"]
         self.assertNotIn("hero-carousel", enum, "an invented archetype must not be admissible")
         self.assertFalse(_region_present(".not-there", '<div class="wrap">x</div>'))
         with self.assertRaises(ValueError):
             _region_present("div > .fancy:hover", "<div/>")
+        from scripts.contracts.page_manifest import render_manifest_page
+        bogus = {**_manifest()["pages"][0], "render_source": "scripts/pipeline/web_render.py::not_a_renderer"}
+        with self.assertRaises(AttributeError):
+            render_manifest_page(bogus, ROOT)
 
     def test_receipt_obligations_match_the_mf1_law(self):
         """Every page owes the two MF1 receipt kinds at the ratified viewports — and the committed

@@ -61,6 +61,7 @@ class PageShellTokenOnlyContract(unittest.TestCase):
         cannot be smuggled in through a token name; every var traces to a declared source."""
         from scripts.rendering.design import loader
         from scripts.rendering.pageshell.pageshell import SHELL_SCALE, _ROLES, _px
+        from scripts.rendering import design_tokens as dt
         for name in _active():
             _, css = _shell(name)
             root_block = re.search(r":root\s*\{([^}]*)\}", css).group(1)
@@ -72,8 +73,12 @@ class PageShellTokenOnlyContract(unittest.TestCase):
             expected["--font-sans"] = tok["font"]["family"]
             # D-SHELL: panel padding traces to the LANGUAGE'S declared density band (THEME_IA),
             # exactly like every colour/radius var traces to resolve_tokens.
-            from scripts.rendering import design_tokens as dt
             expected["--ps-pad"] = _px(dt.density(name)["panel_pad"])
+            motion = dt.THEME_IA[name]["motion"]
+            for key in ("fast", "base", "slow"):
+                expected[f"--motion-{key}"] = f"{motion[key]}ms"
+            for key in ("standard", "enter", "exit"):
+                expected[f"--ease-{key}"] = motion[f"ease-{key}"]
             expected.update(SHELL_SCALE)
             self.assertEqual(root, expected,
                              f"{name}: :root must be EXACTLY resolve_tokens + SHELL_SCALE (no missing/extra var)")
