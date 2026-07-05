@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T16:18:28.223216Z",
+  "generated_at": "2026-07-05T18:15:57.389289Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 8389,
-    "public_scope_commits": 4468,
+    "last_year_contributions": 8391,
+    "public_scope_commits": 4469,
     "total_repos": 70,
     "public_forks": 0,
     "private_owned_repos": 151,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 8389,
-      "display_value": "8,389"
+      "value": 8391,
+      "display_value": "8,391"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 4468,
-      "display_value": "4,468"
+      "value": 4469,
+      "display_value": "4,469"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 8389,
-      "display_value": "8,389"
+      "value": 8391,
+      "display_value": "8,391"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 4468,
-      "display_value": "4,468"
+      "value": 4469,
+      "display_value": "4,469"
     },
     {
       "key": "total_repos",
@@ -189,11 +189,11 @@
   },
   "scorecard": {
     "releases_30d": 0,
-    "active_repos_7d": 5,
+    "active_repos_7d": 6,
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.1285714285714286,
     "ci_coverage_pct": 24.285714285714285,
-    "last_year_contributions": 8389,
+    "last_year_contributions": 8391,
     "active_days_last_year": 287,
     "automation_workflows": 75,
     "primary_lang_share_pct": 50.6,
@@ -205,8 +205,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 8389,
-      "display_value": "8,389",
+      "value": 8391,
+      "display_value": "8,391",
       "accent": "#7dcfff"
     },
     {
@@ -221,8 +221,8 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 5,
-      "display_value": "5",
+      "value": 6,
+      "display_value": "6",
       "accent": "#7dcfff"
     },
     {
@@ -430,6 +430,21 @@
       "featured": true
     },
     {
+      "name": "doubly_linked_list_demo",
+      "full_name": "jguida941/doubly_linked_list_demo",
+      "url": "https://github.com/jguida941/doubly_linked_list_demo",
+      "language": "Makefile",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-07-05",
+      "pushed_at_raw": "2026-07-05T17:59:15Z",
+      "pushed_ago": "today",
+      "created_at": "2025-09-18",
+      "last_commit_msg": "Fix image alt text for accessibility and portfolio captions",
+      "featured": false
+    },
+    {
       "name": "dijkstra-dashboard",
       "full_name": "jguida941/dijkstra-dashboard",
       "url": "https://github.com/jguida941/dijkstra-dashboard",
@@ -439,7 +454,7 @@
       "ci": "yes",
       "pushed_at": "2026-07-05",
       "pushed_at_raw": "2026-07-05T09:07:04Z",
-      "pushed_ago": "7 hours ago",
+      "pushed_ago": "9 hours ago",
       "created_at": "2025-05-17",
       "last_commit_msg": "Merge pull request #2 from jguida941/ai-governance-pilot/dijkstra-das\u2026",
       "featured": false
@@ -454,7 +469,7 @@
       "ci": "no",
       "pushed_at": "2026-07-05",
       "pushed_at_raw": "2026-07-05T01:39:46Z",
-      "pushed_ago": "14 hours ago",
+      "pushed_ago": "16 hours ago",
       "created_at": "2026-07-05",
       "last_commit_msg": "fixed code comments and finished code",
       "featured": false
@@ -637,21 +652,6 @@
       "pushed_ago": "5 months ago",
       "created_at": "2026-01-31",
       "last_commit_msg": "Add gitui v0.1.0 formula",
-      "featured": false
-    },
-    {
-      "name": "pysort-visualizer",
-      "full_name": "jguida941/pysort-visualizer",
-      "url": "https://github.com/jguida941/pysort-visualizer",
-      "language": "Python",
-      "stars": 1,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-01-26",
-      "pushed_at_raw": "2026-01-26T07:17:56Z",
-      "pushed_ago": "5 months ago",
-      "created_at": "2025-09-28",
-      "last_commit_msg": "Fix header formatting in README.md",
       "featured": false
     }
   ],
@@ -890,50 +890,75 @@
   "focus": {
     "now": [
       {
+        "title": "doubly_linked_list_demo",
+        "detail": "Makefile \u00b7 pushed today",
+        "url": "https://github.com/jguida941/doubly_linked_list_demo",
+        "is_private": false
+      },
+      {
         "title": "semantic-tdd-learning-lab",
-        "detail": "Jupyter Notebook \u00b7 pushed 5 hours ago",
+        "detail": "Jupyter Notebook \u00b7 pushed 7 hours ago",
         "url": "",
         "is_private": true
       },
       {
         "title": "semantic-tdd",
-        "detail": "Python \u00b7 pushed 5 hours ago",
+        "detail": "Python \u00b7 pushed 7 hours ago",
         "url": "",
         "is_private": true
-      },
-      {
-        "title": "dijkstra-dashboard",
-        "detail": "Python \u00b7 pushed 7 hours ago",
-        "url": "https://github.com/jguida941/dijkstra-dashboard",
-        "is_private": false
       }
     ],
     "next": [
       {
+        "title": "PR #1",
+        "detail": "doubly_linked_list_demo \u00b7 open \u00b7 today",
+        "url": "https://github.com/jguida941/doubly_linked_list_demo/pull/1"
+      },
+      {
         "title": "PR #2",
-        "detail": "dijkstra-dashboard \u00b7 open \u00b7 7 hours ago",
+        "detail": "dijkstra-dashboard \u00b7 open \u00b7 9 hours ago",
         "url": "https://github.com/jguida941/dijkstra-dashboard/pull/2"
       },
       {
         "title": "PR #2",
-        "detail": "dijkstra-dashboard \u00b7 open \u00b7 7 hours ago",
-        "url": "https://github.com/jguida941/dijkstra-dashboard/pull/2"
-      },
-      {
-        "title": "PR #2",
-        "detail": "dijkstra-dashboard \u00b7 open \u00b7 7 hours ago",
+        "detail": "dijkstra-dashboard \u00b7 open \u00b7 9 hours ago",
         "url": "https://github.com/jguida941/dijkstra-dashboard/pull/2"
       }
     ],
     "shipped": [
       {
+        "title": "Merge pull request #2 from jguida941/ai-governance-pilo...",
+        "detail": "dijkstra-dashboard \u00b7 9 hours ago",
+        "url": "https://github.com/jguida941/dijkstra-dashboard"
+      },
+      {
         "title": "fixed code comments and finished code",
-        "detail": "assembly-notes \u00b7 14 hours ago",
+        "detail": "assembly-notes \u00b7 16 hours ago",
         "url": "https://github.com/jguida941/assembly-notes"
       }
     ]
   },
   "activity_feed": [
+    {
+      "kind": "pull request",
+      "title": "PR #1",
+      "url": "https://github.com/jguida941/doubly_linked_list_demo/pull/1",
+      "repo": "jguida941/doubly_linked_list_demo",
+      "repo_url": "https://github.com/jguida941/doubly_linked_list_demo",
+      "state": "OPEN",
+      "time_ago": "today",
+      "created_at": "2026-07-05T17:59:17Z"
+    },
+    {
+      "kind": "activity",
+      "title": "pull request",
+      "url": "https://github.com/jguida941/doubly_linked_list_demo",
+      "repo": "jguida941/doubly_linked_list_demo",
+      "repo_url": "https://github.com/jguida941/doubly_linked_list_demo",
+      "state": "PULL REQUEST",
+      "time_ago": "today",
+      "created_at": "2026-07-05T17:59:17Z"
+    },
     {
       "kind": "activity",
       "title": "push",
@@ -941,7 +966,7 @@
       "repo": "jguida941/semantic-tdd",
       "repo_url": "https://github.com/jguida941/semantic-tdd",
       "state": "PUSH",
-      "time_ago": "5 hours ago",
+      "time_ago": "7 hours ago",
       "created_at": "2026-07-05T10:25:39Z"
     },
     {
@@ -951,7 +976,7 @@
       "repo": "jguida941/dijkstra-dashboard",
       "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
       "state": "OPEN",
-      "time_ago": "7 hours ago",
+      "time_ago": "9 hours ago",
       "created_at": "2026-07-05T09:07:04Z"
     },
     {
@@ -961,7 +986,7 @@
       "repo": "jguida941/dijkstra-dashboard",
       "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
       "state": "PULL REQUEST",
-      "time_ago": "7 hours ago",
+      "time_ago": "9 hours ago",
       "created_at": "2026-07-05T09:07:04Z"
     },
     {
@@ -971,7 +996,7 @@
       "repo": "jguida941/dijkstra-dashboard",
       "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
       "state": "OPEN",
-      "time_ago": "7 hours ago",
+      "time_ago": "9 hours ago",
       "created_at": "2026-07-05T09:05:27Z"
     },
     {
@@ -981,18 +1006,8 @@
       "repo": "jguida941/dijkstra-dashboard",
       "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
       "state": "OPEN",
-      "time_ago": "7 hours ago",
+      "time_ago": "9 hours ago",
       "created_at": "2026-07-05T08:42:10Z"
-    },
-    {
-      "kind": "pull request",
-      "title": "PR #1",
-      "url": "https://github.com/jguida941/dijkstra-dashboard/pull/1",
-      "repo": "jguida941/dijkstra-dashboard",
-      "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
-      "state": "OPEN",
-      "time_ago": "10 hours ago",
-      "created_at": "2026-07-05T05:50:30Z"
     },
     {
       "kind": "activity",
@@ -1001,7 +1016,7 @@
       "repo": "jguida941/assembly-notes",
       "repo_url": "https://github.com/jguida941/assembly-notes",
       "state": "PUSH",
-      "time_ago": "14 hours ago",
+      "time_ago": "16 hours ago",
       "created_at": "2026-07-05T01:39:47Z"
     },
     {
@@ -1011,7 +1026,7 @@
       "repo": "jguida941/assembly-notes",
       "repo_url": "https://github.com/jguida941/assembly-notes",
       "state": "CREATED",
-      "time_ago": "15 hours ago",
+      "time_ago": "17 hours ago",
       "created_at": "2026-07-05T01:03:52Z"
     },
     {
@@ -1068,12 +1083,21 @@
   "recent_releases": [],
   "recent_pull_requests": [
     {
+      "title": "PR #1",
+      "url": "https://github.com/jguida941/doubly_linked_list_demo/pull/1",
+      "repo": "jguida941/doubly_linked_list_demo",
+      "repo_url": "https://github.com/jguida941/doubly_linked_list_demo",
+      "state": "OPEN",
+      "time_ago": "today",
+      "created_at": "2026-07-05T17:59:17Z"
+    },
+    {
       "title": "PR #2",
       "url": "https://github.com/jguida941/dijkstra-dashboard/pull/2",
       "repo": "jguida941/dijkstra-dashboard",
       "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
       "state": "OPEN",
-      "time_ago": "7 hours ago",
+      "time_ago": "9 hours ago",
       "created_at": "2026-07-05T09:07:04Z"
     },
     {
@@ -1082,7 +1106,7 @@
       "repo": "jguida941/dijkstra-dashboard",
       "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
       "state": "OPEN",
-      "time_ago": "7 hours ago",
+      "time_ago": "9 hours ago",
       "created_at": "2026-07-05T09:05:27Z"
     },
     {
@@ -1091,7 +1115,7 @@
       "repo": "jguida941/dijkstra-dashboard",
       "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
       "state": "OPEN",
-      "time_ago": "7 hours ago",
+      "time_ago": "9 hours ago",
       "created_at": "2026-07-05T08:42:10Z"
     },
     {
@@ -1100,17 +1124,8 @@
       "repo": "jguida941/dijkstra-dashboard",
       "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
       "state": "OPEN",
-      "time_ago": "7 hours ago",
+      "time_ago": "9 hours ago",
       "created_at": "2026-07-05T08:42:10Z"
-    },
-    {
-      "title": "PR #1",
-      "url": "https://github.com/jguida941/dijkstra-dashboard/pull/1",
-      "repo": "jguida941/dijkstra-dashboard",
-      "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
-      "state": "OPEN",
-      "time_ago": "10 hours ago",
-      "created_at": "2026-07-05T05:50:30Z"
     }
   ],
   "engineering": {
@@ -1127,7 +1142,7 @@
       60,
       34,
       361,
-      22
+      24
     ],
     "automation_workflows": 75,
     "automation_repos": 16,
@@ -1141,7 +1156,7 @@
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 8389,
+    "total": 8391,
     "weeks": [
       [
         {
@@ -2706,7 +2721,7 @@
       [
         {
           "date": "2026-07-05",
-          "count": 22
+          "count": 24
         }
       ]
     ]
@@ -2883,7 +2898,7 @@
         0,
         0,
         0,
-        0,
+        2,
         0,
         0,
         0,
@@ -2898,11 +2913,11 @@
     ],
     "event_mix": {
       "push": 91,
-      "pull request": 7,
-      "create": 7,
+      "pull request": 8,
+      "create": 8,
       "comment": 2
     },
-    "total": 107,
+    "total": 109,
     "timezone": "New York"
   }
 }
