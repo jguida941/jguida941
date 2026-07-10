@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-10T18:45:09.175659Z",
+  "generated_at": "2026-07-10T20:42:54.681720Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,15 +18,15 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 9511,
-    "public_scope_commits": 6512,
+    "last_year_contributions": 9519,
+    "public_scope_commits": 6521,
     "total_repos": 71,
     "public_forks": 0,
     "private_owned_repos": 154,
     "total_stars": 79,
     "languages_count": 26,
     "prs_merged": 41,
-    "releases": 0,
+    "releases": 1,
     "ci_repos": 17,
     "streak_days": 14
   },
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 9511,
-      "display_value": "9,511"
+      "value": 9519,
+      "display_value": "9,519"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6512,
-      "display_value": "6,512"
+      "value": 6521,
+      "display_value": "6,521"
     },
     {
       "key": "total_repos",
@@ -91,8 +91,8 @@
       "key": "releases",
       "label": "Releases (30 Days)",
       "dashboard_label": "Releases (30d)",
-      "value": 0,
-      "display_value": "0"
+      "value": 1,
+      "display_value": "1"
     },
     {
       "key": "ci_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 9511,
-      "display_value": "9,511"
+      "value": 9519,
+      "display_value": "9,519"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6512,
-      "display_value": "6,512"
+      "value": 6521,
+      "display_value": "6,521"
     },
     {
       "key": "total_repos",
@@ -161,8 +161,8 @@
     {
       "key": "releases",
       "label": "Releases (30d)",
-      "value": 0,
-      "display_value": "0"
+      "value": 1,
+      "display_value": "1"
     },
     {
       "key": "ci_repos",
@@ -188,12 +188,12 @@
     "events_note": "Public events feed available."
   },
   "scorecard": {
-    "releases_30d": 0,
-    "active_repos_7d": 6,
+    "releases_30d": 1,
+    "active_repos_7d": 7,
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.1126760563380282,
     "ci_coverage_pct": 23.943661971830984,
-    "last_year_contributions": 9511,
+    "last_year_contributions": 9519,
     "active_days_last_year": 287,
     "automation_workflows": 78,
     "primary_lang_share_pct": 71.2,
@@ -205,8 +205,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 9511,
-      "display_value": "9,511",
+      "value": 9519,
+      "display_value": "9,519",
       "accent": "#7dcfff"
     },
     {
@@ -221,8 +221,8 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 6,
-      "display_value": "6",
+      "value": 7,
+      "display_value": "7",
       "accent": "#7dcfff"
     },
     {
@@ -245,8 +245,8 @@
       "key": "releases_30d",
       "label": "Releases (30d)",
       "detail": "published in last month",
-      "value": 0,
-      "display_value": "0",
+      "value": 1,
+      "display_value": "1",
       "accent": "#ff9e64"
     },
     {
@@ -299,10 +299,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-07-10",
-      "pushed_at_raw": "2026-07-10T18:43:37Z",
+      "pushed_at_raw": "2026-07-10T20:39:15Z",
       "pushed_ago": "today",
       "created_at": "2025-11-06",
-      "last_commit_msg": "chore(release-gates): retire review-channel bridge declarations + gat\u2026",
+      "last_commit_msg": "ci(release): bypass governance gate in release_attestation for v1.2.3",
       "featured": true
     },
     {
@@ -334,7 +334,7 @@
     },
     {
       "name": "Rust",
-      "bytes": 3616660,
+      "bytes": 3618710,
       "percent": 7.84
     },
     {
@@ -408,10 +408,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-07-10",
-      "pushed_at_raw": "2026-07-10T18:43:37Z",
+      "pushed_at_raw": "2026-07-10T20:39:15Z",
       "pushed_ago": "today",
       "created_at": "2025-11-06",
-      "last_commit_msg": "chore(release-gates): retire review-channel bridge declarations + gat\u2026",
+      "last_commit_msg": "ci(release): bypass governance gate in release_attestation for v1.2.3",
       "featured": true
     },
     {
@@ -430,6 +430,21 @@
       "featured": true
     },
     {
+      "name": "homebrew-voiceterm",
+      "full_name": "jguida941/homebrew-voiceterm",
+      "url": "https://github.com/jguida941/homebrew-voiceterm",
+      "language": "Ruby",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-07-10",
+      "pushed_at_raw": "2026-07-10T20:34:07Z",
+      "pushed_ago": "today",
+      "created_at": "2026-01-22",
+      "last_commit_msg": "voiceterm 1.2.3",
+      "featured": false
+    },
+    {
       "name": "assembly-notes",
       "full_name": "jguida941/assembly-notes",
       "url": "https://github.com/jguida941/assembly-notes",
@@ -439,7 +454,7 @@
       "ci": "no",
       "pushed_at": "2026-07-10",
       "pushed_at_raw": "2026-07-10T00:20:27Z",
-      "pushed_ago": "18 hours ago",
+      "pushed_ago": "20 hours ago",
       "created_at": "2026-07-05",
       "last_commit_msg": "Reorganize Module 1 into module-1/lesson-01-cpp-to-assembly/{src,note\u2026",
       "featured": false
@@ -499,7 +514,7 @@
       "ci": "no",
       "pushed_at": "2026-07-05",
       "pushed_at_raw": "2026-07-05T19:08:20Z",
-      "pushed_ago": "4 days ago",
+      "pushed_ago": "5 days ago",
       "created_at": "2025-09-18",
       "last_commit_msg": "Merge pull request #1 from jguida941/ai-governance-pilot/doubly_linke\u2026",
       "featured": false
@@ -547,21 +562,6 @@
       "pushed_ago": "1 week ago",
       "created_at": "2026-06-28",
       "last_commit_msg": "Update README.md",
-      "featured": false
-    },
-    {
-      "name": "homebrew-voiceterm",
-      "full_name": "jguida941/homebrew-voiceterm",
-      "url": "https://github.com/jguida941/homebrew-voiceterm",
-      "language": "Ruby",
-      "stars": 1,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-03-07",
-      "pushed_at_raw": "2026-03-07T03:23:26Z",
-      "pushed_ago": "4 months ago",
-      "created_at": "2026-01-22",
-      "last_commit_msg": "Update to v1.1.1",
       "featured": false
     },
     {
@@ -894,14 +894,14 @@
         "is_private": false
       },
       {
-        "title": "semantic-tdd",
-        "detail": "Python \u00b7 pushed today",
-        "url": "",
-        "is_private": true
+        "title": "homebrew-voiceterm",
+        "detail": "Ruby \u00b7 pushed today",
+        "url": "https://github.com/jguida941/homebrew-voiceterm",
+        "is_private": false
       },
       {
-        "title": "repo-surface-scout",
-        "detail": "Python \u00b7 pushed today",
+        "title": "semantic-tdd",
+        "detail": "Python \u00b7 pushed 2 hours ago",
         "url": "",
         "is_private": true
       }
@@ -916,14 +916,15 @@
         "title": "PR #4",
         "detail": "dijkstra-dashboard \u00b7 open \u00b7 3 days ago",
         "url": "https://github.com/jguida941/dijkstra-dashboard/pull/4"
-      },
-      {
-        "title": "PR #3",
-        "detail": "dijkstra-dashboard \u00b7 open \u00b7 3 days ago",
-        "url": "https://github.com/jguida941/dijkstra-dashboard/pull/3"
       }
     ],
-    "shipped": []
+    "shipped": [
+      {
+        "title": "v1.2.3",
+        "detail": "voiceterm \u00b7 today",
+        "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.3"
+      }
+    ]
   },
   "activity_feed": [
     {
@@ -934,7 +935,27 @@
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-07-10T18:43:38Z"
+      "created_at": "2026-07-10T20:39:15Z"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/homebrew-voiceterm",
+      "repo": "jguida941/homebrew-voiceterm",
+      "repo_url": "https://github.com/jguida941/homebrew-voiceterm",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-07-10T20:34:08Z"
+    },
+    {
+      "kind": "release",
+      "title": "v1.2.3",
+      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.3",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "RELEASED",
+      "time_ago": "today",
+      "created_at": "2026-07-10T20:26:17Z"
     },
     {
       "kind": "activity",
@@ -943,7 +964,7 @@
       "repo": "jguida941/semantic-tdd",
       "repo_url": "https://github.com/jguida941/semantic-tdd",
       "state": "PUSH",
-      "time_ago": "11 hours ago",
+      "time_ago": "13 hours ago",
       "created_at": "2026-07-10T07:14:08Z"
     },
     {
@@ -953,7 +974,7 @@
       "repo": "jguida941/assembly-notes",
       "repo_url": "https://github.com/jguida941/assembly-notes",
       "state": "PUSH",
-      "time_ago": "18 hours ago",
+      "time_ago": "20 hours ago",
       "created_at": "2026-07-10T00:20:28Z"
     },
     {
@@ -973,7 +994,7 @@
       "repo": "jguida941/CS-360",
       "repo_url": "https://github.com/jguida941/CS-360",
       "state": "CREATED",
-      "time_ago": "2 days ago",
+      "time_ago": "3 days ago",
       "created_at": "2026-07-07T19:20:02Z"
     },
     {
@@ -1007,66 +1028,6 @@
       "created_at": "2026-07-07T18:21:43Z"
     },
     {
-      "kind": "pull request",
-      "title": "PR #3",
-      "url": "https://github.com/jguida941/dijkstra-dashboard/pull/3",
-      "repo": "jguida941/dijkstra-dashboard",
-      "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
-      "state": "OPEN",
-      "time_ago": "3 days ago",
-      "created_at": "2026-07-07T18:17:56Z"
-    },
-    {
-      "kind": "pull request",
-      "title": "PR #3",
-      "url": "https://github.com/jguida941/dijkstra-dashboard/pull/3",
-      "repo": "jguida941/dijkstra-dashboard",
-      "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
-      "state": "OPEN",
-      "time_ago": "3 days ago",
-      "created_at": "2026-07-07T18:06:32Z"
-    },
-    {
-      "kind": "activity",
-      "title": "delete",
-      "url": "https://github.com/jguida941/gitui",
-      "repo": "jguida941/gitui",
-      "repo_url": "https://github.com/jguida941/gitui",
-      "state": "DELETE",
-      "time_ago": "3 days ago",
-      "created_at": "2026-07-07T17:58:06Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/benny-accessibility-hub-semantic-tdd-proof-",
-      "repo": "jguida941/benny-accessibility-hub-semantic-tdd-proof-",
-      "repo_url": "https://github.com/jguida941/benny-accessibility-hub-semantic-tdd-proof-",
-      "state": "PUSH",
-      "time_ago": "4 days ago",
-      "created_at": "2026-07-06T00:36:58Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/doubly_linked_list_demo",
-      "repo": "jguida941/doubly_linked_list_demo",
-      "repo_url": "https://github.com/jguida941/doubly_linked_list_demo",
-      "state": "PUSH",
-      "time_ago": "4 days ago",
-      "created_at": "2026-07-05T19:08:21Z"
-    },
-    {
-      "kind": "pull request",
-      "title": "PR #1",
-      "url": "https://github.com/jguida941/doubly_linked_list_demo/pull/1",
-      "repo": "jguida941/doubly_linked_list_demo",
-      "repo_url": "https://github.com/jguida941/doubly_linked_list_demo",
-      "state": "OPEN",
-      "time_ago": "4 days ago",
-      "created_at": "2026-07-05T19:08:20Z"
-    },
-    {
       "kind": "created",
       "title": "assembly-notes",
       "url": "https://github.com/jguida941/assembly-notes",
@@ -1087,7 +1048,16 @@
       "created_at": "2026-07-02T19:09:11Z"
     }
   ],
-  "recent_releases": [],
+  "recent_releases": [
+    {
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "tag": "v1.2.3",
+      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.3",
+      "time_ago": "today",
+      "created_at": "2026-07-10T20:26:17Z"
+    }
+  ],
   "recent_pull_requests": [
     {
       "title": "PR #4",
@@ -1106,33 +1076,6 @@
       "state": "OPEN",
       "time_ago": "3 days ago",
       "created_at": "2026-07-07T18:21:43Z"
-    },
-    {
-      "title": "PR #3",
-      "url": "https://github.com/jguida941/dijkstra-dashboard/pull/3",
-      "repo": "jguida941/dijkstra-dashboard",
-      "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
-      "state": "OPEN",
-      "time_ago": "3 days ago",
-      "created_at": "2026-07-07T18:17:56Z"
-    },
-    {
-      "title": "PR #3",
-      "url": "https://github.com/jguida941/dijkstra-dashboard/pull/3",
-      "repo": "jguida941/dijkstra-dashboard",
-      "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
-      "state": "OPEN",
-      "time_ago": "3 days ago",
-      "created_at": "2026-07-07T18:06:32Z"
-    },
-    {
-      "title": "PR #1",
-      "url": "https://github.com/jguida941/doubly_linked_list_demo/pull/1",
-      "repo": "jguida941/doubly_linked_list_demo",
-      "repo_url": "https://github.com/jguida941/doubly_linked_list_demo",
-      "state": "OPEN",
-      "time_ago": "4 days ago",
-      "created_at": "2026-07-05T19:08:20Z"
     }
   ],
   "engineering": {
@@ -1149,7 +1092,7 @@
       60,
       34,
       361,
-      172
+      180
     ],
     "automation_workflows": 78,
     "automation_repos": 16,
@@ -1163,7 +1106,7 @@
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 9511,
+    "total": 9519,
     "weeks": [
       [
         {
@@ -2728,7 +2671,7 @@
         },
         {
           "date": "2026-07-10",
-          "count": 26
+          "count": 34
         }
       ]
     ]
@@ -2756,13 +2699,12 @@
         0,
         0,
         0,
-        2,
         0,
-        3,
-        2
+        0,
+        0,
+        0
       ],
       [
-        2,
         0,
         0,
         0,
@@ -2775,10 +2717,11 @@
         0,
         0,
         0,
-        2,
-        10,
+        0,
+        0,
         4,
         4,
+        2,
         0,
         0,
         0,
@@ -2854,77 +2797,78 @@
         0,
         0,
         3,
-        4,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2,
-        0,
-        0
-      ],
-      [
-        0,
-        4,
-        0,
-        1,
         5,
-        4,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2,
-        0,
         3,
+        4,
         0,
         0,
         0,
-        2,
-        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0
       ]
     ],
     "event_mix": {
-      "push": 69,
-      "create": 34,
-      "pull request": 13,
-      "comment": 3
+      "push": 52,
+      "create": 27,
+      "pull request": 2,
+      "release": 1,
+      "comment": 1
     },
-    "total": 119,
+    "total": 83,
     "timezone": "New York"
   }
 }
