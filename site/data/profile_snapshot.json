@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-12T17:26:45.484562Z",
+  "generated_at": "2026-07-12T19:31:24.172898Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 9552,
-    "public_scope_commits": 6549,
+    "last_year_contributions": 9555,
+    "public_scope_commits": 6552,
     "total_repos": 71,
     "public_forks": 0,
     "private_owned_repos": 154,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 9552,
-      "display_value": "9,552"
+      "value": 9555,
+      "display_value": "9,555"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6549,
-      "display_value": "6,549"
+      "value": 6552,
+      "display_value": "6,552"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 9552,
-      "display_value": "9,552"
+      "value": 9555,
+      "display_value": "9,555"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6549,
-      "display_value": "6,549"
+      "value": 6552,
+      "display_value": "6,552"
     },
     {
       "key": "total_repos",
@@ -189,24 +189,24 @@
   },
   "scorecard": {
     "releases_30d": 1,
-    "active_repos_7d": 7,
+    "active_repos_7d": 6,
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.1126760563380282,
     "ci_coverage_pct": 23.943661971830984,
-    "last_year_contributions": 9552,
+    "last_year_contributions": 9555,
     "active_days_last_year": 289,
     "automation_workflows": 78,
     "primary_lang_share_pct": 71.2,
     "median_days_since_push": 211.0,
-    "days_since_last_push": 1.0
+    "days_since_last_push": 0.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 9552,
-      "display_value": "9,552",
+      "value": 9555,
+      "display_value": "9,555",
       "accent": "#7dcfff"
     },
     {
@@ -221,8 +221,8 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 7,
-      "display_value": "7",
+      "value": 6,
+      "display_value": "6",
       "accent": "#7dcfff"
     },
     {
@@ -261,8 +261,8 @@
       "key": "days_since_last_push",
       "label": "Last Push",
       "detail": "days since your most recent commit",
-      "value": 1.0,
-      "display_value": "1d",
+      "value": 0.0,
+      "display_value": "0d",
       "accent": "#9ece6a"
     }
   ],
@@ -339,7 +339,7 @@
     },
     {
       "name": "C++",
-      "bytes": 1830229,
+      "bytes": 1830605,
       "percent": 3.97
     },
     {
@@ -430,6 +430,21 @@
       "featured": true
     },
     {
+      "name": "assembly-notes",
+      "full_name": "jguida941/assembly-notes",
+      "url": "https://github.com/jguida941/assembly-notes",
+      "language": "Assembly",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-07-12",
+      "pushed_at_raw": "2026-07-12T18:44:18Z",
+      "pushed_ago": "today",
+      "created_at": "2026-07-05",
+      "last_commit_msg": "Clean up assignment2_2 spacing and output formatting",
+      "featured": false
+    },
+    {
       "name": "homebrew-voiceterm",
       "full_name": "jguida941/homebrew-voiceterm",
       "url": "https://github.com/jguida941/homebrew-voiceterm",
@@ -442,21 +457,6 @@
       "pushed_ago": "1 day ago",
       "created_at": "2026-01-22",
       "last_commit_msg": "voiceterm 1.2.3",
-      "featured": false
-    },
-    {
-      "name": "assembly-notes",
-      "full_name": "jguida941/assembly-notes",
-      "url": "https://github.com/jguida941/assembly-notes",
-      "language": "Assembly",
-      "stars": 0,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-07-10",
-      "pushed_at_raw": "2026-07-10T00:20:27Z",
-      "pushed_ago": "2 days ago",
-      "created_at": "2026-07-05",
-      "last_commit_msg": "Reorganize Module 1 into module-1/lesson-01-cpp-to-assembly/{src,note\u2026",
       "featured": false
     },
     {
@@ -484,7 +484,7 @@
       "ci": "yes",
       "pushed_at": "2026-07-07",
       "pushed_at_raw": "2026-07-07T18:23:22Z",
-      "pushed_ago": "4 days ago",
+      "pushed_ago": "5 days ago",
       "created_at": "2025-05-17",
       "last_commit_msg": "Merge pull request #4 from jguida941/docs/algorithm-badges",
       "featured": false
@@ -499,7 +499,7 @@
       "ci": "yes",
       "pushed_at": "2026-07-07",
       "pushed_at_raw": "2026-07-07T17:58:05Z",
-      "pushed_ago": "4 days ago",
+      "pushed_ago": "5 days ago",
       "created_at": "2026-01-15",
       "last_commit_msg": "Add macOS launcher script",
       "featured": false
@@ -514,7 +514,7 @@
       "ci": "no",
       "pushed_at": "2026-07-05",
       "pushed_at_raw": "2026-07-05T19:08:20Z",
-      "pushed_ago": "6 days ago",
+      "pushed_ago": "1 week ago",
       "created_at": "2025-09-18",
       "last_commit_msg": "Merge pull request #1 from jguida941/ai-governance-pilot/doubly_linke\u2026",
       "featured": false
@@ -559,7 +559,7 @@
       "ci": "no",
       "pushed_at": "2026-06-28",
       "pushed_at_raw": "2026-06-28T19:00:47Z",
-      "pushed_ago": "1 week ago",
+      "pushed_ago": "2 weeks ago",
       "created_at": "2026-06-28",
       "last_commit_msg": "Update README.md",
       "featured": false
@@ -683,7 +683,7 @@
       "visibility": "public",
       "description": null,
       "html_url": "https://github.com/jguida941/assembly-notes",
-      "pushed_at": "2026-07-10T00:20:27Z",
+      "pushed_at": "2026-07-12T18:44:18Z",
       "created_at": "2026-07-05T01:03:52Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -695,10 +695,10 @@
       "workflow_file_count": 0,
       "language_bytes": {
         "Assembly": 2159,
-        "C++": 866,
+        "C++": 1242,
         "CMake": 178
       },
-      "latest_commit_message": "Reorganize Module 1 into module-1/lesson-01-cpp-to-assembly/{src,note\u2026"
+      "latest_commit_message": "Clean up assignment2_2 spacing and output formatting"
     },
     {
       "name": "cpp-to-assembly",
@@ -888,20 +888,20 @@
   "focus": {
     "now": [
       {
+        "title": "assembly-notes",
+        "detail": "Assembly \u00b7 pushed today",
+        "url": "https://github.com/jguida941/assembly-notes",
+        "is_private": false
+      },
+      {
         "title": "semantic-tdd",
-        "detail": "Python \u00b7 pushed today",
+        "detail": "Python \u00b7 pushed 3 hours ago",
         "url": "",
         "is_private": true
       },
       {
         "title": "ai-review-packager",
-        "detail": "Python \u00b7 pushed today",
-        "url": "",
-        "is_private": true
-      },
-      {
-        "title": "translation-proof-adapter",
-        "detail": "Python \u00b7 pushed today",
+        "detail": "Python \u00b7 pushed 3 hours ago",
         "url": "",
         "is_private": true
       }
@@ -916,6 +916,16 @@
     ]
   },
   "activity_feed": [
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/assembly-notes",
+      "repo": "jguida941/assembly-notes",
+      "repo_url": "https://github.com/jguida941/assembly-notes",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-07-12T18:44:18Z"
+    },
     {
       "kind": "activity",
       "title": "push",
@@ -959,16 +969,6 @@
     {
       "kind": "activity",
       "title": "push",
-      "url": "https://github.com/jguida941/assembly-notes",
-      "repo": "jguida941/assembly-notes",
-      "repo_url": "https://github.com/jguida941/assembly-notes",
-      "state": "PUSH",
-      "time_ago": "2 days ago",
-      "created_at": "2026-07-10T00:20:28Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
       "url": "https://github.com/jguida941/CS-360",
       "repo": "jguida941/CS-360",
       "repo_url": "https://github.com/jguida941/CS-360",
@@ -983,7 +983,7 @@
       "repo": "jguida941/CS-360",
       "repo_url": "https://github.com/jguida941/CS-360",
       "state": "CREATED",
-      "time_ago": "4 days ago",
+      "time_ago": "5 days ago",
       "created_at": "2026-07-07T19:20:02Z"
     },
     {
@@ -1032,21 +1032,21 @@
       34,
       361,
       202,
-      11
+      14
     ],
     "automation_workflows": 78,
     "automation_repos": 16,
     "primary_lang_share_pct": 71.2,
     "languages_over_5pct": 3,
     "median_days_since_push": 211.0,
-    "days_since_last_push": 1.0,
+    "days_since_last_push": 0.0,
     "public_repos_total": 71,
     "public_nonfork_repos": 71,
     "private_repos_total": 154,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 9552,
+    "total": 9555,
     "weeks": [
       [
         {
@@ -2611,7 +2611,7 @@
       [
         {
           "date": "2026-07-12",
-          "count": 11
+          "count": 14
         }
       ]
     ]
@@ -2660,7 +2660,7 @@
         0,
         0,
         0,
-        4,
+        2,
         2,
         0,
         0,
@@ -2789,7 +2789,7 @@
         0,
         0,
         0,
-        0,
+        2,
         0,
         0,
         0,
@@ -2802,8 +2802,8 @@
       ]
     ],
     "event_mix": {
-      "push": 51,
-      "create": 26,
+      "push": 52,
+      "create": 25,
       "comment": 4,
       "release": 1
     },
