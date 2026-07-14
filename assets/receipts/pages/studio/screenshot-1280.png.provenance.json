@@ -1,7 +1,9 @@
 {
   "artifact": "assets/receipts/pages/studio/screenshot-1280.png",
+  "artifact_sha256": "8e0403ed60801ceda8970b9563c6a8ad043010ed66f10d389611da5a936749ab",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
+  "capture_origin": "ephemeral-local-http",
   "chrome_version": "Google Chrome 150.0.7871.115",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -9,16 +11,46 @@
     "--no-first-run",
     "--no-default-browser-check",
     "--hide-scrollbars",
+    "--run-all-compositor-stages-before-draw",
     "--window-size=1280,1536",
-    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/studio/screenshot-1280.png",
-    "file:///Users/jguida941/jguida941/jguida941/site/studio.html"
+    "--virtual-time-budget=15000",
+    "--dump-dom",
+    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/studio/.screenshot-1280.png.374850d4c9e344e586b0ca9868332906.tmp.png",
+    "http://127.0.0.1:62398/site/studio.html?__receipt_capture=09ec79279c424c0bac34e279861a078e&page=studio&page_sha256=7e2fa450dc21d97cc2164d84328e10e23d73cabc0cae04f1545bc511a4dc7fa1&width=1280&height=1536"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-screenshot",
   "page": "studio",
-  "page_sha256": "308aef6ca875a85530e7e1694e673276b9cff276abe07ea490b5ef2c21f44e92",
+  "page_sha256": "7e2fa450dc21d97cc2164d84328e10e23d73cabc0cae04f1545bc511a4dc7fa1",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/studio.html",
+  "same_session_capture": {
+    "capture_id": "09ec79279c424c0bac34e279861a078e",
+    "facts": {
+      "capture_id": "09ec79279c424c0bac34e279861a078e",
+      "empty_state_hidden": {},
+      "hydration_state": null,
+      "page": "studio",
+      "page_sha256": "7e2fa450dc21d97cc2164d84328e10e23d73cabc0cae04f1545bc511a4dc7fa1",
+      "prototype_origin_counts": {},
+      "readiness": {
+        "animation_frames": 2,
+        "fonts": "ready",
+        "outcome": "ready"
+      },
+      "sentinel_values": {},
+      "viewport": {
+        "height": 1536,
+        "width": 1280
+      }
+    },
+    "facts_sha256": "54d8fcac57dd30f4eae98a3b9eec40f627143eefc2951f1eb7a6125854580760",
+    "readiness": {
+      "animation_frames": 2,
+      "fonts": "ready",
+      "outcome": "ready"
+    }
+  },
   "viewport": {
     "height": 1536,
     "width": 1280

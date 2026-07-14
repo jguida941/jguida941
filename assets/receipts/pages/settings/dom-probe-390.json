@@ -10,7 +10,9 @@
       "parent": ".base"
     }
   ],
+  "empty_state_hidden": {},
   "horizontal_overflow": false,
+  "hydration_state": null,
   "kind": "chrome-headless-dom-probe",
   "offender_count": 51,
   "offenders": [
@@ -593,12 +595,925 @@
       },
       "tag": "tr",
       "width": 479.14
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 142.14,
+      "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "th",
+      "width": 151.77
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 142.14,
+      "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "tbody",
+      "width": 479.14
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 142.14,
+      "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "tr",
+      "width": 479.14
+    },
+    {
+      "class": "cell no",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 142.14,
+      "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "td",
+      "width": 151.77
+    },
+    {
+      "class": "src",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 130.14,
+      "right": 520.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 127.77
+    },
+    {
+      "class": "verdict no",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 130.14,
+      "right": 520.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 127.77
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 142.14,
+      "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "tr",
+      "width": 479.14
+    },
+    {
+      "class": "cell no",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 142.14,
+      "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "td",
+      "width": 151.77
+    },
+    {
+      "class": "src",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 130.14,
+      "right": 520.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 127.77
+    },
+    {
+      "class": "verdict no",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 130.14,
+      "right": 520.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 127.77
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 142.14,
+      "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "tr",
+      "width": 479.14
+    },
+    {
+      "class": "cell ok",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 142.14,
+      "right": 532.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "td",
+      "width": 151.77
+    },
+    {
+      "class": "src",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 130.14,
+      "right": 520.14,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 127.77
+    },
+    {
+      "class": "verdict ok",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "grid",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "table",
+      "width": 443.28
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "thead",
+      "width": 443.28
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "tr",
+      "width": 443.28
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "th",
+      "width": 115.91
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "tbody",
+      "width": 443.28
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "tr",
+      "width": 443.28
+    },
+    {
+      "class": "cell ok",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "td",
+      "width": 115.91
+    },
+    {
+      "class": "src",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "verdict ok",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "tr",
+      "width": 443.28
+    },
+    {
+      "class": "cell ok",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "td",
+      "width": 115.91
+    },
+    {
+      "class": "src",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "verdict ok",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 53,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "tr",
+      "width": 443.28
+    },
+    {
+      "class": "cell ok",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 380.38,
+      "overflow_px": 106.28,
+      "right": 496.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "td",
+      "width": 115.91
+    },
+    {
+      "class": "src",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 91.91
+    },
+    {
+      "class": "verdict ok",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 392.38,
+      "overflow_px": 94.28,
+      "right": 484.28,
+      "scroll_container": {
+        "class": "table-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 53,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "base",
+          "id": "",
+          "tag": "section"
+        },
+        "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".base"
+        },
+        "tag": "div",
+        "width": 284
+      },
+      "tag": "span",
+      "width": 91.91
     }
   ],
   "overflow_px": 0,
   "page": "settings",
+  "prototype_origin_counts": {},
+  "readiness": {
+    "elapsed_ms": 55,
+    "outcome": "hydration-marker-missing",
+    "selector": "[data-dashboard-hydration]",
+    "state": null
+  },
   "route": "site/settings.html",
   "scroll_width": 390,
+  "sentinel_values": {
+    "cal-total": null,
+    "hero-contributions": null,
+    "lang-count": null,
+    "lang-name": null,
+    "rhythm-meta": null
+  },
   "uncontained_offender_count": 0,
   "viewport": {
     "height": 1000,

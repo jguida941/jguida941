@@ -46,11 +46,16 @@ class WebDashboardContract(unittest.TestCase):
             "site/index.html is GENERATED — regenerate via scripts.pipeline.web_render and "
             "commit; it must never be hand-edited (run: python -m scripts.pipeline.web_render)")
 
-    def test_token_root_embedded_verbatim(self):
-        from scripts.rendering.design_tokens import emit_css_root
-        self.assertIn(
-            emit_css_root().strip(), self.html,
-            "the web :root must be design_tokens.emit_css_root() verbatim (Law 3 token parity)")
+    def test_pageshell_consumes_the_one_declaration_projection_without_a_second_root(self):
+        from scripts.rendering import design_tokens
+        from scripts.rendering.pageshell.pageshell import _profile_decls
+
+        for profile in design_tokens.ACTIVE_THEME_NAMES:
+            self.assertEqual(_profile_decls(profile), design_tokens.css_declarations(profile))
+            for name, value in design_tokens.css_declarations(profile).items():
+                self.assertIn(f"{name}: {value};", self.html)
+        self.assertEqual(self.html.count("--glass-blur: 22px;"), 1,
+                         "index ships pageshell's projection once, not a duplicate legacy root")
 
     def test_binds_shared_snapshot_metric_keys(self):
         """The web reads the SAME shared-snapshot keys the README SVG cards do."""
@@ -76,16 +81,17 @@ class WebDashboardContract(unittest.TestCase):
         still distinguishes OK from failure. The colour belongs in a small glyph, not a
         saturated full-hue pill (the old 'green button' AI tell)."""
         html = self.html
-        self.assertIn("STATUS_ICON", html, "web status must resolve an icon SHAPE per state")
-        icons = re.search(r"STATUS_ICON\s*=\s*\{(.*?)\};", html, re.S)
-        self.assertIsNotNone(icons, "STATUS_ICON map not found")
-        shapes = re.findall(r'<path[^>]*\bd="([^"]+)"', icons.group(1))
-        self.assertGreaterEqual(len(set(shapes)), 3,
-                                "the 3 status states must use 3 DISTINCT shapes (colour-independence)")
+        prototype = re.search(
+            r'<template[^>]*data-prototype="pipeline-status".*?</template>', html, re.S)
+        self.assertIsNotNone(prototype, "pipeline status must have one governed static prototype")
+        for field in ("ok-icon", "warn-icon", "bad-icon"):
+            self.assertIn(f'data-field="{field}"', prototype.group(0))
+        shapes = re.findall(r'<(?:path|polygon)[^>]*(?:d|points)="([^"]+)"', prototype.group(0))
+        self.assertGreaterEqual(len(set(shapes)), 3, "status states require distinct Lucide geometry")
         # restraint: the chip LABEL stays neutral ink — colour lives in the glyph, not a
         # full-hue text/pill. So .chip.<state> must NOT repaint the label colour.
         for state in ("ok", "warn", "bad"):
-            rule = re.search(r"\.chip\." + state + r"\s*\{([^}]*)\}", html)
+            rule = re.search(r'\.db-status\[data-status="' + state + r'"\]\s*\{([^}]*)\}', html)
             if rule:
                 self.assertNotRegex(
                     rule.group(1), r"(^|;)\s*color\s*:",
@@ -105,7 +111,7 @@ class WebDashboardContract(unittest.TestCase):
         self.assertRegex(html, r"@media[^{]*max-width:\s*4[0-8]\dpx", "needs a phone breakpoint (<=480px)")
         self.assertIn("-webkit-backdrop-filter", html, "Safari needs the -webkit-backdrop-filter prefix")
         self.assertIn("min-height: 44px", html, "interactive controls need >=44px touch targets (Apple/WCAG)")
-        self.assertRegex(html, r"\.heat-wrap\s*\{[^}]*overflow-x:\s*auto",
+        self.assertRegex(html, r"\.db-rhythm-scroll\s*\{[^}]*overflow-x:\s*auto",
                          "the heatmap must scroll on a narrow screen, not squish/distort")
 
     def test_colour_only_from_tokens_no_rainbow(self):
@@ -114,8 +120,12 @@ class WebDashboardContract(unittest.TestCase):
         two injected blocks — the token source (emit_css_root's :root/[data-theme])
         and the LANG_COLORS map (Linguist identity colours, data not chrome). Scrub
         both, then the remaining component CSS + HTML + JS must hold NO raw hex."""
-        from scripts.rendering.design_tokens import emit_css_root
-        scrubbed = self.html.replace(emit_css_root().strip(), "")
+        from scripts.rendering import design_tokens
+        scrubbed = self.html
+        for profile in design_tokens.ACTIVE_THEME_NAMES:
+            for value in design_tokens.css_declarations(profile).values():
+                if re.fullmatch(r"#[0-9a-fA-F]{3,8}", value):
+                    scrubbed = scrubbed.replace(value, "")
         scrubbed = re.sub(r"const LANG_COLORS = \{.*?\};", "", scrubbed, flags=re.S)
         stray = sorted(set(re.findall(r"#[0-9a-fA-F]{3,8}\b", scrubbed)))
         self.assertEqual([], stray, f"component chrome must paint from token vars, not raw hex: {stray}")

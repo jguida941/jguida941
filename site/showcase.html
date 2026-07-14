@@ -39,28 +39,62 @@
 <style>* { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 :root {
-  --backdrop: #000000;
-  --surface: #1c1c1e;
-  --surface-raised: #2c2c2e;
   --ink-strong: #f5f5f7;
   --ink: #c7c7cc;
   --ink-dim: #98989d;
-  --accent: #0a84ff;
+  --surface: #1c1c1e;
+  --surface-raised: #2c2c2e;
+  --backdrop: #000000;
   --hairline: #38383a;
+  --accent: #0a84ff;
   --status-success: #30d158;
   --status-warning: #ff9f0a;
   --status-danger: #ff453a;
+  --glass-blur: 30px;
+  --glass-saturate: 180%;
+  --surface-opacity: 0.6;
+  --raised-opacity: 0.5;
+  --sheen-opacity: 0.1;
+  color-scheme: dark;
   --radius-panel: 14px;
   --radius-tile: 12px;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  color-scheme: dark;
+  --pad-panel: 32px;
   --ps-pad: 32px;
+  --pad-tile: 24px;
+  --gap-grid: 24px;
+  --type-display: 54px;
+  --type-display-weight: 600;
+  --type-metric_lg: 30px;
+  --type-metric_lg-weight: 600;
+  --type-metric: 22px;
+  --type-metric-weight: 600;
+  --type-title: 22px;
+  --type-title-weight: 600;
+  --type-body: 14px;
+  --type-body-weight: 400;
+  --type-caption: 12px;
+  --type-caption-weight: 400;
+  --type-eyebrow: 11px;
+  --type-eyebrow-weight: 600;
+  --type-chip: 11px;
+  --type-chip-weight: 500;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
   --motion-fast: 150ms;
   --motion-base: 300ms;
   --motion-slow: 500ms;
   --ease-standard: ease-out;
   --ease-enter: ease-out;
   --ease-exit: ease-in;
+  --motion-switcher: 250ms;
+  --ease-switcher: ease-in-out;
+  --button-hover-background: transparent;
+  --button-active-background: transparent;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   --ps-measure-page: 980px;
   --ps-gutter: clamp(20px, 4vw, 56px);
   --ps-pad-tight: 12px;
@@ -74,53 +108,121 @@ html, body { height: 100%; margin: 0; }
   --ps-measure: 76ch;
 }
 :root[data-theme="liquid-glass"] {
-  --backdrop: #0c0e18;
-  --surface: #1b1e2e;
-  --surface-raised: #232843;
   --ink-strong: #c0caf5;
   --ink: #a9b1d6;
   --ink-dim: #8a94bd;
-  --accent: #7dcfff;
+  --surface: #1b1e2e;
+  --surface-raised: #232843;
+  --backdrop: #0c0e18;
   --hairline: #c0caf5;
+  --accent: #7dcfff;
   --status-success: #9ece6a;
   --status-warning: #e0af68;
   --status-danger: #f7768e;
+  --glass-blur: 22px;
+  --glass-saturate: 160%;
+  --surface-opacity: 0.55;
+  --raised-opacity: 0.55;
+  --sheen-opacity: 0.07;
+  color-scheme: dark;
   --radius-panel: 18px;
   --radius-tile: 13px;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  color-scheme: dark;
+  --pad-panel: 28px;
   --ps-pad: 28px;
+  --pad-tile: 14px;
+  --gap-grid: 20px;
+  --type-display: 46px;
+  --type-display-weight: 600;
+  --type-metric_lg: 26px;
+  --type-metric_lg-weight: 600;
+  --type-metric: 22px;
+  --type-metric-weight: 600;
+  --type-title: 20px;
+  --type-title-weight: 600;
+  --type-body: 14px;
+  --type-body-weight: 400;
+  --type-caption: 12px;
+  --type-caption-weight: 400;
+  --type-eyebrow: 11px;
+  --type-eyebrow-weight: 600;
+  --type-chip: 11px;
+  --type-chip-weight: 500;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
   --motion-fast: 120ms;
   --motion-base: 200ms;
   --motion-slow: 400ms;
   --ease-standard: ease-in-out;
   --ease-enter: ease-out;
   --ease-exit: ease-in;
+  --motion-switcher: 320ms;
+  --ease-switcher: cubic-bezier(0.34,1.56,0.64,1);
+  --button-hover-background: transparent;
+  --button-active-background: transparent;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
 
 :root[data-theme="carbon"] {
-  --backdrop: #ffffff;
-  --surface: #ffffff;
-  --surface-raised: #f4f4f4;
   --ink-strong: #161616;
   --ink: #525252;
   --ink-dim: #6f6f6f;
-  --accent: #0f62fe;
+  --surface: #ffffff;
+  --surface-raised: #f4f4f4;
+  --backdrop: #ffffff;
   --hairline: #e0e0e0;
+  --accent: #0f62fe;
   --status-success: #198038;
   --status-warning: #f1c21b;
   --status-danger: #da1e28;
+  --glass-blur: 0px;
+  --glass-saturate: 100%;
+  --surface-opacity: 1;
+  --raised-opacity: 1;
+  --sheen-opacity: 0;
+  color-scheme: light;
   --radius-panel: 0px;
   --radius-tile: 0px;
-  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
-  color-scheme: light;
+  --pad-panel: 20px;
   --ps-pad: 20px;
+  --pad-tile: 12px;
+  --gap-grid: 12px;
+  --type-display: 40px;
+  --type-display-weight: 600;
+  --type-metric_lg: 24px;
+  --type-metric_lg-weight: 600;
+  --type-metric: 22px;
+  --type-metric-weight: 600;
+  --type-title: 18px;
+  --type-title-weight: 600;
+  --type-body: 14px;
+  --type-body-weight: 400;
+  --type-caption: 12px;
+  --type-caption-weight: 400;
+  --type-eyebrow: 11px;
+  --type-eyebrow-weight: 600;
+  --type-chip: 11px;
+  --type-chip-weight: 500;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
   --motion-fast: 70ms;
   --motion-base: 110ms;
   --motion-slow: 240ms;
   --ease-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
   --ease-enter: cubic-bezier(0, 0, 0.38, 0.9);
   --ease-exit: cubic-bezier(0.2, 0, 1, 0.9);
+  --motion-switcher: 70ms;
+  --ease-switcher: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --button-hover-background: #0353e9;
+  --button-active-background: #002d9c;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
 }
 .ps-apple-dark { background: var(--backdrop); color: var(--ink); font-family: var(--font-sans);
   margin: 0; min-height: 100%; }
@@ -185,26 +287,32 @@ table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-t
 .btn-apple-dark-filled { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; cursor: pointer; border-radius: 999px; min-height: 50px; padding: 14px 20px; background: #0a84ff; color: #ffffff; font: 600 17px/1.2 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; transition: all 250ms ease-in-out; }
 .chip-apple-dark-regular { display: inline-flex; align-items: center; gap: 6px; border: 0; cursor: default; border-radius: 999px; min-height: 28px; padding: 5px 12px; background: #2c2c2e; color: #f5f5f7; font: 500 13px/1.33 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; transition: all 200ms ease-in-out; }
 .card-apple-dark-metrics { background: #2c2c2e; border-radius: 14px; border: 1px solid #38383a; overflow: hidden; }
-.card-apple-dark-metrics .card-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: transparent; }
+.card-apple-dark-metrics .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
 .card-apple-dark-metrics .card-row + .card-row { border-top: 1px solid #38383a; }
-.card-apple-dark-metrics .card-label { color: #98989d; font: 400 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
-.card-apple-dark-metrics .card-value { color: #f5f5f7; font: 600 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+.card-apple-dark-metrics .card-label { display: flex; align-items: center; gap: 8px; color: #98989d; font: 400 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; min-width: 0; }
+.card-apple-dark-metrics .card-detail { color: #98989d; font-size: 12px; }
+.card-apple-dark-metrics .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+.card-apple-dark-metrics .card-value { color: #f5f5f7; font: 600 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; text-align: right; white-space: nowrap; }
 .btn-carbon-primary { display: inline-flex; align-items: center; justify-content: space-between; gap: 6px; border: 0; cursor: pointer; border-radius: 0px; min-height: 48px; padding: 12px 64px 12px 16px; background: #0f62fe; color: #ffffff; font: 600 17px/1.2 'IBM Plex Sans', system-ui, sans-serif; transition: all 70ms cubic-bezier(0.2, 0, 0.38, 0.9); }
 .chip-carbon-gray { display: inline-flex; align-items: center; gap: 6px; border: 0; cursor: default; border-radius: 16px; min-height: 24px; padding: 2px 8px; background: #f4f4f4; color: #161616; font: 400 12px/1.33 'IBM Plex Sans', system-ui, sans-serif; transition: all 70ms cubic-bezier(0.2, 0, 0.38, 0.9); }
 .card-carbon-metrics { background: #f4f4f4; border-radius: 0px; border: 1px solid #e0e0e0; overflow: hidden; }
-.card-carbon-metrics .card-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: transparent; }
+.card-carbon-metrics .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
 .card-carbon-metrics .card-row + .card-row { border-top: 1px solid #e0e0e0; }
-.card-carbon-metrics .card-label { color: #6f6f6f; font: 400 14px/1.3 'IBM Plex Sans', system-ui, sans-serif; }
-.card-carbon-metrics .card-value { color: #161616; font: 600 14px/1.3 'IBM Plex Sans', system-ui, sans-serif; }
+.card-carbon-metrics .card-label { display: flex; align-items: center; gap: 8px; color: #6f6f6f; font: 400 14px/1.3 'IBM Plex Sans', system-ui, sans-serif; min-width: 0; }
+.card-carbon-metrics .card-detail { color: #6f6f6f; font-size: 12px; }
+.card-carbon-metrics .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+.card-carbon-metrics .card-value { color: #161616; font: 600 14px/1.3 'IBM Plex Sans', system-ui, sans-serif; text-align: right; white-space: nowrap; }
 .btn-liquid-glass-prominent { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; cursor: pointer; border-radius: 999px; min-height: 44px; padding: 12px 20px; background: #7dcfff; color: #0c0e18; font: 600 17px/1.2 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; transition: all 320ms cubic-bezier(0.34,1.56,0.64,1); -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%); box-shadow: 0 8px 24px rgba(0,0,0,0.28); }
 .chip-liquid-glass-regular { display: inline-flex; align-items: center; gap: 6px; border: 0; cursor: default; border-radius: 999px; min-height: 26px; padding: 5px 12px; background: color-mix(in srgb, #7dcfff 16%, transparent); color: #c0caf5; font: 500 13px/1.33 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; transition: all 260ms cubic-bezier(0.34,1.56,0.64,1); -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%); box-shadow: 0 2px 8px rgba(0,0,0,0.20); }
 .card-liquid-glass-metrics { background: #232843; border-radius: 14px; border: 1px solid #c0caf5; overflow: hidden; -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%); }
-.card-liquid-glass-metrics .card-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: transparent; }
+.card-liquid-glass-metrics .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
 .card-liquid-glass-metrics .card-row + .card-row { border-top: 1px solid #c0caf5; }
-.card-liquid-glass-metrics .card-label { color: #8a94bd; font: 400 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
-.card-liquid-glass-metrics .card-value { color: #c0caf5; font: 600 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }</style>
+.card-liquid-glass-metrics .card-label { display: flex; align-items: center; gap: 8px; color: #8a94bd; font: 400 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; min-width: 0; }
+.card-liquid-glass-metrics .card-detail { color: #8a94bd; font-size: 12px; }
+.card-liquid-glass-metrics .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+.card-liquid-glass-metrics .card-value { color: #c0caf5; font: 600 14px/1.3 -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; text-align: right; white-space: nowrap; }</style>
 </head><body>
-<div class="ps-apple-dark" data-dom-owner="pageshell"><div class="ps-main" data-dom-owner="pageshell"><nav class="site-nav nav-liquid-glass nav-carbon nav-apple-dark" data-dom-owner="webkit.nav" aria-label="Site"><a href="index.html" data-theme-propagate>home</a><a href="showcase.html" data-theme-propagate aria-current="page">showcase</a><a href="studio.html" data-theme-propagate>studio</a><a href="settings.html" data-theme-propagate>settings</a></nav><h1 class="ps-title" data-dom-owner="pageshell">Design-language conformance</h1><p class="ps-intro" data-dom-owner="pageshell">Every active design language, rendered from its own cited doctrine, with the conformance receipt for each invariant. Apple Dark is the house language; your chosen language follows you across the governed site.</p><p class="ps-crumbs" data-dom-owner="pageshell"><a href="index.html" data-theme-propagate>home</a> · <a href="studio.html" data-theme-propagate>studio</a> · <a href="settings.html" data-theme-propagate>settings</a></p><section class="ps-panel" data-dom-owner="pageshell"><h2 class="ps-panel-h" data-dom-owner="pageshell">How to read this</h2><div class="legend" data-dom-owner="page.showcase"><span><b class="badge badge-pass" data-dom-owner="page.showcase">pass</b> a deterministic invariant the render satisfies</span><span><b class="badge badge-fail" data-dom-owner="page.showcase">fail</b> a deterministic invariant the render violates (shown honestly)</span><span><b class="badge badge-candidate" data-dom-owner="page.showcase">cannot certify</b> a judgment/deferred aspect (e.g. contrast over glass) — automation cannot decide it; a human/visual receipt does</span></div></section><section class="lang" data-dom-owner="page.showcase" data-profile="apple-dark"><header><h2>apple-dark</h2><p class="tally" data-dom-owner="page.showcase">27 pass · 0 fail · 3 cannot certify</p></header><div class="stage" data-dom-owner="page.showcase" style="background:#000000"><div class="stage-row" data-dom-owner="page.showcase"><button class="btn-apple-dark-filled" data-dom-owner="webkit.button">filled</button><span class="chip-apple-dark-regular" data-dom-owner="webkit.chip">regular</span></div><div class="stage-row" data-dom-owner="page.showcase"><div class="card-apple-dark-metrics card-group" data-dom-owner="webkit.card"><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card">Commits</span><span class="card-value" data-dom-owner="webkit.card">1,240</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card">Current streak</span><span class="card-value" data-dom-owner="webkit.card">23 days</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card">Languages</span><span class="card-value" data-dom-owner="webkit.card">12</span></div></div></div></div><div class="table-scroll" data-dom-owner="page.showcase"><table class="invariants" data-dom-owner="page.showcase"><thead><tr><th>invariant</th><th>law</th><th>verdict</th><th>receipt</th></tr></thead>
+<div class="ps-apple-dark" data-dom-owner="pageshell"><div class="ps-main" data-dom-owner="pageshell"><nav class="site-nav nav-liquid-glass nav-carbon nav-apple-dark" data-dom-owner="webkit.nav" aria-label="Site"><a href="index.html" data-theme-propagate>home</a><a href="showcase.html" data-theme-propagate aria-current="page">showcase</a><a href="studio.html" data-theme-propagate>studio</a><a href="settings.html" data-theme-propagate>settings</a></nav><h1 class="ps-title" data-dom-owner="pageshell">Design-language conformance</h1><p class="ps-intro" data-dom-owner="pageshell">Every active design language, rendered from its own cited doctrine, with the conformance receipt for each invariant. Apple Dark is the house language; your chosen language follows you across the governed site.</p><p class="ps-crumbs" data-dom-owner="pageshell"><a href="index.html" data-theme-propagate>home</a> · <a href="studio.html" data-theme-propagate>studio</a> · <a href="settings.html" data-theme-propagate>settings</a></p><section class="ps-panel" data-dom-owner="pageshell"><h2 class="ps-panel-h" data-dom-owner="pageshell">How to read this</h2><div class="legend" data-dom-owner="page.showcase"><span><b class="badge badge-pass" data-dom-owner="page.showcase">pass</b> a deterministic invariant the render satisfies</span><span><b class="badge badge-fail" data-dom-owner="page.showcase">fail</b> a deterministic invariant the render violates (shown honestly)</span><span><b class="badge badge-candidate" data-dom-owner="page.showcase">cannot certify</b> a judgment/deferred aspect (e.g. contrast over glass) — automation cannot decide it; a human/visual receipt does</span></div></section><section class="lang" data-dom-owner="page.showcase" data-profile="apple-dark"><header><h2>apple-dark</h2><p class="tally" data-dom-owner="page.showcase">27 pass · 0 fail · 3 cannot certify</p></header><div class="stage" data-dom-owner="page.showcase" style="background:#000000"><div class="stage-row" data-dom-owner="page.showcase"><button class="btn-apple-dark-filled" data-dom-owner="webkit.button">filled</button><span class="chip-apple-dark-regular" data-dom-owner="webkit.chip">regular</span></div><div class="stage-row" data-dom-owner="page.showcase"><div class="card-apple-dark-metrics card-group" data-dom-owner="webkit.card"><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Commits</span></span><span class="card-value" data-dom-owner="webkit.card">1,240</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Current streak</span></span><span class="card-value" data-dom-owner="webkit.card">23 days</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Languages</span></span><span class="card-value" data-dom-owner="webkit.card">12</span></div></div></div></div><div class="table-scroll" data-dom-owner="page.showcase"><table class="invariants" data-dom-owner="page.showcase"><thead><tr><th>invariant</th><th>law</th><th>verdict</th><th>receipt</th></tr></thead>
 <tbody class="aspect-group" data-dom-owner="page.showcase" data-aspect="page-shell">
 <tr class="aspect-head" data-dom-owner="page.showcase"><th colspan="4" scope="colgroup">page-shell · <span class="cite" data-dom-owner="page.showcase">docs/design/pageshell.md</span></th></tr>
 <tr data-invariant="ap-page-backdrop" data-status="pass"><td class="inv" data-dom-owner="page.showcase">ap-page-backdrop</td><td class="law" data-dom-owner="page.showcase">the page chrome paints the language backdrop token</td><td class="verdict" data-dom-owner="page.showcase"><span class="badge badge-pass" data-dom-owner="page.showcase">pass</span></td><td class="receipt" data-dom-owner="page.showcase"></td></tr>
@@ -266,7 +374,7 @@ table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-t
 <tr data-invariant="ap-card-fills" data-status="candidate"><td class="inv" data-dom-owner="page.showcase">ap-card-fills</td><td class="law" data-dom-owner="page.showcase">content fills the card (no giant dead space)</td><td class="verdict" data-dom-owner="page.showcase"><span class="badge badge-candidate" data-dom-owner="page.showcase">cannot certify</span></td><td class="receipt" data-dom-owner="page.showcase">present · token-derived-reconstruction<br><code>assets/receipts/apple-dark/ap-card-fills.png</code></td></tr>
 </tbody>
 </table></div></section>
-<section class="lang" data-dom-owner="page.showcase" data-profile="carbon"><header><h2>carbon</h2><p class="tally" data-dom-owner="page.showcase">27 pass · 0 fail · 3 cannot certify</p></header><div class="stage" data-dom-owner="page.showcase" style="background:#ffffff"><div class="stage-row" data-dom-owner="page.showcase"><button class="btn-carbon-primary" data-dom-owner="webkit.button"><span class="btn-label" data-dom-owner="webkit.button">primary</span><svg class="btn-icon" data-dom-owner="webkit.button" aria-hidden="true" width="16" height="16"></svg></button><span class="chip-carbon-gray" data-dom-owner="webkit.chip"><span class="chip-label" data-dom-owner="webkit.chip">gray</span><button class="chip-dismiss" data-dom-owner="webkit.chip" aria-label="Remove gray">&times;</button></span></div><div class="stage-row" data-dom-owner="page.showcase"><div class="card-carbon-metrics card-group" data-dom-owner="webkit.card"><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card">Commits</span><span class="card-value" data-dom-owner="webkit.card">1,240</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card">Current streak</span><span class="card-value" data-dom-owner="webkit.card">23 days</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card">Languages</span><span class="card-value" data-dom-owner="webkit.card">12</span></div></div></div></div><div class="table-scroll" data-dom-owner="page.showcase"><table class="invariants" data-dom-owner="page.showcase"><thead><tr><th>invariant</th><th>law</th><th>verdict</th><th>receipt</th></tr></thead>
+<section class="lang" data-dom-owner="page.showcase" data-profile="carbon"><header><h2>carbon</h2><p class="tally" data-dom-owner="page.showcase">27 pass · 0 fail · 3 cannot certify</p></header><div class="stage" data-dom-owner="page.showcase" style="background:#ffffff"><div class="stage-row" data-dom-owner="page.showcase"><button class="btn-carbon-primary" data-dom-owner="webkit.button"><span class="btn-label" data-dom-owner="webkit.button">primary</span><svg class="btn-icon" data-dom-owner="webkit.button" aria-hidden="true" width="16" height="16"></svg></button><span class="chip-carbon-gray" data-dom-owner="webkit.chip"><span class="chip-label" data-dom-owner="webkit.chip">gray</span><button class="chip-dismiss" data-dom-owner="webkit.chip" aria-label="Remove gray">&times;</button></span></div><div class="stage-row" data-dom-owner="page.showcase"><div class="card-carbon-metrics card-group" data-dom-owner="webkit.card"><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Commits</span></span><span class="card-value" data-dom-owner="webkit.card">1,240</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Current streak</span></span><span class="card-value" data-dom-owner="webkit.card">23 days</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Languages</span></span><span class="card-value" data-dom-owner="webkit.card">12</span></div></div></div></div><div class="table-scroll" data-dom-owner="page.showcase"><table class="invariants" data-dom-owner="page.showcase"><thead><tr><th>invariant</th><th>law</th><th>verdict</th><th>receipt</th></tr></thead>
 <tbody class="aspect-group" data-dom-owner="page.showcase" data-aspect="page-shell">
 <tr class="aspect-head" data-dom-owner="page.showcase"><th colspan="4" scope="colgroup">page-shell · <span class="cite" data-dom-owner="page.showcase">docs/design/pageshell.md</span></th></tr>
 <tr data-invariant="cb-page-backdrop" data-status="pass"><td class="inv" data-dom-owner="page.showcase">cb-page-backdrop</td><td class="law" data-dom-owner="page.showcase">the page chrome paints the language backdrop token</td><td class="verdict" data-dom-owner="page.showcase"><span class="badge badge-pass" data-dom-owner="page.showcase">pass</span></td><td class="receipt" data-dom-owner="page.showcase"></td></tr>
@@ -328,7 +436,7 @@ table.invariants { width: 100%; border-collapse: collapse; font-size: var(--ps-t
 <tr data-invariant="cb-card-fills" data-status="candidate"><td class="inv" data-dom-owner="page.showcase">cb-card-fills</td><td class="law" data-dom-owner="page.showcase">content fills the Tile (no giant dead space)</td><td class="verdict" data-dom-owner="page.showcase"><span class="badge badge-candidate" data-dom-owner="page.showcase">cannot certify</span></td><td class="receipt" data-dom-owner="page.showcase">present · token-derived-reconstruction<br><code>assets/receipts/carbon/cb-card-fills.png</code></td></tr>
 </tbody>
 </table></div></section>
-<section class="lang" data-dom-owner="page.showcase" data-profile="liquid-glass"><header><h2>liquid-glass</h2><p class="tally" data-dom-owner="page.showcase">24 pass · 0 fail · 3 cannot certify</p></header><div class="stage" data-dom-owner="page.showcase" style="background:#0c0e18"><div class="stage-row" data-dom-owner="page.showcase"><button class="btn-liquid-glass-prominent" data-dom-owner="webkit.button">prominent</button><span class="chip-liquid-glass-regular" data-dom-owner="webkit.chip">regular</span></div><div class="stage-row" data-dom-owner="page.showcase"><div class="card-liquid-glass-metrics card-group" data-dom-owner="webkit.card"><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card">Commits</span><span class="card-value" data-dom-owner="webkit.card">1,240</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card">Current streak</span><span class="card-value" data-dom-owner="webkit.card">23 days</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card">Languages</span><span class="card-value" data-dom-owner="webkit.card">12</span></div></div></div></div><div class="table-scroll" data-dom-owner="page.showcase"><table class="invariants" data-dom-owner="page.showcase"><thead><tr><th>invariant</th><th>law</th><th>verdict</th><th>receipt</th></tr></thead>
+<section class="lang" data-dom-owner="page.showcase" data-profile="liquid-glass"><header><h2>liquid-glass</h2><p class="tally" data-dom-owner="page.showcase">24 pass · 0 fail · 3 cannot certify</p></header><div class="stage" data-dom-owner="page.showcase" style="background:#0c0e18"><div class="stage-row" data-dom-owner="page.showcase"><button class="btn-liquid-glass-prominent" data-dom-owner="webkit.button">prominent</button><span class="chip-liquid-glass-regular" data-dom-owner="webkit.chip">regular</span></div><div class="stage-row" data-dom-owner="page.showcase"><div class="card-liquid-glass-metrics card-group" data-dom-owner="webkit.card"><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Commits</span></span><span class="card-value" data-dom-owner="webkit.card">1,240</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Current streak</span></span><span class="card-value" data-dom-owner="webkit.card">23 days</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Languages</span></span><span class="card-value" data-dom-owner="webkit.card">12</span></div></div></div></div><div class="table-scroll" data-dom-owner="page.showcase"><table class="invariants" data-dom-owner="page.showcase"><thead><tr><th>invariant</th><th>law</th><th>verdict</th><th>receipt</th></tr></thead>
 <tbody class="aspect-group" data-dom-owner="page.showcase" data-aspect="page-shell">
 <tr class="aspect-head" data-dom-owner="page.showcase"><th colspan="4" scope="colgroup">page-shell · <span class="cite" data-dom-owner="page.showcase">docs/design/pageshell.md</span></th></tr>
 <tr data-invariant="lg-page-backdrop" data-status="pass"><td class="inv" data-dom-owner="page.showcase">lg-page-backdrop</td><td class="law" data-dom-owner="page.showcase">the page chrome paints the language backdrop token</td><td class="verdict" data-dom-owner="page.showcase"><span class="badge badge-pass" data-dom-owner="page.showcase">pass</span></td><td class="receipt" data-dom-owner="page.showcase"></td></tr>

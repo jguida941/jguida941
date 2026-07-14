@@ -138,8 +138,8 @@ class ThemeContinuityReceiptContract(unittest.TestCase):
             DECLARED_HORIZONTAL_SCROLL_CONTAINERS,
             {
                 "index": (
-                    {"class": "cal-wrap", "parent": "#calendar-panel"},
-                    {"class": "heat-wrap", "parent": "#rhythm-panel"},
+                    {"class": "db-calendar-scroll", "parent": "#calendar-panel"},
+                    {"class": "db-rhythm-scroll", "parent": "#rhythm-panel"},
                 ),
                 "showcase": ({"class": "table-scroll", "parent": ".lang"},),
                 "settings": ({"class": "table-scroll", "parent": ".base"},),

@@ -1,25 +1,61 @@
 {
   "artifact": "assets/receipts/pages/index/dom-probe-390.json",
+  "artifact_sha256": "3fb3b58958c08f168c9a053c5610c0597423f5f384d5a43a305197669f7fe3e5",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
+  "capture_origin": "ephemeral-local-http",
   "chrome_version": "Google Chrome 150.0.7871.115",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
     "--no-first-run",
     "--no-default-browser-check",
-    "--allow-file-access-from-files",
     "--window-size=800,1000",
-    "--virtual-time-budget=2500",
+    "--virtual-time-budget=5000",
     "--dump-dom",
-    "file:///var/folders/6_/_15pvmxd7yq5qrnmzr92dkr00000gn/T/index-probe-po3uobwa/index.html"
+    "http://127.0.0.1:62398/__dom_probe__.html?page=index&viewport=390&height=1000"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
+  "data_path": "site/data/profile_snapshot.json",
+  "data_sha256": "c8acce6d0fb75f55b52da0fff5b105459d4aa603da6d22edd6c8696852399f7f",
+  "empty_state_hidden": {
+    "flagship": true,
+    "focus-next": false,
+    "focus-now": true,
+    "focus-shipped": true
+  },
+  "hydration_state": "complete",
   "kind": "chrome-headless-dom-probe",
   "page": "index",
-  "page_sha256": "0ff28a77296023fad80548cc5ac8ecf2376321a8ad5276b7047578ac32c11e98",
+  "page_sha256": "92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f",
   "producer": "scripts/quality/headless_receipts.py",
+  "prototype_origin_counts": {
+    "calendar-cell": 367,
+    "calendar-scale": 5,
+    "event-mix": 4,
+    "focus-item": 5,
+    "heat-cell": 168,
+    "heat-day": 7,
+    "heat-hour": 5,
+    "language-legend": 6,
+    "language-segment": 6,
+    "pipeline-status": 4,
+    "repository": 3
+  },
+  "readiness": {
+    "elapsed_ms": 100,
+    "outcome": "ready",
+    "selector": "[data-dashboard-hydration]",
+    "state": "complete"
+  },
   "route": "site/index.html",
+  "sentinel_values": {
+    "cal-total": "9,571 contributions",
+    "hero-contributions": "9,571",
+    "lang-count": "26 languages",
+    "lang-name": "Python",
+    "rhythm-meta": "82 events \u00b7 New York"
+  },
   "viewport": {
     "height": 1000,
     "width": 390

@@ -30,7 +30,7 @@
   computed-style/geometry facts and provenance. **D1 explicitly supersedes P5-ARCH's earlier
   “freeze the scorecard and drop the runtime switcher” decision**; its content/pattern freeze
   remains, but not its theme ban.
-- ✅ **P5-COVERAGE W2 — closed-world static DOM ownership.** Every class-bearing start tag in
+- ✅ **P5-COVERAGE W2/W3 — closed-world static DOM ownership.** Every static body element in
   committed manifest pages now resolves to an exact emitter-owned `(page, tag, classes, count)`
   signature in `contracts/dom_cover.json`, proven by sentinel rerenders through the manifest.
   Index's 49 bespoke fingerprints / 115 occurrences are immutable, shrinking W3 debt; its
@@ -38,6 +38,19 @@
   manifest route until W4 replaces the honest `committed-static-dom` claim with post-hydration
   rendered facts. Owner/emitter and index-owner rosters are independently admitted, so neither a
   blanket `page.index` marker nor an alias around `render_dashboard` can launder debt.
+- ✅ **P5-COVERAGE W3 — index is inside the governed emitter world.** `site/index.html` is now
+  generated through pageshell plus narrow `webkit.dashboard`, `webkit.nav`, `webkit.switcher`, and
+  `webkit.card` emitters. The switcher and both grouped readouts consume the selected profile; the
+  switcher states are exact per-profile declaration maps, and the hydration program may only clone
+  contract-pinned inert prototypes through typed writers and closed bounds. W2's bespoke index
+  fingerprints remain immutable resolved history, while the live DOM cover has zero index debt.
+  Static visible text is owner/parent pinned with boundary-space-sensitive hashes; runtime hydration
+  is a frozen singleton program, and unproved empty-state claims remain hidden. Chrome screenshots
+  and 390px probes use a hermetic HTTP origin; hydration is accepted only at `complete` with
+  snapshot-derived sentinel text, exact prototype counts, empty-state parity, and a pinned data hash.
+  The 1280 PNG and readiness facts come from one Chrome page session, and artifact-hash sidecars make
+  interrupted publication fail closed. Local composition measurements remain the declared unresolved
+  `W5-dashboard-literal-provenance` gap rather than false owner ratification. **367 green.**
 - ✅ **P5-THEME-ROSTER-AUTHORITY (supersedes the old public Power BI theme experiment)** —
   `contracts/design_profiles/_index.json.active_design_profiles` is the public roster authority;
   `site/index.html` remains the one canonical public surface with one selector exposing exactly

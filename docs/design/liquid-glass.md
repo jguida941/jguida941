@@ -86,24 +86,26 @@ background). Apple grouped ⇒ only the container is chromed; anti-pattern ⇒ e
 ## 6. Mapping to THIS repo (the real one)
 
 The dashboard is **generated** by `scripts/pipeline/web_render.py::render_dashboard()` into the
-committed `site/index.html` (drift-guarded by `tests/contracts/test_web_dashboard.py`). The CSS is
-emitted by `_component_css`. The current readout clusters use `.tiles` (grid) of `.tile` cards;
-`.tile` independently carries `background` + `border` + `border-radius` (`web_render.py` ~lines
-101–104) — the chrome that makes each metric its own box.
+committed `site/index.html` (drift-guarded by `tests/contracts/test_web_dashboard.py`). W3 removed
+the page-local component CSS and routes the document through pageshell plus the narrow
+`webkit.dashboard`, `webkit.nav`, `webkit.switcher`, and `webkit.card` emitters. Both scalar readouts
+are switchable grouped cards, so Liquid Glass material is selected by root profile state rather than
+being copied into dashboard CSS.
 
 | Doctrine concept | Real artifact |
 |---|---|
-| KPI readout (6 scalar metrics) | the scorecard `.tiles` → `.tile` × 6 |
-| Raw-Data Snapshot readout | the snapshot `.tiles` → `.tile` × N |
-| Per-metric chrome (the tell) | `.tile { background; border:1px; border-radius }` |
-| Target | one chromed `.mgroup` container of bare hairline-divided `.mrow` Value-1 rows |
+| KPI readout (6 scalar metrics) | `webkit.card` dashboard-score group with six `card-row` values |
+| Raw-Data Snapshot readout | `webkit.card` dashboard-snapshot group with six `card-row` values |
+| Per-metric chrome (the tell) | forbidden: each row is chrome-less inside one governed container |
+| Runtime content | typed, bounded clones from contract-pinned inert prototypes |
 
 The CI-coverage **ring** and the **hero** are single charts/headers (HIG charting-data) and are
 **out of scope** — the grouped-readout rule applies only to clusters of ≥3 sibling scalar metrics.
 
 ## 7. The deterministic gate (browserless) vs the judgment (visual receipt)
 
-Honest split — this repo's test suite has no headless browser, so (the deterministic gate is
+Honest split — the structural gate remains browserless, while Chrome receipts observe the hydrated
+surface. The deterministic gate is
 `test_design_character.test_metric_readout_is_grouped_not_giant_boxes`, RED-first, mutation-proven,
 codex-agreed):
 - **DETERMINISTIC (red-now/green-after):** the STRUCTURAL composition —

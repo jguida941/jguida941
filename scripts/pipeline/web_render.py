@@ -1,531 +1,407 @@
-"""Generate the web dashboard (site/index.html) — the second projection of the one
-analytics contract, built the SAME way the SVG cards are: from the single design-token
-source (scripts.rendering.design_tokens) + the shared snapshot.
+"""Generate the governed public dashboard at ``site/index.html``.
 
-Design laws made literal here:
-  * IA = Power BI: one dominant hero KPI, then a bento of cards; every number has ONE
-    home (no metric repeated across cards); tabular figures everywhere.
-  * Public theme roster = active design profiles. The switcher exposes only governed
-    active profiles; reserved profiles stay out of the canonical site surface.
-  * Projection parity: the page hydrates client-side from data/profile_snapshot.json
-    (same source as the README SVGs), so the bot's hourly refresh flows in with no
-    regeneration. The committed index.html is GENERATED — a drift guard forbids hand
-    edits, and a token-parity guard requires emit_css_root() verbatim.
-
-Privacy: token_mode and any private-repo file content are NEVER emitted — only public
-counts/metadata. The page is static (GitHub Pages safe): no inline secrets, no server.
+W3 makes this module composition-only: pageshell owns chrome, webkit owns
+navigation/switcher/cards/dashboard surface, and this file owns document assembly
+plus the hash-pinned, prototype-only hydration program. candidate_only.
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
-from scripts.rendering.design_tokens import DEFAULT_THEME, THEME_META, THEMES, emit_css_root
+from scripts.rendering.design_tokens import DEFAULT_THEME
+
 
 DATA_URL = "./data/profile_snapshot.json"
 
 
-def _component_css() -> str:
-    """Component styles — every value resolves from a token var (no raw hex here)."""
-    return """
-*,*::before,*::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  margin: 0;
-  font-family: var(--font-sans);
-  background:
-    radial-gradient(1200px 800px at 50% -10%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
-    var(--backdrop);
-  color: var(--ink);
-  line-height: 1.45;
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: "tnum" 1, "cv01" 1;
-  min-height: 100vh;
-  overflow-x: hidden;  /* a min-width child (calendar/heatmap) scrolls in its own wrap, never the page */
-}
-.wrap { max-width: 980px; margin: 0 auto; padding: clamp(20px, 4vw, 56px) 20px 72px; }
-.num { font-variant-numeric: tabular-nums; }
+def _lang_colors_json() -> str:
+    from scripts.core.config import LANG_COLORS
 
-/* --- glass panel (governed material) --- */
-.panel {
-  position: relative;
-  background: color-mix(in srgb, var(--surface) calc(var(--surface-opacity) * 100%), transparent);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  border: 1px solid color-mix(in srgb, var(--hairline) 16%, transparent);
-  border-radius: var(--radius-panel);
-  box-shadow: 0 24px 60px -28px rgba(0,0,0,.65), inset 0 1px 0 color-mix(in srgb, white calc(var(--sheen-opacity)*100%), transparent);
-  padding: var(--pad-panel, clamp(20px, 3vw, 30px));
-  margin-bottom: var(--gap-grid, 20px);
-}
-.eyebrow {
-  font-size: var(--type-eyebrow); font-weight: var(--type-eyebrow-weight);
-  letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); margin: 0 0 6px;
-}
-.title { font-size: var(--type-title); font-weight: var(--type-title-weight); color: var(--ink-strong); margin: 0; }
-.hairline { height: 1px; background: color-mix(in srgb, var(--hairline) 14%, transparent); border: 0; margin: 16px 0 22px; }
-.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.section-meta { font-size: var(--type-caption); color: var(--ink-dim); }
-
-/* --- hero --- */
-.hero .topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.hero h1 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 600; color: var(--ink-strong); margin: 2px 0 4px; letter-spacing: -0.01em; }
-.hero .tag { font-size: var(--type-body); color: var(--ink); margin: 0; }
-.hero .kpi { display: flex; align-items: flex-end; gap: 28px; margin-top: 24px; flex-wrap: wrap; }
-.hero .kpi-value { font-size: clamp(46px, 8vw, 72px); font-weight: 600; color: var(--ink-strong); line-height: .96; letter-spacing: -0.02em; }
-.hero .kpi-label { font-size: var(--type-body); color: var(--ink); margin-top: 8px; }
-.hero .stats { display: flex; gap: 26px; padding-bottom: 6px; }
-.stat .v { font-size: var(--type-metric_lg); font-weight: 600; color: var(--ink-strong); }
-.stat .l { font-size: var(--type-caption); color: var(--ink-dim); }
-.live { display: inline-flex; align-items: center; gap: 7px; font-size: var(--type-caption); color: var(--ink-dim); margin-top: 14px; }
-.live .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-success); box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-success) 60%, transparent); animation: pulse 2.4s infinite; }
-@keyframes pulse { 0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--status-success) 55%,transparent);} 70%{box-shadow:0 0 0 7px transparent;} 100%{box-shadow:0 0 0 0 transparent;} }
-
-/* --- theme switcher --- */
-.switcher { display: inline-flex; gap: 3px; padding: 3px; border-radius: 999px;
-  background: color-mix(in srgb, var(--surface-raised) 70%, transparent);
-  border: 1px solid color-mix(in srgb, var(--hairline) 14%, transparent); }
-.switcher button {
-  font: inherit; font-size: var(--type-chip); font-weight: var(--type-chip-weight); color: var(--ink-dim);
-  background: transparent; border: 0; border-radius: 999px; padding: 7px 13px; cursor: pointer; white-space: nowrap;
-  transition: color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard); }
-.switcher button[aria-pressed="true"] { color: var(--ink-strong); background: color-mix(in srgb, var(--accent) 22%, transparent); }
-.switcher button:hover { color: var(--ink); }
-
-/* --- bento grid --- */
-.bento { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap-grid, 20px); align-items: start; }
-.bento .panel { margin: 0; }
-.span-2 { grid-column: 1 / -1; }
-
-/* --- metric tiles --- */
-/* Apple grouped inset-list readout (docs/design/liquid-glass.md, cited HIG): a cluster of >=3
-   scalar metrics is ONE chromed container of BARE, hairline-divided 'Value 1' rows (label left,
-   value right) — never N independently-chromed cards. Only .mgroup carries chrome; rows are
-   divided by a 1px hairline, the value dominates. Closes the giant-empty-box anti-pattern. */
-.mgroup { border: 1px solid color-mix(in srgb, var(--hairline) 12%, transparent); border-radius: var(--radius-tile); background: color-mix(in srgb, var(--surface-raised) calc(var(--raised-opacity)*100%), transparent); overflow: hidden; }
-.mrow { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 11px var(--pad-tile, 16px); min-height: 44px; }
-.mrow + .mrow { border-top: 1px solid color-mix(in srgb, var(--hairline) 9%, transparent); }
-.ml { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.mt { display: flex; align-items: center; gap: 8px; font-size: var(--type-body); font-weight: 600; color: var(--ink); }
-.ms { font-size: var(--type-caption); color: var(--ink-dim); }
-.mv { font-size: var(--type-metric); font-weight: 600; color: var(--ink-strong); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.mrow svg { width: 15px; height: 15px; stroke: var(--ink-dim); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
-
-/* --- ring (CI coverage) --- */
-.ring { --p: 0; position: relative; width: 64px; height: 64px; border-radius: 50%; flex: 0 0 auto;
-  background: conic-gradient(var(--accent) calc(var(--p)*1%), color-mix(in srgb,var(--hairline) 12%, transparent) 0);
-  display: grid; place-items: center; }
-.ring::after { content: ""; position: absolute; inset: 8px; border-radius: 50%; background: var(--surface-raised); z-index: 0; }
-.ring span { position: relative; z-index: 1; font-size: var(--type-caption); font-weight: 600; color: var(--ink-strong); }
-.ring-row { display: flex; align-items: center; gap: 14px; }
-
-/* --- language bar --- */
-.langbar { height: 13px; border-radius: 7px; overflow: hidden; display: flex; background: color-mix(in srgb,var(--hairline) 10%, transparent); }
-.langbar i { height: 100%; display: block; }
-.langlegend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 16px; margin-top: 16px; }
-.langlegend .row { display: flex; align-items: center; gap: 8px; font-size: var(--type-caption); }
-.langlegend .swatch { width: 9px; height: 9px; border-radius: 3px; flex: 0 0 auto; }
-.langlegend .nm { color: var(--ink); }
-.langlegend .pc { margin-left: auto; color: var(--ink-strong); font-weight: 600; }
-/* --- list rows (repos / focus) --- */
-.rows { display: flex; flex-direction: column; gap: 8px; }
-.rrow { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--radius-tile);
-  background: color-mix(in srgb, var(--surface-raised) calc(var(--raised-opacity)*100%), transparent);
-  border: 1px solid color-mix(in srgb, var(--hairline) 10%, transparent); }
-.rrow .ldot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
-.rrow .nm { color: var(--ink-strong); font-weight: 500; font-size: var(--type-body); text-decoration: none; }
-.rrow a.nm:hover { color: var(--accent); }
-.rrow .meta { margin-left: auto; font-size: var(--type-caption); color: var(--ink-dim); text-align: right; white-space: nowrap; }
-.lockico { width: 12px; height: 12px; stroke: var(--ink-dim); fill: none; stroke-width: 1.6; }
-.lanes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.lane h4 { font-size: var(--type-eyebrow); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); margin: 0 0 10px; }
-.lane .item { font-size: var(--type-caption); color: var(--ink); padding: 8px 0; border-top: 1px solid color-mix(in srgb,var(--hairline) 10%, transparent); }
-.lane .item b { display: block; color: var(--ink-strong); font-weight: 500; font-size: var(--type-body); }
-
-/* --- pipeline status chips --- */
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-/* Status by SHAPE + label (DESIGN_SPEC 3.6): a neutral pill carries a small status
-   glyph — colour lives in the 13px icon, never a saturated full-hue button. */
-.chip { display: inline-flex; align-items: center; gap: 7px; font-size: var(--type-chip); font-weight: var(--type-chip-weight);
-  padding: 6px 12px; border-radius: 999px; color: var(--ink);
-  background: color-mix(in srgb, var(--surface-raised) 70%, transparent);
-  border: 1px solid color-mix(in srgb, var(--hairline) 12%, transparent); }
-.chip svg { width: 13px; height: 13px; fill: none; stroke: var(--ink-dim); stroke-width: 2.2;
-  stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
-.chip.ok svg { stroke: var(--status-success); }
-.chip.warn svg { stroke: var(--status-warning); }
-.chip.bad svg { stroke: var(--status-danger); }
-
-/* --- contribution calendar (intensity = accent opacity; restraint holds) --- */
-.cal-wrap { overflow-x: auto; padding-bottom: 4px; }
-.cal { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 3px; min-width: max-content; }
-.cal i { width: 11px; height: 11px; border-radius: 3px; background: color-mix(in srgb, var(--hairline) 9%, transparent); display: block; }
-.cal-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; font-size: var(--type-caption); color: var(--ink-dim); }
-.cal-scale { display: inline-flex; align-items: center; gap: 7px; }
-.cal-swatches { display: inline-flex; gap: 3px; }
-.cal-swatches i { width: 11px; height: 11px; border-radius: 3px; }
-
-/* --- activity rhythm heatmap (square-ish cells, left-aligned punch card) --- */
-.heat { display: grid; grid-template-columns: 30px 1fr; gap: 4px 8px; align-items: start; max-width: 560px; }
-.heat-days { display: grid; grid-auto-rows: 16px; gap: 4px; }
-.heat-days span { font-size: var(--type-caption); color: var(--ink-dim); line-height: 16px; }
-.heat-grid { display: grid; grid-template-columns: repeat(24, 1fr); grid-auto-rows: 16px; gap: 4px; }
-.heat-grid i { border-radius: 3px; background: color-mix(in srgb, var(--hairline) 9%, transparent); display: block; }
-.heat-hours { grid-column: 2; display: grid; grid-template-columns: repeat(24, 1fr); font-size: var(--type-caption); color: var(--ink-dim); margin-top: 7px; }
-.heat-hours span { grid-row: 1; text-align: center; }
-.mix { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 22px; }
-.mix .m { display: inline-flex; align-items: center; gap: 8px; font-size: var(--type-caption); color: var(--ink); }
-.mix .m b { color: var(--ink-strong); font-weight: 600; }
-.mix .bar { width: 52px; height: 7px; border-radius: 4px; background: color-mix(in srgb, var(--hairline) 12%, transparent); overflow: hidden; }
-.mix .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
-/* RETIRED (was: Apple drops the dense heatmap). That distinctness invariant deleted the rhythm
-   visualization and left a near-empty "When I Code" panel — the exact content-to-chrome
-   anti-pattern. Distinctness never trumps content-to-chrome: Apple shows the rhythm like every
-   theme; its distinctness comes from colour/type/density/material. The heatmap is legitimate,
-   filled content (GitHub's own contribution grid is a dense grid). */
-.heat-wrap { overflow-x: auto; }
-
-footer { text-align: center; color: var(--ink-dim); font-size: var(--type-caption); margin-top: 26px; }
-footer a { color: var(--ink); text-decoration: none; }
-
-/* --- a11y + responsive --- */
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-@media (max-width: 760px) {
-  /* section-level layout collapses to one column on a narrow screen; the metric readouts are
-     grouped inset-LISTS (.mgroup of .mrow rows), already a single dense column at every width */
-  .bento, .langlegend, .lanes { grid-template-columns: 1fr; }
-  .hero .kpi { gap: 18px; }
-  .hero .stats { gap: 18px; }
-}
-/* Phone tier (Apple HIG / WCAG 2.5.5): >=44px touch targets, tighter margins, the dense
-   heatmap scrolls inside .heat-wrap (min-width keeps cells square instead of distorting). */
-@media (max-width: 480px) {
-  .wrap { padding: 16px 12px 48px; }
-  .section-head { flex-wrap: wrap; }
-  .hero .stats { flex-wrap: wrap; gap: 14px; }
-  .switcher { width: 100%; }
-  .switcher button { flex: 1; min-height: 44px; }
-  .rrow { min-height: 44px; }
-  .heat { min-width: 460px; }
-}
-""" + _nav_parts()[1] + """
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
-@media (prefers-reduced-transparency: reduce) {
-  .panel, .switcher, .mgroup, .rrow { -webkit-backdrop-filter: none; backdrop-filter: none;
-    background: var(--surface); }
-}
-"""
+    return json.dumps(LANG_COLORS, sort_keys=True, separators=(",", ":"))
 
 
-def _svg_icon(paths: str) -> str:
-    return f'<svg viewBox="0 0 24 24" aria-hidden="true">{paths}</svg>'
+def _runtime_contract_json() -> str:
+    from scripts.rendering.webkit.dashboard import load_dashboard_contract
 
-
-# Minimal inline Lucide glyphs (currentColor via CSS stroke) for tile labels.
-_ICONS = {
-    "fire": '<path d="M12 2c1 4 4 5 4 9a4 4 0 0 1-8 0c0-1.5.7-2.4 1.3-3.2C10.5 6.5 11 4 12 2Z"/>',
-    "commit": '<circle cx="12" cy="12" r="3.2"/><path d="M3 12h5.8M15.2 12H21"/>',
-    "ci": '<path d="M20 6 9 17l-5-5"/>',
-    "workflow": '<rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><path d="M9 6h6a3 3 0 0 1 3 3v6"/>',
-    "release": '<path d="M3 11l8-8 10 10-8 8z"/><circle cx="8.5" cy="8.5" r="1.4"/>',
-    "code": '<path d="m8 6-5 6 5 6M16 6l5 6-5 6"/>',
-    "calendar": '<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/>',
-    "star": '<path d="m12 3 2.6 5.6L21 9.3l-4.5 4.3 1.1 6.1L12 17l-5.6 2.7 1.1-6.1L3 9.3l6.4-.7z"/>',
-}
-
-
-
-_NAV_LINKS = [("home", "index.html"), ("showcase", "showcase.html"),
-              ("studio", "studio.html"), ("settings", "settings.html")]
-
-
-def _nav_parts() -> tuple[str, str]:
-    """The governed site-nav band (P5-BOARD B-1b) rendered in the page's own language."""
-    from scripts.rendering.webkit.components import render_switchable_nav
-    return render_switchable_nav(DEFAULT_THEME, _NAV_LINKS, active="index.html")
-
-
-def _nav_band_html() -> str:
-    return _nav_parts()[0]
-
-
-def _hero() -> str:
-    metas = "".join(
-        f'<button type="button" data-theme-set="{name}" aria-pressed="{str(name == DEFAULT_THEME).lower()}" '
-        f'title="{THEME_META[name]["blurb"]}">{THEME_META[name]["label"]}</button>'
-        for name in THEMES
-    )
-    return f"""
-  <header class="panel hero">
-    <div class="topline">
-      <div>
-        <p class="eyebrow">GitHub Analytics · Live</p>
-        <h1 id="hero-name">@jguida941</h1>
-        <p class="tag" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p>
-        {_nav_band_html()}
-      </div>
-      <div class="switcher" role="group" aria-label="Theme">{metas}</div>
-    </div>
-    <div class="kpi">
-      <div>
-        <div class="kpi-value num" data-bind="snapshot.last_year_contributions">—</div>
-        <div class="kpi-label">contributions · last 12 months</div>
-      </div>
-      <div class="stats">
-        <div class="stat"><div class="v num" data-bind="scorecard.active_days_last_year">—</div><div class="l">active days</div></div>
-        <div class="stat"><div class="v num" data-bind="snapshot.total_repos">—</div><div class="l">public repos</div></div>
-        <div class="stat"><div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">stars</div></div>
-      </div>
-    </div>
-    <div class="live"><span class="dot"></span><span>Live · updated <span id="updated">—</span></span></div>
-  </header>"""
-
-
-def _scorecard() -> str:
-    return f"""
-  <section class="panel">
-    <div class="section-head"><div><p class="eyebrow">GitHub Signals · 12 Months</p><h2 class="title">Builder Scorecard</h2></div></div>
-    <hr class="hairline">
-    <div class="ring-row" style="margin-bottom:14px">
-      <div class="ring" id="ci-ring"><span class="num" data-bind="scorecard.ci_coverage_pct" data-suffix="%" data-round="0">—</span></div>
-      <div><div class="mt">CI coverage</div><div class="ms">of public repos automated</div></div>
-    </div>
-    <div class="mgroup">
-      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['fire'])} active days</span><span class="ms">last 12 months</span></span><span class="mv num" data-bind="scorecard.active_days_last_year">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['commit'])} active repos</span><span class="ms">last 7 days</span></span><span class="mv num" data-bind="scorecard.active_repos_7d">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['workflow'])} workflows</span><span class="ms">CI/CD pipelines</span></span><span class="mv num" data-bind="scorecard.automation_workflows">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['release'])} releases</span><span class="ms">last 30 days</span></span><span class="mv num" data-bind="scorecard.releases_30d">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['code'])} <span id="lang-name">primary language</span></span><span class="ms">share of code</span></span><span class="mv num" data-bind="scorecard.primary_lang_share_pct" data-suffix="%" data-round="0">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['calendar'])} last push</span><span class="ms">days since last commit</span></span><span class="mv num" data-bind="scorecard.days_since_last_push" data-suffix="d" data-round="0">—</span></div>
-    </div>
-  </section>"""
-
-
-def _languages() -> str:
-    return """
-  <section class="panel">
-    <div class="section-head"><div><p class="eyebrow">Code Composition</p><h2 class="title">Language Breakdown</h2></div><span class="section-meta" id="lang-count">—</span></div>
-    <hr class="hairline">
-    <div class="lang-bars">
-      <div class="langbar" id="langbar"></div>
-      <div class="langlegend" id="langlegend"></div>
-    </div>
-  </section>"""
-
-
-def _calendar() -> str:
-    return """
-  <section class="panel" id="calendar-panel" hidden>
-    <div class="section-head"><div><p class="eyebrow">Last 12 Months</p><h2 class="title">Contribution Calendar</h2></div><span class="section-meta" id="cal-total">—</span></div>
-    <hr class="hairline">
-    <div class="cal-wrap"><div class="cal" id="cal"></div></div>
-    <div class="cal-foot"><span id="cal-months"></span><span class="cal-scale">Less <span class="cal-swatches" id="cal-scale"></span> More</span></div>
-  </section>"""
-
-
-def _rhythm() -> str:
-    return """
-  <section class="panel" id="rhythm-panel" hidden>
-    <div class="section-head"><div><p class="eyebrow">Activity Rhythm</p><h2 class="title">When I Code</h2></div><span class="section-meta" id="rhythm-meta">—</span></div>
-    <hr class="hairline">
-    <div class="heat-wrap"><div class="heat"><div class="heat-days" id="heat-days"></div><div class="heat-grid" id="heat-grid"></div><div class="heat-hours" id="heat-hours"></div></div></div>
-    <div class="mix" id="event-mix"></div>
-  </section>"""
-
-
-def _repos_focus() -> str:
-    return """
-  <div class="bento">
-    <section class="panel">
-      <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
-      <hr class="hairline">
-      <div class="rows" id="flagship"></div>
-    </section>
-    <section class="panel">
-      <div class="section-head"><div><p class="eyebrow">Active Focus</p><h2 class="title">Current Focus</h2></div></div>
-      <hr class="hairline">
-      <div class="lanes" id="focus"></div>
-    </section>
-  </div>"""
-
-
-def _snapshot() -> str:
-    return """
-  <section class="panel">
-    <div class="section-head"><div><p class="eyebrow">Live GitHub Data</p><h2 class="title">Raw Data Snapshot</h2></div></div>
-    <hr class="hairline">
-    <div class="mgroup" id="snap-tiles"></div>
-    <p class="eyebrow" style="margin:20px 0 0">Pipeline Status</p>
-    <div class="chips" id="pipeline"></div>
-  </section>"""
+    contract = load_dashboard_contract()
+    payload = {
+        "bindings": contract["bindings"],
+        "copy": contract["copy"],
+        "custom_properties": contract["custom_properties"],
+        "geometry": contract["geometry"],
+        "hydration_writes": contract["hydration_writes"],
+        "intensity": contract["intensity"],
+        "limits": contract["limits"],
+        "prototypes": contract["prototypes"],
+        "runtime_policy": contract["runtime_policy"],
+        "status": contract["status"],
+    }
+    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
 
 def _script() -> str:
-    # Client-side hydration + theme switch. Reads ONLY public fields (no token_mode).
+    """Return the frozen prototype-only hydration program with data placeholders."""
     return """
-  <script>
+<script>
+(function () {
+  "use strict";
   const DATA_URL = "__DATA_URL__";
   const LANG_COLORS = __LANG_COLORS__;
-  const fmt = (n) => {
-    if (n == null || isNaN(n)) return "—";
-    n = Number(n);
-    if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1)+"M";
-    if (Math.abs(n) >= 1e4) return Math.round(n/1e3)+"k";
-    return n.toLocaleString("en-US");
+  const RUNTIME = __RUNTIME_CONTRACT__;
+  const PROTOTYPES = new Map(RUNTIME.prototypes.map((row) => [row.id, row]));
+  const STATIC_WRITES = RUNTIME.hydration_writes;
+  const counts = new Map();
+
+  const fmt = (value) => {
+    if (value == null || Number.isNaN(Number(value))) return "—";
+    const number = Number(value);
+    if (Math.abs(number) >= 1000000) return (number / 1000000).toFixed(1) + "M";
+    if (Math.abs(number) >= 10000) return Math.round(number / 1000) + "k";
+    return number.toLocaleString("en-US");
   };
-  const get = (obj, path) => path.split(".").reduce((o,k)=> (o==null?undefined:o[k]), obj);
-  const esc = (s) => String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-  const safeUrl = (u) => /^https?:\\/\\//i.test(String(u||"")) ? esc(u) : "#";
-  // Status reads by SHAPE + label, never hue alone (DESIGN_SPEC 3.6): 3 distinct glyphs.
-  const STATUS_ICON = {
-    ok: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
-    warn: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 16.5v.01"/></svg>',
-    bad: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  const get = (object, path) => path.split(".").reduce(
+    (value, key) => value == null ? undefined : value[key], object);
+  const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, Number(value) || 0));
+  const sourceColor = (name) => Object.prototype.hasOwnProperty.call(LANG_COLORS, name)
+    ? LANG_COLORS[name] : "var(--accent)";
+  const level = (value, maximum) => {
+    const ratio = maximum > 0 ? Number(value || 0) / maximum : 0;
+    if (ratio <= 0) return "0";
+    if (ratio <= RUNTIME.intensity.thresholds[1]) return "1";
+    if (ratio <= RUNTIME.intensity.thresholds[2]) return "2";
+    if (ratio <= RUNTIME.intensity.thresholds[3]) return "3";
+    return "4";
   };
 
-  function hydrate(d) {
-    document.querySelectorAll("[data-bind]").forEach(el => {
-      let v = get(d, el.getAttribute("data-bind"));
-      if (v == null) return;
-      const round = el.getAttribute("data-round");
-      if (round != null && !isNaN(v)) v = Number(v).toFixed(+round);
-      el.textContent = (typeof v === "number" || (round != null)) ? fmt(v) : v;
-      const suf = el.getAttribute("data-suffix"); if (suf) el.textContent += suf;
-    });
-    // hero meta
-    if (d.username) document.getElementById("hero-name").textContent = "@" + d.username;
-    if (d.generated_at) {
-      const dt = new Date(d.generated_at);
-      document.getElementById("updated").textContent = isNaN(dt) ? d.generated_at
-        : dt.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
-    }
-    // CI ring fill
-    const ci = get(d, "scorecard.ci_coverage_pct");
-    if (ci != null) document.getElementById("ci-ring").style.setProperty("--p", Math.max(0, Math.min(100, ci)));
-    // primary language name
-    const langs = d.top_languages || [];
-    if (langs[0] && langs[0].name) document.getElementById("lang-name").textContent = langs[0].name;
-    document.getElementById("lang-count").textContent = (get(d,"snapshot.languages_count")||langs.length) + " languages";
-    // language bar + legend
-    const top = langs.slice(0, 6);
-    const colorFor = (nm) => LANG_COLORS[nm] || "var(--accent)";
-    document.getElementById("langbar").innerHTML = top.map(l =>
-      `<i style="width:${(l.percent||0).toFixed(2)}%;background:${colorFor(l.name)}"></i>`).join("");
-    document.getElementById("langlegend").innerHTML = top.map(l =>
-      `<div class="row"><span class="swatch" style="background:${colorFor(l.name)}"></span>`+
-      `<span class="nm">${esc(l.name)}</span><span class="pc num">${(l.percent||0).toFixed(1)}%</span></div>`).join("");
-    // flagship repos
-    const repos = (d.featured_repo_facts || []).slice(0, 5);
-    document.getElementById("flagship").innerHTML = repos.map(r => {
-      const nm = r.url ? `<a class="nm" href="${safeUrl(r.url)}">${esc(r.name)}</a>` : `<span class="nm">${esc(r.name)}</span>`;
-      return `<div class="rrow"><span class="ldot" style="background:${colorFor(r.language)}"></span>${nm}`+
-        `<span class="meta">${esc(r.language||"")} · ★ ${fmt(r.stars||0)} · ${esc(r.pushed_ago||"")}</span></div>`;
-    }).join("") || `<div class="rrow"><span class="meta">No flagship repositories</span></div>`;
-    // focus lanes
-    const lanes = [["Now","now"],["Next","next"],["Shipped","shipped"]];
-    const lock = `<svg class="lockico" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
-    document.getElementById("focus").innerHTML = lanes.map(([label, key]) => {
-      const items = (get(d, "focus."+key) || []).slice(0, 3);
-      const body = items.map(it =>
-        `<div class="item"><b>${it.is_private?lock+" ":""}${esc(it.title)}</b>${esc(it.detail||"")}</div>`).join("")
-        || `<div class="item">—</div>`;
-      return `<div class="lane"><h4>${label}</h4>${body}</div>`;
-    }).join("");
-    // snapshot tiles (deduped: contributions is the hero, not repeated here)
-    const TILE = {public_scope_commits:"Commits", total_repos:"Public Repos", private_owned_repos:"Private",
-      total_stars:"Stars", prs_merged:"PRs Merged", ci_repos:"CI Repos"};
-    const rows = (d.snapshot_rows || []).filter(r => TILE[r.key]);
-    document.getElementById("snap-tiles").innerHTML = rows.slice(0, 6).map(r =>
-      `<div class="mrow"><span class="ml"><span class="mt">${esc(TILE[r.key])}</span></span><span class="mv num">${esc(r.display_value)}</span></div>`).join("");
-    // pipeline status — public source health only (never auth/credential fields)
-    const q = d.data_quality || {};
-    const cls = (s) => s==="ok"?"ok":(["error","failed","missing"].includes(s)?"bad":"warn");
-    const PIPE = [["CI","ci_status"],["Commits","commits_status"],["Releases","releases_status"],["Events","events_status"]];
-    document.getElementById("pipeline").innerHTML = PIPE.map(([nm,k]) => {
-      const s = q[k] || "unknown";
-      const state = cls(s);
-      const label = s === "ok" ? "OK" : esc(s[0].toUpperCase() + s.slice(1));
-      return `<span class="chip ${state}">${STATUS_ICON[state] || STATUS_ICON.warn}${nm} · ${label}</span>`;
-    }).join("");
-    // contribution calendar (intensity = accent opacity by level)
-    const cal = d.contribution_calendar;
-    if (cal && Array.isArray(cal.weeks) && cal.weeks.length && (cal.total || 0) > 0) {
-      const days = cal.weeks.flat().filter(x => x && x.date);
-      const maxc = Math.max(1, ...days.map(x => x.count || 0));
-      const op = [0, 38, 58, 78, 100];
-      const lvl = (c) => c <= 0 ? 0 : (c/maxc <= .25 ? 1 : c/maxc <= .5 ? 2 : c/maxc <= .75 ? 3 : 4);
-      const fill = (l) => l ? `background:color-mix(in srgb, var(--accent) ${op[l]}%, transparent)` : "";
-      const first = new Date(days[0].date + "T00:00:00Z").getUTCDay();
-      let cells = "";
-      for (let i = 0; i < first; i++) cells += "<i></i>";
-      days.forEach(dy => cells += `<i style="${fill(lvl(dy.count))}" title="${esc(dy.date)}: ${fmt(dy.count)}"></i>`);
-      document.getElementById("cal").innerHTML = cells;
-      document.getElementById("cal-total").textContent = fmt(cal.total) + " contributions";
-      const mlabel = (s) => { const t = new Date(s + "T00:00:00Z"); return isNaN(t) ? esc(s) : t.toLocaleString("en-US", {month:"short", year:"numeric"}); };
-      document.getElementById("cal-months").textContent = mlabel(days[0].date) + " – " + mlabel(days[days.length-1].date);
-      document.getElementById("cal-scale").innerHTML = [0,1,2,3,4].map(l => `<i style="${fill(l)}"></i>`).join("");
-      document.getElementById("calendar-panel").hidden = false;
-    }
-    // activity rhythm heatmap (7 weekday rows x 24 hours)
-    const rh = d.activity_rhythm;
-    if (rh && Array.isArray(rh.matrix) && rh.total) {
-      const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-      const maxm = Math.max(1, ...rh.matrix.flat());
-      const hop = [0, 30, 52, 76, 100];
-      const hlvl = (c) => c <= 0 ? 0 : (c/maxm <= .25 ? 1 : c/maxm <= .5 ? 2 : c/maxm <= .75 ? 3 : 4);
-      document.getElementById("heat-days").innerHTML = DAYS.map(x => `<span>${x}</span>`).join("");
-      document.getElementById("heat-grid").innerHTML = rh.matrix.map((row, di) =>
-        row.map((c, hi) => `<i style="${hlvl(c) ? `background:color-mix(in srgb, var(--accent) ${hop[hlvl(c)]}%, transparent)` : ""}" title="${DAYS[di]} ${String(hi).padStart(2,"0")}:00 · ${fmt(c)} events"></i>`).join("")).join("");
-      document.getElementById("heat-hours").innerHTML = [0,6,12,18,23].map(h => `<span style="grid-column:${h+1}">${String(h).padStart(2,"0")}</span>`).join("");
-      document.getElementById("rhythm-meta").textContent = fmt(rh.total) + " events · " + esc(rh.timezone || "");
-      const mix = Object.entries(rh.event_mix || {});
-      const maxmix = Math.max(1, ...mix.map(([,v]) => v));
-      document.getElementById("event-mix").innerHTML = mix.map(([k,v]) =>
-        `<span class="m"><span class="bar"><i style="width:${(v/maxmix*100).toFixed(0)}%"></i></span>${esc(k)} <b>${fmt(v)}</b></span>`).join("");
-      document.getElementById("rhythm-panel").hidden = false;
-    }
+  function permitted(writes, field, sink, name) {
+    return writes.some((row) => row.field === field && row.sink === sink && row.name === (name || null));
   }
 
-  fetch(DATA_URL, { cache: "no-store" }).then(r => r.json()).then(hydrate).catch(e => {
-    document.getElementById("hero-tag").textContent = "Could not load profile_snapshot.json";
+  function writer(root, policy) {
+    const fields = new Map();
+    if (root.dataset.field) fields.set(root.dataset.field, root);
+    root.querySelectorAll("[data-field]").forEach((node) => {
+      if (fields.has(node.dataset.field)) throw new Error("duplicate prototype field");
+      fields.set(node.dataset.field, node);
+    });
+    const nodeFor = (field, sink, name) => {
+      if (!permitted(policy.writes, field, sink, name)) throw new Error("undeclared prototype write");
+      const node = fields.get(field);
+      if (!node) throw new Error("missing prototype field");
+      return node;
+    };
+    return Object.freeze({
+      text(field, value) { nodeFor(field, "text", null).textContent = String(value == null ? "" : value); },
+      title(field, value) { nodeFor(field, "title", null).title = String(value == null ? "" : value); },
+      hidden(field, value) { nodeFor(field, "hidden", null).hidden = Boolean(value); },
+      dataEnum(field, name, value) {
+        const node = nodeFor(field, "data-enum", name);
+        const allowed = RUNTIME.runtime_policy.data_axes[name] || [];
+        const normalized = String(value);
+        if (!allowed.includes(normalized)) throw new Error("off-enum data axis");
+        node.dataset[name] = normalized;
+      },
+      customNumber(field, name, value) {
+        const node = nodeFor(field, "custom-number", name);
+        const rule = RUNTIME.custom_properties[name];
+        if (!rule || rule.kind !== "number") throw new Error("undeclared numeric property");
+        node.style.setProperty(name, String(clamp(value, rule.minimum, rule.maximum)));
+      },
+      customColor(field, name, value) {
+        const node = nodeFor(field, "custom-color", name);
+        const rule = RUNTIME.custom_properties[name];
+        if (!rule || rule.kind !== "closed-color-map") throw new Error("undeclared color property");
+        const allowed = value === "var(--accent)" || Object.values(LANG_COLORS).includes(value);
+        if (!allowed) throw new Error("off-map color");
+        node.style.setProperty(name, value);
+      },
+      safeHref(field, value) {
+        const node = nodeFor(field, "safe-href", "href");
+        const url = new URL(String(value || ""), location.href);
+        const policy = RUNTIME.runtime_policy.allowed_url;
+        if (!policy.protocols.includes(url.protocol) || !policy.hosts.includes(url.hostname)) {
+          throw new Error("unsafe repository URL");
+        }
+        node.href = url.href;
+      }
+    });
+  }
+
+  function targetFor(targetId, budgetKey) {
+    if (targetId !== "focus") return document.getElementById(targetId);
+    if (!RUNTIME.geometry.focus_lanes.includes(budgetKey)) throw new Error("off-enum focus lane");
+    return document.querySelector('[data-focus-items="' + budgetKey + '"]');
+  }
+
+  function appendClone(prototypeId, targetId, budgetKey, configure) {
+    const policy = PROTOTYPES.get(prototypeId);
+    if (!policy || policy.target !== targetId) throw new Error("undeclared prototype/target pair");
+    const count = counts.get(prototypeId) || 0;
+    if (count >= policy.max_clones) throw new Error("prototype clone cap exceeded");
+    const template = document.querySelector('template[data-prototype="' + prototypeId + '"]');
+    const target = targetFor(targetId, budgetKey);
+    if (!template || !target || target.dataset.domOwner !== policy.target_owner) {
+      throw new Error("prototype endpoint mismatch");
+    }
+    const node = template.content.firstElementChild.cloneNode(true);
+    if (!node || node.dataset.prototypeOrigin !== prototypeId
+        || node.dataset.domOwner !== policy.unit.owner) throw new Error("prototype unit mismatch");
+    configure(writer(node, policy));
+    target.append(node);
+    counts.set(prototypeId, count + 1);
+  }
+
+  function resetTargets() {
+    counts.clear();
+    for (const row of RUNTIME.prototypes) {
+      if (row.target === "focus") continue;
+      const target = document.getElementById(row.target);
+      if (!target) throw new Error("missing prototype target");
+      target.replaceChildren();
+    }
+    document.querySelectorAll("[data-focus-items]").forEach((target) => target.replaceChildren());
+  }
+
+  function staticPolicy(target, sink, name) {
+    return STATIC_WRITES.some((row) => row.target === target && row.sink === sink
+      && row.name === (name || null));
+  }
+  function staticNode(target) {
+    const node = target.startsWith("[") ? document.querySelector(target)
+      : document.getElementById(target);
+    if (!node) throw new Error("missing static write target");
+    return node;
+  }
+  function staticText(target, value) {
+    if (!staticPolicy(target, "text", null)) throw new Error("undeclared static text write");
+    staticNode(target).textContent = String(value == null ? "" : value);
+  }
+  function staticHidden(target, value) {
+    if (!staticPolicy(target, "hidden", null)) throw new Error("undeclared static hidden write");
+    staticNode(target).hidden = Boolean(value);
+  }
+  function staticSelectorHidden(target, value) {
+    if (!target.startsWith("[data-empty-state=")) throw new Error("invalid empty-state selector");
+    staticHidden(target, value);
+  }
+  function hideAllEmptyStates() {
+    STATIC_WRITES.filter((row) => row.target.startsWith('[data-empty-state="'))
+      .forEach((row) => staticSelectorHidden(row.target, true));
+  }
+  function setEmptyStateForSuccess(target, itemCount) {
+    staticSelectorHidden(target, Number(itemCount) > 0);
+  }
+  function staticDataEnum(target, name, value) {
+    if (!staticPolicy(target, "data-enum", name)) throw new Error("undeclared static data write");
+    const allowed = RUNTIME.runtime_policy.data_axes[name] || [];
+    const normalized = String(value);
+    if (!allowed.includes(normalized)) throw new Error("off-enum static data axis");
+    staticNode(target).dataset[name] = normalized;
+  }
+  function staticNumber(target, name, value) {
+    if (!staticPolicy(target, "custom-number", name)) throw new Error("undeclared static number write");
+    const rule = RUNTIME.custom_properties[name];
+    staticNode(target).style.setProperty(name, String(clamp(value, rule.minimum, rule.maximum)));
+  }
+
+  function hydrateBindings(data) {
+    const declared = new Map(RUNTIME.bindings.map((row) => [row.slot, row]));
+    document.querySelectorAll("[data-bind]").forEach((node) => {
+      const rule = declared.get(node.dataset.slot);
+      if (!rule || rule.path !== node.dataset.bind) throw new Error("binding placement drift");
+      let value = get(data, rule.path);
+      if (value == null) return;
+      if (rule.round != null) value = Number(value).toFixed(rule.round);
+      node.textContent = (typeof value === "number" || rule.round != null) ? fmt(value) : String(value);
+      if (rule.suffix) node.textContent += rule.suffix;
+    });
+  }
+
+  function hydrate(data) {
+    hideAllEmptyStates();
+    resetTargets();
+    hydrateBindings(data);
+    if (data.username) staticText("hero-name", "@" + data.username);
+    if (data.generated_at) {
+      const date = new Date(data.generated_at);
+      staticText("updated", Number.isNaN(date.valueOf()) ? data.generated_at
+        : date.toLocaleString("en-US", {month: "short", day: "numeric", hour: "numeric", minute: "2-digit"}));
+    }
+    const ci = get(data, "scorecard.ci_coverage_pct");
+    if (ci != null) staticNumber("ci-ring", "--db-progress", ci);
+
+    const languages = Array.isArray(data.top_languages)
+      ? data.top_languages.slice(0, RUNTIME.limits.languages) : [];
+    if (languages[0] && languages[0].name) staticText("lang-name", languages[0].name);
+    staticText("lang-count", fmt(get(data, "snapshot.languages_count") || languages.length) + " languages");
+    languages.forEach((language) => {
+      const color = sourceColor(language.name);
+      appendClone("language-segment", "langbar", null, (out) => {
+        out.customColor("segment", "--db-language-color", color);
+        out.customNumber("segment", "--db-share", language.percent || 0);
+      });
+      appendClone("language-legend", "langlegend", null, (out) => {
+        out.customColor("swatch", "--db-language-color", color);
+        out.text("name", language.name || "");
+        out.text("percent", Number(language.percent || 0).toFixed(1) + "%");
+      });
+    });
+
+    const repositories = Array.isArray(data.featured_repo_facts)
+      ? data.featured_repo_facts.slice(0, RUNTIME.limits.repositories) : [];
+    setEmptyStateForSuccess('[data-empty-state="flagship"]', repositories.length);
+    repositories.forEach((repository) => appendClone("repository", "flagship", null, (out) => {
+      out.customColor("dot", "--db-language-color", sourceColor(repository.language));
+      const linked = Boolean(repository.url);
+      out.hidden("link", !linked);
+      out.hidden("name", linked);
+      out.text("link", repository.name || "");
+      out.text("name", repository.name || "");
+      if (linked) out.safeHref("link", repository.url);
+      out.text("meta", (repository.language || "") + " · ★ " + fmt(repository.stars || 0)
+        + " · " + (repository.pushed_ago || ""));
+    }));
+
+    for (const lane of RUNTIME.geometry.focus_lanes) {
+      const items = Array.isArray(get(data, "focus." + lane))
+        ? get(data, "focus." + lane).slice(0, RUNTIME.limits.focus_items_per_lane) : [];
+      setEmptyStateForSuccess('[data-empty-state="focus-' + lane + '"]', items.length);
+      items.forEach((item) => appendClone("focus-item", "focus", lane, (out) => {
+        out.hidden("lock", !item.is_private);
+        out.text("title-text", item.title || "");
+        out.text("detail", item.detail || "");
+      }));
+    }
+
+    const snapshot = new Map((Array.isArray(data.snapshot_rows) ? data.snapshot_rows : [])
+      .map((row) => [row.key, row.display_value]));
+    if (!staticPolicy("snap-tiles", "text", "data-snapshot-key")) throw new Error("snapshot write not declared");
+    document.querySelectorAll("[data-snapshot-key]").forEach((node) => {
+      if (snapshot.has(node.dataset.snapshotKey)) node.textContent = String(snapshot.get(node.dataset.snapshotKey));
+    });
+
+    const quality = data.data_quality || {};
+    RUNTIME.status.pipeline.forEach((entry) => appendClone("pipeline-status", "pipeline", null, (out) => {
+      const raw = String(quality[entry.key] || "unknown");
+      const status = RUNTIME.status.map[raw] || "warn";
+      const statusLabel = raw === "ok" ? RUNTIME.copy.status_ok
+        : raw.charAt(0).toUpperCase() + raw.slice(1);
+      out.dataEnum("root", "status", status);
+      out.hidden("ok-icon", status !== "ok");
+      out.hidden("warn-icon", status !== "warn");
+      out.hidden("bad-icon", status !== "bad");
+      out.text("label", RUNTIME.copy[entry.label] + " · " + statusLabel);
+    }));
+
+    const calendar = data.contribution_calendar;
+    if (calendar && Array.isArray(calendar.weeks) && calendar.weeks.length && Number(calendar.total) > 0) {
+      const days = calendar.weeks.flat().filter((day) => day && day.date)
+        .slice(0, RUNTIME.limits.calendar_days);
+      const maximum = Math.max(1, ...days.map((day) => Number(day.count) || 0));
+      const first = days.length ? new Date(days[0].date + "T00:00:00Z").getUTCDay() : 0;
+      for (let index = 0; index < Math.min(first, RUNTIME.limits.calendar_leading_blanks); index += 1) {
+        appendClone("calendar-cell", "cal", null, (out) => out.dataEnum("cell", "level", "0"));
+      }
+      days.forEach((day) => appendClone("calendar-cell", "cal", null, (out) => {
+        out.dataEnum("cell", "level", level(day.count, maximum));
+        out.title("cell", day.date + ": " + fmt(day.count) + " contributions");
+      }));
+      RUNTIME.intensity.calendar_opacity_pct.forEach((unused, index) =>
+        appendClone("calendar-scale", "cal-scale", null,
+          (out) => out.dataEnum("scale", "level", String(index))));
+      staticText("cal-total", fmt(calendar.total) + " contributions");
+      if (days.length) {
+        const month = (source) => {
+          const date = new Date(source + "T00:00:00Z");
+          return Number.isNaN(date.valueOf()) ? source
+            : date.toLocaleString("en-US", {month: "short", year: "numeric"});
+        };
+        staticText("cal-months", month(days[0].date) + " – " + month(days[days.length - 1].date));
+      }
+      staticHidden("calendar-panel", false);
+    }
+
+    const rhythm = data.activity_rhythm;
+    if (rhythm && Array.isArray(rhythm.matrix) && Number(rhythm.total) > 0) {
+      const values = [];
+      for (let day = 0; day < RUNTIME.limits.heat_rows; day += 1) {
+        const row = Array.isArray(rhythm.matrix[day]) ? rhythm.matrix[day] : [];
+        for (let hour = 0; hour < RUNTIME.limits.heat_columns; hour += 1) values.push(Number(row[hour]) || 0);
+      }
+      const maximum = Math.max(1, ...values);
+      RUNTIME.geometry.weekdays.forEach((day) =>
+        appendClone("heat-day", "heat-days", null, (out) => out.text("label", day)));
+      values.forEach((count, index) => appendClone("heat-cell", "heat-grid", null, (out) => {
+        const day = Math.floor(index / RUNTIME.limits.heat_columns);
+        const hour = index % RUNTIME.limits.heat_columns;
+        out.dataEnum("cell", "level", level(count, maximum));
+        out.title("cell", RUNTIME.geometry.weekdays[day] + " " + String(hour).padStart(2, "0")
+          + ":00 · " + fmt(count) + " events");
+      }));
+      RUNTIME.geometry.hour_labels.forEach((hour) => appendClone("heat-hour", "heat-hours", null, (out) => {
+        out.text("label", String(hour).padStart(2, "0"));
+        out.customNumber("label", "--db-column", hour + 1);
+      }));
+      const mix = Object.entries(rhythm.event_mix || {}).slice(0, RUNTIME.limits.event_mix);
+      const mixMaximum = Math.max(1, ...mix.map((entry) => Number(entry[1]) || 0));
+      mix.forEach(([label, count]) => appendClone("event-mix", "event-mix", null, (out) => {
+        out.customNumber("bar", "--db-progress", Number(count) / mixMaximum * 100);
+        out.text("label", label);
+        out.text("count", fmt(count));
+      }));
+      staticText("rhythm-meta", fmt(rhythm.total) + " events · " + String(rhythm.timezone || ""));
+      staticHidden("rhythm-panel", false);
+    }
+    staticDataEnum("[data-dashboard-hydration]", "dashboardHydration", "complete");
+  }
+
+  fetch(DATA_URL, {cache: "no-store"}).then((response) => response.json()).then(hydrate).catch(() => {
+    hideAllEmptyStates();
+    staticText("hero-tag", RUNTIME.copy.load_error);
+    staticDataEnum("[data-dashboard-hydration]", "dashboardHydration", "error");
   });
-  </script>"""
-
-
-def _lang_colors_json() -> str:
-    import json
-    from scripts.core.config import LANG_COLORS
-    return json.dumps(LANG_COLORS)
+}());
+</script>"""
 
 
 def render_dashboard(default_theme: str = DEFAULT_THEME) -> str:
-    if default_theme not in THEMES:
-        raise KeyError(f"default theme {default_theme!r} is not active")
-    from scripts.rendering.pageshell.pageshell import theme_continuity_script_tag
+    from scripts.rendering import design_tokens
+    from scripts.rendering.pageshell.pageshell import render_page_shell, theme_continuity_script_tag
+    from scripts.rendering.webkit.dashboard import load_dashboard_contract, render_dashboard_surface
 
-    css = emit_css_root() + _component_css()
-    script = (
-        _script()
-        .replace("__DATA_URL__", DATA_URL)
-        .replace("__LANG_COLORS__", _lang_colors_json())
+    if default_theme not in design_tokens.ACTIVE_THEME_NAMES:
+        raise KeyError(f"default theme {default_theme!r} is not active")
+    contract = load_dashboard_contract()
+    surface_html, surface_css = render_dashboard_surface(default_theme)
+    shell_html, shell_css = render_page_shell(
+        default_theme,
+        title=contract["copy"]["hero_title"],
+        intro=contract["copy"]["hero_intro"],
+        breadcrumbs=[(contract["copy"]["breadcrumb_home"], "index.html")],
+        body_html=surface_html,
+        title_id="hero-name",
+        intro_id="hero-tag",
     )
-    body = "".join([_hero(), _scorecard(), _calendar(), _languages(), _rhythm(), _repos_focus(), _snapshot()])
+    script = (_script().replace("__DATA_URL__", DATA_URL)
+              .replace("__LANG_COLORS__", _lang_colors_json())
+              .replace("__RUNTIME_CONTRACT__", _runtime_contract_json()))
+    document = contract["document"]
     return f"""<!DOCTYPE html>
-<html lang="en" data-house-theme="{default_theme}">
+<html lang="{document['language']}" data-house-theme="{default_theme}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 {theme_continuity_script_tag()}
-<title>jguida941 · Builder Dashboard</title>
-<meta name="description" content="Live GitHub builder analytics — regenerated hourly.">
+<title>{document['title']}</title>
+<meta name="description" content="{document['description']}">
 <style>
-{css}
+{shell_css}
+{surface_css}
 </style>
 </head>
 <body>
-<main class="wrap">
-{body}
-  <footer>Generated from the GitHub API · <a href="https://github.com/jguida941">@jguida941</a></footer>
-</main>
+{shell_html}
 {script}
 </body>
 </html>

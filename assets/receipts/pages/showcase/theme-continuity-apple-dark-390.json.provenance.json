@@ -1,5 +1,6 @@
 {
   "artifact": "assets/receipts/pages/showcase/theme-continuity-apple-dark-390.json",
+  "artifact_sha256": "38ae5c558e0b59b6f42149ebd03681296c126d869c63aa38d39a746afb09e9bf",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "chrome_version": "Google Chrome 150.0.7871.115",
@@ -11,14 +12,14 @@
     "--window-size=800,1300",
     "--virtual-time-budget=3500",
     "--dump-dom",
-    "http://127.0.0.1:50058/__theme_probe__.html?page=showcase&theme=apple-dark&viewport=390"
+    "http://127.0.0.1:62568/__theme_probe__.html?page=showcase&theme=apple-dark&viewport=390"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "house_theme": "apple-dark",
   "kind": "chrome-headless-theme-continuity-facts",
   "observed_theme": "apple-dark",
   "page": "showcase",
-  "page_sha256": "84f56bbbb85507dbc4283de775b45a14f935055fa1d2f3f2fac8a15c7d711569",
+  "page_sha256": "92d6636cf959fef7f6dfa4888f52d0e618298eedbfd1070d57cc38fcfc930259",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/showcase.html",
   "seeded_theme": "apple-dark",

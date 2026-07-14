@@ -1,8 +1,9 @@
-"""W2 - closed-world ownership for every class-bearing shipped DOM element.
+"""W2/W3 - closed-world ownership for every shipped static body element.
 
 The DATA is ``contracts/dom_cover.json``. This guard parses committed HTML as DOM start tags,
 binds exact signatures to exercised emitters, and treats index's pre-W3 markup as immutable,
-shrinking debt. Runtime dashboard classes remain an explicitly pinned W4 handoff.
+shrinking debt. Classless descendants inherit only their nearest explicit owner. Runtime dashboard
+clones remain an explicitly pinned W4 rendered-DOM handoff.
 """
 from __future__ import annotations
 
@@ -36,7 +37,8 @@ MARKER = "data-dom-owner"
 
 # Independent pins: changing mutable DATA and its self-reported hash together must still red.
 INDEX_BASELINE_SHA256 = "43ef30ede628617d4de91a619ad607bf959104730e7249f9d934d712d3855b6b"
-INDEX_HYDRATION_SCRIPT_SHA256 = "4b6c753aebf33739546c717759077cc907fa57a5c2d46c35791fba86f4edcb82"
+INDEX_HYDRATION_SCRIPT_SHA256 = "cf7cad9eea603b41d9f06828021ebeb5fb7c288c194b74344250b573cdd09fb3"
+W2_INDEX_HYDRATION_SCRIPT_SHA256 = "4b6c753aebf33739546c717759077cc907fa57a5c2d46c35791fba86f4edcb82"
 ADMITTED_OWNER_EMITTERS = {
     "page.settings": "scripts/rendering/settings/settings.py::render_settings",
     "page.showcase": "scripts/rendering/showcase/showcase.py::render_showcase",
@@ -47,17 +49,36 @@ ADMITTED_OWNER_EMITTERS = {
     "webkit.card": "scripts/rendering/webkit/components.py::render_card",
     "webkit.chip": "scripts/rendering/webkit/components.py::render_chip",
     "webkit.nav": "scripts/rendering/webkit/components.py::render_switchable_nav",
+    "webkit.dashboard": "scripts/rendering/webkit/dashboard.py::render_dashboard_surface",
+    "webkit.switcher": "scripts/rendering/webkit/components.py::render_theme_switcher",
 }
-INDEX_ADMITTED_OWNERS = {"webkit.nav"}
+INDEX_ADMITTED_OWNERS = {"pageshell", "webkit.card", "webkit.dashboard", "webkit.nav",
+                         "webkit.switcher"}
 RUNTIME_SCRIPT_SHA256 = {
-    "index-hydration": "1fd0a8e1a50b7bacee632481c6a29af3601511bdf10732244f85f8c7068f7922",
+    "index-hydration": "3a9572a03f7e18daa999a3da7ffc3a6423e8f44f6ad8eeb147866d3f5f847859",
     "studio-space-data": "dfdea4749364280200d2be02705097e1930776d4e977baca85fcaaeeabe4dd4a",
     "studio-toggle": "05efb2d307a54d28797ae4dcc7ee634fe1bf5ea9c8950c54e654b724cd528af2",
     "theme-continuity": "ba6b047216cd3c87896d81838f0f825cf26172ae4204e167c6c463a2ae3bf111",
 }
-RUNTIME_SOURCE_SHA256 = {
-    "index-hydration": INDEX_HYDRATION_SCRIPT_SHA256,
-    "studio-toggle": RUNTIME_SCRIPT_SHA256["studio-toggle"],
+RUNTIME_CLASS_DEBT_SOURCE_SHA256 = {"studio-toggle": RUNTIME_SCRIPT_SHA256["studio-toggle"]}
+STATIC_TEXT_NORMALIZATION = "body text; exclude script/style/template; collapse ASCII/HTML whitespace"
+STATIC_TEXT_PINS = {
+    "index": {"node_count": 83, "sha256": "0de9378ee9118954cfa2aaeb7a5f384c19140f340359b511a62081124f920258"},
+    "settings": {"node_count": 98, "sha256": "3aab946d8e43c5d7a78bec01a95a9ef1826a78c2ff9fa8ab3d48ad88f56e8dbf"},
+    "showcase": {"node_count": 400, "sha256": "e06dff453c48f6868e4878dd3865d4f99d4e86a5af8f44d04330f6c5ef226fff"},
+    "studio": {"node_count": 375, "sha256": "d1e0f7fa0278f478441e7b7634f37bf8fdf11d1d70ea0809586e2c547fd8453c"},
+}
+W2_INDEX_RUNTIME_CLASS_HISTORY = {
+    "page": "index",
+    "producer": "scripts/pipeline/web_render.py::_script",
+    "source_sha256": W2_INDEX_HYDRATION_SCRIPT_SHA256,
+    "class_tokens": ["bad", "bar", "chip", "item", "lane", "ldot", "lockico", "m", "meta",
+                     "ml", "mrow", "mt", "mv", "nm", "num", "ok", "pc", "row", "rrow",
+                     "swatch", "warn"],
+    "dynamic_axes": {"status": ["bad", "ok", "warn"]},
+    "status": "resolved",
+    "resolved_by": "W3",
+    "replacement": "runtime_prototype_cover.index-hydration",
 }
 
 
@@ -68,30 +89,89 @@ class ClassElement:
     owner: str | None
 
 
+@dataclass(frozen=True)
+class StaticTextNode:
+    owner: str
+    parent_tag: str
+    parent_classes: tuple[str, ...]
+    text: str
+
+
 class _ClassParser(HTMLParser):
-    def __init__(self) -> None:
+    _VOID = frozenset({"area", "base", "br", "col", "embed", "hr", "img", "input", "link",
+                       "meta", "param", "source", "track", "wbr"})
+
+    def __init__(self, *, fragment: bool = False) -> None:
         super().__init__(convert_charrefs=True)
         self.elements: list[ClassElement] = []
+        self.text_nodes: list[StaticTextNode] = []
         self.errors: list[str] = []
+        self._in_body = fragment
+        self._owner_stack: list[tuple[str, tuple[str, ...], str | None]] = []
 
-    def _capture(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+    def _capture(self, tag: str, attrs: list[tuple[str, str | None]], *, self_closing: bool) -> None:
         names = [name for name, _ in attrs]
         if len(names) != len(set(names)):
             self.errors.append(f"{tag}: duplicate attribute")
             return
         data = dict(attrs)
-        raw = (data.get("class") or "").split()
-        if not raw:
+        if tag == "body":
+            self._in_body = True
+            self._owner_stack = []
             return
-        if len(raw) != len(set(raw)):
-            self.errors.append(f"{tag}: duplicate class token")
-        self.elements.append(ClassElement(tag, tuple(sorted(raw)), data.get(MARKER)))
+        if not self._in_body:
+            return
+        raw = (data.get("class") or "").split()
+        explicit_owner = data.get(MARKER)
+        inherited_owner = self._owner_stack[-1][2] if self._owner_stack else None
+        owner = explicit_owner or inherited_owner
+        if tag != "script":
+            if not owner:
+                self.errors.append(f"{tag}: rendered body element lacks {MARKER}")
+            else:
+                if len(raw) != len(set(raw)):
+                    self.errors.append(f"{tag}: duplicate class token")
+                self.elements.append(ClassElement(tag, tuple(sorted(raw)), owner))
+        if not self_closing and tag not in self._VOID:
+            self._owner_stack.append((tag, tuple(sorted(raw)), owner))
 
     def handle_starttag(self, tag, attrs):  # noqa: ANN001 - HTMLParser callback
-        self._capture(tag, attrs)
+        self._capture(tag, attrs, self_closing=False)
 
     def handle_startendtag(self, tag, attrs):  # noqa: ANN001 - HTMLParser callback
-        self._capture(tag, attrs)
+        self._capture(tag, attrs, self_closing=True)
+
+    def handle_data(self, data: str) -> None:
+        if not self._in_body or any(tag in {"script", "style", "template"}
+                                    for tag, _, _ in self._owner_stack):
+            return
+        normalized = re.sub(r"[\t\n\f\r ]+", " ", data)
+        if normalized == " ":
+            return
+        if not normalized:
+            return
+        parent_tag, parent_classes, owner = self._owner_stack[-1] if self._owner_stack else (
+            "", (), None)
+        if not owner:
+            self.errors.append("visible static text lacks data-dom-owner lineage")
+            return
+        self.text_nodes.append(StaticTextNode(
+            owner=owner,
+            parent_tag=parent_tag,
+            parent_classes=parent_classes,
+            text=normalized,
+        ))
+
+    def handle_endtag(self, tag):  # noqa: ANN001 - HTMLParser callback
+        if tag == "body":
+            self._in_body = False
+            self._owner_stack = []
+            return
+        if self._in_body and self._owner_stack:
+            while self._owner_stack:
+                open_tag, _, _ = self._owner_stack.pop()
+                if open_tag == tag:
+                    break
 
 
 class _ScriptParser(HTMLParser):
@@ -164,6 +244,23 @@ def _parse(html: str) -> tuple[list[ClassElement], list[str]]:
     return parser.elements, parser.errors
 
 
+def _static_text_facts(html: str) -> dict:
+    parser = _ClassParser()
+    parser.feed(html)
+    parser.close()
+    payload = [
+        {
+            "owner": node.owner,
+            "parent_tag": node.parent_tag,
+            "parent_classes": list(node.parent_classes),
+            "text": node.text,
+        }
+        for node in parser.text_nodes
+    ]
+    encoded = json.dumps(payload, ensure_ascii=True, separators=(",", ":")).encode()
+    return {"node_count": len(payload), "sha256": hashlib.sha256(encoded).hexdigest()}
+
+
 def _parse_scripts(html: str) -> _ScriptParser:
     parser = _ScriptParser()
     parser.feed(html)
@@ -177,6 +274,33 @@ def _manifest() -> dict:
 
 def _contract() -> dict:
     return json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
+
+
+def _dashboard_contract() -> dict:
+    return json.loads((ROOT / "contracts" / "dashboard_surface.json").read_text(encoding="utf-8"))
+
+
+def _prototype_projection() -> list[dict]:
+    rows = []
+    for row in _dashboard_contract()["prototypes"]:
+        writes = json.dumps(row["writes"], sort_keys=True, separators=(",", ":")).encode()
+        rows.append({
+            "id": row["id"],
+            "target": row["target"],
+            "max_clones": row["max_clones"],
+            "budget_group": row["budget_group"],
+            "unit_tree_sha256": row["unit"]["tree_sha256"],
+            "writes_sha256": hashlib.sha256(writes).hexdigest(),
+        })
+    return rows
+
+
+def _prototype_policy_sha256() -> str:
+    dashboard = _dashboard_contract()
+    payload = {key: dashboard[key] for key in (
+        "custom_properties", "hydration_writes", "prototypes", "runtime_policy")}
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
 
 
 def _baseline_payload(rows: list[dict]) -> bytes:
@@ -194,10 +318,10 @@ def _baseline_hash(rows: list[dict]) -> str:
 def _contract_errors(contract: dict, manifest: dict) -> list[str]:
     errors: list[str] = []
     top_keys = {"contract_id", "schema_version", "authority_status", "cannot_mark_done", "purpose",
-                "marker_attribute", "coverage", "owners", "pages"}
+                "marker_attribute", "coverage", "owners", "pages", "static_text_cover"}
     if set(contract) != top_keys:
         errors.append("top-level keys are not closed")
-    if contract.get("contract_id") != "ClosedWorldDomCover" or contract.get("schema_version") != 1:
+    if contract.get("contract_id") != "ClosedWorldDomCover" or contract.get("schema_version") != 2:
         errors.append("contract identity/schema mismatch")
     if contract.get("authority_status") != "candidate_only" or contract.get("cannot_mark_done") is not True:
         errors.append("candidate-only honesty flags missing")
@@ -206,12 +330,19 @@ def _contract_errors(contract: dict, manifest: dict) -> list[str]:
 
     coverage = contract.get("coverage", {})
     coverage_keys = {"claim", "classless_and_inline_scope", "rendered_dom_target",
-                     "runtime_producers", "runtime_class_debt"}
+                     "runtime_producers", "runtime_class_debt", "runtime_class_history",
+                     "runtime_prototype_cover"}
     if set(coverage) != coverage_keys or coverage.get("claim") != "committed-static-dom":
         errors.append("coverage claim/schema drift")
     if coverage.get("rendered_dom_target") != "W4":
         errors.append("runtime closure must target W4")
     manifest_pages = {page["id"]: page for page in manifest["pages"]}
+    static_text = contract.get("static_text_cover", {})
+    if static_text != {
+        "normalization": STATIC_TEXT_NORMALIZATION,
+        "pages": STATIC_TEXT_PINS,
+    }:
+        errors.append("static visible text cover is not independently pinned")
     producers = coverage.get("runtime_producers", [])
     producer_keys = {"id", "producer", "kind", "pages", "script_sha256"}
     if producers != sorted(producers, key=lambda row: row.get("id", "")):
@@ -237,7 +368,8 @@ def _contract_errors(contract: dict, manifest: dict) -> list[str]:
         errors.append("runtime producer roster is not independently closed")
 
     runtime_debt = coverage.get("runtime_class_debt", {})
-    if list(runtime_debt) != sorted(runtime_debt) or set(runtime_debt) != set(RUNTIME_SOURCE_SHA256):
+    if (list(runtime_debt) != sorted(runtime_debt)
+            or set(runtime_debt) != set(RUNTIME_CLASS_DEBT_SOURCE_SHA256)):
         errors.append("runtime class debt roster is not independently closed")
     runtime_keys = {"page", "producer", "source_sha256", "class_tokens", "dynamic_axes"}
     for producer_id, runtime in runtime_debt.items():
@@ -246,7 +378,7 @@ def _contract_errors(contract: dict, manifest: dict) -> list[str]:
             continue
         if producer_kinds.get(producer_id) != "dom-mutator" or runtime["page"] not in manifest_pages:
             errors.append(f"{producer_id}: runtime class debt has no declared mutator/page")
-        if runtime["source_sha256"] != RUNTIME_SOURCE_SHA256.get(producer_id):
+        if runtime["source_sha256"] != RUNTIME_CLASS_DEBT_SOURCE_SHA256.get(producer_id):
             errors.append(f"{producer_id}: runtime source is not independently pinned")
         tokens = runtime["class_tokens"]
         if tokens != sorted(set(tokens)) or not all(re.fullmatch(r"[A-Za-z_][\w-]*", x) for x in tokens):
@@ -254,6 +386,23 @@ def _contract_errors(contract: dict, manifest: dict) -> list[str]:
         axes = runtime["dynamic_axes"]
         if list(axes) != sorted(axes) or any(values != sorted(set(values)) for values in axes.values()):
             errors.append(f"{producer_id}: runtime dynamic axes are not canonical")
+
+    history = coverage.get("runtime_class_history", {})
+    if history != {"index-hydration-w2": W2_INDEX_RUNTIME_CLASS_HISTORY}:
+        errors.append("W2 index runtime class history drifted or was erased")
+
+    prototype_cover = coverage.get("runtime_prototype_cover", {})
+    expected_prototype_cover = {
+        "index-hydration": {
+            "contract": "contracts/dashboard_surface.json",
+            "producer": "scripts/pipeline/web_render.py::_script",
+            "source_sha256": INDEX_HYDRATION_SCRIPT_SHA256,
+            "policy_sha256": _prototype_policy_sha256(),
+            "prototypes": _prototype_projection(),
+        }
+    }
+    if prototype_cover != expected_prototype_cover:
+        errors.append("runtime prototype cover is not the exact dashboard-policy projection")
 
     pages = contract.get("pages", {})
     if set(pages) != set(manifest_pages):
@@ -294,6 +443,8 @@ def _contract_errors(contract: dict, manifest: dict) -> list[str]:
         if page_id == "index":
             if page["debt_target"] != "W3" or digest != INDEX_BASELINE_SHA256:
                 errors.append("index debt is not pinned independently to W3")
+            if any(row["resolved_count"] != row["baseline_count"] for row in debt):
+                errors.append("W3 must leave every immutable index debt row fully resolved")
         elif debt or page["debt_target"] is not None:
             errors.append(f"{page_id}: governed page carries debt")
 
@@ -325,7 +476,7 @@ def _contract_errors(contract: dict, manifest: dict) -> list[str]:
             if identity in seen_signatures:
                 errors.append(f"{owner_id}: duplicate signature")
             seen_signatures.add(identity)
-            if row["page"] not in allowed_pages or classes != sorted(set(classes)) or not classes:
+            if row["page"] not in allowed_pages or classes != sorted(set(classes)):
                 errors.append(f"{owner_id}: malformed/off-page signature")
             if type(row["count"]) is not int or row["count"] <= 0:
                 errors.append(f"{owner_id}: invalid signature count")
@@ -372,6 +523,9 @@ def _document_errors(page_id: str, html: str, contract: dict) -> list[str]:
             expected_debt[(page_id, row["tag"], tuple(row["classes"]))] = remaining
     if actual_debt != expected_debt:
         errors.append(f"{page_id}: unowned debt drifted")
+    expected_text = contract["static_text_cover"]["pages"].get(page_id)
+    if _static_text_facts(html) != expected_text:
+        errors.append(f"{page_id}: static visible text drifted")
     return errors
 
 
@@ -460,7 +614,7 @@ def _direct_owner_signatures(rendered, owner: str) -> Counter:  # noqa: ANN001
         values = ()
     for value in values:
         if isinstance(value, str):
-            parser = _ClassParser()
+            parser = _ClassParser(fragment=True)
             parser.feed(value)
             signatures.update((element.tag, element.classes) for element in parser.elements
                               if element.owner == owner)
@@ -469,8 +623,30 @@ def _direct_owner_signatures(rendered, owner: str) -> Counter:  # noqa: ANN001
     return signatures
 
 
-def _record_direct_emissions(emitter, sentinel: str, records: list[tuple[str, Counter]]):  # noqa: ANN001, ANN202
-    """Give every direct invocation a nonce and record its exact owned DOM signatures."""
+def _direct_owner_texts(rendered, owner: str) -> Counter:  # noqa: ANN001
+    texts: Counter = Counter()
+    values = rendered.values() if isinstance(rendered, dict) else rendered
+    if isinstance(rendered, str):
+        values = (rendered,)
+    elif not isinstance(rendered, (dict, list, tuple)):
+        values = ()
+    for value in values:
+        if isinstance(value, str):
+            parser = _ClassParser(fragment=True)
+            parser.feed(value)
+            texts.update(
+                (node.parent_tag, node.parent_classes, node.text)
+                for node in parser.text_nodes if node.owner == owner
+            )
+        else:
+            texts.update(_direct_owner_texts(value, owner))
+    return texts
+
+
+def _record_direct_emissions(
+    emitter, sentinel: str, records: list[tuple[str, Counter, Counter]]
+):  # noqa: ANN001, ANN202
+    """Give every direct invocation a nonce and record its exact owned DOM and text."""
     @wraps(emitter)
     def recording(*args, **kwargs):  # noqa: ANN002, ANN003, ANN202 - transparent test probe
         rendered = emitter(*args, **kwargs)
@@ -478,7 +654,8 @@ def _record_direct_emissions(emitter, sentinel: str, records: list[tuple[str, Co
         instrumented = _replace_rendered_marker(
             rendered, f'{MARKER}="{sentinel}"', f'{MARKER}="{invocation}"')
         signatures = _direct_owner_signatures(instrumented, invocation)
-        records.append((invocation, signatures))
+        texts = _direct_owner_texts(instrumented, invocation)
+        records.append((invocation, signatures, texts))
         return instrumented
 
     return recording
@@ -519,11 +696,13 @@ class DomCoverContract(unittest.TestCase):
                              f"{owner_id}: exact marker must be minted by one function only")
             for page_id in owner["pages"]:
                 base = render_manifest_page(manifest[page_id], ROOT)
-                expected = base.count(literal)
+                base_parser = _ClassParser()
+                base_parser.feed(base)
+                expected = sum(element.owner == owner_id for element in base_parser.elements)
                 self.assertGreater(expected, 0, f"{owner_id}: phantom page edge")
                 sentinel = f"sentinel-{owner_id.replace('.', '-')}"
                 mutated_emitter = _mutated_emitter(emitter, owner_id, sentinel)
-                direct_records: list[tuple[str, Counter]] = []
+                direct_records: list[tuple[str, Counter, Counter]] = []
                 recording_emitter = _record_direct_emissions(mutated_emitter, sentinel, direct_records)
                 with mock.patch.object(module, name, recording_emitter):
                     mutated = render_manifest_page(manifest[page_id], ROOT)
@@ -533,7 +712,7 @@ class DomCoverContract(unittest.TestCase):
                 parser = _ClassParser()
                 parser.feed(mutated)
                 final_count = 0
-                for invocation, direct_signatures in direct_records:
+                for invocation, direct_signatures, direct_texts in direct_records:
                     self.assertTrue(direct_signatures,
                                     f"{owner_id}: invocation emitted no directly owned DOM")
                     final_signatures = Counter(
@@ -541,6 +720,11 @@ class DomCoverContract(unittest.TestCase):
                         if element.owner == invocation)
                     self.assertIn(final_signatures, (Counter(), direct_signatures),
                                   f"{owner_id}: caller copied, discarded part of, or rewrote direct DOM")
+                    final_texts = Counter(
+                        (node.parent_tag, node.parent_classes, node.text)
+                        for node in parser.text_nodes if node.owner == invocation)
+                    self.assertIn(final_texts, (Counter(), direct_texts),
+                                  f"{owner_id}: caller copied, discarded part of, or rewrote text")
                     final_count += sum(final_signatures.values())
                 self.assertEqual(expected, final_count,
                                  f"{owner_id}: direct invocation reconciliation missed shipped DOM")
@@ -568,18 +752,19 @@ class DomCoverContract(unittest.TestCase):
             self.assertEqual(expected_by_page[page["id"]], actual,
                              f"{page['id']}: executable script roster/hash drifted")
 
-        runtime = coverage["runtime_class_debt"]["index-hydration"]
         script = _script()
         digest = hashlib.sha256(script.encode()).hexdigest()
         self.assertEqual(INDEX_HYDRATION_SCRIPT_SHA256, digest)
-        self.assertEqual(INDEX_HYDRATION_SCRIPT_SHA256, runtime["source_sha256"])
-        templates = re.findall(r'class="([^"]+)"', script)
-        literal_tokens = {token for value in templates for token in value.split()
-                          if not token.startswith("${")}
-        dynamic_tokens = {token for values in runtime["dynamic_axes"].values() for token in values}
-        self.assertEqual(set(runtime["class_tokens"]), literal_tokens | dynamic_tokens)
-        self.assertEqual({"${state}"}, {token for value in templates for token in value.split()
-                                        if token.startswith("${")})
+        prototype = coverage["runtime_prototype_cover"]["index-hydration"]
+        self.assertEqual(INDEX_HYDRATION_SCRIPT_SHA256, prototype["source_sha256"])
+        self.assertEqual(_prototype_policy_sha256(), prototype["policy_sha256"])
+        self.assertEqual(_prototype_projection(), prototype["prototypes"])
+        self.assertEqual(
+            {"index-hydration-w2": W2_INDEX_RUNTIME_CLASS_HISTORY},
+            coverage["runtime_class_history"],
+        )
+        self.assertEqual(1, script.count(".cloneNode(true)"))
+        self.assertNotRegex(script, r"innerHTML|insertAdjacentHTML|createElement|classList|className")
 
         studio = coverage["runtime_class_debt"]["studio-toggle"]
         self.assertEqual(studio["source_sha256"], hashlib.sha256(_STUDIO_JS.encode()).hexdigest())
@@ -601,21 +786,28 @@ class DomCoverContract(unittest.TestCase):
         contract, manifest = _contract(), _manifest()
         index = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
         settings = (ROOT / "site" / "settings.html").read_text(encoding="utf-8")
-        self.assertTrue(_document_errors("index", index.replace("</main>",
-                                                                  '<div class="rogue"></div></main>'), contract))
+        self.assertTrue(_document_errors("index", index.replace("</body>",
+                                                                  '<div class="rogue"></div></body>'), contract))
+        self.assertTrue(_document_errors("index", index.replace("</body>",
+                                                                  '<p>rogue visible text</p></body>'), contract))
+        self.assertTrue(_document_errors("index", index.replace("</body>",
+                                                                  '<button>rogue action</button></body>'), contract))
         self.assertTrue(_document_errors("settings", settings.replace(
             '<h1 class="ps-title" data-dom-owner="pageshell">',
             '<div class="ps-title" data-dom-owner="pageshell">', 1), contract))
         self.assertTrue(_document_errors("settings", settings.replace(
             'data-dom-owner="page.settings"', 'data-dom-owner="page.studio"', 1), contract))
         self.assertTrue(_document_errors("index", index.replace(
-            '<div class="bento">', '<div class="bento"><div class="bento"></div>', 1), contract))
+            '<div class="db-dashboard"', '<div class="db-dashboard"><div class="rogue"></div><div',
+            1), contract))
+        self.assertTrue(_document_errors("index", index.replace(
+            "GitHub Analytics · Live", "GitHub Analytics · Live ROGUE", 1), contract))
 
         malformed = deepcopy(contract)
         malformed["pages"]["index"]["debt"][0]["invented"] = True
         self.assertTrue(_contract_errors(malformed, manifest))
         malformed = deepcopy(contract)
-        malformed["pages"]["index"]["debt"][0]["resolved_count"] = 2
+        malformed["pages"]["index"]["debt"][0]["resolved_count"] -= 1
         self.assertTrue(_contract_errors(malformed, manifest))
         malformed = deepcopy(contract)
         malformed["pages"]["index"]["debt"].append(deepcopy(
@@ -640,6 +832,15 @@ class DomCoverContract(unittest.TestCase):
             malformed["coverage"]["runtime_producers"][0]))
         self.assertTrue(_contract_errors(malformed, manifest),
                         "an undeclared/duplicate runtime producer must break the independent roster")
+        malformed = deepcopy(contract)
+        malformed["coverage"]["runtime_prototype_cover"]["index-hydration"]["prototypes"][0][
+            "max_clones"] += 1
+        self.assertTrue(_contract_errors(malformed, manifest),
+                        "prototype cover must be an exact projection, not a mutable allowlist")
+        malformed = deepcopy(contract)
+        del malformed["coverage"]["runtime_class_history"]
+        self.assertTrue(_contract_errors(malformed, manifest),
+                        "resolved W2 runtime history may not be erased")
 
         literal = f'{MARKER}="pageshell"'
         synthetic = (
@@ -662,18 +863,19 @@ class DomCoverContract(unittest.TestCase):
         def child():
             return f'<nav class="nav" {MARKER}="{child_owner}"></nav>'
 
-        direct_records: list[tuple[str, Counter]] = []
+        direct_records: list[tuple[str, Counter, Counter]] = []
         recording_child = _record_direct_emissions(child, child_owner, direct_records)
         child_html = recording_child()
         copied_attribute = re.search(r'data-dom-owner="[^"]+"', child_html).group(0)
         forged_page = child_html + f'<div class="debt" {copied_attribute}></div>'
-        invocation, direct_signatures = direct_records[0]
-        parser = _ClassParser()
+        invocation, direct_signatures, direct_texts = direct_records[0]
+        parser = _ClassParser(fragment=True)
         parser.feed(forged_page)
         final_signatures = Counter((element.tag, element.classes) for element in parser.elements
                                    if element.owner == invocation)
         self.assertNotEqual(direct_signatures, final_signatures,
                             "copying a legitimate return marker in a caller must red exact lineage")
+        self.assertEqual(Counter(), direct_texts)
 
         settings_with_script = settings.replace(
             "</body>", '<script>insertAdjacentHTML("beforeend", "<b class=\\"rogue\\">")</script></body>')
@@ -713,6 +915,22 @@ class DomCoverContract(unittest.TestCase):
             with self.subTest(active_surface=label):
                 parsed = _parse_scripts(settings.replace("</body>", f"{payload}</body>"))
                 self.assertTrue(parsed.active_surfaces or parsed.external_scripts or parsed.inline_handlers)
+
+    def test_static_text_projection_preserves_visible_boundaries(self):
+        base = '<body><div data-dom-owner="pageshell">A <span>B</span></div></body>'
+        no_boundary = '<body><div data-dom-owner="pageshell">A<span>B</span></div></body>'
+        nbsp = '<body><div data-dom-owner="pageshell">A\u00a0<span>B</span></div></body>'
+        self.assertNotEqual(_static_text_facts(base), _static_text_facts(no_boundary))
+        self.assertNotEqual(_static_text_facts(base), _static_text_facts(nbsp))
+        nonrendering_a = (
+            '<body><div data-dom-owner="pageshell">A'
+            '<script>one</script><style>.a{}</style><template>first</template></div></body>'
+        )
+        nonrendering_b = (
+            '<body><div data-dom-owner="pageshell">A'
+            '<script>two</script><style>.b{}</style><template>second</template></div></body>'
+        )
+        self.assertEqual(_static_text_facts(nonrendering_a), _static_text_facts(nonrendering_b))
 
 
 class DomCoverRedPresence(unittest.TestCase):

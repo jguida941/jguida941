@@ -1,7 +1,9 @@
 {
   "artifact": "assets/receipts/pages/index/screenshot-1280.png",
+  "artifact_sha256": "b4a34cefc3a66e663634785ea3856b01305dd346c77bb57ed217e5faf27c7933",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
+  "capture_origin": "ephemeral-local-http",
   "chrome_version": "Google Chrome 150.0.7871.115",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
@@ -9,16 +11,98 @@
     "--no-first-run",
     "--no-default-browser-check",
     "--hide-scrollbars",
+    "--run-all-compositor-stages-before-draw",
     "--window-size=1280,1536",
-    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/index/screenshot-1280.png",
-    "file:///Users/jguida941/jguida941/jguida941/site/index.html"
+    "--virtual-time-budget=15000",
+    "--dump-dom",
+    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/index/.screenshot-1280.png.488711f0e7034201a8e74f500cc5c733.tmp.png",
+    "http://127.0.0.1:62398/site/index.html?__receipt_capture=78a5fa5a50fe44acb4f15c06676a4e8d&page=index&page_sha256=92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f&width=1280&height=1536"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
+  "data_path": "site/data/profile_snapshot.json",
+  "data_sha256": "c8acce6d0fb75f55b52da0fff5b105459d4aa603da6d22edd6c8696852399f7f",
+  "empty_state_hidden": {
+    "flagship": true,
+    "focus-next": false,
+    "focus-now": true,
+    "focus-shipped": true
+  },
+  "hydration_state": "complete",
   "kind": "chrome-headless-screenshot",
   "page": "index",
-  "page_sha256": "0ff28a77296023fad80548cc5ac8ecf2376321a8ad5276b7047578ac32c11e98",
+  "page_sha256": "92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f",
   "producer": "scripts/quality/headless_receipts.py",
+  "prototype_origin_counts": {
+    "calendar-cell": 367,
+    "calendar-scale": 5,
+    "event-mix": 4,
+    "focus-item": 5,
+    "heat-cell": 168,
+    "heat-day": 7,
+    "heat-hour": 5,
+    "language-legend": 6,
+    "language-segment": 6,
+    "pipeline-status": 4,
+    "repository": 3
+  },
   "route": "site/index.html",
+  "same_session_capture": {
+    "capture_id": "78a5fa5a50fe44acb4f15c06676a4e8d",
+    "facts": {
+      "capture_id": "78a5fa5a50fe44acb4f15c06676a4e8d",
+      "empty_state_hidden": {
+        "flagship": true,
+        "focus-next": false,
+        "focus-now": true,
+        "focus-shipped": true
+      },
+      "hydration_state": "complete",
+      "page": "index",
+      "page_sha256": "92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f",
+      "prototype_origin_counts": {
+        "calendar-cell": 367,
+        "calendar-scale": 5,
+        "event-mix": 4,
+        "focus-item": 5,
+        "heat-cell": 168,
+        "heat-day": 7,
+        "heat-hour": 5,
+        "language-legend": 6,
+        "language-segment": 6,
+        "pipeline-status": 4,
+        "repository": 3
+      },
+      "readiness": {
+        "animation_frames": 2,
+        "fonts": "ready",
+        "outcome": "ready"
+      },
+      "sentinel_values": {
+        "cal-total": "9,571 contributions",
+        "hero-contributions": "9,571",
+        "lang-count": "26 languages",
+        "lang-name": "Python",
+        "rhythm-meta": "82 events \u00b7 New York"
+      },
+      "viewport": {
+        "height": 1536,
+        "width": 1280
+      }
+    },
+    "facts_sha256": "af900990e4edaf91d4827d17c4efd1b914e72dd3580e652cc9c2f0f6492bda11",
+    "readiness": {
+      "animation_frames": 2,
+      "fonts": "ready",
+      "outcome": "ready"
+    }
+  },
+  "sentinel_values": {
+    "cal-total": "9,571 contributions",
+    "hero-contributions": "9,571",
+    "lang-count": "26 languages",
+    "lang-name": "Python",
+    "rhythm-meta": "82 events \u00b7 New York"
+  },
   "viewport": {
     "height": 1536,
     "width": 1280

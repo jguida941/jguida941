@@ -1,5 +1,6 @@
 {
   "artifact": "assets/receipts/pages/showcase/theme-state-storage-denied-breadcrumb.json",
+  "artifact_sha256": "8517c89aea0a277afc4501fbcb03fc0bf34589b170b561af62b3af74b1fc95ef",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "chrome_version": "Google Chrome 150.0.7871.115",
@@ -11,14 +12,14 @@
     "--window-size=800,1300",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:50500/__theme_state_probe__.html?scenario=storage-denied-breadcrumb"
+    "http://127.0.0.1:62958/__theme_state_probe__.html?scenario=storage-denied-breadcrumb"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "follow_page": "index",
-  "follow_page_sha256": "0ff28a77296023fad80548cc5ac8ecf2376321a8ad5276b7047578ac32c11e98",
+  "follow_page_sha256": "92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f",
   "kind": "chrome-headless-theme-state-machine-facts",
   "page": "showcase",
-  "page_sha256": "84f56bbbb85507dbc4283de775b45a14f935055fa1d2f3f2fac8a15c7d711569",
+  "page_sha256": "92d6636cf959fef7f6dfa4888f52d0e618298eedbfd1070d57cc38fcfc930259",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/showcase.html",
   "scenario": "storage-denied-breadcrumb",

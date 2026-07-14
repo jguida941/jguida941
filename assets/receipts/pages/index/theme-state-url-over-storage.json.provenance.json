@@ -1,5 +1,6 @@
 {
   "artifact": "assets/receipts/pages/index/theme-state-url-over-storage.json",
+  "artifact_sha256": "958b534969590ce46c02486daad11ff0b9448355908b5aa9ac7c3b5a27469913",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "chrome_version": "Google Chrome 150.0.7871.115",
@@ -11,12 +12,12 @@
     "--window-size=800,1300",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:50500/__theme_state_probe__.html?scenario=url-over-storage"
+    "http://127.0.0.1:62958/__theme_state_probe__.html?scenario=url-over-storage"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-theme-state-machine-facts",
   "page": "index",
-  "page_sha256": "0ff28a77296023fad80548cc5ac8ecf2376321a8ad5276b7047578ac32c11e98",
+  "page_sha256": "92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/index.html",
   "scenario": "url-over-storage",

@@ -1,5 +1,6 @@
 {
   "artifact": "assets/receipts/pages/studio/theme-continuity-apple-dark-390.json",
+  "artifact_sha256": "704ab64714791015849b8de59c32ef1884b6a282e74794e409be10925beddada",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "chrome_version": "Google Chrome 150.0.7871.115",
@@ -11,14 +12,14 @@
     "--window-size=800,1300",
     "--virtual-time-budget=3500",
     "--dump-dom",
-    "http://127.0.0.1:50058/__theme_probe__.html?page=studio&theme=apple-dark&viewport=390"
+    "http://127.0.0.1:62568/__theme_probe__.html?page=studio&theme=apple-dark&viewport=390"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "house_theme": "apple-dark",
   "kind": "chrome-headless-theme-continuity-facts",
   "observed_theme": "apple-dark",
   "page": "studio",
-  "page_sha256": "308aef6ca875a85530e7e1694e673276b9cff276abe07ea490b5ef2c21f44e92",
+  "page_sha256": "7e2fa450dc21d97cc2164d84328e10e23d73cabc0cae04f1545bc511a4dc7fa1",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/studio.html",
   "seeded_theme": "apple-dark",

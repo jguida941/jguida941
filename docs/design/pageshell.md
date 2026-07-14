@@ -149,25 +149,52 @@ current start/follow page hashes, preventing a vacuous or stale journey. Navigat
 resolved foreground/background/border colors, display, ancestor visibility, opacity, active-link
 cardinality, rendered-box geometry, and viewport intersection, so a hidden or invisible underline
 cannot satisfy anatomy. Mobile containment binds each escape to its page and exact parent
-structure (`#calendar-panel > .cal-wrap`, `#rhythm-panel > .heat-wrap`, `.lang/.base >
+structure (`#calendar-panel > .db-calendar-scroll`, `#rhythm-panel > .db-rhythm-scroll`, `.lang/.base >
 .table-scroll`); contained offenders and their container identities remain visible in the facts.
 
 ## §8 — Closed-world DOM ownership (W2)
 
-`contracts/dom_cover.json` closes the class-bearing DOM surface of every committed manifest page.
+`contracts/dom_cover.json` closes every static body element on every committed manifest page.
 Ownership is an emitter fact, not a class-name inference: pageshell, switchable nav, webkit
 button/chip/card/archetype, and each registered proof-page renderer stamp their own nodes with
-`data-dom-owner`. `tests/contracts/test_dom_cover.py` requires exact per-page tag/class/count
-signatures and then replaces each declared emitter's marker with a sentinel while rerendering
-through `page_manifest.json`. A copied shell class or forged marker therefore cannot pass by
-coincidence.
+`data-dom-owner`; classless descendants inherit only the nearest explicit owner, while a top-level
+unowned element reds. `tests/contracts/test_dom_cover.py` requires exact per-page tag/class/count
+signatures and then replaces each declared emitter's marker with a sentinel while rerendering through
+`page_manifest.json`. A copied shell class, classless rogue button, or forged marker therefore cannot
+pass by coincidence.
 
-Index remains declared debt until W3: its immutable 49 static fingerprints may only shrink through
-deletion or migration into a governed pageshell/webkit (or equivalently guarded narrow component)
-emitter. Merely adding a blanket `page.index` owner is forbidden. W2 honestly claims
-`committed-static-dom`, not browser DOM: every inline script on every manifest route is classified
-and independently hash-pinned, external scripts/inline handlers are closed out, and index hydration
-plus Studio's toggle carry exact runtime class debt. W4 replaces those conservative source tripwires
-with post-hydration DOM/computed-style facts over page, theme, viewport, and state. Classless nodes and
-inline style remain governed by the existing literal gates plus the W3/W4 rendered-surface laws;
-this class-bearing cover does not claim otherwise.
+W3 migrated index through pageshell and narrow webkit emitters. Its immutable 49 static fingerprints
+and runtime-class vocabulary remain as resolved history, but the active index cover has no debt and
+no blanket `page.index` owner. The dashboard layout/data slots belong to `webkit.dashboard`; navigation,
+the profile-aware segmented switcher, and the two grouped metric surfaces come directly from their
+`webkit.nav`, `webkit.switcher`, and `webkit.card` emitters. Hydration can only clone contract-pinned
+inert prototypes into closed targets through typed writers and data-bounded caps. W4 replaces the
+remaining source-level runtime tripwire with post-hydration DOM/computed-style facts over page, theme,
+viewport, and state.
+
+## §9 — Governed index composition (W3)
+
+`scripts/pipeline/web_render.py` is composition-only: it threads the selected house profile through
+`render_page_shell`, `render_dashboard_surface`, switchable navigation, and the theme switcher. The
+canonical `design_tokens.css_declarations(profile)` projection feeds every pageshell theme block; index
+does not carry a second token root or ungoverned local visual literals. Its local CSS numeric grammar is
+an exact context/selector/property/value/multiplicity manifest recorded as the unresolved
+`W5-dashboard-literal-provenance` gap in D-W3-LIT-1, while shared
+switcher states are exact declaration maps owned by each profile. `contracts/dashboard_surface.json` closes
+section order, visible copy, ids, bindings, prototype grammar, write sinks, value domains, and clone
+budgets. `tests/contracts/test_dashboard_surface.py` mutation-proves those boundaries, while
+`test_dom_cover.py` proves exact element and visible-text lineage, boundary-space-sensitive static
+text hashes, and the resolved-debt ratchet. The hydration program is admitted as a frozen singleton
+byte grammar (raw template plus post-substitution inline-script hashes); its lexical API checks are
+diagnostics, not a claim to be a reusable JavaScript parser.
+
+MF1 screenshots and mobile probes are served from the producer's ephemeral localhost origin. This is
+part of the proof: the index receipt must load the hash-pinned `profile_snapshot.json`, reach explicit
+`complete` hydration, match snapshot-derived sentinel text, exact prototype clone counts and empty-state
+visibility, await fonts plus two animation frames, and only then admit the 390 probe. The 1280 screenshot
+runs `--dump-dom` and `--screenshot` in one Chrome process against one instrumented page session. Its
+non-rendering marker carries that same session's hydration/facts/readiness and must validate before the
+staged PNG is published. Every sidecar binds the artifact hash and is replaced last as the bundle commit
+marker, so an interrupted two-file publication reddens instead of silently pairing old proof with a new
+artifact. The independent 390 probe remains its own MF1 fact, not evidence for the screenshot process.
+A placeholder-only `file://` screenshot is not an acceptable W3 receipt.

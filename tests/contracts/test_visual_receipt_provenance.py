@@ -101,6 +101,71 @@ class ZeroWidthContainmentGaming(unittest.TestCase):
 
 
 class ReceiptProvenanceContract(unittest.TestCase):
+    def test_same_session_screenshot_facts_fail_closed(self):
+        from copy import deepcopy
+        from scripts.quality.headless_receipts import (
+            _same_session_capture_script,
+            _validate_same_session_facts,
+        )
+
+        expected = {
+            "capture_id": "capture-1",
+            "page": "index",
+            "page_sha256": "a" * 64,
+            "viewport": {"width": 1280, "height": 1536},
+        }
+        facts = {
+            **expected,
+            "readiness": {"outcome": "ready", "fonts": "ready", "animation_frames": 2},
+            "hydration_state": "complete",
+            "sentinel_values": {},
+            "prototype_origin_counts": {},
+            "empty_state_hidden": {},
+        }
+        script = _same_session_capture_script(**expected)
+        self.assertIn("document.fonts.ready", script)
+        self.assertIn("requestAnimationFrame", script)
+        self.assertIn("receipt-same-session", script)
+        _validate_same_session_facts(facts, expected, expected_index={
+            "sentinel_values": {},
+            "prototype_origin_counts": {},
+            "empty_state_hidden": {},
+        })
+        for path, wrong in (
+            (("capture_id",), "wrong"),
+            (("page_sha256",), "b" * 64),
+            (("viewport", "width"), 390),
+            (("readiness", "outcome"), "hydration-timeout"),
+            (("readiness", "fonts"), "pending"),
+            (("readiness", "animation_frames"), 1),
+            (("hydration_state",), "error"),
+        ):
+            mutant = deepcopy(facts)
+            target = mutant
+            for key in path[:-1]:
+                target = target[key]
+            target[path[-1]] = wrong
+            with self.assertRaises(RuntimeError, msg=str(path)):
+                _validate_same_session_facts(mutant, expected, expected_index={
+                    "sentinel_values": {},
+                    "prototype_origin_counts": {},
+                    "empty_state_hidden": {},
+                })
+
+    def test_interrupted_receipt_bundle_is_detected(self):
+        import hashlib
+        import tempfile
+        from scripts.quality.headless_receipts import _validate_receipt_bundle
+
+        with tempfile.TemporaryDirectory() as tmp:
+            artifact = Path(tmp) / "receipt.json"
+            artifact.write_bytes(b"old")
+            provenance = {"artifact_sha256": hashlib.sha256(b"old").hexdigest()}
+            _validate_receipt_bundle(artifact, provenance)
+            artifact.write_bytes(b"new")
+            with self.assertRaises(RuntimeError):
+                _validate_receipt_bundle(artifact, provenance)
+
     def test_obligation_kinds_name_their_actual_producer(self):
         """No obligation may claim a capability its producer lacks: the reconstruction kind must not
         say 'screenshot'; the css-contrast kind must not say 'headless'. Every kind is in the honest
@@ -213,10 +278,30 @@ class ReceiptProvenanceContract(unittest.TestCase):
             screenshot_sidecar = json.loads(provenance_path(screenshot).read_text(encoding="utf-8"))
             self.assertEqual(screenshot_sidecar["kind"], SCREENSHOT_KIND)
             self.assertIn("--headless=new", screenshot_sidecar["command"])
+            self.assertIn("--dump-dom", screenshot_sidecar["command"])
+            self.assertEqual(sum(arg.startswith("--screenshot=")
+                                 for arg in screenshot_sidecar["command"]), 1)
             self.assertTrue(screenshot_sidecar["chrome_version"].startswith("Google Chrome "))
             self.assertEqual(screenshot_sidecar["viewport"]["width"], 1280)
             self.assertEqual(screenshot_sidecar["page_sha256"], page_sha,
                              f"{page}: screenshot receipt is stale — reproduce via headless_receipts")
+            self.assertEqual(
+                screenshot_sidecar["artifact_sha256"],
+                hashlib.sha256(screenshot.read_bytes()).hexdigest(),
+                f"{page}: screenshot/provenance bundle is incomplete",
+            )
+            same_session = screenshot_sidecar["same_session_capture"]
+            self.assertEqual(same_session["capture_id"], same_session["facts"]["capture_id"])
+            self.assertEqual(same_session["facts"]["page"], page)
+            self.assertEqual(same_session["facts"]["page_sha256"], page_sha)
+            self.assertEqual(same_session["facts"]["viewport"], screenshot_sidecar["viewport"])
+            self.assertEqual(same_session["readiness"], {
+                "outcome": "ready", "fonts": "ready", "animation_frames": 2,
+            })
+            facts_hash = hashlib.sha256(json.dumps(
+                same_session["facts"], sort_keys=True, separators=(",", ":"), ensure_ascii=True
+            ).encode()).hexdigest()
+            self.assertEqual(same_session["facts_sha256"], facts_hash)
 
             probe = dom_probe_artifact(page)
             self.assertTrue(probe.is_file(), f"{page}: missing DOM probe receipt")
@@ -230,6 +315,24 @@ class ReceiptProvenanceContract(unittest.TestCase):
             self.assertIn("--headless=new", probe_sidecar["command"])
             self.assertEqual(probe_sidecar["page_sha256"], page_sha,
                              f"{page}: probe receipt is stale — reproduce via headless_receipts")
+            self.assertEqual(probe_sidecar["artifact_sha256"],
+                             hashlib.sha256(probe.read_bytes()).hexdigest())
+            if page == "index":
+                data_path = ROOT / "site" / "data" / "profile_snapshot.json"
+                data_sha = hashlib.sha256(data_path.read_bytes()).hexdigest()
+                self.assertEqual(data["hydration_state"], "complete")
+                self.assertEqual(probe_sidecar["data_sha256"], data_sha)
+                self.assertEqual(probe_sidecar["hydration_state"], "complete")
+                self.assertEqual(screenshot_sidecar["data_sha256"], data_sha)
+                self.assertEqual(screenshot_sidecar["hydration_state"], "complete")
+                self.assertEqual(screenshot_sidecar["sentinel_values"],
+                                 data["sentinel_values"])
+                self.assertEqual(screenshot_sidecar["prototype_origin_counts"],
+                                 data["prototype_origin_counts"])
+                self.assertEqual(
+                    screenshot_sidecar["same_session_capture"]["facts"]["hydration_state"],
+                    "complete",
+                )
             if page in DESIGN_PAGES:
                 self.assertIs(data["horizontal_overflow"], False,
                               f"{page}: 390px DOM probe overflowed: {data.get('offenders')}")

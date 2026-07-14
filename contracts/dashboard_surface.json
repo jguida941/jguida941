@@ -1,0 +1,1179 @@
+{
+    "contract_id": "GovernedDashboardSurface",
+    "schema_version": 1,
+    "authority_status": "candidate_only",
+    "cannot_mark_done": true,
+    "purpose": "W3 candidate DATA: the landing dashboard is a pageshell composition whose visible copy, static anatomy, dynamic prototype grammar, bounded writes, and CSS/script bytes are closed before rendered facts land in W4.",
+    "document": {
+        "title": "jguida941 \u00b7 Builder Dashboard",
+        "description": "Live GitHub builder analytics \u2014 regenerated hourly.",
+        "language": "en"
+    },
+    "sections": [
+        {
+            "id": "hero",
+            "eyebrow": "hero_eyebrow",
+            "title": null,
+            "hidden": false
+        },
+        {
+            "id": "scorecard",
+            "eyebrow": "scorecard_eyebrow",
+            "title": "scorecard_title",
+            "hidden": false
+        },
+        {
+            "id": "calendar",
+            "eyebrow": "calendar_eyebrow",
+            "title": "calendar_title",
+            "hidden": true
+        },
+        {
+            "id": "languages",
+            "eyebrow": "languages_eyebrow",
+            "title": "languages_title",
+            "hidden": false
+        },
+        {
+            "id": "rhythm",
+            "eyebrow": "rhythm_eyebrow",
+            "title": "rhythm_title",
+            "hidden": true
+        },
+        {
+            "id": "flagship",
+            "eyebrow": "flagship_eyebrow",
+            "title": "flagship_title",
+            "hidden": false
+        },
+        {
+            "id": "focus",
+            "eyebrow": "focus_eyebrow",
+            "title": "focus_title",
+            "hidden": false
+        },
+        {
+            "id": "snapshot",
+            "eyebrow": "snapshot_eyebrow",
+            "title": "snapshot_title",
+            "hidden": false
+        }
+    ],
+    "ids": [
+        "hero-name",
+        "hero-tag",
+        "updated",
+        "ci-ring",
+        "lang-name",
+        "calendar-panel",
+        "cal-total",
+        "cal",
+        "cal-months",
+        "cal-scale",
+        "lang-count",
+        "langbar",
+        "langlegend",
+        "rhythm-panel",
+        "rhythm-meta",
+        "heat-days",
+        "heat-grid",
+        "heat-hours",
+        "event-mix",
+        "flagship",
+        "focus",
+        "snap-tiles",
+        "pipeline"
+    ],
+    "bindings": [
+        {
+            "slot": "hero-contributions",
+            "path": "snapshot.last_year_contributions",
+            "suffix": null,
+            "round": null
+        },
+        {
+            "slot": "hero-active-days",
+            "path": "scorecard.active_days_last_year",
+            "suffix": null,
+            "round": null
+        },
+        {
+            "slot": "hero-repos",
+            "path": "snapshot.total_repos",
+            "suffix": null,
+            "round": null
+        },
+        {
+            "slot": "hero-stars",
+            "path": "snapshot.total_stars",
+            "suffix": null,
+            "round": null
+        },
+        {
+            "slot": "ci-coverage",
+            "path": "scorecard.ci_coverage_pct",
+            "suffix": "%",
+            "round": 0
+        },
+        {
+            "slot": "score-active-days",
+            "path": "scorecard.active_days_last_year",
+            "suffix": null,
+            "round": null
+        },
+        {
+            "slot": "score-active-repos",
+            "path": "scorecard.active_repos_7d",
+            "suffix": null,
+            "round": null
+        },
+        {
+            "slot": "score-workflows",
+            "path": "scorecard.automation_workflows",
+            "suffix": null,
+            "round": null
+        },
+        {
+            "slot": "score-releases",
+            "path": "scorecard.releases_30d",
+            "suffix": null,
+            "round": null
+        },
+        {
+            "slot": "score-language-share",
+            "path": "scorecard.primary_lang_share_pct",
+            "suffix": "%",
+            "round": 0
+        },
+        {
+            "slot": "score-last-push",
+            "path": "scorecard.days_since_last_push",
+            "suffix": "d",
+            "round": 0
+        }
+    ],
+    "copy": {
+        "hero_title": "@jguida941",
+        "hero_intro": "Builder dashboard \u2014 regenerated hourly from the GitHub API.",
+        "breadcrumb_home": "home",
+        "hero_eyebrow": "GitHub Analytics \u00b7 Live",
+        "hero_kpi_label": "contributions \u00b7 last 12 months",
+        "hero_active_days": "active days",
+        "hero_public_repos": "public repos",
+        "hero_stars": "stars",
+        "live_prefix": "Live \u00b7 updated",
+        "scorecard_eyebrow": "GitHub Signals \u00b7 12 Months",
+        "scorecard_title": "Builder Scorecard",
+        "ci_label": "CI coverage",
+        "ci_detail": "of public repos automated",
+        "score_active_days": "Active days",
+        "score_active_days_detail": "last 12 months",
+        "score_active_repos": "Active repos",
+        "score_active_repos_detail": "last 7 days",
+        "score_workflows": "Workflows",
+        "score_workflows_detail": "CI/CD pipelines",
+        "score_releases": "Releases",
+        "score_releases_detail": "last 30 days",
+        "score_primary_language": "primary language",
+        "score_language_detail": "share of code",
+        "score_last_push": "Last push",
+        "score_last_push_detail": "days since last commit",
+        "calendar_eyebrow": "Last 12 Months",
+        "calendar_title": "Contribution Calendar",
+        "calendar_less": "Less",
+        "calendar_more": "More",
+        "languages_eyebrow": "Code Composition",
+        "languages_title": "Language Breakdown",
+        "rhythm_eyebrow": "Activity Rhythm",
+        "rhythm_title": "When I Code",
+        "flagship_eyebrow": "Showcase",
+        "flagship_title": "Flagship Projects",
+        "flagship_empty": "No featured repositories yet.",
+        "focus_eyebrow": "Active Focus",
+        "focus_title": "Current Focus",
+        "focus_empty": "No items yet.",
+        "focus_now": "Now",
+        "focus_next": "Next",
+        "focus_shipped": "Shipped",
+        "snapshot_eyebrow": "Live GitHub Data",
+        "snapshot_title": "Raw Data Snapshot",
+        "snapshot_commits": "Commits",
+        "snapshot_repos": "Public Repos",
+        "snapshot_private": "Private",
+        "snapshot_stars": "Stars total",
+        "snapshot_prs": "PRs Merged",
+        "snapshot_ci": "CI Repos",
+        "pipeline_title": "Pipeline Status",
+        "pipeline_ci": "CI",
+        "pipeline_commits": "Commits source",
+        "pipeline_releases": "Releases source",
+        "pipeline_events": "Events source",
+        "status_ok": "OK",
+        "load_error": "Could not load profile_snapshot.json",
+        "footer_prefix": "Generated from the GitHub API \u00b7",
+        "footer_link": "@jguida941 on GitHub",
+        "calendar_label": "Contribution activity",
+        "rhythm_label": "Activity by weekday and hour"
+    },
+    "limits": {
+        "languages": 6,
+        "repositories": 5,
+        "focus_items_per_lane": 3,
+        "focus_lanes": 3,
+        "snapshot_rows": 6,
+        "pipeline_rows": 4,
+        "calendar_days": 371,
+        "calendar_leading_blanks": 6,
+        "heat_rows": 7,
+        "heat_columns": 24,
+        "heat_hour_labels": 5,
+        "event_mix": 12
+    },
+    "status": {
+        "source_path": "data_quality",
+        "map": {
+            "ok": "ok",
+            "error": "bad",
+            "failed": "bad",
+            "missing": "bad",
+            "unknown": "warn"
+        },
+        "pipeline": [
+            {
+                "label": "pipeline_ci",
+                "key": "ci_status"
+            },
+            {
+                "label": "pipeline_commits",
+                "key": "commits_status"
+            },
+            {
+                "label": "pipeline_releases",
+                "key": "releases_status"
+            },
+            {
+                "label": "pipeline_events",
+                "key": "events_status"
+            }
+        ]
+    },
+    "intensity": {
+        "thresholds": [
+            0,
+            0.25,
+            0.5,
+            0.75
+        ],
+        "calendar_opacity_pct": [
+            0,
+            38,
+            58,
+            78,
+            100
+        ],
+        "rhythm_opacity_pct": [
+            0,
+            30,
+            52,
+            76,
+            100
+        ]
+    },
+    "geometry": {
+        "weekdays": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun"
+        ],
+        "hour_labels": [
+            0,
+            6,
+            12,
+            18,
+            23
+        ],
+        "calendar_rows": 7,
+        "focus_lanes": [
+            "now",
+            "next",
+            "shipped"
+        ]
+    },
+    "data_colors": {
+        "source": "scripts.core.config.LANG_COLORS",
+        "fallback": "var(--accent)",
+        "allowed_pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "custom_properties": {
+        "--db-column": {
+            "kind": "number",
+            "minimum": 1,
+            "maximum": 24,
+            "unit": null
+        },
+        "--db-language-color": {
+            "kind": "closed-color-map",
+            "minimum": null,
+            "maximum": null,
+            "unit": null
+        },
+        "--db-progress": {
+            "kind": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "unit": null
+        },
+        "--db-share": {
+            "kind": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "unit": null
+        }
+    },
+    "prototypes": [
+        {
+            "id": "calendar-cell",
+            "target": "cal",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "div",
+            "insertion": "replace-children",
+            "budget_group": "calendar",
+            "max_clones": 377,
+            "bound": {
+                "kind": "calendar",
+                "source_path": "contribution_calendar.weeks",
+                "limit": 371,
+                "leading_blanks_max": 6
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 1,
+                "tree_sha256": "c5071f3bc28e3ed8a989077f5a8132d495a10beabf1a4d1a0caf6fa1f5575911",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "cell"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "cell",
+                    "sink": "data-enum",
+                    "name": "level",
+                    "domain": {
+                        "kind": "enum",
+                        "values": [
+                            "0",
+                            "1",
+                            "2",
+                            "3",
+                            "4"
+                        ]
+                    }
+                },
+                {
+                    "field": "cell",
+                    "sink": "title",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "calendar-scale",
+            "target": "cal-scale",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "span",
+            "insertion": "replace-children",
+            "budget_group": "calendar-scale",
+            "max_clones": 5,
+            "bound": {
+                "kind": "fixed",
+                "source_path": "intensity.calendar_opacity_pct",
+                "limit": 5
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 1,
+                "tree_sha256": "9d57f6bf1f5f24a87bc49886b7c8a5b25d57b88efa3bc14b74d819003b2eeb8d",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "scale"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "scale",
+                    "sink": "data-enum",
+                    "name": "level",
+                    "domain": {
+                        "kind": "enum",
+                        "values": [
+                            "0",
+                            "1",
+                            "2",
+                            "3",
+                            "4"
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": "event-mix",
+            "target": "event-mix",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "div",
+            "insertion": "replace-children",
+            "budget_group": "event-mix",
+            "max_clones": 12,
+            "bound": {
+                "kind": "array-prefix",
+                "source_path": "activity_rhythm.event_mix",
+                "limit": 12
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 5,
+                "tree_sha256": "d4b26933cebfa7fee08114debc786050ed4566fc834fd82a314ab206e1dc664e",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "bar",
+                    "count",
+                    "label",
+                    "root"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "bar",
+                    "sink": "custom-number",
+                    "name": "--db-progress",
+                    "domain": {
+                        "kind": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                    }
+                },
+                {
+                    "field": "count",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                },
+                {
+                    "field": "label",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "focus-item",
+            "target": "focus",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "div",
+            "insertion": "append-field",
+            "budget_group": "focus",
+            "max_clones": 9,
+            "bound": {
+                "kind": "array-prefix",
+                "source_path": "focus.*",
+                "limit": 9
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 7,
+                "tree_sha256": "0d869630fe89071a07c74e35232e3024b0be7db4c1904c6b3121a452d0a684f7",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "detail",
+                    "lock",
+                    "root",
+                    "title",
+                    "title-text"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "detail",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                },
+                {
+                    "field": "lock",
+                    "sink": "hidden",
+                    "name": null,
+                    "domain": {
+                        "kind": "boolean"
+                    }
+                },
+                {
+                    "field": "title-text",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "heat-cell",
+            "target": "heat-grid",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "div",
+            "insertion": "replace-children",
+            "budget_group": "heat",
+            "max_clones": 168,
+            "bound": {
+                "kind": "matrix",
+                "source_path": "activity_rhythm.matrix",
+                "limit": 168,
+                "rows": 7,
+                "columns": 24
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 1,
+                "tree_sha256": "681bee2b7faab54ff0e9d17944531823ddd38e1765946d5d34299ec6f005db84",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "cell"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "cell",
+                    "sink": "data-enum",
+                    "name": "level",
+                    "domain": {
+                        "kind": "enum",
+                        "values": [
+                            "0",
+                            "1",
+                            "2",
+                            "3",
+                            "4"
+                        ]
+                    }
+                },
+                {
+                    "field": "cell",
+                    "sink": "title",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "heat-day",
+            "target": "heat-days",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "div",
+            "insertion": "replace-children",
+            "budget_group": "heat-days",
+            "max_clones": 7,
+            "bound": {
+                "kind": "fixed",
+                "source_path": "geometry.weekdays",
+                "limit": 7
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 1,
+                "tree_sha256": "c80224c38b4c885a82a3445ee620dbb9cd371aac57dda6a3e5ba8bd8fc117df2",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "label"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "label",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "heat-hour",
+            "target": "heat-hours",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "div",
+            "insertion": "replace-children",
+            "budget_group": "heat-hours",
+            "max_clones": 5,
+            "bound": {
+                "kind": "fixed",
+                "source_path": "geometry.hour_labels",
+                "limit": 5
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 1,
+                "tree_sha256": "ae6e298994e928d3932574efb91df512471847732c3a6401dcf837f4be7e08b1",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "label"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "label",
+                    "sink": "custom-number",
+                    "name": "--db-column",
+                    "domain": {
+                        "kind": "number",
+                        "minimum": 1,
+                        "maximum": 24
+                    }
+                },
+                {
+                    "field": "label",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "language-legend",
+            "target": "langlegend",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "div",
+            "insertion": "replace-children",
+            "budget_group": "languages",
+            "max_clones": 6,
+            "bound": {
+                "kind": "array-prefix",
+                "source_path": "top_languages",
+                "limit": 6
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 4,
+                "tree_sha256": "2d4317dd98d3951c0d7f16645253d0127e517ec14776fc62e773a46d5bc83664",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "name",
+                    "percent",
+                    "root",
+                    "swatch"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "name",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                },
+                {
+                    "field": "percent",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                },
+                {
+                    "field": "swatch",
+                    "sink": "custom-color",
+                    "name": "--db-language-color",
+                    "domain": {
+                        "kind": "closed-map",
+                        "source": "data_colors"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "language-segment",
+            "target": "langbar",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "div",
+            "insertion": "replace-children",
+            "budget_group": "languages",
+            "max_clones": 6,
+            "bound": {
+                "kind": "array-prefix",
+                "source_path": "top_languages",
+                "limit": 6
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 1,
+                "tree_sha256": "d8a2a54303f3ef71961a9ee20785576e754b681f617bddebd6a4683641ae12fd",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "segment"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "segment",
+                    "sink": "custom-color",
+                    "name": "--db-language-color",
+                    "domain": {
+                        "kind": "closed-map",
+                        "source": "data_colors"
+                    }
+                },
+                {
+                    "field": "segment",
+                    "sink": "custom-number",
+                    "name": "--db-share",
+                    "domain": {
+                        "kind": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                    }
+                }
+            ]
+        },
+        {
+            "id": "pipeline-status",
+            "target": "pipeline",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "div",
+            "insertion": "replace-children",
+            "budget_group": "pipeline",
+            "max_clones": 4,
+            "bound": {
+                "kind": "fixed",
+                "source_path": "status.pipeline",
+                "limit": 4
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 11,
+                "tree_sha256": "6a017992ce89d4daf395f4ecd2d20866b7bd3213433ecf4f1ebd4b107ee6b306",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "bad-icon",
+                    "label",
+                    "ok-icon",
+                    "root",
+                    "warn-icon"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "bad-icon",
+                    "sink": "hidden",
+                    "name": null,
+                    "domain": {
+                        "kind": "boolean"
+                    }
+                },
+                {
+                    "field": "label",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                },
+                {
+                    "field": "ok-icon",
+                    "sink": "hidden",
+                    "name": null,
+                    "domain": {
+                        "kind": "boolean"
+                    }
+                },
+                {
+                    "field": "root",
+                    "sink": "data-enum",
+                    "name": "status",
+                    "domain": {
+                        "kind": "enum",
+                        "values": [
+                            "bad",
+                            "ok",
+                            "warn"
+                        ]
+                    }
+                },
+                {
+                    "field": "warn-icon",
+                    "sink": "hidden",
+                    "name": null,
+                    "domain": {
+                        "kind": "boolean"
+                    }
+                }
+            ]
+        },
+        {
+            "id": "repository",
+            "target": "flagship",
+            "target_owner": "webkit.dashboard",
+            "target_tag": "div",
+            "insertion": "replace-children",
+            "budget_group": "repositories",
+            "max_clones": 5,
+            "bound": {
+                "kind": "array-prefix",
+                "source_path": "featured_repo_facts",
+                "limit": 5
+            },
+            "unit": {
+                "root_count": 1,
+                "element_count": 5,
+                "tree_sha256": "6dfc8c86478ea04d27ed2ea06dc2f05381da6f1c16673e6160c96a3d3ea2bb59",
+                "owner": "webkit.dashboard",
+                "fields": [
+                    "dot",
+                    "link",
+                    "meta",
+                    "name",
+                    "root"
+                ]
+            },
+            "writes": [
+                {
+                    "field": "dot",
+                    "sink": "custom-color",
+                    "name": "--db-language-color",
+                    "domain": {
+                        "kind": "closed-map",
+                        "source": "data_colors"
+                    }
+                },
+                {
+                    "field": "link",
+                    "sink": "hidden",
+                    "name": null,
+                    "domain": {
+                        "kind": "boolean"
+                    }
+                },
+                {
+                    "field": "link",
+                    "sink": "safe-href",
+                    "name": "href",
+                    "domain": {
+                        "kind": "url",
+                        "protocols": [
+                            "https:"
+                        ],
+                        "hosts": [
+                            "github.com"
+                        ]
+                    }
+                },
+                {
+                    "field": "link",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                },
+                {
+                    "field": "meta",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                },
+                {
+                    "field": "name",
+                    "sink": "hidden",
+                    "name": null,
+                    "domain": {
+                        "kind": "boolean"
+                    }
+                },
+                {
+                    "field": "name",
+                    "sink": "text",
+                    "name": null,
+                    "domain": {
+                        "kind": "string"
+                    }
+                }
+            ]
+        }
+    ],
+    "hydration_writes": [
+        {
+            "target": "[data-bind]",
+            "sink": "text",
+            "name": null,
+            "source": "bindings",
+            "domain": {
+                "kind": "formatted-binding"
+            }
+        },
+        {
+            "target": "hero-name",
+            "sink": "text",
+            "name": null,
+            "source": "username",
+            "domain": {
+                "kind": "string"
+            }
+        },
+        {
+            "target": "updated",
+            "sink": "text",
+            "name": null,
+            "source": "generated_at",
+            "domain": {
+                "kind": "date-string"
+            }
+        },
+        {
+            "target": "ci-ring",
+            "sink": "custom-number",
+            "name": "--db-progress",
+            "source": "scorecard.ci_coverage_pct",
+            "domain": {
+                "kind": "number",
+                "minimum": 0,
+                "maximum": 100
+            }
+        },
+        {
+            "target": "lang-name",
+            "sink": "text",
+            "name": null,
+            "source": "top_languages.0.name",
+            "domain": {
+                "kind": "string"
+            }
+        },
+        {
+            "target": "lang-count",
+            "sink": "text",
+            "name": null,
+            "source": "snapshot.languages_count",
+            "domain": {
+                "kind": "count-label"
+            }
+        },
+        {
+            "target": "snap-tiles",
+            "sink": "text",
+            "name": "data-snapshot-key",
+            "source": "snapshot_rows",
+            "domain": {
+                "kind": "closed-key-map"
+            }
+        },
+        {
+            "target": "cal-total",
+            "sink": "text",
+            "name": null,
+            "source": "contribution_calendar.total",
+            "domain": {
+                "kind": "count-label"
+            }
+        },
+        {
+            "target": "cal-months",
+            "sink": "text",
+            "name": null,
+            "source": "contribution_calendar.weeks",
+            "domain": {
+                "kind": "date-range"
+            }
+        },
+        {
+            "target": "calendar-panel",
+            "sink": "hidden",
+            "name": null,
+            "source": "contribution_calendar",
+            "domain": {
+                "kind": "boolean"
+            }
+        },
+        {
+            "target": "rhythm-meta",
+            "sink": "text",
+            "name": null,
+            "source": "activity_rhythm",
+            "domain": {
+                "kind": "count-label"
+            }
+        },
+        {
+            "target": "rhythm-panel",
+            "sink": "hidden",
+            "name": null,
+            "source": "activity_rhythm",
+            "domain": {
+                "kind": "boolean"
+            }
+        },
+        {
+            "target": "[data-empty-state=\"flagship\"]",
+            "sink": "hidden",
+            "name": null,
+            "source": "featured_repo_facts",
+            "domain": {
+                "kind": "boolean"
+            }
+        },
+        {
+            "target": "[data-empty-state=\"focus-now\"]",
+            "sink": "hidden",
+            "name": null,
+            "source": "focus.now",
+            "domain": {
+                "kind": "boolean"
+            }
+        },
+        {
+            "target": "[data-empty-state=\"focus-next\"]",
+            "sink": "hidden",
+            "name": null,
+            "source": "focus.next",
+            "domain": {
+                "kind": "boolean"
+            }
+        },
+        {
+            "target": "[data-empty-state=\"focus-shipped\"]",
+            "sink": "hidden",
+            "name": null,
+            "source": "focus.shipped",
+            "domain": {
+                "kind": "boolean"
+            }
+        },
+        {
+            "target": "[data-dashboard-hydration]",
+            "sink": "data-enum",
+            "name": "dashboardHydration",
+            "source": "fetch-lifecycle",
+            "domain": {
+                "kind": "enum",
+                "values": [
+                    "complete",
+                    "error",
+                    "pending"
+                ]
+            }
+        },
+        {
+            "target": "hero-tag",
+            "sink": "text",
+            "name": null,
+            "source": "fetch-error",
+            "domain": {
+                "kind": "closed-copy"
+            }
+        }
+    ],
+    "runtime_policy": {
+        "allowed_dom_methods": [
+            "append",
+            "cloneNode",
+            "getElementById",
+            "querySelector",
+            "querySelectorAll",
+            "replaceChildren"
+        ],
+        "allowed_url": {
+            "protocols": [
+                "https:"
+            ],
+            "hosts": [
+                "github.com"
+            ]
+        },
+        "custom_property_names": [
+            "--db-column",
+            "--db-language-color",
+            "--db-progress",
+            "--db-share"
+        ],
+        "data_axes": {
+            "level": [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4"
+            ],
+            "status": [
+                "bad",
+                "ok",
+                "warn"
+            ],
+            "dashboardHydration": [
+                "complete",
+                "error",
+                "pending"
+            ]
+        },
+        "head_resources": [
+            "inline-theme-bootstrap",
+            "inline-style",
+            "inline-dashboard-hydration"
+        ]
+    },
+    "css_policy": {
+        "scope": "scripts/rendering/webkit/dashboard.py::_dashboard_css",
+        "canonicalizer": "scripts/rendering/webkit/design_render_adapter.py::css_numeric_occurrences",
+        "occurrence_manifest_sha256": "de176991a500c32bbdb949dbcf902bb2c38e72627dc383ffe35f777b1911f7c8",
+        "occurrence_count": 126,
+        "literal_vocabulary": [
+            "0", "1", "1%", "1.6", "100%", "10px", "11px", "12px", "13px",
+            "14px", "16px", "18%", "1fr", "1px", "2", "20px", "22px", "24",
+            "24px", "26px", "28px", "2px", "3", "30px", "38%", "3px", "44px",
+            "460px", "480px", "4px", "50%", "52px", "560px", "58%", "600",
+            "64px", "6px", "7", "760px", "78%", "7px", "8px", "9px"
+        ],
+        "variable_refs": [
+            "--accent", "--db-column", "--db-language-color", "--db-progress", "--db-share",
+            "--gap-grid", "--hairline", "--ink", "--ink-dim", "--ink-strong", "--ps-pad",
+            "--radius-panel", "--radius-tile", "--status-danger", "--status-success",
+            "--status-warning", "--surface", "--surface-raised", "--type-body",
+            "--type-caption", "--type-chip", "--type-display", "--type-display-weight",
+            "--type-eyebrow", "--type-eyebrow-weight", "--type-metric_lg",
+            "--type-metric_lg-weight", "--type-title", "--type-title-weight"
+        ],
+        "function_roster": ["calc", "color-mix", "conic-gradient", "repeat", "var"],
+        "color_keywords": ["currentColor", "transparent"],
+        "provenance": {
+            "authority_status": "declared-unresolved",
+            "exactness": "consistency-only",
+            "gap_id": "W5-dashboard-literal-provenance",
+            "ratification_status": "unratified",
+            "source_mode": null,
+            "source_ref": "docs/plans/handoff/w3-index-migration-design.md#d-w3-lit-1-dashboard-literal-gap"
+        }
+    },
+    "grammar_hashes": {
+        "css_sha256": "6bf0a2d1afa9cd9373ec5133d7270e927326b299c1c9d6f70814ab7ddb574acb",
+        "script_sha256": "cf7cad9eea603b41d9f06828021ebeb5fb7c288c194b74344250b573cdd09fb3"
+    }
+}

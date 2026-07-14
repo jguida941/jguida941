@@ -53,6 +53,13 @@
       "transition_ms": 250,
       "easing": "ease-in-out",
       "active_css": {"opacity": "0.4", "transform": "scale(0.97)"},
+      "switcher_css": {
+        "hover": {"opacity": "0.72"},
+        "active": {"opacity": "0.4", "transform": "scale(0.97)"},
+        "focus-visible": {"outline": "4px solid color-mix(in srgb, var(--accent) 50%, transparent)", "outline-offset": "2px"},
+        "selected": {"color": "var(--ink-strong)", "background": "color-mix(in srgb, var(--accent) 22%, transparent)"},
+        "disabled": {"opacity": "0.4", "cursor": "not-allowed"}
+      },
       "elevation_shadow": null,
       "variants": ["plain", "gray", "tinted", "filled", "destructive"],
       "states": ["rest", "hover", "active", "focus-visible", "disabled"],

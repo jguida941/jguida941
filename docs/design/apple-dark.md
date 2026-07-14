@@ -81,3 +81,12 @@ separator is **material**: `material_opaque` (no backdrop-filter) here vs `mater
 Per the research, we do NOT invent a second axis to pad a quorum. vs carbon: the SHAPE wall
 (rounded vs square radius 0) + gridline-vs-hairline character. **"Content fills the card"** is
 JUDGMENT → `candidate` + visual receipt, never fake-green.
+
+## Shared dashboard realization
+
+W3 makes the public dashboard a governed pageshell surface instead of a separate bespoke theme
+implementation. Selecting Apple Dark activates its opaque page roles, rounded navigation/switcher
+anatomy, and the opaque branches of the two grouped `webkit.card` readouts. The dashboard emitter
+owns only data layout and typed hydration slots; profile literals remain in the design profile and
+flow through the canonical declaration projection. This preserves the material distinction from
+Liquid Glass on the same real content surface.

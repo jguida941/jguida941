@@ -75,6 +75,25 @@ def card_rows_inline(facts: dict, **_) -> bool:
     return facts.get("rows_horizontal") is True
 
 
+def switcher_profile_governed(facts: dict, **_) -> bool:
+    """The segmented switcher covers one closed roster with full state and touch geometry."""
+    html_profiles = facts.get("html_profiles")
+    css_profiles = facts.get("css_profiles")
+    profiles = facts.get("profiles")
+    expected = facts.get("expected_profiles")
+    if (not isinstance(html_profiles, tuple) or not html_profiles
+            or html_profiles != css_profiles
+            or facts.get("button_count") != len(html_profiles)
+            or facts.get("pressed_count") != 1
+            or facts.get("icon_count") != len(html_profiles)
+            or not isinstance(profiles, dict) or set(profiles) != set(html_profiles)
+            or not isinstance(expected, dict) or set(expected) != set(html_profiles)):
+        return False
+    if not all(facts.get(key) is True for key in ("has_rest", "has_pressed", "has_disabled")):
+        return False
+    return profiles == expected and all(row.get("height_px", 0) >= 44 for row in profiles.values())
+
+
 # --- page-shell (the site's own chrome as a governed language instance) ---------------------------
 def backdrop_is_token(facts: dict, **_) -> bool:
     """The page ground is the language's backdrop token: the shell root paints `var(--backdrop)`.

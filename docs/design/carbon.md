@@ -68,3 +68,12 @@ rounded Apple grouped list and NOT one floating box per number.
 ≥2 rows, 1px divider, horizontal row axis, `material_flat` (no blur AND no shadow), radius 0. The
 **"content fills the Tile / no dead space"** law is JUDGMENT — a static parser sees declared boxes,
 not rendered ink, so it ships `candidate` + a visual receipt, never a fake-green number.
+
+## Shared dashboard realization
+
+W3 places `site/index.html` inside the same governed pipeline as the proof pages. Selecting Carbon
+activates the Carbon pageshell/navigation anatomy, the square profile-governed theme switcher, and
+the Carbon branches of both real grouped `webkit.card` readouts. Dashboard-specific CSS may arrange
+data, but it cannot restate Carbon color, type, radius, material, or motion literals. Those values
+arrive through the canonical profile declaration projection; `contracts/dashboard_surface.json` and
+the DOM cover bind every visible slot and runtime prototype to its narrow emitter.

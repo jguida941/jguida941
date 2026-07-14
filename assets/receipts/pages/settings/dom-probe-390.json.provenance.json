@@ -1,23 +1,24 @@
 {
   "artifact": "assets/receipts/pages/settings/dom-probe-390.json",
+  "artifact_sha256": "d88f8a6315a803cae6e1a5f90f3fef691febf3093daddd564ec76a72b98fa83a",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
+  "capture_origin": "ephemeral-local-http",
   "chrome_version": "Google Chrome 150.0.7871.115",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
     "--no-first-run",
     "--no-default-browser-check",
-    "--allow-file-access-from-files",
     "--window-size=800,1000",
-    "--virtual-time-budget=2500",
+    "--virtual-time-budget=5000",
     "--dump-dom",
-    "file:///var/folders/6_/_15pvmxd7yq5qrnmzr92dkr00000gn/T/settings-probe-bdcw_ao3/settings.html"
+    "http://127.0.0.1:62398/__dom_probe__.html?page=settings&viewport=390&height=1000"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-dom-probe",
   "page": "settings",
-  "page_sha256": "fd7cfee94ebf83fe07a139cf0a42706ba41bf1150d3dda0e538a283c58c1c128",
+  "page_sha256": "cf8141bdc9b7c65a34d587fb19cf8e3fd5706b7608d91ac1581696e97624bb52",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/settings.html",
   "viewport": {

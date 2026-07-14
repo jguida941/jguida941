@@ -68,7 +68,7 @@
         {"id": "quality", "target_dir": "quality", "members": ["design_invariants.py", "diagnostics.py", "headless_receipts.py", "metrics_svg.py", "settings_admissibility.py", "severity.py", "triage.py", "validate_generated_profile.py", "visual_receipts.py"]},
         {"id": "rendering", "target_dir": "rendering", "members": ["card_theme.py", "components.py", "design_tokens.py", "generate_activity_heatmap.py", "generate_badges.py", "generate_builder_scorecard.py", "generate_contribution_panel.py", "generate_currently_working.py", "generate_engineering_cadence.py", "generate_focus_board.py", "generate_language_chart.py", "generate_metrics_general.py", "generate_repo_spotlight.py", "generate_snapshot_panel.py", "generate_streak_summary.py", "glass_kit.py", "icons.py", "svg_utils.py"]},
         {"id": "design", "target_dir": "rendering/design", "members": ["loader.py"]},
-        {"id": "webkit", "target_dir": "rendering/webkit", "members": ["archetype.py", "components.py", "design_render_adapter.py"]},
+        {"id": "webkit", "target_dir": "rendering/webkit", "members": ["archetype.py", "components.py", "dashboard.py", "design_render_adapter.py"]},
         {"id": "showcase", "target_dir": "rendering/showcase", "members": ["showcase.py"]},
         {"id": "settings", "target_dir": "rendering/settings", "members": ["settings.py"]},
         {"id": "studio", "target_dir": "rendering/studio", "members": ["studio.py"]},
@@ -83,7 +83,7 @@
       "root_allowlist": [],
       "groups": [
         {"id": "contracts", "target_dir": "contracts", "members": ["test_bootstrap_red_ref.py", "test_card_contracts.py", "test_data_semantics.py", "test_design_button.py", "test_design_card.py", "test_design_character.py", "test_design_chip.py", "test_design_conformance.py", "test_design_contract.py", "test_design_distinctness.py", "test_design_profiles_schema.py", "test_glass_preserved.py", "test_icon_system.py", "test_label_legibility.py", "test_page_shell.py",
-          "test_dom_cover.py", "test_page_manifest.py",
+          "test_dom_cover.py", "test_dashboard_surface.py", "test_page_manifest.py",
           "test_design_motion.py",
           "test_design_nav.py", "test_public_data_privacy.py", "test_readme_projection.py", "test_scripts_layout_contract.py", "test_settings_composition.py", "test_showcase_coverage.py", "test_skill_structure.py", "test_structural_layout.py", "test_studio.py", "test_tests_layout_contract.py", "test_theme_continuity.py", "test_theme_roster_authority.py", "test_theme_system.py", "test_tile_composition.py", "test_typography_restraint.py", "test_visual_receipt_provenance.py", "test_web_dashboard.py"]},
         {"id": "core", "target_dir": "core", "members": ["test_profile_cli.py", "test_runtime_env.py"]},
@@ -97,7 +97,7 @@
       "root": "contracts",
       "glob": "**/*.json",
       "placement_enforced": true,
-      "root_allowlist": ["repo_layout.json", "page_manifest.json", "dom_cover.json"],
+      "root_allowlist": ["repo_layout.json", "page_manifest.json", "dom_cover.json", "dashboard_surface.json"],
       "group_dirs": ["design_profiles"]
     },
     "site_layout": {

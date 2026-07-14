@@ -55,6 +55,13 @@
       "easing": "cubic-bezier(0.2, 0, 0.38, 0.9)",
       "active_css": {"background-color": "#002d9c"},
       "hover_css": {"background-color": "#0353e9"},
+      "switcher_css": {
+        "hover": {"background-color": "var(--button-hover-background)"},
+        "active": {"background-color": "var(--button-active-background)"},
+        "focus-visible": {"outline": "2px solid var(--accent)", "outline-offset": "-2px"},
+        "selected": {"color": "var(--ink-strong)", "background": "color-mix(in srgb, var(--accent) 22%, transparent)"},
+        "disabled": {"opacity": "0.4", "cursor": "not-allowed"}
+      },
       "elevation_shadow": null,
       "variants": ["primary", "secondary", "tertiary", "ghost", "danger-primary"],
       "states": ["rest", "hover", "active", "focus-visible", "disabled"],

@@ -205,48 +205,58 @@ def radius(name: str | None = None) -> dict[str, int]:
 
 
 # --- CSS emission ----------------------------------------------------------------
-def _role_vars(name: str, indent: str = "  ") -> str:
-    roles_map = THEMES[name]
-    mat = MATERIALS[name]
-    lines = [f"{indent}--{role}: {roles_map[role]};" for role in ROLES]
-    lines.append(f"{indent}--glass-blur: {mat['blur']:g}px;")
-    lines.append(f"{indent}--glass-saturate: {mat['saturate']:g}%;")
-    lines.append(f"{indent}--surface-opacity: {mat['surface_opacity']:g};")
-    lines.append(f"{indent}--raised-opacity: {mat['raised_opacity']:g};")
-    lines.append(f"{indent}--sheen-opacity: {mat['sheen']:g};")
-    return "\n".join(lines)
-
-
-def _ia_vars(name: str, indent: str = "  ") -> str:
+def css_declarations(name: str) -> dict[str, str]:
+    """Return the one ordered profile-to-CSS declaration projection."""
     from scripts.rendering.design import loader
 
-    r = radius(name)
+    if name not in ACTIVE_THEME_NAMES:
+        raise KeyError(f"theme {name!r} is not active")
+    resolved = loader.resolve_tokens(name)
+    roles_map = resolved["color"]
+    mat = MATERIALS[name]
+    r = resolved["radius"]
     d = density(name)
-    lines = [f"{indent}color-scheme: {color_scheme(name)};",
-             f"{indent}--radius-panel: {r['panel']}px;", f"{indent}--radius-tile: {r['tile']}px;"]
-    lines.append(f"{indent}--pad-panel: {d['panel_pad']}px;")
-    # Cross-page continuity fact: pageshell consumes --ps-pad for the same governed density value.
-    # Keeping the alias in the index token blocks lets one runtime proof compare the selected
-    # profile's shell density on every route; W3 will consume it when index joins pageshell.
-    lines.append(f"{indent}--ps-pad: {d['panel_pad']}px;")
-    lines.append(f"{indent}--pad-tile: {d['tile_pad']}px;")
-    lines.append(f"{indent}--gap-grid: {d['gap']}px;")
-    # NOTE: `tile_min` stays in THEME_IA as a reserved per-theme density spec for the future
-    # showcase GRID layouts, but the scorecard readout is now the grouped inset-LIST (no grid), so
-    # we do NOT emit a dead `--tile-min` CSS var that nothing consumes.
+    declarations: dict[str, str] = {f"--{role}": roles_map[role] for role in ROLES}
+    declarations.update({
+        "--glass-blur": f"{mat['blur']:g}px",
+        "--glass-saturate": f"{mat['saturate']:g}%",
+        "--surface-opacity": f"{mat['surface_opacity']:g}",
+        "--raised-opacity": f"{mat['raised_opacity']:g}",
+        "--sheen-opacity": f"{mat['sheen']:g}",
+        "color-scheme": color_scheme(name),
+        "--radius-panel": f"{r['panel']}px",
+        "--radius-tile": f"{r['tile']}px",
+        "--pad-panel": f"{d['panel_pad']}px",
+        "--ps-pad": f"{d['panel_pad']}px",
+        "--pad-tile": f"{d['tile_pad']}px",
+        "--gap-grid": f"{d['gap']}px",
+    })
     for key, (size, weight) in type_scale(name).items():
-        lines.append(f"{indent}--type-{key}: {size}px;")
-        lines.append(f"{indent}--type-{key}-weight: {weight};")
+        declarations[f"--type-{key}"] = f"{size}px"
+        declarations[f"--type-{key}-weight"] = str(weight)
     for key, val in space(name).items():
-        lines.append(f"{indent}--space-{key}: {val}px;")
-    m = THEME_IA.get(name, {}).get("motion", {})
-    if m:
+        declarations[f"--space-{key}"] = f"{val}px"
+    motion = THEME_IA.get(name, {}).get("motion", {})
+    if motion:
         for key in ("fast", "base", "slow"):
-            lines.append(f"{indent}--motion-{key}: {m[key]}ms;")
+            declarations[f"--motion-{key}"] = f"{motion[key]}ms"
         for key in ("standard", "enter", "exit"):
-            lines.append(f"{indent}--ease-{key}: {m['ease-' + key]};")
-    lines.append(f"{indent}--font-sans: {loader.resolve_tokens(name)['font']['family']};")
-    return "\n".join(lines)
+            declarations[f"--ease-{key}"] = motion["ease-" + key]
+    button = loader.load(name)["components"]["button"]
+    declarations["--motion-switcher"] = f"{button['transition_ms']}ms"
+    declarations["--ease-switcher"] = button["easing"]
+    declarations["--button-hover-background"] = button.get("hover_css", {}).get(
+        "background-color", "transparent"
+    )
+    declarations["--button-active-background"] = button.get("active_css", {}).get(
+        "background-color", "transparent"
+    )
+    declarations["--font-sans"] = resolved["font"]["family"]
+    return declarations
+
+
+def _declaration_lines(name: str, indent: str = "  ") -> str:
+    return "\n".join(f"{indent}{key}: {value};" for key, value in css_declarations(name).items())
 
 
 def emit_css_root() -> str:
@@ -254,9 +264,9 @@ def emit_css_root() -> str:
     other theme gets a [data-theme="name"] block carrying its OWN full axis (colour +
     material + per-theme radius/type), so flipping the theme reflows the whole page —
     not just its palette. Theme switching is a single attribute on <html>."""
-    blocks = [":root {\n" + _role_vars(DEFAULT_THEME) + "\n" + _ia_vars(DEFAULT_THEME) + "\n}"]
+    blocks = [":root {\n" + _declaration_lines(DEFAULT_THEME) + "\n}"]
     for name in THEMES:
         if name == DEFAULT_THEME:
             continue
-        blocks.append(f'[data-theme="{name}"] {{\n' + _role_vars(name) + "\n" + _ia_vars(name) + "\n}")
+        blocks.append(f'[data-theme="{name}"] {{\n' + _declaration_lines(name) + "\n}")
     return "\n\n".join(blocks) + "\n"

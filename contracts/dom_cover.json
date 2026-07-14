@@ -1,46 +1,89 @@
 {
   "contract_id": "ClosedWorldDomCover",
-  "schema_version": 1,
+  "schema_version": 2,
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "purpose": "W2: exact emitter-owned closure for every class-bearing element in committed page bytes. Index debt is immutable and may only shrink in W3. Every inline executable producer and runtime class mutation is source-pinned until W4 promotes the claim to rendered DOM. Classless nodes and inline style remain under separate literal and rendered-facts laws.",
+  "purpose": "W3: exact emitter-owned closure for every body element and static visible text node in committed page bytes. Unmarked descendants inherit only their nearest explicit governed owner; top-level unowned elements or text red. Immutable W2 index debt is retained as fully resolved history; prototype-derived hydration is source/policy pinned until W4 promotes the claim to rendered DOM.",
   "marker_attribute": "data-dom-owner",
+  "static_text_cover": {
+    "normalization": "body text; exclude script/style/template; collapse ASCII/HTML whitespace",
+    "pages": {
+      "index": {
+        "node_count": 83,
+        "sha256": "0de9378ee9118954cfa2aaeb7a5f384c19140f340359b511a62081124f920258"
+      },
+      "settings": {
+        "node_count": 98,
+        "sha256": "3aab946d8e43c5d7a78bec01a95a9ef1826a78c2ff9fa8ab3d48ad88f56e8dbf"
+      },
+      "showcase": {
+        "node_count": 400,
+        "sha256": "e06dff453c48f6868e4878dd3865d4f99d4e86a5af8f44d04330f6c5ef226fff"
+      },
+      "studio": {
+        "node_count": 375,
+        "sha256": "d1e0f7fa0278f478441e7b7634f37bf8fdf11d1d70ea0809586e2c547fd8453c"
+      }
+    }
+  },
   "coverage": {
     "claim": "committed-static-dom",
-    "classless_and_inline_scope": "outside this class-bearing ownership cover; existing literal guards plus W3/W4 remain binding",
+    "classless_and_inline_scope": "every static body element and visible text node is covered: an explicit data-dom-owner starts a narrow lineage and unmarked descendants inherit that nearest owner; ordered text facts preserve parent shape, boundary spaces, and NBSP while excluding script/style/template; computed inline values remain a W4 rendered-facts target",
     "rendered_dom_target": "W4",
     "runtime_producers": [
       {
         "id": "index-hydration",
         "producer": "scripts/pipeline/web_render.py::render_dashboard[_script]",
         "kind": "dom-mutator",
-        "pages": ["index"],
-        "script_sha256": "1fd0a8e1a50b7bacee632481c6a29af3601511bdf10732244f85f8c7068f7922"
+        "pages": [
+          "index"
+        ],
+        "script_sha256": "3a9572a03f7e18daa999a3da7ffc3a6423e8f44f6ad8eeb147866d3f5f847859"
       },
       {
         "id": "studio-space-data",
         "producer": "scripts/rendering/studio/studio.py::render_studio[STUDIO_SPACE]",
         "kind": "data-only",
-        "pages": ["studio"],
+        "pages": [
+          "studio"
+        ],
         "script_sha256": "dfdea4749364280200d2be02705097e1930776d4e977baca85fcaaeeabe4dd4a"
       },
       {
         "id": "studio-toggle",
         "producer": "scripts/rendering/studio/studio.py::_STUDIO_JS",
         "kind": "dom-mutator",
-        "pages": ["studio"],
+        "pages": [
+          "studio"
+        ],
         "script_sha256": "05efb2d307a54d28797ae4dcc7ee634fe1bf5ea9c8950c54e654b724cd528af2"
       },
       {
         "id": "theme-continuity",
         "producer": "scripts/rendering/pageshell/pageshell.py::theme_continuity_script_tag",
         "kind": "dom-mutator",
-        "pages": ["index", "settings", "showcase", "studio"],
+        "pages": [
+          "index",
+          "settings",
+          "showcase",
+          "studio"
+        ],
         "script_sha256": "ba6b047216cd3c87896d81838f0f825cf26172ae4204e167c6c463a2ae3bf111"
       }
     ],
     "runtime_class_debt": {
-      "index-hydration": {
+      "studio-toggle": {
+        "page": "studio",
+        "producer": "scripts/rendering/studio/studio.py::_STUDIO_JS",
+        "source_sha256": "05efb2d307a54d28797ae4dcc7ee634fe1bf5ea9c8950c54e654b724cd528af2",
+        "class_tokens": [
+          "active"
+        ],
+        "dynamic_axes": {}
+      }
+    },
+    "runtime_class_history": {
+      "index-hydration-w2": {
         "page": "index",
         "producer": "scripts/pipeline/web_render.py::_script",
         "source_sha256": "4b6c753aebf33739546c717759077cc907fa57a5c2d46c35791fba86f4edcb82",
@@ -68,15 +111,113 @@
           "warn"
         ],
         "dynamic_axes": {
-          "status": ["bad", "ok", "warn"]
-        }
-      },
-      "studio-toggle": {
-        "page": "studio",
-        "producer": "scripts/rendering/studio/studio.py::_STUDIO_JS",
-        "source_sha256": "05efb2d307a54d28797ae4dcc7ee634fe1bf5ea9c8950c54e654b724cd528af2",
-        "class_tokens": ["active"],
-        "dynamic_axes": {}
+          "status": [
+            "bad",
+            "ok",
+            "warn"
+          ]
+        },
+        "status": "resolved",
+        "resolved_by": "W3",
+        "replacement": "runtime_prototype_cover.index-hydration"
+      }
+    },
+    "runtime_prototype_cover": {
+      "index-hydration": {
+        "contract": "contracts/dashboard_surface.json",
+        "producer": "scripts/pipeline/web_render.py::_script",
+        "source_sha256": "cf7cad9eea603b41d9f06828021ebeb5fb7c288c194b74344250b573cdd09fb3",
+        "policy_sha256": "7a4a129a2866c083fd5842571590918e997316f775b52238074e09165d802789",
+        "prototypes": [
+          {
+            "id": "calendar-cell",
+            "target": "cal",
+            "max_clones": 377,
+            "budget_group": "calendar",
+            "unit_tree_sha256": "c5071f3bc28e3ed8a989077f5a8132d495a10beabf1a4d1a0caf6fa1f5575911",
+            "writes_sha256": "601b8b94f381e4bae5b11e7af86ee19d095ad263051ed4a547f5430e864f7d2e"
+          },
+          {
+            "id": "calendar-scale",
+            "target": "cal-scale",
+            "max_clones": 5,
+            "budget_group": "calendar-scale",
+            "unit_tree_sha256": "9d57f6bf1f5f24a87bc49886b7c8a5b25d57b88efa3bc14b74d819003b2eeb8d",
+            "writes_sha256": "5ada5036fc22f699dfc488e05226908c1ba787741a0b50d53e2b5ec0822cdc08"
+          },
+          {
+            "id": "event-mix",
+            "target": "event-mix",
+            "max_clones": 12,
+            "budget_group": "event-mix",
+            "unit_tree_sha256": "d4b26933cebfa7fee08114debc786050ed4566fc834fd82a314ab206e1dc664e",
+            "writes_sha256": "3a262006d812854ea21a796457688c2befabf4b12e4eec38dff74725dbc8fae2"
+          },
+          {
+            "id": "focus-item",
+            "target": "focus",
+            "max_clones": 9,
+            "budget_group": "focus",
+            "unit_tree_sha256": "0d869630fe89071a07c74e35232e3024b0be7db4c1904c6b3121a452d0a684f7",
+            "writes_sha256": "13f466cfc70d558c5fe0df4f197afaba88c917cc14eca547c8e4fbdcdcaff06f"
+          },
+          {
+            "id": "heat-cell",
+            "target": "heat-grid",
+            "max_clones": 168,
+            "budget_group": "heat",
+            "unit_tree_sha256": "681bee2b7faab54ff0e9d17944531823ddd38e1765946d5d34299ec6f005db84",
+            "writes_sha256": "601b8b94f381e4bae5b11e7af86ee19d095ad263051ed4a547f5430e864f7d2e"
+          },
+          {
+            "id": "heat-day",
+            "target": "heat-days",
+            "max_clones": 7,
+            "budget_group": "heat-days",
+            "unit_tree_sha256": "c80224c38b4c885a82a3445ee620dbb9cd371aac57dda6a3e5ba8bd8fc117df2",
+            "writes_sha256": "28ba4345265a1f1dcd98b4610070958be3213dfb327d958a05323b37c240cc52"
+          },
+          {
+            "id": "heat-hour",
+            "target": "heat-hours",
+            "max_clones": 5,
+            "budget_group": "heat-hours",
+            "unit_tree_sha256": "ae6e298994e928d3932574efb91df512471847732c3a6401dcf837f4be7e08b1",
+            "writes_sha256": "f08febf0aedc8eaec3d0ab15f529721cc83c390d03c7aff5c8a2ffaaefc47358"
+          },
+          {
+            "id": "language-legend",
+            "target": "langlegend",
+            "max_clones": 6,
+            "budget_group": "languages",
+            "unit_tree_sha256": "2d4317dd98d3951c0d7f16645253d0127e517ec14776fc62e773a46d5bc83664",
+            "writes_sha256": "7b23321449a4b8f3fa3fc6da4fc481919a7763b918cf350935f40145a20cde18"
+          },
+          {
+            "id": "language-segment",
+            "target": "langbar",
+            "max_clones": 6,
+            "budget_group": "languages",
+            "unit_tree_sha256": "d8a2a54303f3ef71961a9ee20785576e754b681f617bddebd6a4683641ae12fd",
+            "writes_sha256": "90a94d36e14e23654449e934fab66bd5259be02ef6f4af206b681488fb2921fa"
+          },
+          {
+            "id": "pipeline-status",
+            "target": "pipeline",
+            "max_clones": 4,
+            "budget_group": "pipeline",
+            "unit_tree_sha256": "6a017992ce89d4daf395f4ecd2d20866b7bd3213433ecf4f1ebd4b107ee6b306",
+            "writes_sha256": "52717c7f657965a87bc94444b7af42e1821c62a76d8d5712ed9f7de952b63bcf"
+          },
+          {
+            "id": "repository",
+            "target": "flagship",
+            "max_clones": 5,
+            "budget_group": "repositories",
+            "unit_tree_sha256": "6dfc8c86478ea04d27ed2ea06dc2f05381da6f1c16673e6160c96a3d3ea2bb59",
+            "writes_sha256": "9ff5fddd112f6c0b67ca6ee831f81cf5234b79d0ca1f4144c7ac3e370854450e"
+          }
+        ]
       }
     }
   },
@@ -87,6 +228,18 @@
         "settings"
       ],
       "signatures": [
+        {
+          "page": "settings",
+          "tag": "b",
+          "classes": [],
+          "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "code",
+          "classes": [],
+          "count": 1
+        },
         {
           "page": "settings",
           "tag": "div",
@@ -101,6 +254,12 @@
           "classes": [
             "table-scroll"
           ],
+          "count": 3
+        },
+        {
+          "page": "settings",
+          "tag": "h2",
+          "classes": [],
           "count": 3
         },
         {
@@ -155,6 +314,12 @@
         },
         {
           "page": "settings",
+          "tag": "tbody",
+          "classes": [],
+          "count": 3
+        },
+        {
+          "page": "settings",
           "tag": "td",
           "classes": [
             "cell",
@@ -174,10 +339,28 @@
         {
           "page": "settings",
           "tag": "th",
+          "classes": [],
+          "count": 12
+        },
+        {
+          "page": "settings",
+          "tag": "th",
           "classes": [
             "comp"
           ],
           "count": 9
+        },
+        {
+          "page": "settings",
+          "tag": "thead",
+          "classes": [],
+          "count": 3
+        },
+        {
+          "page": "settings",
+          "tag": "tr",
+          "classes": [],
+          "count": 12
         }
       ]
     },
@@ -216,6 +399,18 @@
         },
         {
           "page": "showcase",
+          "tag": "br",
+          "classes": [],
+          "count": 9
+        },
+        {
+          "page": "showcase",
+          "tag": "code",
+          "classes": [],
+          "count": 9
+        },
+        {
+          "page": "showcase",
           "tag": "div",
           "classes": [
             "legend"
@@ -248,6 +443,18 @@
         },
         {
           "page": "showcase",
+          "tag": "h2",
+          "classes": [],
+          "count": 3
+        },
+        {
+          "page": "showcase",
+          "tag": "header",
+          "classes": [],
+          "count": 3
+        },
+        {
+          "page": "showcase",
           "tag": "p",
           "classes": [
             "tally"
@@ -260,6 +467,12 @@
           "classes": [
             "lang"
           ],
+          "count": 3
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [],
           "count": 3
         },
         {
@@ -335,6 +548,24 @@
             "verdict"
           ],
           "count": 87
+        },
+        {
+          "page": "showcase",
+          "tag": "th",
+          "classes": [],
+          "count": 42
+        },
+        {
+          "page": "showcase",
+          "tag": "thead",
+          "classes": [],
+          "count": 3
+        },
+        {
+          "page": "showcase",
+          "tag": "tr",
+          "classes": [],
+          "count": 90
         },
         {
           "page": "showcase",
@@ -633,12 +864,65 @@
     "pageshell": {
       "emitter": "scripts/rendering/pageshell/pageshell.py::render_page_shell",
       "pages": [
+        "index",
         "settings",
         "showcase",
         "studio"
       ],
       "signatures": [
         {
+          "page": "index",
+          "tag": "a",
+          "classes": [],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "ps-liquid-glass"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "ps-main"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "h1",
+          "classes": [
+            "ps-title"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "p",
+          "classes": [
+            "ps-crumbs"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "p",
+          "classes": [
+            "ps-intro"
+          ],
+          "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "a",
+          "classes": [],
+          "count": 3
+        },
+        {
           "page": "settings",
           "tag": "div",
           "classes": [
@@ -696,6 +980,12 @@
         },
         {
           "page": "showcase",
+          "tag": "a",
+          "classes": [],
+          "count": 3
+        },
+        {
+          "page": "showcase",
           "tag": "div",
           "classes": [
             "ps-apple-dark"
@@ -749,6 +1039,12 @@
             "ps-panel"
           ],
           "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "a",
+          "classes": [],
+          "count": 3
         },
         {
           "page": "studio",
@@ -896,6 +1192,12 @@
         },
         {
           "page": "studio",
+          "tag": "h1",
+          "classes": [],
+          "count": 19
+        },
+        {
+          "page": "studio",
           "tag": "header",
           "classes": [
             "arch-apple-dark-hero"
@@ -941,6 +1243,12 @@
             "arch-liquid-glass-nav"
           ],
           "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "p",
+          "classes": [],
+          "count": 19
         },
         {
           "page": "studio",
@@ -1188,10 +1496,103 @@
     "webkit.card": {
       "emitter": "scripts/rendering/webkit/components.py::render_card",
       "pages": [
+        "index",
         "showcase",
         "studio"
       ],
       "signatures": [
+        {
+          "page": "index",
+          "tag": "circle",
+          "classes": [],
+          "count": 2
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "card-apple-dark-dashboard-score",
+            "card-carbon-dashboard-score",
+            "card-group",
+            "card-liquid-glass-dashboard-score"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "card-apple-dark-dashboard-snapshot",
+            "card-carbon-dashboard-snapshot",
+            "card-group",
+            "card-liquid-glass-dashboard-snapshot"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "card-row"
+          ],
+          "count": 12
+        },
+        {
+          "page": "index",
+          "tag": "line",
+          "classes": [],
+          "count": 2
+        },
+        {
+          "page": "index",
+          "tag": "path",
+          "classes": [],
+          "count": 8
+        },
+        {
+          "page": "index",
+          "tag": "rect",
+          "classes": [],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [],
+          "count": 12
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "card-detail"
+          ],
+          "count": 6
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "card-label"
+          ],
+          "count": 12
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "card-value"
+          ],
+          "count": 12
+        },
+        {
+          "page": "index",
+          "tag": "svg",
+          "classes": [
+            "card-icon"
+          ],
+          "count": 6
+        },
         {
           "page": "showcase",
           "tag": "div",
@@ -1225,6 +1626,12 @@
           "classes": [
             "card-row"
           ],
+          "count": 9
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [],
           "count": 9
         },
         {
@@ -1276,6 +1683,12 @@
           "classes": [
             "card-row"
           ],
+          "count": 57
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [],
           "count": 57
         },
         {
@@ -1497,6 +1910,640 @@
         }
       ]
     },
+    "webkit.dashboard": {
+      "emitter": "scripts/rendering/webkit/dashboard.py::render_dashboard_surface",
+      "pages": [
+        "index"
+      ],
+      "signatures": [
+        {
+          "page": "index",
+          "tag": "a",
+          "classes": [],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "a",
+          "classes": [
+            "db-repository-name"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "b",
+          "classes": [],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [],
+          "count": 2
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-calendar-foot"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-calendar-grid"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-calendar-scroll"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-dashboard"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-event-mix"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-focus-item"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-focus-items"
+          ],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-focus-lanes"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-heat-days"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-heat-grid"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-heat-hours"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-hero-kpi"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-hero-label"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-hero-primary"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-hero-stat"
+          ],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-hero-stats"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-hero-top"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-language-bar"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-language-legend"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-language-legend-row"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-live"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-pipeline"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-repository-list"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-repository-row"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-rhythm-grid"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-rhythm-scroll"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-score-copy"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-score-ring"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-score-ring-row"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-snapshot-card"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "footer",
+          "classes": [
+            "db-footer"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "h2",
+          "classes": [
+            "db-section-title"
+          ],
+          "count": 7
+        },
+        {
+          "page": "index",
+          "tag": "h3",
+          "classes": [
+            "db-focus-lane-title"
+          ],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "h3",
+          "classes": [
+            "db-pipeline-title"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "header",
+          "classes": [
+            "db-section-head"
+          ],
+          "count": 7
+        },
+        {
+          "page": "index",
+          "tag": "i",
+          "classes": [
+            "db-calendar-cell"
+          ],
+          "count": 2
+        },
+        {
+          "page": "index",
+          "tag": "i",
+          "classes": [
+            "db-event-fill"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "i",
+          "classes": [
+            "db-heat-cell"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "i",
+          "classes": [
+            "db-language-dot"
+          ],
+          "count": 2
+        },
+        {
+          "page": "index",
+          "tag": "i",
+          "classes": [
+            "db-language-segment"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "i",
+          "classes": [
+            "db-live-dot"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "p",
+          "classes": [
+            "db-empty"
+          ],
+          "count": 4
+        },
+        {
+          "page": "index",
+          "tag": "p",
+          "classes": [
+            "db-eyebrow"
+          ],
+          "count": 8
+        },
+        {
+          "page": "index",
+          "tag": "path",
+          "classes": [],
+          "count": 7
+        },
+        {
+          "page": "index",
+          "tag": "rect",
+          "classes": [],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "section",
+          "classes": [
+            "db-calendar",
+            "db-section"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "section",
+          "classes": [
+            "db-flagship",
+            "db-section"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "section",
+          "classes": [
+            "db-focus",
+            "db-section"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "section",
+          "classes": [
+            "db-focus-lane"
+          ],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "section",
+          "classes": [
+            "db-hero",
+            "db-section"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "section",
+          "classes": [
+            "db-languages",
+            "db-section"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "section",
+          "classes": [
+            "db-rhythm",
+            "db-section"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "section",
+          "classes": [
+            "db-scorecard",
+            "db-section"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "section",
+          "classes": [
+            "db-section",
+            "db-snapshot"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [],
+          "count": 7
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-calendar-scale"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-event-item"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-event-track"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-focus-detail"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-heat-day"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-heat-hour"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-hero-stat-label"
+          ],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-hero-stat-value"
+          ],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-language-name"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-language-percent"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-repository-meta"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-repository-name"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-score-detail"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-score-label"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-score-ring-value"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-section-meta"
+          ],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "db-status"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "strong",
+          "classes": [
+            "db-focus-title"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "svg",
+          "classes": [
+            "db-icon"
+          ],
+          "count": 4
+        },
+        {
+          "page": "index",
+          "tag": "template",
+          "classes": [],
+          "count": 11
+        }
+      ]
+    },
     "webkit.nav": {
       "emitter": "scripts/rendering/webkit/components.py::render_switchable_nav",
       "pages": [
@@ -1508,6 +2555,12 @@
       "signatures": [
         {
           "page": "index",
+          "tag": "a",
+          "classes": [],
+          "count": 4
+        },
+        {
+          "page": "index",
           "tag": "nav",
           "classes": [
             "nav-apple-dark",
@@ -1516,6 +2569,12 @@
             "site-nav"
           ],
           "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "a",
+          "classes": [],
+          "count": 4
         },
         {
           "page": "settings",
@@ -1530,6 +2589,12 @@
         },
         {
           "page": "showcase",
+          "tag": "a",
+          "classes": [],
+          "count": 4
+        },
+        {
+          "page": "showcase",
           "tag": "nav",
           "classes": [
             "nav-apple-dark",
@@ -1541,6 +2606,12 @@
         },
         {
           "page": "studio",
+          "tag": "a",
+          "classes": [],
+          "count": 4
+        },
+        {
+          "page": "studio",
           "tag": "nav",
           "classes": [
             "nav-apple-dark",
@@ -1549,6 +2620,50 @@
             "site-nav"
           ],
           "count": 1
+        }
+      ]
+    },
+    "webkit.switcher": {
+      "emitter": "scripts/rendering/webkit/components.py::render_theme_switcher",
+      "pages": [
+        "index"
+      ],
+      "signatures": [
+        {
+          "page": "index",
+          "tag": "button",
+          "classes": [
+            "theme-option"
+          ],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "theme-switcher"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "path",
+          "classes": [],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [],
+          "count": 3
+        },
+        {
+          "page": "index",
+          "tag": "svg",
+          "classes": [
+            "theme-option-icon"
+          ],
+          "count": 3
         }
       ]
     }
@@ -1566,7 +2681,7 @@
             "bento"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1575,7 +2690,7 @@
             "cal"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1584,7 +2699,7 @@
             "cal-foot"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1593,7 +2708,7 @@
             "cal-wrap"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1602,7 +2717,7 @@
             "chips"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1611,7 +2726,7 @@
             "heat"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1620,7 +2735,7 @@
             "heat-days"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1629,7 +2744,7 @@
             "heat-grid"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1638,7 +2753,7 @@
             "heat-hours"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1647,7 +2762,7 @@
             "heat-wrap"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1656,7 +2771,7 @@
             "kpi"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1665,7 +2780,7 @@
             "kpi-label"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1675,7 +2790,7 @@
             "num"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1684,7 +2799,7 @@
             "l"
           ],
           "baseline_count": 3,
-          "resolved_count": 0
+          "resolved_count": 3
         },
         {
           "page": "index",
@@ -1693,7 +2808,7 @@
             "lanes"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1702,7 +2817,7 @@
             "lang-bars"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1711,7 +2826,7 @@
             "langbar"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1720,7 +2835,7 @@
             "langlegend"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1729,7 +2844,7 @@
             "live"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1738,7 +2853,7 @@
             "mgroup"
           ],
           "baseline_count": 2,
-          "resolved_count": 0
+          "resolved_count": 2
         },
         {
           "page": "index",
@@ -1747,7 +2862,7 @@
             "mix"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1756,7 +2871,7 @@
             "mrow"
           ],
           "baseline_count": 6,
-          "resolved_count": 0
+          "resolved_count": 6
         },
         {
           "page": "index",
@@ -1765,7 +2880,7 @@
             "ms"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1774,7 +2889,7 @@
             "mt"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1784,7 +2899,7 @@
             "v"
           ],
           "baseline_count": 3,
-          "resolved_count": 0
+          "resolved_count": 3
         },
         {
           "page": "index",
@@ -1793,7 +2908,7 @@
             "ring"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1802,7 +2917,7 @@
             "ring-row"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1811,7 +2926,7 @@
             "rows"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1820,7 +2935,7 @@
             "section-head"
           ],
           "baseline_count": 7,
-          "resolved_count": 0
+          "resolved_count": 7
         },
         {
           "page": "index",
@@ -1829,7 +2944,7 @@
             "stat"
           ],
           "baseline_count": 3,
-          "resolved_count": 0
+          "resolved_count": 3
         },
         {
           "page": "index",
@@ -1838,7 +2953,7 @@
             "stats"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1847,7 +2962,7 @@
             "switcher"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1856,7 +2971,7 @@
             "topline"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1865,7 +2980,7 @@
             "title"
           ],
           "baseline_count": 7,
-          "resolved_count": 0
+          "resolved_count": 7
         },
         {
           "page": "index",
@@ -1875,7 +2990,7 @@
             "panel"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1884,7 +2999,7 @@
             "hairline"
           ],
           "baseline_count": 7,
-          "resolved_count": 0
+          "resolved_count": 7
         },
         {
           "page": "index",
@@ -1893,7 +3008,7 @@
             "wrap"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1902,7 +3017,7 @@
             "eyebrow"
           ],
           "baseline_count": 9,
-          "resolved_count": 0
+          "resolved_count": 9
         },
         {
           "page": "index",
@@ -1911,7 +3026,7 @@
             "tag"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1920,7 +3035,7 @@
             "panel"
           ],
           "baseline_count": 7,
-          "resolved_count": 0
+          "resolved_count": 7
         },
         {
           "page": "index",
@@ -1929,7 +3044,7 @@
             "cal-scale"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1938,7 +3053,7 @@
             "cal-swatches"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1947,7 +3062,7 @@
             "dot"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -1956,7 +3071,7 @@
             "ml"
           ],
           "baseline_count": 6,
-          "resolved_count": 0
+          "resolved_count": 6
         },
         {
           "page": "index",
@@ -1965,7 +3080,7 @@
             "ms"
           ],
           "baseline_count": 6,
-          "resolved_count": 0
+          "resolved_count": 6
         },
         {
           "page": "index",
@@ -1974,7 +3089,7 @@
             "mt"
           ],
           "baseline_count": 6,
-          "resolved_count": 0
+          "resolved_count": 6
         },
         {
           "page": "index",
@@ -1984,7 +3099,7 @@
             "num"
           ],
           "baseline_count": 6,
-          "resolved_count": 0
+          "resolved_count": 6
         },
         {
           "page": "index",
@@ -1993,7 +3108,7 @@
             "num"
           ],
           "baseline_count": 1,
-          "resolved_count": 0
+          "resolved_count": 1
         },
         {
           "page": "index",
@@ -2002,7 +3117,7 @@
             "section-meta"
           ],
           "baseline_count": 3,
-          "resolved_count": 0
+          "resolved_count": 3
         }
       ]
     },

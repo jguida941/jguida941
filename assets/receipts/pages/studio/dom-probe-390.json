@@ -5,14 +5,30 @@
   "client_width": 390,
   "contract_id": "PageHeadlessDomProbe",
   "declared_scroll_containers": [],
+  "empty_state_hidden": {},
   "horizontal_overflow": false,
+  "hydration_state": null,
   "kind": "chrome-headless-dom-probe",
   "offender_count": 0,
   "offenders": [],
   "overflow_px": 0,
   "page": "studio",
+  "prototype_origin_counts": {},
+  "readiness": {
+    "elapsed_ms": 52,
+    "outcome": "hydration-marker-missing",
+    "selector": "[data-dashboard-hydration]",
+    "state": null
+  },
   "route": "site/studio.html",
   "scroll_width": 390,
+  "sentinel_values": {
+    "cal-total": null,
+    "hero-contributions": null,
+    "lang-count": null,
+    "lang-name": null,
+    "rhythm-meta": null
+  },
   "uncontained_offender_count": 0,
   "viewport": {
     "height": 1000,

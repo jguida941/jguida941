@@ -92,10 +92,24 @@
   --ease-standard: ease-in-out;
   --ease-enter: ease-out;
   --ease-exit: ease-in;
+  --motion-switcher: 320ms;
+  --ease-switcher: cubic-bezier(0.34,1.56,0.64,1);
+  --button-hover-background: transparent;
+  --button-active-background: transparent;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --ps-measure-page: 980px;
+  --ps-gutter: clamp(20px, 4vw, 56px);
+  --ps-pad-tight: 12px;
+  --ps-gap: 24px;
+  --ps-gap-tight: 8px;
+  --ps-gap-section: 32px;
+  --ps-type-title: 28px;
+  --ps-type-h2: 20px;
+  --ps-type-body: 15px;
+  --ps-type-sub: 13px;
+  --ps-measure: 76ch;
 }
-
-[data-theme="carbon"] {
+:root[data-theme="carbon"] {
   --ink-strong: #161616;
   --ink: #525252;
   --ink-dim: #6f6f6f;
@@ -147,10 +161,14 @@
   --ease-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
   --ease-enter: cubic-bezier(0, 0, 0.38, 0.9);
   --ease-exit: cubic-bezier(0.2, 0, 1, 0.9);
+  --motion-switcher: 70ms;
+  --ease-switcher: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --button-hover-background: #0353e9;
+  --button-active-background: #002d9c;
   --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
 }
 
-[data-theme="apple-dark"] {
+:root[data-theme="apple-dark"] {
   --ink-strong: #f5f5f7;
   --ink: #c7c7cc;
   --ink-dim: #98989d;
@@ -202,189 +220,120 @@
   --ease-standard: ease-out;
   --ease-enter: ease-out;
   --ease-exit: ease-in;
+  --motion-switcher: 250ms;
+  --ease-switcher: ease-in-out;
+  --button-hover-background: transparent;
+  --button-active-background: transparent;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
-
-*,*::before,*::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  margin: 0;
-  font-family: var(--font-sans);
-  background:
-    radial-gradient(1200px 800px at 50% -10%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%),
-    var(--backdrop);
-  color: var(--ink);
-  line-height: 1.45;
-  -webkit-font-smoothing: antialiased;
-  font-feature-settings: "tnum" 1, "cv01" 1;
-  min-height: 100vh;
-  overflow-x: hidden;  /* a min-width child (calendar/heatmap) scrolls in its own wrap, never the page */
-}
-.wrap { max-width: 980px; margin: 0 auto; padding: clamp(20px, 4vw, 56px) 20px 72px; }
-.num { font-variant-numeric: tabular-nums; }
-
-/* --- glass panel (governed material) --- */
-.panel {
-  position: relative;
-  background: color-mix(in srgb, var(--surface) calc(var(--surface-opacity) * 100%), transparent);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  border: 1px solid color-mix(in srgb, var(--hairline) 16%, transparent);
-  border-radius: var(--radius-panel);
-  box-shadow: 0 24px 60px -28px rgba(0,0,0,.65), inset 0 1px 0 color-mix(in srgb, white calc(var(--sheen-opacity)*100%), transparent);
-  padding: var(--pad-panel, clamp(20px, 3vw, 30px));
-  margin-bottom: var(--gap-grid, 20px);
-}
-.eyebrow {
-  font-size: var(--type-eyebrow); font-weight: var(--type-eyebrow-weight);
-  letter-spacing: .12em; text-transform: uppercase; color: var(--ink-dim); margin: 0 0 6px;
-}
-.title { font-size: var(--type-title); font-weight: var(--type-title-weight); color: var(--ink-strong); margin: 0; }
-.hairline { height: 1px; background: color-mix(in srgb, var(--hairline) 14%, transparent); border: 0; margin: 16px 0 22px; }
-.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.section-meta { font-size: var(--type-caption); color: var(--ink-dim); }
-
-/* --- hero --- */
-.hero .topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.hero h1 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 600; color: var(--ink-strong); margin: 2px 0 4px; letter-spacing: -0.01em; }
-.hero .tag { font-size: var(--type-body); color: var(--ink); margin: 0; }
-.hero .kpi { display: flex; align-items: flex-end; gap: 28px; margin-top: 24px; flex-wrap: wrap; }
-.hero .kpi-value { font-size: clamp(46px, 8vw, 72px); font-weight: 600; color: var(--ink-strong); line-height: .96; letter-spacing: -0.02em; }
-.hero .kpi-label { font-size: var(--type-body); color: var(--ink); margin-top: 8px; }
-.hero .stats { display: flex; gap: 26px; padding-bottom: 6px; }
-.stat .v { font-size: var(--type-metric_lg); font-weight: 600; color: var(--ink-strong); }
-.stat .l { font-size: var(--type-caption); color: var(--ink-dim); }
-.live { display: inline-flex; align-items: center; gap: 7px; font-size: var(--type-caption); color: var(--ink-dim); margin-top: 14px; }
-.live .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-success); box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-success) 60%, transparent); animation: pulse 2.4s infinite; }
-@keyframes pulse { 0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--status-success) 55%,transparent);} 70%{box-shadow:0 0 0 7px transparent;} 100%{box-shadow:0 0 0 0 transparent;} }
-
-/* --- theme switcher --- */
-.switcher { display: inline-flex; gap: 3px; padding: 3px; border-radius: 999px;
-  background: color-mix(in srgb, var(--surface-raised) 70%, transparent);
-  border: 1px solid color-mix(in srgb, var(--hairline) 14%, transparent); }
-.switcher button {
-  font: inherit; font-size: var(--type-chip); font-weight: var(--type-chip-weight); color: var(--ink-dim);
-  background: transparent; border: 0; border-radius: 999px; padding: 7px 13px; cursor: pointer; white-space: nowrap;
-  transition: color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard); }
-.switcher button[aria-pressed="true"] { color: var(--ink-strong); background: color-mix(in srgb, var(--accent) 22%, transparent); }
-.switcher button:hover { color: var(--ink); }
-
-/* --- bento grid --- */
-.bento { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap-grid, 20px); align-items: start; }
-.bento .panel { margin: 0; }
-.span-2 { grid-column: 1 / -1; }
-
-/* --- metric tiles --- */
-/* Apple grouped inset-list readout (docs/design/liquid-glass.md, cited HIG): a cluster of >=3
-   scalar metrics is ONE chromed container of BARE, hairline-divided 'Value 1' rows (label left,
-   value right) — never N independently-chromed cards. Only .mgroup carries chrome; rows are
-   divided by a 1px hairline, the value dominates. Closes the giant-empty-box anti-pattern. */
-.mgroup { border: 1px solid color-mix(in srgb, var(--hairline) 12%, transparent); border-radius: var(--radius-tile); background: color-mix(in srgb, var(--surface-raised) calc(var(--raised-opacity)*100%), transparent); overflow: hidden; }
-.mrow { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 11px var(--pad-tile, 16px); min-height: 44px; }
-.mrow + .mrow { border-top: 1px solid color-mix(in srgb, var(--hairline) 9%, transparent); }
-.ml { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.mt { display: flex; align-items: center; gap: 8px; font-size: var(--type-body); font-weight: 600; color: var(--ink); }
-.ms { font-size: var(--type-caption); color: var(--ink-dim); }
-.mv { font-size: var(--type-metric); font-weight: 600; color: var(--ink-strong); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.mrow svg { width: 15px; height: 15px; stroke: var(--ink-dim); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
-
-/* --- ring (CI coverage) --- */
-.ring { --p: 0; position: relative; width: 64px; height: 64px; border-radius: 50%; flex: 0 0 auto;
-  background: conic-gradient(var(--accent) calc(var(--p)*1%), color-mix(in srgb,var(--hairline) 12%, transparent) 0);
-  display: grid; place-items: center; }
-.ring::after { content: ""; position: absolute; inset: 8px; border-radius: 50%; background: var(--surface-raised); z-index: 0; }
-.ring span { position: relative; z-index: 1; font-size: var(--type-caption); font-weight: 600; color: var(--ink-strong); }
-.ring-row { display: flex; align-items: center; gap: 14px; }
-
-/* --- language bar --- */
-.langbar { height: 13px; border-radius: 7px; overflow: hidden; display: flex; background: color-mix(in srgb,var(--hairline) 10%, transparent); }
-.langbar i { height: 100%; display: block; }
-.langlegend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 16px; margin-top: 16px; }
-.langlegend .row { display: flex; align-items: center; gap: 8px; font-size: var(--type-caption); }
-.langlegend .swatch { width: 9px; height: 9px; border-radius: 3px; flex: 0 0 auto; }
-.langlegend .nm { color: var(--ink); }
-.langlegend .pc { margin-left: auto; color: var(--ink-strong); font-weight: 600; }
-/* --- list rows (repos / focus) --- */
-.rows { display: flex; flex-direction: column; gap: 8px; }
-.rrow { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--radius-tile);
-  background: color-mix(in srgb, var(--surface-raised) calc(var(--raised-opacity)*100%), transparent);
-  border: 1px solid color-mix(in srgb, var(--hairline) 10%, transparent); }
-.rrow .ldot { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
-.rrow .nm { color: var(--ink-strong); font-weight: 500; font-size: var(--type-body); text-decoration: none; }
-.rrow a.nm:hover { color: var(--accent); }
-.rrow .meta { margin-left: auto; font-size: var(--type-caption); color: var(--ink-dim); text-align: right; white-space: nowrap; }
-.lockico { width: 12px; height: 12px; stroke: var(--ink-dim); fill: none; stroke-width: 1.6; }
-.lanes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.lane h4 { font-size: var(--type-eyebrow); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-dim); margin: 0 0 10px; }
-.lane .item { font-size: var(--type-caption); color: var(--ink); padding: 8px 0; border-top: 1px solid color-mix(in srgb,var(--hairline) 10%, transparent); }
-.lane .item b { display: block; color: var(--ink-strong); font-weight: 500; font-size: var(--type-body); }
-
-/* --- pipeline status chips --- */
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
-/* Status by SHAPE + label (DESIGN_SPEC 3.6): a neutral pill carries a small status
-   glyph — colour lives in the 13px icon, never a saturated full-hue button. */
-.chip { display: inline-flex; align-items: center; gap: 7px; font-size: var(--type-chip); font-weight: var(--type-chip-weight);
-  padding: 6px 12px; border-radius: 999px; color: var(--ink);
-  background: color-mix(in srgb, var(--surface-raised) 70%, transparent);
-  border: 1px solid color-mix(in srgb, var(--hairline) 12%, transparent); }
-.chip svg { width: 13px; height: 13px; fill: none; stroke: var(--ink-dim); stroke-width: 2.2;
-  stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
-.chip.ok svg { stroke: var(--status-success); }
-.chip.warn svg { stroke: var(--status-warning); }
-.chip.bad svg { stroke: var(--status-danger); }
-
-/* --- contribution calendar (intensity = accent opacity; restraint holds) --- */
-.cal-wrap { overflow-x: auto; padding-bottom: 4px; }
-.cal { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 3px; min-width: max-content; }
-.cal i { width: 11px; height: 11px; border-radius: 3px; background: color-mix(in srgb, var(--hairline) 9%, transparent); display: block; }
-.cal-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; font-size: var(--type-caption); color: var(--ink-dim); }
-.cal-scale { display: inline-flex; align-items: center; gap: 7px; }
-.cal-swatches { display: inline-flex; gap: 3px; }
-.cal-swatches i { width: 11px; height: 11px; border-radius: 3px; }
-
-/* --- activity rhythm heatmap (square-ish cells, left-aligned punch card) --- */
-.heat { display: grid; grid-template-columns: 30px 1fr; gap: 4px 8px; align-items: start; max-width: 560px; }
-.heat-days { display: grid; grid-auto-rows: 16px; gap: 4px; }
-.heat-days span { font-size: var(--type-caption); color: var(--ink-dim); line-height: 16px; }
-.heat-grid { display: grid; grid-template-columns: repeat(24, 1fr); grid-auto-rows: 16px; gap: 4px; }
-.heat-grid i { border-radius: 3px; background: color-mix(in srgb, var(--hairline) 9%, transparent); display: block; }
-.heat-hours { grid-column: 2; display: grid; grid-template-columns: repeat(24, 1fr); font-size: var(--type-caption); color: var(--ink-dim); margin-top: 7px; }
-.heat-hours span { grid-row: 1; text-align: center; }
-.mix { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 22px; }
-.mix .m { display: inline-flex; align-items: center; gap: 8px; font-size: var(--type-caption); color: var(--ink); }
-.mix .m b { color: var(--ink-strong); font-weight: 600; }
-.mix .bar { width: 52px; height: 7px; border-radius: 4px; background: color-mix(in srgb, var(--hairline) 12%, transparent); overflow: hidden; }
-.mix .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
-/* RETIRED (was: Apple drops the dense heatmap). That distinctness invariant deleted the rhythm
-   visualization and left a near-empty "When I Code" panel — the exact content-to-chrome
-   anti-pattern. Distinctness never trumps content-to-chrome: Apple shows the rhythm like every
-   theme; its distinctness comes from colour/type/density/material. The heatmap is legitimate,
-   filled content (GitHub's own contribution grid is a dense grid). */
-.heat-wrap { overflow-x: auto; }
-
-footer { text-align: center; color: var(--ink-dim); font-size: var(--type-caption); margin-top: 26px; }
-footer a { color: var(--ink); text-decoration: none; }
-
-/* --- a11y + responsive --- */
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-@media (max-width: 760px) {
-  /* section-level layout collapses to one column on a narrow screen; the metric readouts are
-     grouped inset-LISTS (.mgroup of .mrow rows), already a single dense column at every width */
-  .bento, .langlegend, .lanes { grid-template-columns: 1fr; }
-  .hero .kpi { gap: 18px; }
-  .hero .stats { gap: 18px; }
-}
-/* Phone tier (Apple HIG / WCAG 2.5.5): >=44px touch targets, tighter margins, the dense
-   heatmap scrolls inside .heat-wrap (min-width keeps cells square instead of distorting). */
-@media (max-width: 480px) {
-  .wrap { padding: 16px 12px 48px; }
-  .section-head { flex-wrap: wrap; }
-  .hero .stats { flex-wrap: wrap; gap: 14px; }
-  .switcher { width: 100%; }
-  .switcher button { flex: 1; min-height: 44px; }
-  .rrow { min-height: 44px; }
-  .heat { min-width: 460px; }
-}
+.ps-liquid-glass { background: var(--backdrop); color: var(--ink); font-family: var(--font-sans);
+  margin: 0; min-height: 100%; }
+.ps-liquid-glass .ps-main { max-width: var(--ps-measure-page); margin: 0 auto;
+  padding: var(--ps-gutter); }
+.ps-liquid-glass .ps-title { margin: 0 0 var(--ps-gap-tight); color: var(--ink-strong);
+  font-size: var(--ps-type-title); font-weight: 700; line-height: 1.2; }
+.ps-liquid-glass .ps-intro { margin: 0 0 var(--ps-gap-tight); color: var(--ink-dim);
+  font-size: var(--ps-type-body); line-height: 1.5; max-width: var(--ps-measure); }
+.ps-liquid-glass .ps-crumbs { margin: 0 0 var(--ps-gap-section); color: var(--ink-dim);
+  font-size: var(--ps-type-sub); }
+.ps-liquid-glass .ps-crumbs a { color: var(--accent); text-decoration: none; }
+.ps-liquid-glass .ps-panel { background: var(--surface); border: 1px solid var(--hairline);
+  border-radius: var(--radius-panel); padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }
+.ps-liquid-glass .ps-panel-h { margin: 0 0 var(--ps-pad-tight); color: var(--ink-strong);
+  font-size: var(--ps-type-h2); font-weight: 600; }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-score { background: var(--surface-raised); border-radius: 14px; border: 1px solid var(--hairline); overflow: hidden; -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-score .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-score .card-row + .card-row { border-top: 1px solid var(--hairline); }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-score .card-label { display: flex; align-items: center; gap: 8px; color: var(--ink-dim); font: 400 14px/1.3 var(--font-sans); min-width: 0; }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-score .card-detail { color: var(--ink-dim); font-size: 12px; }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-score .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-score .card-value { color: var(--ink-strong); font: 600 14px/1.3 var(--font-sans); text-align: right; white-space: nowrap; }
+:root[data-theme="carbon"] .card-carbon-dashboard-score { background: var(--surface-raised); border-radius: 0px; border: 1px solid var(--hairline); overflow: hidden; }
+:root[data-theme="carbon"] .card-carbon-dashboard-score .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
+:root[data-theme="carbon"] .card-carbon-dashboard-score .card-row + .card-row { border-top: 1px solid var(--hairline); }
+:root[data-theme="carbon"] .card-carbon-dashboard-score .card-label { display: flex; align-items: center; gap: 8px; color: var(--ink-dim); font: 400 14px/1.3 var(--font-sans); min-width: 0; }
+:root[data-theme="carbon"] .card-carbon-dashboard-score .card-detail { color: var(--ink-dim); font-size: 12px; }
+:root[data-theme="carbon"] .card-carbon-dashboard-score .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+:root[data-theme="carbon"] .card-carbon-dashboard-score .card-value { color: var(--ink-strong); font: 600 14px/1.3 var(--font-sans); text-align: right; white-space: nowrap; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-score { background: var(--surface-raised); border-radius: 14px; border: 1px solid var(--hairline); overflow: hidden; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-score .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-score .card-row + .card-row { border-top: 1px solid var(--hairline); }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-score .card-label { display: flex; align-items: center; gap: 8px; color: var(--ink-dim); font: 400 14px/1.3 var(--font-sans); min-width: 0; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-score .card-detail { color: var(--ink-dim); font-size: 12px; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-score .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-score .card-value { color: var(--ink-strong); font: 600 14px/1.3 var(--font-sans); text-align: right; white-space: nowrap; }
+:root:not([data-theme]) .card-liquid-glass-dashboard-score { background: var(--surface-raised); border-radius: 14px; border: 1px solid var(--hairline); overflow: hidden; -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); }
+:root:not([data-theme]) .card-liquid-glass-dashboard-score .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
+:root:not([data-theme]) .card-liquid-glass-dashboard-score .card-row + .card-row { border-top: 1px solid var(--hairline); }
+:root:not([data-theme]) .card-liquid-glass-dashboard-score .card-label { display: flex; align-items: center; gap: 8px; color: var(--ink-dim); font: 400 14px/1.3 var(--font-sans); min-width: 0; }
+:root:not([data-theme]) .card-liquid-glass-dashboard-score .card-detail { color: var(--ink-dim); font-size: 12px; }
+:root:not([data-theme]) .card-liquid-glass-dashboard-score .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+:root:not([data-theme]) .card-liquid-glass-dashboard-score .card-value { color: var(--ink-strong); font: 600 14px/1.3 var(--font-sans); text-align: right; white-space: nowrap; }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-snapshot { background: var(--surface-raised); border-radius: 14px; border: 1px solid var(--hairline); overflow: hidden; -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-snapshot .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-snapshot .card-row + .card-row { border-top: 1px solid var(--hairline); }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-snapshot .card-label { display: flex; align-items: center; gap: 8px; color: var(--ink-dim); font: 400 14px/1.3 var(--font-sans); min-width: 0; }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-snapshot .card-detail { color: var(--ink-dim); font-size: 12px; }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-snapshot .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+:root[data-theme="liquid-glass"] .card-liquid-glass-dashboard-snapshot .card-value { color: var(--ink-strong); font: 600 14px/1.3 var(--font-sans); text-align: right; white-space: nowrap; }
+:root[data-theme="carbon"] .card-carbon-dashboard-snapshot { background: var(--surface-raised); border-radius: 0px; border: 1px solid var(--hairline); overflow: hidden; }
+:root[data-theme="carbon"] .card-carbon-dashboard-snapshot .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
+:root[data-theme="carbon"] .card-carbon-dashboard-snapshot .card-row + .card-row { border-top: 1px solid var(--hairline); }
+:root[data-theme="carbon"] .card-carbon-dashboard-snapshot .card-label { display: flex; align-items: center; gap: 8px; color: var(--ink-dim); font: 400 14px/1.3 var(--font-sans); min-width: 0; }
+:root[data-theme="carbon"] .card-carbon-dashboard-snapshot .card-detail { color: var(--ink-dim); font-size: 12px; }
+:root[data-theme="carbon"] .card-carbon-dashboard-snapshot .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+:root[data-theme="carbon"] .card-carbon-dashboard-snapshot .card-value { color: var(--ink-strong); font: 600 14px/1.3 var(--font-sans); text-align: right; white-space: nowrap; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-snapshot { background: var(--surface-raised); border-radius: 14px; border: 1px solid var(--hairline); overflow: hidden; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-snapshot .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-snapshot .card-row + .card-row { border-top: 1px solid var(--hairline); }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-snapshot .card-label { display: flex; align-items: center; gap: 8px; color: var(--ink-dim); font: 400 14px/1.3 var(--font-sans); min-width: 0; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-snapshot .card-detail { color: var(--ink-dim); font-size: 12px; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-snapshot .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+:root[data-theme="apple-dark"] .card-apple-dark-dashboard-snapshot .card-value { color: var(--ink-strong); font: 600 14px/1.3 var(--font-sans); text-align: right; white-space: nowrap; }
+:root:not([data-theme]) .card-liquid-glass-dashboard-snapshot { background: var(--surface-raised); border-radius: 14px; border: 1px solid var(--hairline); overflow: hidden; -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); }
+:root:not([data-theme]) .card-liquid-glass-dashboard-snapshot .card-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: transparent; }
+:root:not([data-theme]) .card-liquid-glass-dashboard-snapshot .card-row + .card-row { border-top: 1px solid var(--hairline); }
+:root:not([data-theme]) .card-liquid-glass-dashboard-snapshot .card-label { display: flex; align-items: center; gap: 8px; color: var(--ink-dim); font: 400 14px/1.3 var(--font-sans); min-width: 0; }
+:root:not([data-theme]) .card-liquid-glass-dashboard-snapshot .card-detail { color: var(--ink-dim); font-size: 12px; }
+:root:not([data-theme]) .card-liquid-glass-dashboard-snapshot .card-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+:root:not([data-theme]) .card-liquid-glass-dashboard-snapshot .card-value { color: var(--ink-strong); font: 600 14px/1.3 var(--font-sans); text-align: right; white-space: nowrap; }
+:root[data-theme="liquid-glass"] .theme-switcher { border-radius: 999px; }
+:root[data-theme="liquid-glass"] .theme-switcher .theme-option { min-height: 44px; border-radius: 999px; justify-content: center; transition-duration: var(--motion-switcher); transition-timing-function: var(--ease-switcher); }
+:root[data-theme="liquid-glass"] .theme-switcher .theme-option-icon { display: none; }
+:root[data-theme="liquid-glass"] .theme-switcher .theme-option:hover { filter: brightness(1.08); }
+:root[data-theme="liquid-glass"] .theme-switcher .theme-option:active { filter: brightness(1.18) saturate(1.1); transform: scale(0.98); }
+:root[data-theme="liquid-glass"] .theme-switcher .theme-option:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 60%, transparent); outline-offset: 2px; }
+:root[data-theme="liquid-glass"] .theme-switcher .theme-option[aria-pressed="true"] { color: var(--ink-strong); background: color-mix(in srgb, var(--accent) 22%, transparent); }
+:root[data-theme="liquid-glass"] .theme-switcher .theme-option:disabled { opacity: 0.4; cursor: not-allowed; }
+:root[data-theme="carbon"] .theme-switcher { border-radius: 0px; }
+:root[data-theme="carbon"] .theme-switcher .theme-option { min-height: 48px; border-radius: 0px; justify-content: space-between; transition-duration: var(--motion-switcher); transition-timing-function: var(--ease-switcher); }
+:root[data-theme="carbon"] .theme-switcher .theme-option-icon { display: block; }
+:root[data-theme="carbon"] .theme-switcher .theme-option:hover { background-color: var(--button-hover-background); }
+:root[data-theme="carbon"] .theme-switcher .theme-option:active { background-color: var(--button-active-background); }
+:root[data-theme="carbon"] .theme-switcher .theme-option:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+:root[data-theme="carbon"] .theme-switcher .theme-option[aria-pressed="true"] { color: var(--ink-strong); background: color-mix(in srgb, var(--accent) 22%, transparent); }
+:root[data-theme="carbon"] .theme-switcher .theme-option:disabled { opacity: 0.4; cursor: not-allowed; }
+:root[data-theme="apple-dark"] .theme-switcher { border-radius: 999px; }
+:root[data-theme="apple-dark"] .theme-switcher .theme-option { min-height: 50px; border-radius: 999px; justify-content: center; transition-duration: var(--motion-switcher); transition-timing-function: var(--ease-switcher); }
+:root[data-theme="apple-dark"] .theme-switcher .theme-option-icon { display: none; }
+:root[data-theme="apple-dark"] .theme-switcher .theme-option:hover { opacity: 0.72; }
+:root[data-theme="apple-dark"] .theme-switcher .theme-option:active { opacity: 0.4; transform: scale(0.97); }
+:root[data-theme="apple-dark"] .theme-switcher .theme-option:focus-visible { outline: 4px solid color-mix(in srgb, var(--accent) 50%, transparent); outline-offset: 2px; }
+:root[data-theme="apple-dark"] .theme-switcher .theme-option[aria-pressed="true"] { color: var(--ink-strong); background: color-mix(in srgb, var(--accent) 22%, transparent); }
+:root[data-theme="apple-dark"] .theme-switcher .theme-option:disabled { opacity: 0.4; cursor: not-allowed; }
+:root:not([data-theme]) .theme-switcher[data-switcher-house="liquid-glass"] { border-radius: 999px; }
+:root:not([data-theme]) .theme-switcher[data-switcher-house="liquid-glass"] .theme-option { min-height: 44px; border-radius: 999px; justify-content: center; transition-duration: var(--motion-switcher); transition-timing-function: var(--ease-switcher); }
+:root:not([data-theme]) .theme-switcher[data-switcher-house="liquid-glass"] .theme-option-icon { display: none; }
+:root:not([data-theme]) .theme-switcher[data-switcher-house="liquid-glass"] .theme-option:hover { filter: brightness(1.08); }
+:root:not([data-theme]) .theme-switcher[data-switcher-house="liquid-glass"] .theme-option:active { filter: brightness(1.18) saturate(1.1); transform: scale(0.98); }
+:root:not([data-theme]) .theme-switcher[data-switcher-house="liquid-glass"] .theme-option:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 60%, transparent); outline-offset: 2px; }
+:root:not([data-theme]) .theme-switcher[data-switcher-house="liquid-glass"] .theme-option[aria-pressed="true"] { color: var(--ink-strong); background: color-mix(in srgb, var(--accent) 22%, transparent); }
+:root:not([data-theme]) .theme-switcher[data-switcher-house="liquid-glass"] .theme-option:disabled { opacity: 0.4; cursor: not-allowed; }
+.theme-switcher { display: inline-flex; gap: 3px; padding: 3px; border: 1px solid var(--hairline); background: var(--surface-raised); }
+.theme-option { display: inline-flex; align-items: center; gap: 8px; border: 0; padding: 7px 13px; color: var(--ink-dim); background: transparent; font: inherit; cursor: pointer; white-space: nowrap; transition-property: color, background, filter, opacity, transform; }
+.theme-option-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.theme-option[aria-pressed="false"] .theme-option-icon { opacity: 0; }
+.theme-option:hover { color: var(--ink); }
 :root[data-theme="liquid-glass"] .nav-liquid-glass { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 :root[data-theme="liquid-glass"] .nav-liquid-glass a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
 :root[data-theme="liquid-glass"] .nav-liquid-glass a[aria-current] { background: var(--accent); color: var(--backdrop); }
@@ -397,224 +346,406 @@ footer a { color: var(--ink); text-decoration: none; }
 :root:not([data-theme]) .nav-liquid-glass { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 :root:not([data-theme]) .nav-liquid-glass a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
 :root:not([data-theme]) .nav-liquid-glass a[aria-current] { background: var(--accent); color: var(--backdrop); }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
-@media (prefers-reduced-transparency: reduce) {
-  .panel, .switcher, .mgroup, .rrow { -webkit-backdrop-filter: none; backdrop-filter: none;
-    background: var(--surface); }
-}
-
+.db-dashboard { display: flex; flex-direction: column; gap: var(--gap-grid); }
+.db-section { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-panel); padding: var(--ps-pad); }
+.db-section[hidden] { display: none; }
+.db-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.db-eyebrow { margin: 0 0 4px; color: var(--ink-dim); font-size: var(--type-eyebrow); font-weight: var(--type-eyebrow-weight); text-transform: uppercase; letter-spacing: 0; }
+.db-section-title { margin: 0; color: var(--ink-strong); font-size: var(--type-title); font-weight: var(--type-title-weight); }
+.db-hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.db-hero-kpi { display: flex; align-items: flex-end; gap: 28px; margin-top: 24px; flex-wrap: wrap; }
+.db-hero-primary { color: var(--ink-strong); font-size: var(--type-display); font-weight: var(--type-display-weight); line-height: 1; }
+.db-hero-label { color: var(--ink); font-size: var(--type-body); }
+.db-hero-stats { display: flex; gap: 26px; flex-wrap: wrap; }
+.db-hero-stat { display: flex; flex-direction: column; }
+.db-hero-stat-value { color: var(--ink-strong); font-size: var(--type-metric_lg); font-weight: var(--type-metric_lg-weight); font-variant-numeric: tabular-nums; }
+.db-hero-stat-label { color: var(--ink-dim); font-size: var(--type-caption); }
+.db-live { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; color: var(--ink-dim); font-size: var(--type-caption); }
+.db-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-success); }
+.db-score-ring-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.db-score-ring { --db-progress: 0; position: relative; display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: conic-gradient(var(--accent) calc(var(--db-progress) * 1%), var(--hairline) 0); }
+.db-score-ring::after { position: absolute; inset: 8px; content: ""; border-radius: 50%; background: var(--surface-raised); }
+.db-score-ring-value { position: relative; z-index: 1; color: var(--ink-strong); font-size: var(--type-caption); }
+.db-score-copy { display: flex; flex-direction: column; }
+.db-score-label { color: var(--ink-strong); font-weight: 600; }
+.db-score-detail { color: var(--ink-dim); font-size: var(--type-caption); }
+.db-calendar-scroll,.db-rhythm-scroll { overflow-x: auto; }
+.db-calendar-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 3px; min-width: max-content; }
+.db-calendar-cell { display: block; width: 11px; height: 11px; border-radius: 3px; background: color-mix(in srgb, var(--hairline) 18%, transparent); }
+.db-calendar-cell[data-level="1"],.db-heat-cell[data-level="1"] { background: color-mix(in srgb, var(--accent) 38%, transparent); }
+.db-calendar-cell[data-level="2"],.db-heat-cell[data-level="2"] { background: color-mix(in srgb, var(--accent) 58%, transparent); }
+.db-calendar-cell[data-level="3"],.db-heat-cell[data-level="3"] { background: color-mix(in srgb, var(--accent) 78%, transparent); }
+.db-calendar-cell[data-level="4"],.db-heat-cell[data-level="4"] { background: var(--accent); }
+.db-calendar-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; color: var(--ink-dim); font-size: var(--type-caption); }
+.db-calendar-scale { display: inline-flex; align-items: center; gap: 3px; }
+.db-language-bar { display: flex; overflow: hidden; height: 13px; border-radius: 7px; background: var(--hairline); }
+.db-language-segment { display: block; width: calc(var(--db-share) * 1%); height: 100%; background: var(--db-language-color); }
+.db-language-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 16px; margin-top: 16px; }
+.db-language-legend-row { display: flex; align-items: center; gap: 8px; font-size: var(--type-caption); }
+.db-language-dot { width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; background: var(--db-language-color); }
+.db-language-name { color: var(--ink); }
+.db-language-percent { margin-left: auto; color: var(--ink-strong); font-weight: 600; }
+.db-rhythm-grid { display: grid; grid-template-columns: 30px 1fr; gap: 4px 8px; align-items: start; min-width: 460px; max-width: 560px; }
+.db-heat-days { display: grid; grid-auto-rows: 16px; gap: 4px; }
+.db-heat-day { color: var(--ink-dim); font-size: var(--type-caption); line-height: 16px; }
+.db-heat-grid { display: grid; grid-template-columns: repeat(24, 1fr); grid-auto-rows: 16px; gap: 4px; }
+.db-heat-cell { display: block; border-radius: 3px; background: color-mix(in srgb, var(--hairline) 18%, transparent); }
+.db-heat-hours { grid-column: 2; display: grid; grid-template-columns: repeat(24, 1fr); margin-top: 7px; color: var(--ink-dim); font-size: var(--type-caption); }
+.db-heat-hour { grid-column: var(--db-column); text-align: center; }
+.db-event-mix { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 22px; }
+.db-event-item { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-size: var(--type-caption); }
+.db-event-track { width: 52px; height: 7px; overflow: hidden; border-radius: 4px; background: var(--hairline); }
+.db-event-fill { display: block; width: calc(var(--db-progress) * 1%); height: 100%; background: var(--accent); }
+.db-repository-list { display: flex; flex-direction: column; gap: 8px; }
+.db-empty { margin: 0; color: var(--ink-dim); font-size: var(--type-body); }
+.db-repository-row { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 12px 14px; border: 1px solid var(--hairline); border-radius: var(--radius-tile); background: var(--surface-raised); }
+.db-repository-name { color: var(--ink-strong); font-size: var(--type-body); text-decoration: none; }
+.db-repository-meta { margin-left: auto; color: var(--ink-dim); font-size: var(--type-caption); text-align: right; }
+.db-focus-lanes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.db-focus-lane-title { margin: 0 0 10px; color: var(--ink-dim); font-size: var(--type-eyebrow); text-transform: uppercase; }
+.db-focus-items { display: flex; flex-direction: column; }
+.db-focus-item { padding: 8px 0; border-top: 1px solid var(--hairline); color: var(--ink); font-size: var(--type-caption); }
+.db-focus-title { display: flex; align-items: center; gap: 4px; color: var(--ink-strong); font-size: var(--type-body); }
+.db-focus-detail { display: block; }
+.db-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.db-snapshot-card { margin-bottom: 20px; }
+.db-pipeline-title { margin: 0 0 8px; color: var(--ink-dim); font-size: var(--type-eyebrow); text-transform: uppercase; }
+.db-pipeline { display: flex; flex-wrap: wrap; gap: 8px; }
+.db-status { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; padding: 6px 12px; border: 1px solid var(--hairline); border-radius: var(--radius-tile); color: var(--ink); background: var(--surface-raised); font-size: var(--type-chip); }
+.db-status[data-status="ok"] .db-icon { color: var(--status-success); }
+.db-status[data-status="warn"] .db-icon { color: var(--status-warning); }
+.db-status[data-status="bad"] .db-icon { color: var(--status-danger); }
+.db-footer { text-align: center; color: var(--ink-dim); font-size: var(--type-caption); }
+.db-footer a { color: var(--ink); text-decoration: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 760px) { .db-language-legend,.db-focus-lanes { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .db-section-head { flex-wrap: wrap; } .theme-switcher { width: 100%; flex-wrap: wrap; } .theme-option { flex: 1 0 100%; } }
+@media (prefers-reduced-motion: reduce) { .db-dashboard * { animation: none; transition: none; } }
+@media (prefers-reduced-transparency: reduce) { .db-dashboard,.db-section { backdrop-filter: none; -webkit-backdrop-filter: none; } }
 </style>
 </head>
 <body>
-<main class="wrap">
+<div class="ps-liquid-glass" data-dom-owner="pageshell"><div class="ps-main" data-dom-owner="pageshell"><h1 class="ps-title" data-dom-owner="pageshell" id="hero-name">@jguida941</h1><p class="ps-intro" data-dom-owner="pageshell" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p><p class="ps-crumbs" data-dom-owner="pageshell"><a href="index.html" data-theme-propagate>home</a></p><div class="db-dashboard" data-dom-owner="webkit.dashboard" data-dashboard-hydration="pending"><section class="db-section db-hero" data-dom-owner="webkit.dashboard" data-dashboard-section="hero"><div class="db-hero-top" data-dom-owner="webkit.dashboard"><div data-dom-owner="webkit.dashboard"><p class="db-eyebrow" data-dom-owner="webkit.dashboard">GitHub Analytics · Live</p><nav class="site-nav nav-liquid-glass nav-carbon nav-apple-dark" data-dom-owner="webkit.nav" aria-label="Site"><a href="index.html" data-theme-propagate aria-current="page">home</a><a href="showcase.html" data-theme-propagate>showcase</a><a href="studio.html" data-theme-propagate>studio</a><a href="settings.html" data-theme-propagate>settings</a></nav></div><div class="theme-switcher" data-dom-owner="webkit.switcher" data-switcher-house="liquid-glass" role="group" aria-label="Theme"><button class="theme-option" data-dom-owner="webkit.switcher" type="button" data-theme-set="liquid-glass" aria-pressed="true" title="Apple frosted glass · Tokyo Night"><span data-dom-owner="webkit.switcher">Liquid Glass</span><svg class="theme-option-icon" data-dom-owner="webkit.switcher" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button class="theme-option" data-dom-owner="webkit.switcher" type="button" data-theme-set="carbon" aria-pressed="false" title="IBM Carbon · flat structured UI"><span data-dom-owner="webkit.switcher">Carbon</span><svg class="theme-option-icon" data-dom-owner="webkit.switcher" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button><button class="theme-option" data-dom-owner="webkit.switcher" type="button" data-theme-set="apple-dark" aria-pressed="false" title="System dark · one vivid accent"><span data-dom-owner="webkit.switcher">Apple Dark</span><svg class="theme-option-icon" data-dom-owner="webkit.switcher" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></button></div></div><div class="db-hero-kpi" data-dom-owner="webkit.dashboard"><div data-dom-owner="webkit.dashboard"><div class="db-hero-primary" data-dom-owner="webkit.dashboard" data-slot="hero-contributions" data-bind="snapshot.last_year_contributions">—</div><div class="db-hero-label" data-dom-owner="webkit.dashboard">contributions · last 12 months</div></div><div class="db-hero-stats" data-dom-owner="webkit.dashboard"><div class="db-hero-stat" data-dom-owner="webkit.dashboard"><span class="db-hero-stat-value" data-dom-owner="webkit.dashboard" data-slot="hero-active-days" data-bind="scorecard.active_days_last_year">—</span><span class="db-hero-stat-label" data-dom-owner="webkit.dashboard">active days</span></div><div class="db-hero-stat" data-dom-owner="webkit.dashboard"><span class="db-hero-stat-value" data-dom-owner="webkit.dashboard" data-slot="hero-repos" data-bind="snapshot.total_repos">—</span><span class="db-hero-stat-label" data-dom-owner="webkit.dashboard">public repos</span></div><div class="db-hero-stat" data-dom-owner="webkit.dashboard"><span class="db-hero-stat-value" data-dom-owner="webkit.dashboard" data-slot="hero-stars" data-bind="snapshot.total_stars">—</span><span class="db-hero-stat-label" data-dom-owner="webkit.dashboard">stars</span></div></div></div><div class="db-live" data-dom-owner="webkit.dashboard"><i class="db-live-dot" data-dom-owner="webkit.dashboard"></i><span data-dom-owner="webkit.dashboard">Live · updated <span data-dom-owner="webkit.dashboard" id="updated">—</span></span></div></section><section class="db-section db-scorecard" data-dom-owner="webkit.dashboard" data-dashboard-section="scorecard"><header class="db-section-head" data-dom-owner="webkit.dashboard"><p class="db-eyebrow" data-dom-owner="webkit.dashboard">GitHub Signals · 12 Months</p><h2 class="db-section-title" data-dom-owner="webkit.dashboard">Builder Scorecard</h2></header><div class="db-score-ring-row" data-dom-owner="webkit.dashboard"><div class="db-score-ring" data-dom-owner="webkit.dashboard" id="ci-ring"><span class="db-score-ring-value" data-dom-owner="webkit.dashboard" data-slot="ci-coverage" data-bind="scorecard.ci_coverage_pct" data-suffix="%" data-round="0">—</span></div><div class="db-score-copy" data-dom-owner="webkit.dashboard"><span class="db-score-label" data-dom-owner="webkit.dashboard">CI coverage</span><span class="db-score-detail" data-dom-owner="webkit.dashboard">of public repos automated</span></div></div><div class="card-liquid-glass-dashboard-score card-carbon-dashboard-score card-apple-dark-dashboard-score card-group" data-dom-owner="webkit.card"><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><svg class="card-icon" data-dom-owner="webkit.card" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg><span data-dom-owner="webkit.card">Active days</span><span class="card-detail" data-dom-owner="webkit.card">last 12 months</span></span><span class="card-value" data-dom-owner="webkit.card" data-slot="score-active-days" data-bind="scorecard.active_days_last_year">—</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><svg class="card-icon" data-dom-owner="webkit.card" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><line x1="3" x2="9" y1="12" y2="12"/><line x1="15" x2="21" y1="12" y2="12"/></svg><span data-dom-owner="webkit.card">Active repos</span><span class="card-detail" data-dom-owner="webkit.card">last 7 days</span></span><span class="card-value" data-dom-owner="webkit.card" data-slot="score-active-repos" data-bind="scorecard.active_repos_7d">—</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><svg class="card-icon" data-dom-owner="webkit.card" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></svg><span data-dom-owner="webkit.card">Workflows</span><span class="card-detail" data-dom-owner="webkit.card">CI/CD pipelines</span></span><span class="card-value" data-dom-owner="webkit.card" data-slot="score-workflows" data-bind="scorecard.automation_workflows">—</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><svg class="card-icon" data-dom-owner="webkit.card" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg><span data-dom-owner="webkit.card">Releases</span><span class="card-detail" data-dom-owner="webkit.card">last 30 days</span></span><span class="card-value" data-dom-owner="webkit.card" data-slot="score-releases" data-bind="scorecard.releases_30d">—</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><svg class="card-icon" data-dom-owner="webkit.card" viewBox="0 0 24 24" aria-hidden="true"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg><span data-dom-owner="webkit.card" id="lang-name">primary language</span><span class="card-detail" data-dom-owner="webkit.card">share of code</span></span><span class="card-value" data-dom-owner="webkit.card" data-slot="score-language-share" data-bind="scorecard.primary_lang_share_pct" data-suffix="%" data-round="0">—</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><svg class="card-icon" data-dom-owner="webkit.card" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg><span data-dom-owner="webkit.card">Last push</span><span class="card-detail" data-dom-owner="webkit.card">days since last commit</span></span><span class="card-value" data-dom-owner="webkit.card" data-slot="score-last-push" data-bind="scorecard.days_since_last_push" data-suffix="d" data-round="0">—</span></div></div></section><section class="db-section db-calendar" data-dom-owner="webkit.dashboard" data-dashboard-section="calendar" id="calendar-panel" hidden><header class="db-section-head" data-dom-owner="webkit.dashboard"><p class="db-eyebrow" data-dom-owner="webkit.dashboard">Last 12 Months</p><h2 class="db-section-title" data-dom-owner="webkit.dashboard">Contribution Calendar</h2></header><span class="db-section-meta" data-dom-owner="webkit.dashboard" id="cal-total">—</span><div class="db-calendar-scroll" data-dom-owner="webkit.dashboard"><div class="db-calendar-grid" data-dom-owner="webkit.dashboard" id="cal" aria-label="Contribution activity"></div></div><div class="db-calendar-foot" data-dom-owner="webkit.dashboard"><span data-dom-owner="webkit.dashboard" id="cal-months"></span><span data-dom-owner="webkit.dashboard">Less <span class="db-calendar-scale" data-dom-owner="webkit.dashboard" id="cal-scale"></span> More</span></div></section><section class="db-section db-languages" data-dom-owner="webkit.dashboard" data-dashboard-section="languages"><header class="db-section-head" data-dom-owner="webkit.dashboard"><p class="db-eyebrow" data-dom-owner="webkit.dashboard">Code Composition</p><h2 class="db-section-title" data-dom-owner="webkit.dashboard">Language Breakdown</h2></header><span class="db-section-meta" data-dom-owner="webkit.dashboard" id="lang-count">—</span><div class="db-language-bar" data-dom-owner="webkit.dashboard" id="langbar"></div><div class="db-language-legend" data-dom-owner="webkit.dashboard" id="langlegend"></div></section><section class="db-section db-rhythm" data-dom-owner="webkit.dashboard" data-dashboard-section="rhythm" id="rhythm-panel" hidden><header class="db-section-head" data-dom-owner="webkit.dashboard"><p class="db-eyebrow" data-dom-owner="webkit.dashboard">Activity Rhythm</p><h2 class="db-section-title" data-dom-owner="webkit.dashboard">When I Code</h2></header><span class="db-section-meta" data-dom-owner="webkit.dashboard" id="rhythm-meta">—</span><div class="db-rhythm-scroll" data-dom-owner="webkit.dashboard"><div class="db-rhythm-grid" data-dom-owner="webkit.dashboard" aria-label="Activity by weekday and hour"><div class="db-heat-days" data-dom-owner="webkit.dashboard" id="heat-days"></div><div class="db-heat-grid" data-dom-owner="webkit.dashboard" id="heat-grid"></div><div class="db-heat-hours" data-dom-owner="webkit.dashboard" id="heat-hours"></div></div></div><div class="db-event-mix" data-dom-owner="webkit.dashboard" id="event-mix"></div></section><section class="db-section db-flagship" data-dom-owner="webkit.dashboard" data-dashboard-section="flagship"><header class="db-section-head" data-dom-owner="webkit.dashboard"><p class="db-eyebrow" data-dom-owner="webkit.dashboard">Showcase</p><h2 class="db-section-title" data-dom-owner="webkit.dashboard">Flagship Projects</h2></header><p class="db-empty" data-dom-owner="webkit.dashboard" hidden data-empty-state="flagship">No featured repositories yet.</p><div class="db-repository-list" data-dom-owner="webkit.dashboard" id="flagship"></div></section><section class="db-section db-focus" data-dom-owner="webkit.dashboard" data-dashboard-section="focus"><header class="db-section-head" data-dom-owner="webkit.dashboard"><p class="db-eyebrow" data-dom-owner="webkit.dashboard">Active Focus</p><h2 class="db-section-title" data-dom-owner="webkit.dashboard">Current Focus</h2></header><div class="db-focus-lanes" data-dom-owner="webkit.dashboard" id="focus"><section class="db-focus-lane" data-dom-owner="webkit.dashboard" data-focus-lane="now"><h3 class="db-focus-lane-title" data-dom-owner="webkit.dashboard">Now</h3><p class="db-empty" data-dom-owner="webkit.dashboard" hidden data-empty-state="focus-now">No items yet.</p><div class="db-focus-items" data-dom-owner="webkit.dashboard" data-focus-items="now"></div></section><section class="db-focus-lane" data-dom-owner="webkit.dashboard" data-focus-lane="next"><h3 class="db-focus-lane-title" data-dom-owner="webkit.dashboard">Next</h3><p class="db-empty" data-dom-owner="webkit.dashboard" hidden data-empty-state="focus-next">No items yet.</p><div class="db-focus-items" data-dom-owner="webkit.dashboard" data-focus-items="next"></div></section><section class="db-focus-lane" data-dom-owner="webkit.dashboard" data-focus-lane="shipped"><h3 class="db-focus-lane-title" data-dom-owner="webkit.dashboard">Shipped</h3><p class="db-empty" data-dom-owner="webkit.dashboard" hidden data-empty-state="focus-shipped">No items yet.</p><div class="db-focus-items" data-dom-owner="webkit.dashboard" data-focus-items="shipped"></div></section></div></section><section class="db-section db-snapshot" data-dom-owner="webkit.dashboard" data-dashboard-section="snapshot"><header class="db-section-head" data-dom-owner="webkit.dashboard"><p class="db-eyebrow" data-dom-owner="webkit.dashboard">Live GitHub Data</p><h2 class="db-section-title" data-dom-owner="webkit.dashboard">Raw Data Snapshot</h2></header><div class="db-snapshot-card" data-dom-owner="webkit.dashboard" id="snap-tiles"><div class="card-liquid-glass-dashboard-snapshot card-carbon-dashboard-snapshot card-apple-dark-dashboard-snapshot card-group" data-dom-owner="webkit.card"><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Commits</span></span><span class="card-value" data-dom-owner="webkit.card" data-snapshot-key="public_scope_commits">—</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Public Repos</span></span><span class="card-value" data-dom-owner="webkit.card" data-snapshot-key="total_repos">—</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Private</span></span><span class="card-value" data-dom-owner="webkit.card" data-snapshot-key="private_owned_repos">—</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">Stars total</span></span><span class="card-value" data-dom-owner="webkit.card" data-snapshot-key="total_stars">—</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">PRs Merged</span></span><span class="card-value" data-dom-owner="webkit.card" data-snapshot-key="prs_merged">—</span></div><div class="card-row" data-dom-owner="webkit.card"><span class="card-label" data-dom-owner="webkit.card"><span data-dom-owner="webkit.card">CI Repos</span></span><span class="card-value" data-dom-owner="webkit.card" data-snapshot-key="ci_repos">—</span></div></div></div><h3 class="db-pipeline-title" data-dom-owner="webkit.dashboard">Pipeline Status</h3><div class="db-pipeline" data-dom-owner="webkit.dashboard" id="pipeline"></div></section><footer class="db-footer" data-dom-owner="webkit.dashboard">Generated from the GitHub API · <a data-dom-owner="webkit.dashboard" href="https://github.com/jguida941" rel="noreferrer">@jguida941 on GitHub</a></footer><template data-dom-owner="webkit.dashboard" data-prototype="language-segment"><i class="db-language-segment" data-dom-owner="webkit.dashboard" data-prototype-origin="language-segment" data-field="segment"></i></template><template data-dom-owner="webkit.dashboard" data-prototype="language-legend"><div class="db-language-legend-row" data-dom-owner="webkit.dashboard" data-prototype-origin="language-legend" data-field="root"><i class="db-language-dot" data-dom-owner="webkit.dashboard" data-field="swatch"></i><span class="db-language-name" data-dom-owner="webkit.dashboard" data-field="name"></span><span class="db-language-percent" data-dom-owner="webkit.dashboard" data-field="percent"></span></div></template><template data-dom-owner="webkit.dashboard" data-prototype="repository"><div class="db-repository-row" data-dom-owner="webkit.dashboard" data-prototype-origin="repository" data-field="root"><i class="db-language-dot" data-dom-owner="webkit.dashboard" data-field="dot"></i><a class="db-repository-name" data-dom-owner="webkit.dashboard" data-field="link" rel="noreferrer"></a><span class="db-repository-name" data-dom-owner="webkit.dashboard" data-field="name"></span><span class="db-repository-meta" data-dom-owner="webkit.dashboard" data-field="meta"></span></div></template><template data-dom-owner="webkit.dashboard" data-prototype="focus-item"><div class="db-focus-item" data-dom-owner="webkit.dashboard" data-prototype-origin="focus-item" data-field="root"><strong class="db-focus-title" data-dom-owner="webkit.dashboard" data-field="title"><svg class="db-icon" data-dom-owner="webkit.dashboard" data-field="lock" viewBox="0 0 24 24" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span data-dom-owner="webkit.dashboard" data-field="title-text"></span></strong><span class="db-focus-detail" data-dom-owner="webkit.dashboard" data-field="detail"></span></div></template><template data-dom-owner="webkit.dashboard" data-prototype="calendar-cell"><i class="db-calendar-cell" data-dom-owner="webkit.dashboard" data-prototype-origin="calendar-cell" data-field="cell"></i></template><template data-dom-owner="webkit.dashboard" data-prototype="calendar-scale"><i class="db-calendar-cell" data-dom-owner="webkit.dashboard" data-prototype-origin="calendar-scale" data-field="scale"></i></template><template data-dom-owner="webkit.dashboard" data-prototype="heat-day"><span class="db-heat-day" data-dom-owner="webkit.dashboard" data-prototype-origin="heat-day" data-field="label"></span></template><template data-dom-owner="webkit.dashboard" data-prototype="heat-cell"><i class="db-heat-cell" data-dom-owner="webkit.dashboard" data-prototype-origin="heat-cell" data-field="cell"></i></template><template data-dom-owner="webkit.dashboard" data-prototype="heat-hour"><span class="db-heat-hour" data-dom-owner="webkit.dashboard" data-prototype-origin="heat-hour" data-field="label"></span></template><template data-dom-owner="webkit.dashboard" data-prototype="event-mix"><span class="db-event-item" data-dom-owner="webkit.dashboard" data-prototype-origin="event-mix" data-field="root"><span class="db-event-track" data-dom-owner="webkit.dashboard"><i class="db-event-fill" data-dom-owner="webkit.dashboard" data-field="bar"></i></span><span data-dom-owner="webkit.dashboard" data-field="label"></span><b data-dom-owner="webkit.dashboard" data-field="count"></b></span></template><template data-dom-owner="webkit.dashboard" data-prototype="pipeline-status"><span class="db-status" data-dom-owner="webkit.dashboard" data-prototype-origin="pipeline-status" data-field="root"><svg class="db-icon" data-dom-owner="webkit.dashboard" data-field="ok-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><svg class="db-icon" data-dom-owner="webkit.dashboard" data-field="warn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><svg class="db-icon" data-dom-owner="webkit.dashboard" data-field="bad-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg><span data-dom-owner="webkit.dashboard" data-field="label"></span></span></template></div></div></div>
 
-  <header class="panel hero">
-    <div class="topline">
-      <div>
-        <p class="eyebrow">GitHub Analytics · Live</p>
-        <h1 id="hero-name">@jguida941</h1>
-        <p class="tag" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p>
-        <nav class="site-nav nav-liquid-glass nav-carbon nav-apple-dark" data-dom-owner="webkit.nav" aria-label="Site"><a href="index.html" data-theme-propagate aria-current="page">home</a><a href="showcase.html" data-theme-propagate>showcase</a><a href="studio.html" data-theme-propagate>studio</a><a href="settings.html" data-theme-propagate>settings</a></nav>
-      </div>
-      <div class="switcher" role="group" aria-label="Theme"><button type="button" data-theme-set="liquid-glass" aria-pressed="true" title="Apple frosted glass · Tokyo Night">Liquid Glass</button><button type="button" data-theme-set="carbon" aria-pressed="false" title="IBM Carbon · flat structured UI">Carbon</button><button type="button" data-theme-set="apple-dark" aria-pressed="false" title="System dark · one vivid accent">Apple Dark</button></div>
-    </div>
-    <div class="kpi">
-      <div>
-        <div class="kpi-value num" data-bind="snapshot.last_year_contributions">—</div>
-        <div class="kpi-label">contributions · last 12 months</div>
-      </div>
-      <div class="stats">
-        <div class="stat"><div class="v num" data-bind="scorecard.active_days_last_year">—</div><div class="l">active days</div></div>
-        <div class="stat"><div class="v num" data-bind="snapshot.total_repos">—</div><div class="l">public repos</div></div>
-        <div class="stat"><div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">stars</div></div>
-      </div>
-    </div>
-    <div class="live"><span class="dot"></span><span>Live · updated <span id="updated">—</span></span></div>
-  </header>
-  <section class="panel">
-    <div class="section-head"><div><p class="eyebrow">GitHub Signals · 12 Months</p><h2 class="title">Builder Scorecard</h2></div></div>
-    <hr class="hairline">
-    <div class="ring-row" style="margin-bottom:14px">
-      <div class="ring" id="ci-ring"><span class="num" data-bind="scorecard.ci_coverage_pct" data-suffix="%" data-round="0">—</span></div>
-      <div><div class="mt">CI coverage</div><div class="ms">of public repos automated</div></div>
-    </div>
-    <div class="mgroup">
-      <div class="mrow"><span class="ml"><span class="mt"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 4 5 4 9a4 4 0 0 1-8 0c0-1.5.7-2.4 1.3-3.2C10.5 6.5 11 4 12 2Z"/></svg> active days</span><span class="ms">last 12 months</span></span><span class="mv num" data-bind="scorecard.active_days_last_year">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M3 12h5.8M15.2 12H21"/></svg> active repos</span><span class="ms">last 7 days</span></span><span class="mv num" data-bind="scorecard.active_repos_7d">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><path d="M9 6h6a3 3 0 0 1 3 3v6"/></svg> workflows</span><span class="ms">CI/CD pipelines</span></span><span class="mv num" data-bind="scorecard.automation_workflows">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l8-8 10 10-8 8z"/><circle cx="8.5" cy="8.5" r="1.4"/></svg> releases</span><span class="ms">last 30 days</span></span><span class="mv num" data-bind="scorecard.releases_30d">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-5 6 5 6M16 6l5 6-5 6"/></svg> <span id="lang-name">primary language</span></span><span class="ms">share of code</span></span><span class="mv num" data-bind="scorecard.primary_lang_share_pct" data-suffix="%" data-round="0">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg> last push</span><span class="ms">days since last commit</span></span><span class="mv num" data-bind="scorecard.days_since_last_push" data-suffix="d" data-round="0">—</span></div>
-    </div>
-  </section>
-  <section class="panel" id="calendar-panel" hidden>
-    <div class="section-head"><div><p class="eyebrow">Last 12 Months</p><h2 class="title">Contribution Calendar</h2></div><span class="section-meta" id="cal-total">—</span></div>
-    <hr class="hairline">
-    <div class="cal-wrap"><div class="cal" id="cal"></div></div>
-    <div class="cal-foot"><span id="cal-months"></span><span class="cal-scale">Less <span class="cal-swatches" id="cal-scale"></span> More</span></div>
-  </section>
-  <section class="panel">
-    <div class="section-head"><div><p class="eyebrow">Code Composition</p><h2 class="title">Language Breakdown</h2></div><span class="section-meta" id="lang-count">—</span></div>
-    <hr class="hairline">
-    <div class="lang-bars">
-      <div class="langbar" id="langbar"></div>
-      <div class="langlegend" id="langlegend"></div>
-    </div>
-  </section>
-  <section class="panel" id="rhythm-panel" hidden>
-    <div class="section-head"><div><p class="eyebrow">Activity Rhythm</p><h2 class="title">When I Code</h2></div><span class="section-meta" id="rhythm-meta">—</span></div>
-    <hr class="hairline">
-    <div class="heat-wrap"><div class="heat"><div class="heat-days" id="heat-days"></div><div class="heat-grid" id="heat-grid"></div><div class="heat-hours" id="heat-hours"></div></div></div>
-    <div class="mix" id="event-mix"></div>
-  </section>
-  <div class="bento">
-    <section class="panel">
-      <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
-      <hr class="hairline">
-      <div class="rows" id="flagship"></div>
-    </section>
-    <section class="panel">
-      <div class="section-head"><div><p class="eyebrow">Active Focus</p><h2 class="title">Current Focus</h2></div></div>
-      <hr class="hairline">
-      <div class="lanes" id="focus"></div>
-    </section>
-  </div>
-  <section class="panel">
-    <div class="section-head"><div><p class="eyebrow">Live GitHub Data</p><h2 class="title">Raw Data Snapshot</h2></div></div>
-    <hr class="hairline">
-    <div class="mgroup" id="snap-tiles"></div>
-    <p class="eyebrow" style="margin:20px 0 0">Pipeline Status</p>
-    <div class="chips" id="pipeline"></div>
-  </section>
-  <footer>Generated from the GitHub API · <a href="https://github.com/jguida941">@jguida941</a></footer>
-</main>
-
-  <script>
+<script>
+(function () {
+  "use strict";
   const DATA_URL = "./data/profile_snapshot.json";
-  const LANG_COLORS = {"Python": "#3572A5", "Java": "#b07219", "C++": "#f34b7d", "Rust": "#dea584", "Ruby": "#701516", "HTML": "#e34c26", "JavaScript": "#f1e05a", "TypeScript": "#3178c6", "Go": "#00ADD8", "Kotlin": "#A97BFF", "Swift": "#F05138", "C#": "#178600", "PHP": "#4F5D95", "Vue": "#41b883", "Shell": "#89e051", "C": "#555555", "Makefile": "#427819", "CSS": "#563d7c", "SCSS": "#c6538c", "CMake": "#DA3434", "Dockerfile": "#384d54", "GLSL": "#5686a5", "Batchfile": "#C1F12E", "Jupyter Notebook": "#DA5B0B"};
-  const fmt = (n) => {
-    if (n == null || isNaN(n)) return "—";
-    n = Number(n);
-    if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(1)+"M";
-    if (Math.abs(n) >= 1e4) return Math.round(n/1e3)+"k";
-    return n.toLocaleString("en-US");
+  const LANG_COLORS = {"Batchfile":"#C1F12E","C":"#555555","C#":"#178600","C++":"#f34b7d","CMake":"#DA3434","CSS":"#563d7c","Dockerfile":"#384d54","GLSL":"#5686a5","Go":"#00ADD8","HTML":"#e34c26","Java":"#b07219","JavaScript":"#f1e05a","Jupyter Notebook":"#DA5B0B","Kotlin":"#A97BFF","Makefile":"#427819","PHP":"#4F5D95","Python":"#3572A5","Ruby":"#701516","Rust":"#dea584","SCSS":"#c6538c","Shell":"#89e051","Swift":"#F05138","TypeScript":"#3178c6","Vue":"#41b883"};
+  const RUNTIME = {"bindings":[{"path":"snapshot.last_year_contributions","round":null,"slot":"hero-contributions","suffix":null},{"path":"scorecard.active_days_last_year","round":null,"slot":"hero-active-days","suffix":null},{"path":"snapshot.total_repos","round":null,"slot":"hero-repos","suffix":null},{"path":"snapshot.total_stars","round":null,"slot":"hero-stars","suffix":null},{"path":"scorecard.ci_coverage_pct","round":0,"slot":"ci-coverage","suffix":"%"},{"path":"scorecard.active_days_last_year","round":null,"slot":"score-active-days","suffix":null},{"path":"scorecard.active_repos_7d","round":null,"slot":"score-active-repos","suffix":null},{"path":"scorecard.automation_workflows","round":null,"slot":"score-workflows","suffix":null},{"path":"scorecard.releases_30d","round":null,"slot":"score-releases","suffix":null},{"path":"scorecard.primary_lang_share_pct","round":0,"slot":"score-language-share","suffix":"%"},{"path":"scorecard.days_since_last_push","round":0,"slot":"score-last-push","suffix":"d"}],"copy":{"breadcrumb_home":"home","calendar_eyebrow":"Last 12 Months","calendar_label":"Contribution activity","calendar_less":"Less","calendar_more":"More","calendar_title":"Contribution Calendar","ci_detail":"of public repos automated","ci_label":"CI coverage","flagship_empty":"No featured repositories yet.","flagship_eyebrow":"Showcase","flagship_title":"Flagship Projects","focus_empty":"No items yet.","focus_eyebrow":"Active Focus","focus_next":"Next","focus_now":"Now","focus_shipped":"Shipped","focus_title":"Current Focus","footer_link":"@jguida941 on GitHub","footer_prefix":"Generated from the GitHub API \u00b7","hero_active_days":"active days","hero_eyebrow":"GitHub Analytics \u00b7 Live","hero_intro":"Builder dashboard \u2014 regenerated hourly from the GitHub API.","hero_kpi_label":"contributions \u00b7 last 12 months","hero_public_repos":"public repos","hero_stars":"stars","hero_title":"@jguida941","languages_eyebrow":"Code Composition","languages_title":"Language Breakdown","live_prefix":"Live \u00b7 updated","load_error":"Could not load profile_snapshot.json","pipeline_ci":"CI","pipeline_commits":"Commits source","pipeline_events":"Events source","pipeline_releases":"Releases source","pipeline_title":"Pipeline Status","rhythm_eyebrow":"Activity Rhythm","rhythm_label":"Activity by weekday and hour","rhythm_title":"When I Code","score_active_days":"Active days","score_active_days_detail":"last 12 months","score_active_repos":"Active repos","score_active_repos_detail":"last 7 days","score_language_detail":"share of code","score_last_push":"Last push","score_last_push_detail":"days since last commit","score_primary_language":"primary language","score_releases":"Releases","score_releases_detail":"last 30 days","score_workflows":"Workflows","score_workflows_detail":"CI/CD pipelines","scorecard_eyebrow":"GitHub Signals \u00b7 12 Months","scorecard_title":"Builder Scorecard","snapshot_ci":"CI Repos","snapshot_commits":"Commits","snapshot_eyebrow":"Live GitHub Data","snapshot_private":"Private","snapshot_prs":"PRs Merged","snapshot_repos":"Public Repos","snapshot_stars":"Stars total","snapshot_title":"Raw Data Snapshot","status_ok":"OK"},"custom_properties":{"--db-column":{"kind":"number","maximum":24,"minimum":1,"unit":null},"--db-language-color":{"kind":"closed-color-map","maximum":null,"minimum":null,"unit":null},"--db-progress":{"kind":"number","maximum":100,"minimum":0,"unit":null},"--db-share":{"kind":"number","maximum":100,"minimum":0,"unit":null}},"geometry":{"calendar_rows":7,"focus_lanes":["now","next","shipped"],"hour_labels":[0,6,12,18,23],"weekdays":["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]},"hydration_writes":[{"domain":{"kind":"formatted-binding"},"name":null,"sink":"text","source":"bindings","target":"[data-bind]"},{"domain":{"kind":"string"},"name":null,"sink":"text","source":"username","target":"hero-name"},{"domain":{"kind":"date-string"},"name":null,"sink":"text","source":"generated_at","target":"updated"},{"domain":{"kind":"number","maximum":100,"minimum":0},"name":"--db-progress","sink":"custom-number","source":"scorecard.ci_coverage_pct","target":"ci-ring"},{"domain":{"kind":"string"},"name":null,"sink":"text","source":"top_languages.0.name","target":"lang-name"},{"domain":{"kind":"count-label"},"name":null,"sink":"text","source":"snapshot.languages_count","target":"lang-count"},{"domain":{"kind":"closed-key-map"},"name":"data-snapshot-key","sink":"text","source":"snapshot_rows","target":"snap-tiles"},{"domain":{"kind":"count-label"},"name":null,"sink":"text","source":"contribution_calendar.total","target":"cal-total"},{"domain":{"kind":"date-range"},"name":null,"sink":"text","source":"contribution_calendar.weeks","target":"cal-months"},{"domain":{"kind":"boolean"},"name":null,"sink":"hidden","source":"contribution_calendar","target":"calendar-panel"},{"domain":{"kind":"count-label"},"name":null,"sink":"text","source":"activity_rhythm","target":"rhythm-meta"},{"domain":{"kind":"boolean"},"name":null,"sink":"hidden","source":"activity_rhythm","target":"rhythm-panel"},{"domain":{"kind":"boolean"},"name":null,"sink":"hidden","source":"featured_repo_facts","target":"[data-empty-state=\"flagship\"]"},{"domain":{"kind":"boolean"},"name":null,"sink":"hidden","source":"focus.now","target":"[data-empty-state=\"focus-now\"]"},{"domain":{"kind":"boolean"},"name":null,"sink":"hidden","source":"focus.next","target":"[data-empty-state=\"focus-next\"]"},{"domain":{"kind":"boolean"},"name":null,"sink":"hidden","source":"focus.shipped","target":"[data-empty-state=\"focus-shipped\"]"},{"domain":{"kind":"enum","values":["complete","error","pending"]},"name":"dashboardHydration","sink":"data-enum","source":"fetch-lifecycle","target":"[data-dashboard-hydration]"},{"domain":{"kind":"closed-copy"},"name":null,"sink":"text","source":"fetch-error","target":"hero-tag"}],"intensity":{"calendar_opacity_pct":[0,38,58,78,100],"rhythm_opacity_pct":[0,30,52,76,100],"thresholds":[0,0.25,0.5,0.75]},"limits":{"calendar_days":371,"calendar_leading_blanks":6,"event_mix":12,"focus_items_per_lane":3,"focus_lanes":3,"heat_columns":24,"heat_hour_labels":5,"heat_rows":7,"languages":6,"pipeline_rows":4,"repositories":5,"snapshot_rows":6},"prototypes":[{"bound":{"kind":"calendar","leading_blanks_max":6,"limit":371,"source_path":"contribution_calendar.weeks"},"budget_group":"calendar","id":"calendar-cell","insertion":"replace-children","max_clones":377,"target":"cal","target_owner":"webkit.dashboard","target_tag":"div","unit":{"element_count":1,"fields":["cell"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"c5071f3bc28e3ed8a989077f5a8132d495a10beabf1a4d1a0caf6fa1f5575911"},"writes":[{"domain":{"kind":"enum","values":["0","1","2","3","4"]},"field":"cell","name":"level","sink":"data-enum"},{"domain":{"kind":"string"},"field":"cell","name":null,"sink":"title"}]},{"bound":{"kind":"fixed","limit":5,"source_path":"intensity.calendar_opacity_pct"},"budget_group":"calendar-scale","id":"calendar-scale","insertion":"replace-children","max_clones":5,"target":"cal-scale","target_owner":"webkit.dashboard","target_tag":"span","unit":{"element_count":1,"fields":["scale"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"9d57f6bf1f5f24a87bc49886b7c8a5b25d57b88efa3bc14b74d819003b2eeb8d"},"writes":[{"domain":{"kind":"enum","values":["0","1","2","3","4"]},"field":"scale","name":"level","sink":"data-enum"}]},{"bound":{"kind":"array-prefix","limit":12,"source_path":"activity_rhythm.event_mix"},"budget_group":"event-mix","id":"event-mix","insertion":"replace-children","max_clones":12,"target":"event-mix","target_owner":"webkit.dashboard","target_tag":"div","unit":{"element_count":5,"fields":["bar","count","label","root"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"d4b26933cebfa7fee08114debc786050ed4566fc834fd82a314ab206e1dc664e"},"writes":[{"domain":{"kind":"number","maximum":100,"minimum":0},"field":"bar","name":"--db-progress","sink":"custom-number"},{"domain":{"kind":"string"},"field":"count","name":null,"sink":"text"},{"domain":{"kind":"string"},"field":"label","name":null,"sink":"text"}]},{"bound":{"kind":"array-prefix","limit":9,"source_path":"focus.*"},"budget_group":"focus","id":"focus-item","insertion":"append-field","max_clones":9,"target":"focus","target_owner":"webkit.dashboard","target_tag":"div","unit":{"element_count":7,"fields":["detail","lock","root","title","title-text"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"0d869630fe89071a07c74e35232e3024b0be7db4c1904c6b3121a452d0a684f7"},"writes":[{"domain":{"kind":"string"},"field":"detail","name":null,"sink":"text"},{"domain":{"kind":"boolean"},"field":"lock","name":null,"sink":"hidden"},{"domain":{"kind":"string"},"field":"title-text","name":null,"sink":"text"}]},{"bound":{"columns":24,"kind":"matrix","limit":168,"rows":7,"source_path":"activity_rhythm.matrix"},"budget_group":"heat","id":"heat-cell","insertion":"replace-children","max_clones":168,"target":"heat-grid","target_owner":"webkit.dashboard","target_tag":"div","unit":{"element_count":1,"fields":["cell"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"681bee2b7faab54ff0e9d17944531823ddd38e1765946d5d34299ec6f005db84"},"writes":[{"domain":{"kind":"enum","values":["0","1","2","3","4"]},"field":"cell","name":"level","sink":"data-enum"},{"domain":{"kind":"string"},"field":"cell","name":null,"sink":"title"}]},{"bound":{"kind":"fixed","limit":7,"source_path":"geometry.weekdays"},"budget_group":"heat-days","id":"heat-day","insertion":"replace-children","max_clones":7,"target":"heat-days","target_owner":"webkit.dashboard","target_tag":"div","unit":{"element_count":1,"fields":["label"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"c80224c38b4c885a82a3445ee620dbb9cd371aac57dda6a3e5ba8bd8fc117df2"},"writes":[{"domain":{"kind":"string"},"field":"label","name":null,"sink":"text"}]},{"bound":{"kind":"fixed","limit":5,"source_path":"geometry.hour_labels"},"budget_group":"heat-hours","id":"heat-hour","insertion":"replace-children","max_clones":5,"target":"heat-hours","target_owner":"webkit.dashboard","target_tag":"div","unit":{"element_count":1,"fields":["label"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"ae6e298994e928d3932574efb91df512471847732c3a6401dcf837f4be7e08b1"},"writes":[{"domain":{"kind":"number","maximum":24,"minimum":1},"field":"label","name":"--db-column","sink":"custom-number"},{"domain":{"kind":"string"},"field":"label","name":null,"sink":"text"}]},{"bound":{"kind":"array-prefix","limit":6,"source_path":"top_languages"},"budget_group":"languages","id":"language-legend","insertion":"replace-children","max_clones":6,"target":"langlegend","target_owner":"webkit.dashboard","target_tag":"div","unit":{"element_count":4,"fields":["name","percent","root","swatch"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"2d4317dd98d3951c0d7f16645253d0127e517ec14776fc62e773a46d5bc83664"},"writes":[{"domain":{"kind":"string"},"field":"name","name":null,"sink":"text"},{"domain":{"kind":"string"},"field":"percent","name":null,"sink":"text"},{"domain":{"kind":"closed-map","source":"data_colors"},"field":"swatch","name":"--db-language-color","sink":"custom-color"}]},{"bound":{"kind":"array-prefix","limit":6,"source_path":"top_languages"},"budget_group":"languages","id":"language-segment","insertion":"replace-children","max_clones":6,"target":"langbar","target_owner":"webkit.dashboard","target_tag":"div","unit":{"element_count":1,"fields":["segment"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"d8a2a54303f3ef71961a9ee20785576e754b681f617bddebd6a4683641ae12fd"},"writes":[{"domain":{"kind":"closed-map","source":"data_colors"},"field":"segment","name":"--db-language-color","sink":"custom-color"},{"domain":{"kind":"number","maximum":100,"minimum":0},"field":"segment","name":"--db-share","sink":"custom-number"}]},{"bound":{"kind":"fixed","limit":4,"source_path":"status.pipeline"},"budget_group":"pipeline","id":"pipeline-status","insertion":"replace-children","max_clones":4,"target":"pipeline","target_owner":"webkit.dashboard","target_tag":"div","unit":{"element_count":11,"fields":["bad-icon","label","ok-icon","root","warn-icon"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"6a017992ce89d4daf395f4ecd2d20866b7bd3213433ecf4f1ebd4b107ee6b306"},"writes":[{"domain":{"kind":"boolean"},"field":"bad-icon","name":null,"sink":"hidden"},{"domain":{"kind":"string"},"field":"label","name":null,"sink":"text"},{"domain":{"kind":"boolean"},"field":"ok-icon","name":null,"sink":"hidden"},{"domain":{"kind":"enum","values":["bad","ok","warn"]},"field":"root","name":"status","sink":"data-enum"},{"domain":{"kind":"boolean"},"field":"warn-icon","name":null,"sink":"hidden"}]},{"bound":{"kind":"array-prefix","limit":5,"source_path":"featured_repo_facts"},"budget_group":"repositories","id":"repository","insertion":"replace-children","max_clones":5,"target":"flagship","target_owner":"webkit.dashboard","target_tag":"div","unit":{"element_count":5,"fields":["dot","link","meta","name","root"],"owner":"webkit.dashboard","root_count":1,"tree_sha256":"6dfc8c86478ea04d27ed2ea06dc2f05381da6f1c16673e6160c96a3d3ea2bb59"},"writes":[{"domain":{"kind":"closed-map","source":"data_colors"},"field":"dot","name":"--db-language-color","sink":"custom-color"},{"domain":{"kind":"boolean"},"field":"link","name":null,"sink":"hidden"},{"domain":{"hosts":["github.com"],"kind":"url","protocols":["https:"]},"field":"link","name":"href","sink":"safe-href"},{"domain":{"kind":"string"},"field":"link","name":null,"sink":"text"},{"domain":{"kind":"string"},"field":"meta","name":null,"sink":"text"},{"domain":{"kind":"boolean"},"field":"name","name":null,"sink":"hidden"},{"domain":{"kind":"string"},"field":"name","name":null,"sink":"text"}]}],"runtime_policy":{"allowed_dom_methods":["append","cloneNode","getElementById","querySelector","querySelectorAll","replaceChildren"],"allowed_url":{"hosts":["github.com"],"protocols":["https:"]},"custom_property_names":["--db-column","--db-language-color","--db-progress","--db-share"],"data_axes":{"dashboardHydration":["complete","error","pending"],"level":["0","1","2","3","4"],"status":["bad","ok","warn"]},"head_resources":["inline-theme-bootstrap","inline-style","inline-dashboard-hydration"]},"status":{"map":{"error":"bad","failed":"bad","missing":"bad","ok":"ok","unknown":"warn"},"pipeline":[{"key":"ci_status","label":"pipeline_ci"},{"key":"commits_status","label":"pipeline_commits"},{"key":"releases_status","label":"pipeline_releases"},{"key":"events_status","label":"pipeline_events"}],"source_path":"data_quality"}};
+  const PROTOTYPES = new Map(RUNTIME.prototypes.map((row) => [row.id, row]));
+  const STATIC_WRITES = RUNTIME.hydration_writes;
+  const counts = new Map();
+
+  const fmt = (value) => {
+    if (value == null || Number.isNaN(Number(value))) return "—";
+    const number = Number(value);
+    if (Math.abs(number) >= 1000000) return (number / 1000000).toFixed(1) + "M";
+    if (Math.abs(number) >= 10000) return Math.round(number / 1000) + "k";
+    return number.toLocaleString("en-US");
   };
-  const get = (obj, path) => path.split(".").reduce((o,k)=> (o==null?undefined:o[k]), obj);
-  const esc = (s) => String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-  const safeUrl = (u) => /^https?:\/\//i.test(String(u||"")) ? esc(u) : "#";
-  // Status reads by SHAPE + label, never hue alone (DESIGN_SPEC 3.6): 3 distinct glyphs.
-  const STATUS_ICON = {
-    ok: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
-    warn: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 16.5v.01"/></svg>',
-    bad: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  const get = (object, path) => path.split(".").reduce(
+    (value, key) => value == null ? undefined : value[key], object);
+  const clamp = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, Number(value) || 0));
+  const sourceColor = (name) => Object.prototype.hasOwnProperty.call(LANG_COLORS, name)
+    ? LANG_COLORS[name] : "var(--accent)";
+  const level = (value, maximum) => {
+    const ratio = maximum > 0 ? Number(value || 0) / maximum : 0;
+    if (ratio <= 0) return "0";
+    if (ratio <= RUNTIME.intensity.thresholds[1]) return "1";
+    if (ratio <= RUNTIME.intensity.thresholds[2]) return "2";
+    if (ratio <= RUNTIME.intensity.thresholds[3]) return "3";
+    return "4";
   };
 
-  function hydrate(d) {
-    document.querySelectorAll("[data-bind]").forEach(el => {
-      let v = get(d, el.getAttribute("data-bind"));
-      if (v == null) return;
-      const round = el.getAttribute("data-round");
-      if (round != null && !isNaN(v)) v = Number(v).toFixed(+round);
-      el.textContent = (typeof v === "number" || (round != null)) ? fmt(v) : v;
-      const suf = el.getAttribute("data-suffix"); if (suf) el.textContent += suf;
-    });
-    // hero meta
-    if (d.username) document.getElementById("hero-name").textContent = "@" + d.username;
-    if (d.generated_at) {
-      const dt = new Date(d.generated_at);
-      document.getElementById("updated").textContent = isNaN(dt) ? d.generated_at
-        : dt.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
-    }
-    // CI ring fill
-    const ci = get(d, "scorecard.ci_coverage_pct");
-    if (ci != null) document.getElementById("ci-ring").style.setProperty("--p", Math.max(0, Math.min(100, ci)));
-    // primary language name
-    const langs = d.top_languages || [];
-    if (langs[0] && langs[0].name) document.getElementById("lang-name").textContent = langs[0].name;
-    document.getElementById("lang-count").textContent = (get(d,"snapshot.languages_count")||langs.length) + " languages";
-    // language bar + legend
-    const top = langs.slice(0, 6);
-    const colorFor = (nm) => LANG_COLORS[nm] || "var(--accent)";
-    document.getElementById("langbar").innerHTML = top.map(l =>
-      `<i style="width:${(l.percent||0).toFixed(2)}%;background:${colorFor(l.name)}"></i>`).join("");
-    document.getElementById("langlegend").innerHTML = top.map(l =>
-      `<div class="row"><span class="swatch" style="background:${colorFor(l.name)}"></span>`+
-      `<span class="nm">${esc(l.name)}</span><span class="pc num">${(l.percent||0).toFixed(1)}%</span></div>`).join("");
-    // flagship repos
-    const repos = (d.featured_repo_facts || []).slice(0, 5);
-    document.getElementById("flagship").innerHTML = repos.map(r => {
-      const nm = r.url ? `<a class="nm" href="${safeUrl(r.url)}">${esc(r.name)}</a>` : `<span class="nm">${esc(r.name)}</span>`;
-      return `<div class="rrow"><span class="ldot" style="background:${colorFor(r.language)}"></span>${nm}`+
-        `<span class="meta">${esc(r.language||"")} · ★ ${fmt(r.stars||0)} · ${esc(r.pushed_ago||"")}</span></div>`;
-    }).join("") || `<div class="rrow"><span class="meta">No flagship repositories</span></div>`;
-    // focus lanes
-    const lanes = [["Now","now"],["Next","next"],["Shipped","shipped"]];
-    const lock = `<svg class="lockico" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
-    document.getElementById("focus").innerHTML = lanes.map(([label, key]) => {
-      const items = (get(d, "focus."+key) || []).slice(0, 3);
-      const body = items.map(it =>
-        `<div class="item"><b>${it.is_private?lock+" ":""}${esc(it.title)}</b>${esc(it.detail||"")}</div>`).join("")
-        || `<div class="item">—</div>`;
-      return `<div class="lane"><h4>${label}</h4>${body}</div>`;
-    }).join("");
-    // snapshot tiles (deduped: contributions is the hero, not repeated here)
-    const TILE = {public_scope_commits:"Commits", total_repos:"Public Repos", private_owned_repos:"Private",
-      total_stars:"Stars", prs_merged:"PRs Merged", ci_repos:"CI Repos"};
-    const rows = (d.snapshot_rows || []).filter(r => TILE[r.key]);
-    document.getElementById("snap-tiles").innerHTML = rows.slice(0, 6).map(r =>
-      `<div class="mrow"><span class="ml"><span class="mt">${esc(TILE[r.key])}</span></span><span class="mv num">${esc(r.display_value)}</span></div>`).join("");
-    // pipeline status — public source health only (never auth/credential fields)
-    const q = d.data_quality || {};
-    const cls = (s) => s==="ok"?"ok":(["error","failed","missing"].includes(s)?"bad":"warn");
-    const PIPE = [["CI","ci_status"],["Commits","commits_status"],["Releases","releases_status"],["Events","events_status"]];
-    document.getElementById("pipeline").innerHTML = PIPE.map(([nm,k]) => {
-      const s = q[k] || "unknown";
-      const state = cls(s);
-      const label = s === "ok" ? "OK" : esc(s[0].toUpperCase() + s.slice(1));
-      return `<span class="chip ${state}">${STATUS_ICON[state] || STATUS_ICON.warn}${nm} · ${label}</span>`;
-    }).join("");
-    // contribution calendar (intensity = accent opacity by level)
-    const cal = d.contribution_calendar;
-    if (cal && Array.isArray(cal.weeks) && cal.weeks.length && (cal.total || 0) > 0) {
-      const days = cal.weeks.flat().filter(x => x && x.date);
-      const maxc = Math.max(1, ...days.map(x => x.count || 0));
-      const op = [0, 38, 58, 78, 100];
-      const lvl = (c) => c <= 0 ? 0 : (c/maxc <= .25 ? 1 : c/maxc <= .5 ? 2 : c/maxc <= .75 ? 3 : 4);
-      const fill = (l) => l ? `background:color-mix(in srgb, var(--accent) ${op[l]}%, transparent)` : "";
-      const first = new Date(days[0].date + "T00:00:00Z").getUTCDay();
-      let cells = "";
-      for (let i = 0; i < first; i++) cells += "<i></i>";
-      days.forEach(dy => cells += `<i style="${fill(lvl(dy.count))}" title="${esc(dy.date)}: ${fmt(dy.count)}"></i>`);
-      document.getElementById("cal").innerHTML = cells;
-      document.getElementById("cal-total").textContent = fmt(cal.total) + " contributions";
-      const mlabel = (s) => { const t = new Date(s + "T00:00:00Z"); return isNaN(t) ? esc(s) : t.toLocaleString("en-US", {month:"short", year:"numeric"}); };
-      document.getElementById("cal-months").textContent = mlabel(days[0].date) + " – " + mlabel(days[days.length-1].date);
-      document.getElementById("cal-scale").innerHTML = [0,1,2,3,4].map(l => `<i style="${fill(l)}"></i>`).join("");
-      document.getElementById("calendar-panel").hidden = false;
-    }
-    // activity rhythm heatmap (7 weekday rows x 24 hours)
-    const rh = d.activity_rhythm;
-    if (rh && Array.isArray(rh.matrix) && rh.total) {
-      const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-      const maxm = Math.max(1, ...rh.matrix.flat());
-      const hop = [0, 30, 52, 76, 100];
-      const hlvl = (c) => c <= 0 ? 0 : (c/maxm <= .25 ? 1 : c/maxm <= .5 ? 2 : c/maxm <= .75 ? 3 : 4);
-      document.getElementById("heat-days").innerHTML = DAYS.map(x => `<span>${x}</span>`).join("");
-      document.getElementById("heat-grid").innerHTML = rh.matrix.map((row, di) =>
-        row.map((c, hi) => `<i style="${hlvl(c) ? `background:color-mix(in srgb, var(--accent) ${hop[hlvl(c)]}%, transparent)` : ""}" title="${DAYS[di]} ${String(hi).padStart(2,"0")}:00 · ${fmt(c)} events"></i>`).join("")).join("");
-      document.getElementById("heat-hours").innerHTML = [0,6,12,18,23].map(h => `<span style="grid-column:${h+1}">${String(h).padStart(2,"0")}</span>`).join("");
-      document.getElementById("rhythm-meta").textContent = fmt(rh.total) + " events · " + esc(rh.timezone || "");
-      const mix = Object.entries(rh.event_mix || {});
-      const maxmix = Math.max(1, ...mix.map(([,v]) => v));
-      document.getElementById("event-mix").innerHTML = mix.map(([k,v]) =>
-        `<span class="m"><span class="bar"><i style="width:${(v/maxmix*100).toFixed(0)}%"></i></span>${esc(k)} <b>${fmt(v)}</b></span>`).join("");
-      document.getElementById("rhythm-panel").hidden = false;
-    }
+  function permitted(writes, field, sink, name) {
+    return writes.some((row) => row.field === field && row.sink === sink && row.name === (name || null));
   }
 
-  fetch(DATA_URL, { cache: "no-store" }).then(r => r.json()).then(hydrate).catch(e => {
-    document.getElementById("hero-tag").textContent = "Could not load profile_snapshot.json";
+  function writer(root, policy) {
+    const fields = new Map();
+    if (root.dataset.field) fields.set(root.dataset.field, root);
+    root.querySelectorAll("[data-field]").forEach((node) => {
+      if (fields.has(node.dataset.field)) throw new Error("duplicate prototype field");
+      fields.set(node.dataset.field, node);
+    });
+    const nodeFor = (field, sink, name) => {
+      if (!permitted(policy.writes, field, sink, name)) throw new Error("undeclared prototype write");
+      const node = fields.get(field);
+      if (!node) throw new Error("missing prototype field");
+      return node;
+    };
+    return Object.freeze({
+      text(field, value) { nodeFor(field, "text", null).textContent = String(value == null ? "" : value); },
+      title(field, value) { nodeFor(field, "title", null).title = String(value == null ? "" : value); },
+      hidden(field, value) { nodeFor(field, "hidden", null).hidden = Boolean(value); },
+      dataEnum(field, name, value) {
+        const node = nodeFor(field, "data-enum", name);
+        const allowed = RUNTIME.runtime_policy.data_axes[name] || [];
+        const normalized = String(value);
+        if (!allowed.includes(normalized)) throw new Error("off-enum data axis");
+        node.dataset[name] = normalized;
+      },
+      customNumber(field, name, value) {
+        const node = nodeFor(field, "custom-number", name);
+        const rule = RUNTIME.custom_properties[name];
+        if (!rule || rule.kind !== "number") throw new Error("undeclared numeric property");
+        node.style.setProperty(name, String(clamp(value, rule.minimum, rule.maximum)));
+      },
+      customColor(field, name, value) {
+        const node = nodeFor(field, "custom-color", name);
+        const rule = RUNTIME.custom_properties[name];
+        if (!rule || rule.kind !== "closed-color-map") throw new Error("undeclared color property");
+        const allowed = value === "var(--accent)" || Object.values(LANG_COLORS).includes(value);
+        if (!allowed) throw new Error("off-map color");
+        node.style.setProperty(name, value);
+      },
+      safeHref(field, value) {
+        const node = nodeFor(field, "safe-href", "href");
+        const url = new URL(String(value || ""), location.href);
+        const policy = RUNTIME.runtime_policy.allowed_url;
+        if (!policy.protocols.includes(url.protocol) || !policy.hosts.includes(url.hostname)) {
+          throw new Error("unsafe repository URL");
+        }
+        node.href = url.href;
+      }
+    });
+  }
+
+  function targetFor(targetId, budgetKey) {
+    if (targetId !== "focus") return document.getElementById(targetId);
+    if (!RUNTIME.geometry.focus_lanes.includes(budgetKey)) throw new Error("off-enum focus lane");
+    return document.querySelector('[data-focus-items="' + budgetKey + '"]');
+  }
+
+  function appendClone(prototypeId, targetId, budgetKey, configure) {
+    const policy = PROTOTYPES.get(prototypeId);
+    if (!policy || policy.target !== targetId) throw new Error("undeclared prototype/target pair");
+    const count = counts.get(prototypeId) || 0;
+    if (count >= policy.max_clones) throw new Error("prototype clone cap exceeded");
+    const template = document.querySelector('template[data-prototype="' + prototypeId + '"]');
+    const target = targetFor(targetId, budgetKey);
+    if (!template || !target || target.dataset.domOwner !== policy.target_owner) {
+      throw new Error("prototype endpoint mismatch");
+    }
+    const node = template.content.firstElementChild.cloneNode(true);
+    if (!node || node.dataset.prototypeOrigin !== prototypeId
+        || node.dataset.domOwner !== policy.unit.owner) throw new Error("prototype unit mismatch");
+    configure(writer(node, policy));
+    target.append(node);
+    counts.set(prototypeId, count + 1);
+  }
+
+  function resetTargets() {
+    counts.clear();
+    for (const row of RUNTIME.prototypes) {
+      if (row.target === "focus") continue;
+      const target = document.getElementById(row.target);
+      if (!target) throw new Error("missing prototype target");
+      target.replaceChildren();
+    }
+    document.querySelectorAll("[data-focus-items]").forEach((target) => target.replaceChildren());
+  }
+
+  function staticPolicy(target, sink, name) {
+    return STATIC_WRITES.some((row) => row.target === target && row.sink === sink
+      && row.name === (name || null));
+  }
+  function staticNode(target) {
+    const node = target.startsWith("[") ? document.querySelector(target)
+      : document.getElementById(target);
+    if (!node) throw new Error("missing static write target");
+    return node;
+  }
+  function staticText(target, value) {
+    if (!staticPolicy(target, "text", null)) throw new Error("undeclared static text write");
+    staticNode(target).textContent = String(value == null ? "" : value);
+  }
+  function staticHidden(target, value) {
+    if (!staticPolicy(target, "hidden", null)) throw new Error("undeclared static hidden write");
+    staticNode(target).hidden = Boolean(value);
+  }
+  function staticSelectorHidden(target, value) {
+    if (!target.startsWith("[data-empty-state=")) throw new Error("invalid empty-state selector");
+    staticHidden(target, value);
+  }
+  function hideAllEmptyStates() {
+    STATIC_WRITES.filter((row) => row.target.startsWith('[data-empty-state="'))
+      .forEach((row) => staticSelectorHidden(row.target, true));
+  }
+  function setEmptyStateForSuccess(target, itemCount) {
+    staticSelectorHidden(target, Number(itemCount) > 0);
+  }
+  function staticDataEnum(target, name, value) {
+    if (!staticPolicy(target, "data-enum", name)) throw new Error("undeclared static data write");
+    const allowed = RUNTIME.runtime_policy.data_axes[name] || [];
+    const normalized = String(value);
+    if (!allowed.includes(normalized)) throw new Error("off-enum static data axis");
+    staticNode(target).dataset[name] = normalized;
+  }
+  function staticNumber(target, name, value) {
+    if (!staticPolicy(target, "custom-number", name)) throw new Error("undeclared static number write");
+    const rule = RUNTIME.custom_properties[name];
+    staticNode(target).style.setProperty(name, String(clamp(value, rule.minimum, rule.maximum)));
+  }
+
+  function hydrateBindings(data) {
+    const declared = new Map(RUNTIME.bindings.map((row) => [row.slot, row]));
+    document.querySelectorAll("[data-bind]").forEach((node) => {
+      const rule = declared.get(node.dataset.slot);
+      if (!rule || rule.path !== node.dataset.bind) throw new Error("binding placement drift");
+      let value = get(data, rule.path);
+      if (value == null) return;
+      if (rule.round != null) value = Number(value).toFixed(rule.round);
+      node.textContent = (typeof value === "number" || rule.round != null) ? fmt(value) : String(value);
+      if (rule.suffix) node.textContent += rule.suffix;
+    });
+  }
+
+  function hydrate(data) {
+    hideAllEmptyStates();
+    resetTargets();
+    hydrateBindings(data);
+    if (data.username) staticText("hero-name", "@" + data.username);
+    if (data.generated_at) {
+      const date = new Date(data.generated_at);
+      staticText("updated", Number.isNaN(date.valueOf()) ? data.generated_at
+        : date.toLocaleString("en-US", {month: "short", day: "numeric", hour: "numeric", minute: "2-digit"}));
+    }
+    const ci = get(data, "scorecard.ci_coverage_pct");
+    if (ci != null) staticNumber("ci-ring", "--db-progress", ci);
+
+    const languages = Array.isArray(data.top_languages)
+      ? data.top_languages.slice(0, RUNTIME.limits.languages) : [];
+    if (languages[0] && languages[0].name) staticText("lang-name", languages[0].name);
+    staticText("lang-count", fmt(get(data, "snapshot.languages_count") || languages.length) + " languages");
+    languages.forEach((language) => {
+      const color = sourceColor(language.name);
+      appendClone("language-segment", "langbar", null, (out) => {
+        out.customColor("segment", "--db-language-color", color);
+        out.customNumber("segment", "--db-share", language.percent || 0);
+      });
+      appendClone("language-legend", "langlegend", null, (out) => {
+        out.customColor("swatch", "--db-language-color", color);
+        out.text("name", language.name || "");
+        out.text("percent", Number(language.percent || 0).toFixed(1) + "%");
+      });
+    });
+
+    const repositories = Array.isArray(data.featured_repo_facts)
+      ? data.featured_repo_facts.slice(0, RUNTIME.limits.repositories) : [];
+    setEmptyStateForSuccess('[data-empty-state="flagship"]', repositories.length);
+    repositories.forEach((repository) => appendClone("repository", "flagship", null, (out) => {
+      out.customColor("dot", "--db-language-color", sourceColor(repository.language));
+      const linked = Boolean(repository.url);
+      out.hidden("link", !linked);
+      out.hidden("name", linked);
+      out.text("link", repository.name || "");
+      out.text("name", repository.name || "");
+      if (linked) out.safeHref("link", repository.url);
+      out.text("meta", (repository.language || "") + " · ★ " + fmt(repository.stars || 0)
+        + " · " + (repository.pushed_ago || ""));
+    }));
+
+    for (const lane of RUNTIME.geometry.focus_lanes) {
+      const items = Array.isArray(get(data, "focus." + lane))
+        ? get(data, "focus." + lane).slice(0, RUNTIME.limits.focus_items_per_lane) : [];
+      setEmptyStateForSuccess('[data-empty-state="focus-' + lane + '"]', items.length);
+      items.forEach((item) => appendClone("focus-item", "focus", lane, (out) => {
+        out.hidden("lock", !item.is_private);
+        out.text("title-text", item.title || "");
+        out.text("detail", item.detail || "");
+      }));
+    }
+
+    const snapshot = new Map((Array.isArray(data.snapshot_rows) ? data.snapshot_rows : [])
+      .map((row) => [row.key, row.display_value]));
+    if (!staticPolicy("snap-tiles", "text", "data-snapshot-key")) throw new Error("snapshot write not declared");
+    document.querySelectorAll("[data-snapshot-key]").forEach((node) => {
+      if (snapshot.has(node.dataset.snapshotKey)) node.textContent = String(snapshot.get(node.dataset.snapshotKey));
+    });
+
+    const quality = data.data_quality || {};
+    RUNTIME.status.pipeline.forEach((entry) => appendClone("pipeline-status", "pipeline", null, (out) => {
+      const raw = String(quality[entry.key] || "unknown");
+      const status = RUNTIME.status.map[raw] || "warn";
+      const statusLabel = raw === "ok" ? RUNTIME.copy.status_ok
+        : raw.charAt(0).toUpperCase() + raw.slice(1);
+      out.dataEnum("root", "status", status);
+      out.hidden("ok-icon", status !== "ok");
+      out.hidden("warn-icon", status !== "warn");
+      out.hidden("bad-icon", status !== "bad");
+      out.text("label", RUNTIME.copy[entry.label] + " · " + statusLabel);
+    }));
+
+    const calendar = data.contribution_calendar;
+    if (calendar && Array.isArray(calendar.weeks) && calendar.weeks.length && Number(calendar.total) > 0) {
+      const days = calendar.weeks.flat().filter((day) => day && day.date)
+        .slice(0, RUNTIME.limits.calendar_days);
+      const maximum = Math.max(1, ...days.map((day) => Number(day.count) || 0));
+      const first = days.length ? new Date(days[0].date + "T00:00:00Z").getUTCDay() : 0;
+      for (let index = 0; index < Math.min(first, RUNTIME.limits.calendar_leading_blanks); index += 1) {
+        appendClone("calendar-cell", "cal", null, (out) => out.dataEnum("cell", "level", "0"));
+      }
+      days.forEach((day) => appendClone("calendar-cell", "cal", null, (out) => {
+        out.dataEnum("cell", "level", level(day.count, maximum));
+        out.title("cell", day.date + ": " + fmt(day.count) + " contributions");
+      }));
+      RUNTIME.intensity.calendar_opacity_pct.forEach((unused, index) =>
+        appendClone("calendar-scale", "cal-scale", null,
+          (out) => out.dataEnum("scale", "level", String(index))));
+      staticText("cal-total", fmt(calendar.total) + " contributions");
+      if (days.length) {
+        const month = (source) => {
+          const date = new Date(source + "T00:00:00Z");
+          return Number.isNaN(date.valueOf()) ? source
+            : date.toLocaleString("en-US", {month: "short", year: "numeric"});
+        };
+        staticText("cal-months", month(days[0].date) + " – " + month(days[days.length - 1].date));
+      }
+      staticHidden("calendar-panel", false);
+    }
+
+    const rhythm = data.activity_rhythm;
+    if (rhythm && Array.isArray(rhythm.matrix) && Number(rhythm.total) > 0) {
+      const values = [];
+      for (let day = 0; day < RUNTIME.limits.heat_rows; day += 1) {
+        const row = Array.isArray(rhythm.matrix[day]) ? rhythm.matrix[day] : [];
+        for (let hour = 0; hour < RUNTIME.limits.heat_columns; hour += 1) values.push(Number(row[hour]) || 0);
+      }
+      const maximum = Math.max(1, ...values);
+      RUNTIME.geometry.weekdays.forEach((day) =>
+        appendClone("heat-day", "heat-days", null, (out) => out.text("label", day)));
+      values.forEach((count, index) => appendClone("heat-cell", "heat-grid", null, (out) => {
+        const day = Math.floor(index / RUNTIME.limits.heat_columns);
+        const hour = index % RUNTIME.limits.heat_columns;
+        out.dataEnum("cell", "level", level(count, maximum));
+        out.title("cell", RUNTIME.geometry.weekdays[day] + " " + String(hour).padStart(2, "0")
+          + ":00 · " + fmt(count) + " events");
+      }));
+      RUNTIME.geometry.hour_labels.forEach((hour) => appendClone("heat-hour", "heat-hours", null, (out) => {
+        out.text("label", String(hour).padStart(2, "0"));
+        out.customNumber("label", "--db-column", hour + 1);
+      }));
+      const mix = Object.entries(rhythm.event_mix || {}).slice(0, RUNTIME.limits.event_mix);
+      const mixMaximum = Math.max(1, ...mix.map((entry) => Number(entry[1]) || 0));
+      mix.forEach(([label, count]) => appendClone("event-mix", "event-mix", null, (out) => {
+        out.customNumber("bar", "--db-progress", Number(count) / mixMaximum * 100);
+        out.text("label", label);
+        out.text("count", fmt(count));
+      }));
+      staticText("rhythm-meta", fmt(rhythm.total) + " events · " + String(rhythm.timezone || ""));
+      staticHidden("rhythm-panel", false);
+    }
+    staticDataEnum("[data-dashboard-hydration]", "dashboardHydration", "complete");
+  }
+
+  fetch(DATA_URL, {cache: "no-store"}).then((response) => response.json()).then(hydrate).catch(() => {
+    hideAllEmptyStates();
+    staticText("hero-tag", RUNTIME.copy.load_error);
+    staticDataEnum("[data-dashboard-hydration]", "dashboardHydration", "error");
   });
-  </script>
+}());
+</script>
 </body>
 </html>

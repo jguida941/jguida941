@@ -6,10 +6,16 @@
   "computed_root_tokens": {
     "--accent": "#0f62fe",
     "--backdrop": "#ffffff",
+    "--button-active-background": "#002d9c",
+    "--button-hover-background": "#0353e9",
     "--ease-enter": "cubic-bezier(0, 0, 0.38, 0.9)",
     "--ease-exit": "cubic-bezier(0.2, 0, 1, 0.9)",
     "--ease-standard": "cubic-bezier(0.2, 0, 0.38, 0.9)",
+    "--ease-switcher": "cubic-bezier(0.2, 0, 0.38, 0.9)",
     "--font-sans": "'IBM Plex Sans', system-ui, sans-serif",
+    "--gap-grid": "12px",
+    "--glass-blur": "0px",
+    "--glass-saturate": "100%",
     "--hairline": "#e0e0e0",
     "--ink": "#525252",
     "--ink-dim": "#6f6f6f",
@@ -17,24 +23,52 @@
     "--motion-base": "110ms",
     "--motion-fast": "70ms",
     "--motion-slow": "240ms",
+    "--motion-switcher": "70ms",
+    "--pad-panel": "20px",
+    "--pad-tile": "12px",
     "--ps-pad": "20px",
     "--radius-panel": "0px",
     "--radius-tile": "0px",
+    "--raised-opacity": "1",
+    "--sheen-opacity": "0",
+    "--space-lg": "16px",
+    "--space-md": "12px",
+    "--space-sm": "8px",
+    "--space-xl": "24px",
+    "--space-xs": "4px",
+    "--space-xxl": "32px",
     "--status-danger": "#da1e28",
     "--status-success": "#198038",
     "--status-warning": "#f1c21b",
     "--surface": "#ffffff",
+    "--surface-opacity": "1",
     "--surface-raised": "#f4f4f4",
+    "--type-body": "14px",
+    "--type-body-weight": "400",
+    "--type-caption": "12px",
+    "--type-caption-weight": "400",
+    "--type-chip": "11px",
+    "--type-chip-weight": "500",
+    "--type-display": "40px",
+    "--type-display-weight": "600",
+    "--type-eyebrow": "11px",
+    "--type-eyebrow-weight": "600",
+    "--type-metric": "22px",
+    "--type-metric-weight": "600",
+    "--type-metric_lg": "24px",
+    "--type-metric_lg-weight": "600",
+    "--type-title": "18px",
+    "--type-title-weight": "600",
     "color-scheme": "light"
   },
   "contract_id": "PageThemeContinuityFacts",
   "declared_scroll_containers": [
     {
-      "class": "cal-wrap",
+      "class": "db-calendar-scroll",
       "parent": "#calendar-panel"
     },
     {
-      "class": "heat-wrap",
+      "class": "db-rhythm-scroll",
       "parent": "#rhythm-panel"
     }
   ],
@@ -48,9 +82,9 @@
     "border_bottom_color": "rgb(15, 98, 254)",
     "border_bottom_width_px": 2,
     "box": {
-      "height": 32.84,
-      "left": 33,
-      "top": 138.33,
+      "height": 30,
+      "left": 49,
+      "top": 208.59,
       "width": 63.19
     },
     "display": "block",
@@ -64,24 +98,24 @@
   "observed_theme": "carbon",
   "offenders": [
     {
-      "class": "cal",
+      "class": "db-calendar-grid",
       "contained_by_declared_scroll": true,
       "id": "cal",
-      "left": 33,
-      "right": 772,
+      "left": 49,
+      "right": 788,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -90,24 +124,24 @@
       "width": 739
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 383,
-      "right": 394,
+      "left": 385,
+      "right": 396,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -116,24 +150,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 383,
-      "right": 394,
+      "left": 385,
+      "right": 396,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -142,24 +176,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 383,
-      "right": 394,
+      "left": 385,
+      "right": 396,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -168,24 +202,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 383,
-      "right": 394,
+      "left": 385,
+      "right": 396,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -194,24 +228,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 383,
-      "right": 394,
+      "left": 385,
+      "right": 396,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -220,24 +254,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 383,
-      "right": 394,
+      "left": 385,
+      "right": 396,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -246,24 +280,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 383,
-      "right": 394,
+      "left": 385,
+      "right": 396,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -272,24 +306,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 397,
-      "right": 408,
+      "left": 399,
+      "right": 410,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -298,24 +332,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 397,
-      "right": 408,
+      "left": 399,
+      "right": 410,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -324,24 +358,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 397,
-      "right": 408,
+      "left": 399,
+      "right": 410,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -350,24 +384,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 397,
-      "right": 408,
+      "left": 399,
+      "right": 410,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -376,24 +410,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 397,
-      "right": 408,
+      "left": 399,
+      "right": 410,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -402,24 +436,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 397,
-      "right": 408,
+      "left": 399,
+      "right": 410,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -428,24 +462,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 397,
-      "right": 408,
+      "left": 399,
+      "right": 410,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -454,24 +488,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 411,
-      "right": 422,
+      "left": 413,
+      "right": 424,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -480,24 +514,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 411,
-      "right": 422,
+      "left": 413,
+      "right": 424,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -506,24 +540,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 411,
-      "right": 422,
+      "left": 413,
+      "right": 424,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -532,24 +566,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 411,
-      "right": 422,
+      "left": 413,
+      "right": 424,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"
@@ -558,24 +592,24 @@
       "width": 11
     },
     {
-      "class": "",
+      "class": "db-calendar-cell",
       "contained_by_declared_scroll": true,
       "id": "",
-      "left": 411,
-      "right": 422,
+      "left": 413,
+      "right": 424,
       "scroll_container": {
-        "class": "cal-wrap",
+        "class": "db-calendar-scroll",
         "id": "",
-        "left": 33,
+        "left": 49,
         "overflow_x": "auto",
         "parent": {
-          "class": "panel",
+          "class": "db-section db-calendar",
           "id": "calendar-panel",
           "tag": "section"
         },
-        "right": 357,
+        "right": 341,
         "rule": {
-          "class": "cal-wrap",
+          "class": "db-calendar-scroll",
           "parent": "#calendar-panel"
         },
         "tag": "div"

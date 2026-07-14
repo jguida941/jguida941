@@ -7,6 +7,7 @@ headless-probe (a declared later slice), never faked here. candidate_only.
 """
 from __future__ import annotations
 
+from collections import Counter
 import re
 
 
@@ -255,6 +256,80 @@ def content_offtokens(css: str, allowed_px: frozenset = frozenset(),
     return bad
 
 
+_CSS_NUMBER = re.compile(
+    r"(?<![A-Za-z0-9_.-])-?(?:\d+\.\d+|\d+)(?:[A-Za-z]+|%)?"
+)
+
+
+def css_numeric_occurrences(css: str) -> list[dict]:
+    """Return an exact multiset of numeric CSS literals with structural context.
+
+    The governed dashboard emitter uses a deliberately closed grammar: ordinary rules and nested
+    at-rules, with no braces inside declaration values. This parser is small by design and rejects
+    malformed/unbalanced input instead of guessing. It is a fact producer; policy lives in DATA.
+    """
+    source = re.sub(r"/\*.*?\*/", " ", css, flags=re.S)
+    observed: Counter[tuple[str, str, str, str]] = Counter()
+
+    def normalized(value: str) -> str:
+        return " ".join(value.split())
+
+    def tokens(value: str) -> list[str]:
+        return [match.group(0) for match in _CSS_NUMBER.finditer(value)]
+
+    def walk(fragment: str, contexts: tuple[str, ...]) -> None:
+        cursor = 0
+        while cursor < len(fragment):
+            opening = fragment.find("{", cursor)
+            if opening < 0:
+                if fragment[cursor:].strip():
+                    raise ValueError("CSS text outside a governed rule")
+                return
+            header = normalized(fragment[cursor:opening])
+            if not header:
+                raise ValueError("CSS rule has an empty header")
+            depth = 1
+            closing = opening + 1
+            while closing < len(fragment) and depth:
+                if fragment[closing] == "{":
+                    depth += 1
+                elif fragment[closing] == "}":
+                    depth -= 1
+                closing += 1
+            if depth:
+                raise ValueError("CSS rule has unbalanced braces")
+            body = fragment[opening + 1:closing - 1]
+            context = " > ".join(contexts)
+            if header.startswith("@"):
+                for token in tokens(header):
+                    observed[(context, "", "@prelude", token)] += 1
+                walk(body, contexts + (header,))
+            else:
+                if "{" in body or "}" in body:
+                    raise ValueError("nested ordinary CSS rule")
+                for declaration in body.split(";"):
+                    if not declaration.strip():
+                        continue
+                    prop, separator, value = declaration.partition(":")
+                    if not separator or not prop.strip() or not value.strip():
+                        raise ValueError(f"malformed CSS declaration in {header!r}")
+                    for token in tokens(value):
+                        observed[(context, header, prop.strip().lower(), token)] += 1
+            cursor = closing
+
+    walk(source, ())
+    return [
+        {
+            "context": context,
+            "selector": selector,
+            "property": prop,
+            "value": value,
+            "count": count,
+        }
+        for (context, selector, prop, value), count in sorted(observed.items())
+    ]
+
+
 def pageshell_facts(html: str, css: str) -> dict:
     """Verdict-free facts for the page CHROME (`render_page_shell`). The host chrome must be CLOSED (one
     `.ps-<lang>` root rule + descendant `.ps-<lang> .child`/element rules only; no @-rules / attribute /
@@ -396,4 +471,120 @@ def card_facts(html: str, css: str) -> dict:
         "divider_1px": divider_1px,
         "has_backdrop_filter": _has_prop(container, "backdrop-filter"),
         "has_box_shadow": _has_prop(container, "box-shadow"),
+    }
+
+
+def switcher_facts(html: str, css: str) -> dict:
+    """Verdict-free facts for the switchable segmented theme control."""
+    from scripts.rendering.design import loader
+
+    html_profiles = tuple(re.findall(r'data-theme-set="([a-z0-9-]+)"', html))
+    css_profiles = tuple(dict.fromkeys(re.findall(
+        r':root\[data-theme="([a-z0-9-]+)"\] \.theme-switcher\s*\{', css)))
+    profiles = {}
+    expected_profiles = {}
+
+    def declaration_map(body: str) -> dict[str, str]:
+        return {
+            prop.strip(): value.strip()
+            for declaration in body.split(";") if declaration.strip()
+            for prop, separator, value in [declaration.partition(":")]
+            if separator and prop.strip() and value.strip()
+        }
+
+    for profile in css_profiles:
+        root = re.search(
+            rf':root\[data-theme="{re.escape(profile)}"\] \.theme-switcher\s*\{{([^}}]*)\}}',
+            css,
+        )
+        option = re.search(
+            rf':root\[data-theme="{re.escape(profile)}"\] \.theme-switcher '
+            rf'\.theme-option\s*\{{([^}}]*)\}}',
+            css,
+        )
+        root_body = root.group(1) if root else ""
+        option_body = option.group(1) if option else ""
+        height = re.search(r"min-height:\s*(\d+)px", option_body)
+        radius = re.search(r"border-radius:\s*(\d+)px", option_body)
+        justify = re.search(r"justify-content:\s*([\w-]+)", option_body)
+        def state_body(suffix: str) -> str:
+            match = re.search(
+                rf':root\[data-theme="{re.escape(profile)}"\] \.theme-switcher '
+                rf'\.theme-option{suffix}\s*\{{([^}}]*)\}}',
+                css,
+            )
+            return match.group(1).strip() if match else ""
+
+        icon_rule = re.search(
+            rf':root\[data-theme="{re.escape(profile)}"\] \.theme-switcher '
+            rf'\.theme-option-icon\s*\{{([^}}]*)\}}',
+            css,
+        )
+        icon_body = icon_rule.group(1) if icon_rule else ""
+        hover_body = state_body(":hover")
+        active_body = state_body(":active")
+        focus_body = state_body(":focus-visible")
+        selected_body = state_body(r'\[aria-pressed="true"\]')
+        disabled_body = state_body(":disabled")
+        if "var(--button-active-background)" in active_body:
+            mechanic = "token-swap"
+        elif "filter: brightness(" in active_body:
+            mechanic = "glass-brightness"
+        elif re.search(r"\bopacity:\s*0\.4\b", active_body):
+            mechanic = "opacity-dim"
+        else:
+            mechanic = None
+        if "outline: 3px" in focus_body and "60%" in focus_body:
+            focus_recipe = "capsule-halo"
+        elif "outline: 2px" in focus_body and "outline-offset: -2px" in focus_body:
+            focus_recipe = "square-2px-ring"
+        elif "outline: 4px" in focus_body and "50%" in focus_body:
+            focus_recipe = "rounded-system-ring"
+        else:
+            focus_recipe = None
+        anatomy = ("label-left-icon-right"
+                   if justify and justify.group(1) == "space-between" and "display: block" in icon_body
+                   else ("centered-capsule"
+                         if justify and justify.group(1) == "center" and "display: none" in icon_body
+                         else None))
+        profiles[profile] = {
+            "height_px": int(height.group(1)) if height else None,
+            "radius_px": int(radius.group(1)) if radius else None,
+            "anatomy": anatomy,
+            "state_mechanic": mechanic,
+            "focus_recipe": focus_recipe,
+            "hover_nonempty": bool(hover_body),
+            "active_nonempty": bool(active_body),
+            "focus_nonempty": bool(focus_body),
+            "state_css": {
+                "hover": declaration_map(hover_body),
+                "active": declaration_map(active_body),
+                "focus-visible": declaration_map(focus_body),
+                "selected": declaration_map(selected_body),
+                "disabled": declaration_map(disabled_body),
+            },
+        }
+        button = loader.load(profile)["components"]["button"]
+        expected_profiles[profile] = {
+            "height_px": button["height_px"],
+            "radius_px": button["radius_px"],
+            "anatomy": button["anatomy"],
+            "state_mechanic": button["state_mechanic"],
+            "focus_recipe": button["focus_recipe"],
+            "hover_nonempty": True,
+            "active_nonempty": True,
+            "focus_nonempty": True,
+            "state_css": button["switcher_css"],
+        }
+    return {
+        "html_profiles": html_profiles,
+        "css_profiles": css_profiles,
+        "button_count": html.count('class="theme-option"'),
+        "pressed_count": len(re.findall(r'class="theme-option"[^>]*aria-pressed="true"', html)),
+        "profiles": profiles,
+        "expected_profiles": expected_profiles,
+        "has_rest": re.search(r"\.theme-option\s*\{", css) is not None,
+        "icon_count": html.count('class="theme-option-icon"'),
+        "has_pressed": '.theme-option[aria-pressed="true"]' in css,
+        "has_disabled": ".theme-option:disabled" in css,
     }

@@ -102,22 +102,22 @@ class DesignCharacterContract(unittest.TestCase):
         chrome, so both FAIL regardless of columns/height. The geometric ink-fill is the visual-
         receipt judgment, not faked here. Mutation-proof: re-add border-radius/background to `.mrow`."""
         import re
-        from scripts.pipeline.web_render import render_dashboard
-        html = render_dashboard()
-        self.assertIn('class="mgroup"', html, "the metric readout must be ONE grouped container")
-        self.assertIn('class="mrow"', html, "metrics must be Value-1 rows inside the group, not cards")
-        self.assertRegex(html, r"\.mgroup\s*\{[^}]*border-radius:",
-                         "the group container carries the rounded chrome")
-        mrow = re.search(r"\.mrow\s*\{([^}]*)\}", html)
-        self.assertIsNotNone(mrow, ".mrow rule must exist")
-        body = mrow.group(1)
-        for chrome in ("border-radius", "background", "border:"):
-            self.assertNotIn(chrome, body,
-                             f".mrow must carry NO independent {chrome} — only the group is chromed")
-        self.assertRegex(html, r"\.mrow\s*\+\s*\.mrow\s*\{[^}]*border-top:",
-                         "adjacent metric rows are divided by a hairline, not gapped cards")
-        self.assertRegex(html, r"\.mrow\s*\{[^}]*display:\s*(grid|flex)",
-                         "rows are inline label+value (Value-1), not a tall stacked box")
+        from scripts.contracts.design_predicates import (
+            card_hairline_divided, card_multi_row, card_rows_inline, card_single_container)
+        from scripts.rendering.webkit.dashboard import render_dashboard_surface
+        from scripts.rendering.webkit.design_render_adapter import card_facts
+
+        html, css = render_dashboard_surface("liquid-glass")
+        self.assertEqual(html.count("card-group"), 2, "scorecard and snapshot each use one group")
+        for section_id in ("scorecard", "snapshot"):
+            section = re.search(
+                rf'<section[^>]*data-dashboard-section="{section_id}".*?</section>', html, re.S)
+            self.assertIsNotNone(section)
+            facts = card_facts(section.group(0), css)
+            self.assertTrue(card_single_container(facts))
+            self.assertTrue(card_multi_row(facts, min_rows=6))
+            self.assertTrue(card_hairline_divided(facts))
+            self.assertTrue(card_rows_inline(facts))
 
     def test_density_is_web_only_and_preserves_svg_parity(self):
         """Density is a web concern; the DEFAULT theme's type/radius still equal config."""

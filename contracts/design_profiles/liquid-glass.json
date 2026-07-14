@@ -53,6 +53,13 @@
       "transition_ms": 320,
       "easing": "cubic-bezier(0.34,1.56,0.64,1)",
       "active_css": {"filter": "brightness(1.18) saturate(1.1)", "transform": "scale(0.98)"},
+      "switcher_css": {
+        "hover": {"filter": "brightness(1.08)"},
+        "active": {"filter": "brightness(1.18) saturate(1.1)", "transform": "scale(0.98)"},
+        "focus-visible": {"outline": "3px solid color-mix(in srgb, var(--accent) 60%, transparent)", "outline-offset": "2px"},
+        "selected": {"color": "var(--ink-strong)", "background": "color-mix(in srgb, var(--accent) 22%, transparent)"},
+        "disabled": {"opacity": "0.4", "cursor": "not-allowed"}
+      },
       "elevation_shadow": "0 8px 24px rgba(0,0,0,0.28)",
       "variants": ["prominent", "glass", "tinted", "plain", "destructive"],
       "states": ["rest", "hover", "active", "focus-visible", "disabled"],

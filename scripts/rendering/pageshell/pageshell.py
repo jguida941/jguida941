@@ -47,29 +47,9 @@ def _px(value) -> str:
 
 
 def _profile_decls(profile: str) -> dict[str, str]:
-    """Required per-profile declarations, with no design-value fallbacks."""
-    from scripts.rendering.design import loader
+    """Required declarations from the canonical profile-to-CSS projection."""
     from scripts.rendering import design_tokens as _dt
-
-    tok = loader.resolve_tokens(profile)
-    color = tok["color"]
-    radius = tok["radius"]
-    font = tok["font"]
-    decls = {f"--{role}": color[role] for role in _ROLES}
-    decls["--radius-panel"] = _px(radius["panel"])
-    decls["--radius-tile"] = _px(radius["tile"])
-    decls["--font-sans"] = font["family"]
-    decls["color-scheme"] = _dt.color_scheme(profile)
-    # panel padding is the LANGUAGE'S OWN cited density band (apple-dark 'airy' 32 / carbon
-    # 'compact' 20 / liquid-glass 'medium' 28 — design_tokens.THEME_IA, grounded per language),
-    # not a minted constant (design-audit #7). Provenance-pinned like every other :root var.
-    decls["--ps-pad"] = _px(_dt.THEME_IA[profile]["density"]["panel_pad"])
-    motion = _dt.THEME_IA[profile]["motion"]
-    for key in ("fast", "base", "slow"):
-        decls[f"--motion-{key}"] = f"{motion[key]}ms"
-    for key in ("standard", "enter", "exit"):
-        decls[f"--ease-{key}"] = motion[f"ease-{key}"]
-    return decls
+    return _dt.css_declarations(profile)
 
 
 def _declaration_block(selector: str, decls: dict[str, str]) -> str:
@@ -184,6 +164,8 @@ def render_page_shell(
     prefix_html: str = "",
     glossary=None,
     profile_data: dict | None = None,
+    title_id: str | None = None,
+    intro_id: str | None = None,
 ) -> tuple[str, str]:
     """Return `(html, css)` for a page framed in `profile`'s design language.
 
@@ -194,6 +176,10 @@ def render_page_shell(
     `:checked ~` sibling selectors must precede the stages they reveal). The chrome (bg/header/crumbs/
     panels) is token-only + governed; all injected content is guarded (no shell-reserved ps-* classes)."""
     ns = f"ps-{profile}"
+    id_pattern = _re.compile(r"[A-Za-z][A-Za-z0-9_:.\-]*\Z")
+    for label, value in (("title_id", title_id), ("intro_id", intro_id)):
+        if value is not None and not id_pattern.fullmatch(value):
+            raise ValueError(f"{label} is not a valid HTML id")
     for blob in (prefix_html, body_html, *(body for _, body in (sections or []))):
         if blob and _INJECTED_PS.search(blob):
             raise ValueError(
@@ -207,12 +193,14 @@ def render_page_shell(
         f'<section class="ps-panel" data-dom-owner="pageshell">'
         f'<h2 class="ps-panel-h" data-dom-owner="pageshell">{_html.escape(heading)}</h2>{body}</section>'
         for heading, body in (sections or []))
+    title_attr = f' id="{_html.escape(title_id)}"' if title_id else ""
+    intro_attr = f' id="{_html.escape(intro_id)}"' if intro_id else ""
     html = (
         f'<div class="{ns}" data-dom-owner="pageshell">'
         f'<div class="ps-main" data-dom-owner="pageshell">'
         f'{prefix_html}'
-        f'<h1 class="ps-title" data-dom-owner="pageshell">{_html.escape(title)}</h1>'
-        f'<p class="ps-intro" data-dom-owner="pageshell">{_html.escape(intro)}</p>'
+        f'<h1 class="ps-title" data-dom-owner="pageshell"{title_attr}>{_html.escape(title)}</h1>'
+        f'<p class="ps-intro" data-dom-owner="pageshell"{intro_attr}>{_html.escape(intro)}</p>'
         f'<p class="ps-crumbs" data-dom-owner="pageshell">{crumbs}</p>'
         f'{panels}'
         f'{body_html}'
