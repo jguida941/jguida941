@@ -2,7 +2,7 @@
   "artifact": "assets/receipts/pages/studio/dom-probe-390.json",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "chrome_version": "Google Chrome 149.0.7827.200",
+  "chrome_version": "Google Chrome 150.0.7871.115",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
@@ -12,12 +12,12 @@
     "--window-size=800,1000",
     "--virtual-time-budget=2500",
     "--dump-dom",
-    "file:///var/folders/6_/_15pvmxd7yq5qrnmzr92dkr00000gn/T/studio-probe-a0o3wpju/studio.html"
+    "file:///var/folders/6_/_15pvmxd7yq5qrnmzr92dkr00000gn/T/studio-probe-83l0t8g1/studio.html"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-dom-probe",
   "page": "studio",
-  "page_sha256": "b977d006297a5e6de3d7244fcf710d1bae9cf20e6e1ba31c74179b03a9950209",
+  "page_sha256": "da96d7de3e0cde1f793f478544b6bc63b87f1704b0a68538ae0983bdba8e865a",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/studio.html",
   "viewport": {

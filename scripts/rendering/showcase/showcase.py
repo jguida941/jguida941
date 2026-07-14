@@ -190,8 +190,9 @@ _CONTENT_ALLOWED_WORDS = frozenset({
 def render_showcase(receipts: dict) -> str:
     """Pure: committed receipts -> the showcase HTML, framed in the governed apple-dark page-shell.
     Deterministic (profiles sorted; receipt order preserved). No timestamps, no probe coupling."""
-    from scripts.rendering.pageshell.pageshell import render_page_shell
-    from scripts.rendering.webkit.components import render_nav
+    from scripts.rendering.pageshell.pageshell import (render_page_shell,
+                                                       theme_continuity_script_tag)
+    from scripts.rendering.webkit.components import render_switchable_nav
 
     button_css = []
     sections = []
@@ -226,13 +227,13 @@ def render_showcase(receipts: dict) -> str:
     )
     _nav_links = [("home", "index.html"), ("showcase", "showcase.html"),
                   ("studio", "studio.html"), ("settings", "settings.html")]
-    nav_html, nav_css = render_nav(HOUSE, _nav_links, active="showcase.html")
+    nav_html, nav_css = render_switchable_nav(HOUSE, _nav_links, active="showcase.html")
     shell_html, shell_style = render_page_shell(
         HOUSE,
         title="Design-language conformance",
         intro="Every active design language, rendered from its own cited doctrine, with the conformance "
-              "receipt for each invariant. The page's own frame is the apple-dark design language — the "
-              "proof surface follows the very process it displays.",
+              "receipt for each invariant. Apple Dark is the house language; your chosen language follows "
+              "you across the governed site.",
         breadcrumbs=[("home", "index.html"), ("studio", "studio.html"), ("settings", "settings.html")],
         prefix_html=nav_html,
         sections=[("How to read this", legend)],
@@ -240,10 +241,11 @@ def render_showcase(receipts: dict) -> str:
     )
     return (
         "<!doctype html>\n"
-        '<html lang="en"><head><meta charset="utf-8">\n'
+        f'<html lang="en" data-house-theme="{HOUSE}"><head><meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        f"{theme_continuity_script_tag()}\n"
         "<title>Design-language conformance — showcase</title>\n"
-        f"<style>:root {{ color-scheme: dark; }}\n* {{ box-sizing: border-box; }}\n"
+        f"<style>* {{ box-sizing: border-box; }}\n"
         f"html, body {{ height: 100%; margin: 0; }}\n{shell_style}\n{nav_css}\n{_CONTENT_CSS}\n"
         + "\n".join(button_css) + "</style>\n"
         "</head><body>\n"

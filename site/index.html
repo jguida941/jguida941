@@ -1,8 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-house-theme="liquid-glass">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(function () {
+  "use strict";
+  const THEMES = ["liquid-glass","carbon","apple-dark"];
+  const STORAGE_KEY = "dash-theme";
+  const root = document.documentElement;
+  const valid = (name) => THEMES.includes(name);
+  let storedTheme = null;
+  try { storedTheme = localStorage.getItem(STORAGE_KEY); } catch (error) {}
+  const urlTheme = new URLSearchParams(location.search).get("theme");
+  const houseTheme = root.dataset.houseTheme;
+  const initialTheme = valid(urlTheme) ? urlTheme : (valid(storedTheme) ? storedTheme : houseTheme);
+  if (!valid(initialTheme)) throw new Error("invalid data-house-theme");
+  function applyTheme(name, persist) {
+    if (!valid(name)) return false;
+    root.dataset.theme = name;
+    if (persist) { try { localStorage.setItem(STORAGE_KEY, name); } catch (error) {} }
+    document.querySelectorAll("[data-theme-set]").forEach((button) =>
+      button.setAttribute("aria-pressed", String(button.dataset.themeSet === name)));
+    document.querySelectorAll("[data-theme-propagate]").forEach((link) => {
+      const url = new URL(link.getAttribute("href"), location.href);
+      url.searchParams.set("theme", name);
+      link.href = url.href;
+    });
+    return true;
+  }
+  applyTheme(initialTheme, valid(urlTheme));
+  document.addEventListener("DOMContentLoaded", function () {
+    applyTheme(root.dataset.theme, false);
+    document.querySelectorAll("[data-theme-set]").forEach((button) =>
+      button.addEventListener("click", () => applyTheme(button.dataset.themeSet, true)));
+  });
+}());
+</script>
 <title>jguida941 · Builder Dashboard</title>
 <meta name="description" content="Live GitHub builder analytics — regenerated hourly.">
 <style>
@@ -23,9 +57,11 @@
   --surface-opacity: 0.55;
   --raised-opacity: 0.55;
   --sheen-opacity: 0.07;
+  color-scheme: dark;
   --radius-panel: 18px;
   --radius-tile: 13px;
   --pad-panel: 28px;
+  --ps-pad: 28px;
   --pad-tile: 14px;
   --gap-grid: 20px;
   --type-display: 46px;
@@ -76,9 +112,11 @@
   --surface-opacity: 1;
   --raised-opacity: 1;
   --sheen-opacity: 0;
+  color-scheme: light;
   --radius-panel: 0px;
   --radius-tile: 0px;
   --pad-panel: 20px;
+  --ps-pad: 20px;
   --pad-tile: 12px;
   --gap-grid: 12px;
   --type-display: 40px;
@@ -109,7 +147,7 @@
   --ease-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
   --ease-enter: cubic-bezier(0, 0, 0.38, 0.9);
   --ease-exit: cubic-bezier(0.2, 0, 1, 0.9);
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
 }
 
 [data-theme="apple-dark"] {
@@ -129,9 +167,11 @@
   --surface-opacity: 0.6;
   --raised-opacity: 0.5;
   --sheen-opacity: 0.1;
+  color-scheme: dark;
   --radius-panel: 14px;
   --radius-tile: 12px;
   --pad-panel: 32px;
+  --ps-pad: 32px;
   --pad-tile: 24px;
   --gap-grid: 24px;
   --type-display: 54px;
@@ -345,9 +385,18 @@ footer a { color: var(--ink); text-decoration: none; }
   .rrow { min-height: 44px; }
   .heat { min-width: 460px; }
 }
-.nav-liquid-glass { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.nav-liquid-glass a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
-.nav-liquid-glass a[aria-current] { background: var(--accent); color: var(--backdrop); }
+:root[data-theme="liquid-glass"] .nav-liquid-glass { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+:root[data-theme="liquid-glass"] .nav-liquid-glass a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
+:root[data-theme="liquid-glass"] .nav-liquid-glass a[aria-current] { background: var(--accent); color: var(--backdrop); }
+:root[data-theme="carbon"] .nav-carbon { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+:root[data-theme="carbon"] .nav-carbon a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 0px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
+:root[data-theme="carbon"] .nav-carbon a[aria-current] { color: var(--ink); border-bottom: 2px solid var(--accent); border-radius: 0; }
+:root[data-theme="apple-dark"] .nav-apple-dark { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+:root[data-theme="apple-dark"] .nav-apple-dark a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
+:root[data-theme="apple-dark"] .nav-apple-dark a[aria-current] { background: var(--accent); color: var(--backdrop); }
+:root:not([data-theme]) .nav-liquid-glass { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+:root:not([data-theme]) .nav-liquid-glass a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
+:root:not([data-theme]) .nav-liquid-glass a[aria-current] { background: var(--accent); color: var(--backdrop); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 @media (prefers-reduced-transparency: reduce) {
   .panel, .switcher, .mgroup, .rrow { -webkit-backdrop-filter: none; backdrop-filter: none;
@@ -365,7 +414,7 @@ footer a { color: var(--ink); text-decoration: none; }
         <p class="eyebrow">GitHub Analytics · Live</p>
         <h1 id="hero-name">@jguida941</h1>
         <p class="tag" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p>
-        <nav class="site-nav nav-liquid-glass" aria-label="Site"><a href="index.html" aria-current="page">home</a><a href="showcase.html">showcase</a><a href="studio.html">studio</a><a href="settings.html">settings</a></nav>
+        <nav class="site-nav nav-liquid-glass nav-carbon nav-apple-dark" aria-label="Site"><a href="index.html" data-theme-propagate aria-current="page">home</a><a href="showcase.html" data-theme-propagate>showcase</a><a href="studio.html" data-theme-propagate>studio</a><a href="settings.html" data-theme-propagate>settings</a></nav>
       </div>
       <div class="switcher" role="group" aria-label="Theme"><button type="button" data-theme-set="liquid-glass" aria-pressed="true" title="Apple frosted glass · Tokyo Night">Liquid Glass</button><button type="button" data-theme-set="carbon" aria-pressed="false" title="IBM Carbon · flat structured UI">Carbon</button><button type="button" data-theme-set="apple-dark" aria-pressed="false" title="System dark · one vivid accent">Apple Dark</button></div>
     </div>
@@ -459,21 +508,6 @@ footer a { color: var(--ink); text-decoration: none; }
     warn: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 16.5v.01"/></svg>',
     bad: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   };
-
-  function setTheme(name) {
-    document.documentElement.dataset.theme = (name === "liquid-glass") ? "" : name;
-    try { localStorage.setItem("dash-theme", name); } catch (e) {}
-    document.querySelectorAll("[data-theme-set]").forEach(b =>
-      b.setAttribute("aria-pressed", String(b.dataset.themeSet === name)));
-  }
-  document.querySelectorAll("[data-theme-set]").forEach(b =>
-    b.addEventListener("click", () => setTheme(b.dataset.themeSet)));
-  const THEMES = ["liquid-glass", "carbon", "apple-dark"];
-  const urlTheme = new URLSearchParams(location.search).get("theme");
-  try {
-    const t = urlTheme || localStorage.getItem("dash-theme");
-    if (t && THEMES.includes(t)) setTheme(t);
-  } catch (e) { if (urlTheme && THEMES.includes(urlTheme)) setTheme(urlTheme); }
 
   function hydrate(d) {
     document.querySelectorAll("[data-bind]").forEach(el => {

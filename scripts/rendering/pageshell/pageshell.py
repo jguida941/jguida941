@@ -13,6 +13,7 @@ chrome. Governed by conform()'s `page-shell` aspect + tests/contracts/test_page_
 from __future__ import annotations
 
 import html as _html
+import json as _json
 import re as _re
 
 
@@ -45,32 +46,97 @@ def _px(value) -> str:
     return f"{value}px" if isinstance(value, (int, float)) else str(value)
 
 
-def root_block(profile: str, profile_data: dict | None = None) -> str:
-    """The `:root { … }` token declaration block: the language's resolved colour/radius/font tokens +
-    the shared IA scale. Every host-chrome rule references these vars — this block is the ONLY place a
-    literal value appears, and the provenance gate pins each var to its real source."""
+def _profile_decls(profile: str) -> dict[str, str]:
+    """Required per-profile declarations, with no design-value fallbacks."""
     from scripts.rendering.design import loader
+    from scripts.rendering import design_tokens as _dt
 
     tok = loader.resolve_tokens(profile)
     color = tok["color"]
-    radius = tok.get("radius", {})
+    radius = tok["radius"]
+    font = tok["font"]
     decls = {f"--{role}": color[role] for role in _ROLES}
-    decls["--radius-panel"] = _px(radius.get("panel", 12))
-    decls["--radius-tile"] = _px(radius.get("tile", 8))
-    decls["--font-sans"] = tok.get("font", {}).get("family", "sans-serif")
+    decls["--radius-panel"] = _px(radius["panel"])
+    decls["--radius-tile"] = _px(radius["tile"])
+    decls["--font-sans"] = font["family"]
+    decls["color-scheme"] = _dt.color_scheme(profile)
     # panel padding is the LANGUAGE'S OWN cited density band (apple-dark 'airy' 32 / carbon
     # 'compact' 20 / liquid-glass 'medium' 28 — design_tokens.THEME_IA, grounded per language),
     # not a minted constant (design-audit #7). Provenance-pinned like every other :root var.
-    from scripts.rendering import design_tokens as _dt
-    decls["--ps-pad"] = _px(_dt.density(profile)["panel_pad"])
+    decls["--ps-pad"] = _px(_dt.THEME_IA[profile]["density"]["panel_pad"])
     motion = _dt.THEME_IA[profile]["motion"]
     for key in ("fast", "base", "slow"):
         decls[f"--motion-{key}"] = f"{motion[key]}ms"
     for key in ("standard", "enter", "exit"):
         decls[f"--ease-{key}"] = motion[f"ease-{key}"]
+    return decls
+
+
+def _declaration_block(selector: str, decls: dict[str, str]) -> str:
+    body = "\n".join(f"  {key}: {value};" for key, value in decls.items())
+    return f"{selector} {{\n{body}\n}}"
+
+
+def root_block(profile: str, profile_data: dict | None = None) -> str:
+    """Base house declarations plus the shared shell scale."""
+    decls = _profile_decls(profile)
     decls.update(SHELL_SCALE)
-    body = "\n".join(f"  {k}: {v};" for k, v in decls.items())
-    return f":root {{\n{body}\n}}"
+    return _declaration_block(":root", decls)
+
+
+def theme_override_blocks(house: str) -> str:
+    """Per-profile overrides for every active language other than the base house."""
+    from scripts.rendering import design_tokens as _dt
+
+    if house not in _dt.ACTIVE_THEME_NAMES:
+        raise KeyError(f"house profile {house!r} is not active")
+    return "\n\n".join(
+        _declaration_block(f':root[data-theme="{profile}"]', _profile_decls(profile))
+        for profile in _dt.ACTIVE_THEME_NAMES
+        if profile != house
+    )
+
+
+def theme_continuity_script_tag() -> str:
+    """The one verdict-free theme bootstrap shared byte-for-byte by every page."""
+    from scripts.rendering import design_tokens as _dt
+
+    roster = _json.dumps(list(_dt.ACTIVE_THEME_NAMES), separators=(",", ":"))
+    storage_key = _json.dumps(_dt.THEME_STORAGE_KEY)
+    return f"""<script>
+(function () {{
+  "use strict";
+  const THEMES = {roster};
+  const STORAGE_KEY = {storage_key};
+  const root = document.documentElement;
+  const valid = (name) => THEMES.includes(name);
+  let storedTheme = null;
+  try {{ storedTheme = localStorage.getItem(STORAGE_KEY); }} catch (error) {{}}
+  const urlTheme = new URLSearchParams(location.search).get("theme");
+  const houseTheme = root.dataset.houseTheme;
+  const initialTheme = valid(urlTheme) ? urlTheme : (valid(storedTheme) ? storedTheme : houseTheme);
+  if (!valid(initialTheme)) throw new Error("invalid data-house-theme");
+  function applyTheme(name, persist) {{
+    if (!valid(name)) return false;
+    root.dataset.theme = name;
+    if (persist) {{ try {{ localStorage.setItem(STORAGE_KEY, name); }} catch (error) {{}} }}
+    document.querySelectorAll("[data-theme-set]").forEach((button) =>
+      button.setAttribute("aria-pressed", String(button.dataset.themeSet === name)));
+    document.querySelectorAll("[data-theme-propagate]").forEach((link) => {{
+      const url = new URL(link.getAttribute("href"), location.href);
+      url.searchParams.set("theme", name);
+      link.href = url.href;
+    }});
+    return true;
+  }}
+  applyTheme(initialTheme, valid(urlTheme));
+  document.addEventListener("DOMContentLoaded", function () {{
+    applyTheme(root.dataset.theme, false);
+    document.querySelectorAll("[data-theme-set]").forEach((button) =>
+      button.addEventListener("click", () => applyTheme(button.dataset.themeSet, true)));
+  }});
+}}());
+</script>"""
 
 
 def shell_css(profile: str) -> str:
@@ -80,6 +146,7 @@ def shell_css(profile: str) -> str:
     ns = f"ps-{profile}"
     return "\n".join([
         root_block(profile),
+        theme_override_blocks(profile),
         f".{ns} {{ background: var(--backdrop); color: var(--ink); font-family: var(--font-sans);",
         f"  margin: 0; min-height: 100%; }}",
         # ONE centered content column — the audit's root cause was full-bleed sprawl (no container).
@@ -133,7 +200,8 @@ def render_page_shell(
                 "injected content carries a shell-reserved ps-* class — the shell anatomy "
                 "(ps-title/ps-crumbs/ps-panel/…) may only be rendered by render_page_shell itself "
                 "(codex A3 #2: an injected ps-title could spoof the page-shell facts)")
-    crumbs = " · ".join(f'<a href="{_html.escape(href)}">{_html.escape(label)}</a>'
+    crumbs = " · ".join(f'<a href="{_html.escape(href)}" data-theme-propagate>'
+                        f'{_html.escape(label)}</a>'
                         for label, href in breadcrumbs)
     panels = "".join(
         f'<section class="ps-panel"><h2 class="ps-panel-h">{_html.escape(heading)}</h2>{body}</section>'

@@ -81,13 +81,18 @@ class SettingsCompositionContract(unittest.TestCase):
 
     def test_settings_page_is_generated_and_has_no_second_verdict_source(self):
         """codex must-fix #2 — ONE Python decider: site/settings.html DISPLAYS the admissibility that
-        Python computes and carries NO verdict logic of its own (no <script>). Drift-guarded."""
+        Python computes. Its only script is the shared verdict-free theme bootstrap."""
+        import re
+        from scripts.rendering.pageshell.pageshell import theme_continuity_script_tag
         from scripts.rendering.settings.settings import render_settings
         self.assertTrue(SETTINGS.is_file(), "site/settings.html must be generated + committed")
         self.assertEqual(SETTINGS.read_text(encoding="utf-8"), render_settings(),
                          "settings drift — regenerate via scripts.rendering.settings.settings.write_settings")
-        self.assertNotIn("<script", SETTINGS.read_text(encoding="utf-8"),
-                         "the settings page carries no JS verdict source (Python is the ONE decider)")
+        scripts = re.findall(r"<script>.*?</script>", SETTINGS.read_text(encoding="utf-8"), re.S)
+        self.assertEqual(scripts, [theme_continuity_script_tag()],
+                         "theme continuity is the only settings script; Python remains the ONE decider")
+        for verdict_token in ("admissible_space", "is_admissible", "matching_languages"):
+            self.assertNotIn(verdict_token, scripts[0])
 
 
 class SettingsChromeContract(unittest.TestCase):

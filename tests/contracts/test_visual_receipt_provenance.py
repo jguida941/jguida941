@@ -40,14 +40,26 @@ def _obligations():
 
 def _uncontained_dom_offenders(data: dict) -> list[dict]:
     """Committed DOM probes are acceptance facts. An element-level offender is acceptable only
-    when the browser producer proved it is inside the measured horizontal table scroller."""
+    when the browser producer proved it is inside a page/parent-bound horizontal scroller."""
+    from scripts.quality.headless_receipts import DECLARED_HORIZONTAL_SCROLL_CONTAINERS
+
+    rules = DECLARED_HORIZONTAL_SCROLL_CONTAINERS.get(data.get("page"), ())
     out = []
     for offender in data.get("offenders", []):
         scroll = offender.get("scroll_container") or {}
+        rule = scroll.get("rule")
+        parent = scroll.get("parent") or {}
+        parent_selector = rule.get("parent", "") if isinstance(rule, dict) else ""
+        parent_matches = (
+            parent.get("id") == parent_selector[1:]
+            if parent_selector.startswith("#") else
+            parent_selector.removeprefix(".") in str(parent.get("class", "")).split()
+        )
         if (
-            offender.get("contained_by_table_scroll") is True
-            and scroll.get("class") == "table-scroll"
-            and scroll.get("overflow_x") == "auto"
+            offender.get("contained_by_declared_scroll") is True
+            and rule in rules
+            and parent_matches
+            and scroll.get("overflow_x") in ("auto", "scroll")
             and scroll.get("in_viewport") is True
             # the zero-width gaming vector (adversarial gate, live-probed): a width:0 wrapper
             # "contains" any child; containment demands a meaningfully positive measured width.
@@ -60,20 +72,30 @@ def _uncontained_dom_offenders(data: dict) -> list[dict]:
 
 
 class ZeroWidthContainmentGaming(unittest.TestCase):
-    def test_zero_width_table_scroll_does_not_contain(self):
+    def test_zero_width_or_wrong_location_scroll_does_not_contain(self):
         """A width:0 overflow-x:auto wrapper swallows any child visually while 'containing' it —
         the adversarial gate proved a 500px child inside width:0 evaluates contained=true in the
         browser; the acceptance predicate must refuse non-positive wrapper widths."""
-        gamed = {"offenders": [{
-            "contained_by_table_scroll": True,
+        rule = {"class": "table-scroll", "parent": ".base"}
+        gamed = {"page": "settings", "offenders": [{
+            "contained_by_declared_scroll": True,
             "scroll_container": {"class": "table-scroll", "overflow_x": "auto",
-                                 "in_viewport": True, "width": 0},
+                                 "in_viewport": True, "width": 0, "rule": rule,
+                                 "parent": {"class": "base"}},
         }]}
         self.assertEqual(len(_uncontained_dom_offenders(gamed)), 1)
-        real = {"offenders": [{
-            "contained_by_table_scroll": True,
+        wrong_parent = {"page": "settings", "offenders": [{
+            "contained_by_declared_scroll": True,
             "scroll_container": {"class": "table-scroll", "overflow_x": "auto",
-                                 "in_viewport": True, "width": 284},
+                                 "in_viewport": True, "width": 284, "rule": rule,
+                                 "parent": {"class": "rogue"}},
+        }]}
+        self.assertEqual(len(_uncontained_dom_offenders(wrong_parent)), 1)
+        real = {"page": "settings", "offenders": [{
+            "contained_by_declared_scroll": True,
+            "scroll_container": {"class": "table-scroll", "overflow_x": "auto",
+                                 "in_viewport": True, "width": 284, "rule": rule,
+                                 "parent": {"class": "base"}},
         }]}
         self.assertEqual(_uncontained_dom_offenders(real), [])
 

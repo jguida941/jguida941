@@ -1,0 +1,29 @@
+{
+  "artifact": "assets/receipts/pages/studio/theme-continuity-liquid-glass-1280.json",
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "chrome_version": "Google Chrome 150.0.7871.115",
+  "command": [
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "--headless=new",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--window-size=1360,1300",
+    "--virtual-time-budget=3500",
+    "--dump-dom",
+    "http://127.0.0.1:64308/__theme_probe__.html?page=studio&theme=liquid-glass&viewport=1280"
+  ],
+  "contract_id": "PageHeadlessReceiptProvenance",
+  "house_theme": "apple-dark",
+  "kind": "chrome-headless-theme-continuity-facts",
+  "observed_theme": "liquid-glass",
+  "page": "studio",
+  "page_sha256": "da96d7de3e0cde1f793f478544b6bc63b87f1704b0a68538ae0983bdba8e865a",
+  "producer": "scripts/quality/headless_receipts.py",
+  "route": "site/studio.html",
+  "seeded_theme": "liquid-glass",
+  "viewport": {
+    "height": 1200,
+    "width": 1280
+  }
+}

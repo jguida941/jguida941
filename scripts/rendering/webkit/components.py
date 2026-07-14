@@ -246,6 +246,21 @@ def render_card(profile: str, variant: str, state: str, profile_data: dict | Non
     return html, css
 
 
+def _nav_css(nav: dict, selector: str) -> str:
+    rules = [
+        f"{selector} {{ display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }}",
+        f"{selector} a {{ color: var(--ink-dim); text-decoration: none; padding: 6px 14px;"
+        f" border-radius: {nav['radius_px']}px; font-weight: 600; font-size: 13px;"
+        f" transition: color var(--motion-fast) var(--ease-standard); }}",
+    ]
+    if nav["anatomy"] == "underline-tabs":
+        rules.append(f"{selector} a[aria-current] {{ color: var(--ink); border-bottom: 2px solid var(--accent);"
+                     f" border-radius: 0; }}")
+    else:
+        rules.append(f"{selector} a[aria-current] {{ background: var(--accent); color: var(--backdrop); }}")
+    return "\n".join(rules)
+
+
 def render_nav(profile: str, links: list, active: str, profile_data: dict | None = None) -> tuple[str, str]:
     """The site NAV band (P5-BOARD B-1b, docs/design/board.md §1 / test_design_nav). Anatomy from
     `components.nav` profile DATA (carbon: underline-tabs, square; capsule languages: pills with a
@@ -258,19 +273,30 @@ def render_nav(profile: str, links: list, active: str, profile_data: dict | None
     nav = prof["components"]["nav"]
     cls = f"nav-{profile}"
     items = "".join(
-        f'<a href="{_escape(href)}"' + (' aria-current="page"' if href == active else "")
+        f'<a href="{_escape(href)}" data-theme-propagate' + (' aria-current="page"' if href == active else "")
         + f'>{_escape(label)}</a>'
         for label, href in links)
     html = f'<nav class="site-nav {cls}" aria-label="Site">{items}</nav>'
-    base = [
-        f".{cls} {{ display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }}",
-        f".{cls} a {{ color: var(--ink-dim); text-decoration: none; padding: 6px 14px;"
-        f" border-radius: {nav['radius_px']}px; font-weight: 600; font-size: 13px;"
-        f" transition: color var(--motion-fast) var(--ease-standard); }}",
-    ]
-    if nav["anatomy"] == "underline-tabs":
-        base.append(f".{cls} a[aria-current] {{ color: var(--ink); border-bottom: 2px solid var(--accent);"
-                    f" border-radius: 0; }}")
-    else:  # capsule-pills
-        base.append(f".{cls} a[aria-current] {{ background: var(--accent); color: var(--backdrop); }}")
-    return html, "\n".join(base)
+    return html, _nav_css(nav, f".{cls}")
+
+
+def render_switchable_nav(house: str, links: list, active: str) -> tuple[str, str]:
+    """One semantic nav whose profile-derived anatomy follows the root theme."""
+    from scripts.rendering.design import loader
+
+    profiles = tuple(loader.load("_index")["active_design_profiles"])
+    if house not in profiles:
+        raise KeyError(f"house profile {house!r} is not active")
+    classes = " ".join(f"nav-{profile}" for profile in profiles)
+    items = "".join(
+        f'<a href="{_escape(href)}" data-theme-propagate' + (' aria-current="page"' if href == active else "")
+        + f'>{_escape(label)}</a>'
+        for label, href in links)
+    html = f'<nav class="site-nav {classes}" aria-label="Site">{items}</nav>'
+    blocks = []
+    for profile in profiles:
+        nav = loader.load(profile)["components"]["nav"]
+        blocks.append(_nav_css(nav, f':root[data-theme="{profile}"] .nav-{profile}'))
+    blocks.append(_nav_css(loader.load(house)["components"]["nav"],
+                           f':root:not([data-theme]) .nav-{house}'))
+    return html, "\n".join(blocks)

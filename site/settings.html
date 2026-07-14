@@ -1,9 +1,42 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8">
+<html lang="en" data-house-theme="apple-dark"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+(function () {
+  "use strict";
+  const THEMES = ["liquid-glass","carbon","apple-dark"];
+  const STORAGE_KEY = "dash-theme";
+  const root = document.documentElement;
+  const valid = (name) => THEMES.includes(name);
+  let storedTheme = null;
+  try { storedTheme = localStorage.getItem(STORAGE_KEY); } catch (error) {}
+  const urlTheme = new URLSearchParams(location.search).get("theme");
+  const houseTheme = root.dataset.houseTheme;
+  const initialTheme = valid(urlTheme) ? urlTheme : (valid(storedTheme) ? storedTheme : houseTheme);
+  if (!valid(initialTheme)) throw new Error("invalid data-house-theme");
+  function applyTheme(name, persist) {
+    if (!valid(name)) return false;
+    root.dataset.theme = name;
+    if (persist) { try { localStorage.setItem(STORAGE_KEY, name); } catch (error) {} }
+    document.querySelectorAll("[data-theme-set]").forEach((button) =>
+      button.setAttribute("aria-pressed", String(button.dataset.themeSet === name)));
+    document.querySelectorAll("[data-theme-propagate]").forEach((link) => {
+      const url = new URL(link.getAttribute("href"), location.href);
+      url.searchParams.set("theme", name);
+      link.href = url.href;
+    });
+    return true;
+  }
+  applyTheme(initialTheme, valid(urlTheme));
+  document.addEventListener("DOMContentLoaded", function () {
+    applyTheme(root.dataset.theme, false);
+    document.querySelectorAll("[data-theme-set]").forEach((button) =>
+      button.addEventListener("click", () => applyTheme(button.dataset.themeSet, true)));
+  });
+}());
+</script>
 <title>Design-language settings — governed control plane</title>
-<style>:root { color-scheme: dark; }
-* { box-sizing: border-box; }
+<style>* { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 :root {
   --backdrop: #000000;
@@ -20,6 +53,7 @@ html, body { height: 100%; margin: 0; }
   --radius-panel: 14px;
   --radius-tile: 12px;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  color-scheme: dark;
   --ps-pad: 32px;
   --motion-fast: 150ms;
   --motion-base: 300ms;
@@ -39,6 +73,55 @@ html, body { height: 100%; margin: 0; }
   --ps-type-sub: 13px;
   --ps-measure: 76ch;
 }
+:root[data-theme="liquid-glass"] {
+  --backdrop: #0c0e18;
+  --surface: #1b1e2e;
+  --surface-raised: #232843;
+  --ink-strong: #c0caf5;
+  --ink: #a9b1d6;
+  --ink-dim: #8a94bd;
+  --accent: #7dcfff;
+  --hairline: #c0caf5;
+  --status-success: #9ece6a;
+  --status-warning: #e0af68;
+  --status-danger: #f7768e;
+  --radius-panel: 18px;
+  --radius-tile: 13px;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  color-scheme: dark;
+  --ps-pad: 28px;
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 400ms;
+  --ease-standard: ease-in-out;
+  --ease-enter: ease-out;
+  --ease-exit: ease-in;
+}
+
+:root[data-theme="carbon"] {
+  --backdrop: #ffffff;
+  --surface: #ffffff;
+  --surface-raised: #f4f4f4;
+  --ink-strong: #161616;
+  --ink: #525252;
+  --ink-dim: #6f6f6f;
+  --accent: #0f62fe;
+  --hairline: #e0e0e0;
+  --status-success: #198038;
+  --status-warning: #f1c21b;
+  --status-danger: #da1e28;
+  --radius-panel: 0px;
+  --radius-tile: 0px;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  color-scheme: light;
+  --ps-pad: 20px;
+  --motion-fast: 70ms;
+  --motion-base: 110ms;
+  --motion-slow: 240ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-enter: cubic-bezier(0, 0, 0.38, 0.9);
+  --ease-exit: cubic-bezier(0.2, 0, 1, 0.9);
+}
 .ps-apple-dark { background: var(--backdrop); color: var(--ink); font-family: var(--font-sans);
   margin: 0; min-height: 100%; }
 .ps-apple-dark .ps-main { max-width: var(--ps-measure-page); margin: 0 auto;
@@ -54,9 +137,18 @@ html, body { height: 100%; margin: 0; }
   border-radius: var(--radius-panel); padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }
 .ps-apple-dark .ps-panel-h { margin: 0 0 var(--ps-pad-tight); color: var(--ink-strong);
   font-size: var(--ps-type-h2); font-weight: 600; }
-.nav-apple-dark { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.nav-apple-dark a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
-.nav-apple-dark a[aria-current] { background: var(--accent); color: var(--backdrop); }
+:root[data-theme="liquid-glass"] .nav-liquid-glass { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+:root[data-theme="liquid-glass"] .nav-liquid-glass a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
+:root[data-theme="liquid-glass"] .nav-liquid-glass a[aria-current] { background: var(--accent); color: var(--backdrop); }
+:root[data-theme="carbon"] .nav-carbon { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+:root[data-theme="carbon"] .nav-carbon a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 0px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
+:root[data-theme="carbon"] .nav-carbon a[aria-current] { color: var(--ink); border-bottom: 2px solid var(--accent); border-radius: 0; }
+:root[data-theme="apple-dark"] .nav-apple-dark { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+:root[data-theme="apple-dark"] .nav-apple-dark a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
+:root[data-theme="apple-dark"] .nav-apple-dark a[aria-current] { background: var(--accent); color: var(--backdrop); }
+:root:not([data-theme]) .nav-apple-dark { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+:root:not([data-theme]) .nav-apple-dark a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
+:root:not([data-theme]) .nav-apple-dark a[aria-current] { background: var(--accent); color: var(--backdrop); }
 .law { color: var(--ink); font-size: var(--ps-type-sub); }
 .law b { color: var(--accent); }
 .base { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-panel);
@@ -76,7 +168,7 @@ table.grid { width: 100%; border-collapse: collapse; font-size: var(--ps-type-su
 .verdict.no { background: var(--status-danger); color: var(--backdrop); }
 </style>
 </head><body>
-<div class="ps-apple-dark"><div class="ps-main"><nav class="site-nav nav-apple-dark" aria-label="Site"><a href="index.html">home</a><a href="showcase.html">showcase</a><a href="studio.html">studio</a><a href="settings.html" aria-current="page">settings</a></nav><h1 class="ps-title">Governed control plane</h1><p class="ps-intro">Compose a design language: pick a base, then swap any component to another language. This is the design surface — separate from the builder scorecard.</p><p class="ps-crumbs"><a href="index.html">home</a> · <a href="showcase.html">showcase</a> · <a href="studio.html">studio</a></p><section class="ps-panel"><h2 class="ps-panel-h">The law</h2><div class="law">An <b>invalid combination is unconstructable</b>. A swap is admissible ONLY if the composed component, as rendered, is a FULL valid instance of some active design language — a partial mix that belongs to no language (e.g. a frosted material on a square 0-radius card) is refused. The verdict below is computed by ONE Python source (<code>scripts/quality/settings_admissibility.py</code>), routed through the real render → conform path; this page only displays it (no verdict JS).</div></section><section class="base" data-base="apple-dark"><h2>base: apple-dark</h2><p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p><div class="table-scroll"><table class="grid"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp">button</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">chip</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">card</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr></tbody></table></div></section>
+<div class="ps-apple-dark"><div class="ps-main"><nav class="site-nav nav-liquid-glass nav-carbon nav-apple-dark" aria-label="Site"><a href="index.html" data-theme-propagate>home</a><a href="showcase.html" data-theme-propagate>showcase</a><a href="studio.html" data-theme-propagate>studio</a><a href="settings.html" data-theme-propagate aria-current="page">settings</a></nav><h1 class="ps-title">Governed control plane</h1><p class="ps-intro">Compose a design language: pick a base, then swap any component to another language. This is the design surface — separate from the builder scorecard.</p><p class="ps-crumbs"><a href="index.html" data-theme-propagate>home</a> · <a href="showcase.html" data-theme-propagate>showcase</a> · <a href="studio.html" data-theme-propagate>studio</a></p><section class="ps-panel"><h2 class="ps-panel-h">The law</h2><div class="law">An <b>invalid combination is unconstructable</b>. A swap is admissible ONLY if the composed component, as rendered, is a FULL valid instance of some active design language — a partial mix that belongs to no language (e.g. a frosted material on a square 0-radius card) is refused. The verdict below is computed by ONE Python source (<code>scripts/quality/settings_admissibility.py</code>), routed through the real render → conform path; this page only displays it (no verdict JS).</div></section><section class="base" data-base="apple-dark"><h2>base: apple-dark</h2><p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p><div class="table-scroll"><table class="grid"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp">button</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">chip</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">card</th><td class="cell ok"><span class="src">apple-dark (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr></tbody></table></div></section>
 <section class="base" data-base="carbon"><h2>base: carbon</h2><p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p><div class="table-scroll"><table class="grid"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp">button</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon (base)</span><span class="verdict ok">admissible</span></td><td class="cell no"><span class="src">liquid-glass</span><span class="verdict no">unconstructable</span></td></tr><tr><th class="comp">chip</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon (base)</span><span class="verdict ok">admissible</span></td><td class="cell no"><span class="src">liquid-glass</span><span class="verdict no">unconstructable</span></td></tr><tr><th class="comp">card</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon (base)</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass</span><span class="verdict ok">admissible</span></td></tr></tbody></table></div></section>
 <section class="base" data-base="liquid-glass"><h2>base: liquid-glass</h2><p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p><div class="table-scroll"><table class="grid"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp">button</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass (base)</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">chip</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass (base)</span><span class="verdict ok">admissible</span></td></tr><tr><th class="comp">card</th><td class="cell ok"><span class="src">apple-dark</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">carbon</span><span class="verdict ok">admissible</span></td><td class="cell ok"><span class="src">liquid-glass (base)</span><span class="verdict ok">admissible</span></td></tr></tbody></table></div></section></div></div>
 </body></html>

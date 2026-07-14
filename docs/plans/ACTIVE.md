@@ -22,6 +22,14 @@
     RED + retire stale docs (`DESIGN_AUDIT`) → chat→`ClaimIntakeClaim` lowering → then SUBSUME the
     old `MODULE_HOMES`/`TEST_GROUPS` guards into the single `repo_layout.json` cover (kill the
     transitional double-maintenance).
+- ✅ **P5-COVERAGE W1 — one governed, theme-continuous site (D1, owner-ratified
+  2026-07-13).** The three-theme switcher remains. One shared head bootstrap applies
+  `?theme=` → persisted `dash-theme` → declared house precedence before first paint on every
+  manifest route; the selected profile controls shell tokens and navigation anatomy across all
+  four pages. The closed runtime proof is route × active profile × `{1280,390}` with real Chrome
+  computed-style/geometry facts and provenance. **D1 explicitly supersedes P5-ARCH's earlier
+  “freeze the scorecard and drop the runtime switcher” decision**; its content/pattern freeze
+  remains, but not its theme ban.
 - ✅ **P5-THEME-ROSTER-AUTHORITY (supersedes the old public Power BI theme experiment)** —
   `contracts/design_profiles/_index.json.active_design_profiles` is the public roster authority;
   `site/index.html` remains the one canonical public surface with one selector exposing exactly
@@ -167,8 +175,11 @@ easy to measure (token numbers, string presence), not what actually makes it pro
 ### ⟐ ARCHITECTURE (P5-ARCH workflow `wf_8ea0e7d9-544` landed — 11 doc dossiers + synthesis + adversarial critique)
 
 **Decisions adopted:**
-- **The Builder Scorecard FREEZES to ONE language (liquid-glass) and DROPS the runtime switcher.** It stays the
-  GitHub-data surface (SVG cards + `site/index.html` + README), tokens pinned at build time. The PATTERN
+- **SUPERSEDED by P5-COVERAGE D1 (2026-07-13): the Builder Scorecard FREEZES to ONE language
+  (liquid-glass) and DROPS the runtime switcher.** Its content/pattern freeze still governs; the
+  switcher-removal/theme-freeze portion no longer does. It stays the
+  GitHub-data surface (SVG cards + `site/index.html` + README), with its generated content frozen
+  while the governed shell follows D1. The PATTERN
   invariants (content-to-chrome, grouped composition, no giant empty boxes) ALSO apply to it — so the one
   liquid-glass scorecard stops looking AI — but no more theme-chasing on it.
 - **Separate design-language system, NO GitHub data in it (synthetic fixtures):** (A) a CLOSED component library

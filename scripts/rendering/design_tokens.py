@@ -25,6 +25,7 @@ ROLES = (
 )
 
 DEFAULT_THEME = "liquid-glass"
+THEME_STORAGE_KEY = "dash-theme"
 
 def _profiles_dir() -> Path:
     for parent in Path(__file__).resolve().parents:
@@ -112,6 +113,15 @@ THEME_META: dict[str, dict[str, str]] = _active_bridge_map("THEME_META", {
     "apple-dark":   {"label": "Apple Dark", "blurb": "System dark · one vivid accent"},
 })
 
+# Native control/chrome mode is part of the selected language, not page-local decoration.
+# Carbon's shipped white (g10) theme is light; the two dark profiles declare dark surfaces.
+# Sources: docs/design/carbon.md, docs/design/apple-dark.md, docs/design/liquid-glass.md.
+COLOR_SCHEMES: dict[str, str] = _active_bridge_map("COLOR_SCHEMES", {
+    "liquid-glass": "dark",
+    "carbon": "light",
+    "apple-dark": "dark",
+})
+
 # Per-theme INFORMATION ARCHITECTURE — radius + type overrides (over the config defaults).
 # This is what makes each theme a different *website*, not a colour swap: Apple is
 # rounder + larger, Carbon is square/structured/compact. The DEFAULT theme MUST equal config
@@ -173,6 +183,10 @@ def material(name: str | None = None) -> dict[str, float]:
     return dict(MATERIALS[name or DEFAULT_THEME])
 
 
+def color_scheme(name: str | None = None) -> str:
+    return COLOR_SCHEMES[name or DEFAULT_THEME]
+
+
 # --- IA tokens (now PER-THEME: config defaults + the theme's THEME_IA overrides) ----
 def type_scale(name: str | None = None) -> dict[str, tuple[int, int]]:
     base = {k: tuple(v) for k, v in config.TYPE_SCALE.items()}
@@ -204,10 +218,17 @@ def _role_vars(name: str, indent: str = "  ") -> str:
 
 
 def _ia_vars(name: str, indent: str = "  ") -> str:
+    from scripts.rendering.design import loader
+
     r = radius(name)
     d = density(name)
-    lines = [f"{indent}--radius-panel: {r['panel']}px;", f"{indent}--radius-tile: {r['tile']}px;"]
+    lines = [f"{indent}color-scheme: {color_scheme(name)};",
+             f"{indent}--radius-panel: {r['panel']}px;", f"{indent}--radius-tile: {r['tile']}px;"]
     lines.append(f"{indent}--pad-panel: {d['panel_pad']}px;")
+    # Cross-page continuity fact: pageshell consumes --ps-pad for the same governed density value.
+    # Keeping the alias in the index token blocks lets one runtime proof compare the selected
+    # profile's shell density on every route; W3 will consume it when index joins pageshell.
+    lines.append(f"{indent}--ps-pad: {d['panel_pad']}px;")
     lines.append(f"{indent}--pad-tile: {d['tile_pad']}px;")
     lines.append(f"{indent}--gap-grid: {d['gap']}px;")
     # NOTE: `tile_min` stays in THEME_IA as a reserved per-theme density spec for the future
@@ -224,7 +245,7 @@ def _ia_vars(name: str, indent: str = "  ") -> str:
             lines.append(f"{indent}--motion-{key}: {m[key]}ms;")
         for key in ("standard", "enter", "exit"):
             lines.append(f"{indent}--ease-{key}: {m['ease-' + key]};")
-    lines.append(f"{indent}--font-sans: {config.FONT_SANS};")
+    lines.append(f"{indent}--font-sans: {loader.resolve_tokens(name)['font']['family']};")
     return "\n".join(lines)
 
 

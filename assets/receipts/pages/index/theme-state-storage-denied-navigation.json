@@ -1,0 +1,38 @@
+{
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "contract_id": "PageThemeStateMachineFacts",
+  "final": {
+    "house_theme": "apple-dark",
+    "observed_theme": "carbon",
+    "pressed_themes": [],
+    "propagated_link_themes": [
+      "carbon"
+    ],
+    "storage_value": "__storage_error__"
+  },
+  "follow_page": "showcase",
+  "followed_href": "http://127.0.0.1:64705/site/showcase.html?theme=carbon",
+  "initial": {
+    "house_theme": "liquid-glass",
+    "observed_theme": "carbon",
+    "pressed_themes": [
+      "carbon"
+    ],
+    "propagated_link_themes": [
+      "carbon"
+    ],
+    "storage_value": "__storage_error__"
+  },
+  "inputs": {
+    "click_theme": null,
+    "deny_storage": true,
+    "follow_page": "showcase",
+    "follow_via": "nav",
+    "start_page": "index",
+    "storage": null,
+    "url_theme": "carbon"
+  },
+  "kind": "chrome-headless-theme-state-machine-facts",
+  "scenario": "storage-denied-navigation"
+}

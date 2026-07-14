@@ -4,13 +4,19 @@
   "cannot_mark_done": true,
   "client_width": 390,
   "contract_id": "PageHeadlessDomProbe",
+  "declared_scroll_containers": [
+    {
+      "class": "table-scroll",
+      "parent": ".lang"
+    }
+  ],
   "horizontal_overflow": false,
   "kind": "chrome-headless-dom-probe",
   "offender_count": 481,
   "offenders": [
     {
       "class": "invariants",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 315.8,
@@ -21,7 +27,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -30,7 +45,7 @@
     },
     {
       "class": "",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 315.8,
@@ -41,7 +56,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -50,7 +74,7 @@
     },
     {
       "class": "",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 315.8,
@@ -61,7 +85,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -70,7 +103,7 @@
     },
     {
       "class": "",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 373.08,
       "overflow_px": 119.61,
@@ -81,7 +114,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -90,7 +132,7 @@
     },
     {
       "class": "",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 509.61,
       "overflow_px": 315.8,
@@ -101,7 +143,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -110,7 +161,7 @@
     },
     {
       "class": "aspect-group",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 315.8,
@@ -121,7 +172,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -130,7 +190,7 @@
     },
     {
       "class": "aspect-head",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 315.8,
@@ -141,7 +201,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -150,7 +219,7 @@
     },
     {
       "class": "",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 315.8,
@@ -161,7 +230,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -170,7 +248,7 @@
     },
     {
       "class": "",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 315.8,
@@ -181,7 +259,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -190,7 +277,7 @@
     },
     {
       "class": "verdict",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 373.08,
       "overflow_px": 119.61,
@@ -201,7 +288,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -210,7 +306,7 @@
     },
     {
       "class": "badge badge-pass",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 385.08,
       "overflow_px": 50.77,
@@ -221,7 +317,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -230,7 +335,7 @@
     },
     {
       "class": "receipt",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 509.61,
       "overflow_px": 315.8,
@@ -241,7 +346,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -250,7 +364,7 @@
     },
     {
       "class": "",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 315.8,
@@ -261,7 +375,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -270,7 +393,7 @@
     },
     {
       "class": "verdict",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 373.08,
       "overflow_px": 119.61,
@@ -281,7 +404,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -290,7 +422,7 @@
     },
     {
       "class": "badge badge-pass",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 385.08,
       "overflow_px": 50.77,
@@ -301,7 +433,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -310,7 +451,7 @@
     },
     {
       "class": "receipt",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 509.61,
       "overflow_px": 315.8,
@@ -321,7 +462,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -330,7 +480,7 @@
     },
     {
       "class": "",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 53,
       "overflow_px": 315.8,
@@ -341,7 +491,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -350,7 +509,7 @@
     },
     {
       "class": "verdict",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 373.08,
       "overflow_px": 119.61,
@@ -361,7 +520,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -370,7 +538,7 @@
     },
     {
       "class": "badge badge-pass",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 385.08,
       "overflow_px": 50.77,
@@ -381,7 +549,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },
@@ -390,7 +567,7 @@
     },
     {
       "class": "receipt",
-      "contained_by_table_scroll": true,
+      "contained_by_declared_scroll": true,
       "id": "",
       "left": 509.61,
       "overflow_px": 315.8,
@@ -401,7 +578,16 @@
         "in_viewport": true,
         "left": 53,
         "overflow_x": "auto",
+        "parent": {
+          "class": "lang",
+          "id": "",
+          "tag": "section"
+        },
         "right": 337,
+        "rule": {
+          "class": "table-scroll",
+          "parent": ".lang"
+        },
         "tag": "div",
         "width": 284
       },

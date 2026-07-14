@@ -101,3 +101,53 @@ The SHELL-scoped grouping law is emitted per profile (`*-grouping-depth`,
 `section_grouping_flat`): one chrome level, no chromed box inside a chromed box.
 **Declared gap:** the PAGE-level nesting check (e.g. the showcase specimen stage, chromed inside a
 chromed language panel today) lands with D-SHELL-3's stage shrink-wrap/recomposition.
+
+## §7 — Theme continuity across the governed site (D1)
+
+D1 (owner-ratified 2026-07-13) makes the active roster one site-wide choice. It supersedes the
+earlier P5-ARCH instruction to freeze the scorecard to Liquid Glass and remove its switcher; the
+scorecard's content/pattern freeze remains, but every route honors the selected language.
+
+Every page in `contracts/page_manifest.json` emits the exact same
+`theme_continuity_script_tag()` before its first `<style>`. The script accepts only names in
+`active_design_profiles`, then applies this closed precedence:
+
+1. a valid `?theme=<profile>` value;
+2. a valid persisted `dash-theme` value;
+3. the page's valid `data-house-theme`.
+
+Invalid URL/storage values fall through; an invalid house value fails closed. The selected name is
+written to the root `data-theme`, valid URL and button choices persist, and every
+`[data-theme-set]` control exposes the selected state through `aria-pressed`. The bootstrap is the
+only theme state machine; hydration code may not re-decide it. Every governed nav destination is
+marked `data-theme-propagate`, as is every pageshell breadcrumb destination, and the bootstrap
+writes the canonical choice into that link's `theme` query. Theme continuity therefore survives
+either navigation path even when browser storage is denied.
+
+`shell_css()` embeds required declarations for every active profile under
+`:root[data-theme="<profile>"]`, with no profile-value fallbacks. `render_switchable_nav()` emits
+one semantic navigation band whose profile-scoped rule changes both tokens and anatomy (for
+example, Carbon underline tabs versus Apple filled capsules). Navigation therefore cannot remain
+Apple-shaped while the rest of the page claims Carbon.
+
+Native browser chrome is governed too: `design_tokens.COLOR_SCHEMES` declares Carbon's white theme
+as `light` and the two dark-surface profiles as `dark`; each root theme block sets the real
+`color-scheme` property. Pages may not pin it independently.
+
+`tests/contracts/test_theme_continuity.py` closes the static cover and consumes the Chrome facts
+written by `scripts/quality/headless_receipts.py`: every route × active profile × 1280/390 matrix
+cell must restore the seeded persisted choice, resolve the exact required root declarations,
+render the selected navigation anatomy, and remain horizontally contained at 390px. Each fact has
+a provenance sidecar pinning the shipped page hash, real Chrome version, command, and viewport;
+default-theme screenshots alone are not continuity evidence.
+
+Seven additional real-browser state-machine vectors prove valid URL-over-storage precedence,
+invalid URL/storage fallthrough, house fallback, click persistence plus pressed-state reflection,
+index-to-showcase nav propagation, and showcase-to-index breadcrumb propagation while
+`localStorage` is forcibly unavailable. Each fact records the exact scenario inputs and its
+current start/follow page hashes, preventing a vacuous or stale journey. Navigation facts include
+resolved foreground/background/border colors, display, ancestor visibility, opacity, active-link
+cardinality, rendered-box geometry, and viewport intersection, so a hidden or invisible underline
+cannot satisfy anatomy. Mobile containment binds each escape to its page and exact parent
+structure (`#calendar-panel > .cal-wrap`, `#rhythm-panel > .heat-wrap`, `.lang/.base >
+.table-scroll`); contained offenders and their container identities remain visible in the facts.

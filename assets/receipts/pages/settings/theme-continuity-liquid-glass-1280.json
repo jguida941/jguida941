@@ -1,0 +1,72 @@
+{
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "client_width": 1280,
+  "color_scheme": "dark",
+  "computed_root_tokens": {
+    "--accent": "#7dcfff",
+    "--backdrop": "#0c0e18",
+    "--ease-enter": "ease-out",
+    "--ease-exit": "ease-in",
+    "--ease-standard": "ease-in-out",
+    "--font-sans": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+    "--hairline": "#c0caf5",
+    "--ink": "#a9b1d6",
+    "--ink-dim": "#8a94bd",
+    "--ink-strong": "#c0caf5",
+    "--motion-base": "200ms",
+    "--motion-fast": "120ms",
+    "--motion-slow": "400ms",
+    "--ps-pad": "28px",
+    "--radius-panel": "18px",
+    "--radius-tile": "13px",
+    "--status-danger": "#f7768e",
+    "--status-success": "#9ece6a",
+    "--status-warning": "#e0af68",
+    "--surface": "#1b1e2e",
+    "--surface-raised": "#232843",
+    "color-scheme": "dark"
+  },
+  "contract_id": "PageThemeContinuityFacts",
+  "declared_scroll_containers": [
+    {
+      "class": "table-scroll",
+      "parent": ".base"
+    }
+  ],
+  "horizontal_overflow": false,
+  "house_theme": "apple-dark",
+  "kind": "chrome-headless-theme-continuity-facts",
+  "nav": {
+    "active_count": 1,
+    "ancestor_hidden": false,
+    "background_color": "rgb(125, 207, 255)",
+    "border_bottom_color": "rgb(12, 14, 24)",
+    "border_bottom_width_px": 0,
+    "box": {
+      "height": 28,
+      "left": 446.53,
+      "top": 51.19,
+      "width": 79.53
+    },
+    "display": "block",
+    "foreground_color": "rgb(12, 14, 24)",
+    "has_rendered_box": true,
+    "intersects_viewport": true,
+    "opacity": "1",
+    "radius_px": 999,
+    "visibility": "visible"
+  },
+  "observed_theme": "liquid-glass",
+  "offenders": [],
+  "page": "settings",
+  "pressed_themes": [],
+  "route": "/site/settings.html",
+  "scroll_width": 1280,
+  "seeded_theme": "liquid-glass",
+  "uncontained_offender_count": 0,
+  "viewport": {
+    "height": 1200,
+    "width": 1280
+  }
+}

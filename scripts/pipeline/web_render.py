@@ -240,8 +240,8 @@ _NAV_LINKS = [("home", "index.html"), ("showcase", "showcase.html"),
 
 def _nav_parts() -> tuple[str, str]:
     """The governed site-nav band (P5-BOARD B-1b) rendered in the page's own language."""
-    from scripts.rendering.webkit.components import render_nav
-    return render_nav("liquid-glass", _NAV_LINKS, active="index.html")
+    from scripts.rendering.webkit.components import render_switchable_nav
+    return render_switchable_nav(DEFAULT_THEME, _NAV_LINKS, active="index.html")
 
 
 def _nav_band_html() -> str:
@@ -382,21 +382,6 @@ def _script() -> str:
     bad: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   };
 
-  function setTheme(name) {
-    document.documentElement.dataset.theme = (name === "__DEFAULT_THEME__") ? "" : name;
-    try { localStorage.setItem("dash-theme", name); } catch (e) {}
-    document.querySelectorAll("[data-theme-set]").forEach(b =>
-      b.setAttribute("aria-pressed", String(b.dataset.themeSet === name)));
-  }
-  document.querySelectorAll("[data-theme-set]").forEach(b =>
-    b.addEventListener("click", () => setTheme(b.dataset.themeSet)));
-  const THEMES = __THEME_NAMES__;
-  const urlTheme = new URLSearchParams(location.search).get("theme");
-  try {
-    const t = urlTheme || localStorage.getItem("dash-theme");
-    if (t && THEMES.includes(t)) setTheme(t);
-  } catch (e) { if (urlTheme && THEMES.includes(urlTheme)) setTheme(urlTheme); }
-
   function hydrate(d) {
     document.querySelectorAll("[data-bind]").forEach(el => {
       let v = get(d, el.getAttribute("data-bind"));
@@ -513,21 +498,23 @@ def _lang_colors_json() -> str:
 
 
 def render_dashboard(default_theme: str = DEFAULT_THEME) -> str:
+    if default_theme not in THEMES:
+        raise KeyError(f"default theme {default_theme!r} is not active")
+    from scripts.rendering.pageshell.pageshell import theme_continuity_script_tag
+
     css = emit_css_root() + _component_css()
-    import json
     script = (
         _script()
         .replace("__DATA_URL__", DATA_URL)
-        .replace("__DEFAULT_THEME__", DEFAULT_THEME)
         .replace("__LANG_COLORS__", _lang_colors_json())
-        .replace("__THEME_NAMES__", json.dumps(list(THEMES)))
     )
     body = "".join([_hero(), _scorecard(), _calendar(), _languages(), _rhythm(), _repos_focus(), _snapshot()])
     return f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-house-theme="{default_theme}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+{theme_continuity_script_tag()}
 <title>jguida941 · Builder Dashboard</title>
 <meta name="description" content="Live GitHub builder analytics — regenerated hourly.">
 <style>

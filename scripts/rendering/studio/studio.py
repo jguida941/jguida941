@@ -199,8 +199,9 @@ def render_studio() -> str:
             f'{"".join(rows)}</div>'
             f'<div class="variants">{"".join(variants)}</div></section>')
 
-    from scripts.rendering.pageshell.pageshell import render_page_shell
-    from scripts.rendering.webkit.components import render_nav
+    from scripts.rendering.pageshell.pageshell import (render_page_shell,
+                                                       theme_continuity_script_tag)
+    from scripts.rendering.webkit.components import render_switchable_nav
 
     # The switcher + stages + the (verdict-free) scripts are the page's structured content; the radios ride
     # in as the shell root's FIRST children so their `:checked ~` sibling selectors keep reaching them.
@@ -213,7 +214,7 @@ def render_studio() -> str:
     )
     _nav_links = [("home", "index.html"), ("showcase", "showcase.html"),
                   ("studio", "studio.html"), ("settings", "settings.html")]
-    nav_html, nav_css = render_nav(HOUSE, _nav_links, active="studio.html")
+    nav_html, nav_css = render_switchable_nav(HOUSE, _nav_links, active="studio.html")
     shell_html, shell_style = render_page_shell(
         HOUSE,
         title="Design-language studio",
@@ -224,10 +225,11 @@ def render_studio() -> str:
     )
     return (
         "<!doctype html>\n"
-        '<html lang="en"><head><meta charset="utf-8">\n'
+        f'<html lang="en" data-house-theme="{HOUSE}"><head><meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
+        f"{theme_continuity_script_tag()}\n"
         "<title>Design-language studio</title>\n"
-        f"<style>:root {{ color-scheme: dark; }}\n* {{ box-sizing: border-box; }}\n"
+        f"<style>* {{ box-sizing: border-box; }}\n"
         f"html, body {{ height: 100%; margin: 0; }}\n{shell_style}\n{nav_css}\n{_CONTENT_CSS}\n"
         # the switch MECHANISM (pure-CSS reveal + active-tab) and the pre-rendered specimen archetypes,
         # in the specimens' own languages — NOT the scanned page chrome

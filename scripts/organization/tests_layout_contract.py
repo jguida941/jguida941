@@ -55,6 +55,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_structural_layout.py",
             "test_studio.py",
             "test_tests_layout_contract.py",
+            "test_theme_continuity.py",
             "test_theme_roster_authority.py",
             "test_theme_system.py",
             "test_tile_composition.py",
@@ -194,6 +195,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
         "test_design_motion.py",        # P5-BOARD B-1: motion is DATA — cited duration/easing tokens, band law, token-only page motion
         "test_page_manifest.py",        # D-SHELL-2: every page declares intent + archetype + required regions (fail-closed, committed-bytes primary)
         "test_page_shell.py",           # P5-CHROME: the switchable governed page-shell — the site's own chrome is a rendered instance of a language (token-only + provenance + conform)
+        "test_theme_continuity.py",      # W1: one persisted choice controls tokens + governed chrome anatomy on every page
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y

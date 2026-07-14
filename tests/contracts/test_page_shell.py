@@ -27,7 +27,7 @@ def _active():
 def _strip_root_blocks(css: str) -> str:
     """Host chrome AFTER the declared `:root { … }` token blocks are removed — what remains must carry
     no design literal (every colour/space/size is a var())."""
-    return re.sub(r":root\s*\{[^}]*\}", "", css)
+    return re.sub(r':root(?:\[data-theme="[\w-]+"\])?\s*\{[^}]*\}', "", css)
 
 
 def _shell(name: str, **kw):
@@ -113,7 +113,8 @@ class PageShellTokenOnlyContract(unittest.TestCase):
             _, css = _shell(name)
             self.assertRegex(css, r"\.ps-[\w-]+\s*\{[^}]*background:\s*var\(--backdrop\)",
                              f"{name}: the shell root must paint var(--backdrop)")
-            root = dict(re.findall(r"(--[\w-]+):\s*([^;]+);", css))
+            base = re.search(r":root\s*\{([^}]*)\}", css).group(1)
+            root = dict(re.findall(r"(--[\w-]+):\s*([^;]+);", base))
             self.assertEqual(root.get("--backdrop"), loader.resolve_tokens(name)["color"]["backdrop"])
 
 

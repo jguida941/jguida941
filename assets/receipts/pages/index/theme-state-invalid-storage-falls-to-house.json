@@ -1,0 +1,30 @@
+{
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "contract_id": "PageThemeStateMachineFacts",
+  "final": {
+    "house_theme": "liquid-glass",
+    "observed_theme": "liquid-glass",
+    "pressed_themes": [
+      "liquid-glass"
+    ],
+    "propagated_link_themes": [
+      "liquid-glass"
+    ],
+    "storage_value": "not-active"
+  },
+  "follow_page": null,
+  "followed_href": null,
+  "initial": null,
+  "inputs": {
+    "click_theme": null,
+    "deny_storage": false,
+    "follow_page": null,
+    "follow_via": null,
+    "start_page": "index",
+    "storage": "not-active",
+    "url_theme": null
+  },
+  "kind": "chrome-headless-theme-state-machine-facts",
+  "scenario": "invalid-storage-falls-to-house"
+}

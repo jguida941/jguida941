@@ -188,7 +188,7 @@ def _strip_noise(css: str) -> str:
     """The host-chrome CSS with comments + the declared `:root { … }` token blocks removed (so a colour
     hidden after a `/* … */` comment or inside `:root` cannot slip past the value scan)."""
     css = re.sub(r"/\*.*?\*/", " ", css, flags=re.S)
-    return re.sub(r":root\s*\{[^}]*\}", " ", css)
+    return re.sub(r':root(?:\[data-theme="[\w-]+"\])?\s*\{[^}]*\}', " ", css)
 
 
 def _css_rules(css: str):

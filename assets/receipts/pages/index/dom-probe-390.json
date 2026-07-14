@@ -4,6 +4,16 @@
   "cannot_mark_done": true,
   "client_width": 390,
   "contract_id": "PageHeadlessDomProbe",
+  "declared_scroll_containers": [
+    {
+      "class": "cal-wrap",
+      "parent": "#calendar-panel"
+    },
+    {
+      "class": "heat-wrap",
+      "parent": "#rhythm-panel"
+    }
+  ],
   "horizontal_overflow": false,
   "kind": "chrome-headless-dom-probe",
   "offender_count": 0,
