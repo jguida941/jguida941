@@ -224,8 +224,8 @@ class PageShellInjectionContract(unittest.TestCase):
         then prefix, then title."""
         html, _ = self._shell(prefix_html='<input type="radio" id="lang-x" class="lang-radio">')
         self.assertRegex(
-            html, r'<div class="ps-apple-dark"><div class="ps-main">'
-                  r'<input type="radio" id="lang-x"[^>]*><h1 class="ps-title">',
+            html, r'<div class="ps-apple-dark"[^>]*><div class="ps-main"[^>]*>'
+                  r'<input type="radio" id="lang-x"[^>]*><h1 class="ps-title"[^>]*>',
             "prefix_html must render as the content column's first children, before ps-title")
 
     def test_reserved_class_in_prefix_html_is_unconstructable(self):

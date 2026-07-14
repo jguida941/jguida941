@@ -19,7 +19,7 @@
   "profile": "carbon",
   "refute_by": "a rendered-CSS contrast measurement over the rendered button measures below the claimed WCAG threshold",
   "rendered_css": ".btn-carbon-primary { display: inline-flex; align-items: center; justify-content: space-between; gap: 6px; border: 0; cursor: pointer; border-radius: 0px; min-height: 48px; padding: 12px 64px 12px 16px; background: #0f62fe; color: #ffffff; font: 600 17px/1.2 'IBM Plex Sans', system-ui, sans-serif; transition: all 70ms cubic-bezier(0.2, 0, 0.38, 0.9); }",
-  "rendered_html": "<button class=\"btn-carbon-primary\"><span class=\"btn-label\">primary</span><svg class=\"btn-icon\" aria-hidden=\"true\" width=\"16\" height=\"16\"></svg></button>",
+  "rendered_html": "<button class=\"btn-carbon-primary\" data-dom-owner=\"webkit.button\"><span class=\"btn-label\" data-dom-owner=\"webkit.button\">primary</span><svg class=\"btn-icon\" data-dom-owner=\"webkit.button\" aria-hidden=\"true\" width=\"16\" height=\"16\"></svg></button>",
   "status": "present",
   "threshold_ratio": 4.5,
   "variant": "primary"

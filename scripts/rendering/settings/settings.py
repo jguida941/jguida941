@@ -71,13 +71,13 @@ _INTRO = ("Compose a design language: pick a base, then swap any component to an
 
 # The law text (the pre-shell `.law` inner HTML, verbatim) — rendered as a governed shell panel; only its
 # emphasised term is re-tinted to the shell's accent token via `.law b`.
-_LAW_HTML = (
-    '<div class="law">An <b>invalid combination is unconstructable</b>. A swap is admissible '
+_LAW_BODY = (
+    'An <b>invalid combination is unconstructable</b>. A swap is admissible '
     "ONLY if the composed component, as rendered, is a FULL valid instance of some active design "
     "language — a partial mix that belongs to no language (e.g. a frosted material on a square "
     "0-radius card) is refused. The verdict below is computed by ONE Python source "
     "(<code>scripts/quality/settings_admissibility.py</code>), routed through the real "
-    "render → conform path; this page only displays it (no verdict JS).</div>")
+    "render → conform path; this page only displays it (no verdict JS).")
 
 
 def render_settings() -> str:
@@ -88,6 +88,7 @@ def render_settings() -> str:
                                                        theme_continuity_script_tag)
     from scripts.rendering.webkit.components import render_switchable_nav
 
+    law_html = f'<div class="law" data-dom-owner="page.settings">{_LAW_BODY}</div>'
     actives = sorted(active_profiles())
     space = {(c["base"], c["component"], c["source"]): c["admissible"] for c in admissible_space()}
 
@@ -103,15 +104,19 @@ def render_settings() -> str:
                 mark = "admissible" if ok else "unconstructable"
                 note = " (base)" if own else ""
                 cells.append(
-                    f'<td class="cell {cls}"><span class="src">{_html.escape(source)}{note}</span>'
-                    f'<span class="verdict {cls}">{mark}</span></td>')
-            rows.append(f'<tr><th class="comp">{comp}</th>{"".join(cells)}</tr>')
+                    f'<td class="cell {cls}" data-dom-owner="page.settings">'
+                    f'<span class="src" data-dom-owner="page.settings">{_html.escape(source)}{note}</span>'
+                    f'<span class="verdict {cls}" data-dom-owner="page.settings">{mark}</span></td>')
+            rows.append(f'<tr><th class="comp" data-dom-owner="page.settings">'
+                        f'{comp}</th>{"".join(cells)}</tr>')
         head = "".join(f"<th>{_html.escape(s)}</th>" for s in actives)
         base_sections.append(
-            f'<section class="base" data-base="{_html.escape(base)}">'
+            f'<section class="base" data-dom-owner="page.settings" data-base="{_html.escape(base)}">'
             f'<h2>base: {_html.escape(base)}</h2>'
-            f'<p class="hint">swap each component to another language; only ADMISSIBLE swaps can be applied</p>'
-            f'<div class="table-scroll"><table class="grid">'
+            f'<p class="hint" data-dom-owner="page.settings">swap each component to another language; '
+            f'only ADMISSIBLE swaps can be applied</p>'
+            f'<div class="table-scroll" data-dom-owner="page.settings">'
+            f'<table class="grid" data-dom-owner="page.settings">'
             f'<thead><tr><th>component ↓ / source →</th>{head}</tr></thead>'
             f'<tbody>{"".join(rows)}</tbody></table></div></section>')
 
@@ -124,7 +129,7 @@ def render_settings() -> str:
         intro=_INTRO,
         breadcrumbs=[("home", "index.html"), ("showcase", "showcase.html"), ("studio", "studio.html")],
         prefix_html=nav_html,
-        sections=[("The law", _LAW_HTML)],
+        sections=[("The law", law_html)],
         body_html="\n".join(base_sections),
     )
     return (

@@ -57,7 +57,7 @@ class ShowcaseCoverageContract(unittest.TestCase):
         table cannot be laundered by a global set (codex 1c #2)."""
         out = {}
         for prof, body in re.findall(
-                r'<section class="lang" data-profile="([^"]+)">(.*?)</section>', html, re.S):
+                r'<section class="lang"[^>]*data-profile="([^"]+)"[^>]*>(.*?)</section>', html, re.S):
             out.setdefault(prof, []).extend(
                 re.findall(r'<tr data-invariant="([^"]+)" data-status="([^"]+)">', body))
         return out
@@ -219,8 +219,8 @@ class ShowcaseChromeContract(unittest.TestCase):
         doc column dies. Fail-closed: a missing aspect is a KeyError; mixed cites in a group raise."""
         from scripts.rendering.showcase.showcase import _rows, render_showcase
         html = render_showcase(_committed_receipts())
-        self.assertRegex(html, r'<tbody class="aspect-group" data-aspect="page-shell">')
-        self.assertRegex(html, r'<tr class="aspect-head"><th colspan="4" scope="colgroup">')
+        self.assertRegex(html, r'<tbody class="aspect-group"[^>]*data-aspect="page-shell"[^>]*>')
+        self.assertRegex(html, r'<tr class="aspect-head"[^>]*><th colspan="4" scope="colgroup">')
         self.assertNotIn("<th>doc</th>", html, "the per-row doc column must be gone")
         self.assertNotIn('<td class="cite">', html)
         base = {"invariant_id": "a", "status": "pass", "law": "l", "aspect": "s"}

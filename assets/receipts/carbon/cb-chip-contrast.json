@@ -19,7 +19,7 @@
   "profile": "carbon",
   "refute_by": "a rendered-CSS contrast measurement over the rendered chip measures below the claimed WCAG threshold",
   "rendered_css": ".chip-carbon-gray { display: inline-flex; align-items: center; gap: 6px; border: 0; cursor: default; border-radius: 16px; min-height: 24px; padding: 2px 8px; background: #f4f4f4; color: #161616; font: 400 12px/1.33 'IBM Plex Sans', system-ui, sans-serif; transition: all 70ms cubic-bezier(0.2, 0, 0.38, 0.9); }",
-  "rendered_html": "<span class=\"chip-carbon-gray\"><span class=\"chip-label\">gray</span><button class=\"chip-dismiss\" aria-label=\"Remove gray\">&times;</button></span>",
+  "rendered_html": "<span class=\"chip-carbon-gray\" data-dom-owner=\"webkit.chip\"><span class=\"chip-label\" data-dom-owner=\"webkit.chip\">gray</span><button class=\"chip-dismiss\" data-dom-owner=\"webkit.chip\" aria-label=\"Remove gray\">&times;</button></span>",
   "status": "present",
   "threshold_ratio": 4.5,
   "variant": "gray"

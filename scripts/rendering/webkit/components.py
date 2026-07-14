@@ -63,10 +63,12 @@ def render_button(profile: str, variant: str, state: str, profile_data: dict | N
 
     # ANATOMY -> genuinely different DOM (the deterministic structure axis)
     if anatomy == "label-left-icon-right":
-        html = (f'<button class="{cls}"><span class="btn-label">{variant}</span>'
-                f'<svg class="btn-icon" aria-hidden="true" width="16" height="16"></svg></button>')
+        html = (f'<button class="{cls}" data-dom-owner="webkit.button">'
+                f'<span class="btn-label" data-dom-owner="webkit.button">{variant}</span>'
+                f'<svg class="btn-icon" data-dom-owner="webkit.button" aria-hidden="true" '
+                f'width="16" height="16"></svg></button>')
     else:  # centered-capsule
-        html = f'<button class="{cls}">{variant}</button>'
+        html = f'<button class="{cls}" data-dom-owner="webkit.button">{variant}</button>'
 
     # padding: scalar inline, OR [leading, trailing] (Carbon's asymmetric 16/64 icon gutter)
     pi = btn["pad_inline_px"]
@@ -146,10 +148,12 @@ def render_chip(profile: str, variant: str, state: str, profile_data: dict | Non
     # ANATOMY -> genuinely different DOM
     label = _escape(variant)  # variant is controlled profile DATA; escape at the text/attr boundary
     if anatomy == "label-dismiss":  # Carbon dismissible Tag: label + trailing × close button
-        html = (f'<span class="{cls}"><span class="chip-label">{label}</span>'
-                f'<button class="chip-dismiss" aria-label="Remove {label}">&times;</button></span>')
+        html = (f'<span class="{cls}" data-dom-owner="webkit.chip">'
+                f'<span class="chip-label" data-dom-owner="webkit.chip">{label}</span>'
+                f'<button class="chip-dismiss" data-dom-owner="webkit.chip" '
+                f'aria-label="Remove {label}">&times;</button></span>')
     else:  # centered-label (Apple pill)
-        html = f'<span class="{cls}">{label}</span>'
+        html = f'<span class="{cls}" data-dom-owner="webkit.chip">{label}</span>'
 
     base = [
         "display: inline-flex; align-items: center; gap: 6px;",
@@ -215,10 +219,11 @@ def render_card(profile: str, variant: str, state: str, profile_data: dict | Non
     cls = f"card-{profile}-{variant}"
 
     rows_html = "".join(
-        f'<div class="card-row"><span class="card-label">{_escape(lbl)}</span>'
-        f'<span class="card-value">{_escape(val)}</span></div>'
+        f'<div class="card-row" data-dom-owner="webkit.card">'
+        f'<span class="card-label" data-dom-owner="webkit.card">{_escape(lbl)}</span>'
+        f'<span class="card-value" data-dom-owner="webkit.card">{_escape(val)}</span></div>'
         for lbl, val in _CARD_ROWS)
-    html = f'<div class="{cls} card-group">{rows_html}</div>'
+    html = f'<div class="{cls} card-group" data-dom-owner="webkit.card">{rows_html}</div>'
 
     container = [
         f"background: {surface};",
@@ -276,7 +281,8 @@ def render_nav(profile: str, links: list, active: str, profile_data: dict | None
         f'<a href="{_escape(href)}" data-theme-propagate' + (' aria-current="page"' if href == active else "")
         + f'>{_escape(label)}</a>'
         for label, href in links)
-    html = f'<nav class="site-nav {cls}" aria-label="Site">{items}</nav>'
+    html = (f'<nav class="site-nav {cls}" data-dom-owner="webkit.nav.single" '
+            f'aria-label="Site">{items}</nav>')
     return html, _nav_css(nav, f".{cls}")
 
 
@@ -292,7 +298,8 @@ def render_switchable_nav(house: str, links: list, active: str) -> tuple[str, st
         f'<a href="{_escape(href)}" data-theme-propagate' + (' aria-current="page"' if href == active else "")
         + f'>{_escape(label)}</a>'
         for label, href in links)
-    html = f'<nav class="site-nav {classes}" aria-label="Site">{items}</nav>'
+    html = (f'<nav class="site-nav {classes}" data-dom-owner="webkit.nav" '
+            f'aria-label="Site">{items}</nav>')
     blocks = []
     for profile in profiles:
         nav = loader.load(profile)["components"]["nav"]

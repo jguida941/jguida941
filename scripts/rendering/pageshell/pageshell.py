@@ -204,15 +204,16 @@ def render_page_shell(
                         f'{_html.escape(label)}</a>'
                         for label, href in breadcrumbs)
     panels = "".join(
-        f'<section class="ps-panel"><h2 class="ps-panel-h">{_html.escape(heading)}</h2>{body}</section>'
+        f'<section class="ps-panel" data-dom-owner="pageshell">'
+        f'<h2 class="ps-panel-h" data-dom-owner="pageshell">{_html.escape(heading)}</h2>{body}</section>'
         for heading, body in (sections or []))
     html = (
-        f'<div class="{ns}">'
-        f'<div class="ps-main">'
+        f'<div class="{ns}" data-dom-owner="pageshell">'
+        f'<div class="ps-main" data-dom-owner="pageshell">'
         f'{prefix_html}'
-        f'<h1 class="ps-title">{_html.escape(title)}</h1>'
-        f'<p class="ps-intro">{_html.escape(intro)}</p>'
-        f'<p class="ps-crumbs">{crumbs}</p>'
+        f'<h1 class="ps-title" data-dom-owner="pageshell">{_html.escape(title)}</h1>'
+        f'<p class="ps-intro" data-dom-owner="pageshell">{_html.escape(intro)}</p>'
+        f'<p class="ps-crumbs" data-dom-owner="pageshell">{crumbs}</p>'
         f'{panels}'
         f'{body_html}'
         f'</div>'

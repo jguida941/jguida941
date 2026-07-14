@@ -151,3 +151,23 @@ cardinality, rendered-box geometry, and viewport intersection, so a hidden or in
 cannot satisfy anatomy. Mobile containment binds each escape to its page and exact parent
 structure (`#calendar-panel > .cal-wrap`, `#rhythm-panel > .heat-wrap`, `.lang/.base >
 .table-scroll`); contained offenders and their container identities remain visible in the facts.
+
+## §8 — Closed-world DOM ownership (W2)
+
+`contracts/dom_cover.json` closes the class-bearing DOM surface of every committed manifest page.
+Ownership is an emitter fact, not a class-name inference: pageshell, switchable nav, webkit
+button/chip/card/archetype, and each registered proof-page renderer stamp their own nodes with
+`data-dom-owner`. `tests/contracts/test_dom_cover.py` requires exact per-page tag/class/count
+signatures and then replaces each declared emitter's marker with a sentinel while rerendering
+through `page_manifest.json`. A copied shell class or forged marker therefore cannot pass by
+coincidence.
+
+Index remains declared debt until W3: its immutable 49 static fingerprints may only shrink through
+deletion or migration into a governed pageshell/webkit (or equivalently guarded narrow component)
+emitter. Merely adding a blanket `page.index` owner is forbidden. W2 honestly claims
+`committed-static-dom`, not browser DOM: every inline script on every manifest route is classified
+and independently hash-pinned, external scripts/inline handlers are closed out, and index hydration
+plus Studio's toggle carry exact runtime class debt. W4 replaces those conservative source tripwires
+with post-hydration DOM/computed-style facts over page, theme, viewport, and state. Classless nodes and
+inline style remain governed by the existing literal gates plus the W3/W4 rendered-surface laws;
+this class-bearing cover does not claim otherwise.

@@ -83,7 +83,7 @@
       "root_allowlist": [],
       "groups": [
         {"id": "contracts", "target_dir": "contracts", "members": ["test_bootstrap_red_ref.py", "test_card_contracts.py", "test_data_semantics.py", "test_design_button.py", "test_design_card.py", "test_design_character.py", "test_design_chip.py", "test_design_conformance.py", "test_design_contract.py", "test_design_distinctness.py", "test_design_profiles_schema.py", "test_glass_preserved.py", "test_icon_system.py", "test_label_legibility.py", "test_page_shell.py",
-          "test_page_manifest.py",
+          "test_dom_cover.py", "test_page_manifest.py",
           "test_design_motion.py",
           "test_design_nav.py", "test_public_data_privacy.py", "test_readme_projection.py", "test_scripts_layout_contract.py", "test_settings_composition.py", "test_showcase_coverage.py", "test_skill_structure.py", "test_structural_layout.py", "test_studio.py", "test_tests_layout_contract.py", "test_theme_continuity.py", "test_theme_roster_authority.py", "test_theme_system.py", "test_tile_composition.py", "test_typography_restraint.py", "test_visual_receipt_provenance.py", "test_web_dashboard.py"]},
         {"id": "core", "target_dir": "core", "members": ["test_profile_cli.py", "test_runtime_env.py"]},
@@ -97,7 +97,7 @@
       "root": "contracts",
       "glob": "**/*.json",
       "placement_enforced": true,
-      "root_allowlist": ["repo_layout.json", "page_manifest.json"],
+      "root_allowlist": ["repo_layout.json", "page_manifest.json", "dom_cover.json"],
       "group_dirs": ["design_profiles"]
     },
     "site_layout": {

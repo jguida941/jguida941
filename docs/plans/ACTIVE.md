@@ -30,6 +30,14 @@
   computed-style/geometry facts and provenance. **D1 explicitly supersedes P5-ARCH's earlier
   “freeze the scorecard and drop the runtime switcher” decision**; its content/pattern freeze
   remains, but not its theme ban.
+- ✅ **P5-COVERAGE W2 — closed-world static DOM ownership.** Every class-bearing start tag in
+  committed manifest pages now resolves to an exact emitter-owned `(page, tag, classes, count)`
+  signature in `contracts/dom_cover.json`, proven by sentinel rerenders through the manifest.
+  Index's 49 bespoke fingerprints / 115 occurrences are immutable, shrinking W3 debt; its
+  executable producers and closed runtime class axes are independently hash-pinned across every
+  manifest route until W4 replaces the honest `committed-static-dom` claim with post-hydration
+  rendered facts. Owner/emitter and index-owner rosters are independently admitted, so neither a
+  blanket `page.index` marker nor an alias around `render_dashboard` can launder debt.
 - ✅ **P5-THEME-ROSTER-AUTHORITY (supersedes the old public Power BI theme experiment)** —
   `contracts/design_profiles/_index.json.active_design_profiles` is the public roster authority;
   `site/index.html` remains the one canonical public surface with one selector exposing exactly

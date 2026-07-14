@@ -26,7 +26,7 @@ def button_facts(html: str, css: str) -> dict:
     # (fail-closed) — an empty render must not pass an anatomy invariant.
     # label-left-icon-right requires a btn-label WITH text (codex: an empty-label Carbon DOM is not
     # positive evidence) BEFORE the btn-icon; centered-capsule requires a <button> with text.
-    if (re.search(r'class="btn-label">[^<]*\w', html) and "btn-icon" in html
+    if (re.search(r'class="btn-label"[^>]*>[^<]*\w', html) and "btn-icon" in html
             and html.index("btn-label") < html.index("btn-icon")):
         anatomy = "label-left-icon-right"
     elif re.search(r"<button[^>]*>[^<]*\w", html):   # a <button> with actual text (empty <button></button> -> None)
@@ -134,10 +134,10 @@ def chip_facts(html: str, css: str) -> dict:
     # Requires POSITIVE evidence of a rendered chip pill, else None (fail-closed on an empty render).
     dismiss = '<button class="chip-dismiss"'
     # label-dismiss requires a chip-label WITH text (codex: empty label span is not evidence)
-    if (re.search(r'class="chip-label">[^<]*\w', html) and dismiss in html
+    if (re.search(r'class="chip-label"[^>]*>[^<]*\w', html) and dismiss in html
             and html.index("chip-label") < html.index(dismiss)):
         anatomy = "label-dismiss"
-    elif re.search(r'<span class="chip-[^"]*">[^<]*\w', html):   # a chip pill with actual text (empty span -> None)
+    elif re.search(r'<span class="chip-[^"]*"[^>]*>[^<]*\w', html):   # a chip pill with actual text (empty span -> None)
         anatomy = "centered-label"
     else:
         anatomy = None
@@ -292,7 +292,7 @@ def pageshell_facts(html: str, css: str) -> dict:
     has_content_column = bool(
         main_m and "max-width: var(--ps-measure-page)" in main_m.group(1)
         and re.search(r"margin:\s*0 auto", main_m.group(1))
-        and '<div class="ps-main">' in html)
+        and re.search(r'<div class="ps-main"[^>]*>', html))
 
     def _root_px(var: str):
         m = re.search(rf"{re.escape(var)}:\s*(-?\d+(?:\.\d+)?)px", css)
@@ -362,7 +362,7 @@ def card_facts(html: str, css: str) -> dict:
     radius_px = int(m.group(1)) if m else None
 
     container_count = html.count("card-group")     # each container carries the `card-group` marker
-    row_count = html.count('class="card-row"')
+    row_count = len(re.findall(r'class="card-row"(?=[\s>])', html))
 
     row_m = re.search(r"\.card-row\s*\{([^}]*)\}", css)   # the row base rule (not the `+` divider)
     row_body = row_m.group(1) if row_m else None

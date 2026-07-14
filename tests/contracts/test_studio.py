@@ -255,9 +255,9 @@ class StudioChromeContract(unittest.TestCase):
         html = render_studio()
         self.assertRegex(
             html,
-            rf'<div class="ps-{self.HOUSE}"><div class="ps-main">'
+            rf'<div class="ps-{self.HOUSE}"[^>]*><div class="ps-main"[^>]*>'
             rf'(?:<input type="radio"[^>]*class="lang-radio"[^>]*>)+'
-            r'(?:<nav class="site-nav.*?</nav>)?<h1 class="ps-title">',
+            r'(?:<nav class="site-nav.*?</nav>)?<h1 class="ps-title"[^>]*>',
             "the switcher radios must render inside the content column as its first children, before ps-title")
 
     def test_studio_content_css_is_token_only_beyond_the_explicit_allowlist(self):

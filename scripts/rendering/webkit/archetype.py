@@ -43,7 +43,8 @@ def render_archetype(profile: str, profile_data: dict | None = None) -> tuple[st
 
     btn = prof["components"]["button"]
     sig, sec = _signature_variant(btn), _secondary_variant(btn, _signature_variant(btn))
-    cta_html, cta_css = render_button(profile, sig, "rest", profile_data=profile_data)
+    nav_cta_html, cta_css = render_button(profile, sig, "rest", profile_data=profile_data)
+    hero_cta_html, _ = render_button(profile, sig, "rest", profile_data=profile_data)
     sec_html, sec_css = render_button(profile, sec, "rest", profile_data=profile_data)
 
     chip_variants = prof["components"]["chip"].get("variants", ["regular"])[:3]
@@ -73,15 +74,17 @@ def render_archetype(profile: str, profile_data: dict | None = None) -> tuple[st
     ])
 
     html = (
-        f'<div class="{ns}">'
-        f'<nav class="{ns}-nav"><span class="{ns}-logo">◆ studio</span>'
-        f'<span class="{ns}-links">Product · Docs · Pricing</span>{cta_html}</nav>'
-        f'<header class="{ns}-hero"><h1>Build a site in this design language</h1>'
+        f'<div class="{ns}" data-dom-owner="webkit.archetype">'
+        f'<nav class="{ns}-nav" data-dom-owner="webkit.archetype">'
+        f'<span class="{ns}-logo" data-dom-owner="webkit.archetype">◆ studio</span>'
+        f'<span class="{ns}-links" data-dom-owner="webkit.archetype">Product · Docs · Pricing</span>'
+        f'{nav_cta_html}</nav>'
+        f'<header class="{ns}-hero" data-dom-owner="webkit.archetype"><h1>Build a site in this design language</h1>'
         f'<p>Every element — nav, buttons, tags, the grouped metric card — is this language, '
         f'composed from its own cited design doc.</p>'
-        f'<div class="{ns}-chips">{chips_html}</div>'
-        f'<div class="{ns}-actions">{cta_html}{sec_html}</div></header>'
-        f'<div class="{ns}-body">{card_html}</div>'
+        f'<div class="{ns}-chips" data-dom-owner="webkit.archetype">{chips_html}</div>'
+        f'<div class="{ns}-actions" data-dom-owner="webkit.archetype">{hero_cta_html}{sec_html}</div></header>'
+        f'<div class="{ns}-body" data-dom-owner="webkit.archetype">{card_html}</div>'
         f'</div>'
     )
     css = "\n".join([shell_css, cta_css, sec_css, chips_css, card_css])

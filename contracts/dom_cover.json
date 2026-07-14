@@ -1,0 +1,2028 @@
+{
+  "contract_id": "ClosedWorldDomCover",
+  "schema_version": 1,
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "purpose": "W2: exact emitter-owned closure for every class-bearing element in committed page bytes. Index debt is immutable and may only shrink in W3. Every inline executable producer and runtime class mutation is source-pinned until W4 promotes the claim to rendered DOM. Classless nodes and inline style remain under separate literal and rendered-facts laws.",
+  "marker_attribute": "data-dom-owner",
+  "coverage": {
+    "claim": "committed-static-dom",
+    "classless_and_inline_scope": "outside this class-bearing ownership cover; existing literal guards plus W3/W4 remain binding",
+    "rendered_dom_target": "W4",
+    "runtime_producers": [
+      {
+        "id": "index-hydration",
+        "producer": "scripts/pipeline/web_render.py::render_dashboard[_script]",
+        "kind": "dom-mutator",
+        "pages": ["index"],
+        "script_sha256": "1fd0a8e1a50b7bacee632481c6a29af3601511bdf10732244f85f8c7068f7922"
+      },
+      {
+        "id": "studio-space-data",
+        "producer": "scripts/rendering/studio/studio.py::render_studio[STUDIO_SPACE]",
+        "kind": "data-only",
+        "pages": ["studio"],
+        "script_sha256": "dfdea4749364280200d2be02705097e1930776d4e977baca85fcaaeeabe4dd4a"
+      },
+      {
+        "id": "studio-toggle",
+        "producer": "scripts/rendering/studio/studio.py::_STUDIO_JS",
+        "kind": "dom-mutator",
+        "pages": ["studio"],
+        "script_sha256": "05efb2d307a54d28797ae4dcc7ee634fe1bf5ea9c8950c54e654b724cd528af2"
+      },
+      {
+        "id": "theme-continuity",
+        "producer": "scripts/rendering/pageshell/pageshell.py::theme_continuity_script_tag",
+        "kind": "dom-mutator",
+        "pages": ["index", "settings", "showcase", "studio"],
+        "script_sha256": "ba6b047216cd3c87896d81838f0f825cf26172ae4204e167c6c463a2ae3bf111"
+      }
+    ],
+    "runtime_class_debt": {
+      "index-hydration": {
+        "page": "index",
+        "producer": "scripts/pipeline/web_render.py::_script",
+        "source_sha256": "4b6c753aebf33739546c717759077cc907fa57a5c2d46c35791fba86f4edcb82",
+        "class_tokens": [
+          "bad",
+          "bar",
+          "chip",
+          "item",
+          "lane",
+          "ldot",
+          "lockico",
+          "m",
+          "meta",
+          "ml",
+          "mrow",
+          "mt",
+          "mv",
+          "nm",
+          "num",
+          "ok",
+          "pc",
+          "row",
+          "rrow",
+          "swatch",
+          "warn"
+        ],
+        "dynamic_axes": {
+          "status": ["bad", "ok", "warn"]
+        }
+      },
+      "studio-toggle": {
+        "page": "studio",
+        "producer": "scripts/rendering/studio/studio.py::_STUDIO_JS",
+        "source_sha256": "05efb2d307a54d28797ae4dcc7ee634fe1bf5ea9c8950c54e654b724cd528af2",
+        "class_tokens": ["active"],
+        "dynamic_axes": {}
+      }
+    }
+  },
+  "owners": {
+    "page.settings": {
+      "emitter": "scripts/rendering/settings/settings.py::render_settings",
+      "pages": [
+        "settings"
+      ],
+      "signatures": [
+        {
+          "page": "settings",
+          "tag": "div",
+          "classes": [
+            "law"
+          ],
+          "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "div",
+          "classes": [
+            "table-scroll"
+          ],
+          "count": 3
+        },
+        {
+          "page": "settings",
+          "tag": "p",
+          "classes": [
+            "hint"
+          ],
+          "count": 3
+        },
+        {
+          "page": "settings",
+          "tag": "section",
+          "classes": [
+            "base"
+          ],
+          "count": 3
+        },
+        {
+          "page": "settings",
+          "tag": "span",
+          "classes": [
+            "no",
+            "verdict"
+          ],
+          "count": 2
+        },
+        {
+          "page": "settings",
+          "tag": "span",
+          "classes": [
+            "ok",
+            "verdict"
+          ],
+          "count": 25
+        },
+        {
+          "page": "settings",
+          "tag": "span",
+          "classes": [
+            "src"
+          ],
+          "count": 27
+        },
+        {
+          "page": "settings",
+          "tag": "table",
+          "classes": [
+            "grid"
+          ],
+          "count": 3
+        },
+        {
+          "page": "settings",
+          "tag": "td",
+          "classes": [
+            "cell",
+            "no"
+          ],
+          "count": 2
+        },
+        {
+          "page": "settings",
+          "tag": "td",
+          "classes": [
+            "cell",
+            "ok"
+          ],
+          "count": 25
+        },
+        {
+          "page": "settings",
+          "tag": "th",
+          "classes": [
+            "comp"
+          ],
+          "count": 9
+        }
+      ]
+    },
+    "page.showcase": {
+      "emitter": "scripts/rendering/showcase/showcase.py::render_showcase",
+      "pages": [
+        "showcase"
+      ],
+      "signatures": [
+        {
+          "page": "showcase",
+          "tag": "b",
+          "classes": [
+            "badge",
+            "badge-candidate"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "b",
+          "classes": [
+            "badge",
+            "badge-fail"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "b",
+          "classes": [
+            "badge",
+            "badge-pass"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "legend"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "stage"
+          ],
+          "count": 3
+        },
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "stage-row"
+          ],
+          "count": 6
+        },
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "table-scroll"
+          ],
+          "count": 3
+        },
+        {
+          "page": "showcase",
+          "tag": "p",
+          "classes": [
+            "tally"
+          ],
+          "count": 3
+        },
+        {
+          "page": "showcase",
+          "tag": "section",
+          "classes": [
+            "lang"
+          ],
+          "count": 3
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [
+            "badge",
+            "badge-candidate"
+          ],
+          "count": 9
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [
+            "badge",
+            "badge-pass"
+          ],
+          "count": 78
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [
+            "cite"
+          ],
+          "count": 30
+        },
+        {
+          "page": "showcase",
+          "tag": "table",
+          "classes": [
+            "invariants"
+          ],
+          "count": 3
+        },
+        {
+          "page": "showcase",
+          "tag": "tbody",
+          "classes": [
+            "aspect-group"
+          ],
+          "count": 30
+        },
+        {
+          "page": "showcase",
+          "tag": "td",
+          "classes": [
+            "inv"
+          ],
+          "count": 87
+        },
+        {
+          "page": "showcase",
+          "tag": "td",
+          "classes": [
+            "law"
+          ],
+          "count": 87
+        },
+        {
+          "page": "showcase",
+          "tag": "td",
+          "classes": [
+            "receipt"
+          ],
+          "count": 87
+        },
+        {
+          "page": "showcase",
+          "tag": "td",
+          "classes": [
+            "verdict"
+          ],
+          "count": 87
+        },
+        {
+          "page": "showcase",
+          "tag": "tr",
+          "classes": [
+            "aspect-head"
+          ],
+          "count": 30
+        }
+      ]
+    },
+    "page.studio": {
+      "emitter": "scripts/rendering/studio/studio.py::render_studio",
+      "pages": [
+        "studio"
+      ],
+      "signatures": [
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "active",
+            "swap-opt"
+          ],
+          "count": 9
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "swap-opt"
+          ],
+          "count": 18
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "stages"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "swap-controls"
+          ],
+          "count": 3
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "swap-row"
+          ],
+          "count": 9
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "switcher"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-apple-dark-base",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-apple-dark-button-carbon",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-apple-dark-button-liquid-glass",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-apple-dark-card-carbon",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-apple-dark-card-liquid-glass",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-apple-dark-chip-carbon",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-apple-dark-chip-liquid-glass",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-carbon-base",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-carbon-button-apple-dark",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-carbon-card-apple-dark",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-carbon-card-liquid-glass",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-carbon-chip-apple-dark",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-liquid-glass-base",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-liquid-glass-button-apple-dark",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-liquid-glass-button-carbon",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-liquid-glass-card-apple-dark",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-liquid-glass-card-carbon",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-liquid-glass-chip-apple-dark",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "var-liquid-glass-chip-carbon",
+            "variant"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "variants"
+          ],
+          "count": 3
+        },
+        {
+          "page": "studio",
+          "tag": "input",
+          "classes": [
+            "lang-radio"
+          ],
+          "count": 3
+        },
+        {
+          "page": "studio",
+          "tag": "label",
+          "classes": [
+            "lang-tab"
+          ],
+          "count": 3
+        },
+        {
+          "page": "studio",
+          "tag": "p",
+          "classes": [
+            "swap-hint"
+          ],
+          "count": 3
+        },
+        {
+          "page": "studio",
+          "tag": "section",
+          "classes": [
+            "stage"
+          ],
+          "count": 3
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "swap-label"
+          ],
+          "count": 9
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "swap-opts"
+          ],
+          "count": 9
+        }
+      ]
+    },
+    "pageshell": {
+      "emitter": "scripts/rendering/pageshell/pageshell.py::render_page_shell",
+      "pages": [
+        "settings",
+        "showcase",
+        "studio"
+      ],
+      "signatures": [
+        {
+          "page": "settings",
+          "tag": "div",
+          "classes": [
+            "ps-apple-dark"
+          ],
+          "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "div",
+          "classes": [
+            "ps-main"
+          ],
+          "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "h1",
+          "classes": [
+            "ps-title"
+          ],
+          "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "h2",
+          "classes": [
+            "ps-panel-h"
+          ],
+          "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "p",
+          "classes": [
+            "ps-crumbs"
+          ],
+          "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "p",
+          "classes": [
+            "ps-intro"
+          ],
+          "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "section",
+          "classes": [
+            "ps-panel"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "ps-apple-dark"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "ps-main"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "h1",
+          "classes": [
+            "ps-title"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "h2",
+          "classes": [
+            "ps-panel-h"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "p",
+          "classes": [
+            "ps-crumbs"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "p",
+          "classes": [
+            "ps-intro"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "section",
+          "classes": [
+            "ps-panel"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "ps-apple-dark"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "ps-main"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "h1",
+          "classes": [
+            "ps-title"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "p",
+          "classes": [
+            "ps-crumbs"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "p",
+          "classes": [
+            "ps-intro"
+          ],
+          "count": 1
+        }
+      ]
+    },
+    "webkit.archetype": {
+      "emitter": "scripts/rendering/webkit/archetype.py::render_archetype",
+      "pages": [
+        "studio"
+      ],
+      "signatures": [
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-apple-dark"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-apple-dark-actions"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-apple-dark-body"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-apple-dark-chips"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-carbon"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-carbon-actions"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-carbon-body"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-carbon-chips"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-liquid-glass"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-liquid-glass-actions"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-liquid-glass-body"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "arch-liquid-glass-chips"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "header",
+          "classes": [
+            "arch-apple-dark-hero"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "header",
+          "classes": [
+            "arch-carbon-hero"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "header",
+          "classes": [
+            "arch-liquid-glass-hero"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "nav",
+          "classes": [
+            "arch-apple-dark-nav"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "nav",
+          "classes": [
+            "arch-carbon-nav"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "nav",
+          "classes": [
+            "arch-liquid-glass-nav"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "arch-apple-dark-links"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "arch-apple-dark-logo"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "arch-carbon-links"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "arch-carbon-logo"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "arch-liquid-glass-links"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "arch-liquid-glass-logo"
+          ],
+          "count": 7
+        }
+      ]
+    },
+    "webkit.button": {
+      "emitter": "scripts/rendering/webkit/components.py::render_button",
+      "pages": [
+        "showcase",
+        "studio"
+      ],
+      "signatures": [
+        {
+          "page": "showcase",
+          "tag": "button",
+          "classes": [
+            "btn-apple-dark-filled"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "button",
+          "classes": [
+            "btn-carbon-primary"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "button",
+          "classes": [
+            "btn-liquid-glass-prominent"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [
+            "btn-label"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "svg",
+          "classes": [
+            "btn-icon"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-apple-dark-filled"
+          ],
+          "count": 10
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-apple-dark-glass"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-apple-dark-plain"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-apple-dark-primary"
+          ],
+          "count": 2
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-apple-dark-prominent"
+          ],
+          "count": 2
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-apple-dark-secondary"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-carbon-filled"
+          ],
+          "count": 2
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-carbon-plain"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-carbon-primary"
+          ],
+          "count": 8
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-carbon-secondary"
+          ],
+          "count": 4
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-liquid-glass-filled"
+          ],
+          "count": 2
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-liquid-glass-glass"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-liquid-glass-plain"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-liquid-glass-primary"
+          ],
+          "count": 2
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-liquid-glass-prominent"
+          ],
+          "count": 10
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "btn-liquid-glass-secondary"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "btn-label"
+          ],
+          "count": 18
+        },
+        {
+          "page": "studio",
+          "tag": "svg",
+          "classes": [
+            "btn-icon"
+          ],
+          "count": 18
+        }
+      ]
+    },
+    "webkit.card": {
+      "emitter": "scripts/rendering/webkit/components.py::render_card",
+      "pages": [
+        "showcase",
+        "studio"
+      ],
+      "signatures": [
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "card-apple-dark-metrics",
+            "card-group"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "card-carbon-metrics",
+            "card-group"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "card-group",
+            "card-liquid-glass-metrics"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "card-row"
+          ],
+          "count": 9
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [
+            "card-label"
+          ],
+          "count": 9
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [
+            "card-value"
+          ],
+          "count": 9
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "card-apple-dark-metrics",
+            "card-group"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "card-carbon-metrics",
+            "card-group"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "card-group",
+            "card-liquid-glass-metrics"
+          ],
+          "count": 7
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "card-row"
+          ],
+          "count": 57
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "card-label"
+          ],
+          "count": 57
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "card-value"
+          ],
+          "count": 57
+        }
+      ]
+    },
+    "webkit.chip": {
+      "emitter": "scripts/rendering/webkit/components.py::render_chip",
+      "pages": [
+        "showcase",
+        "studio"
+      ],
+      "signatures": [
+        {
+          "page": "showcase",
+          "tag": "button",
+          "classes": [
+            "chip-dismiss"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [
+            "chip-apple-dark-regular"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [
+            "chip-carbon-gray"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [
+            "chip-label"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "span",
+          "classes": [
+            "chip-liquid-glass-regular"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "chip-dismiss"
+          ],
+          "count": 18
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-apple-dark-blue"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-apple-dark-gray"
+          ],
+          "count": 6
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-apple-dark-prominent"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-apple-dark-red"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-apple-dark-regular"
+          ],
+          "count": 6
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-apple-dark-tinted"
+          ],
+          "count": 6
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-carbon-blue"
+          ],
+          "count": 4
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-carbon-gray"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-carbon-red"
+          ],
+          "count": 4
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-carbon-regular"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-carbon-tinted"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-label"
+          ],
+          "count": 18
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-liquid-glass-blue"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-liquid-glass-gray"
+          ],
+          "count": 2
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-liquid-glass-prominent"
+          ],
+          "count": 5
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-liquid-glass-red"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-liquid-glass-regular"
+          ],
+          "count": 6
+        },
+        {
+          "page": "studio",
+          "tag": "span",
+          "classes": [
+            "chip-liquid-glass-tinted"
+          ],
+          "count": 6
+        }
+      ]
+    },
+    "webkit.nav": {
+      "emitter": "scripts/rendering/webkit/components.py::render_switchable_nav",
+      "pages": [
+        "index",
+        "settings",
+        "showcase",
+        "studio"
+      ],
+      "signatures": [
+        {
+          "page": "index",
+          "tag": "nav",
+          "classes": [
+            "nav-apple-dark",
+            "nav-carbon",
+            "nav-liquid-glass",
+            "site-nav"
+          ],
+          "count": 1
+        },
+        {
+          "page": "settings",
+          "tag": "nav",
+          "classes": [
+            "nav-apple-dark",
+            "nav-carbon",
+            "nav-liquid-glass",
+            "site-nav"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "nav",
+          "classes": [
+            "nav-apple-dark",
+            "nav-carbon",
+            "nav-liquid-glass",
+            "site-nav"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "nav",
+          "classes": [
+            "nav-apple-dark",
+            "nav-carbon",
+            "nav-liquid-glass",
+            "site-nav"
+          ],
+          "count": 1
+        }
+      ]
+    }
+  },
+  "pages": {
+    "index": {
+      "route": "site/index.html",
+      "debt_target": "W3",
+      "debt_baseline_sha256": "43ef30ede628617d4de91a619ad607bf959104730e7249f9d934d712d3855b6b",
+      "debt": [
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "bento"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "cal"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "cal-foot"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "cal-wrap"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "chips"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "heat"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "heat-days"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "heat-grid"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "heat-hours"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "heat-wrap"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "kpi"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "kpi-label"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "kpi-value",
+            "num"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "l"
+          ],
+          "baseline_count": 3,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "lanes"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "lang-bars"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "langbar"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "langlegend"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "live"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "mgroup"
+          ],
+          "baseline_count": 2,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "mix"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "mrow"
+          ],
+          "baseline_count": 6,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "ms"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "mt"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "num",
+            "v"
+          ],
+          "baseline_count": 3,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "ring"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "ring-row"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "rows"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "section-head"
+          ],
+          "baseline_count": 7,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "stat"
+          ],
+          "baseline_count": 3,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "stats"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "switcher"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "topline"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "h2",
+          "classes": [
+            "title"
+          ],
+          "baseline_count": 7,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "header",
+          "classes": [
+            "hero",
+            "panel"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "hr",
+          "classes": [
+            "hairline"
+          ],
+          "baseline_count": 7,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "main",
+          "classes": [
+            "wrap"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "p",
+          "classes": [
+            "eyebrow"
+          ],
+          "baseline_count": 9,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "p",
+          "classes": [
+            "tag"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "section",
+          "classes": [
+            "panel"
+          ],
+          "baseline_count": 7,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "cal-scale"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "cal-swatches"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "dot"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "ml"
+          ],
+          "baseline_count": 6,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "ms"
+          ],
+          "baseline_count": 6,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "mt"
+          ],
+          "baseline_count": 6,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "mv",
+            "num"
+          ],
+          "baseline_count": 6,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "num"
+          ],
+          "baseline_count": 1,
+          "resolved_count": 0
+        },
+        {
+          "page": "index",
+          "tag": "span",
+          "classes": [
+            "section-meta"
+          ],
+          "baseline_count": 3,
+          "resolved_count": 0
+        }
+      ]
+    },
+    "settings": {
+      "route": "site/settings.html",
+      "debt_target": null,
+      "debt_baseline_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "debt": []
+    },
+    "showcase": {
+      "route": "site/showcase.html",
+      "debt_target": null,
+      "debt_baseline_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "debt": []
+    },
+    "studio": {
+      "route": "site/studio.html",
+      "debt_target": null,
+      "debt_baseline_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "debt": []
+    }
+  }
+}

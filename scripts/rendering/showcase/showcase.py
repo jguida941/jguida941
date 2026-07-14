@@ -50,7 +50,7 @@ def _signature_variant(btn: dict) -> str:
     return variants[0] if variants else "default"
 
 
-def _stage_block(profile: str) -> tuple[str, str, str]:
+def _stage_block(profile: str, owner_attr: str) -> tuple[str, str, str]:
     """Return (scoped_css, stage_html, backdrop) for a profile's signature button + chip rendered
     on its own backdrop, or a graceful placeholder if the profile isn't loadable (receipts are
     always for known profiles, but stay resilient)."""
@@ -65,14 +65,14 @@ def _stage_block(profile: str) -> tuple[str, str, str]:
         dvar = prof["components"]["card"]["variants"][0]
         card_html, card_css = render_card(profile, dvar, "rest")
         backdrop = loader.resolve_tokens(profile).get("color", {}).get("backdrop", "#000000")
-        stage = (f'<div class="stage-row">{btn_html}{chip_html}</div>'
-                 f'<div class="stage-row">{card_html}</div>')
+        stage = (f'<div class="stage-row" {owner_attr}>{btn_html}{chip_html}</div>'
+                 f'<div class="stage-row" {owner_attr}>{card_html}</div>')
         return f"{btn_css}\n{chip_css}\n{card_css}", stage, backdrop
     except Exception:
-        return "", '<span class="no-render">[[component-not-rendered]]</span>', "#111111"
+        return "", f'<span class="no-render" {owner_attr}>[[component-not-rendered]]</span>', "#111111"
 
 
-def _rows(results: list[dict]) -> str:
+def _rows(results: list[dict], owner_attr: str = "") -> str:
     """One <tbody class="aspect-group"> per aspect (D-SHELL-2 L-SHOW-1): rows group by their
     aspect field in FIRST-APPEARANCE order (receipt order preserved within a group), each group
     headed by a subheader th[scope=colgroup] carrying the group's SINGLE hoisted doc cite — the
@@ -87,16 +87,18 @@ def _rows(results: list[dict]) -> str:
         if len(cites) != 1:
             raise ValueError(f"aspect group {aspect!r} carries mixed doc cites {cites} — "
                              f"hoisting would lose provenance (regroup or split the aspect)")
-        out.append(f'<tbody class="aspect-group" data-aspect="{_html.escape(aspect)}">')
-        out.append(f'<tr class="aspect-head"><th colspan="4" scope="colgroup">'
-                   f'{_html.escape(aspect)} · <span class="cite">{_html.escape(cites[0])}</span>'
+        out.append(f'<tbody class="aspect-group" {owner_attr} '
+                   f'data-aspect="{_html.escape(aspect)}">')
+        out.append(f'<tr class="aspect-head" {owner_attr}>'
+                   f'<th colspan="4" scope="colgroup">{_html.escape(aspect)} · '
+                   f'<span class="cite" {owner_attr}>{_html.escape(cites[0])}</span>'
                    f'</th></tr>')
-        out.extend(_row(r) for r in rows)
+        out.extend(_row(r, owner_attr) for r in rows)
         out.append('</tbody>')
     return "\n".join(out)
 
 
-def _row(r: dict) -> str:
+def _row(r: dict, owner_attr: str = "") -> str:
     if True:
         status = r.get("status")
         if status not in _BADGE_TEXT:               # closed enum — fail closed (codex 1c #3): a
@@ -118,10 +120,11 @@ def _row(r: dict) -> str:
             receipt = ""                            # an empty cell renders EMPTY (L-SHOW-5), never a dash
         return (
             f'<tr data-invariant="{inv}" data-status="{status}">'
-            f'<td class="inv">{inv}</td>'
-            f'<td class="law">{law}</td>'
-            f'<td class="verdict"><span class="badge badge-{status}">{badge}</span></td>'
-            f'<td class="receipt">{receipt}</td>'
+            f'<td class="inv" {owner_attr}>{inv}</td>'
+            f'<td class="law" {owner_attr}>{law}</td>'
+            f'<td class="verdict" {owner_attr}>'
+            f'<span class="badge badge-{status}" {owner_attr}>{badge}</span></td>'
+            f'<td class="receipt" {owner_attr}>{receipt}</td>'
             f'</tr>'
         )
 
@@ -194,11 +197,12 @@ def render_showcase(receipts: dict) -> str:
                                                        theme_continuity_script_tag)
     from scripts.rendering.webkit.components import render_switchable_nav
 
+    owner_attr = 'data-dom-owner="page.showcase"'
     button_css = []
     sections = []
     for name in sorted(receipts):
         rc = receipts[name]
-        css, stage_html, backdrop = _stage_block(name)
+        css, stage_html, backdrop = _stage_block(name, owner_attr)
         if css:
             button_css.append(css)
         claim = _html.escape(str(rc.get("profile", name)))
@@ -206,22 +210,29 @@ def render_showcase(receipts: dict) -> str:
         n_cand = sum(1 for r in rc.get("results", []) if r.get("status") == "candidate")
         n_fail = sum(1 for r in rc.get("results", []) if r.get("status") == "fail")
         sections.append(
-            f'<section class="lang" data-profile="{_html.escape(name)}">'
+            f'<section class="lang" {owner_attr} '
+            f'data-profile="{_html.escape(name)}">'
             f'<header><h2>{claim}</h2>'
-            f'<p class="tally">{n_pass} pass · {n_fail} fail · {n_cand} cannot certify</p></header>'
-            f'<div class="stage" style="background:{backdrop}">{stage_html}</div>'
-            f'<div class="table-scroll"><table class="invariants"><thead><tr>'
+            f'<p class="tally" {owner_attr}>'
+            f'{n_pass} pass · {n_fail} fail · {n_cand} cannot certify</p></header>'
+            f'<div class="stage" {owner_attr} '
+            f'style="background:{backdrop}">{stage_html}</div>'
+            f'<div class="table-scroll" {owner_attr}>'
+            f'<table class="invariants" {owner_attr}><thead><tr>'
             f'<th>invariant</th><th>law</th><th>verdict</th><th>receipt</th></tr></thead>'
-            f'\n{_rows(rc.get("results", []))}\n</table></div>'
+            f'\n{_rows(rc.get("results", []), owner_attr)}\n</table></div>'
             f'</section>'
         )
 
     legend = (
-        '<div class="legend">'
-        '<span><b class="badge badge-pass">pass</b> a deterministic invariant the render satisfies</span>'
-        '<span><b class="badge badge-fail">fail</b> a deterministic invariant the render violates '
+        f'<div class="legend" {owner_attr}>'
+        f'<span><b class="badge badge-pass" {owner_attr}>pass</b> '
+        'a deterministic invariant the render satisfies</span>'
+        f'<span><b class="badge badge-fail" {owner_attr}>fail</b> '
+        'a deterministic invariant the render violates '
         "(shown honestly)</span>"
-        '<span><b class="badge badge-candidate">cannot certify</b> a judgment/deferred aspect '
+        f'<span><b class="badge badge-candidate" {owner_attr}>cannot certify</b> '
+        'a judgment/deferred aspect '
         "(e.g. contrast over glass) — automation cannot decide it; a human/visual receipt does</span>"
         "</div>"
     )

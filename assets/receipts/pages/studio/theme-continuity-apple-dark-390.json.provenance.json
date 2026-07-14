@@ -11,14 +11,14 @@
     "--window-size=800,1300",
     "--virtual-time-budget=3500",
     "--dump-dom",
-    "http://127.0.0.1:64308/__theme_probe__.html?page=studio&theme=apple-dark&viewport=390"
+    "http://127.0.0.1:50058/__theme_probe__.html?page=studio&theme=apple-dark&viewport=390"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "house_theme": "apple-dark",
   "kind": "chrome-headless-theme-continuity-facts",
   "observed_theme": "apple-dark",
   "page": "studio",
-  "page_sha256": "da96d7de3e0cde1f793f478544b6bc63b87f1704b0a68538ae0983bdba8e865a",
+  "page_sha256": "308aef6ca875a85530e7e1694e673276b9cff276abe07ea490b5ef2c21f44e92",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/studio.html",
   "seeded_theme": "apple-dark",

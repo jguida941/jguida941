@@ -160,8 +160,10 @@ def render_studio() -> str:
     for i, base in enumerate(actives):
         safe = _html.escape(base)
         checked = " checked" if i == 0 else ""
-        radios.append(f'<input type="radio" name="studio-lang" id="lang-{safe}" class="lang-radio"{checked}>')
-        tabs.append(f'<label for="lang-{safe}" class="lang-tab">{safe}</label>')
+        radios.append(f'<input type="radio" name="studio-lang" id="lang-{safe}" class="lang-radio" '
+                      f'data-dom-owner="page.studio"{checked}>')
+        tabs.append(f'<label for="lang-{safe}" class="lang-tab" '
+                    f'data-dom-owner="page.studio">{safe}</label>')
         switch_css.append(f'#lang-{safe}:checked ~ .stages .stage[data-lang="{safe}"] {{ display: block; }}')
         switch_css.append(f'#lang-{safe}:checked ~ .switcher label[for="lang-{safe}"] '
                           f'{{ background: var(--accent); color: var(--backdrop); border-color: var(--accent); }}')
@@ -169,35 +171,43 @@ def render_studio() -> str:
         variants, rows = [], []
         bh, bc = render_archetype(base)                       # the base default (no swap)
         arch_css.append(scope_css(bc, f"var-{safe}-base"))
-        variants.append(f'<div class="variant var-{safe}-base" data-variant="{safe}-base">{bh}</div>')
+        variants.append(f'<div class="variant var-{safe}-base" data-dom-owner="page.studio" '
+                        f'data-variant="{safe}-base">{bh}</div>')
         for comp in _COMPONENTS:
             opts = []
             for src in actives:
                 ssrc = _html.escape(src)
                 if src == base:
-                    opts.append(f'<button type="button" class="swap-opt active" data-base="{safe}" '
+                    opts.append(f'<button type="button" class="swap-opt active" '
+                                f'data-dom-owner="page.studio" data-base="{safe}" '
                                 f'data-component="{comp}" data-source="{ssrc}">{ssrc} · base</button>')
                 elif admissible.get((base, comp, src), False):
                     key, scope = f"{safe}-{comp}-{ssrc}", f"var-{safe}-{comp}-{ssrc}"
                     spec = copy.deepcopy(loader.load(src)["components"][comp])
                     vh, vc = render_archetype(base, profile_data=compose(base, {comp: spec}))
                     arch_css.append(scope_css(vc, scope))
-                    variants.append(f'<div class="variant {scope}" data-variant="{key}" hidden>{vh}</div>')
-                    opts.append(f'<button type="button" class="swap-opt" data-base="{safe}" '
+                    variants.append(f'<div class="variant {scope}" data-dom-owner="page.studio" '
+                                    f'data-variant="{key}" hidden>{vh}</div>')
+                    opts.append(f'<button type="button" class="swap-opt" '
+                                f'data-dom-owner="page.studio" data-base="{safe}" '
                                 f'data-component="{comp}" data-source="{ssrc}">{ssrc}</button>')
                 else:
-                    opts.append(f'<button type="button" class="swap-opt" data-base="{safe}" '
+                    opts.append(f'<button type="button" class="swap-opt" '
+                                f'data-dom-owner="page.studio" data-base="{safe}" '
                                 f'data-component="{comp}" data-source="{ssrc}" disabled '
                                 f'title="unconstructable — a {ssrc} {comp} is a valid instance of no '
                                 f'design language in a {safe} composition">{ssrc} ✕</button>')
-            rows.append(f'<div class="swap-row"><span class="swap-label">{comp}</span>'
-                        f'<span class="swap-opts">{"".join(opts)}</span></div>')
+            rows.append(f'<div class="swap-row" data-dom-owner="page.studio">'
+                        f'<span class="swap-label" data-dom-owner="page.studio">{comp}</span>'
+                        f'<span class="swap-opts" data-dom-owner="page.studio">'
+                        f'{"".join(opts)}</span></div>')
         stages.append(
-            f'<section class="stage" data-lang="{safe}">'
-            f'<div class="swap-controls"><p class="swap-hint">swap a component to another language '
+            f'<section class="stage" data-dom-owner="page.studio" data-lang="{safe}">'
+            f'<div class="swap-controls" data-dom-owner="page.studio">'
+            f'<p class="swap-hint" data-dom-owner="page.studio">swap a component to another language '
             f'— only admissible swaps are enabled; an invalid mix is unconstructable</p>'
             f'{"".join(rows)}</div>'
-            f'<div class="variants">{"".join(variants)}</div></section>')
+            f'<div class="variants" data-dom-owner="page.studio">{"".join(variants)}</div></section>')
 
     from scripts.rendering.pageshell.pageshell import (render_page_shell,
                                                        theme_continuity_script_tag)
@@ -206,8 +216,8 @@ def render_studio() -> str:
     # The switcher + stages + the (verdict-free) scripts are the page's structured content; the radios ride
     # in as the shell root's FIRST children so their `:checked ~` sibling selectors keep reaching them.
     body_html = (
-        f'<div class="switcher">{"".join(tabs)}</div>'
-        f'<div class="stages">{"".join(stages)}</div>'
+        f'<div class="switcher" data-dom-owner="page.studio">{"".join(tabs)}</div>'
+        f'<div class="stages" data-dom-owner="page.studio">{"".join(stages)}</div>'
         # the ONE decider, embedded verbatim; the frozen toggle only looks it up
         f'<script>window.STUDIO_SPACE = {json.dumps(space, sort_keys=True)};</script>'
         f'<script>{_STUDIO_JS}</script>'
