@@ -1,0 +1,65 @@
+{
+  "contract_id": "DesignSourceClauseCatalog",
+  "schema_version": 1,
+  "clauses": [
+    {
+      "clause_id": "D-PAGESHELL-1",
+      "claim": "The governed site uses one closed page shell with explicit orientation, hierarchy, grouping, and rhythm.",
+      "authority": "owner-ratified",
+      "source_mode": "owner-ratified",
+      "exactness": "specification-exact",
+      "sources": [{"source_kind": "repo-doctrine", "ref": "docs/design/pageshell.md#1-the-honest-gate-provenance--mutation-not-merely-no-hex"}],
+      "scope": {
+        "profiles": ["apple-dark", "carbon", "liquid-glass"],
+        "aspects": ["page-shell", "page-layout", "page-type-ramp", "page-spacing-rhythm", "page-section-grouping"],
+        "invariant_ids": [
+          "ap-page-backdrop", "ap-page-closed", "ap-page-tokenonly", "ap-page-orient", "ap-layout-column", "ap-type-tiered", "ap-rhythm-density", "ap-grouping-depth",
+          "cb-page-backdrop", "cb-page-closed", "cb-page-tokenonly", "cb-page-orient", "cb-layout-column", "cb-type-tiered", "cb-rhythm-density", "cb-grouping-depth",
+          "lg-page-backdrop", "lg-page-closed", "lg-page-tokenonly", "lg-page-orient", "lg-layout-column", "lg-type-tiered", "lg-rhythm-density", "lg-grouping-depth"
+        ]
+      }
+    },
+    {
+      "clause_id": "D-NAV-1",
+      "claim": "Every governed page exposes the same four-route navigation with one active route.",
+      "authority": "owner-ratified",
+      "source_mode": "owner-ratified",
+      "exactness": "specification-exact",
+      "sources": [{"source_kind": "repo-doctrine", "ref": "docs/design/board.md#2-the-board-law"}],
+      "scope": {
+        "profiles": ["apple-dark", "carbon", "liquid-glass"],
+        "aspects": ["component-nav"],
+        "invariant_ids": ["ap-nav-anatomy", "cb-nav-anatomy", "lg-nav-anatomy"]
+      }
+    },
+    {
+      "clause_id": "D-W4-A11Y-1",
+      "claim": "Rendered text contrast and interactive target dimensions meet the cited accessibility baselines.",
+      "authority": "official-docs",
+      "source_mode": "official-spec",
+      "exactness": "specification-exact",
+      "sources": [
+        {"source_kind": "official-doc", "ref": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html"},
+        {"source_kind": "official-doc", "ref": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html"}
+      ],
+      "scope": {
+        "profiles": ["apple-dark", "carbon", "liquid-glass"],
+        "aspects": ["color-roles", "touch-target"],
+        "invariant_ids": ["ap-rendered-contrast", "ap-rendered-touch", "cb-rendered-contrast", "cb-rendered-touch", "lg-rendered-contrast", "lg-rendered-touch"]
+      }
+    },
+    {
+      "clause_id": "D-W4-LAYOUT-1",
+      "claim": "The governed page remains contained at 390px and stays within the ratified content-density band.",
+      "authority": "owner-ratified",
+      "source_mode": "owner-ratified",
+      "exactness": "specification-exact",
+      "sources": [{"source_kind": "repo-doctrine", "ref": "docs/design/pageshell.md#10-rendered-facts-and-deterministic-page-laws-d-w4"}],
+      "scope": {
+        "profiles": ["apple-dark", "carbon", "liquid-glass"],
+        "aspects": ["responsive", "page-content-density"],
+        "invariant_ids": ["ap-rendered-responsive", "ap-rendered-density", "cb-rendered-responsive", "cb-rendered-density", "lg-rendered-responsive", "lg-rendered-density"]
+      }
+    }
+  ]
+}

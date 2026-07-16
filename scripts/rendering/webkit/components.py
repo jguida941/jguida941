@@ -252,6 +252,7 @@ def _card_css(
     profile_data: dict | None = None,
     *,
     token_only: bool = False,
+    surface_context: str = "specimen",
 ) -> str:
     from scripts.rendering import design_tokens as dt
     from scripts.rendering.design import loader
@@ -260,27 +261,34 @@ def _card_css(
     color = loader.resolve_tokens(profile)["color"]
     font = loader.resolve_tokens(profile).get("font", {}).get("family", "sans-serif")
     card = prof["components"]["card"]
-    surface = "var(--surface-raised)" if token_only else color.get("surface-raised", color["surface"])
+    if surface_context not in {"specimen", "content"}:
+        raise ValueError("surface_context must be specimen or content")
+    surface = ("var(--layer-02)" if surface_context == "content" and token_only
+               else "var(--surface-raised)" if token_only
+               else color.get("surface-raised", color["surface"]))
     ink_strong = "var(--ink-strong)" if token_only else color["ink-strong"]
     ink_dim = "var(--ink-dim)" if token_only else color.get("ink-dim", color["ink"])
     hairline = "var(--hairline)" if token_only else color["hairline"]
     font_value = "var(--font-sans)" if token_only else font
+    edge = "var(--group-edge)" if surface_context == "content" and token_only else hairline
+    divider = "var(--row-divider)" if surface_context == "content" and token_only else hairline
     container = [
         f"background: {surface};",
         f"border-radius: {card['radius_px']}px;",
-        f"border: 1px solid {hairline}; overflow: hidden;",
+        f"border: 1px solid {edge}; overflow: hidden;",
     ]
-    if card.get("material") == "liquid-glass" and (material := _liquid_glass_material(dt, profile)):
+    if (surface_context == "specimen" and card.get("material") == "liquid-glass"
+            and (material := _liquid_glass_material(dt, profile))):
         glass = ("blur(var(--glass-blur)) saturate(var(--glass-saturate))" if token_only
                  else f"blur({material['blur']:g}px) saturate({material['saturate']:g}%)")
         container.append(f"-webkit-backdrop-filter: {glass}; backdrop-filter: {glass};")
-    if card.get("elevation_shadow"):
+    if surface_context == "specimen" and card.get("elevation_shadow"):
         container.append(f"box-shadow: {card['elevation_shadow']};")
     return (
         f"{selector} {{ {' '.join(container)} }}\n"
         f"{selector} .card-row {{ display: flex; align-items: center; justify-content: space-between; "
         f"gap: 16px; padding: {card['row_pad']}; background: transparent; }}\n"
-        f"{selector} .card-row + .card-row {{ border-top: 1px solid {hairline}; }}\n"
+        f"{selector} .card-row + .card-row {{ border-top: 1px solid {divider}; }}\n"
         f"{selector} .card-label {{ display: flex; align-items: center; gap: 8px; color: {ink_dim}; "
         f"font: 400 {card['font_size_px']}px/1.3 {font_value}; min-width: 0; }}\n"
         f"{selector} .card-detail {{ color: {ink_dim}; font-size: 12px; }}\n"
@@ -299,6 +307,7 @@ def render_card(
     *,
     rows: tuple[MetricRow, ...] | None = None,
     switchable: bool = False,
+    surface_context: str = "specimen",
 ) -> tuple[str, str]:
     """The CARD / grouped metric surface (instance #3) — the DEEPER-REFRAME answer to "giant KPI
     boxes". Emits ONE container holding N chrome-less rows (label + value inline, hierarchy from
@@ -322,17 +331,17 @@ def render_card(
         html = f'<div class="{classes} card-group" {owner}>{rows_html}</div>'
         blocks = [
             _card_css(name, variant, f':root[data-theme="{name}"] .card-{name}-{variant}',
-                      token_only=True)
+                      token_only=True, surface_context=surface_context)
             for name in profiles
         ]
         blocks.append(_card_css(profile, variant,
                                 f':root:not([data-theme]) .card-{profile}-{variant}', prof,
-                                token_only=True))
+                                token_only=True, surface_context=surface_context))
         css = "\n".join(blocks)
     else:
         cls = f"card-{profile}-{variant}"
         html = f'<div class="{cls} card-group" {owner}>{rows_html}</div>'
-        css = _card_css(profile, variant, f".{cls}", prof)
+        css = _card_css(profile, variant, f".{cls}", prof, surface_context=surface_context)
     return html, css
 
 
@@ -394,68 +403,8 @@ def render_switchable_nav(house: str, links: list, active: str) -> tuple[str, st
     return html, "\n".join(blocks)
 
 
-def _switcher_profile_css(profile: str, selector: str) -> str:
-    from scripts.rendering.design import loader
-
-    button = loader.load(profile)["components"]["button"]
-    justify = "space-between" if button["anatomy"] == "label-left-icon-right" else "center"
-    icon_display = "block" if button["anatomy"] == "label-left-icon-right" else "none"
-    states = button["switcher_css"]
-    required_states = {"hover", "active", "focus-visible", "selected", "disabled"}
-    if set(states) != required_states or any(not states[state] for state in required_states):
-        raise ValueError(f"{profile}: switcher_css must close {sorted(required_states)}")
-
-    def declarations(state: str) -> str:
-        return " ".join(f"{key}: {value};" for key, value in states[state].items())
-
-    return "\n".join((
-        f"{selector} {{ border-radius: {button['radius_px']}px; }}",
-        f"{selector} .theme-option {{ min-height: {button['height_px']}px; "
-        f"border-radius: {button['radius_px']}px; justify-content: {justify}; "
-        f"transition-duration: var(--motion-switcher); "
-        f"transition-timing-function: var(--ease-switcher); }}",
-        f"{selector} .theme-option-icon {{ display: {icon_display}; }}",
-        f"{selector} .theme-option:hover {{ {declarations('hover')} }}",
-        f"{selector} .theme-option:active {{ {declarations('active')} }}",
-        f"{selector} .theme-option:focus-visible {{ {declarations('focus-visible')} }}",
-        f"{selector} .theme-option[aria-pressed=\"true\"] {{ {declarations('selected')} }}",
-        f"{selector} .theme-option:disabled {{ {declarations('disabled')} }}",
-    ))
-
-
 def render_theme_switcher(house: str) -> tuple[str, str]:
-    """Render the one governed segmented theme control for every active profile."""
-    from scripts.rendering import design_tokens as dt
+    """Compatibility facade for the bounded local site-setting renderer."""
+    from scripts.rendering.webkit.theme_selector import render_theme_selector
 
-    profiles = tuple(dt.ACTIVE_THEME_NAMES)
-    if house not in profiles:
-        raise KeyError(f"house profile {house!r} is not active")
-    owner = 'data-dom-owner="webkit.switcher"'
-    from scripts.rendering.icons import LUCIDE
-    icon = (f'<svg class="theme-option-icon" {owner} viewBox="0 0 24 24" aria-hidden="true">'
-            f'{LUCIDE["check"]}</svg>')
-    buttons = "".join(
-        f'<button class="theme-option" {owner} type="button" data-theme-set="{_escape(profile)}" '
-        f'aria-pressed="{str(profile == house).lower()}" title="{_escape(dt.THEME_META[profile]["blurb"])}">'
-        f'<span {owner}>{_escape(dt.THEME_META[profile]["label"])}</span>{icon}</button>'
-        for profile in profiles
-    )
-    html = (f'<div class="theme-switcher" {owner} data-switcher-house="{_escape(house)}" '
-            f'role="group" aria-label="Theme">'
-            f'{buttons}</div>')
-    blocks = [
-        _switcher_profile_css(profile, f':root[data-theme="{profile}"] .theme-switcher')
-        for profile in profiles
-    ]
-    blocks.append(_switcher_profile_css(
-        house,
-        f':root:not([data-theme]) .theme-switcher[data-switcher-house="{house}"]',
-    ))
-    blocks.append("""
-.theme-switcher { display: inline-flex; gap: 3px; padding: 3px; border: 1px solid var(--hairline); background: var(--surface-raised); }
-.theme-option { display: inline-flex; align-items: center; gap: 8px; border: 0; padding: 7px 13px; color: var(--ink-dim); background: transparent; font: inherit; cursor: pointer; white-space: nowrap; transition-property: color, background, filter, opacity, transform; }
-.theme-option-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.theme-option[aria-pressed="false"] .theme-option-icon { opacity: 0; }
-.theme-option:hover { color: var(--ink); }
-""".strip())
-    return html, "\n".join(blocks)
+    return render_theme_selector(house)

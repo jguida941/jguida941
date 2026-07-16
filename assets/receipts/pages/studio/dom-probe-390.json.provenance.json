@@ -1,6 +1,6 @@
 {
   "artifact": "assets/receipts/pages/studio/dom-probe-390.json",
-  "artifact_sha256": "12aacf058ef2e774740a59e2cbcf01dcf7b155a4b8c85f0914ecbcb87efeb4d4",
+  "artifact_sha256": "29a91c033715cbfb0922eff5cc7a38a4c6e2fcbe97effed3781035176bccc5e7",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "capture_origin": "ephemeral-local-http",
@@ -13,7 +13,7 @@
     "--window-size=800,1000",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:62398/__dom_probe__.html?page=studio&viewport=390&height=1000"
+    "http://127.0.0.1:57118/__dom_probe__.html?page=studio&viewport=390&height=1000"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-dom-probe",

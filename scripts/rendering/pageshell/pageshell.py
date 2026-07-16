@@ -25,7 +25,7 @@ import re as _re
 # per-language (the profile's cited density band via `design_tokens.density`), emitted by root_block.
 SHELL_SCALE = {
     "--ps-measure-page": "980px",              # DESIGN_SPEC Part 6 / index.html .wrap
-    "--ps-gutter": "clamp(20px, 4vw, 56px)",   # index.html .wrap fluid gutters
+    "--ps-gutter": "20px",                     # approved pre-W3 desktop inline gutter
     "--ps-pad-tight": "12px",
     "--ps-gap": "24px",                        # DESIGN_SPEC Part 0: section gap 24
     "--ps-gap-tight": "8px",
@@ -36,6 +36,14 @@ SHELL_SCALE = {
     "--ps-type-sub": "13px",
     "--ps-measure": "76ch",
 }
+
+
+def document_root_css() -> str:
+    """Return the user-agent reset required before the governed shell owns the viewport."""
+    return (
+        "html, body { height: 100%; margin: 0; }\n"
+        "*, *::before, *::after { box-sizing: border-box; }"
+    )
 
 # The role tokens the chrome references — every one resolved from the profile (provenance == resolve_tokens).
 _ROLES = ("backdrop", "surface", "surface-raised", "ink-strong", "ink", "ink-dim",
@@ -100,8 +108,11 @@ def theme_continuity_script_tag() -> str:
     if (!valid(name)) return false;
     root.dataset.theme = name;
     if (persist) {{ try {{ localStorage.setItem(STORAGE_KEY, name); }} catch (error) {{}} }}
-    document.querySelectorAll("[data-theme-set]").forEach((button) =>
-      button.setAttribute("aria-pressed", String(button.dataset.themeSet === name)));
+    document.querySelectorAll("[data-theme-set]").forEach((button) => {{
+      const selected = button.dataset.themeSet === name;
+      button.setAttribute("aria-checked", String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    }});
     document.querySelectorAll("[data-theme-propagate]").forEach((link) => {{
       const url = new URL(link.getAttribute("href"), location.href);
       url.searchParams.set("theme", name);
@@ -114,6 +125,23 @@ def theme_continuity_script_tag() -> str:
     applyTheme(root.dataset.theme, false);
     document.querySelectorAll("[data-theme-set]").forEach((button) =>
       button.addEventListener("click", () => applyTheme(button.dataset.themeSet, true)));
+    document.querySelectorAll('[data-theme-selector="site"]').forEach((group) => {{
+      group.addEventListener("keydown", (event) => {{
+        const options = Array.from(group.querySelectorAll('[role="radio"]'));
+        const current = options.indexOf(event.target);
+        if (current < 0) return;
+        let next = current;
+        if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (current - 1 + options.length) % options.length;
+        else if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (current + 1) % options.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = options.length - 1;
+        else if (event.key !== " " && event.key !== "Enter") return;
+        event.preventDefault();
+        const target = options[next];
+        applyTheme(target.dataset.themeSet, true);
+        target.focus();
+      }});
+    }});
   }});
 }}());
 </script>"""
@@ -131,7 +159,7 @@ def shell_css(profile: str) -> str:
         f"  margin: 0; min-height: 100%; }}",
         # ONE centered content column — the audit's root cause was full-bleed sprawl (no container).
         # Measure + gutters are the cited index .wrap values (DESIGN_SPEC Part 6).
-        f".{ns} .ps-main {{ max-width: var(--ps-measure-page); margin: 0 auto;",
+        f".{ns} .ps-main {{ box-sizing: border-box; max-width: var(--ps-measure-page); margin: 0 auto;",
         f"  padding: var(--ps-gutter); }}",
         f".{ns} .ps-title {{ margin: 0 0 var(--ps-gap-tight); color: var(--ink-strong);",
         f"  font-size: var(--ps-type-title); font-weight: 700; line-height: 1.2; }}",
@@ -140,8 +168,8 @@ def shell_css(profile: str) -> str:
         f".{ns} .ps-crumbs {{ margin: 0 0 var(--ps-gap-section); color: var(--ink-dim);",
         f"  font-size: var(--ps-type-sub); }}",
         f".{ns} .ps-crumbs a {{ color: var(--accent); text-decoration: none; }}",
-        f".{ns} .ps-panel {{ background: var(--surface); border: 1px solid var(--hairline);",
-        f"  border-radius: var(--radius-panel); padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }}",
+        f".{ns} .ps-panel {{ contain: paint; background: var(--panel-background); border: var(--panel-border);",
+        f"  box-shadow: var(--panel-shadow); border-radius: var(--radius-panel); padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }}",
         f".{ns} .ps-panel-h {{ margin: 0 0 var(--ps-pad-tight); color: var(--ink-strong);",
         f"  font-size: var(--ps-type-h2); font-weight: 600; }}",
     ])
@@ -166,6 +194,7 @@ def render_page_shell(
     profile_data: dict | None = None,
     title_id: str | None = None,
     intro_id: str | None = None,
+    orientation_mode: str = "shell",
 ) -> tuple[str, str]:
     """Return `(html, css)` for a page framed in `profile`'s design language.
 
@@ -175,6 +204,18 @@ def render_page_shell(
     children inside the shell root, before the title (the studio's pure-CSS switcher radios, whose
     `:checked ~` sibling selectors must precede the stages they reveal). The chrome (bg/header/crumbs/
     panels) is token-only + governed; all injected content is guarded (no shell-reserved ps-* classes)."""
+    if orientation_mode not in {"shell", "delegated"}:
+        raise ValueError("orientation_mode must be shell or delegated")
+    if orientation_mode == "delegated":
+        if title or intro or breadcrumbs or title_id or intro_id:
+            raise ValueError("delegated orientation must be owned entirely by body_html")
+        if len(_re.findall(r"<h1\b[^>]*\bdata-page-title\b", body_html)) != 1:
+            raise ValueError("delegated orientation requires exactly one data-page-title h1")
+        if body_html.count("data-page-intro") != 1:
+            raise ValueError("delegated orientation requires exactly one data-page-intro")
+    elif not title or not intro or not breadcrumbs:
+        raise ValueError("shell orientation requires title, intro, and a real breadcrumb")
+
     ns = f"ps-{profile}"
     id_pattern = _re.compile(r"[A-Za-z][A-Za-z0-9_:.\-]*\Z")
     for label, value in (("title_id", title_id), ("intro_id", intro_id)):
@@ -195,13 +236,18 @@ def render_page_shell(
         for heading, body in (sections or []))
     title_attr = f' id="{_html.escape(title_id)}"' if title_id else ""
     intro_attr = f' id="{_html.escape(intro_id)}"' if intro_id else ""
+    orientation = ""
+    if orientation_mode == "shell":
+        orientation = (
+            f'<h1 class="ps-title" data-page-title data-dom-owner="pageshell"{title_attr}>{_html.escape(title)}</h1>'
+            f'<p class="ps-intro" data-page-intro data-dom-owner="pageshell"{intro_attr}>{_html.escape(intro)}</p>'
+            f'<p class="ps-crumbs" data-page-orientation="breadcrumb" data-dom-owner="pageshell">{crumbs}</p>'
+        )
     html = (
         f'<div class="{ns}" data-dom-owner="pageshell">'
-        f'<div class="ps-main" data-dom-owner="pageshell">'
+        f'<div class="ps-main" data-page-orientation="{orientation_mode}" data-dom-owner="pageshell">'
         f'{prefix_html}'
-        f'<h1 class="ps-title" data-dom-owner="pageshell"{title_attr}>{_html.escape(title)}</h1>'
-        f'<p class="ps-intro" data-dom-owner="pageshell"{intro_attr}>{_html.escape(intro)}</p>'
-        f'<p class="ps-crumbs" data-dom-owner="pageshell">{crumbs}</p>'
+        f'{orientation}'
         f'{panels}'
         f'{body_html}'
         f'</div>'

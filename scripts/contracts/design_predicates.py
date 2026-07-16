@@ -6,6 +6,13 @@ compiles a passing body here. candidate_only.
 """
 from __future__ import annotations
 
+from scripts.contracts.rendered_predicates import (
+    rendered_content_density,
+    rendered_contrast,
+    rendered_responsive,
+    rendered_touch_targets,
+)
+
 
 def button_radius(facts: dict, expected_px: int, **_) -> bool:
     return facts.get("radius_px") == expected_px
@@ -76,22 +83,27 @@ def card_rows_inline(facts: dict, **_) -> bool:
 
 
 def switcher_profile_governed(facts: dict, **_) -> bool:
-    """The segmented switcher covers one closed roster with full state and touch geometry."""
-    html_profiles = facts.get("html_profiles")
-    css_profiles = facts.get("css_profiles")
-    profiles = facts.get("profiles")
+    """The local selector closes roster, selection, equal geometry, and radio semantics."""
+    profiles = facts.get("html_profiles")
     expected = facts.get("expected_profiles")
-    if (not isinstance(html_profiles, tuple) or not html_profiles
-            or html_profiles != css_profiles
-            or facts.get("button_count") != len(html_profiles)
-            or facts.get("pressed_count") != 1
-            or facts.get("icon_count") != len(html_profiles)
-            or not isinstance(profiles, dict) or set(profiles) != set(html_profiles)
-            or not isinstance(expected, dict) or set(expected) != set(html_profiles)):
+    if not isinstance(profiles, tuple) or profiles != expected or not profiles:
         return False
-    if not all(facts.get(key) is True for key in ("has_rest", "has_pressed", "has_disabled")):
-        return False
-    return profiles == expected and all(row.get("height_px", 0) >= 44 for row in profiles.values())
+    required_true = (
+        "has_radiogroup", "labels_nonempty", "equal_grid", "has_checked_style",
+        "has_focus_visible",
+    )
+    return (
+        all(facts.get(key) is True for key in required_true)
+        and facts.get("selector_count") == 1
+        and facts.get("button_count") == len(profiles)
+        and facts.get("radio_count") == len(profiles)
+        and facts.get("checked_count") == 1
+        and facts.get("tabstop_count") == 1
+        and facts.get("peer_tabindex_count") == len(profiles) - 1
+        and facts.get("icon_count") == 0
+        and facts.get("desktop_height_px", 0) >= 38
+        and facts.get("mobile_height_px", 0) >= 44
+    )
 
 
 # --- page-shell (the site's own chrome as a governed language instance) ---------------------------
@@ -140,9 +152,8 @@ def nav_anatomy(facts: dict, **_) -> bool:
 
 
 def page_has_orientation(facts: dict, **_) -> bool:
-    """A user can tell what the page is + GET BACK: a title WITH text AND a real breadcrumb link (non-
-    empty href + text) are present (fail-closed on an empty render / an empty crumbs row)."""
-    return facts.get("has_title") is True and facts.get("has_breadcrumb_link") is True
+    """One page title plus either a real breadcrumb or active global route orientation."""
+    return facts.get("has_orientation") is True
 
 
 def page_has_content_column(facts: dict, **_) -> bool:
@@ -208,4 +219,9 @@ PREDICATES = {
     "section_grouping_flat": section_grouping_flat,
     "motion_tokens_cited": motion_tokens_cited,
     "nav_anatomy": nav_anatomy,
+    # post-hydration page/theme/viewport facts (W4)
+    "rendered_contrast": rendered_contrast,
+    "rendered_touch_targets": rendered_touch_targets,
+    "rendered_responsive": rendered_responsive,
+    "rendered_content_density": rendered_content_density,
 }

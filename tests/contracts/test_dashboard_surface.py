@@ -57,11 +57,11 @@ BANNED_RUNTIME = (
     "className", "classList", "setAttribute(", "removeAttribute(", "toggleAttribute(",
     "appendChild(", "insertBefore(", ".prepend(", ".before(", ".after(", ".replaceWith(",
 )
-EXPECTED_CSS_SHA256 = "6bf0a2d1afa9cd9373ec5133d7270e927326b299c1c9d6f70814ab7ddb574acb"
+EXPECTED_CSS_SHA256 = "9ddcc2585f8beeb17372fdb4249a7febc3abdc875e68622579c95ea1687080de"
 EXPECTED_SCRIPT_SHA256 = "cf7cad9eea603b41d9f06828021ebeb5fb7c288c194b74344250b573cdd09fb3"
 EXPECTED_LOCAL_LITERAL_MANIFEST_SHA256 = "de176991a500c32bbdb949dbcf902bb2c38e72627dc383ffe35f777b1911f7c8"
 EXPECTED_COPY_KEYS = frozenset({
-    "breadcrumb_home", "calendar_eyebrow", "calendar_label", "calendar_less", "calendar_more",
+    "calendar_eyebrow", "calendar_label", "calendar_less", "calendar_more",
     "calendar_title", "ci_detail", "ci_label", "flagship_empty", "flagship_eyebrow", "flagship_title",
     "focus_empty", "focus_eyebrow", "focus_next", "focus_now", "focus_shipped", "focus_title",
     "footer_link", "footer_prefix", "hero_active_days", "hero_eyebrow", "hero_intro",
@@ -300,9 +300,12 @@ class DashboardSurfaceContract(unittest.TestCase):
     def test_index_is_pageshell_with_one_real_hydratable_h1_and_intro(self):
         html = _html()
         self.assertEqual(html.count("<h1"), 1)
-        self.assertRegex(html, r'<h1 class="ps-title" data-dom-owner="pageshell" id="hero-name">')
-        self.assertRegex(html, r'<p class="ps-intro" data-dom-owner="pageshell" id="hero-tag">')
-        self.assertIn('class="ps-main" data-dom-owner="pageshell"', html)
+        hero = re.search(r'<section[^>]*data-dashboard-section="hero".*?</section>', html, re.S)
+        self.assertIsNotNone(hero)
+        self.assertRegex(hero.group(0), r'<h1 class="db-hero-title" id="hero-name" data-page-title')
+        self.assertRegex(hero.group(0), r'<p class="db-hero-intro" id="hero-tag" data-page-intro')
+        self.assertIn('class="ps-main" data-page-orientation="delegated"', html)
+        self.assertNotIn('class="ps-crumbs"', html)
         self.assertNotIn('class="wrap"', html)
 
     def test_exact_sections_ids_bindings_and_retired_debt_absence(self):
@@ -338,23 +341,11 @@ class DashboardSurfaceContract(unittest.TestCase):
             self.assertTrue(card_rows_inline(facts))
         facts = switcher_facts(_html(), css)
         self.assertTrue(switcher_profile_governed(facts))
-        from scripts.rendering.design import loader
-        for profile in loader.load("_index")["active_design_profiles"]:
-            button = loader.load(profile)["components"]["button"]
-            self.assertEqual(
-                facts["profiles"][profile],
-                {
-                    "height_px": button["height_px"],
-                    "radius_px": button["radius_px"],
-                    "anatomy": button["anatomy"],
-                    "state_mechanic": button["state_mechanic"],
-                    "focus_recipe": button["focus_recipe"],
-                    "hover_nonempty": True,
-                    "active_nonempty": True,
-                    "focus_nonempty": True,
-                    "state_css": button["switcher_css"],
-                },
-            )
+        self.assertEqual(facts["html_profiles"], facts["expected_profiles"])
+        self.assertEqual(facts["selector_count"], 1)
+        self.assertEqual(facts["checked_count"], 1)
+        self.assertEqual(facts["tabstop_count"], 1)
+        self.assertEqual(facts["icon_count"], 0)
 
     def test_metric_label_hydration_preserves_card_icon_and_detail(self):
         html = _html()
@@ -466,7 +457,7 @@ class DashboardSurfaceContract(unittest.TestCase):
         policy = _contract()["css_policy"]
         rows = css_numeric_occurrences(local_css)
         self.assertEqual(policy["scope"],
-                         "scripts/rendering/webkit/dashboard.py::_dashboard_css")
+                         "scripts/rendering/webkit/dashboard_style.py::dashboard_css")
         self.assertEqual(_literal_manifest_hash(rows), EXPECTED_LOCAL_LITERAL_MANIFEST_SHA256)
         self.assertEqual(policy["occurrence_manifest_sha256"],
                          EXPECTED_LOCAL_LITERAL_MANIFEST_SHA256)
@@ -482,41 +473,28 @@ class DashboardSurfaceContract(unittest.TestCase):
         self.assertNotRegex(local_css, r"var\([^),]+,")
         self.assertNotRegex(local_css, r"#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?)\(")
         provenance = policy["provenance"]
-        self.assertEqual(
-            provenance,
-            {
-                "authority_status": "declared-unresolved",
-                "exactness": "consistency-only",
-                "gap_id": "W5-dashboard-literal-provenance",
-                "ratification_status": "unratified",
-                "source_mode": None,
-                "source_ref": (
-                    "docs/plans/handoff/w3-index-migration-design.md"
-                    "#d-w3-lit-1-dashboard-literal-gap"
-                ),
-            },
-        )
-        source_path, _, anchor = provenance["source_ref"].partition("#")
-        source = (ROOT / source_path).read_text(encoding="utf-8")
-        self.assertIn(anchor, re.sub(r"[^a-z0-9]+", "-", source.lower()))
-        for literal in policy["literal_vocabulary"]:
-            self.assertIn(f"`{literal}`", source)
+        self.assertEqual(provenance["authority_status"], "approved-reference")
+        self.assertEqual(provenance["exactness"], "measurement-exact")
+        self.assertEqual(provenance["source_mode"], "measured-reference")
+        self.assertEqual(provenance["ratification_status"], "approved")
+        self.assertTrue((ROOT / provenance["source_ref"]).is_file())
 
     def test_default_theme_is_threaded_and_no_fragment_pins_default(self):
         from scripts.rendering.design import loader
         from scripts.rendering.webkit import dashboard
-        from scripts.rendering.webkit.components import render_theme_switcher
+        from scripts.rendering.webkit.theme_selector import render_theme_selector
         from scripts.pipeline.web_render import render_dashboard
 
         self.assertNotIn("DEFAULT_THEME", inspect.getsource(dashboard))
-        self.assertNotIn("DEFAULT_THEME", inspect.getsource(render_theme_switcher))
+        self.assertNotIn("DEFAULT_THEME", inspect.getsource(render_theme_selector))
         for profile in loader.load("_index")["active_design_profiles"]:
             html = render_dashboard(profile)
             self.assertIn(f'data-house-theme="{profile}"', html)
             self.assertIn(f'class="ps-{profile}"', html)
-            self.assertIn(
-                f':root:not([data-theme]) .theme-switcher[data-switcher-house="{profile}"]', html
-            )
+            self.assertIn(f'data-switcher-house="{profile}"', html)
+            selected = re.findall(r'<button[^>]*aria-checked="true"[^>]*>', html)
+            self.assertEqual(len(selected), 1)
+            self.assertIn(f'data-theme-set="{profile}"', selected[0])
             self.assertIn(f':root:not([data-theme]) .card-{profile}-dashboard-score', html)
 
     def test_w2_debt_is_fully_resolved_but_retained_as_history(self):
@@ -588,20 +566,20 @@ class DashboardSurfaceContract(unittest.TestCase):
         )
 
         from scripts.contracts.design_predicates import switcher_profile_governed
-        from scripts.rendering.webkit.components import render_theme_switcher
+        from scripts.rendering.webkit.theme_selector import render_theme_selector
         from scripts.rendering.webkit.design_render_adapter import switcher_facts
-        switcher_html, switcher_css = render_theme_switcher("liquid-glass")
-        from scripts.rendering.design import loader
-        for profile in loader.load("_index")["active_design_profiles"]:
-            prefix = f':root[data-theme="{profile}"] .theme-switcher .theme-option'
-            for state in (":hover", ":active", ":focus-visible",
-                          '[aria-pressed="true"]', ":disabled"):
-                mutant = switcher_css.replace(
-                    f"{prefix}{state} {{", f"{prefix}{state} {{ z-index: 987;", 1)
-                self.assertFalse(
-                    switcher_profile_governed(switcher_facts(switcher_html, mutant)),
-                    f"{profile}/{state}: declaration drift must red",
-                )
+        switcher_html, switcher_css = render_theme_selector("liquid-glass")
+        for mutant_html, mutant_css in (
+            (switcher_html.replace('role="radiogroup"', 'role="group"'), switcher_css),
+            (switcher_html.replace('aria-checked="true"', 'aria-checked="false"'), switcher_css),
+            (switcher_html.replace('tabindex="0"', 'tabindex="-1"'), switcher_css),
+            (switcher_html.replace('role="radio"', 'role="button"', 1), switcher_css),
+            (switcher_html, switcher_css.replace(
+                "grid-template-columns: repeat(3, minmax(0, 1fr))", "grid-template-columns: auto")),
+            (switcher_html, switcher_css.replace(".theme-option:focus-visible", ".theme-option:focus")),
+            (switcher_html, switcher_css.replace('[aria-checked="true"]', '[aria-pressed="true"]')),
+        ):
+            self.assertFalse(switcher_profile_governed(switcher_facts(mutant_html, mutant_css)))
 
         local_css = _dashboard_css()
         for mutant in (

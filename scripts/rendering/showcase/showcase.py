@@ -109,6 +109,13 @@ def _row(r: dict, owner_attr: str = "") -> str:
         inv = _html.escape(str(r.get("invariant_id", "")))
         law = _html.escape(str(r.get("law", "")))
         cite = _html.escape(str(r.get("doc_cite", "")))
+        provenance_keys = ("clause_id", "authority", "source_mode", "exactness")
+        if status == "pass" and any(not r.get(key) for key in provenance_keys):
+            raise ValueError(f"passing invariant {r.get('invariant_id')!r} lacks source provenance")
+        provenance_attrs = "".join(
+            f' data-{key.replace("_", "-")}="{_html.escape(str(r[key]))}"'
+            for key in provenance_keys if r.get(key)
+        )
         obligation = r.get("receipt_obligation") or {}
         if r.get("status") == "candidate" and obligation:
             receipt = (
@@ -119,7 +126,7 @@ def _row(r: dict, owner_attr: str = "") -> str:
         else:
             receipt = ""                            # an empty cell renders EMPTY (L-SHOW-5), never a dash
         return (
-            f'<tr data-invariant="{inv}" data-status="{status}">'
+            f'<tr data-invariant="{inv}" data-status="{status}"{provenance_attrs}>'
             f'<td class="inv" {owner_attr}>{inv}</td>'
             f'<td class="law" {owner_attr}>{law}</td>'
             f'<td class="verdict" {owner_attr}>'
@@ -138,7 +145,7 @@ HOUSE = "apple-dark"
 _CONTENT_CSS = """
 .legend { display: flex; gap: var(--ps-gap); flex-wrap: wrap; font-size: var(--ps-type-sub); color: var(--ink); }
 .legend b { font-weight: 600; }
-.lang { margin: 0 0 var(--ps-gap); padding: var(--ps-pad); border: 1px solid var(--hairline);
+.lang { contain: paint; margin: 0 0 var(--ps-gap); padding: var(--ps-pad); border: 1px solid var(--hairline);
   border-radius: var(--radius-panel); background: var(--surface); }
 .lang header { display: flex; align-items: baseline; justify-content: space-between; gap: var(--ps-gap); }
 .lang h2 { margin: 0 0 var(--ps-pad-tight); font-size: var(--ps-type-h2); color: var(--ink-strong); }
@@ -193,9 +200,10 @@ _CONTENT_ALLOWED_WORDS = frozenset({
 def render_showcase(receipts: dict) -> str:
     """Pure: committed receipts -> the showcase HTML, framed in the governed apple-dark page-shell.
     Deterministic (profiles sorted; receipt order preserved). No timestamps, no probe coupling."""
-    from scripts.rendering.pageshell.pageshell import (render_page_shell,
+    from scripts.rendering.pageshell.pageshell import (document_root_css, render_page_shell,
                                                        theme_continuity_script_tag)
     from scripts.rendering.webkit.components import render_switchable_nav
+    from scripts.rendering.webkit import theme_selector
 
     owner_attr = 'data-dom-owner="page.showcase"'
     button_css = []
@@ -239,6 +247,7 @@ def render_showcase(receipts: dict) -> str:
     _nav_links = [("home", "index.html"), ("showcase", "showcase.html"),
                   ("studio", "studio.html"), ("settings", "settings.html")]
     nav_html, nav_css = render_switchable_nav(HOUSE, _nav_links, active="showcase.html")
+    selector_html, selector_css = theme_selector.render_theme_selector(HOUSE)
     shell_html, shell_style = render_page_shell(
         HOUSE,
         title="Design-language conformance",
@@ -246,7 +255,7 @@ def render_showcase(receipts: dict) -> str:
               "receipt for each invariant. Apple Dark is the house language; your chosen language follows "
               "you across the governed site.",
         breadcrumbs=[("home", "index.html"), ("studio", "studio.html"), ("settings", "settings.html")],
-        prefix_html=nav_html,
+        prefix_html=nav_html + selector_html,
         sections=[("How to read this", legend)],
         body_html="\n".join(sections),
     )
@@ -256,8 +265,7 @@ def render_showcase(receipts: dict) -> str:
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         f"{theme_continuity_script_tag()}\n"
         "<title>Design-language conformance — showcase</title>\n"
-        f"<style>* {{ box-sizing: border-box; }}\n"
-        f"html, body {{ height: 100%; margin: 0; }}\n{shell_style}\n{nav_css}\n{_CONTENT_CSS}\n"
+        f"<style>{document_root_css()}\n{shell_style}\n{nav_css}\n{selector_css}\n{_CONTENT_CSS}\n"
         + "\n".join(button_css) + "</style>\n"
         "</head><body>\n"
         + shell_html

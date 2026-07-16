@@ -1,6 +1,6 @@
 {
   "artifact": "assets/receipts/pages/showcase/dom-probe-390.json",
-  "artifact_sha256": "4854361125dbe56fc8f43d16e2956143d3fa90bef60aef6bb784295ba599de77",
+  "artifact_sha256": "902f0b4a9c618e33ef3dc3525142ddb69d74e5451d0a9a731767253398c2ad46",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "capture_origin": "ephemeral-local-http",
@@ -13,12 +13,12 @@
     "--window-size=800,1000",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:62398/__dom_probe__.html?page=showcase&viewport=390&height=1000"
+    "http://127.0.0.1:57118/__dom_probe__.html?page=showcase&viewport=390&height=1000"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-dom-probe",
   "page": "showcase",
-  "page_sha256": "92d6636cf959fef7f6dfa4888f52d0e618298eedbfd1070d57cc38fcfc930259",
+  "page_sha256": "e9f62ed2a0f496adc8d84e7793b1ea5d3d05ef3579cc5d901ee964d5b06e0e1a",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/showcase.html",
   "viewport": {

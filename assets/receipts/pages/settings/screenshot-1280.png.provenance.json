@@ -15,8 +15,8 @@
     "--window-size=1280,1536",
     "--virtual-time-budget=15000",
     "--dump-dom",
-    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/settings/.screenshot-1280.png.2b5a286450dc4995bd3abbefd0911165.tmp.png",
-    "http://127.0.0.1:62398/site/settings.html?__receipt_capture=19dd068b964f4e6c97cc398817a7f714&page=settings&page_sha256=cf8141bdc9b7c65a34d587fb19cf8e3fd5706b7608d91ac1581696e97624bb52&width=1280&height=1536"
+    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/settings/.screenshot-1280.png.e2c133d49de141cd9e2fdae837e87265.tmp.png",
+    "http://127.0.0.1:57118/site/settings.html?__receipt_capture=23fef339033a4146875fd6c0dc03674a&page=settings&page_sha256=cf8141bdc9b7c65a34d587fb19cf8e3fd5706b7608d91ac1581696e97624bb52&width=1280&height=1536"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-screenshot",
@@ -25,9 +25,9 @@
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/settings.html",
   "same_session_capture": {
-    "capture_id": "19dd068b964f4e6c97cc398817a7f714",
+    "capture_id": "23fef339033a4146875fd6c0dc03674a",
     "facts": {
-      "capture_id": "19dd068b964f4e6c97cc398817a7f714",
+      "capture_id": "23fef339033a4146875fd6c0dc03674a",
       "empty_state_hidden": {},
       "hydration_state": null,
       "page": "settings",
@@ -44,7 +44,7 @@
         "width": 1280
       }
     },
-    "facts_sha256": "791b48cc7497c8119f899f309b9c6864e395b943f67f4a5efa3501d4dc54ed29",
+    "facts_sha256": "cd1fcc4f1fb8796a93e618848c864682db097443daa25931f26aa661a883c349",
     "readiness": {
       "animation_frames": 2,
       "fonts": "ready",

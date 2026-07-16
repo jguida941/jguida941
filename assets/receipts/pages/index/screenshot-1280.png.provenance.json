@@ -15,8 +15,8 @@
     "--window-size=1280,1536",
     "--virtual-time-budget=15000",
     "--dump-dom",
-    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/index/.screenshot-1280.png.488711f0e7034201a8e74f500cc5c733.tmp.png",
-    "http://127.0.0.1:62398/site/index.html?__receipt_capture=78a5fa5a50fe44acb4f15c06676a4e8d&page=index&page_sha256=92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f&width=1280&height=1536"
+    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/index/.screenshot-1280.png.db20f3cf35d448d480d89cb67a25c758.tmp.png",
+    "http://127.0.0.1:57118/site/index.html?__receipt_capture=4002e1c09b9440df9867b0c2c04da204&page=index&page_sha256=92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f&width=1280&height=1536"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "data_path": "site/data/profile_snapshot.json",
@@ -47,9 +47,9 @@
   },
   "route": "site/index.html",
   "same_session_capture": {
-    "capture_id": "78a5fa5a50fe44acb4f15c06676a4e8d",
+    "capture_id": "4002e1c09b9440df9867b0c2c04da204",
     "facts": {
-      "capture_id": "78a5fa5a50fe44acb4f15c06676a4e8d",
+      "capture_id": "4002e1c09b9440df9867b0c2c04da204",
       "empty_state_hidden": {
         "flagship": true,
         "focus-next": false,
@@ -89,7 +89,7 @@
         "width": 1280
       }
     },
-    "facts_sha256": "af900990e4edaf91d4827d17c4efd1b914e72dd3580e652cc9c2f0f6492bda11",
+    "facts_sha256": "e8e656f3230ae54024715c6124c7514387d9e692bf5944bf9898269841043fc3",
     "readiness": {
       "animation_frames": 2,
       "fonts": "ready",

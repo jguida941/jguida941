@@ -129,6 +129,18 @@ class PageShellGateContract(unittest.TestCase):
         self.assertTrue(host_chrome_token_only(f), "a var()-only shell is token-only")
         self.assertTrue(backdrop_is_token(f), "the shell root paints var(--backdrop)")
 
+    def test_paint_containment_is_a_structural_token_only_value(self):
+        from scripts.contracts.design_predicates import host_chrome_token_only
+
+        css = _GATE_CLEAN.replace(
+            "background: var(--surface);",
+            "contain: paint; background: var(--surface);",
+        )
+        self.assertTrue(
+            host_chrome_token_only(self._facts(css)),
+            "contain: paint is structural and must not be mistaken for a design literal",
+        )
+
     def test_every_off_token_colour_and_px_form_is_caught(self):
         """Prop-INDEPENDENT: a colour in ANY property (incl. an obscure one like stop-color) or hidden
         after a comment is caught, no property list (codex A1c #2/#3)."""

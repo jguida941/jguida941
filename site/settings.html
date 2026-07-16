@@ -18,8 +18,11 @@
     if (!valid(name)) return false;
     root.dataset.theme = name;
     if (persist) { try { localStorage.setItem(STORAGE_KEY, name); } catch (error) {} }
-    document.querySelectorAll("[data-theme-set]").forEach((button) =>
-      button.setAttribute("aria-pressed", String(button.dataset.themeSet === name)));
+    document.querySelectorAll("[data-theme-set]").forEach((button) => {
+      const selected = button.dataset.themeSet === name;
+      button.setAttribute("aria-checked", String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    });
     document.querySelectorAll("[data-theme-propagate]").forEach((link) => {
       const url = new URL(link.getAttribute("href"), location.href);
       url.searchParams.set("theme", name);
@@ -32,6 +35,23 @@
     applyTheme(root.dataset.theme, false);
     document.querySelectorAll("[data-theme-set]").forEach((button) =>
       button.addEventListener("click", () => applyTheme(button.dataset.themeSet, true)));
+    document.querySelectorAll('[data-theme-selector="site"]').forEach((group) => {
+      group.addEventListener("keydown", (event) => {
+        const options = Array.from(group.querySelectorAll('[role="radio"]'));
+        const current = options.indexOf(event.target);
+        if (current < 0) return;
+        let next = current;
+        if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (current - 1 + options.length) % options.length;
+        else if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (current + 1) % options.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = options.length - 1;
+        else if (event.key !== " " && event.key !== "Enter") return;
+        event.preventDefault();
+        const target = options[next];
+        applyTheme(target.dataset.themeSet, true);
+        target.focus();
+      });
+    });
   });
 }());
 </script>
@@ -50,6 +70,21 @@ html, body { height: 100%; margin: 0; }
   --status-success: #30d158;
   --status-warning: #ff9f0a;
   --status-danger: #ff453a;
+  --layer-01: #1c1c1e;
+  --layer-02: #2c2c2e;
+  --section-edge: color-mix(in srgb, var(--hairline) 16%, transparent);
+  --group-edge: color-mix(in srgb, var(--hairline) 12%, transparent);
+  --row-divider: color-mix(in srgb, var(--hairline) 9%, transparent);
+  --focus: #0a84ff;
+  --focus-inset: #000000;
+  --selector-edge: color-mix(in srgb, var(--hairline) 14%, transparent);
+  --selector-background: color-mix(in srgb, var(--surface-raised) 86%, transparent);
+  --selector-hover: color-mix(in srgb, var(--ink) 8%, transparent);
+  --selector-selected: color-mix(in srgb, var(--accent) 24%, var(--surface-raised));
+  --selector-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  --panel-background: #1c1c1e;
+  --panel-border: 1px solid var(--section-edge);
+  --panel-shadow: none;
   --glass-blur: 30px;
   --glass-saturate: 180%;
   --surface-opacity: 0.6;
@@ -96,7 +131,7 @@ html, body { height: 100%; margin: 0; }
   --button-active-background: transparent;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
   --ps-measure-page: 980px;
-  --ps-gutter: clamp(20px, 4vw, 56px);
+  --ps-gutter: 20px;
   --ps-pad-tight: 12px;
   --ps-gap: 24px;
   --ps-gap-tight: 8px;
@@ -119,6 +154,21 @@ html, body { height: 100%; margin: 0; }
   --status-success: #9ece6a;
   --status-warning: #e0af68;
   --status-danger: #f7768e;
+  --layer-01: #1b1e2e;
+  --layer-02: #232843;
+  --section-edge: color-mix(in srgb, var(--hairline) 16%, transparent);
+  --group-edge: color-mix(in srgb, var(--hairline) 12%, transparent);
+  --row-divider: color-mix(in srgb, var(--hairline) 9%, transparent);
+  --focus: #7dcfff;
+  --focus-inset: #0c0e18;
+  --selector-edge: color-mix(in srgb, var(--hairline) 14%, transparent);
+  --selector-background: color-mix(in srgb, var(--surface-raised) 86%, transparent);
+  --selector-hover: color-mix(in srgb, var(--ink) 8%, transparent);
+  --selector-selected: color-mix(in srgb, var(--accent) 24%, var(--surface-raised));
+  --selector-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  --panel-background: #1b1e2e;
+  --panel-border: 1px solid var(--section-edge);
+  --panel-shadow: none;
   --glass-blur: 22px;
   --glass-saturate: 160%;
   --surface-opacity: 0.55;
@@ -175,9 +225,24 @@ html, body { height: 100%; margin: 0; }
   --backdrop: #ffffff;
   --hairline: #e0e0e0;
   --accent: #0f62fe;
-  --status-success: #198038;
+  --status-success: #24a148;
   --status-warning: #f1c21b;
   --status-danger: #da1e28;
+  --layer-01: #f4f4f4;
+  --layer-02: #ffffff;
+  --section-edge: transparent;
+  --group-edge: #e0e0e0;
+  --row-divider: #e0e0e0;
+  --focus: #0f62fe;
+  --focus-inset: #ffffff;
+  --selector-edge: #e0e0e0;
+  --selector-background: #f4f4f4;
+  --selector-hover: #e8e8e8;
+  --selector-selected: #e0e0e0;
+  --selector-filter: none;
+  --panel-background: #f4f4f4;
+  --panel-border: 0;
+  --panel-shadow: none;
   --glass-blur: 0px;
   --glass-saturate: 100%;
   --surface-opacity: 1;
@@ -220,13 +285,13 @@ html, body { height: 100%; margin: 0; }
   --ease-exit: cubic-bezier(0.2, 0, 1, 0.9);
   --motion-switcher: 70ms;
   --ease-switcher: cubic-bezier(0.2, 0, 0.38, 0.9);
-  --button-hover-background: #0353e9;
+  --button-hover-background: #0050e6;
   --button-active-background: #002d9c;
   --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
 }
 .ps-apple-dark { background: var(--backdrop); color: var(--ink); font-family: var(--font-sans);
   margin: 0; min-height: 100%; }
-.ps-apple-dark .ps-main { max-width: var(--ps-measure-page); margin: 0 auto;
+.ps-apple-dark .ps-main { box-sizing: border-box; max-width: var(--ps-measure-page); margin: 0 auto;
   padding: var(--ps-gutter); }
 .ps-apple-dark .ps-title { margin: 0 0 var(--ps-gap-tight); color: var(--ink-strong);
   font-size: var(--ps-type-title); font-weight: 700; line-height: 1.2; }
@@ -235,8 +300,8 @@ html, body { height: 100%; margin: 0; }
 .ps-apple-dark .ps-crumbs { margin: 0 0 var(--ps-gap-section); color: var(--ink-dim);
   font-size: var(--ps-type-sub); }
 .ps-apple-dark .ps-crumbs a { color: var(--accent); text-decoration: none; }
-.ps-apple-dark .ps-panel { background: var(--surface); border: 1px solid var(--hairline);
-  border-radius: var(--radius-panel); padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }
+.ps-apple-dark .ps-panel { contain: paint; background: var(--panel-background); border: var(--panel-border);
+  box-shadow: var(--panel-shadow); border-radius: var(--radius-panel); padding: var(--ps-pad); margin: 0 0 var(--ps-gap); }
 .ps-apple-dark .ps-panel-h { margin: 0 0 var(--ps-pad-tight); color: var(--ink-strong);
   font-size: var(--ps-type-h2); font-weight: 600; }
 :root[data-theme="liquid-glass"] .nav-liquid-glass { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -251,6 +316,43 @@ html, body { height: 100%; margin: 0; }
 :root:not([data-theme]) .nav-apple-dark { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 :root:not([data-theme]) .nav-apple-dark a { color: var(--ink-dim); text-decoration: none; padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; transition: color var(--motion-fast) var(--ease-standard); }
 :root:not([data-theme]) .nav-apple-dark a[aria-current] { background: var(--accent); color: var(--backdrop); }
+.theme-switcher {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(100%, 330px);
+  margin: 0 0 8px auto;
+  padding: 3px;
+  border: 1px solid var(--selector-edge);
+  border-radius: var(--radius-tile);
+  background: var(--selector-background);
+  -webkit-backdrop-filter: var(--selector-filter);
+  backdrop-filter: var(--selector-filter);
+}
+.theme-option {
+  display: grid;
+  min-width: 0;
+  min-height: 38px;
+  place-items: center;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: max(0px, calc(var(--radius-tile) - 3px));
+  color: var(--ink-dim);
+  background: transparent;
+  font: 600 13px/1.2 var(--font-sans);
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard);
+}
+.theme-option:hover { color: var(--ink); background: var(--selector-hover); }
+.theme-option[aria-checked="true"] { color: var(--ink-strong); background: var(--selector-selected); }
+.theme-option:focus { outline: 0; }
+.theme-option:focus-visible { box-shadow: inset 0 0 0 2px var(--focus), inset 0 0 0 3px var(--focus-inset); }
+.theme-option:disabled { opacity: .4; cursor: not-allowed; }
+@media (max-width: 480px) {
+  .theme-switcher { width: 100%; }
+  .theme-option { min-height: 44px; padding-inline: 6px; }
+}
 .law { color: var(--ink); font-size: var(--ps-type-sub); }
 .law b { color: var(--accent); }
 .base { background: var(--surface); border: 1px solid var(--hairline); border-radius: var(--radius-panel);
@@ -270,7 +372,7 @@ table.grid { width: 100%; border-collapse: collapse; font-size: var(--ps-type-su
 .verdict.no { background: var(--status-danger); color: var(--backdrop); }
 </style>
 </head><body>
-<div class="ps-apple-dark" data-dom-owner="pageshell"><div class="ps-main" data-dom-owner="pageshell"><nav class="site-nav nav-liquid-glass nav-carbon nav-apple-dark" data-dom-owner="webkit.nav" aria-label="Site"><a href="index.html" data-theme-propagate>home</a><a href="showcase.html" data-theme-propagate>showcase</a><a href="studio.html" data-theme-propagate>studio</a><a href="settings.html" data-theme-propagate aria-current="page">settings</a></nav><h1 class="ps-title" data-dom-owner="pageshell">Governed control plane</h1><p class="ps-intro" data-dom-owner="pageshell">Compose a design language: pick a base, then swap any component to another language. This is the design surface — separate from the builder scorecard.</p><p class="ps-crumbs" data-dom-owner="pageshell"><a href="index.html" data-theme-propagate>home</a> · <a href="showcase.html" data-theme-propagate>showcase</a> · <a href="studio.html" data-theme-propagate>studio</a></p><section class="ps-panel" data-dom-owner="pageshell"><h2 class="ps-panel-h" data-dom-owner="pageshell">The law</h2><div class="law" data-dom-owner="page.settings">An <b>invalid combination is unconstructable</b>. A swap is admissible ONLY if the composed component, as rendered, is a FULL valid instance of some active design language — a partial mix that belongs to no language (e.g. a frosted material on a square 0-radius card) is refused. The verdict below is computed by ONE Python source (<code>scripts/quality/settings_admissibility.py</code>), routed through the real render → conform path; this page only displays it (no verdict JS).</div></section><section class="base" data-dom-owner="page.settings" data-base="apple-dark"><h2>base: apple-dark</h2><p class="hint" data-dom-owner="page.settings">swap each component to another language; only ADMISSIBLE swaps can be applied</p><div class="table-scroll" data-dom-owner="page.settings"><table class="grid" data-dom-owner="page.settings"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp" data-dom-owner="page.settings">button</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td></tr><tr><th class="comp" data-dom-owner="page.settings">chip</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td></tr><tr><th class="comp" data-dom-owner="page.settings">card</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td></tr></tbody></table></div></section>
+<div class="ps-apple-dark" data-dom-owner="pageshell"><div class="ps-main" data-page-orientation="shell" data-dom-owner="pageshell"><nav class="site-nav nav-liquid-glass nav-carbon nav-apple-dark" data-dom-owner="webkit.nav" aria-label="Site"><a href="index.html" data-theme-propagate>home</a><a href="showcase.html" data-theme-propagate>showcase</a><a href="studio.html" data-theme-propagate>studio</a><a href="settings.html" data-theme-propagate aria-current="page">settings</a></nav><div class="theme-switcher" data-dom-owner="webkit.theme-selector" data-theme-selector="site" data-switcher-house="apple-dark" role="radiogroup" aria-label="Site theme"><button class="theme-option" data-dom-owner="webkit.theme-selector" type="button" role="radio" data-theme-set="liquid-glass" aria-checked="false" tabindex="-1" title="Apple frosted glass · Tokyo Night">Liquid Glass</button><button class="theme-option" data-dom-owner="webkit.theme-selector" type="button" role="radio" data-theme-set="carbon" aria-checked="false" tabindex="-1" title="IBM Carbon · flat structured UI">Carbon</button><button class="theme-option" data-dom-owner="webkit.theme-selector" type="button" role="radio" data-theme-set="apple-dark" aria-checked="true" tabindex="0" title="System dark · one vivid accent">Apple Dark</button></div><h1 class="ps-title" data-page-title data-dom-owner="pageshell">Governed control plane</h1><p class="ps-intro" data-page-intro data-dom-owner="pageshell">Compose a design language: pick a base, then swap any component to another language. This is the design surface — separate from the builder scorecard.</p><p class="ps-crumbs" data-page-orientation="breadcrumb" data-dom-owner="pageshell"><a href="index.html" data-theme-propagate>home</a> · <a href="showcase.html" data-theme-propagate>showcase</a> · <a href="studio.html" data-theme-propagate>studio</a></p><section class="ps-panel" data-dom-owner="pageshell"><h2 class="ps-panel-h" data-dom-owner="pageshell">The law</h2><div class="law" data-dom-owner="page.settings">An <b>invalid combination is unconstructable</b>. A swap is admissible ONLY if the composed component, as rendered, is a FULL valid instance of some active design language — a partial mix that belongs to no language (e.g. a frosted material on a square 0-radius card) is refused. The verdict below is computed by ONE Python source (<code>scripts/quality/settings_admissibility.py</code>), routed through the real render → conform path; this page only displays it (no verdict JS).</div></section><section class="base" data-dom-owner="page.settings" data-base="apple-dark"><h2>base: apple-dark</h2><p class="hint" data-dom-owner="page.settings">swap each component to another language; only ADMISSIBLE swaps can be applied</p><div class="table-scroll" data-dom-owner="page.settings"><table class="grid" data-dom-owner="page.settings"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp" data-dom-owner="page.settings">button</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td></tr><tr><th class="comp" data-dom-owner="page.settings">chip</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td></tr><tr><th class="comp" data-dom-owner="page.settings">card</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td></tr></tbody></table></div></section>
 <section class="base" data-dom-owner="page.settings" data-base="carbon"><h2>base: carbon</h2><p class="hint" data-dom-owner="page.settings">swap each component to another language; only ADMISSIBLE swaps can be applied</p><div class="table-scroll" data-dom-owner="page.settings"><table class="grid" data-dom-owner="page.settings"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp" data-dom-owner="page.settings">button</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell no" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass</span><span class="verdict no" data-dom-owner="page.settings">unconstructable</span></td></tr><tr><th class="comp" data-dom-owner="page.settings">chip</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell no" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass</span><span class="verdict no" data-dom-owner="page.settings">unconstructable</span></td></tr><tr><th class="comp" data-dom-owner="page.settings">card</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td></tr></tbody></table></div></section>
 <section class="base" data-dom-owner="page.settings" data-base="liquid-glass"><h2>base: liquid-glass</h2><p class="hint" data-dom-owner="page.settings">swap each component to another language; only ADMISSIBLE swaps can be applied</p><div class="table-scroll" data-dom-owner="page.settings"><table class="grid" data-dom-owner="page.settings"><thead><tr><th>component ↓ / source →</th><th>apple-dark</th><th>carbon</th><th>liquid-glass</th></tr></thead><tbody><tr><th class="comp" data-dom-owner="page.settings">button</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td></tr><tr><th class="comp" data-dom-owner="page.settings">chip</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td></tr><tr><th class="comp" data-dom-owner="page.settings">card</th><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">apple-dark</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">carbon</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td><td class="cell ok" data-dom-owner="page.settings"><span class="src" data-dom-owner="page.settings">liquid-glass (base)</span><span class="verdict ok" data-dom-owner="page.settings">admissible</span></td></tr></tbody></table></div></section></div></div>
 </body></html>

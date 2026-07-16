@@ -1,0 +1,35 @@
+{
+  "contract_id": "DesignSourceClauseCatalog",
+  "schema_version": 1,
+  "clauses": [
+    {
+      "clause_id": "LG-HIG-CONTROL-MATERIAL-1",
+      "claim": "Liquid Glass is reserved for the functional control and navigation layer.",
+      "authority": "official-docs",
+      "source_mode": "official-spec",
+      "exactness": "specification-exact",
+      "sources": [{"source_kind": "official-doc", "ref": "https://developer.apple.com/design/human-interface-guidelines/materials"}],
+      "scope": {
+        "profiles": ["liquid-glass"],
+        "aspects": ["component-button"],
+        "invariant_ids": ["lg-btn-material"]
+      }
+    },
+    {
+      "clause_id": "LG-HIG-LIST-1",
+      "claim": "Grouped dashboard metrics use one inset list container with rows and inline values.",
+      "authority": "official-docs",
+      "source_mode": "official-spec",
+      "exactness": "specification-exact",
+      "sources": [
+        {"source_kind": "official-doc", "ref": "https://developer.apple.com/design/human-interface-guidelines/lists-and-tables"},
+        {"source_kind": "official-doc", "ref": "https://developer.apple.com/documentation/uikit/uitableview/style-swift.enum/insetgrouped"}
+      ],
+      "scope": {
+        "profiles": ["liquid-glass"],
+        "aspects": ["component-card"],
+        "invariant_ids": ["lg-card-container", "lg-card-rows", "lg-card-inline", "lg-card-rounded"]
+      }
+    }
+  ]
+}

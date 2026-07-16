@@ -1,6 +1,6 @@
 {
   "artifact": "assets/receipts/pages/showcase/screenshot-1280.png",
-  "artifact_sha256": "154f98ef9bd1978842304e57c58a1674597af934628b9132de3f70e06428a24f",
+  "artifact_sha256": "5c573f4779d4a5b65d82e2a2fbbd4fda6c3b863cfaf4685ac5948a9c704a0349",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "capture_origin": "ephemeral-local-http",
@@ -15,23 +15,23 @@
     "--window-size=1280,1536",
     "--virtual-time-budget=15000",
     "--dump-dom",
-    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/showcase/.screenshot-1280.png.3ae760d0437c4339bab59eb98aada28e.tmp.png",
-    "http://127.0.0.1:62398/site/showcase.html?__receipt_capture=1e452a259a7343a78954c516776a7559&page=showcase&page_sha256=92d6636cf959fef7f6dfa4888f52d0e618298eedbfd1070d57cc38fcfc930259&width=1280&height=1536"
+    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/showcase/.screenshot-1280.png.950a9597480f45f0b7d9321ba74bfd15.tmp.png",
+    "http://127.0.0.1:57118/site/showcase.html?__receipt_capture=4fba14bb5c4b4f3eadaf34eeab0eaf79&page=showcase&page_sha256=e9f62ed2a0f496adc8d84e7793b1ea5d3d05ef3579cc5d901ee964d5b06e0e1a&width=1280&height=1536"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-screenshot",
   "page": "showcase",
-  "page_sha256": "92d6636cf959fef7f6dfa4888f52d0e618298eedbfd1070d57cc38fcfc930259",
+  "page_sha256": "e9f62ed2a0f496adc8d84e7793b1ea5d3d05ef3579cc5d901ee964d5b06e0e1a",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/showcase.html",
   "same_session_capture": {
-    "capture_id": "1e452a259a7343a78954c516776a7559",
+    "capture_id": "4fba14bb5c4b4f3eadaf34eeab0eaf79",
     "facts": {
-      "capture_id": "1e452a259a7343a78954c516776a7559",
+      "capture_id": "4fba14bb5c4b4f3eadaf34eeab0eaf79",
       "empty_state_hidden": {},
       "hydration_state": null,
       "page": "showcase",
-      "page_sha256": "92d6636cf959fef7f6dfa4888f52d0e618298eedbfd1070d57cc38fcfc930259",
+      "page_sha256": "e9f62ed2a0f496adc8d84e7793b1ea5d3d05ef3579cc5d901ee964d5b06e0e1a",
       "prototype_origin_counts": {},
       "readiness": {
         "animation_frames": 2,
@@ -44,7 +44,7 @@
         "width": 1280
       }
     },
-    "facts_sha256": "2d5b181fdf19466e6aec27c10e9b4fb11923c34fcd75ee5bcb6fc7cbe28b87e9",
+    "facts_sha256": "bdfdd0e7ad6a6f3aa9a3532edbfe94175c5c26aadffd7fcf2019326f799b428c",
     "readiness": {
       "animation_frames": 2,
       "fonts": "ready",

@@ -9,20 +9,20 @@
     "normalization": "body text; exclude script/style/template; collapse ASCII/HTML whitespace",
     "pages": {
       "index": {
-        "node_count": 83,
-        "sha256": "0de9378ee9118954cfa2aaeb7a5f384c19140f340359b511a62081124f920258"
+        "node_count": 82,
+        "sha256": "2a215267f064a4d6a62417f089ef3cb8c50f43857482d3c129db6179b403ed57"
       },
       "settings": {
-        "node_count": 98,
-        "sha256": "3aab946d8e43c5d7a78bec01a95a9ef1826a78c2ff9fa8ab3d48ad88f56e8dbf"
+        "node_count": 101,
+        "sha256": "71999843e4cea0dd608225e30d63e53e3acfa9ab032faffc1dc9a949eff8af6c"
       },
       "showcase": {
-        "node_count": 400,
-        "sha256": "e06dff453c48f6868e4878dd3865d4f99d4e86a5af8f44d04330f6c5ef226fff"
+        "node_count": 463,
+        "sha256": "040f841f29ba6dfa09c7b6799a8d4b6c5dec4e38867dfd55344707f0b038ac30"
       },
       "studio": {
-        "node_count": 375,
-        "sha256": "d1e0f7fa0278f478441e7b7634f37bf8fdf11d1d70ea0809586e2c547fd8453c"
+        "node_count": 378,
+        "sha256": "c84a5f2db119d235d75d8a096a3b89368a2fbf4a18f3ede9d63196ec3473efa6"
       }
     }
   },
@@ -38,7 +38,7 @@
         "pages": [
           "index"
         ],
-        "script_sha256": "3a9572a03f7e18daa999a3da7ffc3a6423e8f44f6ad8eeb147866d3f5f847859"
+        "script_sha256": "306099196a0c1bd7717d3acf5ef2d6d89ab84736871078aafffcbf3310fd0735"
       },
       {
         "id": "studio-space-data",
@@ -68,7 +68,7 @@
           "showcase",
           "studio"
         ],
-        "script_sha256": "ba6b047216cd3c87896d81838f0f825cf26172ae4204e167c6c463a2ae3bf111"
+        "script_sha256": "1c1b0019f9e076bcc63596dc256e25c480fb91cc4c6e513b2d32e6754e3128a2"
       }
     ],
     "runtime_class_debt": {
@@ -491,7 +491,7 @@
             "badge",
             "badge-pass"
           ],
-          "count": 78
+          "count": 90
         },
         {
           "page": "showcase",
@@ -499,7 +499,7 @@
           "classes": [
             "cite"
           ],
-          "count": 30
+          "count": 42
         },
         {
           "page": "showcase",
@@ -515,7 +515,7 @@
           "classes": [
             "aspect-group"
           ],
-          "count": 30
+          "count": 42
         },
         {
           "page": "showcase",
@@ -523,7 +523,7 @@
           "classes": [
             "inv"
           ],
-          "count": 87
+          "count": 99
         },
         {
           "page": "showcase",
@@ -531,7 +531,7 @@
           "classes": [
             "law"
           ],
-          "count": 87
+          "count": 99
         },
         {
           "page": "showcase",
@@ -539,7 +539,7 @@
           "classes": [
             "receipt"
           ],
-          "count": 87
+          "count": 99
         },
         {
           "page": "showcase",
@@ -547,13 +547,13 @@
           "classes": [
             "verdict"
           ],
-          "count": 87
+          "count": 99
         },
         {
           "page": "showcase",
           "tag": "th",
           "classes": [],
-          "count": 42
+          "count": 54
         },
         {
           "page": "showcase",
@@ -565,7 +565,7 @@
           "page": "showcase",
           "tag": "tr",
           "classes": [],
-          "count": 90
+          "count": 102
         },
         {
           "page": "showcase",
@@ -573,7 +573,7 @@
           "classes": [
             "aspect-head"
           ],
-          "count": 30
+          "count": 42
         }
       ]
     },
@@ -872,12 +872,6 @@
       "signatures": [
         {
           "page": "index",
-          "tag": "a",
-          "classes": [],
-          "count": 1
-        },
-        {
-          "page": "index",
           "tag": "div",
           "classes": [
             "ps-liquid-glass"
@@ -889,30 +883,6 @@
           "tag": "div",
           "classes": [
             "ps-main"
-          ],
-          "count": 1
-        },
-        {
-          "page": "index",
-          "tag": "h1",
-          "classes": [
-            "ps-title"
-          ],
-          "count": 1
-        },
-        {
-          "page": "index",
-          "tag": "p",
-          "classes": [
-            "ps-crumbs"
-          ],
-          "count": 1
-        },
-        {
-          "page": "index",
-          "tag": "p",
-          "classes": [
-            "ps-intro"
           ],
           "count": 1
         },
@@ -1940,7 +1910,7 @@
           "page": "index",
           "tag": "div",
           "classes": [],
-          "count": 2
+          "count": 1
         },
         {
           "page": "index",
@@ -2027,6 +1997,14 @@
           "tag": "div",
           "classes": [
             "db-heat-hours"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
+          "tag": "div",
+          "classes": [
+            "db-hero-copy"
           ],
           "count": 1
         },
@@ -2192,6 +2170,14 @@
         },
         {
           "page": "index",
+          "tag": "h1",
+          "classes": [
+            "db-hero-title"
+          ],
+          "count": 1
+        },
+        {
+          "page": "index",
           "tag": "h2",
           "classes": [
             "db-section-title"
@@ -2285,6 +2271,14 @@
             "db-eyebrow"
           ],
           "count": 8
+        },
+        {
+          "page": "index",
+          "tag": "p",
+          "classes": [
+            "db-hero-intro"
+          ],
+          "count": 1
         },
         {
           "page": "index",
@@ -2623,10 +2617,13 @@
         }
       ]
     },
-    "webkit.switcher": {
-      "emitter": "scripts/rendering/webkit/components.py::render_theme_switcher",
+    "webkit.theme-selector": {
+      "emitter": "scripts/rendering/webkit/theme_selector.py::render_theme_selector",
       "pages": [
-        "index"
+        "index",
+        "settings",
+        "showcase",
+        "studio"
       ],
       "signatures": [
         {
@@ -2646,24 +2643,52 @@
           "count": 1
         },
         {
-          "page": "index",
-          "tag": "path",
-          "classes": [],
-          "count": 3
-        },
-        {
-          "page": "index",
-          "tag": "span",
-          "classes": [],
-          "count": 3
-        },
-        {
-          "page": "index",
-          "tag": "svg",
+          "page": "settings",
+          "tag": "button",
           "classes": [
-            "theme-option-icon"
+            "theme-option"
           ],
           "count": 3
+        },
+        {
+          "page": "settings",
+          "tag": "div",
+          "classes": [
+            "theme-switcher"
+          ],
+          "count": 1
+        },
+        {
+          "page": "showcase",
+          "tag": "button",
+          "classes": [
+            "theme-option"
+          ],
+          "count": 3
+        },
+        {
+          "page": "showcase",
+          "tag": "div",
+          "classes": [
+            "theme-switcher"
+          ],
+          "count": 1
+        },
+        {
+          "page": "studio",
+          "tag": "button",
+          "classes": [
+            "theme-option"
+          ],
+          "count": 3
+        },
+        {
+          "page": "studio",
+          "tag": "div",
+          "classes": [
+            "theme-switcher"
+          ],
+          "count": 1
         }
       ]
     }

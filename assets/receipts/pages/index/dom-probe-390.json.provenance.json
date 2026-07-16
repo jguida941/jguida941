@@ -1,6 +1,6 @@
 {
   "artifact": "assets/receipts/pages/index/dom-probe-390.json",
-  "artifact_sha256": "3fb3b58958c08f168c9a053c5610c0597423f5f384d5a43a305197669f7fe3e5",
+  "artifact_sha256": "83c804bd0fbba81af2d75c1e1f019e59af70f4c80bfbec99976a8dcd31e8e4d2",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "capture_origin": "ephemeral-local-http",
@@ -13,7 +13,7 @@
     "--window-size=800,1000",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:62398/__dom_probe__.html?page=index&viewport=390&height=1000"
+    "http://127.0.0.1:57118/__dom_probe__.html?page=index&viewport=390&height=1000"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "data_path": "site/data/profile_snapshot.json",
@@ -43,7 +43,7 @@
     "repository": 3
   },
   "readiness": {
-    "elapsed_ms": 100,
+    "elapsed_ms": 101,
     "outcome": "ready",
     "selector": "[data-dashboard-hydration]",
     "state": "complete"

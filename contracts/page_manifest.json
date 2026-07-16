@@ -19,11 +19,15 @@
       "archetype": "landing",
       "required_regions": [
         "content-column",
-        "site-nav"
+        "orientation",
+        "site-nav",
+        "theme-selector"
       ],
       "region_aliases": {
         "content-column": ".ps-main",
-        "site-nav": ".site-nav"
+        "orientation": "[data-page-orientation]",
+        "site-nav": ".site-nav",
+        "theme-selector": "[data-theme-selector]"
       },
       "receipt_obligations": [
         {
@@ -48,15 +52,17 @@
         "language-section",
         "verdict-table",
         "specimen-stage",
-        "site-nav"
+        "site-nav",
+        "theme-selector"
       ],
       "region_aliases": {
-        "orientation": ".ps-crumbs",
+        "orientation": "[data-page-orientation]",
         "legend": ".legend",
         "language-section": ".lang",
         "verdict-table": ".invariants",
         "specimen-stage": ".stage",
-        "site-nav": ".site-nav"
+        "site-nav": ".site-nav",
+        "theme-selector": "[data-theme-selector]"
       },
       "receipt_obligations": [
         {
@@ -79,13 +85,15 @@
         "orientation",
         "law",
         "control-groups",
-        "site-nav"
+        "site-nav",
+        "theme-selector"
       ],
       "region_aliases": {
-        "orientation": ".ps-crumbs",
+        "orientation": "[data-page-orientation]",
         "law": ".law",
         "control-groups": ".base",
-        "site-nav": ".site-nav"
+        "site-nav": ".site-nav",
+        "theme-selector": "[data-theme-selector]"
       },
       "receipt_obligations": [
         {
@@ -109,14 +117,16 @@
         "language-switcher",
         "swap-controls",
         "archetype-stage",
-        "site-nav"
+        "site-nav",
+        "theme-selector"
       ],
       "region_aliases": {
-        "orientation": ".ps-crumbs",
+        "orientation": "[data-page-orientation]",
         "language-switcher": ".switcher",
         "swap-controls": ".swap-controls",
         "archetype-stage": ".stages",
-        "site-nav": ".site-nav"
+        "site-nav": ".site-nav",
+        "theme-selector": "[data-theme-selector]"
       },
       "receipt_obligations": [
         {

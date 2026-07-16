@@ -1,6 +1,6 @@
 {
   "artifact": "assets/receipts/pages/index/theme-state-storage-denied-navigation.json",
-  "artifact_sha256": "c13644a3dbb97e86b9bc96fee2c05f330939c7b23d9ad58a1e8dce25ff1750e4",
+  "artifact_sha256": "91473e5869e672de96f63579cae590caaf5a37effa685c1c4682ca1850a19fe7",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "chrome_version": "Google Chrome 150.0.7871.115",
@@ -12,11 +12,11 @@
     "--window-size=800,1300",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:62958/__theme_state_probe__.html?scenario=storage-denied-navigation"
+    "http://127.0.0.1:57863/__theme_state_probe__.html?scenario=storage-denied-navigation"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "follow_page": "showcase",
-  "follow_page_sha256": "92d6636cf959fef7f6dfa4888f52d0e618298eedbfd1070d57cc38fcfc930259",
+  "follow_page_sha256": "e9f62ed2a0f496adc8d84e7793b1ea5d3d05ef3579cc5d901ee964d5b06e0e1a",
   "kind": "chrome-headless-theme-state-machine-facts",
   "page": "index",
   "page_sha256": "92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f",

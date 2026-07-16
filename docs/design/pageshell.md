@@ -198,3 +198,95 @@ staged PNG is published. Every sidecar binds the artifact hash and is replaced l
 marker, so an interrupted two-file publication reddens instead of silently pairing old proof with a new
 artifact. The independent 390 probe remains its own MF1 fact, not evidence for the screenshot process.
 A placeholder-only `file://` screenshot is not an acceptable W3 receipt.
+
+<a id="d-w4-rendered-facts"></a>
+## §10 — Rendered facts and deterministic page laws (D-W4)
+
+`contracts/rendered_fact_policy.json` closes the four-page × three-theme × 1280/390 browser matrix.
+Each packet is verdict-free: it records the complete post-hydration body-descendant table, explicit
+`html`/`body` paint and geometry, computed styles, boxes, scroll geometry, text ranges, deterministic
+text hit samples, root spacing tokens, and reachable Studio states. Capture waits
+for the selected theme, index hydration, and fonts, then performs two bounded
+`forced-style-layout-task-turn` observations. This wording is deliberate: Chrome `--dump-dom` does
+not advance `requestAnimationFrame`. Each task turn forces both computed-style and layout reads, and
+the packet records all document animations; a running or pending animation makes the cell invalid.
+Same-origin links are recorded as path, query, and fragment rather than the producer's ephemeral
+localhost origin, so the observed identity table does not absorb a random capture port.
+
+Policy selectors use a closed, compiled subset of comma-separated single compound selectors: an
+optional tag, zero or more classes, and admitted attribute presence/equality or attribute-equality
+negation. Whitespace, combinators, IDs, pseudo-classes, and class negation are rejected. Capture
+re-enumerates every subject in
+every reachable state, requires exact membership against the packet's node table, and binds that state
+to a canonical DOM-identity digest. Equal-cardinality subject swaps and post-hydration DOM drift
+therefore fail. Numeric leaves are finite, non-boolean, quantized facts with closed geometry and scroll
+relationships; viewport dimensions and device-pixel ratio are observed from Chrome, while the producer
+forces the policy's pinned scale factor.
+The Studio matrix is not trusted as copied policy DATA: `state_authority.py` derives the reachable
+projection from `settings_admissibility.py::admissible_space()` at runtime and requires byte-for-byte
+row equality before capture or validation. Both authority modules are input-hashed into every cell.
+
+- **D-W4-COLOR-1 (`color-roles`).** The exact `.ps-title` and `.ps-intro` shell subjects must resolve
+  through an opaque, parseable, interference-free paint stack. WCAG 2.2 contrast-minimum thresholds
+  apply: 3:1 for the declared large title and 4.5:1 for normal intro text. Gradients, filters, blend
+  modes, inset shadows, text strokes, unparseable colors, pseudo-content interference, missing subjects,
+  translucent foreground/fill, or translucent terminal grounds fail closed. A deterministic 4px grid
+  over every governed text range
+  must remain topmost on
+  the exact subject in both normal hit testing and a second witness that temporarily neutralizes
+  `pointer-events: none`; descendant, sibling, and top-layer occlusion therefore fail. Painted
+  `html`, `body`, or element pseudos, including borders, outlines, and shadows, also fail. Source:
+  <https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum>.
+  Foreign paint that may escape its observed border box (shadow, outline, filter, text stroke,
+  border image, SVG ink, or generated pseudo paint) is admissible only when an observed strict
+  ancestor paint/overflow boundary excludes every text sample. The dashboard, showcase language
+  sections, and pageshell panels declare those ample boundaries; an unbounded or unknown clip margin
+  fails closed rather than estimating ink extent.
+- **D-W4-TOUCH-1 (`touch-target`).** Every applicable visible interactive target satisfies WCAG 2.5.8
+  Target Size (Minimum), 24×24 CSS px, or one of its exactly observed spacing, equivalent-target, or
+  inline-text exceptions. A CSS-hidden enabled input is admissible only when it has a nonempty ID and its
+  exact governed `label[for]` remains a covered target. Geometry uses the target's effective
+  viewport/ancestor-clipped box; spacing is the
+  exact 12px radius-circle to neighboring effective-rectangle distance, so a large or clipped neighbor
+  cannot manufacture an exception. Same-action targets do not bypass overlap or spacing; only the
+  separately proved qualifying-equivalent exception applies. Source:
+  <https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum>.
+- **D-W4-RESPONSIVE-1 (`responsive`).** At 390px, root/body and every visible element remain within
+  the viewport's inline bounds. Horizontal excess is admissible only beneath the exact
+  page-and-parent-bound scroll containers declared in policy. The first horizontal clipping/scrolling
+  ancestor decides: an unapproved inner `auto`, `scroll`, `hidden`, or `clip` boundary cannot borrow an
+  approved outer scroller, and a class name copied elsewhere grants no escape.
+- **D-W4-DENSITY-1 (`page-content-density`, owner-ratified 2026-07-14).** Governed page interiors use
+  their exact authored root-token padding, gap, and direct-child block-margin vocabulary. They contain
+  visible nonblank in-flow text or governed prototype paint and reserve at most one
+  device pixel of unexplained vertical space outside the merged visible child margin-box intervals.
+  Recursively clipped intervals count only nontransparent text fill or provenance-closed prototype paint
+  and expose internal blank runs; no child may contain more than 96 CSS px of unaccounted vertical space.
+  Studio admits exactly three governed control surfaces and exactly one
+  visible surface per reachable state. A legitimate minimum height remains valid when content consumes
+  it; hidden surfaces, empty graphic tags, blank wrapper paint, giant padding, gap, margin, or empty
+  reserved space fail. Image-only content needs an explicit observed-paint lane before promotion.
+
+`scripts/quality/rendered_facts/` owns observation, publication, and closed schema. Pure decisions live
+in `scripts/contracts/rendered_predicates.py`; `conform()` loads the exact eight cells for one profile,
+dispatches through the same closed registry as static component laws, and emits only a stable evidence
+projection. Artifact hashes and capture IDs never enter conformance receipts, preventing a facts →
+receipt → page regeneration cycle.
+
+The committed transport is one deterministic gzip member containing canonical sorted JSON. The
+envelope pins an empty filename, zero modification time, compression level, flags, and OS byte; its
+sidecar binds both compressed and canonical hashes plus the one admitted Python and zlib writer
+runtime. Provenance also closes the complete Chrome argv, numeric Chrome version, local probe route,
+and exact page/theme/viewport query; self-reported runtime strings or a shortened fake command cannot
+admit noncanonical bytes.
+The reader admits one bounded member only, rejects truncated, concatenated, trailing, oversized, or
+noncanonical content, and releases each profile matrix between rendered predicates. Reproducibility is
+claimed for the pinned writer/runtime recorded by the sidecar, not across unspecified zlib versions.
+
+Every packet and sidecar hashes the page, profile, policy, this rendered doctrine, all
+observation/schema modules (including `state_authority.py`), the underlying
+`settings_admissibility.py` decision source, the real `headless_receipts.py` runtime adapter, and (for
+index) both public snapshot DATA and `dashboard_surface.json`. Committed loads recursively inventory the
+entire page-receipt subtree against the exact 24 gzip packets and 24 sidecars; missing cells, orphan
+sidecars, nested artifacts, unknown-page artifacts, and stale or rogue rendered-fact names fail before
+conformance.

@@ -50,23 +50,23 @@ ADMITTED_OWNER_EMITTERS = {
     "webkit.chip": "scripts/rendering/webkit/components.py::render_chip",
     "webkit.nav": "scripts/rendering/webkit/components.py::render_switchable_nav",
     "webkit.dashboard": "scripts/rendering/webkit/dashboard.py::render_dashboard_surface",
-    "webkit.switcher": "scripts/rendering/webkit/components.py::render_theme_switcher",
+    "webkit.theme-selector": "scripts/rendering/webkit/theme_selector.py::render_theme_selector",
 }
 INDEX_ADMITTED_OWNERS = {"pageshell", "webkit.card", "webkit.dashboard", "webkit.nav",
-                         "webkit.switcher"}
+                         "webkit.theme-selector"}
 RUNTIME_SCRIPT_SHA256 = {
-    "index-hydration": "3a9572a03f7e18daa999a3da7ffc3a6423e8f44f6ad8eeb147866d3f5f847859",
+    "index-hydration": "306099196a0c1bd7717d3acf5ef2d6d89ab84736871078aafffcbf3310fd0735",
     "studio-space-data": "dfdea4749364280200d2be02705097e1930776d4e977baca85fcaaeeabe4dd4a",
     "studio-toggle": "05efb2d307a54d28797ae4dcc7ee634fe1bf5ea9c8950c54e654b724cd528af2",
-    "theme-continuity": "ba6b047216cd3c87896d81838f0f825cf26172ae4204e167c6c463a2ae3bf111",
+    "theme-continuity": "1c1b0019f9e076bcc63596dc256e25c480fb91cc4c6e513b2d32e6754e3128a2",
 }
 RUNTIME_CLASS_DEBT_SOURCE_SHA256 = {"studio-toggle": RUNTIME_SCRIPT_SHA256["studio-toggle"]}
 STATIC_TEXT_NORMALIZATION = "body text; exclude script/style/template; collapse ASCII/HTML whitespace"
 STATIC_TEXT_PINS = {
-    "index": {"node_count": 83, "sha256": "0de9378ee9118954cfa2aaeb7a5f384c19140f340359b511a62081124f920258"},
-    "settings": {"node_count": 98, "sha256": "3aab946d8e43c5d7a78bec01a95a9ef1826a78c2ff9fa8ab3d48ad88f56e8dbf"},
-    "showcase": {"node_count": 400, "sha256": "e06dff453c48f6868e4878dd3865d4f99d4e86a5af8f44d04330f6c5ef226fff"},
-    "studio": {"node_count": 375, "sha256": "d1e0f7fa0278f478441e7b7634f37bf8fdf11d1d70ea0809586e2c547fd8453c"},
+    "index": {"node_count": 82, "sha256": "2a215267f064a4d6a62417f089ef3cb8c50f43857482d3c129db6179b403ed57"},
+    "settings": {"node_count": 101, "sha256": "71999843e4cea0dd608225e30d63e53e3acfa9ab032faffc1dc9a949eff8af6c"},
+    "showcase": {"node_count": 463, "sha256": "040f841f29ba6dfa09c7b6799a8d4b6c5dec4e38867dfd55344707f0b038ac30"},
+    "studio": {"node_count": 378, "sha256": "c84a5f2db119d235d75d8a096a3b89368a2fbf4a18f3ede9d63196ec3473efa6"},
 }
 W2_INDEX_RUNTIME_CLASS_HISTORY = {
     "page": "index",
@@ -793,8 +793,8 @@ class DomCoverContract(unittest.TestCase):
         self.assertTrue(_document_errors("index", index.replace("</body>",
                                                                   '<button>rogue action</button></body>'), contract))
         self.assertTrue(_document_errors("settings", settings.replace(
-            '<h1 class="ps-title" data-dom-owner="pageshell">',
-            '<div class="ps-title" data-dom-owner="pageshell">', 1), contract))
+            '<h1 class="ps-title" data-page-title data-dom-owner="pageshell">',
+            '<div class="ps-title" data-page-title data-dom-owner="pageshell">', 1), contract))
         self.assertTrue(_document_errors("settings", settings.replace(
             'data-dom-owner="page.settings"', 'data-dom-owner="page.studio"', 1), contract))
         self.assertTrue(_document_errors("index", index.replace(

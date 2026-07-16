@@ -243,7 +243,14 @@ def _receipt_status(obligation: dict | None) -> str | None:
     return "present" if (_root() / artifact).is_file() else "pending"
 
 
-def _result(inv: dict, profile: str, status: str, evidence: dict) -> dict:
+def _result(
+    inv: dict,
+    profile: str,
+    status: str,
+    evidence: dict,
+    *,
+    provenance: dict | None = None,
+) -> dict:
     aspect = inv.get("aspect")
     obligation = inv.get("receipt_obligation")
     receipt_status = _receipt_status(obligation)
@@ -252,6 +259,7 @@ def _result(inv: dict, profile: str, status: str, evidence: dict) -> dict:
         "profile": profile,
         "aspect": aspect,
         "determinism": inv.get("determinism"),
+        "fact_source": inv.get("fact_source"),
         "status": status,                       # pass | fail | candidate (axe/ACT lineage)
         "law": inv.get("law"),
         "doc_cite": inv.get("doc_cite"),
@@ -260,6 +268,15 @@ def _result(inv: dict, profile: str, status: str, evidence: dict) -> dict:
         "cannot_mark_done": True,
         "claim": _CLAIM[status].format(aspect=aspect, profile=profile),
     }
+    if provenance and provenance.get("status") == "resolved":
+        for key in ("clause_id", "authority", "source_mode", "exactness", "sources"):
+            payload[key] = provenance[key]
+    elif provenance:
+        payload["candidate_reason"] = provenance.get("candidate_reason", "provenance-unresolved")
+        payload["provenance_gap"] = {
+            "reason": provenance.get("reason", "unresolved provenance"),
+            "required_resolution": provenance.get("required_resolution", "repair-binding"),
+        }
     if inv.get("defer_reason"):
         payload["defer_reason"] = inv["defer_reason"]
     if inv.get("refute_by"):
@@ -277,35 +294,91 @@ def _result(inv: dict, profile: str, status: str, evidence: dict) -> dict:
     return payload
 
 
-def conform(profile: str) -> list[dict]:
+def _rendered_evidence(bundle: list[dict], predicate_class: str) -> dict:
+    packets = [entry["facts"] for entry in bundle]
+    subject_key = {
+        "rendered_contrast": "contrast",
+        "rendered_touch_targets": "interactive",
+        "rendered_content_density": "density",
+    }.get(predicate_class)
+    subject_count = 0
+    if subject_key:
+        for packet in packets:
+            subjects = packet["subjects"][subject_key]
+            count = (len(subjects) if isinstance(subjects, list)
+                     else sum(len(indices) for indices in subjects.values()))
+            subject_count += count * len(packet["states"])
+    return {
+        "fact_source": "rendered",
+        "predicate_class": predicate_class,
+        "matrix_cells": len(packets),
+        "pages": sorted({packet["page"] for packet in packets}),
+        "viewports": sorted({packet["viewport"]["width"] for packet in packets}),
+        "state_observations": sum(len(packet["states"]) for packet in packets),
+        "subject_observations": subject_count,
+    }
+
+
+def conform(profile: str, *, rendered_facts: list[dict] | None = None) -> list[dict]:
     from scripts.contracts import design_predicates as predicates
+    from scripts.quality.design_sources.catalog import load_catalog
+    from scripts.quality.design_sources.resolver import resolve_invariant
     from scripts.rendering.design import loader
 
     prof = loader.load(profile)
+    source_catalog = load_catalog()
     results: list[dict] = []
     facts_cache: dict = {}
     for inv in prof.get("invariants", []):
+        provenance = resolve_invariant(profile, inv, catalog=source_catalog)
+        if not provenance["pass_eligible"]:
+            results.append(_result(
+                inv,
+                profile,
+                "candidate",
+                {"provenance_status": provenance["status"]},
+                provenance=provenance,
+            ))
+            continue
         emitted = inv.get("emission_status") == "emitted" and inv.get("determinism") == "deterministic"
         if not emitted:
             # judgment / deferred -> candidate (review anchor + visual receipt), never a fake pass
-            results.append(_result(inv, profile, "candidate", {}))
+            results.append(_result(inv, profile, "candidate", {}, provenance=provenance))
             continue
         pred = inv.get("predicate", {})
         fn = predicates.PREDICATES.get(pred.get("predicate_class"))
         params = dict(pred.get("params", {}))
-        component = _COMPONENT_FACTS.get(inv.get("aspect"))
-        if component is not None:
-            key, gather = component
-            comp = prof["components"].get(key)   # page-shell has no components[] block -> variant None
-            variant = params.pop("variant", comp["variants"][0] if comp else None)
-            cache_key = (key, variant)
-            if cache_key not in facts_cache:       # gather ONCE per (component, variant), not eagerly
-                facts_cache[cache_key] = gather(profile, variant)
-            facts = facts_cache[cache_key]
+        fact_source = inv.get("fact_source")
+        if fact_source == "rendered":
+            from scripts.quality.rendered_facts.policy import load_policy
+            from scripts.quality.rendered_facts.schema import load_bundle
+            facts = load_bundle(profile, rendered_facts)
+            params["policy"] = load_policy()
+            evidence = _rendered_evidence(facts, pred.get("predicate_class", ""))
+        elif fact_source == "static":
+            component = _COMPONENT_FACTS.get(inv.get("aspect"))
+            if component is None:
+                facts = {}
+                evidence = facts
+            else:
+                key, gather = component
+                comp = prof["components"].get(key)
+                variant = params.pop("variant", comp["variants"][0] if comp else None)
+                cache_key = (key, variant)
+                if cache_key not in facts_cache:
+                    facts_cache[cache_key] = gather(profile, variant)
+                facts = facts_cache[cache_key]
+                evidence = facts
         else:
-            facts = {}
+            results.append(_result(
+                inv, profile, "fail", {"unsupported_fact_source": fact_source},
+                provenance=provenance))
+            continue
         ok = bool(fn(facts, **params)) if fn else False
-        results.append(_result(inv, profile, "pass" if ok else "fail", facts))
+        results.append(_result(
+            inv, profile, "pass" if ok else "fail", evidence, provenance=provenance))
+        if fact_source == "rendered":
+            del facts
     return results
 
 

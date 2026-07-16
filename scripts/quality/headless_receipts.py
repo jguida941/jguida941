@@ -221,6 +221,78 @@ def _write_provenance(
     return out
 
 
+class _RenderedFactsRuntime:
+    """Inject the legacy Chrome transport into the acyclic rendered-facts package."""
+
+    @staticmethod
+    def site_server():
+        return _site_server()
+
+    @staticmethod
+    def chrome() -> Path:
+        return _chrome()
+
+    @staticmethod
+    def chrome_version(chrome: Path) -> str:
+        return _chrome_version(chrome)
+
+    @staticmethod
+    def run(command: list[str]) -> subprocess.CompletedProcess[str]:
+        return _run(command)
+
+    @staticmethod
+    def parse_probe_dump(dump: str) -> dict:
+        return _parse_probe_dump(dump)
+
+    @staticmethod
+    def write_provenance(**kwargs) -> Path:
+        return _write_provenance(**kwargs)
+
+
+_RENDERED_FACTS_RUNTIME = _RenderedFactsRuntime()
+
+
+def rendered_facts_artifact(page: str, theme: str, viewport: int) -> Path:
+    from scripts.quality.rendered_facts.policy import artifact_path
+
+    return artifact_path(page, theme, viewport)
+
+
+def rendered_state_plan(page: str) -> list[dict]:
+    from scripts.quality.rendered_facts.policy import state_plan
+
+    return state_plan(page)
+
+
+def validate_rendered_fact_packet(
+    payload: dict, *, page: str, theme: str, viewport: int
+) -> None:
+    from scripts.quality.rendered_facts.schema import validate_packet
+
+    validate_packet(payload, page=page, theme=theme, viewport=viewport)
+
+
+def load_rendered_fact_bundle(theme: str, entries: list[dict] | None = None) -> list[dict]:
+    from scripts.quality.rendered_facts.schema import load_bundle
+
+    return load_bundle(theme, entries)
+
+
+def rendered_facts(
+    page: str, theme: str, viewport: int, *, base_url: str | None = None
+) -> Path:
+    from scripts.quality.rendered_facts.producer import capture
+
+    return capture(
+        _RENDERED_FACTS_RUNTIME, page, theme, viewport, base_url=base_url)
+
+
+def write_all_rendered_facts() -> list[Path]:
+    from scripts.quality.rendered_facts.producer import write_all
+
+    return write_all(_RENDERED_FACTS_RUNTIME)
+
+
 def _dashboard_number(value: object) -> str:
     number = float(value or 0)
     if abs(number) >= 10000:
@@ -549,7 +621,9 @@ def screenshot_page(
             return screenshot_page(page, width, base_url=local_url)
     _receipt_dir(page, create=True)
     artifact = screenshot_artifact(page, width)
-    staged = artifact.with_name(f".{artifact.name}.{uuid.uuid4().hex}.tmp.png")
+    # Chrome 150 intermittently omits --dump-dom output when --screenshot targets a dotfile.
+    # Keep staging atomic without making the capture target hidden.
+    staged = artifact.with_name(f"{artifact.name}.{uuid.uuid4().hex}.tmp.png")
     try:
         capture = _capture_screenshot_session(
             page, width, base_url=base_url, staged_png=staged)
@@ -920,8 +994,8 @@ def _theme_probe_html(page: str, theme: str, viewport: int) -> str:
           height: Math.round(navRect.height * 100) / 100
         }
       } : null,
-      pressed_themes: Array.prototype.map.call(
-        doc.querySelectorAll('[data-theme-set][aria-pressed="true"]'),
+      selected_themes: Array.prototype.map.call(
+        doc.querySelectorAll('[data-theme-set][aria-checked="true"]'),
         (button) => button.dataset.themeSet),
       declared_scroll_containers: scrollRules,
       horizontal_overflow: scrollWidth - clientWidth > 1
@@ -999,8 +1073,8 @@ def _theme_state_probe_html(scenario: str) -> str:
       observed_theme: root.dataset.theme || "",
       house_theme: root.dataset.houseTheme || "",
       storage_value: storageValue,
-      pressed_themes: Array.from(
-        doc.querySelectorAll('[data-theme-set][aria-pressed="true"]'),
+      selected_themes: Array.from(
+        doc.querySelectorAll('[data-theme-set][aria-checked="true"]'),
         (button) => button.dataset.themeSet),
       propagated_link_themes: Array.from(new Set(linkThemes)).sort()
     };
@@ -1071,6 +1145,23 @@ class _ReceiptHandler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
+        if parsed.path == "/__rendered_facts__.html":
+            from scripts.quality.rendered_facts.probe import probe_html
+
+            try:
+                query = parse_qs(parsed.query, strict_parsing=True)
+                page = query["page"][0]
+                theme = query["theme"][0]
+                viewport = int(query["viewport"][0])
+                height = int(query["height"][0])
+                if page not in PAGE_ROUTES:
+                    raise KeyError(page)
+                body = probe_html(page, theme, viewport, height).encode("utf-8")
+            except (KeyError, ValueError, IndexError) as exc:
+                self.send_error(400, f"invalid rendered facts query: {exc}")
+                return
+            self._send_html(body)
+            return
         if parsed.path == "/__dom_probe__.html":
             try:
                 query = parse_qs(parsed.query, strict_parsing=True)
@@ -1411,6 +1502,7 @@ def write_all_page_receipts() -> list[Path]:
             out.append(probe)
     out.extend(write_all_theme_continuity_receipts())
     out.extend(write_all_theme_state_receipts())
+    out.extend(write_all_rendered_facts())
     return out
 
 

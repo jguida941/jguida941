@@ -182,6 +182,7 @@ _SAFE_VALUE_WORDS = frozenset("""
  normal bold bolder lighter italic oblique underline overline line-through uppercase lowercase capitalize
  center left right start end justify flex block inline grid wrap nowrap visible collapse pointer default
  middle top bottom baseline stretch content-box border-box relative absolute fixed sticky static
+ paint
 """.split())
 
 
@@ -357,9 +358,14 @@ def pageshell_facts(html: str, css: str) -> dict:
     uses_backdrop_var = (bool(root_bg) and _value_offtokens(root_bg[-1]) == 0
                          and _VAR_REF.findall(root_bg[-1]) == ["var(--backdrop)"])
 
-    has_title = bool(re.search(r'class="ps-title"[^>]*>[^<]*\w', html))
+    title_nodes = re.findall(r'<h1\b[^>]*(?:data-page-title|class="[^"]*ps-title[^"]*")[^>]*>[^<]*\w', html)
+    has_title = len(title_nodes) == 1
     crumbs_m = re.search(r'class="ps-crumbs"[^>]*>(.*?)</p>', html, re.S)
     has_breadcrumb_link = bool(crumbs_m and re.search(r'<a[^>]+href="[^"]+"[^>]*>[^<]*\w', crumbs_m.group(1)))
+    has_active_nav = bool(re.search(
+        r'<nav\b[^>]*class="[^"]*site-nav[^"]*"[^>]*>.*?aria-current="page"', html, re.S
+    ))
+    has_orientation = has_title and (has_breadcrumb_link or has_active_nav)
 
     # LAYOUT facts (design-audit D-SHELL) — fail-closed: absent column/ramp vars -> False/None.
     main_m = (re.search(rf"\.{re.escape(shell_cls)}\s+\.ps-main\s*\{{([^}}]*)\}}", css)
@@ -418,6 +424,8 @@ def pageshell_facts(html: str, css: str) -> dict:
         "uses_backdrop_var": uses_backdrop_var,
         "has_title": has_title,
         "has_breadcrumb_link": has_breadcrumb_link,
+        "has_active_nav": has_active_nav,
+        "has_orientation": has_orientation,
         "has_content_column": has_content_column,
         "type_ramp_tiered": type_ramp_tiered,
         "pad_px": _root_px("--ps-pad"),
@@ -475,116 +483,32 @@ def card_facts(html: str, css: str) -> dict:
 
 
 def switcher_facts(html: str, css: str) -> dict:
-    """Verdict-free facts for the switchable segmented theme control."""
-    from scripts.rendering.design import loader
+    """Verdict-free facts for the owner-ratified site-setting radiogroup."""
+    from scripts.rendering import design_tokens as dt
 
     html_profiles = tuple(re.findall(r'data-theme-set="([a-z0-9-]+)"', html))
-    css_profiles = tuple(dict.fromkeys(re.findall(
-        r':root\[data-theme="([a-z0-9-]+)"\] \.theme-switcher\s*\{', css)))
-    profiles = {}
-    expected_profiles = {}
-
-    def declaration_map(body: str) -> dict[str, str]:
-        return {
-            prop.strip(): value.strip()
-            for declaration in body.split(";") if declaration.strip()
-            for prop, separator, value in [declaration.partition(":")]
-            if separator and prop.strip() and value.strip()
-        }
-
-    for profile in css_profiles:
-        root = re.search(
-            rf':root\[data-theme="{re.escape(profile)}"\] \.theme-switcher\s*\{{([^}}]*)\}}',
-            css,
-        )
-        option = re.search(
-            rf':root\[data-theme="{re.escape(profile)}"\] \.theme-switcher '
-            rf'\.theme-option\s*\{{([^}}]*)\}}',
-            css,
-        )
-        root_body = root.group(1) if root else ""
-        option_body = option.group(1) if option else ""
-        height = re.search(r"min-height:\s*(\d+)px", option_body)
-        radius = re.search(r"border-radius:\s*(\d+)px", option_body)
-        justify = re.search(r"justify-content:\s*([\w-]+)", option_body)
-        def state_body(suffix: str) -> str:
-            match = re.search(
-                rf':root\[data-theme="{re.escape(profile)}"\] \.theme-switcher '
-                rf'\.theme-option{suffix}\s*\{{([^}}]*)\}}',
-                css,
-            )
-            return match.group(1).strip() if match else ""
-
-        icon_rule = re.search(
-            rf':root\[data-theme="{re.escape(profile)}"\] \.theme-switcher '
-            rf'\.theme-option-icon\s*\{{([^}}]*)\}}',
-            css,
-        )
-        icon_body = icon_rule.group(1) if icon_rule else ""
-        hover_body = state_body(":hover")
-        active_body = state_body(":active")
-        focus_body = state_body(":focus-visible")
-        selected_body = state_body(r'\[aria-pressed="true"\]')
-        disabled_body = state_body(":disabled")
-        if "var(--button-active-background)" in active_body:
-            mechanic = "token-swap"
-        elif "filter: brightness(" in active_body:
-            mechanic = "glass-brightness"
-        elif re.search(r"\bopacity:\s*0\.4\b", active_body):
-            mechanic = "opacity-dim"
-        else:
-            mechanic = None
-        if "outline: 3px" in focus_body and "60%" in focus_body:
-            focus_recipe = "capsule-halo"
-        elif "outline: 2px" in focus_body and "outline-offset: -2px" in focus_body:
-            focus_recipe = "square-2px-ring"
-        elif "outline: 4px" in focus_body and "50%" in focus_body:
-            focus_recipe = "rounded-system-ring"
-        else:
-            focus_recipe = None
-        anatomy = ("label-left-icon-right"
-                   if justify and justify.group(1) == "space-between" and "display: block" in icon_body
-                   else ("centered-capsule"
-                         if justify and justify.group(1) == "center" and "display: none" in icon_body
-                         else None))
-        profiles[profile] = {
-            "height_px": int(height.group(1)) if height else None,
-            "radius_px": int(radius.group(1)) if radius else None,
-            "anatomy": anatomy,
-            "state_mechanic": mechanic,
-            "focus_recipe": focus_recipe,
-            "hover_nonempty": bool(hover_body),
-            "active_nonempty": bool(active_body),
-            "focus_nonempty": bool(focus_body),
-            "state_css": {
-                "hover": declaration_map(hover_body),
-                "active": declaration_map(active_body),
-                "focus-visible": declaration_map(focus_body),
-                "selected": declaration_map(selected_body),
-                "disabled": declaration_map(disabled_body),
-            },
-        }
-        button = loader.load(profile)["components"]["button"]
-        expected_profiles[profile] = {
-            "height_px": button["height_px"],
-            "radius_px": button["radius_px"],
-            "anatomy": button["anatomy"],
-            "state_mechanic": button["state_mechanic"],
-            "focus_recipe": button["focus_recipe"],
-            "hover_nonempty": True,
-            "active_nonempty": True,
-            "focus_nonempty": True,
-            "state_css": button["switcher_css"],
-        }
+    option_tags = re.findall(r'<button\b[^>]*class="theme-option"[^>]*>', html)
+    base = re.search(r"\.theme-option\s*\{([^}]*)\}", css)
+    mobile = re.search(r"@media\s*\(max-width:\s*480px\)\s*\{(.*?)\}\s*\}", css, re.S)
+    base_height = re.search(r"min-height:\s*(\d+)px", base.group(1)) if base else None
+    mobile_height = re.search(r"\.theme-option\s*\{[^}]*min-height:\s*(\d+)px", mobile.group(1)) if mobile else None
     return {
         "html_profiles": html_profiles,
-        "css_profiles": css_profiles,
-        "button_count": html.count('class="theme-option"'),
-        "pressed_count": len(re.findall(r'class="theme-option"[^>]*aria-pressed="true"', html)),
-        "profiles": profiles,
-        "expected_profiles": expected_profiles,
-        "has_rest": re.search(r"\.theme-option\s*\{", css) is not None,
+        "expected_profiles": tuple(dt.ACTIVE_THEME_NAMES),
+        "selector_count": len(re.findall(
+            r'<(?:div|fieldset)\b[^>]*\bdata-theme-selector="site"[^>]*>', html
+        )),
+        "has_radiogroup": 'role="radiogroup"' in html,
+        "radio_count": sum('role="radio"' in tag for tag in option_tags),
+        "button_count": len(option_tags),
+        "checked_count": sum('aria-checked="true"' in tag for tag in option_tags),
+        "tabstop_count": sum('tabindex="0"' in tag for tag in option_tags),
+        "peer_tabindex_count": sum('tabindex="-1"' in tag for tag in option_tags),
+        "labels_nonempty": all(re.search(r">[^<]+</button>", html[html.find(tag):]) for tag in option_tags),
         "icon_count": html.count('class="theme-option-icon"'),
-        "has_pressed": '.theme-option[aria-pressed="true"]' in css,
-        "has_disabled": ".theme-option:disabled" in css,
+        "equal_grid": "grid-template-columns: repeat(3, minmax(0, 1fr))" in css,
+        "has_checked_style": '.theme-option[aria-checked="true"]' in css,
+        "has_focus_visible": ".theme-option:focus-visible" in css,
+        "desktop_height_px": int(base_height.group(1)) if base_height else None,
+        "mobile_height_px": int(mobile_height.group(1)) if mobile_height else None,
     }

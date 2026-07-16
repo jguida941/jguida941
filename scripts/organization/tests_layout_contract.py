@@ -39,7 +39,10 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_design_contract.py",
             "test_design_distinctness.py",
             "test_design_profiles_schema.py",
+            "test_doc_authority.py",
             "test_dashboard_surface.py",
+            "test_dashboard_visual_authority.py",
+            "test_page_archetype.py",
             "test_dom_cover.py",
             "test_glass_preserved.py",
             "test_icon_system.py",
@@ -48,8 +51,14 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_page_manifest.py",
             "test_design_motion.py",
             "test_design_nav.py",
+            "test_official_source_parity.py",
+            "test_rendered_fact_adversarial.py",
+            "test_rendered_fact_density_adversarial.py",
+            "test_rendered_fact_paint_adversarial.py",
+            "test_rendered_facts.py",
             "test_public_data_privacy.py",
             "test_readme_projection.py",
+            "test_reference_pack.py",
             "test_scripts_layout_contract.py",
             "test_settings_composition.py",
             "test_showcase_coverage.py",
@@ -64,6 +73,9 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_typography_restraint.py",
             "test_visual_receipt_provenance.py",
             "test_web_dashboard.py",
+            "test_reference_capture.py",
+            "test_reference_lane_contracts.py",
+            "test_reference_probe_generic.py",
         ),
     ),
     TestGroup(
@@ -172,6 +184,14 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     "design_profiles": (
         "test_design_profiles_schema.py",  # P5-PROFILE-SPINE: design profiles are DATA w/ a closed aspect cover
     ),
+    "organization": (
+        "test_doc_authority.py",        # T0: one plan-of-record + lifecycled/capped plan docs (fail-closed)
+    ),
+    "reference_intake": (
+        "test_reference_lane_contracts.py",   # W6-K: reference-capture lane record contracts (w3c-0 §8, R1-R8) + 31-id vocabulary
+        "test_reference_probe_generic.py",    # W6-P: generic foreign-DOM rendered-facts probe — computed CSS + DOM + reachable states
+        "test_reference_capture.py",          # W6-C: capture pipeline (acquire/localize/freeze/serve) + URL security boundary + BACKUP-BEFORE-TRANSFORM
+    ),
     "webkit": (
         "test_design_button.py",        # P5-WEBKIT-BUTTON: profile-driven rendered components (anatomy hook)
         "test_design_card.py",          # P5-COMPONENTS-GROW: the CARD grouped-metric PATTERN (single-container, chrome-less rows)
@@ -197,9 +217,21 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
         "test_dom_cover.py",             # W2: exact emitter-owned static DOM cover + ratcheting index debt
         "test_design_nav.py",           # P5-BOARD B-1b: the governed nav component — per-language anatomy, every page connected
         "test_design_motion.py",        # P5-BOARD B-1: motion is DATA — cited duration/easing tokens, band law, token-only page motion
+        "test_rendered_fact_adversarial.py",  # W4: negative controls for selector, geometry, and visible-content proof
+        "test_rendered_fact_density_adversarial.py",  # W4: negative controls for content-density paint and clipping
+        "test_rendered_fact_paint_adversarial.py",  # W4: negative controls for paint containment and contrast
+        "test_rendered_facts.py",       # W4: post-hydration computed-style facts + rendered predicate dispatch
         "test_page_manifest.py",        # D-SHELL-2: every page declares intent + archetype + required regions (fail-closed, committed-bytes primary)
+        "test_page_archetype.py",       # 2026-07-14 correction: per-language page composition DATA + anti-reskin structure
         "test_page_shell.py",           # P5-CHROME: the switchable governed page-shell — the site's own chrome is a rendered instance of a language (token-only + provenance + conform)
         "test_theme_continuity.py",      # W1: one persisted choice controls tokens + governed chrome anatomy on every page
+    ),
+    "reference_evidence": (
+        "test_dashboard_visual_authority.py",  # W3 correction: visible dashboard choices require named authority
+        "test_reference_pack.py",              # W3 correction: operator-approved evidence is frozen and hash-bound
+    ),
+    "official_source_evidence": (
+        "test_official_source_parity.py",  # Mode A: profile literals equal pinned official code
     ),
     "cross_projection": (
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y

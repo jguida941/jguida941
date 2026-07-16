@@ -209,9 +209,10 @@ def render_studio() -> str:
             f'{"".join(rows)}</div>'
             f'<div class="variants" data-dom-owner="page.studio">{"".join(variants)}</div></section>')
 
-    from scripts.rendering.pageshell.pageshell import (render_page_shell,
+    from scripts.rendering.pageshell.pageshell import (document_root_css, render_page_shell,
                                                        theme_continuity_script_tag)
     from scripts.rendering.webkit.components import render_switchable_nav
+    from scripts.rendering.webkit import theme_selector
 
     # The switcher + stages + the (verdict-free) scripts are the page's structured content; the radios ride
     # in as the shell root's FIRST children so their `:checked ~` sibling selectors keep reaching them.
@@ -225,12 +226,13 @@ def render_studio() -> str:
     _nav_links = [("home", "index.html"), ("showcase", "showcase.html"),
                   ("studio", "studio.html"), ("settings", "settings.html")]
     nav_html, nav_css = render_switchable_nav(HOUSE, _nav_links, active="studio.html")
+    selector_html, selector_css = theme_selector.render_theme_selector(HOUSE)
     shell_html, shell_style = render_page_shell(
         HOUSE,
         title="Design-language studio",
         intro=_INTRO,
         breadcrumbs=[("home", "index.html"), ("showcase", "showcase.html"), ("settings", "settings.html")],
-        prefix_html="".join(radios) + nav_html,
+        prefix_html="".join(radios) + nav_html + selector_html,
         body_html=body_html,
     )
     return (
@@ -239,8 +241,7 @@ def render_studio() -> str:
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
         f"{theme_continuity_script_tag()}\n"
         "<title>Design-language studio</title>\n"
-        f"<style>* {{ box-sizing: border-box; }}\n"
-        f"html, body {{ height: 100%; margin: 0; }}\n{shell_style}\n{nav_css}\n{_CONTENT_CSS}\n"
+        f"<style>{document_root_css()}\n{shell_style}\n{nav_css}\n{selector_css}\n{_CONTENT_CSS}\n"
         # the switch MECHANISM (pure-CSS reveal + active-tab) and the pre-rendered specimen archetypes,
         # in the specimens' own languages — NOT the scanned page chrome
         + "\n".join(switch_css) + "\n" + "\n".join(arch_css) + "</style>\n"

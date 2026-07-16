@@ -367,7 +367,11 @@ def _script() -> str:
 
 def render_dashboard(default_theme: str = DEFAULT_THEME) -> str:
     from scripts.rendering import design_tokens
-    from scripts.rendering.pageshell.pageshell import render_page_shell, theme_continuity_script_tag
+    from scripts.rendering.pageshell.pageshell import (
+        document_root_css,
+        render_page_shell,
+        theme_continuity_script_tag,
+    )
     from scripts.rendering.webkit.dashboard import load_dashboard_contract, render_dashboard_surface
 
     if default_theme not in design_tokens.ACTIVE_THEME_NAMES:
@@ -376,12 +380,11 @@ def render_dashboard(default_theme: str = DEFAULT_THEME) -> str:
     surface_html, surface_css = render_dashboard_surface(default_theme)
     shell_html, shell_css = render_page_shell(
         default_theme,
-        title=contract["copy"]["hero_title"],
-        intro=contract["copy"]["hero_intro"],
-        breadcrumbs=[(contract["copy"]["breadcrumb_home"], "index.html")],
+        title="",
+        intro="",
+        breadcrumbs=[],
         body_html=surface_html,
-        title_id="hero-name",
-        intro_id="hero-tag",
+        orientation_mode="delegated",
     )
     script = (_script().replace("__DATA_URL__", DATA_URL)
               .replace("__LANG_COLORS__", _lang_colors_json())
@@ -396,6 +399,7 @@ def render_dashboard(default_theme: str = DEFAULT_THEME) -> str:
 <title>{document['title']}</title>
 <meta name="description" content="{document['description']}">
 <style>
+{document_root_css()}
 {shell_css}
 {surface_css}
 </style>

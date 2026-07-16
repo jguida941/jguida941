@@ -1,0 +1,48 @@
+{
+  "contract_id": "DesignSourceClauseCatalog",
+  "schema_version": 1,
+  "clauses": [
+    {
+      "clause_id": "CB-SPEC-BUTTON-1",
+      "claim": "Carbon button anatomy is a flat, label-led official component composition.",
+      "authority": "official-docs",
+      "source_mode": "official-spec",
+      "exactness": "specification-exact",
+      "sources": [{"source_kind": "official-doc", "ref": "https://carbondesignsystem.com/components/button/usage/"}],
+      "scope": {
+        "profiles": ["carbon"],
+        "aspects": ["component-button"],
+        "invariant_ids": ["cb-btn-anatomy", "cb-btn-flat"]
+      }
+    },
+    {
+      "clause_id": "CB-SPEC-TAG-1",
+      "claim": "Carbon tags use the official compact label anatomy and sentence-case content.",
+      "authority": "official-docs",
+      "source_mode": "official-spec",
+      "exactness": "specification-exact",
+      "sources": [{"source_kind": "official-doc", "ref": "https://carbondesignsystem.com/components/tag/usage/"}],
+      "scope": {
+        "profiles": ["carbon"],
+        "aspects": ["component-chip"],
+        "invariant_ids": ["cb-chip-anatomy", "cb-chip-flat", "cb-chip-case"]
+      }
+    },
+    {
+      "clause_id": "CB-SPEC-TILE-LIST-1",
+      "claim": "Carbon tiles stay flat and structured data remains one grouped row container with inline values.",
+      "authority": "official-docs",
+      "source_mode": "official-spec",
+      "exactness": "specification-exact",
+      "sources": [
+        {"source_kind": "official-doc", "ref": "https://carbondesignsystem.com/components/tile/usage/"},
+        {"source_kind": "official-doc", "ref": "https://carbondesignsystem.com/components/structured-list/usage/"}
+      ],
+      "scope": {
+        "profiles": ["carbon"],
+        "aspects": ["component-card"],
+        "invariant_ids": ["cb-card-container", "cb-card-rows", "cb-card-inline", "cb-card-flat"]
+      }
+    }
+  ]
+}

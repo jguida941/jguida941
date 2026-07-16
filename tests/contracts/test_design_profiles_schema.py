@@ -80,6 +80,14 @@ class DesignProfileSpineContract(unittest.TestCase):
             self.assertTrue(prof.get("derived_from") is not None or prof.get("derived_from") is None)  # field present
             self.assertIn("derived_from", prof, f"{name}: must declare derived_from (\"config\"|null)")
             self.assertTrue(prof.get("doctrine_doc"), f"{name}: must cite a doctrine_doc")
+            for invariant in prof["invariants"]:
+                if (invariant.get("emission_status") == "emitted"
+                        and invariant.get("determinism") == "deterministic"):
+                    self.assertIn(
+                        invariant.get("fact_source"), ("static", "rendered"),
+                        f"{name}/{invariant.get('invariant_id')}: emitted deterministic "
+                        "invariants must close fact_source as static|rendered",
+                    )
             covered = set(prof["aspect_coverage"].keys())
             self.assertEqual(covered, set(self.roster_ids),
                              f"{name}: aspect_coverage must cover EXACTLY the roster aspects "

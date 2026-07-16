@@ -24,6 +24,7 @@
         "type_ramp_tiered": true,
         "uses_backdrop_var": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-page-backdrop",
       "law": "the page chrome paints the language backdrop token",
       "profile": "liquid-glass",
@@ -50,6 +51,7 @@
         "type_ramp_tiered": true,
         "uses_backdrop_var": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-page-closed",
       "law": "chrome CSS is a closed simple structure (one root rule, no @-rules/attribute/pseudo)",
       "profile": "liquid-glass",
@@ -76,6 +78,7 @@
         "type_ramp_tiered": true,
         "uses_backdrop_var": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-page-tokenonly",
       "law": "host-chrome CSS references tokens only (no raw hex/px)",
       "profile": "liquid-glass",
@@ -102,6 +105,7 @@
         "type_ramp_tiered": true,
         "uses_backdrop_var": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-page-orient",
       "law": "the page carries a title + breadcrumb orientation",
       "profile": "liquid-glass",
@@ -128,6 +132,7 @@
         "type_ramp_tiered": true,
         "uses_backdrop_var": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-layout-column",
       "law": "all content sits in one centered page column (no full-bleed sprawl)",
       "profile": "liquid-glass",
@@ -154,6 +159,7 @@
         "type_ramp_tiered": true,
         "uses_backdrop_var": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-type-tiered",
       "law": "the shell type ramp carries a heading tier (title > h2 > body)",
       "profile": "liquid-glass",
@@ -180,6 +186,7 @@
         "type_ramp_tiered": true,
         "uses_backdrop_var": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-rhythm-density",
       "law": "panel padding follows the language's cited density band",
       "profile": "liquid-glass",
@@ -206,6 +213,7 @@
         "type_ramp_tiered": true,
         "uses_backdrop_var": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-grouping-depth",
       "law": "the shell composes one chrome level (no chromed box inside a chromed box)",
       "profile": "liquid-glass",
@@ -222,6 +230,7 @@
         "motion_in_band": true,
         "motion_vars_provenance": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-motion-band",
       "law": "motion tokens trace to the cited per-language block and sit in the 70-700ms band",
       "profile": "liquid-glass",
@@ -240,6 +249,7 @@
         "nav_links_all": true,
         "nav_token_only": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-nav-anatomy",
       "law": "the site nav band links every surface with a marked active page, token-only",
       "profile": "liquid-glass",
@@ -260,6 +270,7 @@
         "radius_px": 999,
         "state_mechanic": "glass-brightness"
       },
+      "fact_source": "static",
       "invariant_id": "lg-btn-radius",
       "law": "liquid-glass button is a 999px capsule",
       "profile": "liquid-glass",
@@ -280,6 +291,7 @@
         "radius_px": 999,
         "state_mechanic": "glass-brightness"
       },
+      "fact_source": "static",
       "invariant_id": "lg-btn-material",
       "law": "frosted-glass material on the button",
       "profile": "liquid-glass",
@@ -300,6 +312,7 @@
         "radius_px": 999,
         "state_mechanic": "glass-brightness"
       },
+      "fact_source": "static",
       "invariant_id": "lg-btn-mechanic",
       "law": "glass-brightness press (brightness UP)",
       "profile": "liquid-glass",
@@ -318,6 +331,7 @@
         "receipt_kind": "rendered-css-contrast-probe",
         "receipt_status": "present"
       },
+      "fact_source": null,
       "invariant_id": "lg-btn-contrast",
       "law": "button label contrast >= WCAG AA on the actual glass surface",
       "profile": "liquid-glass",
@@ -347,6 +361,7 @@
         "state_mechanic": "glass-brightness",
         "typography_case": "sentence"
       },
+      "fact_source": "static",
       "invariant_id": "lg-chip-radius",
       "law": "liquid-glass chip is a capsule pill (radius 999)",
       "profile": "liquid-glass",
@@ -368,6 +383,7 @@
         "state_mechanic": "glass-brightness",
         "typography_case": "sentence"
       },
+      "fact_source": "static",
       "invariant_id": "lg-chip-material",
       "law": "frosted-glass material on the chip",
       "profile": "liquid-glass",
@@ -389,6 +405,7 @@
         "state_mechanic": "glass-brightness",
         "typography_case": "sentence"
       },
+      "fact_source": "static",
       "invariant_id": "lg-chip-mechanic",
       "law": "glass-brightness press (illuminate-from-within)",
       "profile": "liquid-glass",
@@ -410,6 +427,7 @@
         "state_mechanic": "glass-brightness",
         "typography_case": "sentence"
       },
+      "fact_source": "static",
       "invariant_id": "lg-chip-focus",
       "law": "capsule halo focus",
       "profile": "liquid-glass",
@@ -431,6 +449,7 @@
         "state_mechanic": "glass-brightness",
         "typography_case": "sentence"
       },
+      "fact_source": "static",
       "invariant_id": "lg-chip-case",
       "law": "sentence case (never ALL-CAPS)",
       "profile": "liquid-glass",
@@ -449,6 +468,7 @@
         "receipt_kind": "rendered-css-contrast-probe",
         "receipt_status": "present"
       },
+      "fact_source": null,
       "invariant_id": "lg-chip-contrast",
       "law": "chip label contrast on the actual glass surface",
       "profile": "liquid-glass",
@@ -479,6 +499,7 @@
         "rows_chromeless": true,
         "rows_horizontal": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-card-container",
       "law": "ONE container; rows carry no independent chrome (anti grid-of-tiles)",
       "profile": "liquid-glass",
@@ -501,6 +522,7 @@
         "rows_chromeless": true,
         "rows_horizontal": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-card-rows",
       "law": "groups >=2 metrics as rows (not one box per stat)",
       "profile": "liquid-glass",
@@ -523,6 +545,7 @@
         "rows_chromeless": true,
         "rows_horizontal": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-card-divider",
       "law": "adjacent rows divided by a 1px hairline",
       "profile": "liquid-glass",
@@ -545,6 +568,7 @@
         "rows_chromeless": true,
         "rows_horizontal": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-card-inline",
       "law": "row axis is horizontal label+value (not stacked column)",
       "profile": "liquid-glass",
@@ -567,6 +591,7 @@
         "rows_chromeless": true,
         "rows_horizontal": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-card-material",
       "law": "frosted-glass container",
       "profile": "liquid-glass",
@@ -589,6 +614,7 @@
         "rows_chromeless": true,
         "rows_horizontal": true
       },
+      "fact_source": "static",
       "invariant_id": "lg-card-rounded",
       "law": "rounded inset container (radius 14)",
       "profile": "liquid-glass",
@@ -607,6 +633,7 @@
         "receipt_kind": "token-derived-reconstruction",
         "receipt_status": "present"
       },
+      "fact_source": null,
       "invariant_id": "lg-card-fills",
       "law": "content fills the card (no giant dead space)",
       "profile": "liquid-glass",
@@ -619,6 +646,126 @@
       "receipt_status": "present",
       "refute_by": "a token-derived card reconstruction shows the grouped card has large dead space or one-box-per-stat chrome",
       "status": "candidate"
+    },
+    {
+      "aspect": "color-roles",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'color-roles' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/pageshell.md#d-w4-rendered-facts",
+      "evidence": {
+        "fact_source": "rendered",
+        "matrix_cells": 8,
+        "pages": [
+          "index",
+          "settings",
+          "showcase",
+          "studio"
+        ],
+        "predicate_class": "rendered_contrast",
+        "state_observations": 44,
+        "subject_observations": 88,
+        "viewports": [
+          390,
+          1280
+        ]
+      },
+      "fact_source": "rendered",
+      "invariant_id": "lg-rendered-contrast",
+      "law": "opaque shell title and intro meet their sourced WCAG contrast thresholds",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "touch-target",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'touch-target' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/pageshell.md#d-w4-rendered-facts",
+      "evidence": {
+        "fact_source": "rendered",
+        "matrix_cells": 8,
+        "pages": [
+          "index",
+          "settings",
+          "showcase",
+          "studio"
+        ],
+        "predicate_class": "rendered_touch_targets",
+        "state_observations": 44,
+        "subject_observations": 4430,
+        "viewports": [
+          390,
+          1280
+        ]
+      },
+      "fact_source": "rendered",
+      "invariant_id": "lg-rendered-touch",
+      "law": "every applicable visible interactive target meets WCAG 2.5.8 or an exact observed exception",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "responsive",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'responsive' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/pageshell.md#d-w4-rendered-facts",
+      "evidence": {
+        "fact_source": "rendered",
+        "matrix_cells": 8,
+        "pages": [
+          "index",
+          "settings",
+          "showcase",
+          "studio"
+        ],
+        "predicate_class": "rendered_responsive",
+        "state_observations": 44,
+        "subject_observations": 0,
+        "viewports": [
+          390,
+          1280
+        ]
+      },
+      "fact_source": "rendered",
+      "invariant_id": "lg-rendered-responsive",
+      "law": "all visible rendered content is horizontally contained at 390px except exact governed scroll regions",
+      "profile": "liquid-glass",
+      "status": "pass"
+    },
+    {
+      "aspect": "page-content-density",
+      "authority_status": "candidate_only",
+      "cannot_mark_done": true,
+      "claim": "satisfies 'page-content-density' of the liquid-glass profile v1 \u2014 receipt",
+      "determinism": "deterministic",
+      "doc_cite": "docs/design/pageshell.md#d-w4-rendered-facts",
+      "evidence": {
+        "fact_source": "rendered",
+        "matrix_cells": 8,
+        "pages": [
+          "index",
+          "settings",
+          "showcase",
+          "studio"
+        ],
+        "predicate_class": "rendered_content_density",
+        "state_observations": 44,
+        "subject_observations": 146,
+        "viewports": [
+          390,
+          1280
+        ]
+      },
+      "fact_source": "rendered",
+      "invariant_id": "lg-rendered-density",
+      "law": "governed page interiors use the ratified token budget without unexplained vertical reservation",
+      "profile": "liquid-glass",
+      "status": "pass"
     }
   ]
 }

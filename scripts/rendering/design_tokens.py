@@ -217,6 +217,43 @@ def css_declarations(name: str) -> dict[str, str]:
     r = resolved["radius"]
     d = density(name)
     declarations: dict[str, str] = {f"--{role}": roles_map[role] for role in ROLES}
+    contextual = resolved.get("contextual", {})
+    if name == "carbon":
+        declarations.update({
+            "--layer-01": contextual["layer-01"],
+            "--layer-02": contextual["layer-02"],
+            "--section-edge": "transparent",
+            "--group-edge": contextual["border-subtle-02"],
+            "--row-divider": contextual["border-subtle-02"],
+            "--focus": contextual["focus"],
+            "--focus-inset": contextual["focus-inset"],
+            "--selector-edge": contextual["border-subtle-02"],
+            "--selector-background": contextual["layer-01"],
+            "--selector-hover": contextual["layer-hover-01"],
+            "--selector-selected": contextual["layer-selected-01"],
+            "--selector-filter": "none",
+            "--panel-background": contextual["layer-01"],
+            "--panel-border": "0",
+            "--panel-shadow": "none",
+        })
+    else:
+        declarations.update({
+            "--layer-01": roles_map["surface"],
+            "--layer-02": roles_map["surface-raised"],
+            "--section-edge": "color-mix(in srgb, var(--hairline) 16%, transparent)",
+            "--group-edge": "color-mix(in srgb, var(--hairline) 12%, transparent)",
+            "--row-divider": "color-mix(in srgb, var(--hairline) 9%, transparent)",
+            "--focus": roles_map["accent"],
+            "--focus-inset": roles_map["backdrop"],
+            "--selector-edge": "color-mix(in srgb, var(--hairline) 14%, transparent)",
+            "--selector-background": "color-mix(in srgb, var(--surface-raised) 86%, transparent)",
+            "--selector-hover": "color-mix(in srgb, var(--ink) 8%, transparent)",
+            "--selector-selected": "color-mix(in srgb, var(--accent) 24%, var(--surface-raised))",
+            "--selector-filter": "blur(var(--glass-blur)) saturate(var(--glass-saturate))",
+            "--panel-background": roles_map["surface"],
+            "--panel-border": "1px solid var(--section-edge)",
+            "--panel-shadow": "none",
+        })
     declarations.update({
         "--glass-blur": f"{mat['blur']:g}px",
         "--glass-saturate": f"{mat['saturate']:g}%",

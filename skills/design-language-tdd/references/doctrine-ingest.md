@@ -14,7 +14,7 @@ must be small enough to become a field, predicate, negative case, or receipt obl
 
 Required row shape:
 
-```yaml
+```yaml a
 - claim_id: <lang>-<component-or-axis>-NN
   source: <official URL or local cite>
   doctrine_claim: <one precise design rule>

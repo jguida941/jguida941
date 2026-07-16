@@ -1,0 +1,209 @@
+{
+  "contract_id": "DashboardApprovedReferencePack",
+  "schema_version": 1,
+  "authority_status": "operator-approved-reference",
+  "cannot_mark_done": false,
+  "capture_status": "frozen",
+  "approval": {
+    "clause_id": "R-W3-VIS-REF-1",
+    "approved_at": "2026-07-14",
+    "evidence_ref": "docs/plans/handoff/w3-visual-regression-correction.md#authority-split",
+    "scope": "dashboard composition aspects not superseded by official doctrine"
+  },
+  "frozen_source": {
+    "revision_label": "pre-W3 382ca96b",
+    "source_artifact": "assets/receipts/reference-packs/dashboard-pre-w3/source.html.gz",
+    "source_sha256": "05b5a6d12cc3cd6aa5629803f03c54c433baa27ff61f1a7721f4629f70eba2bf",
+    "renderer_source_sha256": "1d3fb07ee95313c5f75f867713678ef88faae21bc50e9e9e494c3a6a2fa710d9",
+    "fixture": "tests/fixtures/dashboard_reference.json"
+  },
+  "matrix": {
+    "themes": [
+      "liquid-glass",
+      "carbon",
+      "apple-dark"
+    ],
+    "viewports": [
+      {
+        "width": 1280,
+        "height": 1800
+      },
+      {
+        "width": 390,
+        "height": 844
+      }
+    ],
+    "states": [
+      "default"
+    ]
+  },
+  "aspect_ownership": {
+    "orientation": {
+      "source_mode": "measured-reference",
+      "exactness": "measurement-exact"
+    },
+    "page-gutter": {
+      "source_mode": "measured-reference",
+      "exactness": "measurement-exact",
+      "desktop_inline_px": 20,
+      "phone_inline_px": 12
+    },
+    "liquid-content-edge": {
+      "source_mode": "measured-reference",
+      "exactness": "measurement-exact",
+      "mix_percent": 16
+    },
+    "apple-content-edge": {
+      "source_mode": "measured-reference",
+      "exactness": "measurement-exact",
+      "mix_percent": 16
+    },
+    "selector-edge": {
+      "source_mode": "measured-reference",
+      "exactness": "measurement-exact",
+      "mix_percent": 14
+    },
+    "group-edge": {
+      "source_mode": "measured-reference",
+      "exactness": "measurement-exact",
+      "mix_percent": 12
+    },
+    "row-divider": {
+      "source_mode": "measured-reference",
+      "exactness": "measurement-exact",
+      "mix_percent": 9
+    }
+  },
+  "official_precedence_exclusions": [
+    {
+      "aspect": "liquid-content-material",
+      "reason": "Apple HIG Materials forbids Liquid Glass in the content layer"
+    },
+    {
+      "aspect": "carbon-content-layering",
+      "reason": "official Carbon White layer and Tile rules supersede the old theme-independent panel recipe"
+    }
+  ],
+  "captures": [
+    {
+      "theme": "apple-dark",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "state": "default",
+      "screenshot": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/apple-dark-390.png",
+        "sha256": "7b5828b58736b96ac1ce4c9923990761f3aef5d94b73bbe68c18e3204a9e6fc5"
+      },
+      "facts": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/apple-dark-390.facts.json",
+        "sha256": "ca1de5865aa5043f5fb06c141f5e6b6af35d8b14ea20931d3f10cb8ec1d3604d"
+      },
+      "provenance": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/apple-dark-390.provenance.json",
+        "sha256": "a4eb6cf5f378671e2df869273611e446c15378b8fd62eb0d61efc8fe9d2c1064"
+      }
+    },
+    {
+      "theme": "apple-dark",
+      "viewport": {
+        "width": 1280,
+        "height": 1800
+      },
+      "state": "default",
+      "screenshot": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/apple-dark-1280.png",
+        "sha256": "cde7ff64c50df9edd25800fb66d66c77acfd737d3de9be46343fc29bac263f11"
+      },
+      "facts": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/apple-dark-1280.facts.json",
+        "sha256": "b31bc0a9616d98e26a3893a1d50ce836ea350ac8c29f0248484364c089d6e63a"
+      },
+      "provenance": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/apple-dark-1280.provenance.json",
+        "sha256": "df258359ae754b3845873c9114c54b945e2e5430d4e040520d552abe70fcdae4"
+      }
+    },
+    {
+      "theme": "carbon",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "state": "default",
+      "screenshot": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/carbon-390.png",
+        "sha256": "9a291cf8266f8460061d46d07dc17f011fbe3280c598f83d6148746fcaa1e6e0"
+      },
+      "facts": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/carbon-390.facts.json",
+        "sha256": "306cd18ded2b701996d31acbc00c8453d34fc798d96319bc0d225af9beda21ec"
+      },
+      "provenance": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/carbon-390.provenance.json",
+        "sha256": "0551480bc8b267e0d238a8dc57fa0b51005c7cabfa4558ade36709ddff159b49"
+      }
+    },
+    {
+      "theme": "carbon",
+      "viewport": {
+        "width": 1280,
+        "height": 1800
+      },
+      "state": "default",
+      "screenshot": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/carbon-1280.png",
+        "sha256": "f8dbe43ae931c426efba2e1f89d233e3b08c4c71ae156b1f3a298d6abcf8c384"
+      },
+      "facts": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/carbon-1280.facts.json",
+        "sha256": "a0b76d2b38e9ebc6971d86bed9299ee6cbb25f2d207fc7f6ab8574ab1216cdf7"
+      },
+      "provenance": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/carbon-1280.provenance.json",
+        "sha256": "1c3955494f38294c1c6db8e4ea7396323f0ec6458aa09ab7b7f6da0bb2a1c673"
+      }
+    },
+    {
+      "theme": "liquid-glass",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "state": "default",
+      "screenshot": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/liquid-glass-390.png",
+        "sha256": "54e194d05e66aa2aa8b7025f8a96f8987948f7ac04c4bf3c5374f8bfa85f57b9"
+      },
+      "facts": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/liquid-glass-390.facts.json",
+        "sha256": "4e64fca11c46aee78464f27f50a667464b43547047ae25a16cb7e3373082bba5"
+      },
+      "provenance": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/liquid-glass-390.provenance.json",
+        "sha256": "2fd472cfa68201797a3a266cd3f550e3e97d75445e3562ecfe31a1c534e92f16"
+      }
+    },
+    {
+      "theme": "liquid-glass",
+      "viewport": {
+        "width": 1280,
+        "height": 1800
+      },
+      "state": "default",
+      "screenshot": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/liquid-glass-1280.png",
+        "sha256": "95a5a997d653b70cb6798d678c3329bb23b962c3550b1095158d1826abf3257f"
+      },
+      "facts": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/liquid-glass-1280.facts.json",
+        "sha256": "b13cf17f8944b4b8b18015c12f5677cafe6faec061f3c0ff710464bc80998c06"
+      },
+      "provenance": {
+        "path": "assets/receipts/reference-packs/dashboard-pre-w3/liquid-glass-1280.provenance.json",
+        "sha256": "87b5ca134643ec61d7bbce99d1aaad37a6a0a87e5a5737a58f437ac258927607"
+      }
+    }
+  ]
+}

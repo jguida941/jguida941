@@ -63,7 +63,9 @@ class ThemeBootstrapContract(unittest.TestCase):
         self.assertIn(json.dumps(list(ACTIVE), separators=(",", ":")), bootstrap)
         self.assertIn(json.dumps(design_tokens.THEME_STORAGE_KEY), bootstrap)
         for behavior in ("URLSearchParams", "localStorage.getItem", "localStorage.setItem",
-                         "dataset.theme", "data-theme-set", "aria-pressed",
+                         "dataset.theme", "data-theme-set", "aria-checked", "ArrowLeft",
+                         "ArrowRight", "ArrowUp", "ArrowDown", 'event.key === "Home"',
+                         'event.key === "End"', "target.focus()",
                          "data-theme-propagate", 'searchParams.set("theme", name)'):
             self.assertIn(behavior, bootstrap, f"shared bootstrap owns {behavior}")
 
@@ -209,10 +211,7 @@ class ThemeContinuityReceiptContract(unittest.TestCase):
                                              _css_rgb(colors["accent"]))
                             self.assertEqual(data["nav"]["foreground_color"],
                                              _css_rgb(colors["backdrop"]))
-                        if page == "index":
-                            self.assertEqual(data["pressed_themes"], [theme])
-                        else:
-                            self.assertEqual(data["pressed_themes"], [])
+                        self.assertEqual(data["selected_themes"], [theme])
                         if viewport == 390:
                             self.assertIs(data["horizontal_overflow"], False,
                                           f"{page}/{theme}: selected theme overflows at 390")
@@ -253,42 +252,42 @@ class ThemeContinuityReceiptContract(unittest.TestCase):
                            "url_theme": "carbon", "click_theme": None,
                            "deny_storage": False, "follow_page": None, "follow_via": None},
                 "observed_theme": "carbon", "storage_value": "carbon",
-                "pressed_themes": ["carbon"], "link_theme": "carbon",
+                "selected_themes": ["carbon"], "link_theme": "carbon",
             },
             "invalid-url-falls-to-storage": {
                 "inputs": {"start_page": "index", "storage": "carbon",
                            "url_theme": "not-active", "click_theme": None,
                            "deny_storage": False, "follow_page": None, "follow_via": None},
                 "observed_theme": "carbon", "storage_value": "carbon",
-                "pressed_themes": ["carbon"], "link_theme": "carbon",
+                "selected_themes": ["carbon"], "link_theme": "carbon",
             },
             "invalid-storage-falls-to-house": {
                 "inputs": {"start_page": "index", "storage": "not-active",
                            "url_theme": None, "click_theme": None,
                            "deny_storage": False, "follow_page": None, "follow_via": None},
                 "observed_theme": "liquid-glass", "storage_value": "not-active",
-                "pressed_themes": ["liquid-glass"], "link_theme": "liquid-glass",
+                "selected_themes": ["liquid-glass"], "link_theme": "liquid-glass",
             },
             "house-fallback": {
                 "inputs": {"start_page": "index", "storage": None,
                            "url_theme": None, "click_theme": None,
                            "deny_storage": False, "follow_page": None, "follow_via": None},
                 "observed_theme": "liquid-glass", "storage_value": None,
-                "pressed_themes": ["liquid-glass"], "link_theme": "liquid-glass",
+                "selected_themes": ["liquid-glass"], "link_theme": "liquid-glass",
             },
             "button-persists": {
                 "inputs": {"start_page": "index", "storage": None,
                            "url_theme": None, "click_theme": "carbon",
                            "deny_storage": False, "follow_page": None, "follow_via": None},
                 "observed_theme": "carbon", "storage_value": "carbon",
-                "pressed_themes": ["carbon"], "link_theme": "carbon",
+                "selected_themes": ["carbon"], "link_theme": "carbon",
             },
             "storage-denied-navigation": {
                 "inputs": {"start_page": "index", "storage": None,
                            "url_theme": "carbon", "click_theme": None,
                            "deny_storage": True, "follow_page": "showcase", "follow_via": "nav"},
                 "observed_theme": "carbon", "storage_value": "__storage_error__",
-                "pressed_themes": [], "link_theme": "carbon",
+                "selected_themes": ["carbon"], "link_theme": "carbon",
             },
             "storage-denied-breadcrumb": {
                 "inputs": {"start_page": "showcase", "storage": None,
@@ -296,7 +295,7 @@ class ThemeContinuityReceiptContract(unittest.TestCase):
                            "deny_storage": True, "follow_page": "index",
                            "follow_via": "breadcrumb"},
                 "observed_theme": "carbon", "storage_value": "__storage_error__",
-                "pressed_themes": ["carbon"], "link_theme": "carbon",
+                "selected_themes": ["carbon"], "link_theme": "carbon",
             },
         }
         for scenario, want in expected.items():
@@ -310,7 +309,7 @@ class ThemeContinuityReceiptContract(unittest.TestCase):
                 final = data["final"]
                 self.assertEqual(final["observed_theme"], want["observed_theme"])
                 self.assertEqual(final["storage_value"], want["storage_value"])
-                self.assertEqual(final["pressed_themes"], want["pressed_themes"])
+                self.assertEqual(final["selected_themes"], want["selected_themes"])
                 self.assertEqual(final["propagated_link_themes"], [want["link_theme"]])
                 if scenario in ("storage-denied-navigation", "storage-denied-breadcrumb"):
                     self.assertEqual(data["initial"]["observed_theme"], "carbon")

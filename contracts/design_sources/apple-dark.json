@@ -1,0 +1,35 @@
+{
+  "contract_id": "DesignSourceClauseCatalog",
+  "schema_version": 1,
+  "clauses": [
+    {
+      "clause_id": "AP-HIG-MATERIAL-1",
+      "claim": "Apple content surfaces use standard opaque material rather than Liquid Glass.",
+      "authority": "official-docs",
+      "source_mode": "official-spec",
+      "exactness": "specification-exact",
+      "sources": [{"source_kind": "official-doc", "ref": "https://developer.apple.com/design/human-interface-guidelines/materials"}],
+      "scope": {
+        "profiles": ["apple-dark"],
+        "aspects": ["component-button", "component-card"],
+        "invariant_ids": ["ap-btn-material", "ap-card-material"]
+      }
+    },
+    {
+      "clause_id": "AP-HIG-LIST-1",
+      "claim": "Apple grouped data uses one inset container with rows and inline value placement.",
+      "authority": "official-docs",
+      "source_mode": "official-spec",
+      "exactness": "specification-exact",
+      "sources": [
+        {"source_kind": "official-doc", "ref": "https://developer.apple.com/design/human-interface-guidelines/lists-and-tables"},
+        {"source_kind": "official-doc", "ref": "https://developer.apple.com/documentation/uikit/uitableview/style-swift.enum/insetgrouped"}
+      ],
+      "scope": {
+        "profiles": ["apple-dark"],
+        "aspects": ["component-card"],
+        "invariant_ids": ["ap-card-container", "ap-card-rows", "ap-card-inline", "ap-card-rounded"]
+      }
+    }
+  ]
+}

@@ -72,6 +72,26 @@ def _declared_homes(section: dict) -> set[str]:
     return homes
 
 
+def _unknown_receipts(names: list[str], known_profiles: set[str], section: dict) -> list[str]:
+    """Classify receipt paths against the closed profile/page/reference-pack homes."""
+    page_dir = section["page_dir"]
+    pages = set(section["page_allowlist"])
+    pack_dir = section["reference_pack_dir"]
+    packs = set(section["reference_pack_allowlist"])
+    unknown: list[str] = []
+    for name in names:
+        parts = Path(name).parts
+        if parts and parts[0] == page_dir:
+            if len(parts) < 3 or parts[1] not in pages:
+                unknown.append(name)
+        elif parts and parts[0] == pack_dir:
+            if len(parts) < 3 or parts[1] not in packs:
+                unknown.append(name)
+        elif not parts or parts[0] not in known_profiles:
+            unknown.append(name)
+    return sorted(unknown)
+
+
 class StructuralLayoutContract(unittest.TestCase):
     # --- closed-cover parity: every governed file has a declared home ---
 
@@ -153,9 +173,7 @@ class StructuralLayoutContract(unittest.TestCase):
         root = REPO_ROOT / section["root"]
         idx = json.loads((REPO_ROOT / "contracts" / "design_profiles" / "_index.json").read_text(encoding="utf-8"))
         known = set(idx["active_design_profiles"]) | set(idx["reserved_design_profiles"])
-        page_dir = section["page_dir"]
-        pages = set(section["page_allowlist"])
-        undeclared: list[str] = []
+        actual: list[str] = []
         # pathlib does NOT brace-expand, so `**/*.{json,png}` would silently match NOTHING — iterate
         # an explicit `globs` list (JSON receipts + PNG reconstructions) so both are governed.
         globs = section.get("globs") or [section["glob"]]
@@ -164,41 +182,33 @@ class StructuralLayoutContract(unittest.TestCase):
                 for path in root.glob(glob):
                     if not path.is_file():
                         continue
-                    parts = path.relative_to(root).parts
-                    if parts and parts[0] == page_dir:
-                        if len(parts) < 3 or parts[1] not in pages:
-                            undeclared.append(path.relative_to(root).as_posix())
-                    elif not parts or parts[0] not in known:
-                        undeclared.append(path.relative_to(root).as_posix())
-        self.assertEqual([], sorted(undeclared),
-                         "receipt under an unknown profile/page dir — declare the profile or page receipt home")
+                    actual.append(path.relative_to(root).as_posix())
+        self.assertEqual([], _unknown_receipts(actual, known, section),
+                         "receipt under an unknown profile/page/reference-pack dir — declare its home")
 
     def test_receipts_cover_fires_on_a_rogue_profile_or_page_dir(self):
         """Anti-tautology: forged receipts under unknown profile/page dirs break the cover."""
         section = _STRUCT["receipts_layout"]
         idx = json.loads((REPO_ROOT / "contracts" / "design_profiles" / "_index.json").read_text(encoding="utf-8"))
         known = set(idx["active_design_profiles"]) | set(idx["reserved_design_profiles"])
-        page_dir = section["page_dir"]
-        pages = set(section["page_allowlist"])
-
-        def _bad(names: list[str]) -> list[str]:
-            bad: list[str] = []
-            for name in names:
-                parts = Path(name).parts
-                if parts and parts[0] == page_dir:
-                    if len(parts) < 3 or parts[1] not in pages:
-                        bad.append(name)
-                elif not parts or parts[0] not in known:
-                    bad.append(name)
-            return sorted(bad)
-
-        self.assertEqual([], _bad(["liquid-glass/conformance_receipt.json"]), "a known-profile receipt is green")
-        self.assertEqual([], _bad(["pages/index/screenshot-1280.png"]), "a declared page receipt is green")
-        self.assertEqual(["rogue/x.json"], _bad(["liquid-glass/conformance_receipt.json", "rogue/x.json"]),
+        self.assertEqual([], _unknown_receipts(["liquid-glass/conformance_receipt.json"], known, section),
+                         "a known-profile receipt is green")
+        self.assertEqual([], _unknown_receipts(["pages/index/screenshot-1280.png"], known, section),
+                         "a declared page receipt is green")
+        self.assertEqual([], _unknown_receipts(
+            ["reference-packs/dashboard-pre-w3/screenshot-liquid-glass-1280.png"], known, section),
+            "a declared reference-pack receipt is green")
+        self.assertEqual(["rogue/x.json"], _unknown_receipts(
+            ["liquid-glass/conformance_receipt.json", "rogue/x.json"], known, section),
                          "a receipt under an unknown-profile dir must redden the cover")
         self.assertEqual(["pages/rogue/screenshot-1280.png"],
-                         _bad(["pages/index/screenshot-1280.png", "pages/rogue/screenshot-1280.png"]),
+                         _unknown_receipts(
+                             ["pages/index/screenshot-1280.png", "pages/rogue/screenshot-1280.png"],
+                             known, section),
                          "a receipt under an unknown page dir must redden the cover")
+        self.assertEqual(["reference-packs/rogue/facts.json"],
+                         _unknown_receipts(["reference-packs/rogue/facts.json"], known, section),
+                         "a receipt under an unknown reference pack must redden the cover")
 
     # --- inverse drift: no phantom declarations ---
 

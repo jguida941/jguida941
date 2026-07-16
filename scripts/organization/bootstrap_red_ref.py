@@ -15,8 +15,13 @@ repo-specific. candidate_only.
 """
 from __future__ import annotations
 
+import argparse
+from datetime import datetime, timedelta, timezone
+import hashlib
 import json
+from pathlib import Path
 import re
+import subprocess
 import sys
 
 # Verbs that make a task MUTATION-CAPABLE (it will change files). Conservative: any hit -> mutation.
@@ -57,6 +62,13 @@ _EXT_RE = re.compile(r"\.(py|rs|toml|md|json|txt|cfg|ini|yaml|yml|sh|ts|tsx|js|j
 # A shape RED must be an executable target-shape contract — this repo's closed-cover layout guard.
 SHAPE_CONTRACT_TOKENS = ("test_structural_layout", "structural_layout", "repo_layout")
 
+OBSERVATION_CONTRACT = "BootstrapRedObservation"
+OBSERVATION_SCHEMA_VERSION = 1
+MAX_OUTPUT_BYTES = 65536
+MAX_OBSERVATION_AGE = timedelta(hours=24)
+_SCOPE_KEYS = ("routes", "profiles", "aspects")
+_GENERIC_FAILURES = frozenset({"failed", "failure", "error", "assertionerror", "traceback"})
+
 
 def classify(task: str) -> dict:
     """task text -> {mutation_capable, kind, requires_shape_red, read_only}. Plain, conservative."""
@@ -85,37 +97,298 @@ def classify(task: str) -> dict:
     return {"mutation_capable": True, "kind": "code", "requires_shape_red": False, "read_only": False}
 
 
-def gate(task: str, red_ref: str | None = None) -> dict:
-    """Verdict-free relay: classify the task + state whether a RED ref is sufficient. The sealed
-    Rust MissingRedTestRef authority is the decider; this only gathers + relays the rule."""
+def _repo_root(root: str | Path | None = None) -> Path:
+    if root is not None:
+        return Path(root).resolve()
+    for parent in Path(__file__).resolve().parents:
+        if (parent / "contracts" / "repo_layout.json").is_file():
+            return parent
+    raise RuntimeError("repository root not found")
+
+
+def _current_revision(root: Path) -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    return result.stdout.strip()
+
+
+def _red_path(red_ref: str, root: Path) -> Path:
+    raw = (red_ref or "").strip()
+    if not raw:
+        raise ValueError("no named RED")
+    if "::" in raw:
+        raise ValueError("RED reference must be a Python test file; node selectors are not yet admitted")
+    candidate = (root / raw).resolve()
+    try:
+        relative = candidate.relative_to(root)
+    except ValueError as exc:
+        raise ValueError("RED reference escapes repository root") from exc
+    if not candidate.is_file():
+        raise ValueError(f"RED reference does not exist: {raw}")
+    if candidate.suffix != ".py" or not relative.parts or relative.parts[0] != "tests":
+        raise ValueError("RED reference must be an executable tests/**/*.py file")
+    return candidate
+
+
+def _test_command(red_ref: str) -> list[str]:
+    module = red_ref[:-3].replace("/", ".") if red_ref.endswith(".py") else red_ref
+    return [sys.executable, "-m", "unittest", "-v", module]
+
+
+def _sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def _timestamp(value: str) -> datetime:
+    if not isinstance(value, str) or not value.endswith("Z"):
+        raise ValueError("observed_at_utc must be an RFC3339 UTC timestamp")
+    parsed = datetime.fromisoformat(value[:-1] + "+00:00")
+    if parsed.tzinfo is None:
+        raise ValueError("observed_at_utc must carry UTC")
+    return parsed.astimezone(timezone.utc)
+
+
+def _scope_reason(scope) -> str | None:
+    if not isinstance(scope, dict) or set(scope) != set(_SCOPE_KEYS):
+        return "observation scope must contain exactly routes, profiles, and aspects"
+    for key in _SCOPE_KEYS:
+        values = scope[key]
+        if (not isinstance(values, list) or not values
+                or any(not isinstance(value, str) or not value.strip() for value in values)
+                or len(values) != len(set(values))):
+            return f"observation scope.{key} must be a nonempty unique string list"
+    return None
+
+
+def build_observation(
+    task: str,
+    red_ref: str,
+    *,
+    expected_failure_fingerprint: str,
+    scope: dict,
+    exit_code: int,
+    observed_output: str,
+    root: str | Path | None = None,
+    observed_at: datetime | None = None,
+) -> dict:
+    """Build the immutable claim from an already-observed test execution.
+
+    Production callers should use :func:`observe_red`, which executes the canonical command. This
+    constructor is public so the contract suite can mutation-test the validator without spawning a
+    deliberately failing subprocess for every negative vector.
+    """
+    repo = _repo_root(root)
+    path = _red_path(red_ref, repo)
+    output = str(observed_output)
+    if len(output.encode("utf-8")) > MAX_OUTPUT_BYTES:
+        raise ValueError(f"RED output exceeds {MAX_OUTPUT_BYTES} bytes")
+    moment = (observed_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    return {
+        "contract_id": OBSERVATION_CONTRACT,
+        "schema_version": OBSERVATION_SCHEMA_VERSION,
+        "authority_status": "candidate_only",
+        "cannot_mark_done": True,
+        "task": task,
+        "task_sha256": _sha256(task.encode("utf-8")),
+        "base_revision": _current_revision(repo),
+        "red_ref": red_ref,
+        "test_sha256": _sha256(path.read_bytes()),
+        "command": _test_command(red_ref),
+        "exit_code": exit_code,
+        "expected_failure_fingerprint": expected_failure_fingerprint,
+        "observed_output": output,
+        "observed_output_sha256": _sha256(output.encode("utf-8")),
+        "observed_at_utc": moment.isoformat(timespec="seconds").replace("+00:00", "Z"),
+        "scope": scope,
+    }
+
+
+def observe_red(
+    task: str,
+    red_ref: str,
+    *,
+    expected_failure_fingerprint: str,
+    scope: dict,
+    root: str | Path | None = None,
+    timeout_seconds: int = 180,
+) -> dict:
+    """Execute the canonical RED command and bind its nonzero output to repository state."""
+    repo = _repo_root(root)
+    _red_path(red_ref, repo)
+    completed = subprocess.run(
+        _test_command(red_ref),
+        cwd=repo,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        timeout=timeout_seconds,
+    )
+    return build_observation(
+        task,
+        red_ref,
+        expected_failure_fingerprint=expected_failure_fingerprint,
+        scope=scope,
+        exit_code=completed.returncode,
+        observed_output=completed.stdout,
+        root=repo,
+    )
+
+
+def _validate_observation(
+    task: str,
+    red_ref: str,
+    observation: dict,
+    root: Path,
+    *,
+    now: datetime | None = None,
+) -> str | None:
+    if not isinstance(observation, dict):
+        return "missing executable RED observation"
+    if observation.get("contract_id") != OBSERVATION_CONTRACT:
+        return "wrong RED observation contract_id"
+    if observation.get("schema_version") != OBSERVATION_SCHEMA_VERSION:
+        return "wrong RED observation schema_version"
+    if observation.get("authority_status") != "candidate_only" or observation.get("cannot_mark_done") is not True:
+        return "RED observation overclaims authority"
+    if observation.get("task") != task or observation.get("task_sha256") != _sha256(task.encode("utf-8")):
+        return "RED observation task binding is stale"
+    if observation.get("red_ref") != red_ref:
+        return "RED observation names a different test"
+    try:
+        path = _red_path(red_ref, root)
+    except ValueError as exc:
+        return str(exc)
+    if observation.get("test_sha256") != _sha256(path.read_bytes()):
+        return "RED observation test hash is stale"
+    try:
+        revision = _current_revision(root)
+    except (OSError, subprocess.SubprocessError):
+        return "cannot resolve current Git revision"
+    if observation.get("base_revision") != revision:
+        return "RED observation base revision is stale"
+    if observation.get("command") != _test_command(red_ref):
+        return "RED observation command is not canonical"
+    exit_code = observation.get("exit_code")
+    if isinstance(exit_code, bool) or not isinstance(exit_code, int) or exit_code == 0:
+        return "RED observation did not record a nonzero test exit"
+    output = observation.get("observed_output")
+    if not isinstance(output, str) or len(output.encode("utf-8")) > MAX_OUTPUT_BYTES:
+        return "RED observation output is missing or unbounded"
+    if observation.get("observed_output_sha256") != _sha256(output.encode("utf-8")):
+        return "RED observation output hash is stale"
+    fingerprint = observation.get("expected_failure_fingerprint")
+    if (not isinstance(fingerprint, str) or len(fingerprint.strip()) < 12
+            or fingerprint.strip().lower() in _GENERIC_FAILURES):
+        return "expected failure fingerprint is missing or generic"
+    if fingerprint not in output:
+        return "observed failure does not contain the expected fingerprint"
+    scope_error = _scope_reason(observation.get("scope"))
+    if scope_error:
+        return scope_error
+    try:
+        observed_at = _timestamp(observation.get("observed_at_utc"))
+    except (TypeError, ValueError):
+        return "RED observation timestamp is invalid"
+    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    age = current - observed_at
+    if age < -timedelta(minutes=5) or age > MAX_OBSERVATION_AGE:
+        return "RED observation timestamp is stale"
+    return None
+
+
+def gate(
+    task: str,
+    red_ref: str | None = None,
+    observation: dict | None = None,
+    *,
+    root: str | Path | None = None,
+) -> dict:
+    """Fail-closed local admission: a mutation requires a real, current, right-reason RED."""
     cls = classify(task)
     ref = (red_ref or "").strip()
+    repo = _repo_root(root)
     if not cls["mutation_capable"]:
         admit, reason = True, "read-only task: may proceed (mutation-forbidden)"
     elif not ref:
         admit, reason = False, "MUTATION with no named RED — name the failing RED first"
-    elif cls["requires_shape_red"] and not any(tok in ref.lower() for tok in SHAPE_CONTRACT_TOKENS):
+    else:
+        try:
+            _red_path(ref, repo)
+        except ValueError as exc:
+            admit, reason = False, str(exc)
+        else:
+            admit, reason = False, ""
+    if (cls["mutation_capable"] and ref and not admit
+            and reason == ""
+            and cls["requires_shape_red"]
+            and not any(tok in ref.lower() for tok in SHAPE_CONTRACT_TOKENS)):
         admit, reason = False, ("SHAPE/reorg task: the RED must be an executable target-shape "
                                 "contract (tests/contracts/test_structural_layout.py), not just any RED")
-    else:
-        admit, reason = True, "RED reference present and sufficient for the task kind"
+    elif cls["mutation_capable"] and ref and not admit and reason == "":
+        error = _validate_observation(task, ref, observation, repo)
+        admit = error is None
+        reason = error or "current nonzero RED observed for the expected reason and bound to scope"
     return {
         "contract_id": "BootstrapRedRefClaim",
         "authority_status": "candidate_only",
         "cannot_mark_done": True,
         "task_classification": cls,
         "red_ref": ref,
+        "red_observation_sha256": (
+            _sha256(json.dumps(observation, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+            if isinstance(observation, dict) else None
+        ),
         "admit": admit,
         "reason": reason,
-        "decider": "semantic-tdd preflight.rs :: MissingRedTestRef (this is the verdict-free gather/relay)",
+        "decider": "local BootstrapRedObservation validator",
     }
 
 
 def main(argv: list[str] | None = None) -> int:
-    argv = list(sys.argv[1:] if argv is None else argv)
-    task = argv[0] if argv else ""
-    red_ref = argv[1] if len(argv) > 1 else None
-    verdict = gate(task, red_ref)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("task")
+    parser.add_argument("red_ref", nargs="?", default="")
+    parser.add_argument("--expect", default="", help="specific failure substring expected in RED output")
+    parser.add_argument("--routes", default="", help="comma-separated affected route ids")
+    parser.add_argument("--profiles", default="", help="comma-separated affected profile ids")
+    parser.add_argument("--aspects", default="", help="comma-separated governed aspect ids")
+    parser.add_argument("--write", default="", help="optional repository-relative observation JSON path")
+    args = parser.parse_args(list(sys.argv[1:] if argv is None else argv))
+    observation = None
+    cls = classify(args.task)
+    if cls["mutation_capable"] and args.red_ref and args.expect:
+        split = lambda value: [item.strip() for item in value.split(",") if item.strip()]
+        scope = {
+            "routes": split(args.routes),
+            "profiles": split(args.profiles),
+            "aspects": split(args.aspects),
+        }
+        try:
+            observation = observe_red(
+                args.task,
+                args.red_ref,
+                expected_failure_fingerprint=args.expect,
+                scope=scope,
+            )
+        except (OSError, ValueError, subprocess.SubprocessError) as exc:
+            observation = {"collection_error": str(exc)}
+    verdict = gate(args.task, args.red_ref, observation)
+    if args.write and verdict["admit"]:
+        root = _repo_root()
+        target = (root / args.write).resolve()
+        try:
+            target.relative_to(root)
+        except ValueError as exc:
+            raise SystemExit("--write path escapes repository root") from exc
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(observation, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        verdict["observation_path"] = target.relative_to(root).as_posix()
     print(json.dumps(verdict, indent=2))
     return 0 if verdict["admit"] else 1
 

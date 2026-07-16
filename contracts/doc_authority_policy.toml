@@ -1,0 +1,116 @@
+# DocAuthorityPolicy — T0 organization law (operator-directed 2026-07-15).
+# Mirrors primary/semantic-tdd tests/contracts/doc_authority_policy.toml (the single-plan-of-record
+# law) adapted to this kernel-free adopter repo: exactly ONE live plan, a closed lifecycle for
+# every plan-shaped doc, numeric caps so plan sprawl fails closed instead of accumulating.
+# Enforced by tests/contracts/test_doc_authority.py (the slice-0 admission RED).
+
+contract_id = "DocAuthorityPolicy"
+schema_version = 1
+purpose = "Exactly one plan-of-record; every doc under docs/plans/handoff carries a typed lifecycle row; folded/superseded docs name their successor; live-doc count is capped."
+
+[mode]
+mode = "block"
+
+[plan_of_record]
+path = "docs/plans/ACTIVE.md"
+identity_phrases = [
+  "the single plan we execute from",
+  "durable, committed source of truth for the current plan",
+]
+max_lines = 120
+
+[vocab]
+doc_classes = ["plan-of-record", "gate-record", "design-record", "reentry", "architecture"]
+statuses = ["live", "folded", "superseded"]
+
+[zones."docs/plans"]
+allowed_files = ["ACTIVE.md", "DESIGN-SYSTEM.md"]
+allowed_dirs = ["handoff"]
+
+[limits]
+# Slice-0 scope (2026-07-16, landing reconciliation C2/C3): the committed policy carries rows only
+# for docs that ride in the slice-0 commit. Live other-lane design records (w6, w7, w8,
+# w3c-org-rootwide) re-land each with its own lane, adding its row THEN; the cap is sized for the
+# slice-0 set (3 live) plus headroom — never ratcheted mid-flight to admit another lane's doc.
+max_live_handoff_docs = 5
+
+[completeness]
+required_docs = [
+  "docs/plans/ACTIVE.md",
+  "docs/history/PLAN-LEDGER.md",
+  "docs/plans/handoff/HANDOFF.md",
+  "docs/plans/handoff/w3-visual-regression-correction.md",
+]
+
+# [[doc]] lifecycle rows — one per docs/plans/handoff/*.md, both directions closed:
+# a handoff file without a row reddens; a row without a file reddens.
+# RED witness: this section was empty when the test was first observed failing (2026-07-15).
+
+[[doc]]
+path = "docs/plans/handoff/HANDOFF.md"
+class = "reentry"
+status = "live"
+
+[[doc]]
+path = "docs/plans/handoff/w3-visual-regression-correction.md"
+class = "gate-record"
+status = "live"
+
+[[doc]]
+path = "docs/plans/handoff/w3c-0-design-closure.md"
+class = "design-record"
+status = "live"
+
+[[doc]]
+path = "docs/plans/handoff/w4-rendered-facts-design.md"
+class = "design-record"
+status = "folded"
+superseded_by = "docs/plans/handoff/w3c-0-design-closure.md"
+
+[[doc]]
+path = "docs/plans/handoff/w4-rendered-facts-shape.md"
+class = "design-record"
+status = "folded"
+superseded_by = "docs/plans/handoff/w3c-0-design-closure.md"
+
+[[doc]]
+path = "docs/plans/handoff/w1-theme-continuity-design.md"
+class = "design-record"
+status = "folded"
+superseded_by = "docs/history/PLAN-LEDGER.md"
+
+[[doc]]
+path = "docs/plans/handoff/w2-dom-cover-design.md"
+class = "design-record"
+status = "folded"
+superseded_by = "docs/history/PLAN-LEDGER.md"
+
+[[doc]]
+path = "docs/plans/handoff/d-shell-0-design.md"
+class = "design-record"
+status = "folded"
+superseded_by = "docs/history/PLAN-LEDGER.md"
+
+[[doc]]
+path = "docs/plans/handoff/d-shell-2-design.md"
+class = "design-record"
+status = "folded"
+superseded_by = "docs/history/PLAN-LEDGER.md"
+
+[[doc]]
+path = "docs/plans/handoff/b-0-design.md"
+class = "design-record"
+status = "folded"
+superseded_by = "docs/history/PLAN-LEDGER.md"
+
+[[doc]]
+path = "docs/plans/handoff/codex-batch-prompt.md"
+class = "design-record"
+status = "folded"
+superseded_by = "docs/history/PLAN-LEDGER.md"
+
+[[doc]]
+path = "docs/plans/handoff/w3-index-migration-design.md"
+class = "design-record"
+status = "superseded"
+superseded_by = "docs/plans/handoff/w3-visual-regression-correction.md"

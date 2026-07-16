@@ -120,6 +120,27 @@ class StudioSwapContract(unittest.TestCase):
         self.assertEqual(json.loads(m.group(1)), admissible_space(),
                          "embedded space must equal the Python admissible_space() verbatim")
 
+    def test_each_initial_stage_matches_the_single_base_state(self):
+        """Selecting a never-visited base must reveal the same one-active-option state the rendered
+        fact planner names; capture may not normalize away a different shipped initial state."""
+        from scripts.rendering.studio.studio import render_studio
+
+        html = render_studio()
+        for base in _active():
+            match = re.search(
+                rf'<section class="stage"[^>]*data-lang="{re.escape(base)}">(.*?)</section>',
+                html,
+                re.S,
+            )
+            self.assertIsNotNone(match, f"{base}: missing Studio stage")
+            stage = match.group(1)
+            self.assertEqual(stage.count('class="swap-opt active"'), 1, base)
+            self.assertRegex(
+                stage,
+                rf'class="swap-opt active"[^>]*data-base="{re.escape(base)}"[^>]*'
+                rf'data-component="button"[^>]*data-source="{re.escape(base)}"',
+            )
+
     def test_swap_variants_exist_only_for_admissible_cells(self):
         """A pre-rendered archetype variant exists for a swap IFF that cell is admissible; an
         inadmissible source is rendered disabled (no variant target) — no fake-green construction."""

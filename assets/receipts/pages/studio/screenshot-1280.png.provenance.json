@@ -15,8 +15,8 @@
     "--window-size=1280,1536",
     "--virtual-time-budget=15000",
     "--dump-dom",
-    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/studio/.screenshot-1280.png.374850d4c9e344e586b0ca9868332906.tmp.png",
-    "http://127.0.0.1:62398/site/studio.html?__receipt_capture=09ec79279c424c0bac34e279861a078e&page=studio&page_sha256=7e2fa450dc21d97cc2164d84328e10e23d73cabc0cae04f1545bc511a4dc7fa1&width=1280&height=1536"
+    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/studio/.screenshot-1280.png.37a428db158d409287b2667612b26cb5.tmp.png",
+    "http://127.0.0.1:57118/site/studio.html?__receipt_capture=68b6f903ff5748438e7a95a156076a42&page=studio&page_sha256=7e2fa450dc21d97cc2164d84328e10e23d73cabc0cae04f1545bc511a4dc7fa1&width=1280&height=1536"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-screenshot",
@@ -25,9 +25,9 @@
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/studio.html",
   "same_session_capture": {
-    "capture_id": "09ec79279c424c0bac34e279861a078e",
+    "capture_id": "68b6f903ff5748438e7a95a156076a42",
     "facts": {
-      "capture_id": "09ec79279c424c0bac34e279861a078e",
+      "capture_id": "68b6f903ff5748438e7a95a156076a42",
       "empty_state_hidden": {},
       "hydration_state": null,
       "page": "studio",
@@ -44,7 +44,7 @@
         "width": 1280
       }
     },
-    "facts_sha256": "54d8fcac57dd30f4eae98a3b9eec40f627143eefc2951f1eb7a6125854580760",
+    "facts_sha256": "375c08861a9b0cd5a4577342be127dbbaf95c885b98c435e8265718b2b8c465f",
     "readiness": {
       "animation_frames": 2,
       "fonts": "ready",

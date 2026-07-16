@@ -155,7 +155,6 @@
     "copy": {
         "hero_title": "@jguida941",
         "hero_intro": "Builder dashboard \u2014 regenerated hourly from the GitHub API.",
-        "breadcrumb_home": "home",
         "hero_eyebrow": "GitHub Analytics \u00b7 Live",
         "hero_kpi_label": "contributions \u00b7 last 12 months",
         "hero_active_days": "active days",
@@ -1141,7 +1140,7 @@
         ]
     },
     "css_policy": {
-        "scope": "scripts/rendering/webkit/dashboard.py::_dashboard_css",
+    "scope": "scripts/rendering/webkit/dashboard_style.py::dashboard_css",
         "canonicalizer": "scripts/rendering/webkit/design_render_adapter.py::css_numeric_occurrences",
         "occurrence_manifest_sha256": "de176991a500c32bbdb949dbcf902bb2c38e72627dc383ffe35f777b1911f7c8",
         "occurrence_count": 126,
@@ -1164,16 +1163,16 @@
         "function_roster": ["calc", "color-mix", "conic-gradient", "repeat", "var"],
         "color_keywords": ["currentColor", "transparent"],
         "provenance": {
-            "authority_status": "declared-unresolved",
-            "exactness": "consistency-only",
-            "gap_id": "W5-dashboard-literal-provenance",
-            "ratification_status": "unratified",
-            "source_mode": null,
-            "source_ref": "docs/plans/handoff/w3-index-migration-design.md#d-w3-lit-1-dashboard-literal-gap"
+      "authority_status": "approved-reference",
+      "exactness": "measurement-exact",
+      "gap_id": null,
+      "ratification_status": "approved",
+      "source_mode": "measured-reference",
+      "source_ref": "contracts/reference_packs/dashboard-pre-w3/manifest.json"
         }
     },
     "grammar_hashes": {
-        "css_sha256": "6bf0a2d1afa9cd9373ec5133d7270e927326b299c1c9d6f70814ab7ddb574acb",
+        "css_sha256": "9ddcc2585f8beeb17372fdb4249a7febc3abdc875e68622579c95ea1687080de",
         "script_sha256": "cf7cad9eea603b41d9f06828021ebeb5fb7c288c194b74344250b573cdd09fb3"
     }
 }

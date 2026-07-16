@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rendered-facts probe fixture</title>
+  <style>
+    :root { --accent: #3b5bdb; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background-color: #f4f5f7;
+      color: #1f2328;
+      letter-spacing: normal;
+    }
+
+    /* --- landmark: banner header (glass material) --- */
+    header.site {
+      padding: 16px 24px;
+      background-color: rgba(255, 255, 255, 0.82);
+      border-bottom: 1px solid #d0d7de;
+      backdrop-filter: blur(8px) saturate(120%);
+      -webkit-backdrop-filter: blur(8px) saturate(120%);
+    }
+
+    /* --- landmark: primary navigation + links --- */
+    nav.primary { display: flex; gap: 16px; align-items: center; }
+    nav.primary a {
+      color: #3b5bdb;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
+      padding: 8px 12px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      transition: background-color 160ms ease, color 160ms ease;
+    }
+    nav.primary a:hover { background-color: #eef1ff; color: #26398f; }
+    nav.primary a:focus { outline: 2px solid #93a4ff; outline-offset: 2px; }
+
+    /* --- main region + heading tuples --- */
+    main { display: block; padding: 24px; }
+    h1 {
+      font-size: 32px;
+      line-height: 1.2;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 0 0 8px;
+    }
+    .lede { margin: 0 0 20px; font-size: 15px; color: #57606a; line-height: 1.5; }
+    h2 {
+      font-size: 20px;
+      line-height: 1.3;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 24px 0 12px;
+    }
+
+    /* --- button with reachable :hover / :focus / :active states --- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.2;
+      color: #ffffff;
+      background-color: #3b5bdb;
+      border: 1px solid #2f49b0;
+      border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(16, 24, 64, 0.24);
+      transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background-color: #2f49b0;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 24, 64, 0.28);
+    }
+    .btn:focus { outline: 2px solid #93a4ff; outline-offset: 2px; }
+    .btn:active { background-color: #26398f; transform: translateY(0); }
+
+    /* --- card cluster: a container of repeated .card children --- */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .card {
+      padding: 16px;
+      background-color: #ffffff;
+      border: 1px solid #d0d7de;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(16, 24, 64, 0.10);
+    }
+    .card h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; line-height: 1.3; }
+    .card p { margin: 0; font-size: 13px; color: #57606a; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <header class="site">
+    <nav class="primary" aria-label="Primary">
+      <a href="#overview" aria-current="page">Overview</a>
+      <a href="#activity">Activity</a>
+      <a href="#settings">Settings</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Rendered Facts Sample</h1>
+    <p class="lede">A synthetic page for the generic foreign-DOM rendered-facts probe.</p>
+    <button class="btn" type="button" aria-label="Run capture">Run capture</button>
+    <h2>Metrics</h2>
+    <section class="cards" aria-label="Metric cards">
+      <article class="card"><h3>Commits</h3><p>128 this week</p></article>
+      <article class="card"><h3>Reviews</h3><p>34 pending</p></article>
+      <article class="card"><h3>Streak</h3><p>12 days</p></article>
+    </section>
+  </main>
+</body>
+</html>

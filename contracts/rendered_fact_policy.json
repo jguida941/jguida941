@@ -1,0 +1,216 @@
+{
+  "contract_id": "RenderedFactPolicy",
+  "schema_version": 1,
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "purpose": "W4 closed policy for verdict-free post-hydration Chrome facts. Predicates, never this producer, decide contrast, target applicability/exceptions, overflow containment, and page-content density.",
+  "artifact_encoding": {
+    "extension": ".json.gz",
+    "compression": "gzip",
+    "members": 1,
+    "filename": "",
+    "mtime": 0,
+    "compresslevel": 9,
+    "header_flags": 0,
+    "header_xfl": 2,
+    "header_os": 255,
+    "max_uncompressed_bytes": 67108864,
+    "writer": "scripts/quality/rendered_facts/codec.py::compressed_packet_bytes",
+    "writer_runtime": {
+      "python_version": "3.11.14",
+      "zlib_version": "1.2.12",
+      "zlib_runtime_version": "1.2.12"
+    }
+  },
+  "producer_command": {
+    "chrome_path": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "chrome_version_pattern": "Google Chrome [0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+",
+    "fixed_arguments": [
+      "--headless=new",
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--disable-background-timer-throttling",
+      "--disable-backgrounding-occluded-windows",
+      "--disable-renderer-backgrounding",
+      "--run-all-compositor-stages-before-draw"
+    ],
+    "virtual_time_budget_ms": 30000,
+    "probe_scheme": "http",
+    "probe_host": "127.0.0.1",
+    "probe_path": "/__rendered_facts__.html"
+  },
+  "doc_cite": "docs/design/pageshell.md#d-w4-rendered-facts",
+  "matrix": {
+    "profile_source": "contracts/design_profiles/_index.json#/active_design_profiles",
+    "page_source": "contracts/page_manifest.json#/pages",
+    "viewports": [
+      {"width": 1280, "height": 1200, "device_scale_factor": 1},
+      {"width": 390, "height": 1200, "device_scale_factor": 1}
+    ]
+  },
+  "readiness": {
+    "theme_attribute": "data-theme",
+    "index_hydration_selector": "[data-dashboard-hydration]",
+    "index_ready_value": "complete",
+    "fonts": "document.fonts.ready",
+    "settle": {
+      "mechanism": "forced-style-layout-task-turn",
+      "turns": 2,
+      "turn_deadline_ms": 1000,
+      "require_no_running_or_pending_animations": true
+    }
+  },
+  "state_plan": {
+    "default_pages": ["index", "showcase", "settings"],
+    "default_state_id": "default",
+    "studio": {
+      "authority": "scripts/quality/settings_admissibility.py::admissible_space",
+      "base_radio_selector": ".lang-radio",
+      "stage_selector": ".stage[data-lang]",
+      "base_option_selector": ".swap-opt[data-base][data-component=\"button\"]",
+      "swap_option_selector": ".swap-opt[data-base][data-component][data-source]:not([disabled])",
+      "variant_selector": ".variant[data-variant]",
+      "activation_recipe": ["select-base-radio", "activate-base-button-option", "activate-enabled-swap-if-named", "two-bounded-forced-style-layout-task-turns", "record-document-animations"],
+      "states": [
+        {"state_id": "base:liquid-glass", "base": "liquid-glass", "component": "button", "source": "liquid-glass", "variant": "liquid-glass-base"},
+        {"state_id": "base:liquid-glass|swap:button:carbon", "base": "liquid-glass", "component": "button", "source": "carbon", "variant": "liquid-glass-button-carbon"},
+        {"state_id": "base:liquid-glass|swap:button:apple-dark", "base": "liquid-glass", "component": "button", "source": "apple-dark", "variant": "liquid-glass-button-apple-dark"},
+        {"state_id": "base:liquid-glass|swap:chip:carbon", "base": "liquid-glass", "component": "chip", "source": "carbon", "variant": "liquid-glass-chip-carbon"},
+        {"state_id": "base:liquid-glass|swap:chip:apple-dark", "base": "liquid-glass", "component": "chip", "source": "apple-dark", "variant": "liquid-glass-chip-apple-dark"},
+        {"state_id": "base:liquid-glass|swap:card:carbon", "base": "liquid-glass", "component": "card", "source": "carbon", "variant": "liquid-glass-card-carbon"},
+        {"state_id": "base:liquid-glass|swap:card:apple-dark", "base": "liquid-glass", "component": "card", "source": "apple-dark", "variant": "liquid-glass-card-apple-dark"},
+        {"state_id": "base:carbon", "base": "carbon", "component": "button", "source": "carbon", "variant": "carbon-base"},
+        {"state_id": "base:carbon|swap:button:apple-dark", "base": "carbon", "component": "button", "source": "apple-dark", "variant": "carbon-button-apple-dark"},
+        {"state_id": "base:carbon|swap:chip:apple-dark", "base": "carbon", "component": "chip", "source": "apple-dark", "variant": "carbon-chip-apple-dark"},
+        {"state_id": "base:carbon|swap:card:liquid-glass", "base": "carbon", "component": "card", "source": "liquid-glass", "variant": "carbon-card-liquid-glass"},
+        {"state_id": "base:carbon|swap:card:apple-dark", "base": "carbon", "component": "card", "source": "apple-dark", "variant": "carbon-card-apple-dark"},
+        {"state_id": "base:apple-dark", "base": "apple-dark", "component": "button", "source": "apple-dark", "variant": "apple-dark-base"},
+        {"state_id": "base:apple-dark|swap:button:liquid-glass", "base": "apple-dark", "component": "button", "source": "liquid-glass", "variant": "apple-dark-button-liquid-glass"},
+        {"state_id": "base:apple-dark|swap:button:carbon", "base": "apple-dark", "component": "button", "source": "carbon", "variant": "apple-dark-button-carbon"},
+        {"state_id": "base:apple-dark|swap:chip:liquid-glass", "base": "apple-dark", "component": "chip", "source": "liquid-glass", "variant": "apple-dark-chip-liquid-glass"},
+        {"state_id": "base:apple-dark|swap:chip:carbon", "base": "apple-dark", "component": "chip", "source": "carbon", "variant": "apple-dark-chip-carbon"},
+        {"state_id": "base:apple-dark|swap:card:liquid-glass", "base": "apple-dark", "component": "card", "source": "liquid-glass", "variant": "apple-dark-card-liquid-glass"},
+        {"state_id": "base:apple-dark|swap:card:carbon", "base": "apple-dark", "component": "card", "source": "carbon", "variant": "apple-dark-card-carbon"}
+      ]
+    }
+  },
+  "enumeration": {
+    "root": "body",
+    "selector": "*",
+    "order": "preorder",
+    "css_px_precision": 2,
+    "text_nodes": "all-nonblank-range-rects",
+    "same_origin_href_encoding": "path-query-fragment",
+    "pseudo_elements": ["::before", "::after"]
+  },
+  "subject_identity": {
+    "selector_language": "rendered-subject-selector-v1",
+    "membership": "state-invariant",
+    "dom_hash": "sha256-utf8-fixed-field-array-json-v1"
+  },
+  "interactive_selector": "a[href],button,input:not([type=hidden]),select,textarea,summary,label[for],[role=button],[role=link],[role=checkbox],[role=radio],[role=switch],[role=tab],[role=menuitem],[role=option],[tabindex]:not([tabindex=\"-1\"]),[contenteditable]:not([contenteditable=\"false\"])",
+  "contrast_subjects": [
+    {"id": "shell-title", "selector": ".ps-title", "count": 1, "classification": "large", "minimum_ratio": 3.0},
+    {"id": "shell-intro", "selector": ".ps-intro", "count": 1, "classification": "normal", "minimum_ratio": 4.5}
+  ],
+  "root_token_fields": ["--ps-pad", "--ps-pad-tight", "--ps-gap", "--ps-gap-tight", "--gap-grid"],
+  "stable_node_fields": ["index", "parent_index", "tag", "id", "owner", "role", "href", "type", "for", "tabindex", "contenteditable", "direct_text", "text_content", "data"],
+  "text_node_fields": ["index", "parent_index", "child_index", "text"],
+  "mutable_node_fields": ["index", "class", "hidden", "checked", "disabled", "aria_hidden", "aria_checked", "aria_pressed", "aria_selected"],
+  "computed_style_fields": [
+    "display", "visibility", "opacity", "pointer_events", "position", "overflow_x", "overflow_y",
+    "color", "background_color", "background_image", "box_shadow", "font_size", "font_weight", "line_height",
+    "padding_top", "padding_right", "padding_bottom", "padding_left",
+    "border_top_width", "border_right_width", "border_bottom_width", "border_left_width",
+    "border_image_source", "border_image_outset", "outline_width", "outline_style", "outline_color", "outline_offset",
+    "margin_top", "margin_right", "margin_bottom", "margin_left", "row_gap", "column_gap",
+    "min_height", "max_height", "height", "box_sizing", "transform", "filter", "backdrop_filter",
+    "mix_blend_mode", "isolation", "contain", "overflow_clip_margin", "content_visibility", "clip_path", "mask_image",
+    "text_shadow", "webkit_text_fill_color", "webkit_text_stroke_width", "webkit_text_stroke_color", "background_clip"
+  ],
+  "pseudo_style_fields": ["content", "display", "opacity", "color", "background_color", "background_image", "filter", "backdrop_filter", "mix_blend_mode", "border_top_width", "border_top_style", "border_top_color", "border_right_width", "border_right_style", "border_right_color", "border_bottom_width", "border_bottom_style", "border_bottom_color", "border_left_width", "border_left_style", "border_left_color", "border_image_source", "outline_width", "outline_style", "outline_color", "box_shadow", "clip_path", "mask_image"],
+  "density_surfaces": {
+    "index": [
+      {
+        "selector": ".db-section[data-dashboard-section]",
+        "count_source": "contracts/dashboard_surface.json#/sections",
+        "padding_tokens": {"top": "--ps-pad", "right": "--ps-pad", "bottom": "--ps-pad", "left": "--ps-pad"},
+        "allowed_gap_values": ["normal", "0px"],
+        "allowed_child_block_margin_tokens": ["--ps-gap", "--ps-gap-tight", "--ps-pad-tight"],
+        "allowed_child_block_margin_literals": ["0px", "10px", "14px", "16px", "20px", "22px", "24px", "28px"]
+      }
+    ],
+    "showcase": [
+      {
+        "selector": ".ps-panel",
+        "count": 1,
+        "padding_tokens": {"top": "--ps-pad", "right": "--ps-pad", "bottom": "--ps-pad", "left": "--ps-pad"},
+        "allowed_gap_values": ["normal", "0px"],
+        "allowed_child_block_margin_tokens": ["--ps-pad-tight"],
+        "allowed_child_block_margin_literals": ["0px"]
+      },
+      {
+        "selector": ".lang",
+        "count_source": "contracts/design_profiles/_index.json#/active_design_profiles",
+        "padding_tokens": {"top": "--ps-pad", "right": "--ps-pad", "bottom": "--ps-pad", "left": "--ps-pad"},
+        "allowed_gap_values": ["normal", "0px"],
+        "allowed_child_block_margin_tokens": ["--ps-gap", "--ps-gap-tight"],
+        "allowed_child_block_margin_literals": ["0px"]
+      }
+    ],
+    "settings": [
+      {
+        "selector": ".ps-panel",
+        "count": 1,
+        "padding_tokens": {"top": "--ps-pad", "right": "--ps-pad", "bottom": "--ps-pad", "left": "--ps-pad"},
+        "allowed_gap_values": ["normal", "0px"],
+        "allowed_child_block_margin_tokens": ["--ps-pad-tight"],
+        "allowed_child_block_margin_literals": ["0px"]
+      },
+      {
+        "selector": ".base",
+        "count_source": "contracts/design_profiles/_index.json#/active_design_profiles",
+        "padding_tokens": {"top": "--ps-pad", "right": "--ps-pad", "bottom": "--ps-pad", "left": "--ps-pad"},
+        "allowed_gap_values": ["normal", "0px"],
+        "allowed_child_block_margin_tokens": ["--ps-gap", "--ps-gap-tight"],
+        "allowed_child_block_margin_literals": ["0px"]
+      }
+    ],
+    "studio": [
+      {
+        "selector": ".swap-controls",
+        "count_source": "contracts/design_profiles/_index.json#/active_design_profiles",
+        "visible_count": 1,
+        "padding_tokens": {"top": "--ps-pad-tight", "right": "--ps-pad", "bottom": "--ps-pad-tight", "left": "--ps-pad"},
+        "allowed_gap_values": ["normal", "0px"],
+        "allowed_child_block_margin_tokens": ["--ps-gap-tight"],
+        "allowed_child_block_margin_literals": ["0px"]
+      }
+    ]
+  },
+  "allowed_scroll_containers": {
+    "index": [
+      {"class": "db-calendar-scroll", "parent": "#calendar-panel"},
+      {"class": "db-rhythm-scroll", "parent": "#rhythm-panel"}
+    ],
+    "showcase": [{"class": "table-scroll", "parent": ".lang"}],
+    "settings": [{"class": "table-scroll", "parent": ".base"}],
+    "studio": []
+  },
+  "predicate_parameters": {
+    "touch_minimum_css_px": 24,
+    "large_text_minimum_css_px": 24,
+    "large_bold_text_minimum_css_px": 18.6666666667,
+    "large_bold_text_minimum_weight": 700,
+    "rounding_tolerance_device_px": 1,
+    "responsive_viewport_width": 390,
+    "contrast_hit_grid_css_px": 4,
+    "density_max_child_blank_run_css_px": 96
+  },
+  "source_refs": {
+    "contrast": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum",
+    "touch": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum",
+    "responsive": "docs/design/pageshell.md#d-w4-rendered-facts",
+    "density": "docs/design/pageshell.md#d-w4-rendered-facts"
+  }
+}
