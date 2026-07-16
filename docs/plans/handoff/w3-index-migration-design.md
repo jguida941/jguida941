@@ -10,8 +10,15 @@ DATA omitted non-pixel/runtime grammar; cloned templates needed an exact executi
 theme-root projections had no precedence law; and classless visible content was not closed. The
 candidate law below folds every finding before implementation.
 
-DESIGN gate round 2 found two stale checklist contradictions; both were removed. Final:
-`DESIGN-VERDICT: APPROVE`.
+DESIGN gate round 2 found two stale checklist contradictions; both were removed. The historical
+record was `DESIGN-VERDICT: APPROVE`.
+
+> **SUPERSEDED 2026-07-14:** that approval is void. It admitted DOM ownership and migration
+> mechanics while leaving full-page composition consistency-only and unratified, then permitted a
+> shared token-reskinned archetype to ship as three named design languages. The binding replacement
+> gate is the [W3 visual-regression corrective audit](w3-visual-regression-correction.md#codex-corrective-audit--binding-gate-2026-07-14).
+> This document cannot be cited as approval for implementation, commit, merge, push, publication,
+> or vendor-conformance claims.
 
 ## Observed surface
 

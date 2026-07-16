@@ -1,0 +1,130 @@
+{
+  "contract_id": "CorrectionFailureBaseline",
+  "schema_version": 1,
+  "purpose": "R-W3-RATCHET-1: the exact failing/erroring tests of the focused 17-module command at slice-0 landing, measured in the PINNED context: the clean patched worktree (branch tip + the slice final patch), with failure fingerprints. tests/contracts/test_correction_ratchet.py (slice 1) enforces: current failures must be a subset of this ledger AT (test id, fingerprint) granularity; the ledger only SHRINKS (a fixed test is removed in the slice that fixes it); a new fingerprint inside an already-red test is a NEW failure and reddens. setUpClass masks carry an explicit unmask rule. Full-suite green (empty ledger) is required at slice 10.",
+  "observed_utc": "2026-07-15",
+  "command": "PYTHONDONTWRITEBYTECODE=1 python -m unittest -v tests.contracts.test_bootstrap_red_ref tests.contracts.test_page_archetype tests.contracts.test_design_source_provenance tests.contracts.test_official_source_parity tests.contracts.test_reference_pack tests.contracts.test_dashboard_visual_authority tests.contracts.test_dom_cover tests.contracts.test_page_manifest tests.contracts.test_theme_continuity tests.contracts.test_rendered_facts tests.contracts.test_rendered_fact_adversarial tests.contracts.test_rendered_fact_density_adversarial tests.contracts.test_rendered_fact_paint_adversarial tests.contracts.test_skill_structure tests.contracts.test_structural_layout tests.contracts.test_scripts_layout_contract tests.contracts.test_tests_layout_contract",
+  "totals": {
+    "failures": 7,
+    "errors": 9,
+    "ordinary_failing_rows": 7,
+    "loader_masks": 9,
+    "setupclass_masks": 0,
+    "observed_identities": 16
+  },
+  "setupclass_masks": [],
+  "failing": [
+    {
+      "id": "tests.contracts.test_structural_layout.StructuralLayoutContract::test_declared_homes_have_no_phantom_members",
+      "kind": "failure",
+      "fingerprint_mode": "seed-terminal-line",
+      "subtest_vectors": 0,
+      "fingerprints": [
+        "Diff is 1196 characters long. Set self.maxDiff to None to see it. : declared homes reference files that do not exist on disk"
+      ]
+    },
+    {
+      "id": "tests.contracts.test_structural_layout.StructuralLayoutContract::test_every_src_module_has_a_declared_home",
+      "kind": "failure",
+      "fingerprint_mode": "seed-terminal-line",
+      "subtest_vectors": 0,
+      "fingerprints": [
+        "'contracts/rendered/interaction.py' : scripts/ layout cover drifted \u2014 declare every module's home in contracts/repo_layout.json structural_layout.source_layout"
+      ]
+    },
+    {
+      "id": "tests.contracts.test_structural_layout.StructuralLayoutContract::test_every_test_file_has_a_declared_home",
+      "kind": "failure",
+      "fingerprint_mode": "seed-terminal-line",
+      "subtest_vectors": 0,
+      "fingerprints": [
+        "'contracts/test_reference_pack.py' : tests/ layout cover drifted \u2014 declare every test's home in structural_layout.test_layout"
+      ]
+    },
+    {
+      "id": "tests.contracts.test_structural_layout.StructuralLayoutContract::test_guard_fires_on_a_forged_or_misplaced_file",
+      "kind": "failure",
+      "fingerprint_mode": "seed-terminal-line",
+      "subtest_vectors": 0,
+      "fingerprints": [
+        "'contracts/rendered/interaction.py' : the real cover must be green now"
+      ]
+    },
+    {
+      "id": "tests.contracts.test_structural_layout.StructuralLayoutContract::test_placement_enforced_groups_live_in_their_subdir",
+      "kind": "failure",
+      "fingerprint_mode": "seed-terminal-line",
+      "subtest_vectors": 0,
+      "fingerprints": [
+        "Diff is 1287 characters long. Set self.maxDiff to None to see it. : placement drift \u2014 a member is not where its flag says"
+      ]
+    },
+    {
+      "id": "tests.contracts.test_tests_layout_contract.TestsLayoutContract::test_declared_modules_exist",
+      "kind": "failure",
+      "fingerprint_mode": "seed-terminal-line",
+      "subtest_vectors": 0,
+      "fingerprints": [
+        "+  'tests/contracts/test_reference_pack.py'] : declared test modules missing: ['tests/contracts/test_dashboard_visual_authority.py', 'tests/contracts/test_page_"
+      ]
+    },
+    {
+      "id": "tests.contracts.test_tests_layout_contract.TestsLayoutContract::test_design_contracts_grouped_by_authority",
+      "kind": "failure",
+      "fingerprint_mode": "seed-terminal-line",
+      "subtest_vectors": 0,
+      "fingerprints": [
+        "FAILED (failures=7, errors=9)"
+      ]
+    }
+  ],
+  "measurement_context": "clean worktree of the branch tip with ONLY the slice final patch applied (w3c-0 \u00a713.2); never the dirty main worktree",
+  "loader_masks": [
+    {
+      "module": "test_dashboard_visual_authority",
+      "fingerprint": "ModuleNotFoundError: No module named 'tests.contracts.test_dashboard_visual_authority'",
+      "unmask_rule": "this module is uncommitted prior work absent from the clean context; the slice that lands it must land it GREEN \u2014 when it loads, its tests join the comparison and any failing test must already be in this ledger"
+    },
+    {
+      "module": "test_design_source_provenance",
+      "fingerprint": "ModuleNotFoundError: No module named 'tests.contracts.test_design_source_provenance'",
+      "unmask_rule": "this module is uncommitted prior work absent from the clean context; the slice that lands it must land it GREEN \u2014 when it loads, its tests join the comparison and any failing test must already be in this ledger"
+    },
+    {
+      "module": "test_official_source_parity",
+      "fingerprint": "ModuleNotFoundError: No module named 'tests.contracts.test_official_source_parity'",
+      "unmask_rule": "this module is uncommitted prior work absent from the clean context; the slice that lands it must land it GREEN \u2014 when it loads, its tests join the comparison and any failing test must already be in this ledger"
+    },
+    {
+      "module": "test_page_archetype",
+      "fingerprint": "ModuleNotFoundError: No module named 'tests.contracts.test_page_archetype'",
+      "unmask_rule": "this module is uncommitted prior work absent from the clean context; the slice that lands it must land it GREEN \u2014 when it loads, its tests join the comparison and any failing test must already be in this ledger"
+    },
+    {
+      "module": "test_reference_pack",
+      "fingerprint": "ModuleNotFoundError: No module named 'tests.contracts.test_reference_pack'",
+      "unmask_rule": "this module is uncommitted prior work absent from the clean context; the slice that lands it must land it GREEN \u2014 when it loads, its tests join the comparison and any failing test must already be in this ledger"
+    },
+    {
+      "module": "test_rendered_fact_adversarial",
+      "fingerprint": "ModuleNotFoundError: No module named 'tests.contracts.test_rendered_fact_adversarial'",
+      "unmask_rule": "this module is uncommitted prior work absent from the clean context; the slice that lands it must land it GREEN \u2014 when it loads, its tests join the comparison and any failing test must already be in this ledger"
+    },
+    {
+      "module": "test_rendered_fact_density_adversarial",
+      "fingerprint": "ModuleNotFoundError: No module named 'tests.contracts.test_rendered_fact_density_adversarial'",
+      "unmask_rule": "this module is uncommitted prior work absent from the clean context; the slice that lands it must land it GREEN \u2014 when it loads, its tests join the comparison and any failing test must already be in this ledger"
+    },
+    {
+      "module": "test_rendered_fact_paint_adversarial",
+      "fingerprint": "ModuleNotFoundError: No module named 'tests.contracts.test_rendered_fact_paint_adversarial'",
+      "unmask_rule": "this module is uncommitted prior work absent from the clean context; the slice that lands it must land it GREEN \u2014 when it loads, its tests join the comparison and any failing test must already be in this ledger"
+    },
+    {
+      "module": "test_rendered_facts",
+      "fingerprint": "ModuleNotFoundError: No module named 'tests.contracts.test_rendered_facts'",
+      "unmask_rule": "this module is uncommitted prior work absent from the clean context; the slice that lands it must land it GREEN \u2014 when it loads, its tests join the comparison and any failing test must already be in this ledger"
+    }
+  ],
+  "ratchet_status": "SEED \u2014 binds at slice 1. Fingerprints are terminal exception lines (fingerprint_mode: seed-terminal-line), NOT atomic category|side|member members; the slice-1 ratchet's seven-id atomic extractor REGENERATES them at slice-1 landing (w3c-0 \u00a713.2). Measured in the clean patched worktree, 75 tests / 7F / 9E / 16 observed identities."
+}
