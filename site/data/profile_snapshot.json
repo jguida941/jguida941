@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-21T22:12:38.844128Z",
+  "generated_at": "2026-07-21T23:11:37.094113Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,15 +18,15 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 10464,
-    "public_scope_commits": 6712,
+    "last_year_contributions": 10466,
+    "public_scope_commits": 6714,
     "total_repos": 74,
     "public_forks": 0,
     "private_owned_repos": 158,
     "total_stars": 80,
     "languages_count": 26,
     "prs_merged": 41,
-    "releases": 2,
+    "releases": 3,
     "ci_repos": 17,
     "streak_days": 25
   },
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 10464,
-      "display_value": "10,464"
+      "value": 10466,
+      "display_value": "10,466"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6712,
-      "display_value": "6,712"
+      "value": 6714,
+      "display_value": "6,714"
     },
     {
       "key": "total_repos",
@@ -91,8 +91,8 @@
       "key": "releases",
       "label": "Releases (30 Days)",
       "dashboard_label": "Releases (30d)",
-      "value": 2,
-      "display_value": "2"
+      "value": 3,
+      "display_value": "3"
     },
     {
       "key": "ci_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 10464,
-      "display_value": "10,464"
+      "value": 10466,
+      "display_value": "10,466"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6712,
-      "display_value": "6,712"
+      "value": 6714,
+      "display_value": "6,714"
     },
     {
       "key": "total_repos",
@@ -161,8 +161,8 @@
     {
       "key": "releases",
       "label": "Releases (30d)",
-      "value": 2,
-      "display_value": "2"
+      "value": 3,
+      "display_value": "3"
     },
     {
       "key": "ci_repos",
@@ -188,25 +188,25 @@
     "events_note": "Public events feed available."
   },
   "scorecard": {
-    "releases_30d": 2,
-    "active_repos_7d": 4,
-    "avg_release_gap_days": 2.2730092592592595,
+    "releases_30d": 3,
+    "active_repos_7d": 6,
+    "avg_release_gap_days": 5.541840277777778,
     "stars_per_public_repo": 1.0810810810810811,
     "ci_coverage_pct": 22.972972972972975,
-    "last_year_contributions": 10464,
+    "last_year_contributions": 10466,
     "active_days_last_year": 303,
     "automation_workflows": 78,
-    "primary_lang_share_pct": 45.7,
+    "primary_lang_share_pct": 45.6,
     "median_days_since_push": 206.0,
-    "days_since_last_push": 1.0
+    "days_since_last_push": 0.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 10464,
-      "display_value": "10,464",
+      "value": 10466,
+      "display_value": "10,466",
       "accent": "#7dcfff"
     },
     {
@@ -221,8 +221,8 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 4,
-      "display_value": "4",
+      "value": 6,
+      "display_value": "6",
       "accent": "#7dcfff"
     },
     {
@@ -245,24 +245,24 @@
       "key": "releases_30d",
       "label": "Releases (30d)",
       "detail": "published in last month",
-      "value": 2,
-      "display_value": "2",
+      "value": 3,
+      "display_value": "3",
       "accent": "#ff9e64"
     },
     {
       "key": "primary_lang_share_pct",
       "label": "Primary Language",
       "detail": "share of code by bytes",
-      "value": 45.7,
-      "display_value": "45.7%",
+      "value": 45.6,
+      "display_value": "45.6%",
       "accent": "#7aa2f7"
     },
     {
       "key": "days_since_last_push",
       "label": "Last Push",
       "detail": "days since your most recent commit",
-      "value": 1.0,
-      "display_value": "1d",
+      "value": 0.0,
+      "display_value": "0d",
       "accent": "#9ece6a"
     }
   ],
@@ -298,11 +298,11 @@
       "stars": 14,
       "forks": 0,
       "ci": "yes",
-      "pushed_at": "2026-07-13",
-      "pushed_at_raw": "2026-07-13T02:59:25Z",
-      "pushed_ago": "1 week ago",
+      "pushed_at": "2026-07-21",
+      "pushed_at_raw": "2026-07-21T22:31:07Z",
+      "pushed_ago": "today",
       "created_at": "2025-11-06",
-      "last_commit_msg": "release: v1.2.4 \u2014 whisper noise-artifact fixes",
+      "last_commit_msg": "chore: update CI badges",
       "featured": true
     },
     {
@@ -325,32 +325,32 @@
     {
       "name": "Python",
       "bytes": 11136814,
-      "percent": 45.73
+      "percent": 45.65
     },
     {
       "name": "Makefile",
       "bytes": 3932089,
-      "percent": 16.15
+      "percent": 16.12
     },
     {
       "name": "Rust",
-      "bytes": 3625260,
-      "percent": 14.89
+      "bytes": 3670018,
+      "percent": 15.04
     },
     {
       "name": "C++",
       "bytes": 1835579,
-      "percent": 7.54
+      "percent": 7.52
     },
     {
       "name": "Java",
       "bytes": 1585612,
-      "percent": 6.51
+      "percent": 6.5
     },
     {
       "name": "HTML",
       "bytes": 412931,
-      "percent": 1.7
+      "percent": 1.69
     },
     {
       "name": "TypeScript",
@@ -407,11 +407,11 @@
       "stars": 14,
       "forks": 0,
       "ci": "yes",
-      "pushed_at": "2026-07-13",
-      "pushed_at_raw": "2026-07-13T02:59:25Z",
-      "pushed_ago": "1 week ago",
+      "pushed_at": "2026-07-21",
+      "pushed_at_raw": "2026-07-21T22:31:07Z",
+      "pushed_ago": "today",
       "created_at": "2025-11-06",
-      "last_commit_msg": "release: v1.2.4 \u2014 whisper noise-artifact fixes",
+      "last_commit_msg": "chore: update CI badges",
       "featured": true
     },
     {
@@ -428,6 +428,21 @@
       "created_at": "2025-11-15",
       "last_commit_msg": "recent push detected",
       "featured": true
+    },
+    {
+      "name": "homebrew-voiceterm",
+      "full_name": "jguida941/homebrew-voiceterm",
+      "url": "https://github.com/jguida941/homebrew-voiceterm",
+      "language": "Ruby",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-07-21",
+      "pushed_at_raw": "2026-07-21T22:28:26Z",
+      "pushed_ago": "today",
+      "created_at": "2026-01-22",
+      "last_commit_msg": "Update to v1.2.5",
+      "featured": false
     },
     {
       "name": "assembly-notes",
@@ -454,7 +469,7 @@
       "ci": "no",
       "pushed_at": "2026-07-19",
       "pushed_at_raw": "2026-07-19T22:49:17Z",
-      "pushed_ago": "1 day ago",
+      "pushed_ago": "2 days ago",
       "created_at": "2026-07-18",
       "last_commit_msg": "Restore full detailed Project One Milestone paper (warehouse experien\u2026",
       "featured": false
@@ -469,7 +484,7 @@
       "ci": "no",
       "pushed_at": "2026-07-19",
       "pushed_at_raw": "2026-07-19T22:15:18Z",
-      "pushed_ago": "1 day ago",
+      "pushed_ago": "2 days ago",
       "created_at": "2026-07-19",
       "last_commit_msg": "Update assignment document and reflection formatting",
       "featured": false
@@ -487,21 +502,6 @@
       "pushed_ago": "3 days ago",
       "created_at": "2026-07-18",
       "last_commit_msg": "Add universal one-command auto-launcher (start.py + macOS start.command)",
-      "featured": false
-    },
-    {
-      "name": "homebrew-voiceterm",
-      "full_name": "jguida941/homebrew-voiceterm",
-      "url": "https://github.com/jguida941/homebrew-voiceterm",
-      "language": "Ruby",
-      "stars": 1,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-07-13",
-      "pushed_at_raw": "2026-07-13T03:02:03Z",
-      "pushed_ago": "1 week ago",
-      "created_at": "2026-01-22",
-      "last_commit_msg": "Update to v1.2.4",
       "featured": false
     },
     {
@@ -885,22 +885,22 @@
   "focus": {
     "now": [
       {
+        "title": "voiceterm",
+        "detail": "Rust \u00b7 pushed today",
+        "url": "https://github.com/jguida941/voiceterm",
+        "is_private": false
+      },
+      {
+        "title": "homebrew-voiceterm",
+        "detail": "Ruby \u00b7 pushed today",
+        "url": "https://github.com/jguida941/homebrew-voiceterm",
+        "is_private": false
+      },
+      {
         "title": "simple_python",
         "detail": "Python \u00b7 pushed today",
         "url": "",
         "is_private": true
-      },
-      {
-        "title": "guardir",
-        "detail": "Python \u00b7 pushed 1 day ago",
-        "url": "",
-        "is_private": true
-      },
-      {
-        "title": "assembly-notes",
-        "detail": "Assembly \u00b7 pushed 1 day ago",
-        "url": "https://github.com/jguida941/assembly-notes",
-        "is_private": false
       }
     ],
     "next": [
@@ -922,6 +922,11 @@
     ],
     "shipped": [
       {
+        "title": "v1.2.5",
+        "detail": "voiceterm \u00b7 today",
+        "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.5"
+      },
+      {
         "title": "v1.2.4",
         "detail": "voiceterm \u00b7 1 week ago",
         "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.4"
@@ -934,6 +939,36 @@
     ]
   },
   "activity_feed": [
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/homebrew-voiceterm",
+      "repo": "jguida941/homebrew-voiceterm",
+      "repo_url": "https://github.com/jguida941/homebrew-voiceterm",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-07-21T22:28:27Z"
+    },
+    {
+      "kind": "release",
+      "title": "v1.2.5",
+      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.5",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "RELEASED",
+      "time_ago": "today",
+      "created_at": "2026-07-21T22:26:47Z"
+    },
+    {
+      "kind": "activity",
+      "title": "release",
+      "url": "https://github.com/jguida941/voiceterm",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "RELEASE",
+      "time_ago": "today",
+      "created_at": "2026-07-21T22:26:47Z"
+    },
     {
       "kind": "activity",
       "title": "push",
@@ -951,7 +986,7 @@
       "repo": "jguida941/CS360",
       "repo_url": "https://github.com/jguida941/CS360",
       "state": "PUSH",
-      "time_ago": "1 day ago",
+      "time_ago": "2 days ago",
       "created_at": "2026-07-19T22:49:18Z"
     },
     {
@@ -961,7 +996,7 @@
       "repo": "jguida941/android_studio_intro",
       "repo_url": "https://github.com/jguida941/android_studio_intro",
       "state": "PUSH",
-      "time_ago": "1 day ago",
+      "time_ago": "2 days ago",
       "created_at": "2026-07-19T22:15:18Z"
     },
     {
@@ -1005,32 +1040,12 @@
       "created_at": "2026-07-18T20:10:21Z"
     },
     {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/homebrew-voiceterm",
-      "repo": "jguida941/homebrew-voiceterm",
-      "repo_url": "https://github.com/jguida941/homebrew-voiceterm",
-      "state": "PUSH",
-      "time_ago": "1 week ago",
-      "created_at": "2026-07-13T03:02:03Z"
-    },
-    {
       "kind": "release",
       "title": "v1.2.4",
       "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.4",
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "RELEASED",
-      "time_ago": "1 week ago",
-      "created_at": "2026-07-13T02:59:25Z"
-    },
-    {
-      "kind": "activity",
-      "title": "release",
-      "url": "https://github.com/jguida941/voiceterm",
-      "repo": "jguida941/voiceterm",
-      "repo_url": "https://github.com/jguida941/voiceterm",
-      "state": "RELEASE",
       "time_ago": "1 week ago",
       "created_at": "2026-07-13T02:59:25Z"
     },
@@ -1103,19 +1118,17 @@
       "state": "OPEN",
       "time_ago": "2 weeks ago",
       "created_at": "2026-07-07T18:06:32Z"
-    },
-    {
-      "kind": "pull request",
-      "title": "PR #1",
-      "url": "https://github.com/jguida941/doubly_linked_list_demo/pull/1",
-      "repo": "jguida941/doubly_linked_list_demo",
-      "repo_url": "https://github.com/jguida941/doubly_linked_list_demo",
-      "state": "OPEN",
-      "time_ago": "2 weeks ago",
-      "created_at": "2026-07-05T19:08:20Z"
     }
   ],
   "recent_releases": [
+    {
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "tag": "v1.2.5",
+      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.5",
+      "time_ago": "today",
+      "created_at": "2026-07-21T22:26:47Z"
+    },
     {
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
@@ -1169,15 +1182,6 @@
       "state": "OPEN",
       "time_ago": "2 weeks ago",
       "created_at": "2026-07-07T18:06:32Z"
-    },
-    {
-      "title": "PR #1",
-      "url": "https://github.com/jguida941/doubly_linked_list_demo/pull/1",
-      "repo": "jguida941/doubly_linked_list_demo",
-      "repo_url": "https://github.com/jguida941/doubly_linked_list_demo",
-      "state": "OPEN",
-      "time_ago": "2 weeks ago",
-      "created_at": "2026-07-05T19:08:20Z"
     }
   ],
   "engineering": {
@@ -1194,21 +1198,21 @@
       428,
       374,
       275,
-      58
+      60
     ],
     "automation_workflows": 78,
     "automation_repos": 16,
-    "primary_lang_share_pct": 45.7,
+    "primary_lang_share_pct": 45.6,
     "languages_over_5pct": 5,
     "median_days_since_push": 206.0,
-    "days_since_last_push": 1.0,
+    "days_since_last_push": 0.0,
     "public_repos_total": 74,
     "public_nonfork_repos": 74,
     "private_repos_total": 158,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 10464,
+    "total": 10466,
     "weeks": [
       [
         {
@@ -2773,7 +2777,7 @@
         },
         {
           "date": "2026-07-21",
-          "count": 15
+          "count": 17
         }
       ]
     ]
@@ -2825,7 +2829,7 @@
         0,
         0,
         0,
-        0,
+        3,
         0,
         0,
         0,
@@ -2876,7 +2880,7 @@
         0,
         0,
         0,
-        6,
+        5,
         4,
         0,
         1,
@@ -2952,7 +2956,7 @@
         0,
         0,
         2,
-        1,
+        0,
         0,
         0,
         7,
@@ -2964,13 +2968,13 @@
       ]
     ],
     "event_mix": {
-      "push": 70,
+      "push": 71,
       "comment": 6,
-      "pull request": 5,
-      "create": 3,
-      "release": 2
+      "pull request": 4,
+      "release": 3,
+      "create": 3
     },
-    "total": 86,
+    "total": 87,
     "timezone": "New York"
   }
 }
