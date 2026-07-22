@@ -48,22 +48,21 @@ contracts — no hardcoded paths/layouts; packaging = constellation sibling patt
 
 ## ORCHESTRATION (operator-ratified; mirrors the semantic-tdd SOP)
 
-Continuation routing (operator 2026-07-16; AGENTS.md owns this doctrine for this continuation):
-**Fable authors every design and RED. Once a design reaches its binding state (APPROVE or
-lawful convergence, per AGENTS.md) and fresh admission exists, Opus builds only in an isolated
-worktree under the six-field packet; never gating, integrating, or committing. Fable verifies
-in a clean worktree, integrates, and commits the exact approved diff on `w3-correction`; Codex
-never codes and issues the DESIGN/CODE/ADVERSARIAL verdicts.** No artifact author approves its own work;
+Continuation routing (operator 2026-07-22; AGENTS.md owns this doctrine):
+**`/root` conducts, dispatches, verifies, integrates, commits, and records recovery state, but
+does not design, author REDs, implement, or approve. Fable authors every bounded design and
+executable RED. After one bounded Codex review/conformance gate and fresh admission, Opus builds
+GREEN only in an isolated worktree under the six-field packet; Codex reviews the finished
+patch.** No artifact author approves its own work;
 no slice lands without all three gates. Opus read-only fan-outs remain allowed. Findings fold
 into THIS plan or its named record — never a new plan doc (conductor's live scratch record:
 `scratchpad/work/CONTINUATION-PLAN.md`). Integrations stay on `w3-correction`; slice 10 is
 acceptance only; `main` needs a later operator decision. SOP/receipt/effort/packet laws unchanged.
-Review-effort policy: the FIRST review round on an artifact runs at max/ultra effort; repeat
-rounds on the same artifact run at xhigh — never spend ultra on re-reviews (reviews only).
-Convergence cap (lesson of the 13-round slice-0 gate): after TWO REVISE rounds on one artifact,
-remaining findings convert to executable REDs/probe scripts and move to the build phase — codex
-then reviews code and test output, never prose re-descriptions; empirical domains (git, browser
-behavior) are settled by scripts with hostile-case tests from the first round.
+Review history is append-only across corrected/versioned artifacts. After every terminal review,
+stable findings become typed `FindingToEvidenceTransition` rows and move immediately to RED,
+probe, deterministic-validator, minimum-prerequisite, capability-blocker, or operator-policy
+evidence. No review-of-review or broad prose revision loop is permitted. After right-reason RED,
+one bounded RED-conformance check is followed immediately by a different Opus GREEN builder.
 
 ## STATUS
 
@@ -74,7 +73,7 @@ behavior) are settled by scripts with hostile-case tests from the first round.
   text-only as first branch commit only after CODE + ADVERSARIAL approve the exact landing patch;
   org L1/L2 intake follows. T0 lands with slice 0 (doc law + plan).
 - **Correction slices** (development branch `w3-correction`; design → DESIGN gate → RED + admission
-  → isolated, packet-bound Opus build → Fable verification + Codex CODE/ADVERSARIAL → Fable commit;
+  → isolated, packet-bound Opus build → `/root` verification + Codex CODE/ADVERSARIAL → `/root` commit;
   every integration stays on this branch). Slice 0 = design closure + T0 + AGENTS amendment
   (**text-only — no receipts; lands via plain-diff review, NOT the hermetic binary-patch tool, which is slice-1+**). 1 admission/
   source foundation + `dashboard-pre-w3.v2` + slice_patch + ratchet hardening · 2 coverage +
