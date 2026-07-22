@@ -56,3 +56,8 @@ profile fields/predicates/negative tests and pass through rendered facts, and vi
 `receipt_obligation` or remain explicit candidate-only debt.
 
 The model may propose. The rendered, tested shape decides.
+
+## Lifecycle authority
+
+Slice lifecycle, role seats, review gates, and commit authority are governed by `AGENTS.md`
+(operator process correction 2026-07-22); this lane carries only the doctrine-ingest method.

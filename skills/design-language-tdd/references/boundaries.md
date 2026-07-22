@@ -44,3 +44,8 @@ The reusable parts (this skill, the predicate shapes, the character/distinctness
 receipt templates) are written to lift cleanly into repo-surface-scout as `candidate_only` profiles.
 What stays profile-specific: the concrete render adapter, the per-language token values, the captured
 receipts. Keeping the governance logic out of the proof target is the SOP.
+
+## Lifecycle authority
+
+Slice lifecycle, role seats, review gates, and commit authority are governed by `AGENTS.md`
+(operator process correction 2026-07-22); this lane carries only the boundary claims.

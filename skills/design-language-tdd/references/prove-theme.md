@@ -31,8 +31,7 @@ review.
 5. **Honest receipt.** Record "satisfies the `<language>` profile vN across <aspects> — here are the
    receipts," with the invariant → predicate → pass/receipt table. NEVER "is `<language>`".
 
-## Commit discipline (this repo)
+## Lifecycle authority
 
-Each slice: name the RED → declare the home in `repo_layout.json` (same slice) → implement → GREEN →
-visual receipt → codex folded RED-first → commit → CI green → update `docs/plans/ACTIVE.md` STATUS →
-keep docs fresh.
+Slice lifecycle, role seats, review gates, and commit authority are governed by `AGENTS.md`
+(operator process correction 2026-07-22); this lane carries only the proving method.

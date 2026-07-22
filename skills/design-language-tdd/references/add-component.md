@@ -2,7 +2,7 @@
 
 Add a component (button, chip, card, kpi, input, nav, table, chart, hero, type-specimen) to the
 webkit library. A component is **DATA + a render branch + only-new predicates** — never a bespoke
-per-theme template. Follow the per-slice SOP in `SKILL.md`; this lane is the component-specific shape.
+per-theme template. Follow the per-slice SOP in `AGENTS.md`; this lane is the component-specific shape.
 
 ## What a component is, across the four seams
 
@@ -41,7 +41,8 @@ per-theme template. Follow the per-slice SOP in `SKILL.md`; this lane is the com
    AND distinctness); materialize any `receipt_obligation` via `scripts/quality/visual_receipts.py`
    (a deterministic reconstruction / rendered-CSS measurement whose `kind` names its real producer —
    never a reconstruction mislabeled a screenshot; the true headless probe is deferred R4).
-5. **Codex** on the diff (inline) → fold RED-first → commit when green + codex agrees.
+5. **Gates** — the independent codex review and the commit run under the slice SOP; lifecycle,
+   seats, gates, and commits are governed by `AGENTS.md` (operator process correction 2026-07-22).
 
 ## Worked example (the button, instance #1)
 

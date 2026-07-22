@@ -41,3 +41,8 @@ move through the same loop as a component, with any missing judgment left candid
 A passing test proves only the encoded law. It does not prove missing page laws, visual quality, or
 brand authority. Deferred page aspects need explicit `covered-deferred` coverage and named slice
 reasons, never placeholder predicates.
+
+## Lifecycle authority
+
+Slice lifecycle, role seats, review gates, and commit authority are governed by `AGENTS.md`
+(operator process correction 2026-07-22); this lane carries only the page-aspect method.

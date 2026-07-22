@@ -97,3 +97,15 @@ DESIGN + CODE + ADVERSARIAL cadence; T0 doc-authority law). Session plan source:
 Odinproject O0 landed (`bad950a`). Codex rounds: advisory PLAN REVISE (folded); slice-0 DESIGN
 gate r1 REVISE (folded to rev 2); r2 REVISE (folding to rev 3). Transcripts:
 `scratchpad/work/codex-*.md`.
+
+## 2026-07-22 — operator post-review execution law + `/root`-conductor adoption
+
+- Adopted the operator-amended landing `AGENTS.md`/`ACTIVE.md` (sha256 `89de86f1…`/`cf4e82e4…`):
+  `/root` conducts; Fable authors DESIGN + RED; Opus builds GREEN; Codex reviews. Review history
+  is append-only across corrections/renames/versions; terminal findings become typed
+  `FindingToEvidenceTransition` rows (12 rows live in the currency policy); no review-of-review;
+  after right-reason RED plus ONE bounded conformance check, a DIFFERENT Opus builder is
+  dispatched immediately.
+- Law data: `contracts/process_docs_currency_policy.toml` · RED:
+  `tests/contracts/test_process_docs_currency.py` · design:
+  `scratchpad/active/process/process-doc-currentness-adoption-design-r1.md`.
