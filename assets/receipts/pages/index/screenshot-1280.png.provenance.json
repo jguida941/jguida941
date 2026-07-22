@@ -1,10 +1,10 @@
 {
   "artifact": "assets/receipts/pages/index/screenshot-1280.png",
-  "artifact_sha256": "b4a34cefc3a66e663634785ea3856b01305dd346c77bb57ed217e5faf27c7933",
+  "artifact_sha256": "7e74fc4f03760d6bd95e1aad08b9a1a75ee1a74e1da044eeb5679f7abda9e3b9",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "capture_origin": "ephemeral-local-http",
-  "chrome_version": "Google Chrome 150.0.7871.115",
+  "chrome_version": "Google Chrome 150.0.7871.130",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
@@ -15,15 +15,15 @@
     "--window-size=1280,1536",
     "--virtual-time-budget=15000",
     "--dump-dom",
-    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/index/.screenshot-1280.png.488711f0e7034201a8e74f500cc5c733.tmp.png",
-    "http://127.0.0.1:62398/site/index.html?__receipt_capture=78a5fa5a50fe44acb4f15c06676a4e8d&page=index&page_sha256=92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f&width=1280&height=1536"
+    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/index/.screenshot-1280.png.50542fb0314043528aa597c88667c305.tmp.png",
+    "http://127.0.0.1:54541/site/index.html?__receipt_capture=d819c36f26444b25a96a1770855cdd8f&page=index&page_sha256=92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f&width=1280&height=1536"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "data_path": "site/data/profile_snapshot.json",
-  "data_sha256": "c8acce6d0fb75f55b52da0fff5b105459d4aa603da6d22edd6c8696852399f7f",
+  "data_sha256": "7fd7313cabf652087801bdb07e5421b0089242b8975fa18745599a719b68e263",
   "empty_state_hidden": {
     "flagship": true,
-    "focus-next": false,
+    "focus-next": true,
     "focus-now": true,
     "focus-shipped": true
   },
@@ -33,10 +33,10 @@
   "page_sha256": "92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f",
   "producer": "scripts/quality/headless_receipts.py",
   "prototype_origin_counts": {
-    "calendar-cell": 367,
+    "calendar-cell": 368,
     "calendar-scale": 5,
-    "event-mix": 4,
-    "focus-item": 5,
+    "event-mix": 5,
+    "focus-item": 7,
     "heat-cell": 168,
     "heat-day": 7,
     "heat-hour": 5,
@@ -47,12 +47,12 @@
   },
   "route": "site/index.html",
   "same_session_capture": {
-    "capture_id": "78a5fa5a50fe44acb4f15c06676a4e8d",
+    "capture_id": "d819c36f26444b25a96a1770855cdd8f",
     "facts": {
-      "capture_id": "78a5fa5a50fe44acb4f15c06676a4e8d",
+      "capture_id": "d819c36f26444b25a96a1770855cdd8f",
       "empty_state_hidden": {
         "flagship": true,
-        "focus-next": false,
+        "focus-next": true,
         "focus-now": true,
         "focus-shipped": true
       },
@@ -60,10 +60,10 @@
       "page": "index",
       "page_sha256": "92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f",
       "prototype_origin_counts": {
-        "calendar-cell": 367,
+        "calendar-cell": 368,
         "calendar-scale": 5,
-        "event-mix": 4,
-        "focus-item": 5,
+        "event-mix": 5,
+        "focus-item": 7,
         "heat-cell": 168,
         "heat-day": 7,
         "heat-hour": 5,
@@ -78,18 +78,18 @@
         "outcome": "ready"
       },
       "sentinel_values": {
-        "cal-total": "9,571 contributions",
-        "hero-contributions": "9,571",
-        "lang-count": "26 languages",
+        "cal-total": "10k contributions",
+        "hero-contributions": "10k",
+        "lang-count": "25 languages",
         "lang-name": "Python",
-        "rhythm-meta": "82 events \u00b7 New York"
+        "rhythm-meta": "87 events \u00b7 New York"
       },
       "viewport": {
         "height": 1536,
         "width": 1280
       }
     },
-    "facts_sha256": "af900990e4edaf91d4827d17c4efd1b914e72dd3580e652cc9c2f0f6492bda11",
+    "facts_sha256": "28895f0ee2f16b3dc105a953a04aaaeb7441f2f25753bb617ce5b9c303f6598b",
     "readiness": {
       "animation_frames": 2,
       "fonts": "ready",
@@ -97,11 +97,11 @@
     }
   },
   "sentinel_values": {
-    "cal-total": "9,571 contributions",
-    "hero-contributions": "9,571",
-    "lang-count": "26 languages",
+    "cal-total": "10k contributions",
+    "hero-contributions": "10k",
+    "lang-count": "25 languages",
     "lang-name": "Python",
-    "rhythm-meta": "82 events \u00b7 New York"
+    "rhythm-meta": "87 events \u00b7 New York"
   },
   "viewport": {
     "height": 1536,

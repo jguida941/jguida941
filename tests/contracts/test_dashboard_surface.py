@@ -437,7 +437,8 @@ class DashboardSurfaceContract(unittest.TestCase):
                 **expected["prototype_origin_counts"], "repository": 0,
             }),
             ("empty_state_hidden", {
-                **expected["empty_state_hidden"], "focus-next": True,
+                **expected["empty_state_hidden"],
+                "focus-next": not expected["empty_state_hidden"]["focus-next"],
             }),
         ):
             mutant = deepcopy(data)

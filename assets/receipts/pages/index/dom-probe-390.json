@@ -16,14 +16,14 @@
   ],
   "empty_state_hidden": {
     "flagship": true,
-    "focus-next": false,
+    "focus-next": true,
     "focus-now": true,
     "focus-shipped": true
   },
   "horizontal_overflow": false,
   "hydration_state": "complete",
   "kind": "chrome-headless-dom-probe",
-  "offender_count": 261,
+  "offender_count": 262,
   "offenders": [
     {
       "class": "db-calendar-grid",
@@ -5826,6 +5826,35 @@
       "width": 11
     },
     {
+      "class": "db-calendar-cell",
+      "contained_by_declared_scroll": true,
+      "id": "",
+      "left": 785,
+      "overflow_px": 406,
+      "right": 796,
+      "scroll_container": {
+        "class": "db-calendar-scroll",
+        "id": "",
+        "in_viewport": true,
+        "left": 57,
+        "overflow_x": "auto",
+        "parent": {
+          "class": "db-section db-calendar",
+          "id": "calendar-panel",
+          "tag": "section"
+        },
+        "right": 333,
+        "rule": {
+          "class": "db-calendar-scroll",
+          "parent": "#calendar-panel"
+        },
+        "tag": "div",
+        "width": 276
+      },
+      "tag": "i",
+      "width": 11
+    },
+    {
       "class": "db-rhythm-grid",
       "contained_by_declared_scroll": true,
       "id": "",
@@ -7598,10 +7627,10 @@
   "overflow_px": 0,
   "page": "index",
   "prototype_origin_counts": {
-    "calendar-cell": 367,
+    "calendar-cell": 368,
     "calendar-scale": 5,
-    "event-mix": 4,
-    "focus-item": 5,
+    "event-mix": 5,
+    "focus-item": 7,
     "heat-cell": 168,
     "heat-day": 7,
     "heat-hour": 5,
@@ -7619,11 +7648,11 @@
   "route": "site/index.html",
   "scroll_width": 390,
   "sentinel_values": {
-    "cal-total": "9,571 contributions",
-    "hero-contributions": "9,571",
-    "lang-count": "26 languages",
+    "cal-total": "10k contributions",
+    "hero-contributions": "10k",
+    "lang-count": "25 languages",
     "lang-name": "Python",
-    "rhythm-meta": "82 events \u00b7 New York"
+    "rhythm-meta": "87 events \u00b7 New York"
   },
   "uncontained_offender_count": 0,
   "viewport": {

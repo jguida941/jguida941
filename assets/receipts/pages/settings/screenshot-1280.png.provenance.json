@@ -4,7 +4,7 @@
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "capture_origin": "ephemeral-local-http",
-  "chrome_version": "Google Chrome 150.0.7871.115",
+  "chrome_version": "Google Chrome 150.0.7871.130",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
@@ -15,8 +15,8 @@
     "--window-size=1280,1536",
     "--virtual-time-budget=15000",
     "--dump-dom",
-    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/settings/.screenshot-1280.png.2b5a286450dc4995bd3abbefd0911165.tmp.png",
-    "http://127.0.0.1:62398/site/settings.html?__receipt_capture=19dd068b964f4e6c97cc398817a7f714&page=settings&page_sha256=cf8141bdc9b7c65a34d587fb19cf8e3fd5706b7608d91ac1581696e97624bb52&width=1280&height=1536"
+    "--screenshot=/Users/jguida941/jguida941/jguida941/assets/receipts/pages/settings/.screenshot-1280.png.4f9f16cdc10e4ea781c0c6741e8f3d55.tmp.png",
+    "http://127.0.0.1:54541/site/settings.html?__receipt_capture=c570d2965ee244dbadf0f3248b4af8c9&page=settings&page_sha256=cf8141bdc9b7c65a34d587fb19cf8e3fd5706b7608d91ac1581696e97624bb52&width=1280&height=1536"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-screenshot",
@@ -25,9 +25,9 @@
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/settings.html",
   "same_session_capture": {
-    "capture_id": "19dd068b964f4e6c97cc398817a7f714",
+    "capture_id": "c570d2965ee244dbadf0f3248b4af8c9",
     "facts": {
-      "capture_id": "19dd068b964f4e6c97cc398817a7f714",
+      "capture_id": "c570d2965ee244dbadf0f3248b4af8c9",
       "empty_state_hidden": {},
       "hydration_state": null,
       "page": "settings",
@@ -44,7 +44,7 @@
         "width": 1280
       }
     },
-    "facts_sha256": "791b48cc7497c8119f899f309b9c6864e395b943f67f4a5efa3501d4dc54ed29",
+    "facts_sha256": "dbb349e849b8c3b1d52565feba6f6a9f8c02541cd8d4df6be3a48f7dbe222253",
     "readiness": {
       "animation_frames": 2,
       "fonts": "ready",

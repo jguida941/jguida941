@@ -1,9 +1,9 @@
 {
   "artifact": "assets/receipts/pages/index/theme-state-storage-denied-navigation.json",
-  "artifact_sha256": "c13644a3dbb97e86b9bc96fee2c05f330939c7b23d9ad58a1e8dce25ff1750e4",
+  "artifact_sha256": "8faa8f8de7073297c8761432d3d59ebb11a774f3e5c3d38a5138ff497ac5f8b9",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "chrome_version": "Google Chrome 150.0.7871.115",
+  "chrome_version": "Google Chrome 150.0.7871.130",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
@@ -12,7 +12,7 @@
     "--window-size=800,1300",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:62958/__theme_state_probe__.html?scenario=storage-denied-navigation"
+    "http://127.0.0.1:55171/__theme_state_probe__.html?scenario=storage-denied-navigation"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "follow_page": "showcase",

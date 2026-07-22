@@ -3,7 +3,7 @@
   "artifact_sha256": "ed8ed7157ac4a77d2a072012f35a388aea86ccdbd160f40bff8571eb9eef634b",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "chrome_version": "Google Chrome 150.0.7871.115",
+  "chrome_version": "Google Chrome 150.0.7871.130",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
@@ -12,7 +12,7 @@
     "--window-size=800,1300",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:62958/__theme_state_probe__.html?scenario=button-persists"
+    "http://127.0.0.1:55171/__theme_state_probe__.html?scenario=button-persists"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-theme-state-machine-facts",

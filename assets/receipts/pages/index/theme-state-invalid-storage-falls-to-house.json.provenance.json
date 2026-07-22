@@ -3,7 +3,7 @@
   "artifact_sha256": "fe3bcba3720440b23382e233ffbca74a6a22785541ca2f92f00f130c36ba5ba2",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "chrome_version": "Google Chrome 150.0.7871.115",
+  "chrome_version": "Google Chrome 150.0.7871.130",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
@@ -12,7 +12,7 @@
     "--window-size=800,1300",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:62958/__theme_state_probe__.html?scenario=invalid-storage-falls-to-house"
+    "http://127.0.0.1:55171/__theme_state_probe__.html?scenario=invalid-storage-falls-to-house"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-theme-state-machine-facts",

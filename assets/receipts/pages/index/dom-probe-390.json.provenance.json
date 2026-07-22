@@ -1,10 +1,10 @@
 {
   "artifact": "assets/receipts/pages/index/dom-probe-390.json",
-  "artifact_sha256": "3fb3b58958c08f168c9a053c5610c0597423f5f384d5a43a305197669f7fe3e5",
+  "artifact_sha256": "22586d748bb96a27e9423b874b7327ed631d1090cb9ab2d4d168bdd6b81b7d38",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "capture_origin": "ephemeral-local-http",
-  "chrome_version": "Google Chrome 150.0.7871.115",
+  "chrome_version": "Google Chrome 150.0.7871.130",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
@@ -13,14 +13,14 @@
     "--window-size=800,1000",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:62398/__dom_probe__.html?page=index&viewport=390&height=1000"
+    "http://127.0.0.1:54541/__dom_probe__.html?page=index&viewport=390&height=1000"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "data_path": "site/data/profile_snapshot.json",
-  "data_sha256": "c8acce6d0fb75f55b52da0fff5b105459d4aa603da6d22edd6c8696852399f7f",
+  "data_sha256": "7fd7313cabf652087801bdb07e5421b0089242b8975fa18745599a719b68e263",
   "empty_state_hidden": {
     "flagship": true,
-    "focus-next": false,
+    "focus-next": true,
     "focus-now": true,
     "focus-shipped": true
   },
@@ -30,10 +30,10 @@
   "page_sha256": "92dd86a07336810b1f340db3304d2fd534a37862304e630727169eadbad1f97f",
   "producer": "scripts/quality/headless_receipts.py",
   "prototype_origin_counts": {
-    "calendar-cell": 367,
+    "calendar-cell": 368,
     "calendar-scale": 5,
-    "event-mix": 4,
-    "focus-item": 5,
+    "event-mix": 5,
+    "focus-item": 7,
     "heat-cell": 168,
     "heat-day": 7,
     "heat-hour": 5,
@@ -50,11 +50,11 @@
   },
   "route": "site/index.html",
   "sentinel_values": {
-    "cal-total": "9,571 contributions",
-    "hero-contributions": "9,571",
-    "lang-count": "26 languages",
+    "cal-total": "10k contributions",
+    "hero-contributions": "10k",
+    "lang-count": "25 languages",
     "lang-name": "Python",
-    "rhythm-meta": "82 events \u00b7 New York"
+    "rhythm-meta": "87 events \u00b7 New York"
   },
   "viewport": {
     "height": 1000,

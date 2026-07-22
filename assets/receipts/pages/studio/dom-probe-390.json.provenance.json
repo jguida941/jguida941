@@ -1,10 +1,10 @@
 {
   "artifact": "assets/receipts/pages/studio/dom-probe-390.json",
-  "artifact_sha256": "12aacf058ef2e774740a59e2cbcf01dcf7b155a4b8c85f0914ecbcb87efeb4d4",
+  "artifact_sha256": "57f45950d1d72ee143f09fe5a802c3b3de73ae1003d99d4f1f470cdd1bd0a35c",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
   "capture_origin": "ephemeral-local-http",
-  "chrome_version": "Google Chrome 150.0.7871.115",
+  "chrome_version": "Google Chrome 150.0.7871.130",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
@@ -13,7 +13,7 @@
     "--window-size=800,1000",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:62398/__dom_probe__.html?page=studio&viewport=390&height=1000"
+    "http://127.0.0.1:54541/__dom_probe__.html?page=studio&viewport=390&height=1000"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-dom-probe",

@@ -3,7 +3,7 @@
   "artifact_sha256": "ff196c6153505fe83c40c5635ffebabcd6e092c25bdfac3b0e7561611afb952d",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "chrome_version": "Google Chrome 150.0.7871.115",
+  "chrome_version": "Google Chrome 150.0.7871.130",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
@@ -12,7 +12,7 @@
     "--window-size=1360,1300",
     "--virtual-time-budget=3500",
     "--dump-dom",
-    "http://127.0.0.1:62568/__theme_probe__.html?page=showcase&theme=apple-dark&viewport=1280"
+    "http://127.0.0.1:54739/__theme_probe__.html?page=showcase&theme=apple-dark&viewport=1280"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "house_theme": "apple-dark",

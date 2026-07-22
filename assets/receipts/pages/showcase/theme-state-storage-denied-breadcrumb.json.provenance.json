@@ -1,9 +1,9 @@
 {
   "artifact": "assets/receipts/pages/showcase/theme-state-storage-denied-breadcrumb.json",
-  "artifact_sha256": "8517c89aea0a277afc4501fbcb03fc0bf34589b170b561af62b3af74b1fc95ef",
+  "artifact_sha256": "92404fc9a4842a45a2fe283ce741a813b3ff7cbb289fae8267b750ae3b998176",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "chrome_version": "Google Chrome 150.0.7871.115",
+  "chrome_version": "Google Chrome 150.0.7871.130",
   "command": [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "--headless=new",
@@ -12,7 +12,7 @@
     "--window-size=800,1300",
     "--virtual-time-budget=5000",
     "--dump-dom",
-    "http://127.0.0.1:62958/__theme_state_probe__.html?scenario=storage-denied-breadcrumb"
+    "http://127.0.0.1:55171/__theme_state_probe__.html?scenario=storage-denied-breadcrumb"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "follow_page": "index",
