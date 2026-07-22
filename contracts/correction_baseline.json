@@ -78,6 +78,60 @@
       ]
     }
   ],
+  "org_l1_stay_red": {
+    "purpose": "Org L1 (r3) ratchet rows: the CR arms in tests.contracts.test_org_rootwide + tests.contracts.test_process_docs_currency that stay RED BY DESIGN after the L1 landing and flip at the L2/L3/L4 step named per row. At (test id, fingerprint) granularity per the org L1 build packet. The slice-0 failing/totals/command measurement above is UNCHANGED (the five structural_layout identities plus the two tests_layout_contract identities). These two modules are not part of the slice-0 17-module command, so they are held in this distinct ledger; the pre-commit runner (run_pinned_guards.py) pins only test_doc_authority + test_structural_layout and never runs these arms.",
+    "rows": [
+      {
+        "id": "tests.contracts.test_org_rootwide.OrgRootwideContract::test_tracked_routing_docs_cite_no_scratch_evidence",
+        "kind": "failure",
+        "flips_at": "L2/L3",
+        "fingerprint_mode": "first-assertion-reason",
+        "fingerprints": ["['scratch_citation', 'missing_coupled_governed_pointer'] != [] : docs/plans/ACTIVE.md + HANDOFF.md still cite scratchpad/work and carry no coupled governed pointer; regenerated coupled path+digest pointers land at L2/L3"]
+      },
+      {
+        "id": "tests.contracts.test_org_rootwide.OrgRootwideContract::test_intake_roster_is_complete_at_cutoff",
+        "kind": "failure",
+        "flips_at": "L2",
+        "fingerprint_mode": "first-assertion-reason",
+        "fingerprints": ["the intake manifest dev/reports/admissions/w3c-org-intake.json must exist at the L2 cutoff; absent today"]
+      },
+      {
+        "id": "tests.contracts.test_org_rootwide.OrgRootwideNewLaw::test_scratch_retirement_checkpoint",
+        "kind": "failure",
+        "flips_at": "L2/L3",
+        "fingerprint_mode": "first-assertion-reason",
+        "fingerprints": ["undispositioned_scratch_citer (docs/plans/ACTIVE.md, HANDOFF.md and RED-test scratch data) and scratchpad/work not empty; citation promotion + work-drain land at L2/L3 (the section arm \u2014 scratch_citation_dispositions \u2014 is present now)"]
+      },
+      {
+        "id": "tests.contracts.test_process_docs_currency.ProcessDocsCurrencyConvergence::test_agents_md_carries_stable_block_ids",
+        "kind": "failure",
+        "flips_at": "L4",
+        "fingerprint_mode": "first-assertion-reason",
+        "fingerprints": ["AGENTS.md carries zero SOP-BLOCK markers; the canonical block IDs land at L4 (docs-currency slice, after the W7 role registry)"]
+      },
+      {
+        "id": "tests.contracts.test_process_docs_currency.ProcessDocsCurrencyConvergence::test_agents_routes_evidence_to_governed_homes",
+        "kind": "failure",
+        "flips_at": "L4",
+        "fingerprint_mode": "first-assertion-reason",
+        "fingerprints": ["AGENTS.md step-13 RECORD still routes review transcripts to the scratch review-queue, not dev/reports/; the retarget lands at L4"]
+      },
+      {
+        "id": "tests.contracts.test_process_docs_currency.ProcessDocsCurrencyConvergence::test_handoff_carries_sop_pointer_ids",
+        "kind": "failure",
+        "flips_at": "L4",
+        "fingerprint_mode": "first-assertion-reason",
+        "fingerprints": ["HANDOFF.md must carry SOP-POINTER: <block-id> lines; it has none today (they land at L4 alongside the AGENTS block IDs)"]
+      },
+      {
+        "id": "tests.contracts.test_process_docs_currency.ProcessDocsCurrencyConvergence::test_policy_concept_rows_name_projection_owners",
+        "kind": "failure",
+        "flips_at": "L4",
+        "fingerprint_mode": "first-assertion-reason",
+        "fingerprints": ["contracts/process_docs_currency_policy.toml must exist (L4); it is absent today"]
+      }
+    ]
+  },
   "measurement_context": "clean worktree of the branch tip with ONLY the slice final patch applied (w3c-0 \u00a713.2); never the dirty main worktree",
   "loader_masks": [
     {

@@ -14,6 +14,13 @@ site/data/triage_report.json
 site/data/run_diagnostics.json
 site/data/run_diagnostics_history.jsonl
 
+# root-anchored clutter roster (org L1, CR-16): a leading slash ignores ONLY the repo-root
+# tree, never a nested `a/scratchpad/` — proven by hermetic `git check-ignore --no-index` probes.
+/scratchpad/
+/mutants.out/
+/.hypothesis/
+/reports/
+
 # local dev / QA scratch (not part of the pipeline)
 render_one.py
 render_fixture.json

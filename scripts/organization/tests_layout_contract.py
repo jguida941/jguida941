@@ -76,6 +76,8 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_reference_capture.py",
             "test_reference_lane_contracts.py",
             "test_reference_probe_generic.py",
+            "test_org_rootwide.py",
+            "test_process_docs_currency.py",
         ),
     ),
     TestGroup(
@@ -186,6 +188,8 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "organization": (
         "test_doc_authority.py",        # T0: one plan-of-record + lifecycled/capped plan docs (fail-closed)
+        "test_org_rootwide.py",         # org r3: root-wide organization shape law (CR-1..CR-20)
+        "test_process_docs_currency.py",  # org r3: SKILL.md/AGENTS.md process-docs currency (CR-10..CR-13)
     ),
     "reference_intake": (
         "test_reference_lane_contracts.py",   # W6-K: reference-capture lane record contracts (w3c-0 §8, R1-R8) + 31-id vocabulary

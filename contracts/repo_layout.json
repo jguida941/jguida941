@@ -1,13 +1,17 @@
 {
   "contract_id": "ProfileRepoLayout",
-  "schema_version": 1,
-  "authority_status": "candidate_only",
-  "cannot_mark_done": true,
-  "purpose": "P5-0 ORG-AS-INVARIANT: one canonical TARGET-SHAPE for every governed surface (scripts/, tests/, contracts/, docs/), enforced by tests/contracts/test_structural_layout.py as a CLOSED COVER so an undeclared/misplaced file reddens. Ported from repo-surface-scout/contracts/repo_layout.json (the proven MODULE_HOMES-as-data pattern). The guard LAW carries zero repo literals; THIS data file is the per-repo parameterization, so the same law governs any repo. Adding a file and declaring its home is ONE slice; never a silent drop. Verdict-free gather: this repo PROPOSES its shape; semantic-tdd's placement_law.rs / org-layout authority is the eventual decider.",
+  "schema_version": 2,
+  "authority_status": "ratified_root_shape_owner",
+  "purpose": "P5-0 ORG-AS-INVARIANT: one canonical TARGET-SHAPE for every governed surface (scripts/, tests/, contracts/, docs/, site/, assets/receipts/, dev/), enforced by tests/contracts/test_structural_layout.py + tests/contracts/test_org_rootwide.py as a CLOSED COVER so an undeclared/misplaced file reddens. THIS data file is the per-repo parameterization; the guard LAW carries zero repo literals, so the same law governs any repo. Adding a file and declaring its home is ONE slice; never a silent drop. As of the org r3 landing this contract is the RATIFIED root-shape owner for this repo: the in-code rosters MODULE_HOMES and TEST_GROUPS are checked projections of it (projections section).",
   "active_plan": {
     "directory": "docs/plans",
-    "allowed_files": ["ACTIVE.md", "DESIGN-SYSTEM.md"],
-    "allowed_dirs": ["handoff"],
+    "allowed_files": [
+      "ACTIVE.md",
+      "DESIGN-SYSTEM.md"
+    ],
+    "allowed_dirs": [
+      "handoff"
+    ],
     "max_active_lines": 120
   },
   "required_docs": [
@@ -43,12 +47,1063 @@
   "forbidden_paths": [
     "docs/archive"
   ],
-  "runtime_output_roots": ["site/data/"],
+  "runtime_output_roots": [
+    "site/data/"
+  ],
   "generated_clutter": {
-    "names": [".DS_Store", "__pycache__"],
-    "suffixes": [".egg-info", ".pyc"],
-    "ignored_prefixes": [".git/", ".venv/", "site/data/"]
+    "names": [
+      ".DS_Store",
+      "__pycache__"
+    ],
+    "suffixes": [
+      ".egg-info",
+      ".pyc"
+    ],
+    "ignored_prefixes": [
+      ".git/",
+      ".venv/",
+      "site/data/"
+    ]
   },
+  "projections": {
+    "rosters": [
+      {
+        "name": "MODULE_HOMES",
+        "owner": "contracts/repo_layout.json",
+        "source": "scripts/organization/layout_contract.py",
+        "meaning": "semantic home (source_path -> target_path) for every governed scripts/ module",
+        "members": [
+          [
+            "scripts/analytics/collect.py",
+            "scripts/pipeline/collect_data.py"
+          ],
+          [
+            "scripts/analytics/helpers.py",
+            "scripts/pipeline/profile_helpers.py"
+          ],
+          [
+            "scripts/analytics/model.py",
+            "scripts/pipeline/compute_metrics.py"
+          ],
+          [
+            "scripts/config.py",
+            "scripts/core/config.py"
+          ],
+          [
+            "scripts/contracts/design_predicates.py",
+            "scripts/contracts/design_predicates.py"
+          ],
+          [
+            "scripts/contracts/metrics.py",
+            "scripts/contracts/profile_contract.py"
+          ],
+          [
+            "scripts/contracts/page_manifest.py",
+            "scripts/contracts/page_manifest.py"
+          ],
+          [
+            "scripts/contracts/schema.py",
+            "scripts/contracts/__init__.py"
+          ],
+          [
+            "scripts/diagnostics/actions_audit.py",
+            "scripts/github/actions_audit.py"
+          ],
+          [
+            "scripts/diagnostics/branch_protection.py",
+            "scripts/github/branch_protection.py"
+          ],
+          [
+            "scripts/diagnostics/diagnostics.py",
+            "scripts/quality/diagnostics.py"
+          ],
+          [
+            "scripts/diagnostics/severity.py",
+            "scripts/quality/severity.py"
+          ],
+          [
+            "scripts/diagnostics/triage.py",
+            "scripts/quality/triage.py"
+          ],
+          [
+            "scripts/github/cache.py",
+            "scripts/github/github_cache.py"
+          ],
+          [
+            "scripts/github/client.py",
+            "scripts/github/github_client.py"
+          ],
+          [
+            "scripts/github/gh_cli.py",
+            "scripts/github/gh_cli.py"
+          ],
+          [
+            "scripts/github/graphql.py",
+            "scripts/github/github_graphql.py"
+          ],
+          [
+            "scripts/github/transport.py",
+            "scripts/github/github_transport.py"
+          ],
+          [
+            "scripts/organization/bootstrap_red_ref.py",
+            "scripts/organization/bootstrap_red_ref.py"
+          ],
+          [
+            "scripts/organization/layout_audit.py",
+            "scripts/organization/layout_audit.py"
+          ],
+          [
+            "scripts/organization/layout_contract.py",
+            "scripts/organization/layout_contract.py"
+          ],
+          [
+            "scripts/organization/migrate_scripts_layout.py",
+            "scripts/organization/migrate_scripts_layout.py"
+          ],
+          [
+            "scripts/organization/tests_layout_contract.py",
+            "scripts/organization/tests_layout_contract.py"
+          ],
+          [
+            "scripts/pipeline/web_render.py",
+            "scripts/pipeline/web_render.py"
+          ],
+          [
+            "scripts/profile_cli.py",
+            "scripts/cli/profile_cli.py"
+          ],
+          [
+            "scripts/profile_pipeline.py",
+            "scripts/pipeline/profile_pipeline.py"
+          ],
+          [
+            "scripts/quality/design_invariants.py",
+            "scripts/quality/design_invariants.py"
+          ],
+          [
+            "scripts/quality/headless_receipts.py",
+            "scripts/quality/headless_receipts.py"
+          ],
+          [
+            "scripts/quality/settings_admissibility.py",
+            "scripts/quality/settings_admissibility.py"
+          ],
+          [
+            "scripts/quality/visual_receipts.py",
+            "scripts/quality/visual_receipts.py"
+          ],
+          [
+            "scripts/render/card_theme.py",
+            "scripts/rendering/card_theme.py"
+          ],
+          [
+            "scripts/render/cards/generate_activity_heatmap.py",
+            "scripts/rendering/generate_activity_heatmap.py"
+          ],
+          [
+            "scripts/render/cards/generate_badges.py",
+            "scripts/rendering/generate_badges.py"
+          ],
+          [
+            "scripts/render/cards/generate_builder_scorecard.py",
+            "scripts/rendering/generate_builder_scorecard.py"
+          ],
+          [
+            "scripts/render/cards/generate_contribution_panel.py",
+            "scripts/rendering/generate_contribution_panel.py"
+          ],
+          [
+            "scripts/render/cards/generate_currently_working.py",
+            "scripts/rendering/generate_currently_working.py"
+          ],
+          [
+            "scripts/render/cards/generate_engineering_cadence.py",
+            "scripts/rendering/generate_engineering_cadence.py"
+          ],
+          [
+            "scripts/render/cards/generate_focus_board.py",
+            "scripts/rendering/generate_focus_board.py"
+          ],
+          [
+            "scripts/render/cards/generate_language_chart.py",
+            "scripts/rendering/generate_language_chart.py"
+          ],
+          [
+            "scripts/render/cards/generate_metrics_general.py",
+            "scripts/rendering/generate_metrics_general.py"
+          ],
+          [
+            "scripts/render/cards/generate_repo_spotlight.py",
+            "scripts/rendering/generate_repo_spotlight.py"
+          ],
+          [
+            "scripts/render/cards/generate_snapshot_panel.py",
+            "scripts/rendering/generate_snapshot_panel.py"
+          ],
+          [
+            "scripts/render/cards/generate_streak_summary.py",
+            "scripts/rendering/generate_streak_summary.py"
+          ],
+          [
+            "scripts/render/glass_kit.py",
+            "scripts/rendering/glass_kit.py"
+          ],
+          [
+            "scripts/render/metrics_svg.py",
+            "scripts/quality/metrics_svg.py"
+          ],
+          [
+            "scripts/render/outputs.py",
+            "scripts/pipeline/render_outputs.py"
+          ],
+          [
+            "scripts/render/svg_utils.py",
+            "scripts/rendering/svg_utils.py"
+          ],
+          [
+            "scripts/render/validate.py",
+            "scripts/quality/validate_generated_profile.py"
+          ],
+          [
+            "scripts/rendering/components.py",
+            "scripts/rendering/components.py"
+          ],
+          [
+            "scripts/rendering/design/loader.py",
+            "scripts/rendering/design/loader.py"
+          ],
+          [
+            "scripts/rendering/design_tokens.py",
+            "scripts/rendering/design_tokens.py"
+          ],
+          [
+            "scripts/rendering/icons.py",
+            "scripts/rendering/icons.py"
+          ],
+          [
+            "scripts/rendering/pageshell/pageshell.py",
+            "scripts/rendering/pageshell/pageshell.py"
+          ],
+          [
+            "scripts/rendering/settings/settings.py",
+            "scripts/rendering/settings/settings.py"
+          ],
+          [
+            "scripts/rendering/showcase/showcase.py",
+            "scripts/rendering/showcase/showcase.py"
+          ],
+          [
+            "scripts/rendering/studio/studio.py",
+            "scripts/rendering/studio/studio.py"
+          ],
+          [
+            "scripts/rendering/webkit/archetype.py",
+            "scripts/rendering/webkit/archetype.py"
+          ],
+          [
+            "scripts/rendering/webkit/components.py",
+            "scripts/rendering/webkit/components.py"
+          ],
+          [
+            "scripts/rendering/webkit/dashboard.py",
+            "scripts/rendering/webkit/dashboard.py"
+          ],
+          [
+            "scripts/rendering/webkit/design_render_adapter.py",
+            "scripts/rendering/webkit/design_render_adapter.py"
+          ],
+          [
+            "scripts/runtime_env.py",
+            "scripts/core/runtime_env.py"
+          ],
+          [
+            "scripts/settings.py",
+            "scripts/core/settings.py"
+          ]
+        ]
+      },
+      {
+        "name": "TEST_GROUPS",
+        "owner": "contracts/repo_layout.json",
+        "source": "scripts/organization/tests_layout_contract.py",
+        "meaning": "declared home (tests/<group>/<module>) for every governed test module",
+        "members": [
+          "tests/contracts/test_bootstrap_red_ref.py",
+          "tests/contracts/test_card_contracts.py",
+          "tests/contracts/test_dashboard_surface.py",
+          "tests/contracts/test_dashboard_visual_authority.py",
+          "tests/contracts/test_data_semantics.py",
+          "tests/contracts/test_design_button.py",
+          "tests/contracts/test_design_card.py",
+          "tests/contracts/test_design_character.py",
+          "tests/contracts/test_design_chip.py",
+          "tests/contracts/test_design_conformance.py",
+          "tests/contracts/test_design_contract.py",
+          "tests/contracts/test_design_distinctness.py",
+          "tests/contracts/test_design_motion.py",
+          "tests/contracts/test_design_nav.py",
+          "tests/contracts/test_design_profiles_schema.py",
+          "tests/contracts/test_doc_authority.py",
+          "tests/contracts/test_dom_cover.py",
+          "tests/contracts/test_glass_preserved.py",
+          "tests/contracts/test_icon_system.py",
+          "tests/contracts/test_label_legibility.py",
+          "tests/contracts/test_official_source_parity.py",
+          "tests/contracts/test_org_rootwide.py",
+          "tests/contracts/test_page_archetype.py",
+          "tests/contracts/test_page_manifest.py",
+          "tests/contracts/test_page_shell.py",
+          "tests/contracts/test_process_docs_currency.py",
+          "tests/contracts/test_public_data_privacy.py",
+          "tests/contracts/test_readme_projection.py",
+          "tests/contracts/test_reference_capture.py",
+          "tests/contracts/test_reference_lane_contracts.py",
+          "tests/contracts/test_reference_pack.py",
+          "tests/contracts/test_reference_probe_generic.py",
+          "tests/contracts/test_rendered_fact_adversarial.py",
+          "tests/contracts/test_rendered_fact_density_adversarial.py",
+          "tests/contracts/test_rendered_fact_paint_adversarial.py",
+          "tests/contracts/test_rendered_facts.py",
+          "tests/contracts/test_scripts_layout_contract.py",
+          "tests/contracts/test_settings_composition.py",
+          "tests/contracts/test_showcase_coverage.py",
+          "tests/contracts/test_skill_structure.py",
+          "tests/contracts/test_structural_layout.py",
+          "tests/contracts/test_studio.py",
+          "tests/contracts/test_tests_layout_contract.py",
+          "tests/contracts/test_theme_continuity.py",
+          "tests/contracts/test_theme_roster_authority.py",
+          "tests/contracts/test_theme_system.py",
+          "tests/contracts/test_tile_composition.py",
+          "tests/contracts/test_typography_restraint.py",
+          "tests/contracts/test_visual_receipt_provenance.py",
+          "tests/contracts/test_web_dashboard.py",
+          "tests/core/test_profile_cli.py",
+          "tests/core/test_runtime_env.py",
+          "tests/github/test_actions_audit.py",
+          "tests/github/test_branch_protection.py",
+          "tests/github/test_github_client.py",
+          "tests/github/test_settings_tokens.py",
+          "tests/github/test_token_fallback.py",
+          "tests/pipeline/test_compute_metrics_accuracy.py",
+          "tests/pipeline/test_compute_metrics_integration.py",
+          "tests/pipeline/test_profile_pipeline_fixture.py",
+          "tests/quality/test_diagnostics.py",
+          "tests/quality/test_metrics_svg.py",
+          "tests/quality/test_severity.py",
+          "tests/quality/test_triage.py",
+          "tests/rendering/test_generate_contribution_panel.py",
+          "tests/rendering/test_generate_streak_summary.py"
+        ]
+      }
+    ]
+  },
+  "dev_reports": {
+    "purpose": "Closed five-home cover over durable development evidence. Homes land EMPTY at org L1 (typed manifests, zero artifact rows); evidence is routed in at L2 via the birth router. A sixth category never enters (killed-lane 'proposals' is permanently barred).",
+    "schema": {
+      "permanent_retention": {
+        "requires_finalized": true,
+        "requires_digest_bearing_back_references": true
+      },
+      "row_required_fields": [
+        "path",
+        "sha256",
+        "schema_id",
+        "schema_version",
+        "subject",
+        "producer",
+        "produced_utc",
+        "retention_class",
+        "referenced_by"
+      ]
+    },
+    "categories": {
+      "design_reviews": {
+        "owner": "contracts/repo_layout.json",
+        "purpose": "final independent Codex design/code/adversarial gate verdicts (durable evidence)",
+        "retention": "permanent",
+        "control_files": [
+          "manifest.json",
+          "README.md"
+        ]
+      },
+      "admissions": {
+        "owner": "contracts/repo_layout.json",
+        "purpose": "admission envelopes, ratifications and operator records (durable evidence)",
+        "retention": "permanent",
+        "control_files": [
+          "manifest.json",
+          "README.md"
+        ]
+      },
+      "worker_reviews": {
+        "owner": "contracts/repo_layout.json",
+        "purpose": "worker self-verifications, audits and dossiers (durable evidence)",
+        "retention": "permanent",
+        "control_files": [
+          "manifest.json",
+          "README.md"
+        ]
+      },
+      "archive": {
+        "owner": "contracts/repo_layout.json",
+        "purpose": "subject-scoped frozen evidence trees (e.g. the W6 demo tree) kept for provenance",
+        "retention": "permanent",
+        "control_files": [
+          "manifest.json",
+          "README.md"
+        ]
+      },
+      "role_assignments": {
+        "owner": "contracts/repo_layout.json",
+        "purpose": "reserved home for W7 role-assignment records (empty until W7 activates)",
+        "retention": "permanent",
+        "control_files": [
+          "manifest.json",
+          "README.md"
+        ]
+      }
+    }
+  },
+  "live_controls": {
+    "purpose": "Closed enumeration of ignored/local control surfaces: each is declared NON-authoritative so ignored content can never be mistaken for governed truth.",
+    "rows": [
+      {
+        "id": "claude-harness",
+        "path": ".claude",
+        "authoritative": false,
+        "purpose": "agent harness; local convenience mirror only",
+        "authority": "contracts/role_registry.toml",
+        "mirror_parity_check": true
+      },
+      {
+        "id": "git-local-config-hooks",
+        "path": ".git",
+        "authoritative": false,
+        "purpose": "local git config and hooks",
+        "hooks_path_policy": {
+          "governed_dir": "scripts/organization/hooks",
+          "pinned_tests": [
+            "tests/contracts/test_doc_authority.py",
+            "tests/contracts/test_structural_layout.py"
+          ]
+        }
+      },
+      {
+        "id": "virtualenv",
+        "path": ".venv",
+        "authoritative": false,
+        "purpose": "inert local env"
+      },
+      {
+        "id": "caches",
+        "paths": [
+          "__pycache__/",
+          ".pytest_cache/"
+        ],
+        "authoritative": false,
+        "purpose": "inert caches"
+      }
+    ]
+  },
+  "shape": [
+    {
+      "root": "scripts",
+      "universe_source": "index",
+      "evaluation": "exclusions-then-closed-partition",
+      "allowed_node_kinds": [
+        "file",
+        "executable",
+        "dir"
+      ],
+      "semantic_groups": [
+        {
+          "name": "cli",
+          "patterns": [
+            "scripts/cli/"
+          ]
+        },
+        {
+          "name": "contracts",
+          "patterns": [
+            "scripts/contracts/"
+          ]
+        },
+        {
+          "name": "core",
+          "patterns": [
+            "scripts/core/"
+          ]
+        },
+        {
+          "name": "github",
+          "patterns": [
+            "scripts/github/"
+          ]
+        },
+        {
+          "name": "organization",
+          "patterns": [
+            "scripts/organization/"
+          ]
+        },
+        {
+          "name": "pipeline",
+          "patterns": [
+            "scripts/pipeline/"
+          ]
+        },
+        {
+          "name": "quality",
+          "patterns": [
+            "scripts/quality/"
+          ]
+        },
+        {
+          "name": "rendering",
+          "patterns": [
+            "scripts/rendering/"
+          ]
+        },
+        {
+          "name": "scripts-root-files",
+          "patterns": [
+            "scripts/__init__.py",
+            "scripts/build_readme.py",
+            "scripts/profile_cli.py",
+            "scripts/validate_generated_profile.py"
+          ]
+        }
+      ],
+      "exclusions": [],
+      "child_contracts": [],
+      "classification_result": "exact-one"
+    },
+    {
+      "root": "tests",
+      "universe_source": "index",
+      "evaluation": "exclusions-then-closed-partition",
+      "allowed_node_kinds": [
+        "file",
+        "dir"
+      ],
+      "semantic_groups": [
+        {
+          "name": "contracts",
+          "patterns": [
+            "tests/contracts/"
+          ]
+        },
+        {
+          "name": "core",
+          "patterns": [
+            "tests/core/"
+          ]
+        },
+        {
+          "name": "fixtures",
+          "patterns": [
+            "tests/fixtures/"
+          ]
+        },
+        {
+          "name": "github",
+          "patterns": [
+            "tests/github/"
+          ]
+        },
+        {
+          "name": "pipeline",
+          "patterns": [
+            "tests/pipeline/"
+          ]
+        },
+        {
+          "name": "quality",
+          "patterns": [
+            "tests/quality/"
+          ]
+        },
+        {
+          "name": "rendering",
+          "patterns": [
+            "tests/rendering/"
+          ]
+        },
+        {
+          "name": "tests-root-files",
+          "patterns": [
+            "tests/__init__.py"
+          ]
+        }
+      ],
+      "exclusions": [],
+      "child_contracts": [],
+      "classification_result": "exact-one"
+    },
+    {
+      "root": "contracts",
+      "universe_source": "index",
+      "evaluation": "exclusions-then-closed-partition",
+      "allowed_node_kinds": [
+        "file",
+        "dir"
+      ],
+      "semantic_groups": [
+        {
+          "name": "design_profiles",
+          "patterns": [
+            "contracts/design_profiles/"
+          ]
+        },
+        {
+          "name": "contracts-root-files",
+          "patterns": [
+            "contracts/correction_baseline.json",
+            "contracts/dashboard_surface.json",
+            "contracts/doc_authority_policy.toml",
+            "contracts/dom_cover.json",
+            "contracts/page_manifest.json",
+            "contracts/repo_layout.json"
+          ]
+        }
+      ],
+      "exclusions": [],
+      "child_contracts": [],
+      "classification_result": "exact-one"
+    },
+    {
+      "root": "docs",
+      "universe_source": "index",
+      "evaluation": "exclusions-then-closed-partition",
+      "allowed_node_kinds": [
+        "file",
+        "dir"
+      ],
+      "semantic_groups": [
+        {
+          "name": "design",
+          "patterns": [
+            "docs/design/"
+          ]
+        },
+        {
+          "name": "history",
+          "patterns": [
+            "docs/history/"
+          ]
+        },
+        {
+          "name": "plans",
+          "patterns": [
+            "docs/plans/"
+          ]
+        },
+        {
+          "name": "docs-root-files",
+          "patterns": [
+            "docs/DESIGN_AUDIT.md",
+            "docs/DESIGN_SPEC.md",
+            "docs/PIPELINE_CLI.md"
+          ]
+        }
+      ],
+      "exclusions": [],
+      "child_contracts": [],
+      "classification_result": "exact-one"
+    },
+    {
+      "root": "site",
+      "universe_source": "index",
+      "evaluation": "exclusions-then-closed-partition",
+      "allowed_node_kinds": [
+        "file",
+        "dir"
+      ],
+      "semantic_groups": [
+        {
+          "name": "data",
+          "patterns": [
+            "site/data/"
+          ]
+        },
+        {
+          "name": "site-root-files",
+          "patterns": [
+            "site/index.html",
+            "site/settings.html",
+            "site/showcase.html",
+            "site/studio.html"
+          ]
+        }
+      ],
+      "exclusions": [],
+      "child_contracts": [],
+      "classification_result": "exact-one"
+    },
+    {
+      "root": "assets/receipts",
+      "universe_source": "index",
+      "evaluation": "exclusions-then-closed-partition",
+      "allowed_node_kinds": [
+        "file",
+        "dir"
+      ],
+      "semantic_groups": [
+        {
+          "name": "apple-dark",
+          "patterns": [
+            "assets/receipts/apple-dark/"
+          ]
+        },
+        {
+          "name": "carbon",
+          "patterns": [
+            "assets/receipts/carbon/"
+          ]
+        },
+        {
+          "name": "liquid-glass",
+          "patterns": [
+            "assets/receipts/liquid-glass/"
+          ]
+        },
+        {
+          "name": "pages",
+          "patterns": [
+            "assets/receipts/pages/"
+          ]
+        }
+      ],
+      "exclusions": [],
+      "child_contracts": [],
+      "classification_result": "exact-one"
+    },
+    {
+      "root": "dev",
+      "universe_source": "index",
+      "evaluation": "exclusions-then-closed-partition",
+      "allowed_node_kinds": [
+        "file",
+        "dir"
+      ],
+      "semantic_groups": [
+        {
+          "name": "reports",
+          "patterns": [
+            "dev/reports/"
+          ]
+        },
+        {
+          "name": "dev-root-files",
+          "patterns": [
+            "dev/README.md"
+          ]
+        }
+      ],
+      "exclusions": [],
+      "child_contracts": [],
+      "classification_result": "exact-one"
+    }
+  ],
+  "org_shape_accepted_debt": [],
+  "birth_routing": {
+    "lanes": [
+      "org",
+      "w6",
+      "w7",
+      "w8"
+    ],
+    "artifact_kinds": [
+      {
+        "name": "prompts",
+        "extensions": [
+          ".txt",
+          ".md"
+        ]
+      },
+      {
+        "name": "packet",
+        "extensions": [
+          ".md",
+          ".json"
+        ]
+      },
+      {
+        "name": "gate_transcript",
+        "extensions": [
+          ".md",
+          ".log"
+        ]
+      },
+      {
+        "name": "admission",
+        "extensions": [
+          ".json"
+        ]
+      },
+      {
+        "name": "worker_review",
+        "extensions": [
+          ".md",
+          ".json"
+        ]
+      },
+      {
+        "name": "archive_bundle",
+        "extensions": [
+          ".html",
+          ".json",
+          ".png",
+          ".css",
+          ".svg"
+        ]
+      },
+      {
+        "name": "receipt",
+        "extensions": [
+          ".json",
+          ".png"
+        ]
+      },
+      {
+        "name": "staging",
+        "extensions": [
+          ".html",
+          ".json",
+          ".png"
+        ]
+      },
+      {
+        "name": "custody_descriptor",
+        "extensions": [
+          ".json"
+        ]
+      }
+    ],
+    "tracked_record_kinds": [
+      "plan",
+      "admission",
+      "gate_transcript",
+      "receipt",
+      "worker_review"
+    ],
+    "rules": [
+      {
+        "producer": "conductor",
+        "artifact_kind": "prompts",
+        "home_root": "scratch-active",
+        "lane": "org"
+      },
+      {
+        "producer": "conductor",
+        "artifact_kind": "packet",
+        "home_root": "scratch-active",
+        "lane": "org"
+      },
+      {
+        "producer": "conductor",
+        "artifact_kind": "admission",
+        "home_root": "dev-reports:admissions"
+      },
+      {
+        "producer": "codex-gate",
+        "artifact_kind": "gate_transcript",
+        "home_root": "dev-reports:design_reviews"
+      },
+      {
+        "producer": "opus-builder",
+        "artifact_kind": "worker_review",
+        "home_root": "dev-reports:worker_reviews"
+      },
+      {
+        "producer": "w6-producer",
+        "artifact_kind": "archive_bundle",
+        "home_root": "dev-reports:archive"
+      },
+      {
+        "producer": "w6-producer",
+        "artifact_kind": "staging",
+        "home_root": "scratch-active",
+        "lane": "w6"
+      },
+      {
+        "producer": "w6-producer",
+        "artifact_kind": "receipt",
+        "home_root": "assets-receipts"
+      },
+      {
+        "producer": "capture-lane",
+        "artifact_kind": "custody_descriptor",
+        "home_root": "custody"
+      }
+    ]
+  },
+  "scratch_grammar": {
+    "active_root": "scratchpad/active",
+    "archive_root": "scratchpad/archive",
+    "frozen_roots": [
+      "scratchpad/work"
+    ],
+    "active_grammar": "scratchpad/active/<lane>/<kind>/...",
+    "archive_grammar": "scratchpad/archive/<YYYY-MM-DD>/<lane>/<kind>/...",
+    "supersession_pointer": {
+      "filename": "SUPERSEDED-BY.json",
+      "purpose": "names every losing fork copy so divergent content-kin resolve to one survivor",
+      "fields": [
+        "winner",
+        "loser",
+        "reason"
+      ]
+    }
+  },
+  "worktree_governance": {
+    "purpose": "At most one build room per active lane plus the landing vehicle; every registered worktree needs an unexpired live-lane row or a pending-retirement receipt.",
+    "retirement_receipts_root": "scratchpad/active/org/retirement",
+    "live_lanes": [
+      {
+        "lane": "w3-landing",
+        "path_suffix": "scratchpad/wt/w3-landing",
+        "expires_utc": "2026-12-31T00:00:00Z"
+      },
+      {
+        "lane": "w8o",
+        "path_suffix": ".claude/worktrees/w8o-build",
+        "expires_utc": "2026-12-31T00:00:00Z"
+      },
+      {
+        "lane": "ratchet-r6",
+        "path_suffix": ".claude/worktrees/ratchet-r6-build",
+        "expires_utc": "2026-12-31T00:00:00Z"
+      },
+      {
+        "lane": "org-l1",
+        "path_suffix": ".claude/worktrees/org-l1-build",
+        "expires_utc": "2026-12-31T00:00:00Z"
+      }
+    ]
+  },
+  "bootstrap_anchor_consumers": {
+    "anchor": "contracts/repo_layout.json",
+    "owner": "org-L1",
+    "expires_utc": "2026-12-31T00:00:00Z",
+    "note": "subset-only shrink ledger over git grep -c --cached; counts recompute from index blobs; no magic total (includes the org design doc row for the tracked/landed state; subset-only, so it stays green whether or not the design doc is staged)",
+    "rows": [
+      {
+        "consumer_path": "AGENTS.md",
+        "literal_occurrence_count": 2,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "contracts/correction_baseline.json",
+        "literal_occurrence_count": 1,
+        "consumer_kind": "contract"
+      },
+      {
+        "consumer_path": "dev/README.md",
+        "literal_occurrence_count": 2,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "docs/history/PLAN-LEDGER.md",
+        "literal_occurrence_count": 1,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "docs/plans/handoff/w3-visual-regression-correction.md",
+        "literal_occurrence_count": 3,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "docs/plans/handoff/w3c-0-design-closure.md",
+        "literal_occurrence_count": 2,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "docs/plans/handoff/w3c-org-rootwide-design.md",
+        "literal_occurrence_count": 7,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "docs/plans/handoff/w4-rendered-facts-shape.md",
+        "literal_occurrence_count": 1,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "scripts/organization/birth_router.py",
+        "literal_occurrence_count": 1,
+        "consumer_kind": "code"
+      },
+      {
+        "consumer_path": "scripts/organization/scratch_preflight.py",
+        "literal_occurrence_count": 1,
+        "consumer_kind": "code"
+      },
+      {
+        "consumer_path": "skills/README.md",
+        "literal_occurrence_count": 1,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "skills/design-language-tdd/SKILL.md",
+        "literal_occurrence_count": 1,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "skills/design-language-tdd/references/add-design-language.md",
+        "literal_occurrence_count": 1,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "skills/design-language-tdd/references/boundaries.md",
+        "literal_occurrence_count": 1,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "templates/README.md",
+        "literal_occurrence_count": 2,
+        "consumer_kind": "doc"
+      },
+      {
+        "consumer_path": "tests/contracts/test_org_rootwide.py",
+        "literal_occurrence_count": 8,
+        "consumer_kind": "test"
+      },
+      {
+        "consumer_path": "tests/contracts/test_structural_layout.py",
+        "literal_occurrence_count": 2,
+        "consumer_kind": "test"
+      }
+    ],
+    "digest": "3a43984bcf995423bc034a515335baed288eda5a4f7c9de12f61b21016ebc6a4"
+  },
+  "scratch_citation_dispositions": [
+    {
+      "path": ".gitignore",
+      "disposition": "grammar-only"
+    },
+    {
+      "path": "contracts/repo_layout.json",
+      "disposition": "grammar-only"
+    },
+    {
+      "path": "AGENTS.md",
+      "disposition": "grammar-only"
+    },
+    {
+      "path": "docs/history/PLAN-LEDGER.md",
+      "disposition": "dangling-history"
+    },
+    {
+      "path": "docs/plans/handoff/d-shell-2-design.md",
+      "disposition": "dangling-history"
+    },
+    {
+      "path": "docs/plans/handoff/w3c-0-design-closure.md",
+      "disposition": "dangling-history"
+    }
+  ],
   "structural_layout": {
     "candidate_only": true,
     "cannot_mark_done": true,
@@ -57,122 +1112,550 @@
       "root": "scripts",
       "glob": "**/*.py",
       "placement_enforced": true,
-      "root_allowlist": ["__init__.py", "build_readme.py", "profile_cli.py", "validate_generated_profile.py"],
+      "root_allowlist": [
+        "__init__.py",
+        "build_readme.py",
+        "profile_cli.py",
+        "validate_generated_profile.py"
+      ],
       "groups": [
-        {"id": "cli", "target_dir": "cli", "members": ["profile_cli.py"]},
-        {"id": "contracts", "target_dir": "contracts", "members": ["design_predicates.py", "page_manifest.py", "profile_contract.py", "rendered_predicates.py"]},
-        {"id": "rendered-predicates", "target_dir": "contracts/rendered", "members": ["common.py", "contrast.py", "density.py", "effects.py", "interaction.py", "paint.py", "values.py"],
+        {
+          "id": "cli",
+          "target_dir": "cli",
+          "members": [
+            "profile_cli.py"
+          ]
+        },
+        {
+          "id": "contracts",
+          "target_dir": "contracts",
+          "members": [
+            "design_predicates.py",
+            "page_manifest.py",
+            "profile_contract.py",
+            "rendered_predicates.py"
+          ]
+        },
+        {
+          "id": "rendered-predicates",
+          "target_dir": "contracts/rendered",
+          "members": [
+            "common.py",
+            "contrast.py",
+            "density.py",
+            "effects.py",
+            "interaction.py",
+            "paint.py",
+            "values.py"
+          ],
           "module_policy": {
-            "max_lines": {"__init__.py": 40, "common.py": 180, "contrast.py": 180, "density.py": 240, "effects.py": 140, "interaction.py": 300, "paint.py": 220, "values.py": 180},
+            "max_lines": {
+              "__init__.py": 40,
+              "common.py": 180,
+              "contrast.py": 180,
+              "density.py": 240,
+              "effects.py": 140,
+              "interaction.py": 300,
+              "paint.py": 220,
+              "values.py": 180
+            },
             "allowed_internal_imports": {
               "__init__.py": [],
-              "common.py": ["scripts.contracts.rendered.effects", "scripts.contracts.rendered.values"],
-              "contrast.py": ["scripts.contracts.rendered.common", "scripts.contracts.rendered.paint", "scripts.contracts.rendered.values"],
-              "density.py": ["scripts.contracts.rendered.common", "scripts.contracts.rendered.values"],
-              "effects.py": ["scripts.contracts.rendered.values"],
-              "interaction.py": ["scripts.contracts.rendered.common"],
-              "paint.py": ["scripts.contracts.rendered.common", "scripts.contracts.rendered.effects", "scripts.contracts.rendered.values"],
+              "common.py": [
+                "scripts.contracts.rendered.effects",
+                "scripts.contracts.rendered.values"
+              ],
+              "contrast.py": [
+                "scripts.contracts.rendered.common",
+                "scripts.contracts.rendered.paint",
+                "scripts.contracts.rendered.values"
+              ],
+              "density.py": [
+                "scripts.contracts.rendered.common",
+                "scripts.contracts.rendered.values"
+              ],
+              "effects.py": [
+                "scripts.contracts.rendered.values"
+              ],
+              "interaction.py": [
+                "scripts.contracts.rendered.common"
+              ],
+              "paint.py": [
+                "scripts.contracts.rendered.common",
+                "scripts.contracts.rendered.effects",
+                "scripts.contracts.rendered.values"
+              ],
               "values.py": []
             },
-            "forbidden_import_prefixes": ["scripts.quality.design_invariants", "scripts.quality.rendered_facts", "scripts.quality.headless_receipts"],
+            "forbidden_import_prefixes": [
+              "scripts.quality.design_invariants",
+              "scripts.quality.rendered_facts",
+              "scripts.quality.headless_receipts"
+            ],
             "facade": {
               "path": "contracts/rendered_predicates.py",
-              "allowed_imports": ["scripts.contracts.rendered.contrast", "scripts.contracts.rendered.density", "scripts.contracts.rendered.interaction"],
-              "exports": ["rendered_content_density", "rendered_contrast", "rendered_responsive", "rendered_touch_targets"]
+              "allowed_imports": [
+                "scripts.contracts.rendered.contrast",
+                "scripts.contracts.rendered.density",
+                "scripts.contracts.rendered.interaction"
+              ],
+              "exports": [
+                "rendered_content_density",
+                "rendered_contrast",
+                "rendered_responsive",
+                "rendered_touch_targets"
+              ]
             }
-          }},
-        {"id": "core", "target_dir": "core", "members": ["config.py", "runtime_env.py", "settings.py"]},
-        {"id": "github", "target_dir": "github", "members": ["actions_audit.py", "branch_protection.py", "gh_cli.py", "github_cache.py", "github_client.py", "github_graphql.py", "github_transport.py"]},
-        {"id": "organization", "target_dir": "organization", "members": ["bootstrap_red_ref.py", "layout_audit.py", "layout_contract.py", "migrate_scripts_layout.py", "tests_layout_contract.py"]},
-        {"id": "pipeline", "target_dir": "pipeline", "members": ["collect_data.py", "compute_metrics.py", "profile_helpers.py", "profile_pipeline.py", "render_outputs.py", "web_render.py"]},
-        {"id": "quality", "target_dir": "quality", "members": ["design_invariants.py", "diagnostics.py", "headless_receipts.py", "metrics_svg.py", "settings_admissibility.py", "severity.py", "triage.py", "validate_generated_profile.py", "visual_receipts.py"]},
-        {"id": "reference-intake", "target_dir": "quality/reference_intake", "members": ["capture.py", "probe_generic.py", "restore.py", "schema.py", "security.py"]},
-        {"id": "reference-pack", "target_dir": "quality/reference_pack", "members": ["browser.py", "codec.py", "producer.py", "schema.py"],
+          }
+        },
+        {
+          "id": "core",
+          "target_dir": "core",
+          "members": [
+            "config.py",
+            "runtime_env.py",
+            "settings.py"
+          ]
+        },
+        {
+          "id": "github",
+          "target_dir": "github",
+          "members": [
+            "actions_audit.py",
+            "branch_protection.py",
+            "gh_cli.py",
+            "github_cache.py",
+            "github_client.py",
+            "github_graphql.py",
+            "github_transport.py"
+          ]
+        },
+        {
+          "id": "organization",
+          "target_dir": "organization",
+          "members": [
+            "bootstrap_red_ref.py",
+            "layout_audit.py",
+            "layout_contract.py",
+            "migrate_scripts_layout.py",
+            "tests_layout_contract.py"
+          ]
+        },
+        {
+          "id": "pipeline",
+          "target_dir": "pipeline",
+          "members": [
+            "collect_data.py",
+            "compute_metrics.py",
+            "profile_helpers.py",
+            "profile_pipeline.py",
+            "render_outputs.py",
+            "web_render.py"
+          ]
+        },
+        {
+          "id": "quality",
+          "target_dir": "quality",
+          "members": [
+            "design_invariants.py",
+            "diagnostics.py",
+            "headless_receipts.py",
+            "metrics_svg.py",
+            "settings_admissibility.py",
+            "severity.py",
+            "triage.py",
+            "validate_generated_profile.py",
+            "visual_receipts.py"
+          ]
+        },
+        {
+          "id": "reference-intake",
+          "target_dir": "quality/reference_intake",
+          "members": [
+            "capture.py",
+            "probe_generic.py",
+            "restore.py",
+            "schema.py",
+            "security.py"
+          ]
+        },
+        {
+          "id": "reference-pack",
+          "target_dir": "quality/reference_pack",
+          "members": [
+            "browser.py",
+            "codec.py",
+            "producer.py",
+            "schema.py"
+          ],
           "module_policy": {
-            "max_lines": {"__init__.py": 40, "codec.py": 80, "producer.py": 240, "schema.py": 180},
+            "max_lines": {
+              "__init__.py": 40,
+              "codec.py": 80,
+              "producer.py": 240,
+              "schema.py": 180
+            },
             "allowed_internal_imports": {
-              "__init__.py": ["scripts.quality.reference_pack.schema"],
+              "__init__.py": [
+                "scripts.quality.reference_pack.schema"
+              ],
               "codec.py": [],
-              "producer.py": ["scripts.quality.reference_pack.browser", "scripts.quality.reference_pack.codec", "scripts.quality.reference_pack.schema"],
+              "producer.py": [
+                "scripts.quality.reference_pack.browser",
+                "scripts.quality.reference_pack.codec",
+                "scripts.quality.reference_pack.schema"
+              ],
               "schema.py": []
             },
-            "forbidden_import_prefixes": ["scripts.contracts.design_predicates", "scripts.contracts.rendered_predicates", "scripts.quality.design_invariants"]
-          }},
-        {"id": "rendered-facts", "target_dir": "quality/rendered_facts", "members": ["codec.py", "doctrine.py", "geometry.py", "inventory.py", "packet_types.py", "policy.py", "probe.py", "producer.py", "provenance.py", "samples.py", "schema.py", "state_authority.py", "subject_identity.py"],
+            "forbidden_import_prefixes": [
+              "scripts.contracts.design_predicates",
+              "scripts.contracts.rendered_predicates",
+              "scripts.quality.design_invariants"
+            ]
+          }
+        },
+        {
+          "id": "rendered-facts",
+          "target_dir": "quality/rendered_facts",
+          "members": [
+            "codec.py",
+            "doctrine.py",
+            "geometry.py",
+            "inventory.py",
+            "packet_types.py",
+            "policy.py",
+            "probe.py",
+            "producer.py",
+            "provenance.py",
+            "samples.py",
+            "schema.py",
+            "state_authority.py",
+            "subject_identity.py"
+          ],
           "module_policy": {
-            "max_lines": {"__init__.py": 80, "codec.py": 140, "doctrine.py": 80, "geometry.py": 160, "inventory.py": 100, "packet_types.py": 320, "policy.py": 320, "probe.py": 520, "producer.py": 280, "provenance.py": 200, "samples.py": 140, "schema.py": 520, "state_authority.py": 80, "subject_identity.py": 220},
+            "max_lines": {
+              "__init__.py": 80,
+              "codec.py": 140,
+              "doctrine.py": 80,
+              "geometry.py": 160,
+              "inventory.py": 100,
+              "packet_types.py": 320,
+              "policy.py": 320,
+              "probe.py": 520,
+              "producer.py": 280,
+              "provenance.py": 200,
+              "samples.py": 140,
+              "schema.py": 520,
+              "state_authority.py": 80,
+              "subject_identity.py": 220
+            },
             "allowed_internal_imports": {
-              "__init__.py": ["scripts.quality.rendered_facts.policy", "scripts.quality.rendered_facts.producer", "scripts.quality.rendered_facts.schema"],
-              "codec.py": ["scripts.quality.rendered_facts.policy"],
+              "__init__.py": [
+                "scripts.quality.rendered_facts.policy",
+                "scripts.quality.rendered_facts.producer",
+                "scripts.quality.rendered_facts.schema"
+              ],
+              "codec.py": [
+                "scripts.quality.rendered_facts.policy"
+              ],
               "doctrine.py": [],
               "geometry.py": [],
-              "inventory.py": ["scripts.quality.rendered_facts.policy"],
-              "packet_types.py": ["scripts.quality.rendered_facts.geometry"],
-              "policy.py": ["scripts.quality.rendered_facts.doctrine", "scripts.quality.rendered_facts.state_authority"],
-              "probe.py": ["scripts.quality.rendered_facts.policy", "scripts.quality.rendered_facts.subject_identity"],
-              "producer.py": ["scripts.quality.rendered_facts.policy", "scripts.quality.rendered_facts.probe", "scripts.quality.rendered_facts.schema"],
-              "provenance.py": ["scripts.quality.rendered_facts.codec", "scripts.quality.rendered_facts.policy"],
+              "inventory.py": [
+                "scripts.quality.rendered_facts.policy"
+              ],
+              "packet_types.py": [
+                "scripts.quality.rendered_facts.geometry"
+              ],
+              "policy.py": [
+                "scripts.quality.rendered_facts.doctrine",
+                "scripts.quality.rendered_facts.state_authority"
+              ],
+              "probe.py": [
+                "scripts.quality.rendered_facts.policy",
+                "scripts.quality.rendered_facts.subject_identity"
+              ],
+              "producer.py": [
+                "scripts.quality.rendered_facts.policy",
+                "scripts.quality.rendered_facts.probe",
+                "scripts.quality.rendered_facts.schema"
+              ],
+              "provenance.py": [
+                "scripts.quality.rendered_facts.codec",
+                "scripts.quality.rendered_facts.policy"
+              ],
               "samples.py": [],
-              "schema.py": ["scripts.quality.rendered_facts.codec", "scripts.quality.rendered_facts.geometry", "scripts.quality.rendered_facts.inventory", "scripts.quality.rendered_facts.packet_types", "scripts.quality.rendered_facts.policy", "scripts.quality.rendered_facts.provenance", "scripts.quality.rendered_facts.samples", "scripts.quality.rendered_facts.subject_identity"],
+              "schema.py": [
+                "scripts.quality.rendered_facts.codec",
+                "scripts.quality.rendered_facts.geometry",
+                "scripts.quality.rendered_facts.inventory",
+                "scripts.quality.rendered_facts.packet_types",
+                "scripts.quality.rendered_facts.policy",
+                "scripts.quality.rendered_facts.provenance",
+                "scripts.quality.rendered_facts.samples",
+                "scripts.quality.rendered_facts.subject_identity"
+              ],
               "state_authority.py": [],
               "subject_identity.py": []
             },
-            "forbidden_import_prefixes": ["scripts.contracts.design_predicates", "scripts.quality.design_invariants", "scripts.quality.headless_receipts"],
+            "forbidden_import_prefixes": [
+              "scripts.contracts.design_predicates",
+              "scripts.quality.design_invariants",
+              "scripts.quality.headless_receipts"
+            ],
             "facade": {
               "path": "quality/headless_receipts.py",
-              "allowed_imports": ["scripts.quality.rendered_facts.policy", "scripts.quality.rendered_facts.probe", "scripts.quality.rendered_facts.producer", "scripts.quality.rendered_facts.schema"],
-              "exports": ["rendered_facts_artifact", "rendered_state_plan", "validate_rendered_fact_packet", "load_rendered_fact_bundle", "rendered_facts", "write_all_rendered_facts"]
+              "allowed_imports": [
+                "scripts.quality.rendered_facts.policy",
+                "scripts.quality.rendered_facts.probe",
+                "scripts.quality.rendered_facts.producer",
+                "scripts.quality.rendered_facts.schema"
+              ],
+              "exports": [
+                "rendered_facts_artifact",
+                "rendered_state_plan",
+                "validate_rendered_fact_packet",
+                "load_rendered_fact_bundle",
+                "rendered_facts",
+                "write_all_rendered_facts"
+              ]
             }
-          }},
-        {"id": "rendering", "target_dir": "rendering", "members": ["card_theme.py", "components.py", "design_tokens.py", "generate_activity_heatmap.py", "generate_badges.py", "generate_builder_scorecard.py", "generate_contribution_panel.py", "generate_currently_working.py", "generate_engineering_cadence.py", "generate_focus_board.py", "generate_language_chart.py", "generate_metrics_general.py", "generate_repo_spotlight.py", "generate_snapshot_panel.py", "generate_streak_summary.py", "glass_kit.py", "icons.py", "svg_utils.py"]},
-        {"id": "design", "target_dir": "rendering/design", "members": ["loader.py"]},
-        {"id": "webkit", "target_dir": "rendering/webkit", "members": ["archetype.py", "components.py", "dashboard.py", "dashboard_style.py", "design_render_adapter.py", "theme_selector.py"]},
-        {"id": "showcase", "target_dir": "rendering/showcase", "members": ["showcase.py"]},
-        {"id": "settings", "target_dir": "rendering/settings", "members": ["settings.py"]},
-        {"id": "studio", "target_dir": "rendering/studio", "members": ["studio.py"]},
-        {"id": "pageshell", "target_dir": "rendering/pageshell", "members": ["pageshell.py"]}
+          }
+        },
+        {
+          "id": "rendering",
+          "target_dir": "rendering",
+          "members": [
+            "card_theme.py",
+            "components.py",
+            "design_tokens.py",
+            "generate_activity_heatmap.py",
+            "generate_badges.py",
+            "generate_builder_scorecard.py",
+            "generate_contribution_panel.py",
+            "generate_currently_working.py",
+            "generate_engineering_cadence.py",
+            "generate_focus_board.py",
+            "generate_language_chart.py",
+            "generate_metrics_general.py",
+            "generate_repo_spotlight.py",
+            "generate_snapshot_panel.py",
+            "generate_streak_summary.py",
+            "glass_kit.py",
+            "icons.py",
+            "svg_utils.py"
+          ]
+        },
+        {
+          "id": "design",
+          "target_dir": "rendering/design",
+          "members": [
+            "loader.py"
+          ]
+        },
+        {
+          "id": "webkit",
+          "target_dir": "rendering/webkit",
+          "members": [
+            "archetype.py",
+            "components.py",
+            "dashboard.py",
+            "dashboard_style.py",
+            "design_render_adapter.py",
+            "theme_selector.py"
+          ]
+        },
+        {
+          "id": "showcase",
+          "target_dir": "rendering/showcase",
+          "members": [
+            "showcase.py"
+          ]
+        },
+        {
+          "id": "settings",
+          "target_dir": "rendering/settings",
+          "members": [
+            "settings.py"
+          ]
+        },
+        {
+          "id": "studio",
+          "target_dir": "rendering/studio",
+          "members": [
+            "studio.py"
+          ]
+        },
+        {
+          "id": "pageshell",
+          "target_dir": "rendering/pageshell",
+          "members": [
+            "pageshell.py"
+          ]
+        }
       ]
     },
     "test_layout": {
       "root": "tests",
       "glob": "**/test_*.py",
       "placement_enforced": true,
-      "data_dirs": ["fixtures"],
+      "data_dirs": [
+        "fixtures"
+      ],
       "root_allowlist": [],
       "groups": [
-        {"id": "contracts", "target_dir": "contracts", "members": ["test_bootstrap_red_ref.py", "test_card_contracts.py", "test_data_semantics.py", "test_design_button.py", "test_design_card.py", "test_design_character.py", "test_design_chip.py", "test_design_conformance.py", "test_design_contract.py", "test_design_distinctness.py", "test_design_profiles_schema.py", "test_doc_authority.py", "test_glass_preserved.py", "test_icon_system.py", "test_label_legibility.py", "test_page_shell.py",
-          "test_dom_cover.py", "test_dashboard_surface.py", "test_dashboard_visual_authority.py", "test_page_archetype.py", "test_page_manifest.py", "test_reference_pack.py",
-          "test_design_motion.py",
-          "test_design_nav.py", "test_official_source_parity.py", "test_rendered_fact_adversarial.py", "test_rendered_fact_density_adversarial.py", "test_rendered_fact_paint_adversarial.py", "test_rendered_facts.py", "test_public_data_privacy.py", "test_readme_projection.py", "test_reference_capture.py", "test_reference_lane_contracts.py", "test_reference_probe_generic.py", "test_scripts_layout_contract.py", "test_settings_composition.py", "test_showcase_coverage.py", "test_skill_structure.py", "test_structural_layout.py", "test_studio.py", "test_tests_layout_contract.py", "test_theme_continuity.py", "test_theme_roster_authority.py", "test_theme_system.py", "test_tile_composition.py", "test_typography_restraint.py", "test_visual_receipt_provenance.py", "test_web_dashboard.py"]},
-        {"id": "core", "target_dir": "core", "members": ["test_profile_cli.py", "test_runtime_env.py"]},
-        {"id": "github", "target_dir": "github", "members": ["test_actions_audit.py", "test_branch_protection.py", "test_github_client.py", "test_settings_tokens.py", "test_token_fallback.py"]},
-        {"id": "pipeline", "target_dir": "pipeline", "members": ["test_compute_metrics_accuracy.py", "test_compute_metrics_integration.py", "test_profile_pipeline_fixture.py"]},
-        {"id": "quality", "target_dir": "quality", "members": ["test_diagnostics.py", "test_metrics_svg.py", "test_severity.py", "test_triage.py"]},
-        {"id": "rendering", "target_dir": "rendering", "members": ["test_generate_contribution_panel.py", "test_generate_streak_summary.py"]}
+        {
+          "id": "contracts",
+          "target_dir": "contracts",
+          "members": [
+            "test_bootstrap_red_ref.py",
+            "test_card_contracts.py",
+            "test_data_semantics.py",
+            "test_design_button.py",
+            "test_design_card.py",
+            "test_design_character.py",
+            "test_design_chip.py",
+            "test_design_conformance.py",
+            "test_design_contract.py",
+            "test_design_distinctness.py",
+            "test_design_profiles_schema.py",
+            "test_doc_authority.py",
+            "test_glass_preserved.py",
+            "test_icon_system.py",
+            "test_label_legibility.py",
+            "test_page_shell.py",
+            "test_dom_cover.py",
+            "test_dashboard_surface.py",
+            "test_dashboard_visual_authority.py",
+            "test_page_archetype.py",
+            "test_page_manifest.py",
+            "test_reference_pack.py",
+            "test_design_motion.py",
+            "test_design_nav.py",
+            "test_official_source_parity.py",
+            "test_rendered_fact_adversarial.py",
+            "test_rendered_fact_density_adversarial.py",
+            "test_rendered_fact_paint_adversarial.py",
+            "test_rendered_facts.py",
+            "test_public_data_privacy.py",
+            "test_readme_projection.py",
+            "test_reference_capture.py",
+            "test_reference_lane_contracts.py",
+            "test_reference_probe_generic.py",
+            "test_scripts_layout_contract.py",
+            "test_settings_composition.py",
+            "test_showcase_coverage.py",
+            "test_skill_structure.py",
+            "test_structural_layout.py",
+            "test_studio.py",
+            "test_tests_layout_contract.py",
+            "test_theme_continuity.py",
+            "test_theme_roster_authority.py",
+            "test_theme_system.py",
+            "test_tile_composition.py",
+            "test_typography_restraint.py",
+            "test_visual_receipt_provenance.py",
+            "test_web_dashboard.py"
+          ]
+        },
+        {
+          "id": "core",
+          "target_dir": "core",
+          "members": [
+            "test_profile_cli.py",
+            "test_runtime_env.py"
+          ]
+        },
+        {
+          "id": "github",
+          "target_dir": "github",
+          "members": [
+            "test_actions_audit.py",
+            "test_branch_protection.py",
+            "test_github_client.py",
+            "test_settings_tokens.py",
+            "test_token_fallback.py"
+          ]
+        },
+        {
+          "id": "pipeline",
+          "target_dir": "pipeline",
+          "members": [
+            "test_compute_metrics_accuracy.py",
+            "test_compute_metrics_integration.py",
+            "test_profile_pipeline_fixture.py"
+          ]
+        },
+        {
+          "id": "quality",
+          "target_dir": "quality",
+          "members": [
+            "test_diagnostics.py",
+            "test_metrics_svg.py",
+            "test_severity.py",
+            "test_triage.py"
+          ]
+        },
+        {
+          "id": "rendering",
+          "target_dir": "rendering",
+          "members": [
+            "test_generate_contribution_panel.py",
+            "test_generate_streak_summary.py"
+          ]
+        }
       ]
     },
     "contracts_layout": {
       "root": "contracts",
       "glob": "**/*.json",
       "placement_enforced": true,
-      "root_allowlist": ["repo_layout.json", "page_manifest.json", "dom_cover.json", "dashboard_surface.json", "rendered_fact_policy.json", "correction_baseline.json", "reference_aspects.json"],
-      "group_dirs": ["design_profiles", "official_sources", "reference_packs"]
+      "root_allowlist": [
+        "repo_layout.json",
+        "page_manifest.json",
+        "dom_cover.json",
+        "dashboard_surface.json",
+        "rendered_fact_policy.json",
+        "correction_baseline.json",
+        "reference_aspects.json"
+      ],
+      "group_dirs": [
+        "design_profiles",
+        "official_sources",
+        "reference_packs"
+      ]
     },
     "site_layout": {
       "purpose": "P5-0-FINISH: closed cover over GENERATED site HTML so an undeclared site/*.html is structurally unconstructable (the precondition for the design-system showcase/settings homes). site/data/* is hydrated JSON, never matched by the *.html glob. Bespoke root_allowlist + group_dirs method (like contracts_layout); site/ is a root+allowlist shape, NOT a groups/target_dir shape, so it is deliberately NOT in the _ENUMERATED loop (codex R7). showcase.html / settings.html join root_allowlist, and a showcase/ subdir joins group_dirs, only in the slice that creates them.",
       "root": "site",
       "glob": "**/*.html",
-      "root_allowlist": ["index.html", "settings.html", "showcase.html", "studio.html"],
+      "root_allowlist": [
+        "index.html",
+        "settings.html",
+        "showcase.html",
+        "studio.html"
+      ],
       "group_dirs": []
     },
     "receipts_layout": {
       "purpose": "Closed cover over profile conformance, MF1 page receipts, and frozen operator-approved reference packs. Profile names come from design_profiles/_index.json; page and reference-pack names use the allowlists below. Unknown homes red, so producers cannot drop evidence into an ungoverned tree.",
       "root": "assets/receipts",
-      "globs": ["**/*.json", "**/*.json.gz", "**/*.html.gz", "**/*.png"],
+      "globs": [
+        "**/*.json",
+        "**/*.json.gz",
+        "**/*.html.gz",
+        "**/*.png"
+      ],
       "page_dir": "pages",
-      "page_allowlist": ["index", "settings", "showcase", "studio"],
+      "page_allowlist": [
+        "index",
+        "settings",
+        "showcase",
+        "studio"
+      ],
       "reference_pack_dir": "reference-packs",
-      "reference_pack_allowlist": ["dashboard-pre-w3"]
+      "reference_pack_allowlist": [
+        "dashboard-pre-w3"
+      ]
     }
   }
 }

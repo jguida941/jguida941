@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+# Ratchet-aware pre-commit hook (org L1, CR-18). Runs ONLY the two pinned green guards and
+# fails only on failures OUTSIDE the identities banked in contracts/correction_baseline.json
+# (subset law — the same grammar as the failure ratchet). It deliberately does NOT auto-collect
+# the whole suite: the intentionally-RED ratchet set would block every commit. Pinned modules:
+# tests.contracts.test_doc_authority and tests.contracts.test_structural_layout. Activation on a
+# working machine is one config line (core.hooksPath -> scripts/organization/hooks); a clean
+# clone stays green because the runner honours contracts/correction_baseline.json.
+hook_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PYTHONDONTWRITEBYTECODE=1 python3 "$hook_dir/run_pinned_guards.py" \
+  tests.contracts.test_doc_authority tests.contracts.test_structural_layout
