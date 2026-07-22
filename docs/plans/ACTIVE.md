@@ -78,7 +78,7 @@ on the then-current live branch and `/root` commits the activated result.
 | Lane snapshot | Recovery commit | State | Live | Binding evidence / next action |
 |---|---|---|---:|---|
 | Process authority hard block | `bb291a56` | `DONE` | yes | Single-worktree and finite-review law committed and pushed. |
-| Process-currentness successor | active Opus lane | `BUILDING_GREEN` | no | Must produce 52/52 GREEN, then integrate, verify, commit, and push. |
+| Process-currentness successor | `428672a0` | `DONE` | yes | Currentness 52/52 and homing 6/6 GREEN on `w3-correction`; finite process authority is active. |
 | Process-currentness original Opus r1 | `86b4f63d` | `REJECTED_AS_FINAL` | no | Exact CODE + ADVERSARIAL verdicts were `revise`; successor replaces it. |
 | Process-currentness Fable RED snapshot | `48cd8545` | `SUPERSEDED_EVIDENCE` | no | Frozen RED lineage retained; later successor owns activation. |
 | Process-throughput RED | `66df9879` | `RED_ONLY` | no | 23/23 right-reason failures; re-pin after currentness, then GREEN build. |
@@ -96,6 +96,14 @@ on the then-current live branch and `/root` commits the activated result.
 Activation order is fail-closed and dependency-bound: currentness → LANE-A/B/C → A13/A14 GREEN
 → r6 re-pin → org-L1 rebase/re-pin → July SOP fold → W8-O r3 → W7 and the remaining product
 program. Preserving a recovery commit never advances this order and never changes a row to DONE.
+
+Remote branch retirement manifest (2026-07-22): `d-board` tip `92b3b69b1dc696186ce0088ca4c657a4932c1dca`
+and `d-shell-1` tip `dc351b6605373cb4d3cd2bb7dc8a192ed2a03949` are `SUPERSEDED` because every
+unique stable patch is already ancestral to `w3-correction`. `d-shell-1-pregate` tip
+`07dacb75485388e2036e58de26b6e5ee47e0fab7` is `PRESERVE_ONLY`: it is obsolete pre-gate WIP
+superseded by the final D-SHELL series, but its exact tip must be attached as a non-activating
+merge parent before the three obsolete remote names are deleted. `main` is outside this cleanup
+and remains untouched.
 
 - **W3 visible-design correction** — gate record `handoff/w3-visual-regression-correction.md`;
   clean-context baseline 75/7F/9E (102/39F/13E was the dirty-tree diagnostic). **Slice-0 design
