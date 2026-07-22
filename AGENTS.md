@@ -1,12 +1,75 @@
 # AGENTS.md
 
+## Operator process correction (ratified 2026-07-22; highest local precedence)
+
+This amendment supersedes every conflicting conductor, review-convergence, and post-review
+transition sentence below.
+
+**`/root` is the CONDUCTOR.** `/root` reorients against live authority and Git, selects and
+sequences slices, launches every separate worker/reviewer lane, verifies evidence and exact
+patches, integrates, commits, records recovery state, and keeps the main thread orchestral.
+`/root` does not author product designs, executable REDs, GREEN implementations, or approving
+review verdicts.
+
+**Fable 5 is the delegated DESIGN + RED author.** `/root` launches a fresh Fable lane to write
+the bounded scratch design and executable RED/property/metamorphic/generative/fuzz/differential/
+attack-replay/mutation evidence. Fable does not implement GREEN, review or approve its own
+artifacts, integrate, commit, merge, or push.
+
+**Opus is the delegated GREEN builder.** Opus implements only from the exact approved or
+lawfully-converged design, accepted right-reason RED evidence, admission envelope, and closed
+build packet. Opus does not design, author the governing RED, review, approve, integrate,
+commit, merge, or push. An Opus mechanical readout is factual input only; it is not another
+design review and cannot delay RED/build unless it exposes a concrete contradictory fact,
+capability failure, or unsafe write scope.
+
+**Codex is the independent review authority.** Codex reviews exact design/evidence/patch bytes
+but does not author the reviewed RED or implement GREEN. After right-reason pre-GREEN RED
+evidence, exactly one bounded RED-SPEC-CONFORMANCE check is permitted; `/root` then immediately
+dispatches a different Opus builder for GREEN.
+
+### Post-review execution law
+
+Review history is append-only across corrections, versions, renamed files, and successor
+packets. A document correction never resets the design family's review count. `/root` must read
+and count the exact existing Fable/Codex terminal lineage before dispatching any review.
+
+After every terminal review, preserve every stable finding ID in a typed
+`FindingToEvidenceTransition` and classify it exactly once:
+
+- `PROBEABLE`: immediately author executable RED/property/metamorphic/generative/fuzz/
+  differential/attack-replay/mutation evidence as applicable;
+- `MECHANICAL_IDENTITY`: run one deterministic validator/hash/equality/scope correction check,
+  never another LLM review;
+- `STRUCTURAL_PREREQUISITE`: freeze only the smallest missing contract required to make RED
+  executable, then proceed to RED;
+- `ENVIRONMENT_CAPABILITY`: repair the capability or persist a typed blocker with its exact
+  recovery condition;
+- `POLICY_AUTHORITY`: prepare an operator decision packet only for a genuinely irreducible
+  authority choice.
+
+Correcting prose, packets, hashes, or paths never closes a stable finding. Closure requires its
+typed transition plus accepted executable evidence. A reviewer may propose the authority seam,
+control, counterexample, property/metamorphic relation, unique mutant, expected kill, and stop
+condition, but the reviewer may not become the RED author.
+
+No review-of-review or broad prose revision loop is authorized after a terminal review. Existing
+terminal reviews count toward convergence; reaching the older two-`REVISE` cap is an absolute
+stop, not permission for another round. If one required review of exact corrected bytes has not
+occurred, perform that one bounded review. Otherwise compile remaining findings directly into
+RED/probe/validator evidence. New findings from later CODE, ADVERSARIAL, or RED-conformance
+review open new executable evidence slices and never restart the design family.
+
+Progress after review is reported only as changed test/code paths, commands executed, collected
+nodes/cases, observed right-reason failures, mutation/property witnesses, and the exact builder
+handoff. More packet or design prose is not coding progress.
+
 ## Role protocol (operator-ratified 2026-07-02; tiered-build amendment ratified 2026-07-15)
 
-**Fable (Claude, main loop) is the CONDUCTOR**: reorientation, slice design (a scratch design doc
-with open forks BEFORE any code), the RED tests, admission, orchestration, verification,
-integration, and ALL commits/merges/pushes. **The conductor does not implement** — build work is
-routed to a build lane (below). The conductor is accountable for every slice regardless of who
-types the code.
+**`/root` is the CONDUCTOR**: reorientation, admission, orchestration, verification,
+integration, and all commits/merges/pushes. Fable is the delegated design and executable-RED
+author. The conductor does not design, author REDs, implement, or approve; build work is routed
+to Opus. `/root` remains accountable for every slice regardless of who types the code.
 
 **Opus is the build lane; codex is the review authority** (operator-ratified 2026-07-15, Codex-
 conservation amendment — supersedes the brief hard-tier-Codex-build model):
@@ -48,9 +111,10 @@ at (test id, fingerprint) granularity against the pinned baseline digest in
 slice 10 and thereafter. (Design-gated process, resolved 2026-07-16, w3c-0 §16-H1.)
 
 **Continuation routing (operator, 2026-07-16 — lands with slice 0; confirms the seat
-assignments above for the `w3-correction` continuation):** Fable (the conductor) orchestrates,
-authors designs and REDs, verifies every packet-bound patch in a clean worktree, integrates,
-and commits; Opus implements only approved, packet-bound work and runs read-only fan-outs;
+assignments above for the `w3-correction` continuation):** `/root` conducts, verifies every
+packet-bound patch in a clean worktree, integrates, and commits; Fable authors bounded designs
+and executable REDs; Opus implements only approved or lawfully-converged packet-bound work and
+runs read-only fan-outs;
 Codex never codes and independently performs the DESIGN, CODE, and ADVERSARIAL reviews. No
 artifact author issues the approving verdict on its own artifact — a Codex-authored fix
 proposal is review input that Fable re-authors before Codex may gate it. The 13-step slice SOP,
@@ -63,13 +127,16 @@ acceptance checkpoint only; it does not authorize a merge or push to `main`. Any
 promotion to `main` requires a separate explicit operator decision after the completed system and
 receipts are reviewed.
 
-## Review convergence law (operator-ratified 2026-07-15)
+## Review convergence law (operator-ratified 2026-07-15; execution amendment 2026-07-22)
 
-- Effort: the FIRST review round on an artifact runs at max/ultra reasoning; every repeat round
-  on the same artifact runs at xhigh. Never spend ultra/max on re-reviews.
-- Convergence cap: after TWO `REVISE` rounds on the same artifact, all remaining and future
-  findings on it convert to executable REDs/probe scripts and move to the build phase — the
-  reviewer then reviews code and test output, never prose re-descriptions of a mechanism.
+- Effort: the first required review of exact bytes runs at max/ultra reasoning. A blocked or
+  invalid precheck is recorded but issues no verdict. After any terminal verdict, findings move
+  to typed executable evidence; a corrected version does not reset review history or authorize
+  a broad prose re-review. The legacy two-`REVISE` cap remains an absolute upper bound.
+- Convergence transition: every terminal finding becomes a `FindingToEvidenceTransition`.
+  Probeable findings become REDs/probes immediately; identity findings receive one deterministic
+  validator; structural findings receive only the minimum RED prerequisite; capability findings
+  become repairs or typed blockers; only irreducible policy forks return to the operator.
 - Empirical domains (git behavior, browser behavior, filesystem, network) are settled by
   scripts with hostile-case tests from the FIRST round: a mechanism that can be probed must be
   an executable artifact, not prose. (Lesson of the 13-round slice-0 gate, 2026-07-15: five of
@@ -81,9 +148,9 @@ receipts are reviewed.
 1. **REORIENT** — read the plan-of-record (`docs/plans/ACTIVE.md`), the binding gate records it
    routes to, and verify ground truth against the live tree (never trust a doc over the tree).
 2. **DESIGN** — Fable writes the scratch design with open forks BEFORE any code.
-3. **DESIGN GATE** — Codex issues `DESIGN-VERDICT` (first round max/ultra; re-rounds xhigh; the
-   two-REVISE convergence cap above applies). No build before the design's binding state:
-   APPROVE, or lawful convergence with findings folded (verified at the patch gates).
+3. **DESIGN GATE** — Codex performs the one required bounded review of the exact design bytes.
+   After its terminal verdict, every finding transitions to executable evidence; no broad prose
+   re-review follows. No build before APPROVE or lawful executable-evidence convergence.
 4. **RED + PITFALL MATRIX** — Fable authors the failing tests (right-reason failure observed)
    plus the top ~5 authority-poisoning lies this slice could tell, each mapped to a guard;
    property-based cases wherever the domain is generative (orders, schemas, token maps).
@@ -107,7 +174,7 @@ receipts are reviewed.
     own work). Always includes the RED-SPEC-CONFORMANCE arm (each RED verified arm-by-arm:
     exists / targets live surface / pre-GREEN failing witness / right reason / load-bearing vs
     its named mutant / GREEN didn't weaken it).
-12. **COMMIT** — conductor only, after all approvals; commit diff must reproduce the reviewed
+12. **COMMIT** — `/root` only, after all approvals; commit diff must reproduce the reviewed
     patch hash; trailers `Ledger-Sha256` + `Ledger-Change`; docs updated in the same commit.
 13. **RECORD + SUMMARY** — persist review transcripts to the scratch review-queue, update the
     plan-of-record status, record the ledger shrink, and write the slice summary.

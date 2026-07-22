@@ -1,6 +1,6 @@
 ---
 name: design-language-tdd
-description: Add or govern a design language in the self-demonstrating design system by following the one data-flow — PROFILE (DATA) → RENDER (webkit) → INVARIANT (conform) → RECEIPT — RED-first. Use when adding a theme, a component, or an aspect contract. Each pass is data + only-new predicates that PROVE the result against cited docs, never a colour swap. Honest claim only: "satisfies the <language> profile vN — here are the receipts", never "is Apple".
+description: 'Add or govern a design language in the self-demonstrating design system by following the one data-flow — PROFILE (DATA) → RENDER (webkit) → INVARIANT (conform) → RECEIPT — RED-first. Use when adding a theme, a component, or an aspect contract. Each pass is data + only-new predicates that PROVE the result against cited docs, never a colour swap. Honest claim only: "satisfies the LANGUAGE profile vN — here are the receipts", never "is Apple".'
 ---
 
 # design-language-tdd — the repeatable, self-proving engine
@@ -51,7 +51,10 @@ profile is not enough; the rendered artifact must satisfy the doctrine-derived o
   + visual receipt behind a declared headless-probe slice. Never claim deterministic-green you can't
   compute browserless.
 
-## The per-slice SOP (every slice, in order)
+## The per-slice method (domain steps only)
+
+Slice lifecycle, role seats, review gates, and commit authority are governed by `AGENTS.md`
+(operator process correction 2026-07-22); this skill owns no lifecycle and mints no verdict.
 
 1. **Name the RED first** — the failing contract. A shape/move task's RED is `test_structural_layout`.
    (`python -m scripts.organization.bootstrap_red_ref "<task>" "<red>"`.)
@@ -65,8 +68,8 @@ profile is not enough; the rendered artifact must satisfy the doctrine-derived o
    token-derived reconstruction (PIL) or rendered-CSS measurement whose `kind` NAMES its real producer,
    NOT a browser screenshot. The true headless/viewport probe is a deferred R4 aspect; never label a
    reconstruction as a screenshot.
-6. **Codex** — run codex on the DIFF (passed inline so it can't read a stale tree); fold disagreements
-   RED-first; commit only when green + codex agrees.
+6. **Gates** — the independent codex review and the commit run under `AGENTS.md`'s slice SOP and
+   role seats; fold review disagreements RED-first.
 
 ## Lanes (workflow routing)
 
