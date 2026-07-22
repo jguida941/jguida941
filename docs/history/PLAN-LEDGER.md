@@ -97,3 +97,26 @@ DESIGN + CODE + ADVERSARIAL cadence; T0 doc-authority law). Session plan source:
 Odinproject O0 landed (`bad950a`). Codex rounds: advisory PLAN REVISE (folded); slice-0 DESIGN
 gate r1 REVISE (folded to rev 2); r2 REVISE (folding to rev 3). Transcripts:
 `scratchpad/work/codex-*.md`.
+
+## 2026-07-18 — A13/A14 single-conductor + federation bootstrap (LANDED)
+
+- A13: `/root` is the sole conductor (dispatch, integrity, verification, integration, commits,
+  lifecycle — never designing, authoring REDs, implementing, or issuing review verdicts); fresh
+  exact MAX `claude-fable-5` events author; fresh exact `claude-opus-4-8` events build every
+  GREEN tier; fresh separate Codex sessions review at operator-ratified XHIGH (2026-07-19
+  amendment; the grandfathered r1 design review alone ran at MAX and closed REVISE). Supersedes
+  the 2026-07-16 "Fable conducts" continuation routing (that text remains, dated, in the
+  historical records).
+- A14: cross-repo exchange is immutable, consumer-pull, candidate-only; edges pin
+  producer/commit/tree/digest/contract/receipts/candidate/direction/staleness in
+  `contracts/orchestration_exchange_policy.json`; upstream pin changes invalidate downstream.
+- Design gate: lawful two-REVISE convergence (r1 REVISE at grandfathered MAX; r2 XHIGH delta
+  REVISE) — every remaining finding became a typed disposition plus executable RED/probe (r7);
+  no approving DESIGN verdict exists for this lineage; CODE + ADVERSARIAL verified the exact
+  landing patch.
+- New guard `tests/contracts/test_orchestration_exchange.py` (prose-parity + live-rule conflict
+  + fail-closed edge/container validation + convergence preflight + named rejection mutants);
+  evidence/hash classification rows (13-file review bank, 11-entry manifest); the July 18 fold
+  obligations persist as typed data incl. the four step-4 clauses; the temporary bootstrap
+  authority (operator record sha256 `f2af1896…`) RETIRED at this landing commit.
+- W7 remains owner of the future typed actor/session/model/tool/capability/scope registry.

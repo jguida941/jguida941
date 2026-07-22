@@ -15,8 +15,9 @@ It ORIENTS, never decides: the plan-of-record and the live tree win over this ca
    7F / 9E / 16 observed identities (see the seed `contracts/correction_baseline.json`).
 4. `docs/plans/handoff/w3c-0-design-closure.md` — the slice-0 design record: rev 16 (rev15 max
    review REVISE; r2 xhigh REVISE folded — converged; §16: A+H1 resolved, B–G/H2 pending); §15.
-5. Conductor's live continuation record (ignored scratch, the ONLY live scratch plan):
-   `scratchpad/work/CONTINUATION-PLAN.md`; lane receipts under `scratchpad/active/<lane>/`.
+5. Conductor's live scratch index (untracked local scratch, never commit cargo; manually
+   refreshed, never automatically current): `scratchpad/active/process/ROOT-RECOVERY-CHECKPOINT.md`;
+   lane receipts under `scratchpad/active/<lane>/`.
 6. `docs/history/PLAN-LEDGER.md` — folded history + binding doctrine reframes.
 
 ## Current truth (2026-07-16 — reverify with `git status` / `git log --oneline -5`)
@@ -40,9 +41,10 @@ It ORIENTS, never decides: the plan-of-record and the live tree win over this ca
 - Receipts (Chrome-capable env only): `python -m scripts.quality.headless_receipts`.
 
 ## Standing rules
-Continuation routing (operator 2026-07-16): Fable conducts — authors designs + REDs, verifies,
-integrates, and commits; Opus implements packet-bound work; Codex reviews (DESIGN + CODE +
-ADVERSARIAL) and never codes. Opus read-only fan-outs; author-never-approves; three gates per slice.
+Continuation routing (operator 2026-07-18 — A13): `/root` conducts — dispatches, verifies,
+integrates, commits; fresh MAX `claude-fable-5` events author designs/REDs/packets; fresh
+`claude-opus-4-8` events build packet-bound work; Codex reviews (DESIGN + CODE + ADVERSARIAL)
+and never codes. Fresh one-shot exact-model dispatches; author-never-approves; three gates per slice.
 Everything found in any review folds into ACTIVE.md or the named design record — never a new
 plan doc. Session scratch dies; everything binding lives in the tree.
 
