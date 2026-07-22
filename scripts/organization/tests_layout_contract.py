@@ -59,6 +59,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_public_data_privacy.py",
             "test_readme_projection.py",
             "test_reference_pack.py",
+            "test_reorient.py",
             "test_scripts_layout_contract.py",
             "test_settings_composition.py",
             "test_showcase_coverage.py",
@@ -186,6 +187,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "organization": (
         "test_doc_authority.py",        # T0: one plan-of-record + lifecycled/capped plan docs (fail-closed)
+        "test_reorient.py",             # W8-O: the reorient composer contract (board/receipt projection law)
     ),
     "reference_intake": (
         "test_reference_lane_contracts.py",   # W6-K: reference-capture lane record contracts (w3c-0 §8, R1-R8) + 31-id vocabulary

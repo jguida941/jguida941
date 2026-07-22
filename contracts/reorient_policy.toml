@@ -1,0 +1,132 @@
+contract_id = "ReorientPolicy"
+schema_version = 1
+board_schema_version = 1
+receipt_schema_version = 1
+
+# NO [budgets] section — the operator removed wall-clock budgets (2026-07-16 session 2).
+# A reintroduced budget/timer section is an unknown-key contract violation (RED 1).
+
+[discipline]  # operator-mandated background-job laws as DATA rows, reviewed at this gate.
+              # v1 records them; enforcement is conductor discipline now and W7/W8 gate arms
+              # later — discipline_enforced is the honesty bit (RED 22).
+read_only_snapshots = true         # background checks run against immutable snapshots
+no_self_fold = true                # background results never fold themselves into records
+conductor_only_integration = true  # only the conductor integrates/commits
+receipt_interrupt_triggers = ["failure", "invalidation", "gate-readiness"]
+unverified_scout = true            # every scout result is UNVERIFIED until an owning gate
+one_writer_per_lane = true         # lane.lock convention; the 2026-07-16 two-session
+                                   # collision is the recorded motivating incident
+fan_out_ceiling = 6                # max concurrent read-only workers
+exact_key_caching = true           # only an exact-key PASS is reusable (receipt law)
+discipline_enforced = false        # v1 RECORDS the laws; it does not enforce them
+
+[job_states]  # closed vocabulary for background-job receipts (consumers: conductor + later W8)
+values = ["PASS", "FAIL", "INFRA_BLOCKED", "CANCELLED", "STALE"]
+
+[verdict_grammar]
+# the ONLY line shapes the composer may project from a record (anchored, one per line):
+patterns = [
+  "^DESIGN-VERDICT: .+$",
+  "^VERDICT: .+$",
+  "^ADVERSARIAL-VERDICT: .+$",
+  "^[A-Z][A-Z0-9-]*-STATUS: .+$",
+]
+
+[census]  # undeclared-visibility law: files matching these globs that are NOT in any lane
+          # roster and are NOT the composer's own two outputs appear verbatim in the board's
+          # top-level `undeclared` list — visible, never silent.
+watch_globs = [
+  "scratchpad/work/*.md",
+  "scratchpad/work/*.txt",
+  "scratchpad/work/*.json",
+  "scratchpad/active/*/*/*",
+]
+
+# FULL closed lane census — eleven work lanes + the plan record, twelve rows. priority:
+# unique positive integer, 1 = first. charter: ACTIVE | QUEUED | PARKED | LANDED | RECORD (closed enum;
+# RECORD = the plan record itself, never pickable as work). Both are REVIEWED DATA mirroring
+# the plan's landing chain; the board projects them verbatim and owns neither.
+[[lane]]
+id = "plan"
+priority = 1
+charter = "RECORD"
+records = ["scratchpad/work/CONTINUATION-PLAN.md"]
+
+[[lane]]
+id = "w8o"
+priority = 2
+charter = "ACTIVE"
+records = [
+  "scratchpad/active/w8o/design/w8o-reorient-design-2026-07-16.md",
+  "scratchpad/active/w8o/transcripts/codex-w8o-design-gate-r1-2026-07-16.md",
+  "scratchpad/active/w8o/transcripts/codex-w8o-design-gate-r2-2026-07-16.md",
+]
+
+[[lane]]
+id = "w7"
+priority = 3
+charter = "ACTIVE"
+records = ["scratchpad/work/fable-prompt-w7-v12-v13-refinement.txt"]
+
+[[lane]]
+id = "org"
+priority = 4
+charter = "QUEUED"
+records = ["scratchpad/work/fable-prompt-org-red-r3-convergence.txt"]
+
+[[lane]]
+id = "slice-patch"
+priority = 5
+charter = "ACTIVE"
+records = [
+  "scratchpad/active/slice-patch/red/slice-patch-r5-convergence-2026-07-16.md",
+  "scratchpad/active/slice-patch/packet/slice-patch-r5-packet.json",
+]
+
+[[lane]]
+id = "ratchet"
+priority = 6
+charter = "QUEUED"
+records = [
+  "scratchpad/work/fable-prompt-ratchet-r6-convergence.txt",
+  "scratchpad/active/ratchet/prep/prep-receipt-2026-07-16.md",
+]
+
+[[lane]]
+id = "source-foundation"
+priority = 7
+charter = "QUEUED"
+records = ["scratchpad/active/source-foundation/prompts/fable-source-foundation-design-red.txt"]
+
+[[lane]]
+id = "e2e-fixture"
+priority = 8
+charter = "QUEUED"
+records = ["scratchpad/active/e2e-fixture/charter/e2e-fixture-charter-2026-07-16.md"]
+
+[[lane]]
+id = "w6"
+priority = 9
+charter = "QUEUED"
+records = ["scratchpad/work/fable-prompt-w6-r2-adoption.txt"]
+
+[[lane]]
+id = "w8"
+priority = 10
+charter = "QUEUED"
+records = ["scratchpad/work/fable-prompt-w8-convergence-reds.txt"]
+
+[[lane]]
+id = "lexguard"
+priority = 11
+charter = "PARKED"
+records = ["scratchpad/work/lexguard-convergence-decisions-2026-07-16.md"]
+
+[[lane]]
+id = "slice0"
+priority = 12
+charter = "LANDED"
+records = [
+  "scratchpad/work/fable-slice0-rev16-fold-2026-07-16.md",
+  "scratchpad/active/slice0/transcripts/codex-landing-r6-two-closure-APPROVE-2026-07-16.md",
+]
