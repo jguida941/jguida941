@@ -40,9 +40,11 @@ It ORIENTS, never decides: the plan-of-record and the live tree win over this ca
 - Receipts (Chrome-capable env only): `python -m scripts.quality.headless_receipts`.
 
 ## Standing rules
-Continuation routing (operator 2026-07-16): Fable conducts — authors designs + REDs, verifies,
-integrates, and commits; Opus implements packet-bound work; Codex reviews (DESIGN + CODE +
-ADVERSARIAL) and never codes. Opus read-only fan-outs; author-never-approves; three gates per slice.
+Continuation routing (operator 2026-07-22): `/root` conducts — dispatches, verifies, integrates,
+and commits; Fable authors every bounded design and executable RED; Opus builds GREEN only from
+packet-bound work; Codex reviews (DESIGN + CODE + ADVERSARIAL) and never codes. Opus read-only
+fan-outs; author-never-approves; three gates per slice. Slice lifecycle, role seats, review
+gates, and commit authority are governed by `AGENTS.md`.
 Everything found in any review folds into ACTIVE.md or the named design record — never a new
 plan doc. Session scratch dies; everything binding lives in the tree.
 

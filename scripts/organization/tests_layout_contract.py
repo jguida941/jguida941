@@ -56,6 +56,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_rendered_fact_density_adversarial.py",
             "test_rendered_fact_paint_adversarial.py",
             "test_rendered_facts.py",
+            "test_process_docs_currency.py",
             "test_public_data_privacy.py",
             "test_readme_projection.py",
             "test_reference_pack.py",
@@ -186,6 +187,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "organization": (
         "test_doc_authority.py",        # T0: one plan-of-record + lifecycled/capped plan docs (fail-closed)
+        "test_process_docs_currency.py",  # 2026-07-22 operator law: process-doc currency/adoption (fail-closed)
     ),
     "reference_intake": (
         "test_reference_lane_contracts.py",   # W6-K: reference-capture lane record contracts (w3c-0 §8, R1-R8) + 31-id vocabulary
