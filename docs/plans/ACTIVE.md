@@ -67,6 +67,36 @@ one bounded RED-conformance check is followed immediately by a different Opus GR
 
 ## STATUS
 
+### Single-worktree recovery board (operator-directed 2026-07-22)
+
+`w3-correction` is the only live development branch. Recovery commits below are reachable from
+that branch on GitHub through non-activating merge parents. `Live = no` means the bytes are
+preserved but are **not** present in the branch's working tree and therefore cannot be mistaken
+for completed product code. A row becomes `DONE` only after its named executable evidence passes
+on the then-current live branch and `/root` commits the activated result.
+
+| Lane snapshot | Recovery commit | State | Live | Binding evidence / next action |
+|---|---|---|---:|---|
+| Process authority hard block | `bb291a56` | `DONE` | yes | Single-worktree and finite-review law committed and pushed. |
+| Process-currentness successor | active Opus lane | `BUILDING_GREEN` | no | Must produce 52/52 GREEN, then integrate, verify, commit, and push. |
+| Process-currentness original Opus r1 | `86b4f63d` | `REJECTED_AS_FINAL` | no | Exact CODE + ADVERSARIAL verdicts were `revise`; successor replaces it. |
+| Process-currentness Fable RED snapshot | `48cd8545` | `SUPERSEDED_EVIDENCE` | no | Frozen RED lineage retained; later successor owns activation. |
+| Process-throughput RED | `66df9879` | `RED_ONLY` | no | 23/23 right-reason failures; re-pin after currentness, then GREEN build. |
+| A13/A14 canonical r9 | `ea4020bb` | `RED_ONLY` | no | 16 core tests GREEN; adversarial bank intentionally has 125 failures; build GREEN after LANE-A/B/C. |
+| A13/A14 r8 | `6fb53373` | `REJECTED_TRUNCATED` | no | Invalid truncated transport; retained only for recovery evidence. |
+| A13/A14 author original | `dfb8c50b` | `SUPERSEDED` | no | Replaced by canonical r9. |
+| A13/A14 r10 / build-r9 duplicates | `00ede1a8`, `b7a2a8e6` | `SUPERSEDED_DUPLICATE` | no | Exact r9 product bytes; neither contains GREEN. |
+| A13/A14 build / repro / seal candidates | `6d2ae2ae`, `627afc84`, `32051298` | `SUPERSEDED` | no | Same older eight-path candidate; no GREEN implementation. |
+| Ratchet r6 | `d617a873` | `OLD_BASE_GREEN` | no | 85 tests and M1-M7 passed on old base; re-pin after A13/A14, replay, review, activate. |
+| Org-L1 | `ac272c8a` | `OLD_BASE_APPROVED` | no | Rebase after r6 and currentness; reconcile CR-17/doc authority before activation. |
+| W8-O r2 | `39480840` | `REJECTED_AS_FINAL` | no | Adversarial child-Git code/network seam; build W8-O r3 instead. |
+| SOP-skill RED duplicate | `461bdd87` | `SUPERSEDED_DUPLICATE` | no | Same RED bytes retained in currentness lineage. |
+| Pre-crawler checkpoint | `1defb859` | `ARCHIVED_CHECKPOINT` | no | Entire former branch and final dirty authority bytes retained; live authority is `w3-correction`. |
+
+Activation order is fail-closed and dependency-bound: currentness → LANE-A/B/C → A13/A14 GREEN
+→ r6 re-pin → org-L1 rebase/re-pin → July SOP fold → W8-O r3 → W7 and the remaining product
+program. Preserving a recovery commit never advances this order and never changes a row to DONE.
+
 - **W3 visible-design correction** — gate record `handoff/w3-visual-regression-correction.md`;
   clean-context baseline 75/7F/9E (102/39F/13E was the dirty-tree diagnostic). **Slice-0 design
   `handoff/w3c-0-design-closure.md` rev 16 (2026-07-16; rev15 combined max review REVISE;
@@ -74,7 +104,7 @@ one bounded RED-conformance check is followed immediately by a different Opus GR
   text-only as first branch commit only after CODE + ADVERSARIAL approve the exact landing patch;
   org L1/L2 intake follows. T0 lands with slice 0 (doc law + plan).
 - **Correction slices** (development branch `w3-correction`; design → DESIGN gate → RED + admission
-  → isolated, packet-bound Opus build → `/root` verification + Codex CODE/ADVERSARIAL → `/root` commit;
+  → packet-bound Opus build in the single checkout → `/root` verification + Codex CODE/ADVERSARIAL → `/root` commit;
   every integration stays on this branch). Slice 0 = design closure + T0 + AGENTS amendment
   (**text-only — no receipts; lands via plain-diff review, NOT the hermetic binary-patch tool, which is slice-1+**). 1 admission/
   source foundation + `dashboard-pre-w3.v2` + slice_patch + ratchet hardening · 2 coverage +
@@ -84,7 +114,8 @@ one bounded RED-conformance check is followed immediately by a different Opus GR
 - **W6 — the universal capture ENGINE (ACTIVE parallel workstream — this IS the product).**
   Reframed 2026-07-15: the FOUNDATION is design-approved in slice 0 (§8 reference-lane schemas:
   candidate/approval/pack/promotion; §3.1 the closed 31-id aspect vocabulary — the COMPLETENESS
-  mechanism; §3.2 the closed coverage join). It BUILDS NOW on its own branch, parallel to the
+  mechanism; §3.2 the closed coverage join). It builds on `w3-correction` in dependency order
+  under non-overlapping closed write rosters; it never creates its own branch/worktree and never widens the
   fixture-correction, and never widens repo-surface-scout's on-disk `web_surface_probe` (schema
   pins `scout_fetch_executed: false`). Engine lanes (each design→gate→build→review): **W6-P
   generic probe** (every aspect of any served page — the rendered-facts engine without
