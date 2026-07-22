@@ -46,35 +46,34 @@ contracts — no hardcoded paths/layouts; packaging = constellation sibling patt
   target = the operator's resume/portfolio site; its look transfers while the operator's content
   and labels remain. Slice 9 is readiness only; real crawl/APPLY needs post-slice-10 admission.**
 
-## ORCHESTRATION (operator-ratified; mirrors the semantic-tdd SOP)
+## ORCHESTRATION (A13 single-conductor routing, operator 2026-07-18 — AGENTS.md owns the doctrine)
 
-Continuation routing (operator 2026-07-16; AGENTS.md owns this doctrine for this continuation):
-**Fable authors every design and RED. Once a design reaches its binding state (APPROVE or
-lawful convergence, per AGENTS.md) and fresh admission exists, Opus builds only in an isolated
-worktree under the six-field packet; never gating, integrating, or committing. Fable verifies
-in a clean worktree, integrates, and commits the exact approved diff on `w3-correction`; Codex
-never codes and issues the DESIGN/CODE/ADVERSARIAL verdicts.** No artifact author approves its own work;
-no slice lands without all three gates. Opus read-only fan-outs remain allowed. Findings fold
-into THIS plan or its named record — never a new plan doc (conductor's live scratch record:
-`scratchpad/work/CONTINUATION-PLAN.md`). Integrations stay on `w3-correction`; slice 10 is
-acceptance only; `main` needs a later operator decision. SOP/receipt/effort/packet laws unchanged.
-Review-effort policy: the FIRST review round on an artifact runs at max/ultra effort; repeat
-rounds on the same artifact run at xhigh — never spend ultra on re-reviews (reviews only).
-Convergence cap (lesson of the 13-round slice-0 gate): after TWO REVISE rounds on one artifact,
-remaining findings convert to executable REDs/probe scripts and move to the build phase — codex
-then reviews code and test output, never prose re-descriptions; empirical domains (git, browser
-behavior) are settled by scripts with hostile-case tests from the first round.
+**`/root` is the sole conductor** — dispatch, model/tool integrity, currentness/hash checks,
+verification in clean worktrees, integration, every commit, lifecycle recording; it never
+designs, authors REDs, implements, or reviews. **Fresh exact `claude-fable-5` events at MAX
+effort author** designs, REDs, pitfall matrices, admissions, packet specs, review folds, and
+hard-proof interpretation. **Fresh exact `claude-opus-4-8` events build** every GREEN tier from
+an approved design + accepted sealed packet with a closed path roster. **Fresh separate Codex
+sessions review** — DESIGN, then exact-final CODE + ADVERSARIAL — at operator-ratified XHIGH
+(2026-07-19); Codex only reviews. Author-never-approves. Every dispatch is fresh, one-shot,
+exact-model pinned, no fallback or resume; `/root` live-monitors and rescans each closed JSONL;
+a wrong model or forbidden tool voids the complete worker output. One worker lane at a time.
+Effort/convergence, SOP, receipt, packet, and A14 exchange law (immutable, consumer-pull,
+candidate-only) live in `AGENTS.md`; edges pin in `contracts/orchestration_exchange_policy.json`.
+Conductor's live scratch index: `scratchpad/active/process/ROOT-RECOVERY-CHECKPOINT.md`.
+**Binding order:** A13/A14 → re-pin r6 → re-pin org-L1 → July 18 review/SOP fold → W8-O r3 →
+four retro-review rows → W7 → DEMO A/B.
 
 ## STATUS
 
 - **W3 visible-design correction** — gate record `handoff/w3-visual-regression-correction.md`;
   clean-context baseline 75/7F/9E (102/39F/13E was the dirty-tree diagnostic). **Slice-0 design
   `handoff/w3c-0-design-closure.md` rev 16 (2026-07-16; rev15 combined max review REVISE;
-  r2 xhigh REVISE folded — converged; §16: A + H1 resolved, B–G/H2 pending).** Slice 0 lands
-  text-only as first branch commit only after CODE + ADVERSARIAL approve the exact landing patch;
-  org L1/L2 intake follows. T0 lands with slice 0 (doc law + plan).
+  r2 xhigh REVISE folded — converged; §16: A + H1 resolved, B–G/H2 pending).** Slice 0 LANDED
+  (`74fe3ecd`, text-only plain-diff, CODE + ADVERSARIAL approved, SEED baseline committed);
+  org L1/L2 intake follows. T0 landed with slice 0 (doc law + plan).
 - **Correction slices** (development branch `w3-correction`; design → DESIGN gate → RED + admission
-  → isolated, packet-bound Opus build → Fable verification + Codex CODE/ADVERSARIAL → Fable commit;
+  → isolated, packet-bound Opus build → `/root` verification + Codex CODE/ADVERSARIAL → `/root` commit;
   every integration stays on this branch). Slice 0 = design closure + T0 + AGENTS amendment
   (**text-only — no receipts; lands via plain-diff review, NOT the hermetic binary-patch tool, which is slice-1+**). 1 admission/
   source foundation + `dashboard-pre-w3.v2` + slice_patch + ratchet hardening · 2 coverage +
