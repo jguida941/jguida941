@@ -108,7 +108,7 @@ LEDGER_PATH = "docs/history/PLAN-LEDGER.md"
 
 ADOPTION_SHA256 = {
     "AGENTS.md": "38a823c52d8fae295980deea08bacf00f4883d336b0bb014d15cfb4a4934845e",
-    "docs/plans/ACTIVE.md": "ab5e395427913a1d78bc80c247ec2f91acbe851773c3f86aedd81c3ab9adc79e",
+    "docs/plans/ACTIVE.md": "199cd651da3915696a924479acd0f4ecb6a43b52f20dfae05cf98aef60b1db4f",
 }
 
 LEDGER_PREFIX_SHA = "83b351f84fcc4668088bae0e7adf2a103515e03c3afc478a2d9072b890359a44"

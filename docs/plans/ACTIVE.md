@@ -1,159 +1,91 @@
-# ACTIVE PLAN — the universal design-compiler program (plan-of-record)
+# ACTIVE PLAN — universal design-compiler program (plan-of-record)
 
-> THIS is the single plan we execute from — the durable, committed source of truth for the
-> current plan and status. Every other tracked plan-shaped doc is a typed record with a lifecycle
-> row in `contracts/doc_authority_policy.toml` (fail-closed; untracked drafts enter when their
-> lane lands). Finished history folds into `docs/history/PLAN-LEDGER.md`. Never add a second plan doc.
+> THIS is the single plan we execute from and the durable, committed source of truth for the
+> current plan. Finished detail folds into `docs/history/PLAN-LEDGER.md`; plan-shaped records are
+> lifecycled by `contracts/doc_authority_policy.toml`. Never create a second plan-of-record.
 
-## THE PRODUCT (operator-ratified 2026-07-15)
+## PRODUCT AND ACCEPTANCE
 
-Given ANY browser-accessible website, URL/local snapshot, or design document, the system captures
-its routes, regions, components, responsive layouts, interaction states, computed styles, and
-assets; the user selects the aspects they like; the system compiles those selections into
-provenance-bound semantic invariants, generates genuinely-failing RED tests, implements them in a
-target repository, verifies the real rendered result, mutation-proves every invariant, and fails
-closed wherever evidence, state coverage, or enforcement is incomplete. Approved design knowledge
-becomes reusable frozen packs; user tweaks are explicit owner forks, never silent edits.
+Given any browser-accessible site, local snapshot, or design document, capture its routes,
+regions, components, responsive/interaction states, computed styles, DOM, and assets; let the
+user select aspects; compile those selections into provenance-bound semantic invariants; observe
+real REDs; implement, render, measure, mutation-prove, and freeze reusable design packs. Unknown
+coverage fails closed. Accessibility floors are non-waivable. Every restyle first creates a
+hash-pinned `pre-restyle` restore point. The engine is portable and parameterized, never coupled
+to this repository; Apple Dark, Carbon, and Liquid Glass are fixtures, not the product.
 
-    crawl / read docs → select aspects → compile invariants → observe RED
-    → implement → render + measure → mutation-prove → reusable design pack
+- **DEMO A:** official design document → obligations/profile DATA → generated site → receipts.
+- **DEMO B:** capture the selected reference (`https://www.glukhovsky.com/games`) → approve →
+  freeze → apply reversibly to the operator portfolio → mutation proof + receipts.
+- Slice 10 is a development acceptance checkpoint, not authorization to update `main` or deploy.
 
-Apple Dark, Carbon, and Liquid Glass are TEST FIXTURES proving the universal engine — not the
-product. Authority ladder per aspect: official code/spec (Mode A/B) → approved measured reference
-(Mode C) → owner-ratified law (Mode D); no mode = no authority; accessibility floors are
-non-waivable; brand claims are always "satisfies <profile> vN — receipts attached", never "is X".
+## BINDING EXECUTION LAW
 
-**COMPLETENESS (operator 2026-07-15): "everything that can be put in a website"** — every HTML
-(DOM/semantics/attributes), CSS (every computed property, not a visual subset), and observable JS
-aspect (states, hydrated DOM). The probe records the FULL computed-style+DOM+state surface; an
-aspect with no vocabulary id is a coverage gap that reddens, never a silent skip. **BACKUP-BEFORE-
-TRANSFORM (hard law):** a restyle NEVER overrides — it first commits a hash-pinned `pre-restyle`
-restore point (git tag + frozen pack) then transforms reversibly; the O5/DEMO-B lane fails closed
-without one. Slice-0 foundation: `handoff/w3c-0-design-closure.md` §8 (full W6 = its own lane).
+`w3-correction` is the sole development branch and this checkout is the sole worktree.
+`/root` conducts, dispatches, verifies, integrates, commits, and records recovery state; it does not author
+product designs/REDs/GREEN or approval verdicts. Fable is conserved for genuinely missing hard
+product designs: W3 source foundation, whole-site gate, DEMO A/B, and possibly W6-P. Codex owns
+bounded existing specs/RED restoration, deterministic conformance, and CODE/ADVERSARIAL gates;
+Opus builds GREEN from closed current-base packets. No author approves its own artifact.
 
-**MODULARITY (operator law 2026-07-16): the system is a PORTABLE TOOL, never this repo's
-plumbing.** This repo (site + GitHub-pages workflow) is one example target. Every engine piece
-(capture, probe, vocabulary, compiler, ratchet, gates) runs on ANY repo via parameters + data
-contracts — no hardcoded paths/layouts; packaging = constellation sibling pattern. Hardwiring = defect.
+Review lineage is append-only. Terminal findings become typed `FindingToEvidenceTransition` rows.
+No review-of-review or prose reround is allowed. After right-reason RED,
+one bounded RED-conformance check is followed immediately by a different Opus GREEN builder. Old-base,
+preserved, rejected, prompt-only, design-only, and RED-only artifacts are never live completion.
+Visible changes require 1280 screenshots, 390 overflow probes, and authentic provenance receipts.
 
-## PROGRAM DEFINITION-OF-DONE (acceptance demos — the project is not done before these)
+## EXACT CURRENT SEQUENCE (operator-ratified 2026-07-22)
 
-- **DEMO A — design-document lane:** one design document → profile DATA → generated site →
-  receipts, under gates (delivered by correction slices 5–7).
-- **DEMO B — website lane (the vertical):** capture reference → approve aspects → freeze →
-  fidelity-confirm → measure → promote → APPLY under byte-backup → mutation-prove → receipts.
-  **Post-checkpoint selection (operator 2026-07-16): reference = `https://www.glukhovsky.com/games`;
-  target = the operator's resume/portfolio site; its look transfers while the operator's content
-  and labels remain. Slice 9 is readiness only; real crawl/APPLY needs post-slice-10 admission.**
+1. **DONE:** compacted this plan below its 120-line cap; currentness bindings re-pinned and green.
+2. Restore/re-pin the approved slice-patch; prove 34/34 + 10/10 mutants on the current base.
+3. Re-pin ratchet r6; replay 85 tests, the 21/21 matrix, and M1–M7.
+4. Re-pin Org-L1 with CR-17/currentness reconciliation; preserve target-shape RED declarations.
+5. Dispatch the sealed Fable source-foundation prompt, then RED → Opus GREEN → W3 slices 1–10.
 
-## ORCHESTRATION (operator-ratified; mirrors the semantic-tdd SOP)
+Process-system optimization cannot block this product sequence. All work stays on
+`w3-correction`; no worktree/branch creation and no push/merge to `main` without a fresh explicit
+operator decision.
 
-Continuation routing (operator 2026-07-22; AGENTS.md owns this doctrine):
-**`/root` conducts, dispatches, verifies, integrates, commits, and records recovery state, but
-does not design, author REDs, implement, or approve. Fable authors every bounded design and
-executable RED. After one bounded Codex review/conformance gate and fresh admission, Opus builds
-GREEN only in the single authoritative `w3-correction` checkout under a six-field packet and a
-closed, non-overlapping write roster; Codex reviews the finished patch. Creating another Git
-worktree is a hard process failure.** No artifact author approves its own work;
-no slice lands without all three gates. Opus read-only fan-outs remain allowed. Findings fold
-into THIS plan or its named record — never a new plan doc (conductor's live scratch record:
-`scratchpad/work/CONTINUATION-PLAN.md`). Integrations stay on `w3-correction`; slice 10 is
-acceptance only; `main` needs a later operator decision. SOP/receipt/effort/packet laws unchanged.
-Review history is append-only across corrected/versioned artifacts. After every terminal review,
-stable findings become typed `FindingToEvidenceTransition` rows and move immediately to RED,
-probe, deterministic-validator, minimum-prerequisite, capability-blocker, or operator-policy
-evidence. No review-of-review or broad prose revision loop is permitted. After right-reason RED,
-one bounded RED-conformance check is followed immediately by a different Opus GREEN builder.
+## COMPACT WORKBOARD
 
-## STATUS
+| ID | Program row | Honest live state | Binding next action |
+|---:|---|---|---|
+| 1 | Single-worktree/branch recovery | `DONE_LIVE` | Enforce; never recreate retired rooms/branches. |
+| 2 | Process currentness | `DONE_LIVE` | Deterministic identity re-pins only when governed bytes change. |
+| 3 | Temporal effort routing/review | `ARTIFACT_COMPLETE`; review unconsumed | Deferred process work; no redesign. |
+| 4 | RG-J0..J4 Rust guard | `DESIGN_ONLY` | Deferred Codex/Opus build; cannot block product work. |
+| 5 | Process throughput | `RED_ONLY` at `66df9879` | Restore/re-pin/build later. |
+| 6 | Semantic-TDD conductor skill | `RED_ONLY` | Restore/re-pin/build later with Codex/Opus. |
+| 7 | Sealed process handoff | `PENDING_PROCESS` | Assemble after deferred RG/throughput/skill work. |
+| 8 | LANE-A readiness | `DESIGN_ONLY`; four RED/readiness files absent | Codex authors bounded RED; Opus builds later. |
+| 9 | LANE-B lifecycle | `LIVE_PARTIAL` | Complete generic contracts later; currentness transitions stay live. |
+| 10 | LANE-C durable SOP | `DESIGN_ONLY` | Build templates/checkers/recovery schema later. |
+| 11 | A13/A14 exchange | `RED_ONLY` at `ea4020bb` | Restore/re-pin; Opus GREEN later. |
+| 12 | Approved slice-patch prerequisite | `APPROVED_OLD_BASE`, not live | **Next:** current-base activation per sealed evidence. |
+| 13 | Ratchet r6 | `PRESERVED_OLD_BASE_GREEN` at `d617a873` | Re-pin immediately after row 12. |
+| 14 | Org-L1 producer cutover | `PRESERVED_OLD_BASE_APPROVED` at `ac272c8a` | Re-pin after r6; reconcile CR-17/currentness. |
+| 15 | July SOP fold | `READY_LATER` | Bounded mechanical fold after Org-L1. |
+| 16 | W8-O r2/r3 | `REJECTED` / `SPEC_ONLY` | Never activate r2; Codex RED + Opus GREEN r3 later. |
+| 17 | Retro queue | `OPEN` | Clear exact current-base patches; blocks `main`, not development. |
+| 18 | W7 consumers | `DESIGN_ONLY` | Codex bounded work after the product prerequisites. |
+| 19 | Whole-site fail-closed gate | `REQUIREMENTS_ONLY` | Reserved Fable design before promotion/deployment. |
+| 20 | W3 correction slices 1–10 | `LIVE_PARTIAL` (slice 0 only) | Execute rows 12–14, source foundation, then slices 1–10. |
+| 21 | W3 source foundation | `PROMPT_ONLY` | Reserved Fable design after rows 12–14 are live. |
+| 22 | DEMO A compiler | `DESIGN_ONLY` | Reserved Fable end-to-end design after W3 prerequisites. |
+| 23 | W6 universal capture | `DESIGN_ONLY`; old code preserved-not-live | Codex W6-K/W6-C; Fable only if W6-P is genuinely hard. |
+| 24 | DEMO B reference-to-site | `DESIGN_ONLY` | Reserved Fable design after W3/W6/gate closure. |
+| 25 | P5 remainder | `LIVE_PARTIAL` | Org/meta/data/pattern plus themes 4–10 and kits K0–K3 later. |
+| 26 | Bounded dead-code cleanup | `READY_LATER` | Remove only the audited obsolete/unused symbols; preserve compatibility and target-shape REDs. |
+| 27 | Whole-program completeness audit | `DONE_EVIDENCE` | Do not repeat; route only from the sealed handoff. |
+| 28 | `main` promotion/site deployment | `BLOCKED_OPERATOR_DECISION` | Requires whole-site gate, retro clearance, W3 acceptance, and explicit approval. |
 
-### Single-worktree recovery board (operator-directed 2026-07-22)
+## VERIFICATION AND POINTERS
 
-`w3-correction` is the only live development branch. Recovery commits below are reachable from
-that branch on GitHub through non-activating merge parents. `Live = no` means the bytes are
-preserved but are **not** present in the branch's working tree and therefore cannot be mistaken
-for completed product code. A row becomes `DONE` only after its named executable evidence passes
-on the then-current live branch and `/root` commits the activated result.
+Each slice requires its focused suite, the correction ratchet, named non-vacuous mutation
+witnesses, homing, doc authority, and receipts for visible changes. Full discovery is binding at
+slice 10; until r6 promotion, four structural-layout failures are intentional future target-shape
+REDs, while any new unpinned failure blocks integration.
 
-| Lane snapshot | Recovery commit | State | Live | Binding evidence / next action |
-|---|---|---|---:|---|
-| Process authority hard block | `bb291a56` | `DONE` | yes | Single-worktree and finite-review law committed and pushed. |
-| Process-currentness successor | `428672a0` | `DONE` | yes | Currentness 52/52 and homing 6/6 GREEN on `w3-correction`; finite process authority is active. |
-| Process-currentness original Opus r1 | `86b4f63d` | `REJECTED_AS_FINAL` | no | Exact CODE + ADVERSARIAL verdicts were `revise`; successor replaces it. |
-| Process-currentness Fable RED snapshot | `48cd8545` | `SUPERSEDED_EVIDENCE` | no | Frozen RED lineage retained; later successor owns activation. |
-| Process-throughput RED | `66df9879` | `RED_ONLY` | no | 23/23 right-reason failures; re-pin after currentness, then GREEN build. |
-| A13/A14 canonical r9 | `ea4020bb` | `RED_ONLY` | no | 16 core tests GREEN; adversarial bank intentionally has 125 failures; build GREEN after LANE-A/B/C. |
-| A13/A14 r8 | `6fb53373` | `REJECTED_TRUNCATED` | no | Invalid truncated transport; retained only for recovery evidence. |
-| A13/A14 author original | `dfb8c50b` | `SUPERSEDED` | no | Replaced by canonical r9. |
-| A13/A14 r10 / build-r9 duplicates | `00ede1a8`, `b7a2a8e6` | `SUPERSEDED_DUPLICATE` | no | Exact r9 product bytes; neither contains GREEN. |
-| A13/A14 build / repro / seal candidates | `6d2ae2ae`, `627afc84`, `32051298` | `SUPERSEDED` | no | Same older eight-path candidate; no GREEN implementation. |
-| Ratchet r6 | `d617a873` | `OLD_BASE_GREEN` | no | 85 tests and M1-M7 passed on old base; re-pin after A13/A14, replay, review, activate. |
-| Org-L1 | `ac272c8a` | `OLD_BASE_APPROVED` | no | Rebase after r6 and currentness; reconcile CR-17/doc authority before activation. |
-| W8-O r2 | `39480840` | `REJECTED_AS_FINAL` | no | Adversarial child-Git code/network seam; build W8-O r3 instead. |
-| SOP-skill RED duplicate | `461bdd87` | `SUPERSEDED_DUPLICATE` | no | Same RED bytes retained in currentness lineage. |
-| Pre-crawler checkpoint | `1defb859` | `ARCHIVED_CHECKPOINT` | no | Entire former branch and final dirty authority bytes retained; live authority is `w3-correction`. |
-
-Activation order is fail-closed and dependency-bound: currentness → LANE-A/B/C → A13/A14 GREEN
-→ r6 re-pin → org-L1 rebase/re-pin → July SOP fold → W8-O r3 → W7 and the remaining product
-program. Preserving a recovery commit never advances this order and never changes a row to DONE.
-
-Remote branch retirement manifest (2026-07-22): `d-board` tip `92b3b69b1dc696186ce0088ca4c657a4932c1dca`
-and `d-shell-1` tip `dc351b6605373cb4d3cd2bb7dc8a192ed2a03949` are `SUPERSEDED` because every
-unique stable patch is already ancestral to `w3-correction`. `d-shell-1-pregate` tip
-`07dacb75485388e2036e58de26b6e5ee47e0fab7` is `PRESERVE_ONLY`: it is obsolete pre-gate WIP
-superseded by the final D-SHELL series, but its exact tip must be attached as a non-activating
-merge parent before the three obsolete remote names are deleted. `main` is outside this cleanup
-and remains untouched.
-
-- **W3 visible-design correction** — gate record `handoff/w3-visual-regression-correction.md`;
-  clean-context baseline 75/7F/9E (102/39F/13E was the dirty-tree diagnostic). **Slice-0 design
-  `handoff/w3c-0-design-closure.md` rev 16 (2026-07-16; rev15 combined max review REVISE;
-  r2 xhigh REVISE folded — converged; §16: A + H1 resolved, B–G/H2 pending).** Slice 0 lands
-  text-only as first branch commit only after CODE + ADVERSARIAL approve the exact landing patch;
-  org L1/L2 intake follows. T0 lands with slice 0 (doc law + plan).
-- **Correction slices** (development branch `w3-correction`; design → DESIGN gate → RED + admission
-  → packet-bound Opus build in the single checkout → `/root` verification + Codex CODE/ADVERSARIAL → `/root` commit;
-  every integration stays on this branch). Slice 0 = design closure + T0 + AGENTS amendment
-  (**text-only — no receipts; lands via plain-diff review, NOT the hermetic binary-patch tool, which is slice-1+**). 1 admission/
-  source foundation + `dashboard-pre-w3.v2` + slice_patch + ratchet hardening · 2 coverage +
-  fail-closed render admission · 3 mount lifecycle + receipt authenticity · 4 component substrate
-  · 5 Apple · 6 Carbon · 7 Liquid · 8 integrated 12+12+24 evidence + divergence · 9 fixture/manual
-  reference readiness only · 10 clean reviewed `w3-correction` checkpoint; real crawl/APPLY is later.
-- **W6 — the universal capture ENGINE (ACTIVE parallel workstream — this IS the product).**
-  Reframed 2026-07-15: the FOUNDATION is design-approved in slice 0 (§8 reference-lane schemas:
-  candidate/approval/pack/promotion; §3.1 the closed 31-id aspect vocabulary — the COMPLETENESS
-  mechanism; §3.2 the closed coverage join). It builds on `w3-correction` in dependency order
-  under non-overlapping closed write rosters; it never creates its own branch/worktree and never widens the
-  fixture-correction, and never widens repo-surface-scout's on-disk `web_surface_probe` (schema
-  pins `scout_fetch_executed: false`). Engine lanes (each design→gate→build→review): **W6-P
-  generic probe** (every aspect of any served page — the rendered-facts engine without
-  `data-dom-owner` sentinels); **W6-C capture pipeline** (dump-dom → localize → freeze →
-  serve-locally → probe; boundary checks; rights + custody; restore points); **W6-K reference-
-  lane contracts + validators** (§8 schemas as closed contracts). Promotion reuses the correction
-  pipeline. Through slice 9, only fixtures/local snapshots exercise it; live requests/target writes
-  wait for fresh post-checkpoint admission. W6 integration targets `w3-correction`; `main` is
-  separately operator-gated. Foundation: `handoff/w3c-0-design-closure.md` §8; full W6 own lane.
-- **K-series kit + odinproject:** GOVERNANCE only — NO design imposed, NO reference chosen, NO
-  pixel changed; the site is *prepared* for restyle, not restyled. LANDED: O0 harness (`bad950a`),
-  O1-tokenize (`e593d28`, value-preserving colors→tokens — the restyle prerequisite, not a new
-  palette), O2-receipts (`037d3e2`, Chrome MF1 governance; 0 overflow@390). All
-  correctness/hygiene/measurement invariants, NOT design. **O5 keeps the selected reference/target,
-  but no real crawl or target mutation occurs through slice 9. Real crawl/portfolio APPLY starts
-  only after the clean slice-10 checkpoint under fresh admission.** Kit K0–K3 stay post-correction.
-- **P5 remainder** (org meta-gate, P5-DATA sweep, P5-PATTERN, themes 4–10): after the correction; ledger.
-- **Kernel honesty:** enforcement is pytest contracts + receipts + Codex review; no Rust kernel
-  runs here ("kernel decides" is historical — ledger). semantic-tdd is the portability destination;
-  this repo is registered there as a kernel-free adopter (reentry: `handoff/HANDOFF.md`).
-
-## VERIFICATION (every slice)
-
-Focused 17-module command + full `unittest discover` green by slice 10; every named mutant
-reddens the predicate that names its law (witnessed, non-vacuous); MF1 receipts for every visible
-change (1280 screenshot + 390 probe + provenance); Codex DESIGN + CODE + ADVERSARIAL per slice;
-`test_doc_authority` green (one plan, lifecycled records, caps); docs updated in the same commit.
-
-## POINTERS
-
-Architecture seam: `docs/plans/DESIGN-SYSTEM.md` · doctrine: `docs/design/*.md` · skill:
-`skills/design-language-tdd/` · history/doctrine ledger: `docs/history/PLAN-LEDGER.md` · reentry:
-`handoff/HANDOFF.md` · review transcripts: `scratchpad/work/codex-*.md`.
+Architecture: `docs/plans/DESIGN-SYSTEM.md` · W3 closure: `docs/plans/handoff/w3c-0-design-closure.md`
+· history: `docs/history/PLAN-LEDGER.md` · reentry: `docs/plans/handoff/HANDOFF.md` · governing
+execution handoff: `scratchpad/active/process/W3-SINGLE-BRANCH-SEALED-EXECUTION-HANDOFF-2026-07-22.md`.

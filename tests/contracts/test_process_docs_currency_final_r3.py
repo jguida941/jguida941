@@ -32,7 +32,7 @@ FINGERPRINT = "PROCESS-DOC-CURRENTNESS-R3-RED:"
 
 PREDECESSOR_BINDINGS = {
     "tests/contracts/test_process_docs_currency.py":
-        "b39183a8dbd14ecc71afe0ba1f938d943eba65561edbd8ffae1f510d175f3082",
+        "cd433a016eb22962db66396032abc177496aaab75a53099b2bef77f0f849f4b2",
     "tests/contracts/test_process_docs_currency_postreview.py":
         "7914e66434723c70834fabe2bbbcf1f2dc32a86f7fb0173cf64e6e48e58a09bf",
     "tests/contracts/test_process_docs_currency_final_adversarial.py":

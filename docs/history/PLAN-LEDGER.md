@@ -109,3 +109,28 @@ gate r1 REVISE (folded to rev 2); r2 REVISE (folding to rev 3). Transcripts:
 - Law data: `contracts/process_docs_currency_policy.toml` · RED:
   `tests/contracts/test_process_docs_currency.py` · design:
   `scratchpad/active/process/process-doc-currentness-adoption-design-r1.md`.
+
+## 2026-07-22 — single-branch recovery detail folded from ACTIVE
+
+The live plan was compacted after the recovery and feature-completeness audits proved that
+preserved ancestry had not silently activated future GREEN. This historical roster records the
+detail removed from the active routing table:
+
+- `bb291a56` process hard block and `428672a0` currentness successor: live and complete.
+- `86b4f63d` process-currentness Opus r1: rejected as final; `48cd8545` RED snapshot:
+  superseded evidence; `461bdd87` conductor-skill RED: superseded duplicate.
+- `66df9879` throughput and `ea4020bb` A13/A14 r9: RED-only, not live. A13/A14 predecessors
+  `6fb53373`, `dfb8c50b`, `00ede1a8`, `b7a2a8e6`, `6d2ae2ae`, `627afc84`, and `32051298`
+  remain rejected/superseded evidence and contain no accepted GREEN exchange implementation.
+- `d617a873` ratchet r6 and `ac272c8a` Org-L1: old-base GREEN/approved respectively, not live;
+  both require current-base re-pin and replay. `39480840` W8-O r2 is rejected as final.
+- `1defb859` is an archived pre-crawler checkpoint. Its ancestry is evidence, never authority.
+- Retired remote tips `d-board` `92b3b69b…`, `d-shell-1` `dc351b66…`, and
+  `d-shell-1-pregate` `07dacb75…` were preserved through non-activating ancestry and their branch
+  names removed. `main` was synchronized into `w3-correction`, never the reverse.
+
+The folded long-form status also recorded: W3 slice 0 is live while slices 1–10 are absent; W6
+foundation contracts are design-approved but engine GREEN is absent; K-series/Odin work is
+governance-only through the checkpoint; P5 has live profiles/pageshell/data/pattern/skill pieces
+but themes 4–10 and kits K0–K3 remain. The four structural-layout failures are intentional
+future target-shape REDs and must not be deleted to manufacture a green suite.
