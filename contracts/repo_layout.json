@@ -83,7 +83,7 @@
           }},
         {"id": "core", "target_dir": "core", "members": ["config.py", "runtime_env.py", "settings.py"]},
         {"id": "github", "target_dir": "github", "members": ["actions_audit.py", "branch_protection.py", "gh_cli.py", "github_cache.py", "github_client.py", "github_graphql.py", "github_transport.py"]},
-        {"id": "organization", "target_dir": "organization", "members": ["bootstrap_red_ref.py", "layout_audit.py", "layout_contract.py", "migrate_scripts_layout.py", "tests_layout_contract.py"]},
+        {"id": "organization", "target_dir": "organization", "members": ["bootstrap_red_ref.py", "layout_audit.py", "layout_contract.py", "migrate_scripts_layout.py", "process_governance_validator.py", "tests_layout_contract.py"]},
         {"id": "pipeline", "target_dir": "pipeline", "members": ["collect_data.py", "compute_metrics.py", "profile_helpers.py", "profile_pipeline.py", "render_outputs.py", "web_render.py"]},
         {"id": "quality", "target_dir": "quality", "members": ["design_invariants.py", "diagnostics.py", "headless_receipts.py", "metrics_svg.py", "settings_admissibility.py", "severity.py", "triage.py", "validate_generated_profile.py", "visual_receipts.py"]},
         {"id": "reference-intake", "target_dir": "quality/reference_intake", "members": ["capture.py", "probe_generic.py", "restore.py", "schema.py", "security.py"]},
@@ -141,9 +141,9 @@
       "root_allowlist": [],
       "groups": [
         {"id": "contracts", "target_dir": "contracts", "members": ["test_bootstrap_red_ref.py", "test_card_contracts.py", "test_data_semantics.py", "test_design_button.py", "test_design_card.py", "test_design_character.py", "test_design_chip.py", "test_design_conformance.py", "test_design_contract.py", "test_design_distinctness.py", "test_design_profiles_schema.py", "test_doc_authority.py", "test_glass_preserved.py", "test_icon_system.py", "test_label_legibility.py", "test_page_shell.py",
-          "test_dom_cover.py", "test_dashboard_surface.py", "test_dashboard_visual_authority.py", "test_page_archetype.py", "test_page_manifest.py", "test_reference_pack.py",
+          "test_dom_cover.py", "test_dashboard_surface.py", "test_page_manifest.py",
           "test_design_motion.py",
-          "test_design_nav.py", "test_official_source_parity.py", "test_rendered_fact_adversarial.py", "test_rendered_fact_density_adversarial.py", "test_rendered_fact_paint_adversarial.py", "test_rendered_facts.py", "test_public_data_privacy.py", "test_readme_projection.py", "test_reference_capture.py", "test_reference_lane_contracts.py", "test_reference_probe_generic.py", "test_scripts_layout_contract.py", "test_settings_composition.py", "test_showcase_coverage.py", "test_skill_structure.py", "test_structural_layout.py", "test_studio.py", "test_tests_layout_contract.py", "test_theme_continuity.py", "test_theme_roster_authority.py", "test_theme_system.py", "test_tile_composition.py", "test_typography_restraint.py", "test_visual_receipt_provenance.py", "test_web_dashboard.py"]},
+          "test_design_nav.py", "test_process_docs_currency.py", "test_process_docs_currency_postreview.py", "test_process_docs_currency_final_adversarial.py", "test_process_docs_currency_final_r2.py", "test_process_docs_currency_final_r3.py", "test_public_data_privacy.py", "test_readme_projection.py", "test_scripts_layout_contract.py", "test_settings_composition.py", "test_showcase_coverage.py", "test_skill_structure.py", "test_structural_layout.py", "test_studio.py", "test_tests_layout_contract.py", "test_theme_continuity.py", "test_theme_roster_authority.py", "test_theme_system.py", "test_tile_composition.py", "test_typography_restraint.py", "test_visual_receipt_provenance.py", "test_web_dashboard.py"]},
         {"id": "core", "target_dir": "core", "members": ["test_profile_cli.py", "test_runtime_env.py"]},
         {"id": "github", "target_dir": "github", "members": ["test_actions_audit.py", "test_branch_protection.py", "test_github_client.py", "test_settings_tokens.py", "test_token_fallback.py"]},
         {"id": "pipeline", "target_dir": "pipeline", "members": ["test_compute_metrics_accuracy.py", "test_compute_metrics_integration.py", "test_profile_pipeline_fixture.py"]},
@@ -156,7 +156,8 @@
       "glob": "**/*.json",
       "placement_enforced": true,
       "root_allowlist": ["repo_layout.json", "page_manifest.json", "dom_cover.json", "dashboard_surface.json", "rendered_fact_policy.json", "correction_baseline.json", "reference_aspects.json"],
-      "group_dirs": ["design_profiles", "official_sources", "reference_packs"]
+      "group_dirs": ["design_profiles", "official_sources", "reference_packs"],
+      "toml_allowlist": ["doc_authority_policy.toml", "process_docs_currency_policy.toml"]
     },
     "site_layout": {
       "purpose": "P5-0-FINISH: closed cover over GENERATED site HTML so an undeclared site/*.html is structurally unconstructable (the precondition for the design-system showcase/settings homes). site/data/* is hydrated JSON, never matched by the *.html glob. Bespoke root_allowlist + group_dirs method (like contracts_layout); site/ is a root+allowlist shape, NOT a groups/target_dir shape, so it is deliberately NOT in the _ENUMERATED loop (codex R7). showcase.html / settings.html join root_allowlist, and a showcase/ subdir joins group_dirs, only in the slice that creates them.",

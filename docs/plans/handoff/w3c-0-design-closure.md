@@ -108,9 +108,10 @@ resolves the r3 conflict with the unamended `AGENTS.md:21` full-suite-green SOP)
 > at slice 10 and thereafter.
 
 Model-neutral (handoff:52-54). Continuation routing (operator, 2026-07-16 — lands with slice 0,
-never previously committed): Fable (the conductor) orchestrates, authors designs and REDs,
-verifies every packet-bound patch in a clean worktree, integrates, and commits on
-`w3-correction`; Opus implements only approved packet-bound work and runs read-only fan-outs;
+never previously committed; as corrected by the 2026-07-22 operator process law): `/root`
+conducts — it dispatches, verifies every packet-bound patch in a clean worktree, integrates, and
+commits on `w3-correction`; Fable 5 is the delegated DESIGN + RED author for designs and REDs;
+Opus implements only approved packet-bound work and runs read-only fan-outs;
 Codex never codes and independently issues every DESIGN/CODE/ADVERSARIAL verdict; no artifact
 author approves itself. The SOP, effort/convergence, receipt, and packet bindings are unchanged.
 **`AGENTS.md:23`'s stale invocation example is NOT edited in slice 0** — it moves to slice 1
@@ -1000,9 +1001,10 @@ amendment (§1.1 incl. the H1 clause
 and the 2026-07-16 continuation routing) + T0 artifacts + baseline ledger + registry rows.
 Ignored scratch records (review transcripts, the slice-0 admission classification JSON) are
 referenced evidence only, never commit cargo; they enter governed homes via the w3c-org intake
-lane. Per the continuation routing, Codex reviews the landing diff (re-rounds at xhigh per the
-review-effort policy) and never codes; Fable authored these bytes, issues no verdict on them,
-and as conductor integrates the approved patch and makes the commit on `w3-correction`.
+lane. Under the 2026-07-22 operator post-review execution law, Codex reviews the landing diff
+once and never codes; that bounded round is terminal. Fable authored these bytes and issues no
+verdict on them; `/root` conducts, verifies, integrates the approved patch, and makes the
+commit on `w3-correction`.
 
 ### 13.2 The failure ratchet + transitional composers (design-gated process — resolved §16-H1)
 
@@ -1145,7 +1147,7 @@ does not carry the ratchet module or `test_correction_ratchet.py` in its allowed
   isolated packet-bound worktree and produces the DRAFT PATCH in the canonical form below,
   limited to the slice's closed allowed paths; the draft uses the SAME source preflight,
   staging command, ignored-file refusal, XY check, and extraction command required for the
-  final patch — no ambient `git add` is permitted; (3) Fable applies the draft to a CLEAN throwaway
+  final patch — no ambient `git add` is permitted; (3) `/root` applies the draft to a CLEAN throwaway
   worktree of HEAD (slice-0 exception: slice 0 is TEXT-ONLY — no build lane, no draft patch, no
   MF1 receipts, and no baseline regeneration; its seed ledger rides the reviewed patch as fixed
   bytes; this numbered sequence binds slice 1+). For slice 1+, run the exact 17-module command
@@ -1211,7 +1213,7 @@ does not carry the ratchet module or `test_correction_ratchet.py` in its allowed
   ADVERSARIAL review the exact
   final patch (its hash binds build → receipts → verify → review); (6) REVISE folds regenerate
   the final patch (new hash) and re-run (4)-(5) at xhigh; (7) only after both approvals does
-  Fable integrate the approved patch in the primary checkout, repeat the preflight, staging,
+  `/root` integrate the approved patch in the primary checkout, repeat the preflight, staging,
   ignored-file, XY, and byte-identical re-extraction checks there, and COMMIT on `w3-correction`
   with `H-GIT commit --only -- <allowed paths>` to preserve unrelated staged state. The commit
   must carry the sidecar's trailers, its whole changed-path set must pass the closed-allowlist
@@ -1232,16 +1234,24 @@ does not carry the ratchet module or `test_correction_ratchet.py` in its allowed
 ### 13.3 Universal cadence (slices 1-10)
 
 Fable-authored scratch design (bounded section referencing THIS document's laws) → independent
-Codex `DESIGN-VERDICT` (first round max/ultra; re-rounds xhigh) → Fable-authored homed RED →
-fresh admission envelope (§11; ledgered) → isolated packet-bound Opus build → **the §13.2
+Codex `DESIGN-VERDICT` (exactly one bounded round at max/ultra reasoning) → Fable-authored homed
+RED → fresh admission envelope (§11; ledgered) → isolated packet-bound Opus build → **the §13.2
 patch-isolated review-BEFORE-commit sequence**: draft patch → clean-worktree receipts folded into
-the FINAL patch → Fable clean-worktree suite + ratchet + named-mutant verification (§6.4) →
+the FINAL patch → `/root` clean-worktree suite + ratchet + named-mutant verification (§6.4) →
 independent Codex `VERDICT` + `ADVERSARIAL-VERDICT` on the final patch (including RED-SPEC
 CONFORMANCE: exists / targets live surface / pre-GREEN failing witness / right reason /
-load-bearing vs named mutant / GREEN did not weaken it) → REVISE findings fold RED-first and the
-packet-bound patch is rebuilt/reverified/re-reviewed at xhigh → Fable commits the exact approved
-diff on `w3-correction`, with docs in the same commit. Slice 10 is acceptance only; branch `main`
-requires a later separate explicit operator decision.
+load-bearing vs named mutant / GREEN did not weaken it) → REVISE findings fold RED-first into
+typed `FindingToEvidenceTransition` evidence, never another prose round → `/root` commits the
+exact approved diff on `w3-correction`, with docs in the same commit. Slice 10 is acceptance
+only; branch `main` requires a later separate explicit operator decision.
+
+**Superseded cadence clause — conserved verbatim, NOT in force.** Rev 16 closed the review arm of
+the cadence above with the clause quoted below. The 2026-07-22 operator post-review execution law
+(`AGENTS.md`, highest local precedence) replaced that arm with the typed finding-to-evidence
+transition now written into the cadence, so the clause prescribes nothing; its bytes are retained
+as an append-only record of the routing it superseded:
+
+> packet-bound patch is rebuilt/reverified/re-reviewed at xhigh → `/root` commits the exact approved
 
 ### 13.4 Slice contents (delta from the handoff sequence, all reconciled)
 

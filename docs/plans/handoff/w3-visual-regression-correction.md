@@ -46,8 +46,9 @@ W4 design/shape work is downstream and may not overrule this blocker.
 
 The next conversation does not inherit a free-standing Codex builder exception. Follow the current
 [`AGENTS.md`](../../../AGENTS.md) role protocol as confirmed by the 2026-07-16 continuation routing
-(landing with slice 0): Fable (the conductor) orchestrates, authors the slice designs and REDs,
-verifies, integrates, and commits on `w3-correction`; Opus implements only approved, packet-bound
+(landing with slice 0, as corrected by the 2026-07-22 operator process law): `/root` conducts —
+it dispatches, verifies, integrates, and commits on `w3-correction`; Fable 5 is the delegated
+DESIGN + RED author for the slice designs and REDs; Opus implements only approved, packet-bound
 work; Codex never codes and independently issues every DESIGN, CODE, and ADVERSARIAL verdict. No
 artifact author issues the approving verdict on its own artifact.
 “Model-neutral” in this handoff means no model-specific dispatch command or Opus-only dependency; it

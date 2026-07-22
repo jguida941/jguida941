@@ -46,3 +46,8 @@ Name the RED first; declare each new file's home in `contracts/repo_layout.json`
 (the structural-layout cover reddens otherwise). New test files also register in
 `scripts/organization/tests_layout_contract.py` (TEST_GROUPS contracts + DESIGN_CONTRACT_GROUPS
 `design_languages`). Then hand off to `references/prove-theme.md`.
+
+## Lifecycle authority
+
+Slice lifecycle, role seats, review gates, and commit authority are governed by `AGENTS.md`
+(operator process correction 2026-07-22); this lane carries only the design-language method.

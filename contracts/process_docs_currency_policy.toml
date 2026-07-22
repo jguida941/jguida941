@@ -1,0 +1,494 @@
+# Process-doc currentness + adoption policy — policy-as-DATA (fail-closed).
+# Ratified operator law: scratchpad/active/process/OPERATOR-POST-REVIEW-EXECUTION-LAW-2026-07-22.md
+# Design: scratchpad/active/process/process-doc-currentness-adoption-design-r1.md
+# RED: tests/contracts/test_process_docs_currency.py
+# Regex values are TOML literal strings (backslashes stay literal); propositions are basic strings.
+
+[meta]
+contract_id = "ProcessDocsCurrencyPolicy"
+schema_version = 1
+ratified = "2026-07-22"
+law_source = "scratchpad/active/process/OPERATOR-POST-REVIEW-EXECUTION-LAW-2026-07-22.md"
+authority_doc = "AGENTS.md"
+
+[roles]
+conductor = "/root"
+design_red_author = "fable"
+green_builder = "opus"
+reviewer = "codex"
+
+[separation]
+reviewer_may_author_red = false
+red_author_may_build_green = false
+author_approves_own_artifact = false
+
+# PROC-CODE-REVIEWER-IDENTITY-001: the separation record is a CLOSED six-field identity
+# payload. Missing/empty/non-string fields and any unknown field fail closed, so neither the
+# RED author seat nor the GREEN builder seat can approve under a merely-fresh session id.
+[separation.record_schema]
+required_keys = [
+  "red_author_seat",
+  "red_author_session",
+  "reviewer_seat",
+  "reviewer_session",
+  "green_builder_seat",
+  "green_builder_session",
+]
+allow_unknown_keys = false
+
+[successor]
+max_conformance_checks = 1
+required_next_event = "GREEN_DISPATCH"
+green_builder = "opus"
+forbidden_after_red_accepted = ["PROSE_REVIEW", "REVIEW_OF_REVIEW"]
+
+# PROC-CODE-SUCCESSOR-IDENTITY-001: the GREEN_DISPATCH payload is a CLOSED three-field
+# schema — required and allowed are the same roster, so an omitted field and a smuggled
+# field (e.g. prose_review_waiver) both fail closed BEFORE seat/session semantics run.
+[successor.dispatch_schema]
+required_keys = ["builder_seat", "builder_session", "red_author_session"]
+allowed_keys = ["builder_seat", "builder_session", "red_author_session"]
+
+[lineage]
+prose_review_cap = 2
+terminal_verdicts = ["REVISE", "APPROVE"]
+identity_preserving_events = ["CORRECTION", "RENAME", "VERSION_BUMP", "SUCCESSOR_PACKET"]
+reset_events = []
+
+[[review_families]]
+family_id = "semantic-tdd-conductor-skill"
+prose_reviews_used = 1
+terminal_verdict_token = "SKILL-DESIGN-VERDICT: REVISE"
+another_prose_review_authorized = false
+findings = ["SKILL-R1-001", "SKILL-R1-002", "SKILL-R1-003", "SKILL-R1-004", "SKILL-R1-005", "SKILL-R1-006"]
+terminal_review_doc = "scratchpad/active/process/build-lane-contract-system-codex-design-admission-review-r2.md"
+
+[[review_families]]
+family_id = "build-lane-contract-system"
+prose_reviews_used = 2
+terminal_verdict_token = "CONTRACT-DESIGN-VERDICT: REVISE"
+another_prose_review_authorized = false
+
+[transition_classes]
+classes = ["PROBEABLE", "MECHANICAL_IDENTITY", "STRUCTURAL_PREREQUISITE", "ENVIRONMENT_CAPABILITY", "POLICY_AUTHORITY"]
+
+[[transitions]]
+finding_id = "SKILL-R1-001"
+transition_class = "PROBEABLE"
+status = "RED_REQUIRED"
+dependency = "AFTER_LANE_C"
+source_review = "scratchpad/active/process/build-lane-contract-system-codex-design-admission-review-r2.md"
+owner_seat = "fable"
+evidence = "deterministic framework/lockfile evidence: closed detect_stack framework signals + exact conflict/precedence law; identical rosters with pytest config vs unittest imports resolve differently; two package-manager locks resolve as unresolved/ambiguous, never by preference"
+
+[[transitions]]
+finding_id = "SKILL-R1-002"
+transition_class = "PROBEABLE"
+status = "RED_REQUIRED"
+dependency = "AFTER_LANE_C"
+source_review = "scratchpad/active/process/build-lane-contract-system-codex-design-admission-review-r2.md"
+owner_seat = "fable"
+evidence = "right-reason RED identity/fingerprint: red_witness requires expected test identity + expected failure fingerprint, distinguishes runner/infrastructure errors; an unrelated ImportError never emits RED-WITNESS; only the intended assertion does"
+
+[[transitions]]
+finding_id = "SKILL-R1-003"
+transition_class = "PROBEABLE"
+status = "RED_REQUIRED"
+dependency = "AFTER_LANE_C"
+source_review = "scratchpad/active/process/build-lane-contract-system-codex-design-admission-review-r2.md"
+owner_seat = "fable"
+evidence = "authorized fixtures + structured forward-test grading: authorized AGENTS fixture variants (or a specified authority grant) and a structured event/grader schema for state order, reads, tools, refusals, and mutation boundaries; unauthorized fixtures emit exactly one role-block event and zero later tool events"
+
+[[transitions]]
+finding_id = "SKILL-R1-004"
+transition_class = "PROBEABLE"
+status = "RED_REQUIRED"
+dependency = "AFTER_LANE_C"
+source_review = "scratchpad/active/process/build-lane-contract-system-codex-design-admission-review-r2.md"
+owner_seat = "fable"
+evidence = "recursive target-shape validator: deterministic shape-contract validator (or fail-closed absence), git ls-files root census, per-directory misplacement RED; an undeclared root entry and a misplaced governed file fail while the exact recursively declared tree passes"
+
+[[transitions]]
+finding_id = "SKILL-R1-005"
+transition_class = "PROBEABLE"
+status = "RED_REQUIRED"
+dependency = "AFTER_LANE_C"
+source_review = "scratchpad/active/process/build-lane-contract-system-codex-design-admission-review-r2.md"
+owner_seat = "fable"
+evidence = "generic packet validator or exact pre-BUILD refusal: on a repository without packet tooling, either a bundled generic validated packet rejects altered base/design/RED/path hashes, or the skill stops before BUILD with an exact blocked token"
+
+[[transitions]]
+finding_id = "SKILL-R1-006"
+transition_class = "PROBEABLE"
+status = "RED_REQUIRED"
+dependency = "AFTER_LANE_C"
+source_review = "scratchpad/active/process/build-lane-contract-system-codex-design-admission-review-r2.md"
+owner_seat = "fable"
+evidence = "tracked-to-installed sync + generated/validated agents/openai.yaml: deterministic install-sync (exact hash manifest, no extra files) over temp roots incl. stale/locally-modified installed copies; quick_validate passes; agents/openai.yaml generated via the prescribed scripts after reading references/openai_yaml.md and matching the designed interface values"
+
+[[transitions]]
+finding_id = "PROC-ROLE-001"
+transition_class = "PROBEABLE"
+status = "RED_AUTHORED"
+dependency = "IMMEDIATE"
+source_review = "scratchpad/active/process/OPERATOR-POST-REVIEW-EXECUTION-LAW-2026-07-22.md"
+owner_seat = "fable"
+evidence = "tests.contracts.test_process_docs_currency.ProcessDocsCurrencyRed.test_live_docs_forbid_stale_conductor_patterns"
+
+[[transitions]]
+finding_id = "PROC-LINEAGE-001"
+transition_class = "PROBEABLE"
+status = "RED_AUTHORED"
+dependency = "IMMEDIATE"
+source_review = "scratchpad/active/process/OPERATOR-POST-REVIEW-EXECUTION-LAW-2026-07-22.md"
+owner_seat = "fable"
+evidence = "tests.contracts.test_process_docs_currency.ProcessDocsCurrencyRed.test_rename_and_correction_preserve_terminal_lineage"
+
+[[transitions]]
+finding_id = "PROC-LOOP-001"
+transition_class = "PROBEABLE"
+status = "RED_AUTHORED"
+dependency = "IMMEDIATE"
+source_review = "scratchpad/active/process/OPERATOR-POST-REVIEW-EXECUTION-LAW-2026-07-22.md"
+owner_seat = "fable"
+evidence = "tests.contracts.test_process_docs_currency.ProcessDocsCurrencyRed.test_third_prose_review_rejected"
+
+[[transitions]]
+finding_id = "PROC-TRANSITION-001"
+transition_class = "PROBEABLE"
+status = "RED_AUTHORED"
+dependency = "IMMEDIATE"
+source_review = "scratchpad/active/process/OPERATOR-POST-REVIEW-EXECUTION-LAW-2026-07-22.md"
+owner_seat = "fable"
+evidence = "tests.contracts.test_process_docs_currency.ProcessDocsCurrencyRed.test_transition_totality_exact_twelve_findings"
+
+[[transitions]]
+finding_id = "PROC-RED-OWNER-001"
+transition_class = "PROBEABLE"
+status = "RED_AUTHORED"
+dependency = "IMMEDIATE"
+source_review = "scratchpad/active/process/OPERATOR-POST-REVIEW-EXECUTION-LAW-2026-07-22.md"
+owner_seat = "fable"
+evidence = "tests.contracts.test_process_docs_currency.ProcessDocsCurrencyRed.test_reviewer_cannot_author_red"
+
+[[transitions]]
+finding_id = "PROC-BUILDER-001"
+transition_class = "PROBEABLE"
+status = "RED_AUTHORED"
+dependency = "IMMEDIATE"
+source_review = "scratchpad/active/process/OPERATOR-POST-REVIEW-EXECUTION-LAW-2026-07-22.md"
+owner_seat = "fable"
+evidence = "tests.contracts.test_process_docs_currency.ProcessDocsCurrencyRed.test_conformance_requires_immediate_distinct_opus_successor"
+
+[currency]
+historical_exempt_prefixes = ["docs/history/"]
+
+[[currency.documents]]
+path = "AGENTS.md"
+role = "authority"
+adoption_sha256 = "89de86f138b6f16f915b921e820a193fcf0631df7e22c2c3604c6ca81805406a"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+]
+required_propositions = [
+  "`/root` is the CONDUCTOR",
+  "Fable 5 is the delegated DESIGN + RED author",
+  "Opus is the delegated GREEN builder",
+  "Codex is the independent review authority",
+  "A document correction never resets the design family's review count",
+  "`FindingToEvidenceTransition`",
+  "the reviewer may not become the RED author",
+  "No review-of-review",
+  "dispatches a different Opus builder for GREEN",
+]
+
+[[currency.documents]]
+path = "docs/plans/ACTIVE.md"
+role = "plan_of_record"
+adoption_sha256 = "cf4e82e4e3852ecf34c6ca3430e3b4fc4713b7be06a63dc3f0b629d59ef518f5"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+]
+required_propositions = [
+  "`/root` conducts, dispatches, verifies, integrates, commits",
+  "typed `FindingToEvidenceTransition` rows",
+  "No review-of-review",
+  "one bounded RED-conformance check is followed immediately by a different Opus GREEN builder",
+]
+
+[[currency.documents]]
+path = "docs/plans/handoff/HANDOFF.md"
+role = "reentry_card"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+]
+required_propositions = [
+  "`/root` conducts",
+  "are governed by `AGENTS.md`",
+]
+
+[[currency.documents]]
+path = "docs/history/PLAN-LEDGER.md"
+role = "history"
+historical_exempt = true
+immutable_prefix_sha256 = "83b351f84fcc4668088bae0e7adf2a103515e03c3afc478a2d9072b890359a44"
+immutable_prefix_bytes = 7988
+forbidden_patterns = []
+required_propositions = [
+  "## 2026-07-22 — operator post-review execution law + `/root`-conductor adoption",
+]
+
+[[currency.documents]]
+path = "skills/design-language-tdd/SKILL.md"
+role = "skill"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)commit\s+(?:only\s+)?when\s+green\s*\+\s*codex\s+agrees',
+  '(?im)^##\s+commit\s+discipline\b',
+  '(?im)^##\s+the\s+per-slice\s+sop\b',
+  '(?i)\bper[\s-]*slice\s+sop\b[^\n]{0,120}\bskill\.md\b',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+(?:dispatches|approves|integrates|commits|merges|reviews)\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+owns\s+(?:the\s+)?(?:dispatch|approval|review|integration|commit|lifecycle)\b',
+]
+required_propositions = [
+  "are governed by `AGENTS.md`",
+]
+
+[[currency.documents]]
+path = "skills/design-language-tdd/references/prove-theme.md"
+role = "skill_reference"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)commit\s+(?:only\s+)?when\s+green\s*\+\s*codex\s+agrees',
+  '(?im)^##\s+commit\s+discipline\b',
+  '(?im)^##\s+the\s+per-slice\s+sop\b',
+  '(?i)\bper[\s-]*slice\s+sop\b[^\n]{0,120}\bskill\.md\b',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+(?:dispatches|approves|integrates|commits|merges|reviews)\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+owns\s+(?:the\s+)?(?:dispatch|approval|review|integration|commit|lifecycle)\b',
+]
+required_propositions = [
+  "are governed by `AGENTS.md`",
+]
+
+[[currency.documents]]
+path = "skills/design-language-tdd/references/add-component.md"
+role = "skill_reference"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)commit\s+(?:only\s+)?when\s+green\s*\+\s*codex\s+agrees',
+  '(?im)^##\s+commit\s+discipline\b',
+  '(?im)^##\s+the\s+per-slice\s+sop\b',
+  '(?i)\bper[\s-]*slice\s+sop\b[^\n]{0,120}\bskill\.md\b',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+(?:dispatches|approves|integrates|commits|merges|reviews)\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+owns\s+(?:the\s+)?(?:dispatch|approval|review|integration|commit|lifecycle)\b',
+]
+required_propositions = [
+  "are governed by `AGENTS.md`",
+]
+
+# PROC-CODE-CURRENCY-COVER-001 / PROC-CODE-SKILL-CURRENTNESS-001 / PDC-ADV-001 / PDC-ADV-004:
+# the post-review census extension. The sealed seven-row `currency.documents` roster above is
+# NOT widened (the predecessor pins it exactly); every additional authority-derived live process
+# document lands here instead — the two live handoffs the seven-row roster excluded, plus the
+# four reachable skill references that were governed by nothing at all.
+
+[[currency.postreview_documents]]
+path = "docs/plans/handoff/w3-visual-regression-correction.md"
+role = "gate_record"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+]
+required_propositions = []
+
+[[currency.postreview_documents]]
+path = "docs/plans/handoff/w3c-0-design-closure.md"
+role = "design_record"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+]
+required_propositions = []
+
+[[currency.postreview_documents]]
+path = "skills/design-language-tdd/references/add-design-language.md"
+role = "skill_reference"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)commit\s+(?:only\s+)?when\s+green\s*\+\s*codex\s+agrees',
+  '(?im)^##\s+commit\s+discipline\b',
+  '(?im)^##\s+the\s+per-slice\s+sop\b',
+  '(?i)\bper[\s-]*slice\s+sop\b[^\n]{0,120}\bskill\.md\b',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+(?:dispatches|approves|integrates|commits|merges|reviews)\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+owns\s+(?:the\s+)?(?:dispatch|approval|review|integration|commit|lifecycle)\b',
+]
+required_propositions = [
+  "are governed by `AGENTS.md`",
+]
+
+[[currency.postreview_documents]]
+path = "skills/design-language-tdd/references/add-page-aspect.md"
+role = "skill_reference"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)commit\s+(?:only\s+)?when\s+green\s*\+\s*codex\s+agrees',
+  '(?im)^##\s+commit\s+discipline\b',
+  '(?im)^##\s+the\s+per-slice\s+sop\b',
+  '(?i)\bper[\s-]*slice\s+sop\b[^\n]{0,120}\bskill\.md\b',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+(?:dispatches|approves|integrates|commits|merges|reviews)\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+owns\s+(?:the\s+)?(?:dispatch|approval|review|integration|commit|lifecycle)\b',
+]
+required_propositions = [
+  "are governed by `AGENTS.md`",
+]
+
+[[currency.postreview_documents]]
+path = "skills/design-language-tdd/references/boundaries.md"
+role = "skill_reference"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)commit\s+(?:only\s+)?when\s+green\s*\+\s*codex\s+agrees',
+  '(?im)^##\s+commit\s+discipline\b',
+  '(?im)^##\s+the\s+per-slice\s+sop\b',
+  '(?i)\bper[\s-]*slice\s+sop\b[^\n]{0,120}\bskill\.md\b',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+(?:dispatches|approves|integrates|commits|merges|reviews)\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+owns\s+(?:the\s+)?(?:dispatch|approval|review|integration|commit|lifecycle)\b',
+]
+required_propositions = [
+  "are governed by `AGENTS.md`",
+]
+
+[[currency.postreview_documents]]
+path = "skills/design-language-tdd/references/doctrine-ingest.md"
+role = "skill_reference"
+forbidden_patterns = [
+  '(?i)\bfable(?:\s+5)?\s+conducts\b',
+  '(?i)\bfable(?:\s+5)?\s+is\s+the\s+conductor\b',
+  '(?i)\bfable-as-conductor\b',
+  '(?i)\bfable(?:\s+5)?\s*\(\s*the\s+conductor\s*\)',
+  '(?i)commit\s+(?:only\s+)?when\s+green\s*\+\s*codex\s+agrees',
+  '(?im)^##\s+commit\s+discipline\b',
+  '(?im)^##\s+the\s+per-slice\s+sop\b',
+  '(?i)\bper[\s-]*slice\s+sop\b[^\n]{0,120}\bskill\.md\b',
+  '(?i)\bfable(?:\s+5)?\s*,\s*(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+(?:serves?|acts?|acting|serving)\s+as\s+(?:the\s+)?conductor\b',
+  '(?i)\bfable(?:\s+5)?\s+integrates?\b',
+  '(?i)\bfable(?:\s+5)?\s+commits?\b',
+  '(?i)\bfable(?:\s+5)?\s+[^.\n]{0,100}\bverification\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+(?:dispatches|approves|integrates|commits|merges|reviews)\b',
+  '(?i)\b(?:this|the)\s+(?:skill|reference|lane)\s+owns\s+(?:the\s+)?(?:dispatch|approval|review|integration|commit|lifecycle)\b',
+]
+required_propositions = [
+  "are governed by `AGENTS.md`",
+]
+
+[[currency.historical_records]]
+path = "scratchpad/active/process/OPERATOR-POST-REVIEW-EXECUTION-LAW-2026-07-22.md"
+sha256 = "90a9b7e231fecf88339afbac6ab6e5cb13825a3f48b84cbdfe69131da1b63e66"
+enforcement = "identity"
+
+[[currency.historical_records]]
+path = "scratchpad/active/process/build-lane-contract-system-codex-design-admission-review-r2.md"
+sha256 = "102f72c0024ea7f9f6d1dc665e805646ae63d97b05dab76732bbb35b098b5711"
+enforcement = "identity"
+
+[[currency.historical_records]]
+path = "scratchpad/active/process/semantic-tdd-conductor-skill-design-r1.md"
+sha256 = "865c6479e58e9404d70d5340e33474ddd9b76286843bef0c51d19a1ec2dad5e1"
+enforcement = "identity"
+
+[[currency.historical_records]]
+path = "scratchpad/active/process/semantic-tdd-conductor-skill-red-spec-r1.json"
+sha256 = "d73e32afd79bb6763fa7b38c3d4cb7d8a955b888c613df31624a8f08beacdb5a"
+enforcement = "identity"
+
+[[currency.historical_records]]
+path = "scratchpad/active/process/JGUIDA-CONSOLIDATED-RECOVERY-ANTI-STALL-UI-AUTHORITY-PLAN-2026-07-22.md"
+sha256 = "11e0e19ef38801e92e2b4c5729d370a5808a0f6e873728c309795dd94b9e3ceb"
+enforcement = "identity"
