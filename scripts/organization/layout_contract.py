@@ -114,6 +114,8 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/organization/layout_contract.py", "scripts/organization/layout_contract.py", "organization", "semantic scripts layout contract"),
     ModuleHome("scripts/organization/migrate_scripts_layout.py", "scripts/organization/migrate_scripts_layout.py", "organization", "semantic scripts layout migration tool"),
     ModuleHome("scripts/organization/tests_layout_contract.py", "scripts/organization/tests_layout_contract.py", "organization", "semantic test-suite layout contract"),
+    ModuleHome("scripts/organization/correction_ratchet.py", "scripts/organization/correction_ratchet.py", "organization", "R-W3-RATCHET-1 correction failure-ratchet: trusted runner + shrink-only verifiers"),
+    ModuleHome("scripts/organization/ratchet_mutation_matrix.py", "scripts/organization/ratchet_mutation_matrix.py", "organization", "reproducible mutation matrix proving the ratchet defenses are load-bearing"),
 )
 
 ROOT_ENTRYPOINT_SHIMS: frozenset[str] = frozenset(

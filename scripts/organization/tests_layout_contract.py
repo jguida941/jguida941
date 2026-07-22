@@ -30,6 +30,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
         (
             "test_bootstrap_red_ref.py",
             "test_card_contracts.py",
+            "test_correction_ratchet.py",
             "test_data_semantics.py",
             "test_design_button.py",
             "test_design_card.py",
