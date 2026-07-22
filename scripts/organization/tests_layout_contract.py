@@ -52,6 +52,8 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_design_motion.py",
             "test_design_nav.py",
             "test_official_source_parity.py",
+            "test_orchestration_exchange.py",
+            "test_orchestration_exchange_adversarial.py",
             "test_rendered_fact_adversarial.py",
             "test_rendered_fact_density_adversarial.py",
             "test_rendered_fact_paint_adversarial.py",
@@ -186,6 +188,8 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "organization": (
         "test_doc_authority.py",        # T0: one plan-of-record + lifecycled/capped plan docs (fail-closed)
+        "test_orchestration_exchange.py",  # A13/A14: single-conductor + exchange law parity vs AGENTS.md/ACTIVE.md/HANDOFF (fail-closed)
+        "test_orchestration_exchange_adversarial.py",  # A13/A14 r9: frozen adversarial review-to-RED bank over the exchange-guard predicates (fail-closed)
     ),
     "reference_intake": (
         "test_reference_lane_contracts.py",   # W6-K: reference-capture lane record contracts (w3c-0 §8, R1-R8) + 31-id vocabulary
