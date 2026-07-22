@@ -25,7 +25,7 @@ from tests.contracts import test_process_docs_currency_final_r2 as r2
 
 
 ROOT = Path(__file__).resolve().parents[2]
-AUTHORITY_ROOT = ROOT.parents[2]
+AUTHORITY_ROOT = ROOT
 POLICY_PATH = ROOT / "contracts" / "process_docs_currency_policy.toml"
 VALIDATOR_PATH = ROOT / "scripts" / "organization" / "process_governance_validator.py"
 FINGERPRINT = "PROCESS-DOC-CURRENTNESS-R3-RED:"
