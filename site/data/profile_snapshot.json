@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-23T20:20:18.323091Z",
+  "generated_at": "2026-07-23T22:14:39.262442Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,9 +18,9 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 10486,
-    "public_scope_commits": 6742,
-    "total_repos": 74,
+    "last_year_contributions": 10488,
+    "public_scope_commits": 6744,
+    "total_repos": 75,
     "public_forks": 0,
     "private_owned_repos": 159,
     "total_stars": 83,
@@ -35,22 +35,22 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 10486,
-      "display_value": "10,486"
+      "value": 10488,
+      "display_value": "10,488"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6742,
-      "display_value": "6,742"
+      "value": 6744,
+      "display_value": "6,744"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 74,
-      "display_value": "74"
+      "value": 75,
+      "display_value": "75"
     },
     {
       "key": "public_forks",
@@ -113,20 +113,20 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 10486,
-      "display_value": "10,486"
+      "value": 10488,
+      "display_value": "10,488"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6742,
-      "display_value": "6,742"
+      "value": 6744,
+      "display_value": "6,744"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 74,
-      "display_value": "74"
+      "value": 75,
+      "display_value": "75"
     },
     {
       "key": "public_forks",
@@ -189,24 +189,24 @@
   },
   "scorecard": {
     "releases_30d": 4,
-    "active_repos_7d": 8,
+    "active_repos_7d": 9,
     "avg_release_gap_days": 3.7331250000000007,
-    "stars_per_public_repo": 1.1216216216216217,
-    "ci_coverage_pct": 22.972972972972975,
-    "last_year_contributions": 10486,
+    "stars_per_public_repo": 1.1066666666666667,
+    "ci_coverage_pct": 22.666666666666664,
+    "last_year_contributions": 10488,
     "active_days_last_year": 303,
     "automation_workflows": 65,
     "primary_lang_share_pct": 47.1,
-    "median_days_since_push": 208.0,
-    "days_since_last_push": 1.0
+    "median_days_since_push": 203.0,
+    "days_since_last_push": 0.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 10486,
-      "display_value": "10,486",
+      "value": 10488,
+      "display_value": "10,488",
       "accent": "#7dcfff"
     },
     {
@@ -221,16 +221,16 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 8,
-      "display_value": "8",
+      "value": 9,
+      "display_value": "9",
       "accent": "#7dcfff"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with pipelines",
-      "value": 22.972972972972975,
-      "display_value": "23.0%",
+      "value": 22.666666666666664,
+      "display_value": "22.7%",
       "accent": "#ff9e64"
     },
     {
@@ -261,17 +261,17 @@
       "key": "days_since_last_push",
       "label": "Last Push",
       "detail": "days since your most recent commit",
-      "value": 1.0,
-      "display_value": "1d",
+      "value": 0.0,
+      "display_value": "0d",
       "accent": "#9ece6a"
     }
   ],
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 74,
+    "public_owned_repos_total": 75,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 74,
+    "public_owned_nonfork_repos_total": 75,
     "private_owned_repos_total": 159
   },
   "featured_repo_facts": [
@@ -324,7 +324,7 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 11136814,
+      "bytes": 11136956,
       "percent": 47.09
     },
     {
@@ -430,6 +430,21 @@
       "featured": true
     },
     {
+      "name": "neetcode150",
+      "full_name": "jguida941/neetcode150",
+      "url": "https://github.com/jguida941/neetcode150",
+      "language": "Python",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-07-23",
+      "pushed_at_raw": "2026-07-23T21:47:20Z",
+      "pushed_ago": "today",
+      "created_at": "2026-07-23",
+      "last_commit_msg": "Initial commit: NeetCode 150 Python solutions",
+      "featured": false
+    },
+    {
       "name": "pysort-visualizer",
       "full_name": "jguida941/pysort-visualizer",
       "url": "https://github.com/jguida941/pysort-visualizer",
@@ -529,7 +544,7 @@
       "ci": "no",
       "pushed_at": "2026-07-18",
       "pushed_at_raw": "2026-07-18T20:47:46Z",
-      "pushed_ago": "4 days ago",
+      "pushed_ago": "5 days ago",
       "created_at": "2026-07-18",
       "last_commit_msg": "Add universal one-command auto-launcher (start.py + macOS start.command)",
       "featured": false
@@ -638,24 +653,31 @@
       "created_at": "2026-03-02",
       "last_commit_msg": "Add .gitattributes to exclude vendored/generated library files from L\u2026",
       "featured": false
-    },
-    {
-      "name": "opengl-cyberpunk",
-      "full_name": "jguida941/opengl-cyberpunk",
-      "url": "https://github.com/jguida941/opengl-cyberpunk",
-      "language": "C++",
-      "stars": 1,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-03-02",
-      "pushed_at_raw": "2026-03-02T01:14:07Z",
-      "pushed_ago": "4 months ago",
-      "created_at": "2026-02-23",
-      "last_commit_msg": "chore: remove legacy final project and fix language stats",
-      "featured": false
     }
   ],
   "recent_created": [
+    {
+      "name": "neetcode150",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": null,
+      "html_url": "https://github.com/jguida941/neetcode150",
+      "pushed_at": "2026-07-23T21:47:20Z",
+      "created_at": "2026-07-23T21:47:17Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": "Python",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "workflow_file_count": 0,
+      "language_bytes": {
+        "Python": 142
+      },
+      "latest_commit_message": "Initial commit: NeetCode 150 Python solutions"
+    },
     {
       "name": "android_studio_intro",
       "fork": false,
@@ -857,33 +879,16 @@
         "C": 2092
       },
       "latest_commit_message": "Add .gitattributes to exclude vendored/generated library files from L\u2026"
-    },
-    {
-      "name": "breakout-game-opengl",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": "A 2D Breakout game built in C++ with OpenGL and GLFW. Break multi-hit bricks, manage limited reserve balls, collect power-ups, and survive randomized ball-collision events across progressive difficulty levels.",
-      "html_url": "https://github.com/jguida941/breakout-game-opengl",
-      "pushed_at": "2026-03-01T22:39:09Z",
-      "created_at": "2026-03-01T22:26:47Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "language": "C++",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "C++": 77265,
-        "C": 2092
-      },
-      "latest_commit_message": "Adjust GitHub language stats to ignore vendor folders"
     }
   ],
   "focus": {
     "now": [
+      {
+        "title": "neetcode150",
+        "detail": "Python \u00b7 pushed today",
+        "url": "https://github.com/jguida941/neetcode150",
+        "is_private": false
+      },
       {
         "title": "semantic-tdd",
         "detail": "Python \u00b7 pushed 1 day ago",
@@ -895,12 +900,6 @@
         "detail": "C++ \u00b7 pushed 1 day ago",
         "url": "",
         "is_private": true
-      },
-      {
-        "title": "pysort-visualizer",
-        "detail": "Python \u00b7 pushed 1 day ago",
-        "url": "https://github.com/jguida941/pysort-visualizer",
-        "is_private": false
       }
     ],
     "next": [
@@ -929,6 +928,26 @@
     ]
   },
   "activity_feed": [
+    {
+      "kind": "activity",
+      "title": "create",
+      "url": "https://github.com/jguida941/neetcode150",
+      "repo": "jguida941/neetcode150",
+      "repo_url": "https://github.com/jguida941/neetcode150",
+      "state": "CREATE",
+      "time_ago": "today",
+      "created_at": "2026-07-23T21:47:20Z"
+    },
+    {
+      "kind": "created",
+      "title": "neetcode150",
+      "url": "https://github.com/jguida941/neetcode150",
+      "repo": "jguida941/neetcode150",
+      "repo_url": "https://github.com/jguida941/neetcode150",
+      "state": "CREATED",
+      "time_ago": "today",
+      "created_at": "2026-07-23T21:47:17Z"
+    },
     {
       "kind": "activity",
       "title": "push",
@@ -1036,7 +1055,7 @@
       "repo": "jguida941/android_studio_intro",
       "repo_url": "https://github.com/jguida941/android_studio_intro",
       "state": "CREATED",
-      "time_ago": "3 days ago",
+      "time_ago": "4 days ago",
       "created_at": "2026-07-19T21:40:27Z"
     },
     {
@@ -1046,7 +1065,7 @@
       "repo": "jguida941/CS360",
       "repo_url": "https://github.com/jguida941/CS360",
       "state": "CREATED",
-      "time_ago": "4 days ago",
+      "time_ago": "5 days ago",
       "created_at": "2026-07-18T21:32:56Z"
     },
     {
@@ -1056,18 +1075,8 @@
       "repo": "jguida941/pell-grant-ripoff-calculator",
       "repo_url": "https://github.com/jguida941/pell-grant-ripoff-calculator",
       "state": "PUSH",
-      "time_ago": "4 days ago",
-      "created_at": "2026-07-18T20:47:46Z"
-    },
-    {
-      "kind": "created",
-      "title": "pell-grant-ripoff-calculator",
-      "url": "https://github.com/jguida941/pell-grant-ripoff-calculator",
-      "repo": "jguida941/pell-grant-ripoff-calculator",
-      "repo_url": "https://github.com/jguida941/pell-grant-ripoff-calculator",
-      "state": "CREATED",
       "time_ago": "5 days ago",
-      "created_at": "2026-07-18T20:10:21Z"
+      "created_at": "2026-07-18T20:47:46Z"
     },
     {
       "kind": "release",
@@ -1149,21 +1158,21 @@
       428,
       374,
       279,
-      94
+      97
     ],
     "automation_workflows": 65,
     "automation_repos": 16,
     "primary_lang_share_pct": 47.1,
     "languages_over_5pct": 5,
-    "median_days_since_push": 208.0,
-    "days_since_last_push": 1.0,
-    "public_repos_total": 74,
-    "public_nonfork_repos": 74,
+    "median_days_since_push": 203.0,
+    "days_since_last_push": 0.0,
+    "public_repos_total": 75,
+    "public_nonfork_repos": 75,
     "private_repos_total": 159,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 10486,
+    "total": 10488,
     "weeks": [
       [
         {
@@ -1468,7 +1477,7 @@
         },
         {
           "date": "2025-10-02",
-          "count": 6
+          "count": 5
         },
         {
           "date": "2025-10-03",
@@ -2728,7 +2737,7 @@
         },
         {
           "date": "2026-07-23",
-          "count": 8
+          "count": 11
         }
       ]
     ]
@@ -2831,7 +2840,7 @@
         0,
         0,
         0,
-        0,
+        1,
         0,
         0,
         0,
@@ -2856,7 +2865,7 @@
         0,
         0,
         0,
-        4,
+        3,
         0,
         0,
         0,
@@ -2919,8 +2928,8 @@
       ]
     ],
     "event_mix": {
-      "push": 69,
-      "create": 5,
+      "push": 68,
+      "create": 6,
       "comment": 5,
       "release": 4,
       "pull request": 1
