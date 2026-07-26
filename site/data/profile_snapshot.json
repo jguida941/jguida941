@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-25T23:13:05.348123Z",
+  "generated_at": "2026-07-26T00:13:55.105109Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,9 +18,9 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 10523,
-    "public_scope_commits": 6776,
-    "total_repos": 76,
+    "last_year_contributions": 10524,
+    "public_scope_commits": 6777,
+    "total_repos": 77,
     "public_forks": 0,
     "private_owned_repos": 161,
     "total_stars": 84,
@@ -35,22 +35,22 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 10523,
-      "display_value": "10,523"
+      "value": 10524,
+      "display_value": "10,524"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6776,
-      "display_value": "6,776"
+      "value": 6777,
+      "display_value": "6,777"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 76,
-      "display_value": "76"
+      "value": 77,
+      "display_value": "77"
     },
     {
       "key": "public_forks",
@@ -113,20 +113,20 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 10523,
-      "display_value": "10,523"
+      "value": 10524,
+      "display_value": "10,524"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6776,
-      "display_value": "6,776"
+      "value": 6777,
+      "display_value": "6,777"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 76,
-      "display_value": "76"
+      "value": 77,
+      "display_value": "77"
     },
     {
       "key": "public_forks",
@@ -189,15 +189,15 @@
   },
   "scorecard": {
     "releases_30d": 5,
-    "active_repos_7d": 9,
+    "active_repos_7d": 10,
     "avg_release_gap_days": 3.965636574074074,
-    "stars_per_public_repo": 1.105263157894737,
-    "ci_coverage_pct": 22.36842105263158,
-    "last_year_contributions": 10523,
-    "active_days_last_year": 303,
+    "stars_per_public_repo": 1.0909090909090908,
+    "ci_coverage_pct": 22.07792207792208,
+    "last_year_contributions": 10524,
+    "active_days_last_year": 302,
     "automation_workflows": 65,
     "primary_lang_share_pct": 47.1,
-    "median_days_since_push": 200.0,
+    "median_days_since_push": 198.5,
     "days_since_last_push": 0.0
   },
   "scorecard_cards": [
@@ -205,32 +205,32 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 10523,
-      "display_value": "10,523",
+      "value": 10524,
+      "display_value": "10,524",
       "accent": "#7dcfff"
     },
     {
       "key": "active_days_last_year",
       "label": "Active Days",
       "detail": "days shipped in last 12mo",
-      "value": 303,
-      "display_value": "303",
+      "value": 302,
+      "display_value": "302",
       "accent": "#9ece6a"
     },
     {
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 9,
-      "display_value": "9",
+      "value": 10,
+      "display_value": "10",
       "accent": "#7dcfff"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with pipelines",
-      "value": 22.36842105263158,
-      "display_value": "22.4%",
+      "value": 22.07792207792208,
+      "display_value": "22.1%",
       "accent": "#ff9e64"
     },
     {
@@ -269,9 +269,9 @@
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 76,
+    "public_owned_repos_total": 77,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 76,
+    "public_owned_nonfork_repos_total": 77,
     "private_owned_repos_total": 161
   },
   "featured_repo_facts": [
@@ -430,6 +430,21 @@
       "featured": true
     },
     {
+      "name": "binary_to_cpp",
+      "full_name": "jguida941/binary_to_cpp",
+      "url": "https://github.com/jguida941/binary_to_cpp",
+      "language": "n/a",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-07-25",
+      "pushed_at_raw": "2026-07-25T23:13:58Z",
+      "pushed_ago": "today",
+      "created_at": "2026-07-25",
+      "last_commit_msg": "recent push detected",
+      "featured": false
+    },
+    {
       "name": "claude-code-binary-analysis-boundaries",
       "full_name": "jguida941/claude-code-binary-analysis-boundaries",
       "url": "https://github.com/jguida941/claude-code-binary-analysis-boundaries",
@@ -439,7 +454,7 @@
       "ci": "no",
       "pushed_at": "2026-07-25",
       "pushed_at_raw": "2026-07-25T00:49:18Z",
-      "pushed_ago": "22 hours ago",
+      "pushed_ago": "23 hours ago",
       "created_at": "2026-07-24",
       "last_commit_msg": "Tighten two claims and refresh RESULTS.md after the restructure",
       "featured": false
@@ -638,24 +653,29 @@
       "created_at": "2026-06-29",
       "last_commit_msg": "Update Module Eight Journal",
       "featured": false
-    },
-    {
-      "name": "raspberry-pi-smart-thermostat",
-      "full_name": "jguida941/raspberry-pi-smart-thermostat",
-      "url": "https://github.com/jguida941/raspberry-pi-smart-thermostat",
-      "language": "Python",
-      "stars": 0,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-06-28",
-      "pushed_at_raw": "2026-06-28T19:00:47Z",
-      "pushed_ago": "3 weeks ago",
-      "created_at": "2026-06-28",
-      "last_commit_msg": "Update README.md",
-      "featured": false
     }
   ],
   "recent_created": [
+    {
+      "name": "binary_to_cpp",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "A complete beginner-friendly workflow for the binary analysis assignment my course expected students to complete but never clearly taught.",
+      "html_url": "https://github.com/jguida941/binary_to_cpp",
+      "pushed_at": "2026-07-25T23:13:58Z",
+      "created_at": "2026-07-25T23:13:57Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": null,
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "workflow_file_count": 0,
+      "language_bytes": {},
+      "latest_commit_message": ""
+    },
     {
       "name": "claude-code-binary-analysis-boundaries",
       "fork": false,
@@ -861,47 +881,25 @@
         "Python": 25927
       },
       "latest_commit_message": "Update Module Eight Journal"
-    },
-    {
-      "name": "raspberry-pi-smart-thermostat",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": "Simple Raspberry Pi smart thermostat with AHT20 temperature sensing, LCD status output, PWM LED feedback, UART telemetry, and modular Python control logic.",
-      "html_url": "https://github.com/jguida941/raspberry-pi-smart-thermostat",
-      "pushed_at": "2026-06-28T19:00:47Z",
-      "created_at": "2026-06-28T18:41:28Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "language": "Python",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "Python": 11935
-      },
-      "latest_commit_message": "Update README.md"
     }
   ],
   "focus": {
     "now": [
       {
+        "title": "binary_to_cpp",
+        "detail": "code \u00b7 pushed today",
+        "url": "https://github.com/jguida941/binary_to_cpp",
+        "is_private": false
+      },
+      {
         "title": "claude-code-binary-analysis-boundaries",
-        "detail": "Python \u00b7 pushed 22 hours ago",
+        "detail": "Python \u00b7 pushed 23 hours ago",
         "url": "https://github.com/jguida941/claude-code-binary-analysis-boundaries",
         "is_private": false
       },
       {
         "title": "agent-process-watchdog",
-        "detail": "Python \u00b7 pushed 23 hours ago",
-        "url": "",
-        "is_private": true
-      },
-      {
-        "title": "semharness",
-        "detail": "code \u00b7 pushed 1 day ago",
+        "detail": "Python \u00b7 pushed 1 day ago",
         "url": "",
         "is_private": true
       }
@@ -916,7 +914,7 @@
     "shipped": [
       {
         "title": "v1.0.0",
-        "detail": "claude-code-binary-analysis-boundaries \u00b7 22 hours ago",
+        "detail": "claude-code-binary-analysis-boundaries \u00b7 23 hours ago",
         "url": "https://github.com/jguida941/claude-code-binary-analysis-boundaries/releases/tag/v1.0.0"
       },
       {
@@ -933,13 +931,23 @@
   },
   "activity_feed": [
     {
+      "kind": "created",
+      "title": "binary_to_cpp",
+      "url": "https://github.com/jguida941/binary_to_cpp",
+      "repo": "jguida941/binary_to_cpp",
+      "repo_url": "https://github.com/jguida941/binary_to_cpp",
+      "state": "CREATED",
+      "time_ago": "today",
+      "created_at": "2026-07-25T23:13:57Z"
+    },
+    {
       "kind": "activity",
       "title": "push",
       "url": "https://github.com/jguida941/claude-code-binary-analysis-boundaries",
       "repo": "jguida941/claude-code-binary-analysis-boundaries",
       "repo_url": "https://github.com/jguida941/claude-code-binary-analysis-boundaries",
       "state": "PUSH",
-      "time_ago": "22 hours ago",
+      "time_ago": "23 hours ago",
       "created_at": "2026-07-25T00:49:19Z"
     },
     {
@@ -949,7 +957,7 @@
       "repo": "jguida941/claude-code-binary-analysis-boundaries",
       "repo_url": "https://github.com/jguida941/claude-code-binary-analysis-boundaries",
       "state": "RELEASED",
-      "time_ago": "22 hours ago",
+      "time_ago": "23 hours ago",
       "created_at": "2026-07-25T00:30:58Z"
     },
     {
@@ -959,7 +967,7 @@
       "repo": "jguida941/claude-code-binary-analysis-boundaries",
       "repo_url": "https://github.com/jguida941/claude-code-binary-analysis-boundaries",
       "state": "CREATED",
-      "time_ago": "23 hours ago",
+      "time_ago": "1 day ago",
       "created_at": "2026-07-24T23:27:42Z"
     },
     {
@@ -1083,16 +1091,6 @@
       "created_at": "2026-07-19T22:15:18Z"
     },
     {
-      "kind": "created",
-      "title": "android_studio_intro",
-      "url": "https://github.com/jguida941/android_studio_intro",
-      "repo": "jguida941/android_studio_intro",
-      "repo_url": "https://github.com/jguida941/android_studio_intro",
-      "state": "CREATED",
-      "time_ago": "6 days ago",
-      "created_at": "2026-07-19T21:40:27Z"
-    },
-    {
       "kind": "activity",
       "title": "push",
       "url": "https://github.com/jguida941/pell-grant-ripoff-calculator",
@@ -1119,7 +1117,7 @@
       "repo_url": "https://github.com/jguida941/claude-code-binary-analysis-boundaries",
       "tag": "v1.0.0",
       "url": "https://github.com/jguida941/claude-code-binary-analysis-boundaries/releases/tag/v1.0.0",
-      "time_ago": "22 hours ago",
+      "time_ago": "23 hours ago",
       "created_at": "2026-07-25T00:30:58Z"
     },
     {
@@ -1159,9 +1157,8 @@
     }
   ],
   "engineering": {
-    "active_days_last_year": 303,
+    "active_days_last_year": 302,
     "weekly_cadence": [
-      613,
       871,
       99,
       191,
@@ -1172,28 +1169,23 @@
       428,
       374,
       279,
-      145
+      147,
+      0
     ],
     "automation_workflows": 65,
     "automation_repos": 16,
     "primary_lang_share_pct": 47.1,
     "languages_over_5pct": 5,
-    "median_days_since_push": 200.0,
+    "median_days_since_push": 198.5,
     "days_since_last_push": 0.0,
-    "public_repos_total": 76,
-    "public_nonfork_repos": 76,
+    "public_repos_total": 77,
+    "public_nonfork_repos": 77,
     "private_repos_total": 161,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 10523,
+    "total": 10524,
     "weeks": [
-      [
-        {
-          "date": "2025-07-26",
-          "count": 17
-        }
-      ],
       [
         {
           "date": "2025-07-27",
@@ -1497,7 +1489,7 @@
       [
         {
           "date": "2025-10-05",
-          "count": 3
+          "count": 2
         },
         {
           "date": "2025-10-06",
@@ -2751,7 +2743,13 @@
         },
         {
           "date": "2026-07-25",
-          "count": 13
+          "count": 15
+        }
+      ],
+      [
+        {
+          "date": "2026-07-26",
+          "count": 0
         }
       ]
     ]
