@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-27T04:02:05.317651Z",
+  "generated_at": "2026-07-27T07:51:24.765863Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 10553,
-    "public_scope_commits": 6790,
+    "last_year_contributions": 10558,
+    "public_scope_commits": 6757,
     "total_repos": 76,
     "public_forks": 0,
     "private_owned_repos": 162,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 10553,
-      "display_value": "10,553"
+      "value": 10558,
+      "display_value": "10,558"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6790,
-      "display_value": "6,790"
+      "value": 6757,
+      "display_value": "6,757"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 10553,
-      "display_value": "10,553"
+      "value": 10558,
+      "display_value": "10,558"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6790,
-      "display_value": "6,790"
+      "value": 6757,
+      "display_value": "6,757"
     },
     {
       "key": "total_repos",
@@ -193,11 +193,11 @@
     "avg_release_gap_days": 1.543119212962963,
     "stars_per_public_repo": 1.131578947368421,
     "ci_coverage_pct": 23.684210526315788,
-    "last_year_contributions": 10553,
+    "last_year_contributions": 10558,
     "active_days_last_year": 303,
     "automation_workflows": 66,
     "primary_lang_share_pct": 47.7,
-    "median_days_since_push": 201.0,
+    "median_days_since_push": 202.0,
     "days_since_last_push": 0.0
   },
   "scorecard_cards": [
@@ -205,8 +205,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 10553,
-      "display_value": "10,553",
+      "value": 10558,
+      "display_value": "10,558",
       "accent": "#7dcfff"
     },
     {
@@ -324,23 +324,23 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 11480695,
+      "bytes": 11492604,
       "percent": 47.74
     },
     {
       "name": "Makefile",
-      "bytes": 3934793,
-      "percent": 16.36
+      "bytes": 3934782,
+      "percent": 16.35
     },
     {
       "name": "Rust",
       "bytes": 3025100,
-      "percent": 12.58
+      "percent": 12.57
     },
     {
       "name": "C++",
       "bytes": 1830064,
-      "percent": 7.61
+      "percent": 7.6
     },
     {
       "name": "Java",
@@ -359,13 +359,13 @@
     },
     {
       "name": "Shell",
-      "bytes": 309956,
-      "percent": 1.29
+      "bytes": 323534,
+      "percent": 1.34
     },
     {
       "name": "C",
       "bytes": 270693,
-      "percent": 1.13
+      "percent": 1.12
     },
     {
       "name": "JavaScript",
@@ -438,10 +438,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-07-27",
-      "pushed_at_raw": "2026-07-27T03:32:54Z",
-      "pushed_ago": "today",
+      "pushed_at_raw": "2026-07-27T04:42:02Z",
+      "pushed_ago": "3 hours ago",
       "created_at": "2026-07-26",
-      "last_commit_msg": "Integrate portable validation and publication contracts",
+      "last_commit_msg": "Binary Workbench public foundation",
       "featured": false
     },
     {
@@ -484,7 +484,7 @@
       "ci": "no",
       "pushed_at": "2026-07-22",
       "pushed_at_raw": "2026-07-22T04:53:07Z",
-      "pushed_ago": "4 days ago",
+      "pushed_ago": "5 days ago",
       "created_at": "2025-09-28",
       "last_commit_msg": "Fix header formatting in README.md",
       "featured": false
@@ -661,9 +661,9 @@
       "fork": false,
       "private": false,
       "visibility": "public",
-      "description": "Take a compiled binary apart and understand it: a beginner's walkthrough of file, nm, objdump and readelf on real x86-64 ELF programs, plus a tested Python CLI that runs the same workflow and resolves the string data a disassembly points at. Written for SNHU CS-410 Module 3, useful for anyone learning to read assembly.",
+      "description": "Educational x86-64 ELF workbench: inspect programs, list routines, disassemble code, resolve referenced data, and validate a reproducible Docker toolchain on macOS and Linux.",
       "html_url": "https://github.com/jguida941/binary_to_assembly",
-      "pushed_at": "2026-07-27T03:32:54Z",
+      "pushed_at": "2026-07-27T04:42:02Z",
       "created_at": "2026-07-26T03:03:33Z",
       "stargazers_count": 2,
       "forks_count": 0,
@@ -674,12 +674,12 @@
       "has_ci_workflows": true,
       "workflow_file_count": 1,
       "language_bytes": {
-        "Python": 305927,
-        "Shell": 39854,
-        "Makefile": 8102,
-        "Dockerfile": 4611
+        "Python": 317836,
+        "Shell": 53432,
+        "Makefile": 8091,
+        "Dockerfile": 4204
       },
-      "latest_commit_message": "Integrate portable validation and publication contracts"
+      "latest_commit_message": "Binary Workbench public foundation"
     },
     {
       "name": "claude-code-binary-analysis-boundaries",
@@ -890,13 +890,13 @@
     "now": [
       {
         "title": "assembly-notes",
-        "detail": "Assembly \u00b7 pushed today",
+        "detail": "Assembly \u00b7 pushed 2 hours ago",
         "url": "",
         "is_private": true
       },
       {
         "title": "binary_to_assembly",
-        "detail": "Python \u00b7 pushed today",
+        "detail": "Python \u00b7 pushed 3 hours ago",
         "url": "https://github.com/jguida941/binary_to_assembly",
         "is_private": false
       },
@@ -940,8 +940,8 @@
       "repo": "jguida941/binary_to_assembly",
       "repo_url": "https://github.com/jguida941/binary_to_assembly",
       "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-07-27T03:32:55Z"
+      "time_ago": "3 hours ago",
+      "created_at": "2026-07-27T04:42:03Z"
     },
     {
       "kind": "created",
@@ -1010,7 +1010,7 @@
       "repo": "jguida941/pysort-visualizer",
       "repo_url": "https://github.com/jguida941/pysort-visualizer",
       "state": "PUSH",
-      "time_ago": "4 days ago",
+      "time_ago": "5 days ago",
       "created_at": "2026-07-22T04:53:08Z"
     },
     {
@@ -1080,7 +1080,7 @@
       "repo": "jguida941/assembly-notes",
       "repo_url": "https://github.com/jguida941/assembly-notes",
       "state": "PUSH",
-      "time_ago": "6 days ago",
+      "time_ago": "1 week ago",
       "created_at": "2026-07-20T04:18:35Z"
     },
     {
@@ -1155,13 +1155,13 @@
       374,
       279,
       176,
-      29
+      34
     ],
     "automation_workflows": 66,
     "automation_repos": 17,
     "primary_lang_share_pct": 47.7,
     "languages_over_5pct": 5,
-    "median_days_since_push": 201.0,
+    "median_days_since_push": 202.0,
     "days_since_last_push": 0.0,
     "public_repos_total": 76,
     "public_nonfork_repos": 76,
@@ -1169,7 +1169,7 @@
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 10553,
+    "total": 10558,
     "weeks": [
       [
         {
@@ -2734,7 +2734,7 @@
         },
         {
           "date": "2026-07-27",
-          "count": 2
+          "count": 7
         }
       ]
     ]
@@ -2742,7 +2742,7 @@
   "activity_rhythm": {
     "matrix": [
       [
-        3,
+        5,
         0,
         0,
         0,
@@ -2890,7 +2890,7 @@
         0,
         0,
         0,
-        2,
+        0,
         6,
         3,
         0,
