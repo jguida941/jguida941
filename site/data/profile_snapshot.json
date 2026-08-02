@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T11:34:24.100446Z",
+  "generated_at": "2026-08-02T13:54:58.894143Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 10595,
-    "public_scope_commits": 6821,
+    "last_year_contributions": 10608,
+    "public_scope_commits": 6834,
     "total_repos": 74,
     "public_forks": 0,
     "private_owned_repos": 165,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 10595,
-      "display_value": "10,595"
+      "value": 10608,
+      "display_value": "10,608"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6821,
-      "display_value": "6,821"
+      "value": 6834,
+      "display_value": "6,834"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 10595,
-      "display_value": "10,595"
+      "value": 10608,
+      "display_value": "10,608"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6821,
-      "display_value": "6,821"
+      "value": 6834,
+      "display_value": "6,834"
     },
     {
       "key": "total_repos",
@@ -189,24 +189,24 @@
   },
   "scorecard": {
     "releases_30d": 5,
-    "active_repos_7d": 0,
-    "avg_release_gap_days": 1.543119212962963,
+    "active_repos_7d": 1,
+    "avg_release_gap_days": 2.9705439814814816,
     "stars_per_public_repo": 1.135135135135135,
     "ci_coverage_pct": 22.972972972972975,
-    "last_year_contributions": 10595,
+    "last_year_contributions": 10608,
     "active_days_last_year": 304,
     "automation_workflows": 65,
-    "primary_lang_share_pct": 47.2,
-    "median_days_since_push": 217.0,
-    "days_since_last_push": 8.0
+    "primary_lang_share_pct": 47.0,
+    "median_days_since_push": 218.0,
+    "days_since_last_push": 0.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 10595,
-      "display_value": "10,595",
+      "value": 10608,
+      "display_value": "10,608",
       "accent": "#7dcfff"
     },
     {
@@ -221,8 +221,8 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 0,
-      "display_value": "0",
+      "value": 1,
+      "display_value": "1",
       "accent": "#7dcfff"
     },
     {
@@ -253,16 +253,16 @@
       "key": "primary_lang_share_pct",
       "label": "Primary Language",
       "detail": "share of code by bytes",
-      "value": 47.2,
-      "display_value": "47.2%",
+      "value": 47.0,
+      "display_value": "47.0%",
       "accent": "#7aa2f7"
     },
     {
       "key": "days_since_last_push",
       "label": "Last Push",
       "detail": "days since your most recent commit",
-      "value": 8.0,
-      "display_value": "8d",
+      "value": 0.0,
+      "display_value": "0d",
       "accent": "#9ece6a"
     }
   ],
@@ -325,27 +325,27 @@
     {
       "name": "Python",
       "bytes": 11172676,
-      "percent": 47.17
+      "percent": 47.03
     },
     {
       "name": "Makefile",
       "bytes": 3926691,
-      "percent": 16.58
+      "percent": 16.53
     },
     {
       "name": "Rust",
       "bytes": 3025100,
-      "percent": 12.77
+      "percent": 12.73
     },
     {
       "name": "C++",
       "bytes": 1830064,
-      "percent": 7.73
+      "percent": 7.7
     },
     {
       "name": "Java",
-      "bytes": 1585612,
-      "percent": 6.69
+      "bytes": 1654819,
+      "percent": 6.97
     },
     {
       "name": "HTML",
@@ -355,7 +355,7 @@
     {
       "name": "TypeScript",
       "bytes": 411851,
-      "percent": 1.74
+      "percent": 1.73
     },
     {
       "name": "C",
@@ -430,6 +430,21 @@
       "featured": true
     },
     {
+      "name": "CS360",
+      "full_name": "jguida941/CS360",
+      "url": "https://github.com/jguida941/CS360",
+      "language": "Java",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-08-02",
+      "pushed_at_raw": "2026-08-02T13:37:38Z",
+      "pushed_ago": "today",
+      "created_at": "2026-07-18",
+      "last_commit_msg": "Pin field text colors in every theme so DayNight defaults can never d\u2026",
+      "featured": false
+    },
+    {
       "name": "claude-binary-analysis",
       "full_name": "jguida941/claude-binary-analysis",
       "url": "https://github.com/jguida941/claude-binary-analysis",
@@ -487,21 +502,6 @@
       "pushed_ago": "1 week ago",
       "created_at": "2026-01-22",
       "last_commit_msg": "Update VoiceTerm to v1.2.6",
-      "featured": false
-    },
-    {
-      "name": "CS360",
-      "full_name": "jguida941/CS360",
-      "url": "https://github.com/jguida941/CS360",
-      "language": "Java",
-      "stars": 0,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-07-19",
-      "pushed_at_raw": "2026-07-19T22:49:17Z",
-      "pushed_ago": "1 week ago",
-      "created_at": "2026-07-18",
-      "last_commit_msg": "Restore full detailed Project One Milestone paper (warehouse experien\u2026",
       "featured": false
     },
     {
@@ -713,7 +713,7 @@
       "visibility": "public",
       "description": null,
       "html_url": "https://github.com/jguida941/CS360",
-      "pushed_at": "2026-07-19T22:49:17Z",
+      "pushed_at": "2026-08-02T13:37:38Z",
       "created_at": "2026-07-18T21:32:56Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -724,9 +724,9 @@
       "has_ci_workflows": false,
       "workflow_file_count": 0,
       "language_bytes": {
-        "Java": 1210
+        "Java": 70417
       },
-      "latest_commit_message": "Restore full detailed Project One Milestone paper (warehouse experien\u2026"
+      "latest_commit_message": "Pin field text colors in every theme so DayNight defaults can never d\u2026"
     },
     {
       "name": "pell-grant-cal-snhu",
@@ -889,20 +889,20 @@
   "focus": {
     "now": [
       {
+        "title": "CS360",
+        "detail": "Java \u00b7 pushed today",
+        "url": "https://github.com/jguida941/CS360",
+        "is_private": false
+      },
+      {
         "title": "semlineage",
-        "detail": "Python \u00b7 pushed 7 hours ago",
+        "detail": "Python \u00b7 pushed 9 hours ago",
         "url": "",
         "is_private": true
       },
       {
         "title": "binary_to_assembly",
         "detail": "Python \u00b7 pushed 1 day ago",
-        "url": "",
-        "is_private": true
-      },
-      {
-        "title": "neetcode150",
-        "detail": "Python \u00b7 pushed 4 days ago",
         "url": "",
         "is_private": true
       }
@@ -924,15 +924,20 @@
         "title": "v1.2.6",
         "detail": "voiceterm \u00b7 1 week ago",
         "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.6"
-      },
-      {
-        "title": "v1.2.5",
-        "detail": "voiceterm \u00b7 1 week ago",
-        "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.5"
       }
     ]
   },
   "activity_feed": [
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/CS360",
+      "repo": "jguida941/CS360",
+      "repo_url": "https://github.com/jguida941/CS360",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-08-02T13:37:39Z"
+    },
     {
       "kind": "activity",
       "title": "push",
@@ -1044,26 +1049,6 @@
       "created_at": "2026-07-22T01:13:23Z"
     },
     {
-      "kind": "release",
-      "title": "v1.2.5",
-      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.5",
-      "repo": "jguida941/voiceterm",
-      "repo_url": "https://github.com/jguida941/voiceterm",
-      "state": "RELEASED",
-      "time_ago": "1 week ago",
-      "created_at": "2026-07-21T22:26:47Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/assembly-notes",
-      "repo": "jguida941/assembly-notes",
-      "repo_url": "https://github.com/jguida941/assembly-notes",
-      "state": "PUSH",
-      "time_ago": "1 week ago",
-      "created_at": "2026-07-20T04:18:35Z"
-    },
-    {
       "kind": "created",
       "title": "android_studio_intro",
       "url": "https://github.com/jguida941/android_studio_intro",
@@ -1100,14 +1085,6 @@
       "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.6",
       "time_ago": "1 week ago",
       "created_at": "2026-07-22T01:13:23Z"
-    },
-    {
-      "repo": "jguida941/voiceterm",
-      "repo_url": "https://github.com/jguida941/voiceterm",
-      "tag": "v1.2.5",
-      "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.5",
-      "time_ago": "1 week ago",
-      "created_at": "2026-07-21T22:26:47Z"
     }
   ],
   "recent_pull_requests": [
@@ -1135,21 +1112,21 @@
       279,
       181,
       111,
-      4
+      17
     ],
     "automation_workflows": 65,
     "automation_repos": 16,
-    "primary_lang_share_pct": 47.2,
+    "primary_lang_share_pct": 47.0,
     "languages_over_5pct": 5,
-    "median_days_since_push": 217.0,
-    "days_since_last_push": 8.0,
+    "median_days_since_push": 218.0,
+    "days_since_last_push": 0.0,
     "public_repos_total": 74,
     "public_nonfork_repos": 74,
     "private_repos_total": 165,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 10595,
+    "total": 10608,
     "weeks": [
       [
         {
@@ -2714,7 +2691,7 @@
       [
         {
           "date": "2026-08-02",
-          "count": 4
+          "count": 17
         }
       ]
     ]
@@ -2722,7 +2699,7 @@
   "activity_rhythm": {
     "matrix": [
       [
-        3,
+        2,
         0,
         0,
         0,
@@ -2766,7 +2743,7 @@
         0,
         0,
         1,
-        3,
+        1,
         0,
         4,
         7,
@@ -2886,8 +2863,8 @@
         0,
         0,
         0,
-        0,
-        0,
+        1,
+        3,
         0,
         0,
         0,
@@ -2905,12 +2882,12 @@
       ]
     ],
     "event_mix": {
-      "push": 72,
+      "push": 74,
       "create": 7,
-      "release": 3,
+      "release": 2,
       "pull request": 1
     },
-    "total": 83,
+    "total": 84,
     "timezone": "New York"
   }
 }
