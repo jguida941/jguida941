@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T13:54:58.894143Z",
+  "generated_at": "2026-08-02T15:20:07.461408Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,11 +18,11 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 10608,
-    "public_scope_commits": 6834,
-    "total_repos": 74,
+    "last_year_contributions": 10611,
+    "public_scope_commits": 6797,
+    "total_repos": 73,
     "public_forks": 0,
-    "private_owned_repos": 165,
+    "private_owned_repos": 166,
     "total_stars": 84,
     "languages_count": 25,
     "prs_merged": 41,
@@ -35,22 +35,22 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 10608,
-      "display_value": "10,608"
+      "value": 10611,
+      "display_value": "10,611"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6834,
-      "display_value": "6,834"
+      "value": 6797,
+      "display_value": "6,797"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 74,
-      "display_value": "74"
+      "value": 73,
+      "display_value": "73"
     },
     {
       "key": "public_forks",
@@ -63,8 +63,8 @@
       "key": "private_owned_repos",
       "label": "Private Owned Repos",
       "dashboard_label": "Private Owned Repos",
-      "value": 165,
-      "display_value": "165"
+      "value": 166,
+      "display_value": "166"
     },
     {
       "key": "total_stars",
@@ -113,20 +113,20 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 10608,
-      "display_value": "10,608"
+      "value": 10611,
+      "display_value": "10,611"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6834,
-      "display_value": "6,834"
+      "value": 6797,
+      "display_value": "6,797"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 74,
-      "display_value": "74"
+      "value": 73,
+      "display_value": "73"
     },
     {
       "key": "public_forks",
@@ -137,8 +137,8 @@
     {
       "key": "private_owned_repos",
       "label": "Private Owned Repos",
-      "value": 165,
-      "display_value": "165"
+      "value": 166,
+      "display_value": "166"
     },
     {
       "key": "total_stars",
@@ -189,24 +189,24 @@
   },
   "scorecard": {
     "releases_30d": 5,
-    "active_repos_7d": 1,
+    "active_repos_7d": 0,
     "avg_release_gap_days": 2.9705439814814816,
-    "stars_per_public_repo": 1.135135135135135,
-    "ci_coverage_pct": 22.972972972972975,
-    "last_year_contributions": 10608,
+    "stars_per_public_repo": 1.1506849315068493,
+    "ci_coverage_pct": 23.28767123287671,
+    "last_year_contributions": 10611,
     "active_days_last_year": 304,
     "automation_workflows": 65,
-    "primary_lang_share_pct": 47.0,
-    "median_days_since_push": 218.0,
-    "days_since_last_push": 0.0
+    "primary_lang_share_pct": 47.2,
+    "median_days_since_push": 224.0,
+    "days_since_last_push": 8.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 10608,
-      "display_value": "10,608",
+      "value": 10611,
+      "display_value": "10,611",
       "accent": "#7dcfff"
     },
     {
@@ -221,16 +221,16 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 1,
-      "display_value": "1",
+      "value": 0,
+      "display_value": "0",
       "accent": "#7dcfff"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with pipelines",
-      "value": 22.972972972972975,
-      "display_value": "23.0%",
+      "value": 23.28767123287671,
+      "display_value": "23.3%",
       "accent": "#ff9e64"
     },
     {
@@ -253,26 +253,26 @@
       "key": "primary_lang_share_pct",
       "label": "Primary Language",
       "detail": "share of code by bytes",
-      "value": 47.0,
-      "display_value": "47.0%",
+      "value": 47.2,
+      "display_value": "47.2%",
       "accent": "#7aa2f7"
     },
     {
       "key": "days_since_last_push",
       "label": "Last Push",
       "detail": "days since your most recent commit",
-      "value": 0.0,
-      "display_value": "0d",
+      "value": 8.0,
+      "display_value": "8d",
       "accent": "#9ece6a"
     }
   ],
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 74,
+    "public_owned_repos_total": 73,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 74,
-    "private_owned_repos_total": 165
+    "public_owned_nonfork_repos_total": 73,
+    "private_owned_repos_total": 166
   },
   "featured_repo_facts": [
     {
@@ -325,27 +325,27 @@
     {
       "name": "Python",
       "bytes": 11172676,
-      "percent": 47.03
+      "percent": 47.17
     },
     {
       "name": "Makefile",
       "bytes": 3926691,
-      "percent": 16.53
+      "percent": 16.58
     },
     {
       "name": "Rust",
       "bytes": 3025100,
-      "percent": 12.73
+      "percent": 12.77
     },
     {
       "name": "C++",
       "bytes": 1830064,
-      "percent": 7.7
+      "percent": 7.73
     },
     {
       "name": "Java",
-      "bytes": 1654819,
-      "percent": 6.97
+      "bytes": 1584402,
+      "percent": 6.69
     },
     {
       "name": "HTML",
@@ -355,7 +355,7 @@
     {
       "name": "TypeScript",
       "bytes": 411851,
-      "percent": 1.73
+      "percent": 1.74
     },
     {
       "name": "C",
@@ -428,21 +428,6 @@
       "created_at": "2025-11-15",
       "last_commit_msg": "recent push detected",
       "featured": true
-    },
-    {
-      "name": "CS360",
-      "full_name": "jguida941/CS360",
-      "url": "https://github.com/jguida941/CS360",
-      "language": "Java",
-      "stars": 0,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-08-02",
-      "pushed_at_raw": "2026-08-02T13:37:38Z",
-      "pushed_ago": "today",
-      "created_at": "2026-07-18",
-      "last_commit_msg": "Pin field text colors in every theme so DayNight defaults can never d\u2026",
-      "featured": false
     },
     {
       "name": "claude-binary-analysis",
@@ -653,6 +638,21 @@
       "created_at": "2026-02-23",
       "last_commit_msg": "chore: remove legacy final project and fix language stats",
       "featured": false
+    },
+    {
+      "name": "breakout-game-opengl",
+      "full_name": "jguida941/breakout-game-opengl",
+      "url": "https://github.com/jguida941/breakout-game-opengl",
+      "language": "C++",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-03-01",
+      "pushed_at_raw": "2026-03-01T22:39:09Z",
+      "pushed_ago": "5 months ago",
+      "created_at": "2026-03-01",
+      "last_commit_msg": "Adjust GitHub language stats to ignore vendor folders",
+      "featured": false
     }
   ],
   "recent_created": [
@@ -705,28 +705,6 @@
         "Java": 1210
       },
       "latest_commit_message": "Update assignment document and reflection formatting"
-    },
-    {
-      "name": "CS360",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": null,
-      "html_url": "https://github.com/jguida941/CS360",
-      "pushed_at": "2026-08-02T13:37:38Z",
-      "created_at": "2026-07-18T21:32:56Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "language": "Java",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "Java": 70417
-      },
-      "latest_commit_message": "Pin field text colors in every theme so DayNight defaults can never d\u2026"
     },
     {
       "name": "pell-grant-cal-snhu",
@@ -884,6 +862,32 @@
         "C": 2092
       },
       "latest_commit_message": "Adjust GitHub language stats to ignore vendor folders"
+    },
+    {
+      "name": "opengl-cyberpunk",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "Stylized OpenGL cyberpunk 3D scene built in C++ with GLFW, GLEW, and GLM.",
+      "html_url": "https://github.com/jguida941/opengl-cyberpunk",
+      "pushed_at": "2026-03-02T01:14:07Z",
+      "created_at": "2026-02-23T18:16:38Z",
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "language": "C++",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "workflow_file_count": 0,
+      "language_bytes": {
+        "C++": 169638,
+        "GLSL": 8428,
+        "PowerShell": 3706,
+        "Shell": 772,
+        "Batchfile": 316
+      },
+      "latest_commit_message": "chore: remove legacy final project and fix language stats"
     }
   ],
   "focus": {
@@ -891,12 +895,12 @@
       {
         "title": "CS360",
         "detail": "Java \u00b7 pushed today",
-        "url": "https://github.com/jguida941/CS360",
-        "is_private": false
+        "url": "",
+        "is_private": true
       },
       {
         "title": "semlineage",
-        "detail": "Python \u00b7 pushed 9 hours ago",
+        "detail": "Python \u00b7 pushed 11 hours ago",
         "url": "",
         "is_private": true
       },
@@ -1060,13 +1064,13 @@
     },
     {
       "kind": "created",
-      "title": "CS360",
-      "url": "https://github.com/jguida941/CS360",
-      "repo": "jguida941/CS360",
-      "repo_url": "https://github.com/jguida941/CS360",
+      "title": "pell-grant-cal-snhu",
+      "url": "https://github.com/jguida941/pell-grant-cal-snhu",
+      "repo": "jguida941/pell-grant-cal-snhu",
+      "repo_url": "https://github.com/jguida941/pell-grant-cal-snhu",
       "state": "CREATED",
       "time_ago": "2 weeks ago",
-      "created_at": "2026-07-18T21:32:56Z"
+      "created_at": "2026-07-18T20:10:21Z"
     }
   ],
   "recent_releases": [
@@ -1112,21 +1116,21 @@
       279,
       181,
       111,
-      17
+      20
     ],
     "automation_workflows": 65,
     "automation_repos": 16,
-    "primary_lang_share_pct": 47.0,
+    "primary_lang_share_pct": 47.2,
     "languages_over_5pct": 5,
-    "median_days_since_push": 218.0,
-    "days_since_last_push": 0.0,
-    "public_repos_total": 74,
-    "public_nonfork_repos": 74,
-    "private_repos_total": 165,
+    "median_days_since_push": 224.0,
+    "days_since_last_push": 8.0,
+    "public_repos_total": 73,
+    "public_nonfork_repos": 73,
+    "private_repos_total": 166,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 10608,
+    "total": 10611,
     "weeks": [
       [
         {
@@ -2691,7 +2695,7 @@
       [
         {
           "date": "2026-08-02",
-          "count": 17
+          "count": 20
         }
       ]
     ]
