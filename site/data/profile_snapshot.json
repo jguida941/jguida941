@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-12T11:59:26.432129Z",
+  "generated_at": "2026-08-12T13:47:01.965618Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 10815,
-    "public_scope_commits": 6829,
+    "last_year_contributions": 10826,
+    "public_scope_commits": 6830,
     "total_repos": 59,
     "public_forks": 0,
     "private_owned_repos": 186,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 10815,
-      "display_value": "10,815"
+      "value": 10826,
+      "display_value": "10,826"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6829,
-      "display_value": "6,829"
+      "value": 6830,
+      "display_value": "6,830"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 10815,
-      "display_value": "10,815"
+      "value": 10826,
+      "display_value": "10,826"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6829,
-      "display_value": "6,829"
+      "value": 6830,
+      "display_value": "6,830"
     },
     {
       "key": "total_repos",
@@ -193,7 +193,7 @@
     "avg_release_gap_days": 4.004452160493827,
     "stars_per_public_repo": 1.2542372881355932,
     "ci_coverage_pct": 25.423728813559322,
-    "last_year_contributions": 10815,
+    "last_year_contributions": 10826,
     "active_days_last_year": 307,
     "automation_workflows": 63,
     "primary_lang_share_pct": 46.7,
@@ -205,8 +205,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 10815,
-      "display_value": "10,815",
+      "value": 10826,
+      "display_value": "10,826",
       "accent": "#7dcfff"
     },
     {
@@ -890,20 +890,20 @@
   "focus": {
     "now": [
       {
-        "title": "repoboot",
-        "detail": "Rust \u00b7 pushed today",
+        "title": "SemVariants",
+        "detail": "Python \u00b7 pushed today",
+        "url": "",
+        "is_private": true
+      },
+      {
+        "title": "semantic-analysis",
+        "detail": "Python \u00b7 pushed today",
         "url": "",
         "is_private": true
       },
       {
         "title": "semantic-tdd",
-        "detail": "Python \u00b7 pushed 7 hours ago",
-        "url": "",
-        "is_private": true
-      },
-      {
-        "title": "sembridge-gate",
-        "detail": "Rust \u00b7 pushed 8 hours ago",
+        "detail": "Python \u00b7 pushed today",
         "url": "",
         "is_private": true
       }
@@ -1035,32 +1035,22 @@
       "created_at": "2026-07-22T01:58:55Z"
     },
     {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/voiceterm",
-      "repo": "jguida941/voiceterm",
-      "repo_url": "https://github.com/jguida941/voiceterm",
-      "state": "PUSH",
-      "time_ago": "3 weeks ago",
-      "created_at": "2026-07-22T01:21:01Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/homebrew-voiceterm",
-      "repo": "jguida941/homebrew-voiceterm",
-      "repo_url": "https://github.com/jguida941/homebrew-voiceterm",
-      "state": "PUSH",
-      "time_ago": "3 weeks ago",
-      "created_at": "2026-07-22T01:15:15Z"
-    },
-    {
       "kind": "release",
       "title": "v1.2.6",
       "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.6",
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "state": "RELEASED",
+      "time_ago": "3 weeks ago",
+      "created_at": "2026-07-22T01:13:23Z"
+    },
+    {
+      "kind": "activity",
+      "title": "release",
+      "url": "https://github.com/jguida941/voiceterm",
+      "repo": "jguida941/voiceterm",
+      "repo_url": "https://github.com/jguida941/voiceterm",
+      "state": "RELEASE",
       "time_ago": "3 weeks ago",
       "created_at": "2026-07-22T01:13:23Z"
     },
@@ -1164,7 +1154,7 @@
       199,
       111,
       158,
-      126
+      137
     ],
     "automation_workflows": 63,
     "automation_repos": 14,
@@ -1178,7 +1168,7 @@
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 10815,
+    "total": 10826,
     "weeks": [
       [
         {
@@ -2743,7 +2733,7 @@
         },
         {
           "date": "2026-08-12",
-          "count": 47
+          "count": 58
         }
       ]
     ]
@@ -2797,22 +2787,22 @@
         1,
         1,
         0,
-        4,
-        7,
-        1,
-        1
+        0,
+        2,
+        0,
+        0
       ],
       [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
         4,
-        0,
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        10,
         2,
         0,
         0,
@@ -2934,13 +2924,13 @@
       ]
     ],
     "event_mix": {
-      "push": 83,
-      "create": 7,
+      "push": 65,
       "release": 4,
+      "create": 4,
       "comment": 2,
       "pull request": 1
     },
-    "total": 97,
+    "total": 76,
     "timezone": "New York"
   }
 }
