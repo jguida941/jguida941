@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-13T02:47:07.400812Z",
+  "generated_at": "2026-08-13T05:04:41.064844Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,39 +18,39 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 10837,
-    "public_scope_commits": 6889,
-    "total_repos": 60,
+    "last_year_contributions": 10838,
+    "public_scope_commits": 6841,
+    "total_repos": 59,
     "public_forks": 0,
-    "private_owned_repos": 185,
+    "private_owned_repos": 186,
     "total_stars": 74,
     "languages_count": 25,
     "prs_merged": 42,
     "releases": 3,
     "ci_repos": 15,
-    "streak_days": 47
+    "streak_days": 48
   },
   "snapshot_rows": [
     {
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 10837,
-      "display_value": "10,837"
+      "value": 10838,
+      "display_value": "10,838"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6889,
-      "display_value": "6,889"
+      "value": 6841,
+      "display_value": "6,841"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 60,
-      "display_value": "60"
+      "value": 59,
+      "display_value": "59"
     },
     {
       "key": "public_forks",
@@ -63,8 +63,8 @@
       "key": "private_owned_repos",
       "label": "Private Owned Repos",
       "dashboard_label": "Private Owned Repos",
-      "value": 185,
-      "display_value": "185"
+      "value": 186,
+      "display_value": "186"
     },
     {
       "key": "total_stars",
@@ -105,28 +105,28 @@
       "key": "streak_days",
       "label": "Current Streak Days",
       "dashboard_label": "Current Streak Days",
-      "value": 47,
-      "display_value": "47"
+      "value": 48,
+      "display_value": "48"
     }
   ],
   "snapshot_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 10837,
-      "display_value": "10,837"
+      "value": 10838,
+      "display_value": "10,838"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6889,
-      "display_value": "6,889"
+      "value": 6841,
+      "display_value": "6,841"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 60,
-      "display_value": "60"
+      "value": 59,
+      "display_value": "59"
     },
     {
       "key": "public_forks",
@@ -137,8 +137,8 @@
     {
       "key": "private_owned_repos",
       "label": "Private Owned Repos",
-      "value": 185,
-      "display_value": "185"
+      "value": 186,
+      "display_value": "186"
     },
     {
       "key": "total_stars",
@@ -173,8 +173,8 @@
     {
       "key": "streak_days",
       "label": "Current Streak Days",
-      "value": 47,
-      "display_value": "47"
+      "value": 48,
+      "display_value": "48"
     }
   ],
   "data_quality": {
@@ -189,48 +189,48 @@
   },
   "scorecard": {
     "releases_30d": 3,
-    "active_repos_7d": 1,
+    "active_repos_7d": 0,
     "avg_release_gap_days": 4.004452160493827,
-    "stars_per_public_repo": 1.2333333333333334,
-    "ci_coverage_pct": 25.0,
-    "last_year_contributions": 10837,
-    "active_days_last_year": 307,
+    "stars_per_public_repo": 1.2542372881355932,
+    "ci_coverage_pct": 25.423728813559322,
+    "last_year_contributions": 10838,
+    "active_days_last_year": 308,
     "automation_workflows": 63,
-    "primary_lang_share_pct": 45.6,
-    "median_days_since_push": 241.0,
-    "days_since_last_push": 0.0
+    "primary_lang_share_pct": 46.7,
+    "median_days_since_push": 243.0,
+    "days_since_last_push": 10.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 10837,
-      "display_value": "10,837",
+      "value": 10838,
+      "display_value": "10,838",
       "accent": "#7dcfff"
     },
     {
       "key": "active_days_last_year",
       "label": "Active Days",
       "detail": "days shipped in last 12mo",
-      "value": 307,
-      "display_value": "307",
+      "value": 308,
+      "display_value": "308",
       "accent": "#9ece6a"
     },
     {
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 1,
-      "display_value": "1",
+      "value": 0,
+      "display_value": "0",
       "accent": "#7dcfff"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with pipelines",
-      "value": 25.0,
-      "display_value": "25.0%",
+      "value": 25.423728813559322,
+      "display_value": "25.4%",
       "accent": "#ff9e64"
     },
     {
@@ -253,26 +253,26 @@
       "key": "primary_lang_share_pct",
       "label": "Primary Language",
       "detail": "share of code by bytes",
-      "value": 45.6,
-      "display_value": "45.6%",
+      "value": 46.7,
+      "display_value": "46.7%",
       "accent": "#7aa2f7"
     },
     {
       "key": "days_since_last_push",
       "label": "Last Push",
       "detail": "days since your most recent commit",
-      "value": 0.0,
-      "display_value": "0d",
+      "value": 10.0,
+      "display_value": "10d",
       "accent": "#9ece6a"
     }
   ],
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 60,
+    "public_owned_repos_total": 59,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 60,
-    "private_owned_repos_total": 185
+    "public_owned_nonfork_repos_total": 59,
+    "private_owned_repos_total": 186
   },
   "featured_repo_facts": [
     {
@@ -325,62 +325,62 @@
     {
       "name": "Python",
       "bytes": 10953841,
-      "percent": 45.58
+      "percent": 46.72
     },
     {
       "name": "Makefile",
       "bytes": 3924243,
-      "percent": 16.33
+      "percent": 16.74
     },
     {
       "name": "Rust",
-      "bytes": 3605479,
-      "percent": 15.0
+      "bytes": 3025100,
+      "percent": 12.9
     },
     {
       "name": "C++",
       "bytes": 1826158,
-      "percent": 7.6
+      "percent": 7.79
     },
     {
       "name": "Java",
       "bytes": 1582397,
-      "percent": 6.58
+      "percent": 6.75
     },
     {
       "name": "HTML",
       "bytes": 412931,
-      "percent": 1.72
+      "percent": 1.76
     },
     {
       "name": "TypeScript",
       "bytes": 411851,
-      "percent": 1.71
+      "percent": 1.76
     },
     {
       "name": "C",
       "bytes": 268582,
-      "percent": 1.12
+      "percent": 1.15
     },
     {
       "name": "Shell",
-      "bytes": 265442,
-      "percent": 1.1
+      "bytes": 262093,
+      "percent": 1.12
     },
     {
       "name": "JavaScript",
       "bytes": 211396,
-      "percent": 0.88
+      "percent": 0.9
     },
     {
       "name": "Jupyter Notebook",
       "bytes": 192686,
-      "percent": 0.8
+      "percent": 0.82
     },
     {
       "name": "CMake",
       "bytes": 141191,
-      "percent": 0.59
+      "percent": 0.6
     }
   ],
   "repo_language_matrix": [
@@ -428,21 +428,6 @@
       "created_at": "2025-11-15",
       "last_commit_msg": "recent push detected",
       "featured": true
-    },
-    {
-      "name": "repoboot",
-      "full_name": "jguida941/repoboot",
-      "url": "https://github.com/jguida941/repoboot",
-      "language": "Rust",
-      "stars": 0,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-08-12",
-      "pushed_at_raw": "2026-08-12T22:22:20Z",
-      "pushed_ago": "4 hours ago",
-      "created_at": "2026-08-12",
-      "last_commit_msg": "Merge pull request #1 from jguida941/slice-0",
-      "featured": false
     },
     {
       "name": "pysort-visualizer",
@@ -653,32 +638,24 @@
       "created_at": "2026-01-31",
       "last_commit_msg": "Add gitui v0.1.0 formula",
       "featured": false
+    },
+    {
+      "name": "opengl-hourglass",
+      "full_name": "jguida941/opengl-hourglass",
+      "url": "https://github.com/jguida941/opengl-hourglass",
+      "language": "C++",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-01-26",
+      "pushed_at_raw": "2026-01-26T07:06:42Z",
+      "pushed_ago": "6 months ago",
+      "created_at": "2026-01-22",
+      "last_commit_msg": "Fix image alt text for accessibility",
+      "featured": false
     }
   ],
   "recent_created": [
-    {
-      "name": "repoboot",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": null,
-      "html_url": "https://github.com/jguida941/repoboot",
-      "pushed_at": "2026-08-12T22:22:20Z",
-      "created_at": "2026-08-12T00:22:08Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "language": "Rust",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "Rust": 580379,
-        "Shell": 3349
-      },
-      "latest_commit_message": "Merge pull request #1 from jguida941/slice-0"
-    },
     {
       "name": "cpp-to-assembly",
       "fork": false,
@@ -884,25 +861,49 @@
         "Ruby": 1173
       },
       "latest_commit_message": "Update VoiceTerm to v1.2.6"
+    },
+    {
+      "name": "opengl-hourglass",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "Simple OpenGL hourglass scene with run.bat and shaders included.",
+      "html_url": "https://github.com/jguida941/opengl-hourglass",
+      "pushed_at": "2026-01-26T07:06:42Z",
+      "created_at": "2026-01-22T03:32:41Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": "C++",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "workflow_file_count": 0,
+      "language_bytes": {
+        "C++": 22938,
+        "GLSL": 16418,
+        "Batchfile": 284
+      },
+      "latest_commit_message": "Fix image alt text for accessibility"
     }
   ],
   "focus": {
     "now": [
       {
-        "title": "repoboot",
-        "detail": "Rust \u00b7 pushed 4 hours ago",
-        "url": "https://github.com/jguida941/repoboot",
-        "is_private": false
+        "title": "repo-boot",
+        "detail": "Rust \u00b7 pushed today",
+        "url": "",
+        "is_private": true
       },
       {
-        "title": "SemVariants",
-        "detail": "Python \u00b7 pushed 12 hours ago",
+        "title": "semvariants",
+        "detail": "Python \u00b7 pushed 15 hours ago",
         "url": "",
         "is_private": true
       },
       {
         "title": "semantic-analysis",
-        "detail": "Python \u00b7 pushed 13 hours ago",
+        "detail": "Python \u00b7 pushed 15 hours ago",
         "url": "",
         "is_private": true
       }
@@ -934,14 +935,14 @@
   },
   "activity_feed": [
     {
-      "kind": "created",
-      "title": "repoboot",
-      "url": "https://github.com/jguida941/repoboot",
-      "repo": "jguida941/repoboot",
-      "repo_url": "https://github.com/jguida941/repoboot",
-      "state": "CREATED",
-      "time_ago": "1 day ago",
-      "created_at": "2026-08-12T00:22:08Z"
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/repo-boot",
+      "repo": "jguida941/repo-boot",
+      "repo_url": "https://github.com/jguida941/repo-boot",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-08-13T03:20:25Z"
     },
     {
       "kind": "release",
@@ -986,9 +987,9 @@
     {
       "kind": "activity",
       "title": "push",
-      "url": "https://github.com/jguida941/binary_to_assembly",
-      "repo": "jguida941/binary_to_assembly",
-      "repo_url": "https://github.com/jguida941/binary_to_assembly",
+      "url": "https://github.com/jguida941/binary-workbench",
+      "repo": "jguida941/binary-workbench",
+      "repo_url": "https://github.com/jguida941/binary-workbench",
       "state": "PUSH",
       "time_ago": "1 week ago",
       "created_at": "2026-07-30T17:32:26Z"
@@ -1012,16 +1013,6 @@
       "state": "RELEASED",
       "time_ago": "2 weeks ago",
       "created_at": "2026-07-25T00:30:58Z"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/neetcode150",
-      "repo": "jguida941/neetcode150",
-      "repo_url": "https://github.com/jguida941/neetcode150",
-      "state": "PUSH",
-      "time_ago": "2 weeks ago",
-      "created_at": "2026-07-23T22:15:43Z"
     },
     {
       "kind": "pull request",
@@ -1092,6 +1083,16 @@
       "state": "CREATED",
       "time_ago": "1 month ago",
       "created_at": "2026-06-28T18:41:28Z"
+    },
+    {
+      "kind": "created",
+      "title": "SNHU-CS-330",
+      "url": "https://github.com/jguida941/SNHU-CS-330",
+      "repo": "jguida941/SNHU-CS-330",
+      "repo_url": "https://github.com/jguida941/SNHU-CS-330",
+      "state": "CREATED",
+      "time_ago": "5 months ago",
+      "created_at": "2026-03-02T00:25:11Z"
     }
   ],
   "recent_releases": [
@@ -1140,7 +1141,7 @@
     }
   ],
   "engineering": {
-    "active_days_last_year": 307,
+    "active_days_last_year": 308,
     "weekly_cadence": [
       191,
       120,
@@ -1153,27 +1154,23 @@
       199,
       111,
       158,
-      148
+      149
     ],
     "automation_workflows": 63,
     "automation_repos": 14,
-    "primary_lang_share_pct": 45.6,
+    "primary_lang_share_pct": 46.7,
     "languages_over_5pct": 5,
-    "median_days_since_push": 241.0,
-    "days_since_last_push": 0.0,
-    "public_repos_total": 60,
-    "public_nonfork_repos": 60,
-    "private_repos_total": 185,
+    "median_days_since_push": 243.0,
+    "days_since_last_push": 10.0,
+    "public_repos_total": 59,
+    "public_nonfork_repos": 59,
+    "private_repos_total": 186,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 10837,
+    "total": 10838,
     "weeks": [
       [
-        {
-          "date": "2025-08-13",
-          "count": 0
-        },
         {
           "date": "2025-08-14",
           "count": 0
@@ -2736,7 +2733,7 @@
         },
         {
           "date": "2026-08-13",
-          "count": 0
+          "count": 1
         }
       ]
     ]
@@ -2806,7 +2803,7 @@
         0,
         0,
         0,
-        1,
+        0,
         0,
         0,
         1,
@@ -2818,8 +2815,8 @@
         2,
         0,
         0,
-        0,
-        1
+        1,
+        2
       ],
       [
         2,
@@ -2839,8 +2836,8 @@
         0,
         0,
         0,
-        1,
-        1,
+        0,
+        0,
         0,
         0,
         0,
@@ -2929,11 +2926,11 @@
     "event_mix": {
       "push": 60,
       "release": 4,
-      "create": 4,
+      "create": 3,
       "comment": 2,
       "pull request": 1
     },
-    "total": 71,
+    "total": 70,
     "timezone": "New York"
   }
 }
