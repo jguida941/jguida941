@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-15T01:49:33.369975Z",
+  "generated_at": "2026-08-15T03:05:06.810485Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,9 +18,9 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 11045,
-    "public_scope_commits": 6874,
-    "total_repos": 59,
+    "last_year_contributions": 11047,
+    "public_scope_commits": 6876,
+    "total_repos": 60,
     "public_forks": 0,
     "private_owned_repos": 186,
     "total_stars": 74,
@@ -35,22 +35,22 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 11045,
-      "display_value": "11,045"
+      "value": 11047,
+      "display_value": "11,047"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6874,
-      "display_value": "6,874"
+      "value": 6876,
+      "display_value": "6,876"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 59,
-      "display_value": "59"
+      "value": 60,
+      "display_value": "60"
     },
     {
       "key": "public_forks",
@@ -113,20 +113,20 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 11045,
-      "display_value": "11,045"
+      "value": 11047,
+      "display_value": "11,047"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6874,
-      "display_value": "6,874"
+      "value": 6876,
+      "display_value": "6,876"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 59,
-      "display_value": "59"
+      "value": 60,
+      "display_value": "60"
     },
     {
       "key": "public_forks",
@@ -189,48 +189,48 @@
   },
   "scorecard": {
     "releases_30d": 3,
-    "active_repos_7d": 0,
+    "active_repos_7d": 1,
     "avg_release_gap_days": 4.004452160493827,
-    "stars_per_public_repo": 1.2542372881355932,
-    "ci_coverage_pct": 25.423728813559322,
-    "last_year_contributions": 11045,
-    "active_days_last_year": 309,
+    "stars_per_public_repo": 1.2333333333333334,
+    "ci_coverage_pct": 25.0,
+    "last_year_contributions": 11047,
+    "active_days_last_year": 310,
     "automation_workflows": 63,
     "primary_lang_share_pct": 46.7,
-    "median_days_since_push": 245.0,
-    "days_since_last_push": 12.0
+    "median_days_since_push": 243.0,
+    "days_since_last_push": 0.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 11045,
-      "display_value": "11,045",
+      "value": 11047,
+      "display_value": "11,047",
       "accent": "#7dcfff"
     },
     {
       "key": "active_days_last_year",
       "label": "Active Days",
       "detail": "days shipped in last 12mo",
-      "value": 309,
-      "display_value": "309",
+      "value": 310,
+      "display_value": "310",
       "accent": "#9ece6a"
     },
     {
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 0,
-      "display_value": "0",
+      "value": 1,
+      "display_value": "1",
       "accent": "#7dcfff"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with pipelines",
-      "value": 25.423728813559322,
-      "display_value": "25.4%",
+      "value": 25.0,
+      "display_value": "25.0%",
       "accent": "#ff9e64"
     },
     {
@@ -261,17 +261,17 @@
       "key": "days_since_last_push",
       "label": "Last Push",
       "detail": "days since your most recent commit",
-      "value": 12.0,
-      "display_value": "12d",
+      "value": 0.0,
+      "display_value": "0d",
       "accent": "#9ece6a"
     }
   ],
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 59,
+    "public_owned_repos_total": 60,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 59,
+    "public_owned_nonfork_repos_total": 60,
     "private_owned_repos_total": 186
   },
   "featured_repo_facts": [
@@ -428,6 +428,21 @@
       "created_at": "2025-11-15",
       "last_commit_msg": "recent push detected",
       "featured": true
+    },
+    {
+      "name": "scratchpad",
+      "full_name": "jguida941/scratchpad",
+      "url": "https://github.com/jguida941/scratchpad",
+      "language": "n/a",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-08-15",
+      "pushed_at_raw": "2026-08-15T02:15:15Z",
+      "pushed_ago": "today",
+      "created_at": "2026-08-15",
+      "last_commit_msg": "Create README.md for repository overview",
+      "featured": false
     },
     {
       "name": "pysort-visualizer",
@@ -638,24 +653,29 @@
       "created_at": "2026-01-31",
       "last_commit_msg": "Add gitui v0.1.0 formula",
       "featured": false
-    },
-    {
-      "name": "opengl-hourglass",
-      "full_name": "jguida941/opengl-hourglass",
-      "url": "https://github.com/jguida941/opengl-hourglass",
-      "language": "C++",
-      "stars": 0,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-01-26",
-      "pushed_at_raw": "2026-01-26T07:06:42Z",
-      "pushed_ago": "6 months ago",
-      "created_at": "2026-01-22",
-      "last_commit_msg": "Fix image alt text for accessibility",
-      "featured": false
     }
   ],
   "recent_created": [
+    {
+      "name": "scratchpad",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "Loose notes, class work, ideas, and unfinished thoughts that may eventually be folded into other repositories",
+      "html_url": "https://github.com/jguida941/scratchpad",
+      "pushed_at": "2026-08-15T02:15:15Z",
+      "created_at": "2026-08-15T02:12:21Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": null,
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "workflow_file_count": 0,
+      "language_bytes": {},
+      "latest_commit_message": "Create README.md for repository overview"
+    },
     {
       "name": "cpp-to-assembly",
       "fork": false,
@@ -861,49 +881,25 @@
         "Ruby": 1173
       },
       "latest_commit_message": "Update VoiceTerm to v1.2.6"
-    },
-    {
-      "name": "opengl-hourglass",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": "Simple OpenGL hourglass scene with run.bat and shaders included.",
-      "html_url": "https://github.com/jguida941/opengl-hourglass",
-      "pushed_at": "2026-01-26T07:06:42Z",
-      "created_at": "2026-01-22T03:32:41Z",
-      "stargazers_count": 0,
-      "forks_count": 0,
-      "language": "C++",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "C++": 22938,
-        "GLSL": 16418,
-        "Batchfile": 284
-      },
-      "latest_commit_message": "Fix image alt text for accessibility"
     }
   ],
   "focus": {
     "now": [
       {
+        "title": "scratchpad",
+        "detail": "code \u00b7 pushed today",
+        "url": "https://github.com/jguida941/scratchpad",
+        "is_private": false
+      },
+      {
         "title": "binary-workbench",
-        "detail": "Python \u00b7 pushed 8 hours ago",
+        "detail": "Python \u00b7 pushed 9 hours ago",
         "url": "",
         "is_private": true
       },
       {
         "title": "repo-boot",
-        "detail": "Rust \u00b7 pushed 8 hours ago",
-        "url": "",
-        "is_private": true
-      },
-      {
-        "title": "semvariants",
-        "detail": "Python \u00b7 pushed 15 hours ago",
+        "detail": "Rust \u00b7 pushed 10 hours ago",
         "url": "",
         "is_private": true
       }
@@ -911,12 +907,12 @@
     "next": [
       {
         "title": "PR #5",
-        "detail": "repo-boot \u00b7 open \u00b7 9 hours ago",
+        "detail": "repo-boot \u00b7 open \u00b7 11 hours ago",
         "url": "https://github.com/jguida941/repo-boot/pull/5"
       },
       {
         "title": "PR #4",
-        "detail": "repo-boot \u00b7 open \u00b7 10 hours ago",
+        "detail": "repo-boot \u00b7 open \u00b7 11 hours ago",
         "url": "https://github.com/jguida941/repo-boot/pull/4"
       },
       {
@@ -947,11 +943,31 @@
     {
       "kind": "activity",
       "title": "create",
+      "url": "https://github.com/jguida941/scratchpad",
+      "repo": "jguida941/scratchpad",
+      "repo_url": "https://github.com/jguida941/scratchpad",
+      "state": "CREATE",
+      "time_ago": "today",
+      "created_at": "2026-08-15T02:15:16Z"
+    },
+    {
+      "kind": "created",
+      "title": "scratchpad",
+      "url": "https://github.com/jguida941/scratchpad",
+      "repo": "jguida941/scratchpad",
+      "repo_url": "https://github.com/jguida941/scratchpad",
+      "state": "CREATED",
+      "time_ago": "today",
+      "created_at": "2026-08-15T02:12:21Z"
+    },
+    {
+      "kind": "activity",
+      "title": "create",
       "url": "https://github.com/jguida941/binary-workbench",
       "repo": "jguida941/binary-workbench",
       "repo_url": "https://github.com/jguida941/binary-workbench",
       "state": "CREATE",
-      "time_ago": "8 hours ago",
+      "time_ago": "9 hours ago",
       "created_at": "2026-08-14T17:20:06Z"
     },
     {
@@ -961,7 +977,7 @@
       "repo": "jguida941/repo-boot",
       "repo_url": "https://github.com/jguida941/repo-boot",
       "state": "PUSH",
-      "time_ago": "8 hours ago",
+      "time_ago": "10 hours ago",
       "created_at": "2026-08-14T16:55:17Z"
     },
     {
@@ -971,7 +987,7 @@
       "repo": "jguida941/repo-boot",
       "repo_url": "https://github.com/jguida941/repo-boot",
       "state": "OPEN",
-      "time_ago": "9 hours ago",
+      "time_ago": "11 hours ago",
       "created_at": "2026-08-14T15:56:39Z"
     },
     {
@@ -981,7 +997,7 @@
       "repo": "jguida941/repo-boot",
       "repo_url": "https://github.com/jguida941/repo-boot",
       "state": "OPEN",
-      "time_ago": "10 hours ago",
+      "time_ago": "11 hours ago",
       "created_at": "2026-08-14T15:22:34Z"
     },
     {
@@ -1093,16 +1109,6 @@
       "state": "CREATED",
       "time_ago": "1 month ago",
       "created_at": "2026-06-28T18:41:28Z"
-    },
-    {
-      "kind": "created",
-      "title": "SNHU-CS-330",
-      "url": "https://github.com/jguida941/SNHU-CS-330",
-      "repo": "jguida941/SNHU-CS-330",
-      "repo_url": "https://github.com/jguida941/SNHU-CS-330",
-      "state": "CREATED",
-      "time_ago": "5 months ago",
-      "created_at": "2026-03-02T00:25:11Z"
     }
   ],
   "recent_releases": [
@@ -1146,7 +1152,7 @@
       "repo": "jguida941/repo-boot",
       "repo_url": "https://github.com/jguida941/repo-boot",
       "state": "OPEN",
-      "time_ago": "9 hours ago",
+      "time_ago": "11 hours ago",
       "created_at": "2026-08-14T15:56:39Z"
     },
     {
@@ -1155,7 +1161,7 @@
       "repo": "jguida941/repo-boot",
       "repo_url": "https://github.com/jguida941/repo-boot",
       "state": "OPEN",
-      "time_ago": "10 hours ago",
+      "time_ago": "11 hours ago",
       "created_at": "2026-08-14T15:22:34Z"
     },
     {
@@ -1169,7 +1175,7 @@
     }
   ],
   "engineering": {
-    "active_days_last_year": 309,
+    "active_days_last_year": 310,
     "weekly_cadence": [
       191,
       120,
@@ -1182,21 +1188,21 @@
       199,
       111,
       158,
-      356
+      359
     ],
     "automation_workflows": 63,
     "automation_repos": 14,
     "primary_lang_share_pct": 46.7,
     "languages_over_5pct": 5,
-    "median_days_since_push": 245.0,
-    "days_since_last_push": 12.0,
-    "public_repos_total": 59,
-    "public_nonfork_repos": 59,
+    "median_days_since_push": 243.0,
+    "days_since_last_push": 0.0,
+    "public_repos_total": 60,
+    "public_nonfork_repos": 60,
     "private_repos_total": 186,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 11045,
+    "total": 11047,
     "weeks": [
       [
         {
@@ -1493,7 +1499,7 @@
         },
         {
           "date": "2025-10-22",
-          "count": 6
+          "count": 5
         },
         {
           "date": "2025-10-23",
@@ -2761,11 +2767,11 @@
         },
         {
           "date": "2026-08-14",
-          "count": 55
+          "count": 57
         },
         {
           "date": "2026-08-15",
-          "count": 0
+          "count": 1
         }
       ]
     ]
@@ -2899,7 +2905,7 @@
         0,
         1,
         0,
-        0,
+        1,
         0
       ],
       [
@@ -2959,10 +2965,10 @@
       "push": 23,
       "comment": 6,
       "release": 4,
-      "pull request": 3,
-      "create": 2
+      "create": 3,
+      "pull request": 3
     },
-    "total": 38,
+    "total": 39,
     "timezone": "New York"
   }
 }
