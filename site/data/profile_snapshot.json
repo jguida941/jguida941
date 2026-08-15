@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-15T03:54:07.361403Z",
+  "generated_at": "2026-08-15T04:47:09.781278Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,9 +18,9 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 11050,
-    "public_scope_commits": 6876,
-    "total_repos": 60,
+    "last_year_contributions": 11053,
+    "public_scope_commits": 6878,
+    "total_repos": 61,
     "public_forks": 0,
     "private_owned_repos": 187,
     "total_stars": 74,
@@ -28,29 +28,29 @@
     "prs_merged": 45,
     "releases": 3,
     "ci_repos": 15,
-    "streak_days": 49
+    "streak_days": 50
   },
   "snapshot_rows": [
     {
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 11050,
-      "display_value": "11,050"
+      "value": 11053,
+      "display_value": "11,053"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6876,
-      "display_value": "6,876"
+      "value": 6878,
+      "display_value": "6,878"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 60,
-      "display_value": "60"
+      "value": 61,
+      "display_value": "61"
     },
     {
       "key": "public_forks",
@@ -105,28 +105,28 @@
       "key": "streak_days",
       "label": "Current Streak Days",
       "dashboard_label": "Current Streak Days",
-      "value": 49,
-      "display_value": "49"
+      "value": 50,
+      "display_value": "50"
     }
   ],
   "snapshot_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 11050,
-      "display_value": "11,050"
+      "value": 11053,
+      "display_value": "11,053"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6876,
-      "display_value": "6,876"
+      "value": 6878,
+      "display_value": "6,878"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 60,
-      "display_value": "60"
+      "value": 61,
+      "display_value": "61"
     },
     {
       "key": "public_forks",
@@ -173,8 +173,8 @@
     {
       "key": "streak_days",
       "label": "Current Streak Days",
-      "value": 49,
-      "display_value": "49"
+      "value": 50,
+      "display_value": "50"
     }
   ],
   "data_quality": {
@@ -189,15 +189,15 @@
   },
   "scorecard": {
     "releases_30d": 3,
-    "active_repos_7d": 1,
+    "active_repos_7d": 2,
     "avg_release_gap_days": 4.004452160493827,
-    "stars_per_public_repo": 1.2333333333333334,
-    "ci_coverage_pct": 25.0,
-    "last_year_contributions": 11050,
-    "active_days_last_year": 310,
+    "stars_per_public_repo": 1.2131147540983607,
+    "ci_coverage_pct": 24.59016393442623,
+    "last_year_contributions": 11053,
+    "active_days_last_year": 309,
     "automation_workflows": 63,
-    "primary_lang_share_pct": 46.7,
-    "median_days_since_push": 243.0,
+    "primary_lang_share_pct": 46.8,
+    "median_days_since_push": 231.5,
     "days_since_last_push": 0.0
   },
   "scorecard_cards": [
@@ -205,32 +205,32 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 11050,
-      "display_value": "11,050",
+      "value": 11053,
+      "display_value": "11,053",
       "accent": "#7dcfff"
     },
     {
       "key": "active_days_last_year",
       "label": "Active Days",
       "detail": "days shipped in last 12mo",
-      "value": 310,
-      "display_value": "310",
+      "value": 309,
+      "display_value": "309",
       "accent": "#9ece6a"
     },
     {
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 1,
-      "display_value": "1",
+      "value": 2,
+      "display_value": "2",
       "accent": "#7dcfff"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with pipelines",
-      "value": 25.0,
-      "display_value": "25.0%",
+      "value": 24.59016393442623,
+      "display_value": "24.6%",
       "accent": "#ff9e64"
     },
     {
@@ -253,8 +253,8 @@
       "key": "primary_lang_share_pct",
       "label": "Primary Language",
       "detail": "share of code by bytes",
-      "value": 46.7,
-      "display_value": "46.7%",
+      "value": 46.8,
+      "display_value": "46.8%",
       "accent": "#7aa2f7"
     },
     {
@@ -269,9 +269,9 @@
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 60,
+    "public_owned_repos_total": 61,
     "public_owned_forks_total": 0,
-    "public_owned_nonfork_repos_total": 60,
+    "public_owned_nonfork_repos_total": 61,
     "private_owned_repos_total": 187
   },
   "featured_repo_facts": [
@@ -324,28 +324,28 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 10953841,
-      "percent": 46.72
+      "bytes": 10990786,
+      "percent": 46.8
     },
     {
       "name": "Makefile",
       "bytes": 3924243,
-      "percent": 16.74
+      "percent": 16.71
     },
     {
       "name": "Rust",
       "bytes": 3025100,
-      "percent": 12.9
+      "percent": 12.88
     },
     {
       "name": "C++",
       "bytes": 1826158,
-      "percent": 7.79
+      "percent": 7.78
     },
     {
       "name": "Java",
       "bytes": 1582397,
-      "percent": 6.75
+      "percent": 6.74
     },
     {
       "name": "HTML",
@@ -355,12 +355,12 @@
     {
       "name": "TypeScript",
       "bytes": 411851,
-      "percent": 1.76
+      "percent": 1.75
     },
     {
       "name": "C",
       "bytes": 268582,
-      "percent": 1.15
+      "percent": 1.14
     },
     {
       "name": "Shell",
@@ -430,18 +430,33 @@
       "featured": true
     },
     {
-      "name": "simple-scratchpad",
-      "full_name": "jguida941/simple-scratchpad",
-      "url": "https://github.com/jguida941/simple-scratchpad",
+      "name": "semvariant-canaries",
+      "full_name": "jguida941/semvariant-canaries",
+      "url": "https://github.com/jguida941/semvariant-canaries",
       "language": "n/a",
       "stars": 0,
       "forks": 0,
       "ci": "no",
       "pushed_at": "2026-08-15",
-      "pushed_at_raw": "2026-08-15T03:33:47Z",
+      "pushed_at_raw": "2026-08-15T04:39:05Z",
       "pushed_ago": "today",
       "created_at": "2026-08-15",
-      "last_commit_msg": "Create README.md",
+      "last_commit_msg": "recent push detected",
+      "featured": false
+    },
+    {
+      "name": "simple-scratchpad",
+      "full_name": "jguida941/simple-scratchpad",
+      "url": "https://github.com/jguida941/simple-scratchpad",
+      "language": "Python",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-08-15",
+      "pushed_at_raw": "2026-08-15T04:04:22Z",
+      "pushed_ago": "today",
+      "created_at": "2026-08-15",
+      "last_commit_msg": "Update capture.py",
       "featured": false
     },
     {
@@ -638,33 +653,18 @@
       "created_at": "2026-02-13",
       "last_commit_msg": "Update tap files",
       "featured": false
-    },
-    {
-      "name": "homebrew-gitui",
-      "full_name": "jguida941/homebrew-gitui",
-      "url": "https://github.com/jguida941/homebrew-gitui",
-      "language": "Ruby",
-      "stars": 1,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-01-31",
-      "pushed_at_raw": "2026-01-31T05:59:54Z",
-      "pushed_ago": "6 months ago",
-      "created_at": "2026-01-31",
-      "last_commit_msg": "Add gitui v0.1.0 formula",
-      "featured": false
     }
   ],
   "recent_created": [
     {
-      "name": "simple-scratchpad",
+      "name": "semvariant-canaries",
       "fork": false,
       "private": false,
       "visibility": "public",
-      "description": "Loose notes, class work, ideas, and unfinished thoughts that may eventually be folded into other repositories",
-      "html_url": "https://github.com/jguida941/simple-scratchpad",
-      "pushed_at": "2026-08-15T03:33:47Z",
-      "created_at": "2026-08-15T03:33:30Z",
+      "description": "Real-world experiment and canary repo for testing Semvariant behavior, invariants, contradictions, and semantic change detection.",
+      "html_url": "https://github.com/jguida941/semvariant-canaries",
+      "pushed_at": "2026-08-15T04:39:05Z",
+      "created_at": "2026-08-15T04:39:04Z",
       "stargazers_count": 0,
       "forks_count": 0,
       "language": null,
@@ -674,7 +674,29 @@
       "has_ci_workflows": false,
       "workflow_file_count": 0,
       "language_bytes": {},
-      "latest_commit_message": "Create README.md"
+      "latest_commit_message": ""
+    },
+    {
+      "name": "simple-scratchpad",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "Loose notes, class work, ideas, and unfinished thoughts that may eventually be folded into other repositories",
+      "html_url": "https://github.com/jguida941/simple-scratchpad",
+      "pushed_at": "2026-08-15T04:04:22Z",
+      "created_at": "2026-08-15T03:33:30Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": "Python",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "workflow_file_count": 0,
+      "language_bytes": {
+        "Python": 36945
+      },
+      "latest_commit_message": "Update capture.py"
     },
     {
       "name": "cpp-to-assembly",
@@ -859,60 +881,38 @@
         "Ruby": 614
       },
       "latest_commit_message": "Add gitui v0.1.0 formula"
-    },
-    {
-      "name": "homebrew-voiceterm",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": "Homebrew tap for VoiceTerm -VoiceHUD for Codex and Claude with Whisper STT",
-      "html_url": "https://github.com/jguida941/homebrew-voiceterm",
-      "pushed_at": "2026-07-22T01:15:14Z",
-      "created_at": "2026-01-22T17:52:18Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "language": "Ruby",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "Ruby": 1173
-      },
-      "latest_commit_message": "Update VoiceTerm to v1.2.6"
     }
   ],
   "focus": {
     "now": [
       {
-        "title": "scratchpad",
+        "title": "semvariant-canaries",
+        "detail": "code \u00b7 pushed today",
+        "url": "https://github.com/jguida941/semvariant-canaries",
+        "is_private": false
+      },
+      {
+        "title": "binary-workbench",
         "detail": "Python \u00b7 pushed today",
         "url": "",
         "is_private": true
       },
       {
         "title": "simple-scratchpad",
-        "detail": "code \u00b7 pushed today",
+        "detail": "Python \u00b7 pushed today",
         "url": "https://github.com/jguida941/simple-scratchpad",
         "is_private": false
-      },
-      {
-        "title": "binary-workbench",
-        "detail": "Python \u00b7 pushed 10 hours ago",
-        "url": "",
-        "is_private": true
       }
     ],
     "next": [
       {
         "title": "PR #5",
-        "detail": "repo-boot \u00b7 open \u00b7 11 hours ago",
+        "detail": "repo-boot \u00b7 open \u00b7 12 hours ago",
         "url": "https://github.com/jguida941/repo-boot/pull/5"
       },
       {
         "title": "PR #4",
-        "detail": "repo-boot \u00b7 open \u00b7 12 hours ago",
+        "detail": "repo-boot \u00b7 open \u00b7 13 hours ago",
         "url": "https://github.com/jguida941/repo-boot/pull/4"
       },
       {
@@ -941,14 +941,24 @@
   },
   "activity_feed": [
     {
+      "kind": "created",
+      "title": "semvariant-canaries",
+      "url": "https://github.com/jguida941/semvariant-canaries",
+      "repo": "jguida941/semvariant-canaries",
+      "repo_url": "https://github.com/jguida941/semvariant-canaries",
+      "state": "CREATED",
+      "time_ago": "today",
+      "created_at": "2026-08-15T04:39:04Z"
+    },
+    {
       "kind": "activity",
-      "title": "create",
+      "title": "push",
       "url": "https://github.com/jguida941/simple-scratchpad",
       "repo": "jguida941/simple-scratchpad",
       "repo_url": "https://github.com/jguida941/simple-scratchpad",
-      "state": "CREATE",
+      "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-08-15T03:33:48Z"
+      "created_at": "2026-08-15T04:04:22Z"
     },
     {
       "kind": "created",
@@ -967,7 +977,7 @@
       "repo": "jguida941/scratchpad",
       "repo_url": "https://github.com/jguida941/scratchpad",
       "state": "CREATE",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-08-15T02:15:16Z"
     },
     {
@@ -977,7 +987,7 @@
       "repo": "jguida941/binary-workbench",
       "repo_url": "https://github.com/jguida941/binary-workbench",
       "state": "CREATE",
-      "time_ago": "10 hours ago",
+      "time_ago": "11 hours ago",
       "created_at": "2026-08-14T17:20:06Z"
     },
     {
@@ -987,7 +997,7 @@
       "repo": "jguida941/repo-boot",
       "repo_url": "https://github.com/jguida941/repo-boot",
       "state": "PUSH",
-      "time_ago": "10 hours ago",
+      "time_ago": "11 hours ago",
       "created_at": "2026-08-14T16:55:17Z"
     },
     {
@@ -997,7 +1007,7 @@
       "repo": "jguida941/repo-boot",
       "repo_url": "https://github.com/jguida941/repo-boot",
       "state": "OPEN",
-      "time_ago": "11 hours ago",
+      "time_ago": "12 hours ago",
       "created_at": "2026-08-14T15:56:39Z"
     },
     {
@@ -1007,7 +1017,7 @@
       "repo": "jguida941/repo-boot",
       "repo_url": "https://github.com/jguida941/repo-boot",
       "state": "OPEN",
-      "time_ago": "12 hours ago",
+      "time_ago": "13 hours ago",
       "created_at": "2026-08-14T15:22:34Z"
     },
     {
@@ -1109,16 +1119,6 @@
       "state": "CREATED",
       "time_ago": "1 month ago",
       "created_at": "2026-07-02T19:09:11Z"
-    },
-    {
-      "kind": "created",
-      "title": "raspberry-pi-smart-thermostat",
-      "url": "https://github.com/jguida941/raspberry-pi-smart-thermostat",
-      "repo": "jguida941/raspberry-pi-smart-thermostat",
-      "repo_url": "https://github.com/jguida941/raspberry-pi-smart-thermostat",
-      "state": "CREATED",
-      "time_ago": "1 month ago",
-      "created_at": "2026-06-28T18:41:28Z"
     }
   ],
   "recent_releases": [
@@ -1162,7 +1162,7 @@
       "repo": "jguida941/repo-boot",
       "repo_url": "https://github.com/jguida941/repo-boot",
       "state": "OPEN",
-      "time_ago": "11 hours ago",
+      "time_ago": "12 hours ago",
       "created_at": "2026-08-14T15:56:39Z"
     },
     {
@@ -1171,7 +1171,7 @@
       "repo": "jguida941/repo-boot",
       "repo_url": "https://github.com/jguida941/repo-boot",
       "state": "OPEN",
-      "time_ago": "12 hours ago",
+      "time_ago": "13 hours ago",
       "created_at": "2026-08-14T15:22:34Z"
     },
     {
@@ -1185,7 +1185,7 @@
     }
   ],
   "engineering": {
-    "active_days_last_year": 310,
+    "active_days_last_year": 309,
     "weekly_cadence": [
       191,
       120,
@@ -1198,27 +1198,23 @@
       199,
       111,
       158,
-      363
+      368
     ],
     "automation_workflows": 63,
     "automation_repos": 14,
-    "primary_lang_share_pct": 46.7,
+    "primary_lang_share_pct": 46.8,
     "languages_over_5pct": 5,
-    "median_days_since_push": 243.0,
+    "median_days_since_push": 231.5,
     "days_since_last_push": 0.0,
-    "public_repos_total": 60,
-    "public_nonfork_repos": 60,
+    "public_repos_total": 61,
+    "public_nonfork_repos": 61,
     "private_repos_total": 187,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 11050,
+    "total": 11053,
     "weeks": [
       [
-        {
-          "date": "2025-08-15",
-          "count": 1
-        },
         {
           "date": "2025-08-16",
           "count": 0
@@ -1513,7 +1509,7 @@
         },
         {
           "date": "2025-10-23",
-          "count": 46
+          "count": 45
         },
         {
           "date": "2025-10-24",
@@ -2777,11 +2773,11 @@
         },
         {
           "date": "2026-08-14",
-          "count": 60
+          "count": 61
         },
         {
           "date": "2026-08-15",
-          "count": 2
+          "count": 6
         }
       ]
     ]
@@ -2916,10 +2912,10 @@
         1,
         0,
         1,
-        1
+        2
       ],
       [
-        0,
+        2,
         0,
         0,
         0,
@@ -2972,13 +2968,13 @@
       ]
     ],
     "event_mix": {
-      "push": 23,
+      "push": 26,
       "comment": 6,
       "create": 4,
       "release": 4,
       "pull request": 3
     },
-    "total": 40,
+    "total": 43,
     "timezone": "New York"
   }
 }
