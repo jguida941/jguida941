@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-17T15:40:33.105588Z",
+  "generated_at": "2026-08-17T16:45:41.970921Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,15 +18,15 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 11233,
-    "public_scope_commits": 6939,
+    "last_year_contributions": 11234,
+    "public_scope_commits": 6940,
     "total_repos": 61,
     "public_forks": 0,
     "private_owned_repos": 189,
     "total_stars": 75,
     "languages_count": 25,
-    "prs_merged": 18,
-    "releases": 0,
+    "prs_merged": 48,
+    "releases": 3,
     "ci_repos": 16,
     "streak_days": 52
   },
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 11233,
-      "display_value": "11,233"
+      "value": 11234,
+      "display_value": "11,234"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 6939,
-      "display_value": "6,939"
+      "value": 6940,
+      "display_value": "6,940"
     },
     {
       "key": "total_repos",
@@ -84,15 +84,15 @@
       "key": "prs_merged",
       "label": "PRs Merged (Last 12 Months)",
       "dashboard_label": "PRs Merged (12mo)",
-      "value": 18,
-      "display_value": "18"
+      "value": 48,
+      "display_value": "48"
     },
     {
       "key": "releases",
       "label": "Releases (30 Days)",
       "dashboard_label": "Releases (30d)",
-      "value": 0,
-      "display_value": "0"
+      "value": 3,
+      "display_value": "3"
     },
     {
       "key": "ci_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 11233,
-      "display_value": "11,233"
+      "value": 11234,
+      "display_value": "11,234"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 6939,
-      "display_value": "6,939"
+      "value": 6940,
+      "display_value": "6,940"
     },
     {
       "key": "total_repos",
@@ -155,14 +155,14 @@
     {
       "key": "prs_merged",
       "label": "PRs Merged (12mo)",
-      "value": 18,
-      "display_value": "18"
+      "value": 48,
+      "display_value": "48"
     },
     {
       "key": "releases",
       "label": "Releases (30d)",
-      "value": 0,
-      "display_value": "0"
+      "value": 3,
+      "display_value": "3"
     },
     {
       "key": "ci_repos",
@@ -188,33 +188,33 @@
     "events_note": "Public events feed available."
   },
   "scorecard": {
-    "releases_30d": 0,
+    "releases_30d": 3,
     "active_repos_7d": 2,
-    "avg_release_gap_days": 6.006678240740741,
+    "avg_release_gap_days": 4.004452160493827,
     "stars_per_public_repo": 1.2295081967213115,
     "ci_coverage_pct": 26.229508196721312,
-    "last_year_contributions": 11233,
-    "active_days_last_year": 312,
+    "last_year_contributions": 11234,
+    "active_days_last_year": 311,
     "automation_workflows": 64,
     "primary_lang_share_pct": 47.5,
     "median_days_since_push": 234.0,
-    "days_since_last_push": 1.0
+    "days_since_last_push": 2.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 11233,
-      "display_value": "11,233",
+      "value": 11234,
+      "display_value": "11,234",
       "accent": "#7dcfff"
     },
     {
       "key": "active_days_last_year",
       "label": "Active Days",
       "detail": "days shipped in last 12mo",
-      "value": 312,
-      "display_value": "312",
+      "value": 311,
+      "display_value": "311",
       "accent": "#9ece6a"
     },
     {
@@ -245,8 +245,8 @@
       "key": "releases_30d",
       "label": "Releases (30d)",
       "detail": "published in last month",
-      "value": 0,
-      "display_value": "0",
+      "value": 3,
+      "display_value": "3",
       "accent": "#ff9e64"
     },
     {
@@ -261,8 +261,8 @@
       "key": "days_since_last_push",
       "label": "Last Push",
       "detail": "days since your most recent commit",
-      "value": 1.0,
-      "display_value": "1d",
+      "value": 2.0,
+      "display_value": "2d",
       "accent": "#9ece6a"
     }
   ],
@@ -439,7 +439,7 @@
       "ci": "yes",
       "pushed_at": "2026-08-15",
       "pushed_at_raw": "2026-08-15T16:05:38Z",
-      "pushed_ago": "1 day ago",
+      "pushed_ago": "2 days ago",
       "created_at": "2026-08-15",
       "last_commit_msg": "Release Simple Scratchpad 1.2",
       "featured": false
@@ -889,19 +889,35 @@
   "focus": {
     "now": [
       {
-        "title": "simple-scratchpad",
-        "detail": "Python \u00b7 pushed 1 day ago",
-        "url": "https://github.com/jguida941/simple-scratchpad",
-        "is_private": false
+        "title": "semloop",
+        "detail": "Python \u00b7 pushed today",
+        "url": "",
+        "is_private": true
       },
       {
-        "title": "semvariant-canaries",
-        "detail": "code \u00b7 pushed 2 days ago",
-        "url": "https://github.com/jguida941/semvariant-canaries",
-        "is_private": false
+        "title": "CS360",
+        "detail": "Java \u00b7 pushed 1 day ago",
+        "url": "",
+        "is_private": true
+      },
+      {
+        "title": "binary-workbench",
+        "detail": "Python \u00b7 pushed 1 day ago",
+        "url": "",
+        "is_private": true
       }
     ],
     "next": [
+      {
+        "title": "PR #5",
+        "detail": "repo-boot \u00b7 open \u00b7 3 days ago",
+        "url": "https://github.com/jguida941/repo-boot/pull/5"
+      },
+      {
+        "title": "PR #4",
+        "detail": "repo-boot \u00b7 open \u00b7 3 days ago",
+        "url": "https://github.com/jguida941/repo-boot/pull/4"
+      },
       {
         "title": "PR #5",
         "detail": "dijkstra-dashboard \u00b7 open \u00b7 3 weeks ago",
@@ -915,14 +931,14 @@
         "url": "https://github.com/jguida941/pysort-visualizer/releases/tag/v1.1.0"
       },
       {
+        "title": "v1.0.0",
+        "detail": "claude-binary-analysis \u00b7 3 weeks ago",
+        "url": "https://github.com/jguida941/claude-binary-analysis/releases/tag/v1.0.0"
+      },
+      {
         "title": "v1.2.6",
         "detail": "voiceterm \u00b7 3 weeks ago",
         "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.6"
-      },
-      {
-        "title": "v1.2.5",
-        "detail": "voiceterm \u00b7 3 weeks ago",
-        "url": "https://github.com/jguida941/voiceterm/releases/tag/v1.2.5"
       }
     ]
   },
@@ -934,8 +950,18 @@
       "repo": "jguida941/simple-scratchpad",
       "repo_url": "https://github.com/jguida941/simple-scratchpad",
       "state": "PUSH",
-      "time_ago": "1 day ago",
+      "time_ago": "2 days ago",
       "created_at": "2026-08-15T16:05:39Z"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/binary-workbench",
+      "repo": "jguida941/binary-workbench",
+      "repo_url": "https://github.com/jguida941/binary-workbench",
+      "state": "PUSH",
+      "time_ago": "2 days ago",
+      "created_at": "2026-08-15T08:47:27Z"
     },
     {
       "kind": "created",
@@ -958,6 +984,46 @@
       "created_at": "2026-08-15T03:33:30Z"
     },
     {
+      "kind": "activity",
+      "title": "create",
+      "url": "https://github.com/jguida941/scratchpad",
+      "repo": "jguida941/scratchpad",
+      "repo_url": "https://github.com/jguida941/scratchpad",
+      "state": "CREATE",
+      "time_ago": "2 days ago",
+      "created_at": "2026-08-15T02:15:16Z"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/repo-boot",
+      "repo": "jguida941/repo-boot",
+      "repo_url": "https://github.com/jguida941/repo-boot",
+      "state": "PUSH",
+      "time_ago": "2 days ago",
+      "created_at": "2026-08-14T16:55:17Z"
+    },
+    {
+      "kind": "pull request",
+      "title": "PR #5",
+      "url": "https://github.com/jguida941/repo-boot/pull/5",
+      "repo": "jguida941/repo-boot",
+      "repo_url": "https://github.com/jguida941/repo-boot",
+      "state": "OPEN",
+      "time_ago": "3 days ago",
+      "created_at": "2026-08-14T15:56:39Z"
+    },
+    {
+      "kind": "pull request",
+      "title": "PR #4",
+      "url": "https://github.com/jguida941/repo-boot/pull/4",
+      "repo": "jguida941/repo-boot",
+      "repo_url": "https://github.com/jguida941/repo-boot",
+      "state": "OPEN",
+      "time_ago": "3 days ago",
+      "created_at": "2026-08-14T15:22:34Z"
+    },
+    {
       "kind": "release",
       "title": "v1.1.0",
       "url": "https://github.com/jguida941/pysort-visualizer/releases/tag/v1.1.0",
@@ -976,6 +1042,26 @@
       "state": "RELEASE",
       "time_ago": "2 weeks ago",
       "created_at": "2026-08-02T22:46:01Z"
+    },
+    {
+      "kind": "release",
+      "title": "v1.0.0",
+      "url": "https://github.com/jguida941/claude-binary-analysis/releases/tag/v1.0.0",
+      "repo": "jguida941/claude-binary-analysis",
+      "repo_url": "https://github.com/jguida941/claude-binary-analysis",
+      "state": "RELEASED",
+      "time_ago": "3 weeks ago",
+      "created_at": "2026-07-25T00:30:58Z"
+    },
+    {
+      "kind": "activity",
+      "title": "release",
+      "url": "https://github.com/jguida941/claude-binary-analysis",
+      "repo": "jguida941/claude-binary-analysis",
+      "repo_url": "https://github.com/jguida941/claude-binary-analysis",
+      "state": "RELEASE",
+      "time_ago": "3 weeks ago",
+      "created_at": "2026-07-25T00:30:58Z"
     },
     {
       "kind": "pull request",
@@ -1048,6 +1134,14 @@
       "created_at": "2026-08-02T22:46:01Z"
     },
     {
+      "repo": "jguida941/claude-binary-analysis",
+      "repo_url": "https://github.com/jguida941/claude-binary-analysis",
+      "tag": "v1.0.0",
+      "url": "https://github.com/jguida941/claude-binary-analysis/releases/tag/v1.0.0",
+      "time_ago": "3 weeks ago",
+      "created_at": "2026-07-25T00:30:58Z"
+    },
+    {
       "repo": "jguida941/voiceterm",
       "repo_url": "https://github.com/jguida941/voiceterm",
       "tag": "v1.2.6",
@@ -1067,6 +1161,24 @@
   "recent_pull_requests": [
     {
       "title": "PR #5",
+      "url": "https://github.com/jguida941/repo-boot/pull/5",
+      "repo": "jguida941/repo-boot",
+      "repo_url": "https://github.com/jguida941/repo-boot",
+      "state": "OPEN",
+      "time_ago": "3 days ago",
+      "created_at": "2026-08-14T15:56:39Z"
+    },
+    {
+      "title": "PR #4",
+      "url": "https://github.com/jguida941/repo-boot/pull/4",
+      "repo": "jguida941/repo-boot",
+      "repo_url": "https://github.com/jguida941/repo-boot",
+      "state": "OPEN",
+      "time_ago": "3 days ago",
+      "created_at": "2026-08-14T15:22:34Z"
+    },
+    {
+      "title": "PR #5",
       "url": "https://github.com/jguida941/dijkstra-dashboard/pull/5",
       "repo": "jguida941/dijkstra-dashboard",
       "repo_url": "https://github.com/jguida941/dijkstra-dashboard",
@@ -1076,34 +1188,34 @@
     }
   ],
   "engineering": {
-    "active_days_last_year": 312,
+    "active_days_last_year": 311,
     "weekly_cadence": [
       120,
       166,
       98,
       62,
-      427,
-      377,
+      428,
+      376,
       279,
-      198,
+      199,
       111,
-      159,
+      158,
       403,
-      147
+      148
     ],
     "automation_workflows": 64,
     "automation_repos": 15,
     "primary_lang_share_pct": 47.5,
     "languages_over_5pct": 5,
     "median_days_since_push": 234.0,
-    "days_since_last_push": 1.0,
+    "days_since_last_push": 2.0,
     "public_repos_total": 61,
     "public_nonfork_repos": 61,
     "private_repos_total": 189,
-    "recent_private_count": 0
+    "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 11233,
+    "total": 11234,
     "weeks": [
       [
         {
@@ -1434,11 +1546,11 @@
       [
         {
           "date": "2025-11-02",
-          "count": 27
+          "count": 28
         },
         {
           "date": "2025-11-03",
-          "count": 2
+          "count": 1
         },
         {
           "date": "2025-11-04",
@@ -1450,11 +1562,11 @@
         },
         {
           "date": "2025-11-06",
-          "count": 19
+          "count": 20
         },
         {
           "date": "2025-11-07",
-          "count": 1
+          "count": 0
         },
         {
           "date": "2025-11-08",
@@ -1464,11 +1576,11 @@
       [
         {
           "date": "2025-11-09",
-          "count": 16
+          "count": 17
         },
         {
           "date": "2025-11-10",
-          "count": 29
+          "count": 28
         },
         {
           "date": "2025-11-11",
@@ -1484,21 +1596,21 @@
         },
         {
           "date": "2025-11-14",
-          "count": 4
+          "count": 5
         },
         {
           "date": "2025-11-15",
-          "count": 94
+          "count": 93
         }
       ],
       [
         {
           "date": "2025-11-16",
-          "count": 15
+          "count": 16
         },
         {
           "date": "2025-11-17",
-          "count": 35
+          "count": 34
         },
         {
           "date": "2025-11-18",
@@ -1510,11 +1622,11 @@
         },
         {
           "date": "2025-11-20",
-          "count": 124
+          "count": 125
         },
         {
           "date": "2025-11-21",
-          "count": 33
+          "count": 32
         },
         {
           "date": "2025-11-22",
@@ -1524,11 +1636,11 @@
       [
         {
           "date": "2025-11-23",
-          "count": 6
+          "count": 7
         },
         {
           "date": "2025-11-24",
-          "count": 25
+          "count": 24
         },
         {
           "date": "2025-11-25",
@@ -1600,11 +1712,11 @@
         },
         {
           "date": "2025-12-11",
-          "count": 20
+          "count": 21
         },
         {
           "date": "2025-12-12",
-          "count": 3
+          "count": 2
         },
         {
           "date": "2025-12-13",
@@ -1614,11 +1726,11 @@
       [
         {
           "date": "2025-12-14",
-          "count": 25
+          "count": 26
         },
         {
           "date": "2025-12-15",
-          "count": 80
+          "count": 79
         },
         {
           "date": "2025-12-16",
@@ -1652,11 +1764,11 @@
         },
         {
           "date": "2025-12-23",
-          "count": 37
+          "count": 41
         },
         {
           "date": "2025-12-24",
-          "count": 50
+          "count": 46
         },
         {
           "date": "2025-12-25",
@@ -1720,11 +1832,11 @@
         },
         {
           "date": "2026-01-08",
-          "count": 41
+          "count": 42
         },
         {
           "date": "2026-01-09",
-          "count": 28
+          "count": 27
         },
         {
           "date": "2026-01-10",
@@ -1754,17 +1866,17 @@
         },
         {
           "date": "2026-01-16",
-          "count": 9
+          "count": 10
         },
         {
           "date": "2026-01-17",
-          "count": 31
+          "count": 30
         }
       ],
       [
         {
           "date": "2026-01-18",
-          "count": 5
+          "count": 6
         },
         {
           "date": "2026-01-19",
@@ -1772,15 +1884,15 @@
         },
         {
           "date": "2026-01-20",
-          "count": 69
+          "count": 68
         },
         {
           "date": "2026-01-21",
-          "count": 56
+          "count": 57
         },
         {
           "date": "2026-01-22",
-          "count": 72
+          "count": 71
         },
         {
           "date": "2026-01-23",
@@ -1806,11 +1918,11 @@
         },
         {
           "date": "2026-01-28",
-          "count": 19
+          "count": 20
         },
         {
           "date": "2026-01-29",
-          "count": 36
+          "count": 35
         },
         {
           "date": "2026-01-30",
@@ -1900,11 +2012,11 @@
         },
         {
           "date": "2026-02-19",
-          "count": 155
+          "count": 156
         },
         {
           "date": "2026-02-20",
-          "count": 96
+          "count": 95
         },
         {
           "date": "2026-02-21",
@@ -1944,11 +2056,11 @@
       [
         {
           "date": "2026-03-01",
-          "count": 26
+          "count": 27
         },
         {
           "date": "2026-03-02",
-          "count": 11
+          "count": 10
         },
         {
           "date": "2026-03-03",
@@ -2454,11 +2566,11 @@
       [
         {
           "date": "2026-06-28",
-          "count": 74
+          "count": 76
         },
         {
           "date": "2026-06-29",
-          "count": 58
+          "count": 56
         },
         {
           "date": "2026-06-30",
@@ -2478,13 +2590,13 @@
         },
         {
           "date": "2026-07-04",
-          "count": 42
+          "count": 43
         }
       ],
       [
         {
           "date": "2026-07-05",
-          "count": 53
+          "count": 52
         },
         {
           "date": "2026-07-06",
@@ -2500,11 +2612,11 @@
         },
         {
           "date": "2026-07-09",
-          "count": 72
+          "count": 73
         },
         {
           "date": "2026-07-10",
-          "count": 116
+          "count": 115
         },
         {
           "date": "2026-07-11",
@@ -2526,11 +2638,11 @@
         },
         {
           "date": "2026-07-15",
-          "count": 68
+          "count": 69
         },
         {
           "date": "2026-07-16",
-          "count": 27
+          "count": 26
         },
         {
           "date": "2026-07-17",
@@ -2560,21 +2672,21 @@
         },
         {
           "date": "2026-07-23",
-          "count": 25
+          "count": 26
         },
         {
           "date": "2026-07-24",
-          "count": 21
+          "count": 20
         },
         {
           "date": "2026-07-25",
-          "count": 48
+          "count": 49
         }
       ],
       [
         {
           "date": "2026-07-26",
-          "count": 30
+          "count": 29
         },
         {
           "date": "2026-07-27",
@@ -2598,13 +2710,13 @@
         },
         {
           "date": "2026-08-01",
-          "count": 13
+          "count": 14
         }
       ],
       [
         {
           "date": "2026-08-02",
-          "count": 42
+          "count": 41
         },
         {
           "date": "2026-08-03",
@@ -2624,11 +2736,11 @@
         },
         {
           "date": "2026-08-07",
-          "count": 26
+          "count": 28
         },
         {
           "date": "2026-08-08",
-          "count": 55
+          "count": 53
         }
       ],
       [
@@ -2642,11 +2754,11 @@
         },
         {
           "date": "2026-08-11",
-          "count": 28
+          "count": 29
         },
         {
           "date": "2026-08-12",
-          "count": 87
+          "count": 86
         },
         {
           "date": "2026-08-13",
@@ -2654,11 +2766,11 @@
         },
         {
           "date": "2026-08-14",
-          "count": 59
+          "count": 61
         },
         {
           "date": "2026-08-15",
-          "count": 43
+          "count": 41
         }
       ],
       [
@@ -2668,7 +2780,7 @@
         },
         {
           "date": "2026-08-17",
-          "count": 35
+          "count": 36
         }
       ]
     ]
@@ -2772,10 +2884,10 @@
         0,
         0,
         0,
-        0,
-        0,
-        0,
-        0,
+        1,
+        1,
+        4,
+        1,
         0,
         0
       ],
@@ -2787,22 +2899,22 @@
         0,
         0,
         0,
+        1,
+        1,
+        1,
+        3,
+        8,
+        6,
+        2,
         0,
         0,
         0,
         0,
         0,
         0,
+        1,
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        1,
         2
       ],
       [
@@ -2810,7 +2922,7 @@
         0,
         0,
         0,
-        0,
+        1,
         0,
         0,
         0,
@@ -2859,12 +2971,13 @@
       ]
     ],
     "event_mix": {
-      "push": 4,
-      "release": 3,
-      "create": 1,
-      "pull request": 1
+      "push": 26,
+      "create": 4,
+      "comment": 4,
+      "release": 4,
+      "pull request": 3
     },
-    "total": 9,
+    "total": 41,
     "timezone": "New York"
   }
 }
