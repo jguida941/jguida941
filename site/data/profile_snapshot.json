@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-23T19:34:38.861812Z",
+  "generated_at": "2026-08-23T20:38:58.775604Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,9 +18,9 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 11653,
-    "public_scope_commits": 7080,
-    "total_repos": 61,
+    "last_year_contributions": 11655,
+    "public_scope_commits": 7083,
+    "total_repos": 62,
     "public_forks": 1,
     "private_owned_repos": 190,
     "total_stars": 75,
@@ -35,22 +35,22 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 11653,
-      "display_value": "11,653"
+      "value": 11655,
+      "display_value": "11,655"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 7080,
-      "display_value": "7,080"
+      "value": 7083,
+      "display_value": "7,083"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
       "dashboard_label": "Public Non-Fork Repos",
-      "value": 61,
-      "display_value": "61"
+      "value": 62,
+      "display_value": "62"
     },
     {
       "key": "public_forks",
@@ -113,20 +113,20 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 11653,
-      "display_value": "11,653"
+      "value": 11655,
+      "display_value": "11,655"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 7080,
-      "display_value": "7,080"
+      "value": 7083,
+      "display_value": "7,083"
     },
     {
       "key": "total_repos",
       "label": "Public Non-Fork Repos",
-      "value": 61,
-      "display_value": "61"
+      "value": 62,
+      "display_value": "62"
     },
     {
       "key": "public_forks",
@@ -189,24 +189,24 @@
   },
   "scorecard": {
     "releases_30d": 1,
-    "active_repos_7d": 0,
+    "active_repos_7d": 1,
     "avg_release_gap_days": 8.927118055555555,
-    "stars_per_public_repo": 1.2295081967213115,
-    "ci_coverage_pct": 26.229508196721312,
-    "last_year_contributions": 11653,
+    "stars_per_public_repo": 1.2096774193548387,
+    "ci_coverage_pct": 25.806451612903224,
+    "last_year_contributions": 11655,
     "active_days_last_year": 315,
     "automation_workflows": 64,
     "primary_lang_share_pct": 47.5,
-    "median_days_since_push": 240.0,
-    "days_since_last_push": 8.0
+    "median_days_since_push": 229.0,
+    "days_since_last_push": 0.0
   },
   "scorecard_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 11653,
-      "display_value": "11,653",
+      "value": 11655,
+      "display_value": "11,655",
       "accent": "#7dcfff"
     },
     {
@@ -221,16 +221,16 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 0,
-      "display_value": "0",
+      "value": 1,
+      "display_value": "1",
       "accent": "#7dcfff"
     },
     {
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with pipelines",
-      "value": 26.229508196721312,
-      "display_value": "26.2%",
+      "value": 25.806451612903224,
+      "display_value": "25.8%",
       "accent": "#ff9e64"
     },
     {
@@ -261,17 +261,17 @@
       "key": "days_since_last_push",
       "label": "Last Push",
       "detail": "days since your most recent commit",
-      "value": 8.0,
-      "display_value": "8d",
+      "value": 0.0,
+      "display_value": "0d",
       "accent": "#9ece6a"
     }
   ],
   "data_scope": {
     "repos_included": "public + owned + non-fork",
     "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
-    "public_owned_repos_total": 62,
+    "public_owned_repos_total": 63,
     "public_owned_forks_total": 1,
-    "public_owned_nonfork_repos_total": 61,
+    "public_owned_nonfork_repos_total": 62,
     "private_owned_repos_total": 190
   },
   "featured_repo_facts": [
@@ -325,7 +325,7 @@
     {
       "name": "Python",
       "bytes": 11445407,
-      "percent": 47.55
+      "percent": 47.53
     },
     {
       "name": "Makefile",
@@ -335,17 +335,17 @@
     {
       "name": "Rust",
       "bytes": 3025100,
-      "percent": 12.57
+      "percent": 12.56
     },
     {
       "name": "C++",
       "bytes": 1826158,
-      "percent": 7.59
+      "percent": 7.58
     },
     {
       "name": "Java",
-      "bytes": 1582397,
-      "percent": 6.57
+      "bytes": 1596175,
+      "percent": 6.63
     },
     {
       "name": "HTML",
@@ -430,6 +430,21 @@
       "featured": true
     },
     {
+      "name": "CS360-Mobile-App-Portfolio",
+      "full_name": "jguida941/CS360-Mobile-App-Portfolio",
+      "url": "https://github.com/jguida941/CS360-Mobile-App-Portfolio",
+      "language": "Java",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-08-23",
+      "pushed_at_raw": "2026-08-23T20:33:48Z",
+      "pushed_ago": "today",
+      "created_at": "2026-08-23",
+      "last_commit_msg": "Add CS 360 mobile app portfolio artifact",
+      "featured": false
+    },
+    {
       "name": "simple-scratchpad",
       "full_name": "jguida941/simple-scratchpad",
       "url": "https://github.com/jguida941/simple-scratchpad",
@@ -484,7 +499,7 @@
       "ci": "no",
       "pushed_at": "2026-08-02",
       "pushed_at_raw": "2026-08-02T20:34:16Z",
-      "pushed_ago": "2 weeks ago",
+      "pushed_ago": "3 weeks ago",
       "created_at": "2026-07-02",
       "last_commit_msg": "Update README.md",
       "featured": false
@@ -638,24 +653,31 @@
       "created_at": "2026-02-13",
       "last_commit_msg": "Update README with status and next steps",
       "featured": false
-    },
-    {
-      "name": "homebrew-tap-setup-proof",
-      "full_name": "jguida941/homebrew-tap-setup-proof",
-      "url": "https://github.com/jguida941/homebrew-tap-setup-proof",
-      "language": "Ruby",
-      "stars": 1,
-      "forks": 0,
-      "ci": "yes",
-      "pushed_at": "2026-02-13",
-      "pushed_at_raw": "2026-02-13T09:51:56Z",
-      "pushed_ago": "6 months ago",
-      "created_at": "2026-02-13",
-      "last_commit_msg": "Update tap files",
-      "featured": false
     }
   ],
   "recent_created": [
+    {
+      "name": "CS360-Mobile-App-Portfolio",
+      "fork": false,
+      "private": false,
+      "visibility": "public",
+      "description": "CS 360 mobile app portfolio artifact and reflection",
+      "html_url": "https://github.com/jguida941/CS360-Mobile-App-Portfolio",
+      "pushed_at": "2026-08-23T20:33:48Z",
+      "created_at": "2026-08-23T20:33:44Z",
+      "stargazers_count": 0,
+      "forks_count": 0,
+      "language": "Java",
+      "owner": {
+        "login": "jguida941"
+      },
+      "has_ci_workflows": false,
+      "workflow_file_count": 0,
+      "language_bytes": {
+        "Java": 13778
+      },
+      "latest_commit_message": "Add CS 360 mobile app portfolio artifact"
+    },
     {
       "name": "semvariant-canaries",
       "fork": false,
@@ -862,47 +884,25 @@
         "Ruby": 499
       },
       "latest_commit_message": "Update tap files"
-    },
-    {
-      "name": "homebrew-gitui",
-      "fork": false,
-      "private": false,
-      "visibility": "public",
-      "description": null,
-      "html_url": "https://github.com/jguida941/homebrew-gitui",
-      "pushed_at": "2026-01-31T05:59:54Z",
-      "created_at": "2026-01-31T05:43:48Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "language": "Ruby",
-      "owner": {
-        "login": "jguida941"
-      },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "Ruby": 614
-      },
-      "latest_commit_message": "Add gitui v0.1.0 formula"
     }
   ],
   "focus": {
     "now": [
       {
+        "title": "CS360-Mobile-App-Portfolio",
+        "detail": "Java \u00b7 pushed today",
+        "url": "https://github.com/jguida941/CS360-Mobile-App-Portfolio",
+        "is_private": false
+      },
+      {
         "title": "CS360",
-        "detail": "Java \u00b7 pushed 11 hours ago",
+        "detail": "Java \u00b7 pushed 12 hours ago",
         "url": "",
         "is_private": true
       },
       {
         "title": "semloop",
-        "detail": "Python \u00b7 pushed 14 hours ago",
-        "url": "",
-        "is_private": true
-      },
-      {
-        "title": "assurance-delivery",
-        "detail": "Python \u00b7 pushed 2 days ago",
+        "detail": "Python \u00b7 pushed 15 hours ago",
         "url": "",
         "is_private": true
       }
@@ -938,6 +938,26 @@
     ]
   },
   "activity_feed": [
+    {
+      "kind": "activity",
+      "title": "create",
+      "url": "https://github.com/jguida941/CS360-Mobile-App-Portfolio",
+      "repo": "jguida941/CS360-Mobile-App-Portfolio",
+      "repo_url": "https://github.com/jguida941/CS360-Mobile-App-Portfolio",
+      "state": "CREATE",
+      "time_ago": "today",
+      "created_at": "2026-08-23T20:33:48Z"
+    },
+    {
+      "kind": "created",
+      "title": "CS360-Mobile-App-Portfolio",
+      "url": "https://github.com/jguida941/CS360-Mobile-App-Portfolio",
+      "repo": "jguida941/CS360-Mobile-App-Portfolio",
+      "repo_url": "https://github.com/jguida941/CS360-Mobile-App-Portfolio",
+      "state": "CREATED",
+      "time_ago": "today",
+      "created_at": "2026-08-23T20:33:44Z"
+    },
     {
       "kind": "activity",
       "title": "push",
@@ -1047,16 +1067,6 @@
       "state": "RELEASE",
       "time_ago": "4 weeks ago",
       "created_at": "2026-07-25T00:30:58Z"
-    },
-    {
-      "kind": "created",
-      "title": "cpp-to-assembly",
-      "url": "https://github.com/jguida941/cpp-to-assembly",
-      "repo": "jguida941/cpp-to-assembly",
-      "repo_url": "https://github.com/jguida941/cpp-to-assembly",
-      "state": "CREATED",
-      "time_ago": "1 month ago",
-      "created_at": "2026-07-02T19:09:11Z"
     }
   ],
   "recent_releases": [
@@ -1120,21 +1130,21 @@
       158,
       403,
       556,
-      20
+      23
     ],
     "automation_workflows": 64,
     "automation_repos": 15,
     "primary_lang_share_pct": 47.5,
     "languages_over_5pct": 5,
-    "median_days_since_push": 240.0,
-    "days_since_last_push": 8.0,
-    "public_repos_total": 62,
-    "public_nonfork_repos": 61,
+    "median_days_since_push": 229.0,
+    "days_since_last_push": 0.0,
+    "public_repos_total": 63,
+    "public_nonfork_repos": 62,
     "private_repos_total": 190,
     "recent_private_count": 40
   },
   "contribution_calendar": {
-    "total": 11653,
+    "total": 11655,
     "weeks": [
       [
         {
@@ -1439,7 +1449,7 @@
       [
         {
           "date": "2025-11-02",
-          "count": 28
+          "count": 27
         },
         {
           "date": "2025-11-03",
@@ -2699,7 +2709,7 @@
       [
         {
           "date": "2026-08-23",
-          "count": 20
+          "count": 23
         }
       ]
     ]
@@ -2879,7 +2889,7 @@
         0,
         0,
         0,
-        0,
+        1,
         0,
         1,
         0,
@@ -2892,12 +2902,12 @@
     "event_mix": {
       "comment": 5,
       "pull request": 3,
+      "create": 2,
       "issue": 2,
       "release": 2,
-      "push": 1,
-      "create": 1
+      "push": 1
     },
-    "total": 14,
+    "total": 15,
     "timezone": "New York"
   }
 }
