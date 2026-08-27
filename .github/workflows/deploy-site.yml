@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion != 'cancelled' }}
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -35,6 +35,39 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run profile product tests
+        run: |
+          python -m unittest \
+            tests.github.test_github_client \
+            tests.github.test_token_fallback \
+            tests.pipeline.test_compute_metrics_accuracy \
+            tests.pipeline.test_profile_pipeline_fixture \
+            tests.contracts.test_data_semantics \
+            tests.contracts.test_public_data_privacy \
+            tests.contracts.test_design_contract
+
+      - name: Validate profile site artifacts
+        env:
+          GITHUB_USERNAME: jguida941
+          PROFILE_TIMEZONE: America/New_York
+        run: python scripts/profile_cli.py validate
+
+      # A successful upstream run is necessary but not sufficient: the stored
+      # artifact set on main must itself be publishable before it is deployed.
+      - name: Require stored artifact readiness
+        env:
+          GITHUB_USERNAME: jguida941
+          PROFILE_TIMEZONE: America/New_York
+        run: python scripts/profile_cli.py publication-status --require-ready
 
       - uses: actions/configure-pages@v5
         with:

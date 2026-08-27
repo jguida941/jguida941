@@ -66,6 +66,7 @@ _STATUS_DISPLAY = {
     "ok": "OK", "pass": "OK", "passing": "OK", "healthy": "OK", "complete": "OK",
     "partial": "Partial", "fallback": "Fallback", "degraded": "Degraded", "limited": "Limited",
     "empty": "None", "none": "None", "missing": "Missing", "unknown": "Unknown",
+    "exact": "Exact", "unavailable": "Unavailable",
     "error": "Error", "failed": "Failed", "fail": "Failed",
 }
 
@@ -73,9 +74,17 @@ _STATUS_DISPLAY = {
 def _status_name(status: str) -> str:
     """Map a pipeline status word to a design-system status (DESIGN_SPEC 3.6)."""
     n = str(status or "").strip().lower()
-    if n in {"ok", "pass", "passing", "healthy", "complete", "available"}:
+    if n in {"ok", "pass", "passing", "healthy", "complete", "available", "exact"}:
         return "success"
-    if n in {"warn", "warning", "partial", "degraded", "fallback", "limited"}:
+    if n in {
+        "warn",
+        "warning",
+        "partial",
+        "degraded",
+        "fallback",
+        "limited",
+        "unavailable",
+    }:
         return "warning"
     if n in {"error", "failed", "fail", "missing"}:
         return "danger"
@@ -85,6 +94,35 @@ def _status_name(status: str) -> str:
 def _status_display(status: str) -> str:
     n = str(status or "").strip().lower()
     return _STATUS_DISPLAY.get(n, (status or "n/a").strip().title())
+
+
+def _provider_evidence_label(
+    name: str,
+    status: object,
+    carrier: object,
+) -> str:
+    """Describe provider evidence without promoting a fallback to exact truth."""
+    status_text = str(status or "")
+    parts = [name, _status_display(status_text)]
+    if not isinstance(carrier, dict) or status_text.casefold() not in {
+        "fallback",
+        "partial",
+    }:
+        return " · ".join(parts)
+
+    if name == "PRs" and (
+        carrier.get("source_metric_id")
+        == "merged_prs_public_visible_population"
+        or carrier.get("population_id")
+        == "owned-public-repositories-visible-to-public-pr-search"
+    ):
+        parts.append("Public Scope")
+    elif name == "Contributions" and (
+        carrier.get("source_mode") == "previous_snapshot"
+        or carrier.get("completion_reason") == "previous_snapshot"
+    ):
+        parts.append("Previous")
+    return " · ".join(parts)
 
 
 def generate(
@@ -127,12 +165,59 @@ def generate(
         secondary = [r for r in rows if r is not kpi_row][:4]
 
     quality = data_quality if isinstance(data_quality, dict) else {}
+    metric_statuses = quality.get("metric_statuses", {})
+    if not isinstance(metric_statuses, dict):
+        metric_statuses = {}
     status_items = [
         ("CI", quality.get("ci_status")),
         ("Commits", quality.get("commits_status")),
         ("Releases", quality.get("releases_status")),
         ("Events", quality.get("events_status")),
     ]
+    non_exact_metrics = quality.get("non_exact_metrics", {})
+    if not isinstance(non_exact_metrics, dict):
+        non_exact_metrics = {}
+    provider_status_items = [
+        (
+            _provider_evidence_label(
+                "PRs",
+                quality.get("prs_status"),
+                non_exact_metrics.get("prs_merged"),
+            ),
+            quality.get("prs_status"),
+        ),
+        (
+            _provider_evidence_label(
+                "Contributions",
+                quality.get("contributions_status"),
+                non_exact_metrics.get("last_year_contributions"),
+            ),
+            quality.get("contributions_status"),
+        ),
+    ]
+    family_status_items = [
+        ("Private", quality.get("private_aggregate_status")),
+        ("Push", metric_statuses.get("active_repos_7d")),
+        ("Automation", metric_statuses.get("automation_repos")),
+        ("Language", metric_statuses.get("top_languages")),
+    ]
+    scope = data_scope if isinstance(data_scope, dict) else {}
+    population = str(scope.get("repos_included") or "repository scope unavailable")
+    evidence_notes = []
+    ci_family_status = str(metric_statuses.get("automation_repos", "")).casefold()
+    if ci_family_status == "partial":
+        evidence_notes.append(
+            str(quality.get("ci_note") or "CI Partial: known minimum; unknown repositories remain.")
+        )
+    elif ci_family_status == "unavailable":
+        evidence_notes.append("CI Unavailable: no usable repository observation.")
+    language_status = str(metric_statuses.get("top_languages", "")).casefold()
+    if language_status == "partial":
+        evidence_notes.append(
+            str(quality.get("language_note") or "Language Partial: observed bytes only.")
+        )
+    elif language_status == "unavailable":
+        evidence_notes.append("Language Unavailable: no usable byte observation.")
 
     # --- geometry ---
     tile_y = content_top + 24
@@ -140,7 +225,13 @@ def generate(
     status_label_y = tile_y + tile_h + 34
     chips_y = status_label_y + 12
     chip_h = 24
-    height = int(chips_y + chip_h + 22)
+    provider_label_y = chips_y + chip_h + 28
+    provider_chips_y = provider_label_y + 12
+    family_label_y = provider_chips_y + chip_h + 28
+    family_chips_y = family_label_y + 12
+    scope_y = family_chips_y + chip_h + 22
+    notes_start_y = scope_y + 18
+    height = int(notes_start_y + len(evidence_notes) * 16 + 18)
 
     parts: list[str] = [glass_panel(width, height), header_svg]
 
@@ -190,6 +281,73 @@ def generate(
         label = f"{name} · {_status_display(status)}"
         parts.append(status_chip(cx, chips_y, label=label, status=_status_name(status), height=chip_h))
         cx += chip_width(label, icon=True) + SPACE["md"]
+
+    parts.append(
+        text(
+            "PROVIDER EVIDENCE",
+            pad,
+            provider_label_y,
+            token="eyebrow",
+            color=TEXT_DIM,
+            tracking=1.2,
+        )
+    )
+    cx = pad
+    for label, status in provider_status_items:
+        parts.append(
+            status_chip(
+                cx,
+                provider_chips_y,
+                label=label,
+                status=_status_name(status),
+                height=chip_h,
+            )
+        )
+        cx += chip_width(label, icon=True) + SPACE["md"]
+
+    parts.append(
+        text(
+            "REPOSITORY EVIDENCE",
+            pad,
+            family_label_y,
+            token="eyebrow",
+            color=TEXT_DIM,
+            tracking=1.2,
+        )
+    )
+    cx = pad
+    for name, status in family_status_items:
+        label = f"{name} · {_status_display(status)}"
+        parts.append(
+            status_chip(
+                cx,
+                family_chips_y,
+                label=label,
+                status=_status_name(status),
+                height=chip_h,
+            )
+        )
+        cx += chip_width(label, icon=True) + SPACE["md"]
+
+    parts.append(
+        text(
+            f"Observed population · {xml_escape(population)}",
+            pad,
+            scope_y,
+            token="caption",
+            color=TEXT_DIM,
+        )
+    )
+    for index, note in enumerate(evidence_notes):
+        parts.append(
+            text(
+                xml_escape(truncate(note, 112)),
+                pad,
+                notes_start_y + index * 16,
+                token="caption",
+                color=TEXT_DIM,
+            )
+        )
 
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '

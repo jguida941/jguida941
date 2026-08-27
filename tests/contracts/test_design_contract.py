@@ -1,18 +1,27 @@
-"""Red-first DESIGN contracts (semantic-TDD).
+"""Executable contracts for the repository's documented visual system.
 
-Each test encodes a DESIGN_AUDIT invariant as an executable contract. They are
-written RED (they fail on the current code) and are driven GREEN by the design-
-token + component refactor. Direction: Apple HIG restraint x Power BI information
-architecture; numeric thresholds are sourced from docs/DESIGN_SPEC.md.
+Each test maps a product-level invariant from ``docs/DESIGN_AUDIT.md`` and
+``docs/DESIGN_SPEC.md`` to an observable renderer or profile-model result.
+The intended direction is Apple HIG restraint with Power BI information
+architecture, including the numeric thresholds documented in the specification.
 
-Permanent guards once green: raw color/size literals must resolve from the single
-design-token source, and no rendered text may fall below the legibility floor.
+The guards keep colors and sizes on the shared token sources, preserve readable
+text, and require public and private repository metadata to behave consistently
+on surfaces that share the same repository scope.
 """
 from __future__ import annotations
 
+import copy
+import json
+import os
 import re
+import shutil
+import subprocess
+import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[2]  # tests/<group>/<file>.py -> repo root
 RENDERING = ROOT / "scripts" / "rendering"
@@ -29,6 +38,34 @@ _FONT = re.compile(r'font-size="([0-9.]+)"')
 # Legibility floor for README SVGs downscaled into the column (DESIGN_SPEC).
 MIN_FONT = 11.0
 
+_PUBLISHED_PROFILE_PATHS = (
+    "README.md",
+    "metrics.general.svg",
+    "assets/activity_heatmap.svg",
+    "assets/badges.svg",
+    "assets/builder_scorecard.svg",
+    "assets/contribution_calendar.svg",
+    "assets/currently_working.svg",
+    "assets/engineering_cadence.svg",
+    "assets/lang_breakdown.svg",
+    "assets/now_next_shipped.svg",
+    "assets/raw_snapshot.svg",
+    "assets/repo_spotlight.svg",
+    "assets/streak_summary.svg",
+)
+_GOVERNED_AGGREGATE_METRICS = {
+    "active_repos_7d",
+    "automation_repos",
+    "automation_workflows",
+    "ci_coverage_pct",
+    "ci_repos",
+    "days_since_last_push",
+    "languages_count",
+    "languages_over_5pct",
+    "primary_lang_share_pct",
+    "top_languages",
+}
+
 
 def _code_lines(path: Path):
     for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -36,6 +73,251 @@ def _code_lines(path: Path):
         if stripped.startswith("#"):  # skip full-line comments
             continue
         yield i, line
+
+
+def _validate_snapshot_payload(payload: dict):
+    from scripts.quality.validate_generated_profile import validate_profile
+
+    with tempfile.TemporaryDirectory() as directory:
+        output_root = Path(directory)
+        for relative_path in _PUBLISHED_PROFILE_PATHS:
+            source = ROOT / relative_path
+            destination = output_root / relative_path
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
+        snapshot_path = output_root / "site/data/profile_snapshot.json"
+        snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+        snapshot_path.write_text(
+            json.dumps(payload, ensure_ascii=True, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+        original_cwd = Path.cwd()
+        os.chdir(output_root)
+        try:
+            return validate_profile()
+        finally:
+            os.chdir(original_cwd)
+
+
+class PublishedProfileContract(unittest.TestCase):
+    def _valid_nested_payload(self):
+        payload = json.loads(
+            (ROOT / "site/data/profile_snapshot.json").read_text(encoding="utf-8")
+        )
+        payload["data_scope"] = {
+            "repos_included": "public + private observed, exact",
+            "activity_metric_scope": "last twelve months",
+            "public_owned_repos_total": 2,
+            "public_owned_forks_total": 0,
+            "public_owned_nonfork_repos_total": 2,
+            "private_owned_repos_total": 1,
+            "private_owned_nonfork_repos_total": 1,
+            "metric_scopes": {
+                metric: "owned-public-private-nonfork-profile-excluded-exact"
+                for metric in _GOVERNED_AGGREGATE_METRICS
+            },
+        }
+        payload["data_quality"] = {
+            "ci_status": "exact",
+            "ci_note": "Current repository evidence.",
+            "commits_status": "exact",
+            "commits_note": "Current repository evidence.",
+            "releases_status": "exact",
+            "releases_note": "Current repository evidence.",
+            "events_status": "exact",
+            "events_note": "Current repository evidence.",
+            "private_aggregate_status": "exact",
+            "metric_statuses": {
+                metric: "exact" for metric in _GOVERNED_AGGREGATE_METRICS
+            },
+        }
+        return payload
+
+    def test_public_snapshot_requires_every_nested_scope_and_quality_field(self):
+        valid_payload = self._valid_nested_payload()
+        valid_errors = _validate_snapshot_payload(valid_payload).errors
+        self.assertFalse(
+            any(
+                "data_scope." in error or "data_quality." in error
+                for error in valid_errors
+            ),
+            valid_errors,
+        )
+
+        required_paths = {
+            "data_scope": (
+                "repos_included",
+                "activity_metric_scope",
+                "public_owned_repos_total",
+                "public_owned_forks_total",
+                "public_owned_nonfork_repos_total",
+                "private_owned_repos_total",
+                "private_owned_nonfork_repos_total",
+                "metric_scopes",
+            ),
+            "data_quality": (
+                "ci_status",
+                "ci_note",
+                "commits_status",
+                "commits_note",
+                "releases_status",
+                "releases_note",
+                "events_status",
+                "events_note",
+                "private_aggregate_status",
+                "metric_statuses",
+            ),
+        }
+        for section, fields in required_paths.items():
+            for field in fields:
+                with self.subTest(missing=f"{section}.{field}"):
+                    altered = copy.deepcopy(valid_payload)
+                    del altered[section][field]
+                    errors = _validate_snapshot_payload(altered).errors
+                    expected_path = f"{section}.{field}"
+                    self.assertTrue(
+                        any(expected_path in error for error in errors),
+                        errors,
+                    )
+
+        invalid_values = (
+            ("data_scope", "public_owned_repos_total", True),
+            ("data_scope", "private_owned_nonfork_repos_total", -1),
+            ("data_scope", "metric_scopes", {"ci_coverage_pct": "exact"}),
+            ("data_quality", "private_aggregate_status", "ok"),
+            ("data_quality", "metric_statuses", {"ci_coverage_pct": "exact"}),
+        )
+        for section, field, value in invalid_values:
+            with self.subTest(invalid=f"{section}.{field}"):
+                altered = copy.deepcopy(valid_payload)
+                altered[section][field] = value
+                errors = _validate_snapshot_payload(altered).errors
+                expected_path = f"{section}.{field}"
+                self.assertTrue(
+                    any(expected_path in error for error in errors),
+                    errors,
+                )
+
+        with self.subTest(invalid="data_quality.token_mode"):
+            altered = copy.deepcopy(valid_payload)
+            altered["data_quality"]["token_mode"] = "internal"
+            errors = _validate_snapshot_payload(altered).errors
+            self.assertTrue(
+                any("data_quality.token_mode" in error for error in errors),
+                errors,
+            )
+
+
+class PublishedMetricClaimContract(unittest.TestCase):
+    def test_ci_coverage_claim_is_identical_across_json_and_cards(self):
+        import xml.etree.ElementTree as ET
+
+        from scripts.pipeline.compute_metrics import compute_profile_model
+        from scripts.pipeline.render_outputs import ensure_output_dirs, generate_assets
+        from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
+
+        collected = AccuracyTests()._collected()
+        first_public = copy.deepcopy(collected.repos[1])
+        first_public.update(
+            {
+                "name": "public-automated",
+                "has_ci_workflows": True,
+                "workflow_file_count": 1,
+            }
+        )
+        second_public = copy.deepcopy(collected.repos[2])
+        second_public.update(
+            {
+                "name": "public-manual",
+                "has_ci_workflows": False,
+                "workflow_file_count": 0,
+            }
+        )
+        private_repository = copy.deepcopy(collected.private_repos[0])
+        private_repository.update(
+            {
+                "name": "private-manual",
+                "has_ci_workflows": False,
+                "workflow_file_count": 0,
+            }
+        )
+        collected = replace(
+            collected,
+            repo_counts={
+                "public_owned_total": 2,
+                "public_owned_forks": 0,
+                "public_owned_nonfork": 2,
+                "private_owned": 1,
+                "private_owned_nonfork": 1,
+            },
+            repos=[first_public, second_public],
+            all_repos=[first_public, second_public],
+            private_repos=[private_repository],
+            events=[],
+        )
+        model = compute_profile_model(
+            collected,
+            logger=lambda *_args, **_kwargs: None,
+            allow_network_calls=False,
+        )
+        expected_scope = model["data_scope"]["metric_scopes"]["ci_coverage_pct"]
+        expected_status = model["data_quality"]["metric_statuses"]["ci_coverage_pct"]
+        self.assertAlmostEqual(100 / 3, model["scorecard"]["ci_coverage_pct"])
+        self.assertEqual(1, model["engineering"]["automation_repos"])
+        self.assertEqual(3, model["engineering"]["automation_eligible_repos"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            output_root = Path(directory)
+            original_cwd = Path.cwd()
+            os.chdir(output_root)
+            try:
+                ensure_output_dirs()
+                generate_assets(
+                    collected,
+                    model,
+                    logger=lambda *_args, **_kwargs: None,
+                )
+            finally:
+                os.chdir(original_cwd)
+            rendered = {
+                "builder": (output_root / "assets/builder_scorecard.svg").read_text(
+                    encoding="utf-8"
+                ),
+                "cadence": (output_root / "assets/engineering_cadence.svg").read_text(
+                    encoding="utf-8"
+                ),
+            }
+
+        def find_claim(svg_text):
+            root = ET.fromstring(svg_text)
+            for node in root.iter():
+                if node.attrib.get("data-metric-key") == "ci_coverage_pct":
+                    return {
+                        "display_value": node.attrib.get("data-metric-display-value"),
+                        "scope": node.attrib.get("data-metric-scope"),
+                        "status": node.attrib.get("data-metric-status"),
+                        "visible_text": " ".join(node.itertext()),
+                    }
+            return None
+
+        for surface, svg_text in rendered.items():
+            with self.subTest(surface=surface, assertion="visible all-owned value"):
+                self.assertIn("33%", svg_text)
+            with self.subTest(surface=surface, assertion="machine-readable claim"):
+                self.assertEqual(
+                    {
+                        "display_value": "33%",
+                        "scope": expected_scope,
+                        "status": expected_status,
+                        "visible_text": unittest.mock.ANY,
+                    },
+                    find_claim(svg_text),
+                )
+            claim = find_claim(svg_text)
+            if claim is not None:
+                with self.subTest(surface=surface, assertion="visible value matches claim"):
+                    self.assertIn(claim["display_value"], claim["visible_text"])
 
 
 class DesignTokenContract(unittest.TestCase):
@@ -56,9 +338,8 @@ class DesignTokenContract(unittest.TestCase):
 
 
 class FontLegibilityContract(unittest.TestCase):
-    # GREEN permanent guard (Phase-4 B3 landed the sparse-label redesign of the
-    # heatmap + contribution + the progress_ring sublabel). No rendered text literal
-    # may fall below the 11px legibility floor (DESIGN_SPEC 3.8/3.15/3.17).
+    # The sparse-label heatmap, contribution view, and progress-ring sublabel all
+    # share this 11px legibility floor (DESIGN_SPEC 3.8/3.15/3.17).
     def test_no_font_size_below_floor(self):
         offenders = []
         for path in sorted(RENDERING.glob("*.py")):
@@ -120,6 +401,337 @@ _TEXT_NODE = re.compile(r"<text[^>]*>(.*?)</text>", re.S)
 
 def _text_contents(svg: str) -> str:
     return " ".join(_TEXT_NODE.findall(svg))
+
+
+def _provider_dashboard_data(*, exact: bool) -> dict:
+    from scripts.pipeline.compute_metrics import compute_profile_model
+    from tests.contracts.test_data_semantics import GeneratedCardTruthTests
+
+    collected = GeneratedCardTruthTests._aggregate_observation_fixture(exact=exact)
+    model = compute_profile_model(
+        collected,
+        logger=lambda *_args, **_kwargs: None,
+        allow_network_calls=False,
+    )
+    data = json.loads(json.dumps(model["dashboard_data"]))
+    # These unrelated collections stay empty so the test exercises the Raw Snapshot
+    # hydration route without depending on repository, calendar, or rhythm content.
+    data["top_languages"] = []
+    data["featured_repo_facts"] = []
+    data["focus"] = {}
+    data["contribution_calendar"] = None
+    data["activity_rhythm"] = None
+    return data
+
+
+def _hydrate_web_dashboard(data: dict) -> dict:
+    """Execute the emitted dashboard hydration program against a small DOM."""
+    from scripts.pipeline.web_render import render_dashboard
+
+    html = render_dashboard()
+    programs = re.findall(r"<script(?:\s[^>]*)?>(.*?)</script>", html, re.S)
+    program = next((source for source in programs if "fetch(DATA_URL" in source), None)
+    if program is None:
+        raise AssertionError("dashboard output has no hydration program")
+    runtime_match = re.search(
+        r"\bconst RUNTIME = (\{.*?\});\s*const PROTOTYPES",
+        program,
+        re.S,
+    )
+    if runtime_match is None:
+        raise AssertionError("dashboard output has no runtime contract")
+    runtime = json.loads(runtime_match.group(1))
+
+    def dataset_name(attribute: str) -> str:
+        words = attribute.removeprefix("data-").split("-")
+        return words[0] + "".join(word.title() for word in words[1:])
+
+    static_nodes = []
+    routed_attributes = {
+        "data-bind",
+        "data-dashboard-hydration",
+        "data-empty-state",
+        "data-focus-items",
+        "data-snapshot-key",
+    }
+    for tag in re.findall(r"<(?!/|!)[^>]+>", html):
+        attributes = dict(
+            re.findall(r'([A-Za-z_:][A-Za-z0-9_:.-]*)="([^"]*)"', tag)
+        )
+        if "id" not in attributes and not routed_attributes.intersection(attributes):
+            continue
+        static_nodes.append(
+            {
+                "id": attributes.get("id"),
+                "dataset": {
+                    dataset_name(name): value
+                    for name, value in attributes.items()
+                    if name.startswith("data-")
+                },
+            }
+        )
+
+    node = shutil.which("node")
+    if node is None:
+        raise AssertionError("the web product test requires the CI Node runtime")
+
+    harness = (
+        "const TEST_DATA = "
+        + json.dumps(data, sort_keys=True, separators=(",", ":"))
+        + ";\nconst TEST_RUNTIME = "
+        + json.dumps(runtime, sort_keys=True, separators=(",", ":"))
+        + ";\nconst TEST_STATIC_NODES = "
+        + json.dumps(static_nodes, sort_keys=True, separators=(",", ":"))
+        + ";\n"
+        + r"""
+class FakeNode {
+  constructor(id, dataset) {
+    this.id = id || null;
+    this.dataset = Object.assign({}, dataset || {});
+    this.textContent = "";
+    this.hidden = false;
+    this.title = "";
+    this.href = "";
+    this.children = [];
+    this.style = {values: {}, setProperty(name, value) { this.values[name] = String(value); }};
+  }
+  append(node) { this.children.push(node); }
+  replaceChildren(...nodes) { this.children = nodes; }
+  cloneNode(deep) {
+    const copy = new FakeNode(this.id, this.dataset);
+    copy.textContent = this.textContent;
+    copy.hidden = this.hidden;
+    copy.title = this.title;
+    copy.href = this.href;
+    if (deep) copy.children = this.children.map((child) => child.cloneNode(true));
+    return copy;
+  }
+  querySelectorAll(selector) {
+    if (selector !== "[data-field]") return [];
+    const found = [];
+    const visit = (node) => {
+      node.children.forEach((child) => {
+        if (child.dataset.field) found.push(child);
+        visit(child);
+      });
+    };
+    visit(this);
+    return found;
+  }
+}
+
+const staticNodes = TEST_STATIC_NODES.map(
+  (entry) => new FakeNode(entry.id, entry.dataset));
+const byId = new Map(staticNodes.filter((entry) => entry.id)
+  .map((entry) => [entry.id, entry]));
+
+function prototypeRoot(policy) {
+  const fields = Array.isArray(policy.unit.fields) ? policy.unit.fields : [];
+  const rootField = fields.includes("root") ? "root" : (fields[0] || null);
+  const dataset = {domOwner: policy.unit.owner, prototypeOrigin: policy.id};
+  if (rootField) dataset.field = rootField;
+  const root = new FakeNode(null, dataset);
+  fields.filter((field) => field !== rootField).forEach((field) => {
+    root.append(new FakeNode(null, {domOwner: policy.unit.owner, field}));
+  });
+  return root;
+}
+
+const templates = new Map(TEST_RUNTIME.prototypes.map((policy) => [
+  policy.id,
+  {content: {firstElementChild: prototypeRoot(policy)}},
+]));
+for (const policy of TEST_RUNTIME.prototypes) {
+  if (policy.target === "focus") continue;
+  const target = byId.get(policy.target);
+  if (target && !target.dataset.domOwner) target.dataset.domOwner = policy.target_owner;
+}
+
+const dataName = (name) => name.split("-").map(
+  (part, index) => index ? part.charAt(0).toUpperCase() + part.slice(1) : part).join("");
+function matchesDataSelector(node, selector) {
+  const match = /^\[data-([a-z0-9-]+)(?:="([^"]*)")?\]$/.exec(selector);
+  if (!match) return false;
+  const value = node.dataset[dataName(match[1])];
+  return match[2] === undefined ? value !== undefined : value === match[2];
+}
+
+globalThis.location = {href: "https://example.test/index.html"};
+globalThis.document = {
+  getElementById(id) { return byId.get(id) || null; },
+  querySelectorAll(selector) {
+    return staticNodes.filter((entry) => matchesDataSelector(entry, selector));
+  },
+  querySelector(selector) {
+    const template = /^template\[data-prototype="([^"]+)"\]$/.exec(selector);
+    if (template) return templates.get(template[1]) || null;
+    return this.querySelectorAll(selector)[0] || null;
+  },
+};
+globalThis.fetch = () => Promise.resolve({json: () => Promise.resolve(TEST_DATA)});
+"""
+        + program
+        + r"""
+
+function visibleText(node) {
+  return [node.textContent, ...node.children.map(visibleText)]
+    .filter((value) => String(value).trim())
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+setTimeout(() => {
+  const labels = [];
+  for (const target of byId.values()) {
+    for (const child of target.children) {
+      const value = visibleText(child);
+      if (value) labels.push(value);
+    }
+  }
+  const snapshot = Object.fromEntries(staticNodes
+    .filter((entry) => entry.dataset.snapshotKey)
+    .map((entry) => [entry.dataset.snapshotKey, entry.textContent]));
+  const bindings = Object.fromEntries(staticNodes
+    .filter((entry) => entry.dataset.bind)
+    .map((entry) => [entry.dataset.bind, entry.textContent]));
+  const hydration = staticNodes.find(
+    (entry) => entry.dataset.dashboardHydration !== undefined);
+  process.stdout.write(JSON.stringify({
+    hydration: hydration ? hydration.dataset.dashboardHydration : null,
+    labels,
+    snapshot,
+    bindings,
+  }));
+}, 0);
+"""
+    )
+    completed = subprocess.run(
+        [node, "-"],
+        input=harness,
+        text=True,
+        capture_output=True,
+        timeout=20,
+        check=False,
+    )
+    if completed.returncode != 0:
+        raise AssertionError(
+            "dashboard hydration program did not execute:\n" + completed.stderr
+        )
+    try:
+        return json.loads(completed.stdout)
+    except json.JSONDecodeError as exc:
+        raise AssertionError(
+            "dashboard hydration program returned no readable result:\n"
+            + completed.stdout
+            + completed.stderr
+        ) from exc
+
+
+def _provider_evidence(labels: list[str], *terms: str) -> str:
+    return " ".join(
+        label for label in labels if any(term in label.casefold() for term in terms)
+    ).casefold()
+
+
+class WebRawSnapshotTruthContract(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.fallback_data = _provider_dashboard_data(exact=False)
+        cls.exact_data = _provider_dashboard_data(exact=True)
+        cls.fallback_route = _hydrate_web_dashboard(cls.fallback_data)
+        cls.exact_route = _hydrate_web_dashboard(cls.exact_data)
+
+        other_pr_population = copy.deepcopy(cls.fallback_data)
+        pr_carrier = other_pr_population["data_quality"]["non_exact_metrics"][
+            "prs_merged"
+        ]
+        pr_carrier["source_metric_id"] = "merged_prs_primary_visible_population"
+        pr_carrier["population_id"] = (
+            "owned-repositories-visible-to-primary-pr-search"
+        )
+        cls.other_pr_population_route = _hydrate_web_dashboard(other_pr_population)
+
+        current_contribution_source = copy.deepcopy(cls.fallback_data)
+        contribution_carrier = current_contribution_source["data_quality"][
+            "non_exact_metrics"
+        ]["last_year_contributions"]
+        contribution_carrier.update(
+            {
+                "source_metric_id": "github_contribution_calendar_total_and_days",
+                "source_id": "github_graphql_contribution_calendar",
+                "source_mode": "fallback",
+                "completion_reason": "provider_error",
+                "observed_at": current_contribution_source["generated_at"],
+            }
+        )
+        cls.current_contribution_source_route = _hydrate_web_dashboard(
+            current_contribution_source
+        )
+
+    def test_web_raw_snapshot_qualifies_public_pr_fallback(self):
+        route = self.fallback_route
+        self.assertEqual("complete", route["hydration"])
+        self.assertEqual("n/a", route["snapshot"]["prs_merged"])
+        self.assertEqual(
+            23,
+            self.fallback_data["data_quality"]["non_exact_metrics"]
+            ["prs_merged"]["value"],
+        )
+        evidence = _provider_evidence(
+            route["labels"], "prs", "pull request", "pull-request"
+        )
+        other_population_evidence = _provider_evidence(
+            self.other_pr_population_route["labels"],
+            "prs",
+            "pull request",
+            "pull-request",
+        )
+        self.assertNotIn("public", other_population_evidence)
+        self.assertIn("fallback", evidence)
+        self.assertIn("public", evidence)
+        self.assertIn("fallback", other_population_evidence)
+
+    def test_web_raw_snapshot_qualifies_previous_contributions(self):
+        route = self.fallback_route
+        self.assertEqual("complete", route["hydration"])
+        self.assertEqual(
+            777,
+            self.fallback_data["data_quality"]["non_exact_metrics"]
+            ["last_year_contributions"]["value"],
+        )
+        evidence = _provider_evidence(route["labels"], "contribution")
+        current_source_evidence = _provider_evidence(
+            self.current_contribution_source_route["labels"], "contribution"
+        )
+        self.assertNotIn("previous", current_source_evidence)
+        self.assertNotIn("noncurrent", current_source_evidence)
+        self.assertIn("fallback", evidence)
+        self.assertTrue(
+            "previous" in evidence or "noncurrent" in evidence,
+            "previous contribution evidence must remain visibly noncurrent",
+        )
+        self.assertIn("fallback", current_source_evidence)
+
+    def test_web_raw_snapshot_keeps_current_pr_zero_exact(self):
+        route = self.exact_route
+        self.assertEqual("complete", route["hydration"])
+        self.assertEqual("0", route["snapshot"]["prs_merged"])
+        evidence = _provider_evidence(
+            route["labels"], "prs", "pull request", "pull-request"
+        )
+        self.assertIn("ok", evidence)
+        self.assertNotIn("fallback", evidence)
+        self.assertNotIn("public scope", evidence)
+
+    def test_web_raw_snapshot_keeps_current_contribution_zero_exact(self):
+        route = self.exact_route
+        self.assertEqual("complete", route["hydration"])
+        self.assertEqual("0", route["bindings"]["snapshot.last_year_contributions"])
+        evidence = _provider_evidence(route["labels"], "contribution")
+        self.assertIn("ok", evidence)
+        self.assertNotIn("fallback", evidence)
+        self.assertNotIn("previous", evidence)
+        self.assertNotIn("noncurrent", evidence)
 
 
 class ByTheNumbersContract(unittest.TestCase):
@@ -530,6 +1142,213 @@ class LanguageBreakdownContract(unittest.TestCase):
         )
 
 
+class ProfileMetricScopeContract(unittest.TestCase):
+    ALL_OWNED = "owned-public-private-nonfork-profile-excluded-exact"
+    PUSH_METRICS = ("active_repos_7d", "days_since_last_push")
+    AUTOMATION_METRICS = ("automation_repos", "automation_workflows")
+    AUTOMATION_SURFACE_METRICS = AUTOMATION_METRICS + (
+        "ci_coverage_pct",
+        "ci_repos",
+    )
+    LANGUAGE_METRICS = (
+        "top_languages",
+        "primary_lang_share_pct",
+        "languages_over_5pct",
+    )
+    LANGUAGE_SURFACE_METRICS = LANGUAGE_METRICS + ("languages_count",)
+
+    def _model(
+        self,
+        *,
+        public_repo_name="pub1",
+        public_updates=None,
+        omit_private_language_marker=False,
+        **private_updates,
+    ):
+        from scripts.pipeline.compute_metrics import compute_profile_model
+        from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
+
+        collected = AccuracyTests()._collected()
+        public_repos = copy.deepcopy(collected.repos)
+        for repository in public_repos:
+            repository["language_bytes_complete"] = True
+            if repository.get("name") == public_repo_name and public_updates:
+                repository.update(public_updates)
+        private_repo = copy.deepcopy(collected.private_repos[0])
+        private_repo["language_bytes_complete"] = True
+        private_repo.update(private_updates)
+        if omit_private_language_marker:
+            private_repo.pop("language_bytes_complete", None)
+        collected = replace(
+            collected,
+            repos=public_repos,
+            all_repos=copy.deepcopy(public_repos),
+            private_repos=[private_repo],
+        )
+        return compute_profile_model(
+            collected,
+            logger=lambda *_args, **_kwargs: None,
+            allow_network_calls=False,
+        )
+
+    def _truth(self, model):
+        statuses = model["data_quality"].get("metric_statuses")
+        self.assertIsInstance(
+            statuses,
+            dict,
+            "each private-aware metric needs an explicit completeness status",
+        )
+        return statuses, model["data_scope"]["metric_scopes"]
+
+    def _assert_exact_all_owned(self, statuses, scopes, metrics):
+        for metric in metrics:
+            with self.subTest(metric=metric):
+                self.assertEqual("exact", statuses.get(metric))
+                self.assertEqual(self.ALL_OWNED, scopes.get(metric))
+
+    def _assert_not_exact_all_owned(self, statuses, scopes, metrics):
+        for metric in metrics:
+            with self.subTest(metric=metric):
+                self.assertNotEqual("exact", statuses.get(metric))
+                self.assertNotEqual(self.ALL_OWNED, scopes.get(metric))
+
+    def test_complete_private_facts_are_exact_for_each_metric_family(self):
+        model = self._model()
+        statuses, scopes = self._truth(model)
+        metrics = self.PUSH_METRICS + self.AUTOMATION_METRICS + self.LANGUAGE_METRICS
+        self._assert_exact_all_owned(statuses, scopes, metrics)
+        language_bytes = {row["name"]: row["bytes"] for row in model["top_languages"]}
+        self.assertEqual(1000, language_bytes["Rust"])
+
+    def test_missing_private_push_facts_only_degrade_push_metrics(self):
+        model = self._model(pushed_at="")
+        statuses, scopes = self._truth(model)
+        self._assert_not_exact_all_owned(statuses, scopes, self.PUSH_METRICS)
+        self._assert_exact_all_owned(
+            statuses,
+            scopes,
+            self.AUTOMATION_METRICS + self.LANGUAGE_METRICS,
+        )
+
+    def test_unknown_private_workflow_facts_only_degrade_automation_metrics(self):
+        model = self._model(has_ci_workflows=None, workflow_file_count=None)
+        statuses, scopes = self._truth(model)
+        self._assert_not_exact_all_owned(statuses, scopes, self.AUTOMATION_METRICS)
+        self._assert_exact_all_owned(
+            statuses,
+            scopes,
+            self.PUSH_METRICS + self.LANGUAGE_METRICS,
+        )
+
+    def test_incomplete_private_language_facts_only_degrade_language_metrics(self):
+        model = self._model(language_bytes_complete=False)
+        statuses, scopes = self._truth(model)
+        self._assert_not_exact_all_owned(statuses, scopes, self.LANGUAGE_METRICS)
+        self._assert_exact_all_owned(
+            statuses,
+            scopes,
+            self.PUSH_METRICS + self.AUTOMATION_METRICS,
+        )
+
+    def test_missing_public_push_facts_only_degrade_push_metrics(self):
+        model = self._model(public_updates={"pushed_at": ""})
+        statuses, scopes = self._truth(model)
+        self._assert_not_exact_all_owned(statuses, scopes, self.PUSH_METRICS)
+        self._assert_exact_all_owned(
+            statuses,
+            scopes,
+            self.AUTOMATION_METRICS + self.LANGUAGE_METRICS,
+        )
+
+    def test_unknown_public_workflow_facts_only_degrade_automation_metrics(self):
+        model = self._model(
+            public_updates={
+                "has_ci_workflows": None,
+                "workflow_file_count": None,
+            }
+        )
+        statuses, scopes = self._truth(model)
+        self._assert_not_exact_all_owned(
+            statuses,
+            scopes,
+            self.AUTOMATION_SURFACE_METRICS,
+        )
+        self._assert_exact_all_owned(
+            statuses,
+            scopes,
+            self.PUSH_METRICS + self.LANGUAGE_METRICS,
+        )
+
+    def test_incomplete_public_language_facts_only_degrade_language_metrics(self):
+        model = self._model(public_updates={"language_bytes_complete": False})
+        statuses, scopes = self._truth(model)
+        self._assert_not_exact_all_owned(
+            statuses,
+            scopes,
+            self.LANGUAGE_SURFACE_METRICS,
+        )
+        self._assert_exact_all_owned(
+            statuses,
+            scopes,
+            self.PUSH_METRICS + self.AUTOMATION_METRICS,
+        )
+
+    def test_private_language_completeness_marker_is_required_for_exactness(self):
+        missing = self._model(omit_private_language_marker=True)
+        complete = self._model(language_bytes_complete=True)
+        missing_statuses, missing_scopes = self._truth(missing)
+        complete_statuses, complete_scopes = self._truth(complete)
+
+        self._assert_not_exact_all_owned(
+            missing_statuses,
+            missing_scopes,
+            self.LANGUAGE_METRICS,
+        )
+        self._assert_exact_all_owned(
+            complete_statuses,
+            complete_scopes,
+            self.LANGUAGE_METRICS,
+        )
+
+    def test_exposed_aggregate_metrics_have_explicit_status_and_scope(self):
+        model = self._model()
+        statuses, scopes = self._truth(model)
+        self._assert_exact_all_owned(
+            statuses,
+            scopes,
+            ("ci_coverage_pct", "ci_repos", "languages_count"),
+        )
+
+    def test_scorecard_and_engineering_automation_share_one_population(self):
+        model = self._model(
+            public_repo_name="jguida941",
+            public_updates={
+                "has_ci_workflows": False,
+                "workflow_file_count": 0,
+            },
+        )
+        engineering = model["engineering"]
+        eligible = engineering["automation_eligible_repos"]
+        expected_percentage = (
+            engineering["automation_repos"] / eligible * 100 if eligible else 0.0
+        )
+
+        self.assertEqual(
+            engineering["automation_repos"],
+            model["snapshot"]["ci_repos"],
+        )
+        self.assertAlmostEqual(
+            expected_percentage,
+            model["scorecard"]["ci_coverage_pct"],
+        )
+        statuses, scopes = self._truth(model)
+        self._assert_exact_all_owned(
+            statuses,
+            scopes,
+            self.AUTOMATION_SURFACE_METRICS,
+        )
+
+
 class EngineeringCadenceContract(unittest.TestCase):
     """DESIGN_SPEC 3.2/3.8/3.9/Part 4: Engineering Cadence promotes active days to
     one display KPI, renders the weekly cadence as a TrendPanel (stroke >=1.5) and
@@ -604,6 +1423,42 @@ class EngineeringCadenceContract(unittest.TestCase):
             svg, r'<text[^>]*font-size="20"[^>]*>[^<]*%</text>',
             "CI coverage must render as a >=12px labeled gauge",
         )
+
+    def test_ci_coverage_uses_the_same_repository_scope_for_both_terms(self):
+        from scripts.rendering import generate_engineering_cadence as cadence
+
+        def gauge_value(data):
+            captured = []
+
+            def capture(*_args, **kwargs):
+                captured.append(kwargs["value"])
+                return "<g/>"
+
+            import tempfile
+
+            with tempfile.TemporaryDirectory() as directory, patch.object(
+                cadence, "_gauge_cell", side_effect=capture
+            ):
+                cadence.generate(data, output_path=str(Path(directory) / "eng.svg"))
+            return captured[0]
+
+        all_owned = {
+            **self._data(),
+            "automation_repos": 3,
+            "public_nonfork_repos": 1,
+            "private_nonfork_repos": 2,
+            "private_repos_total": 2,
+        }
+        public_only = {
+            **self._data(),
+            "automation_repos": 1,
+            "public_nonfork_repos": 1,
+            "private_nonfork_repos": 0,
+            "private_repos_total": 0,
+        }
+
+        observed = (gauge_value(all_owned), gauge_value(public_only))
+        self.assertEqual((100.0, 100.0), observed)
 
     def test_empty_state(self):
         import tempfile
@@ -683,6 +1538,56 @@ class CurrentlyWorkingContract(unittest.TestCase):
             svg = self._render(str(Path(d) / "cw.svg"))
         self.assertIn(">Python</text>", svg, "language must be shown by label, not hue alone")
         self.assertGreaterEqual(svg.count("<circle"), 1, "each row carries a language dot")
+
+    def test_public_and_private_repository_urls_render_as_svg_anchors(self):
+        import tempfile
+        import xml.etree.ElementTree as ET
+
+        repos = self._repos()
+        repos[-1]["html_url"] = "https://github.com/x/secret-svc"
+        focus = {
+            "now": [
+                {
+                    "title": repo["name"],
+                    "detail": f"{repo['language']} · pushed recently",
+                    "url": repo["html_url"],
+                    "is_private": repo["is_private"],
+                }
+                for repo in (repos[0], repos[-1])
+            ],
+            "next": [],
+            "shipped": [],
+        }
+
+        from scripts.rendering.generate_focus_board import generate as generate_focus
+
+        with tempfile.TemporaryDirectory() as directory:
+            working_output = Path(directory) / "currently-working.svg"
+            focus_output = Path(directory) / "focus.svg"
+            self._render(str(working_output), repos=repos)
+            generate_focus(focus, output_path=str(focus_output))
+
+            for surface, output in (
+                ("currently-working", working_output),
+                ("focus", focus_output),
+            ):
+                with self.subTest(surface=surface):
+                    root = ET.fromstring(output.read_text(encoding="utf-8"))
+                    hrefs = {
+                        node.attrib.get("href")
+                        for node in root.iter()
+                        if node.tag.endswith("a")
+                    }
+                    self.assertIn(
+                        repos[0]["html_url"],
+                        hrefs,
+                        "the public repository is the control for link rendering",
+                    )
+                    self.assertIn(
+                        repos[-1]["html_url"],
+                        hrefs,
+                        "repository visibility must not discard an authorized metadata URL",
+                    )
 
     def test_empty_state(self):
         import tempfile

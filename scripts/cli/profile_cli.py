@@ -39,19 +39,31 @@ def _print_validation_result(result) -> None:
             print(f"  - {warning}")
 
 
-def _run_live_profile_generation() -> None:
+def _report_publication_decision(result: object) -> str:
+    """Print the decision this generation reached, without inferring readiness."""
+    decision = result.get("publication_decision") if isinstance(result, dict) else None
+    if decision is None:
+        return ""
+    described = decision.describe() if hasattr(decision, "describe") else str(decision)
+    print(f"Publication decision: {described}")
+    return str(getattr(decision, "state", decision))
+
+
+def _run_live_profile_generation() -> str:
     from scripts.core.config import USERNAME
     from scripts.pipeline.profile_pipeline import run_profile_pipeline
 
     print("=== GitHub Profile README Builder ===")
     print(f"User: {USERNAME}")
-    run_profile_pipeline(logger=print)
+    result = run_profile_pipeline(logger=print)
+    state = _report_publication_decision(result)
     print("\nDone!")
+    return state
 
 
 def _cmd_build(args: argparse.Namespace) -> CommandResult:
-    _run_live_profile_generation()
-    return CommandResult(exit_code=0, extra={"step": "build"})
+    state = _run_live_profile_generation()
+    return CommandResult(exit_code=0, extra={"step": "build", "publication_state": state})
 
 
 def _cmd_validate(args: argparse.Namespace) -> CommandResult:
@@ -74,10 +86,11 @@ def _cmd_generate_profile(args: argparse.Namespace) -> CommandResult:
     if args.fixture:
         print("=== GitHub Profile README Builder (fixture mode) ===")
         print(f"Fixture: {args.fixture}")
-        run_profile_pipeline_from_fixture(args.fixture, logger=print)
+        generated = run_profile_pipeline_from_fixture(args.fixture, logger=print)
+        publication_state = _report_publication_decision(generated)
         print("\nDone!")
     else:
-        _run_live_profile_generation()
+        publication_state = _run_live_profile_generation()
 
     warnings: list[str] = []
     errors: list[str] = []
@@ -97,6 +110,67 @@ def _cmd_generate_profile(args: argparse.Namespace) -> CommandResult:
             "step": "generate_profile",
             "validated": bool(args.validate),
             "fixture": args.fixture,
+            "publication_state": publication_state,
+        },
+    )
+
+
+def _cmd_publication_status(args: argparse.Namespace) -> CommandResult:
+    """Report the one publication decision for the stored artifact set on disk.
+
+    The subject is the stored set: its own manifest, payload bytes, and recorded
+    quality facts. No provider is queried and no candidate hold from another run
+    is copied onto it.
+    """
+    import json
+
+    from scripts.contracts import PROFILE_ARTIFACT_MANIFEST_PATH
+    from scripts.pipeline.profile_pipeline import (
+        evaluate_profile_publication,
+        stored_publication_subject,
+    )
+    from scripts.quality.validate_generated_profile import (
+        PROFILE_SNAPSHOT_PATH,
+        validate_profile,
+    )
+
+    def read_json(path: Path) -> dict:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return {}
+        return payload if isinstance(payload, dict) else {}
+
+    validation = validate_profile()
+    _print_validation_result(validation)
+    decision = evaluate_profile_publication(
+        stored_publication_subject(
+            read_json(Path(PROFILE_ARTIFACT_MANIFEST_PATH)),
+            read_json(PROFILE_SNAPSHOT_PATH),
+            artifact_errors=tuple(validation.errors),
+        )
+    )
+    print(f"Publication decision: {decision.describe()}")
+
+    publish = decision.allows_canonical_publication
+    if args.github_output:
+        with open(args.github_output, "a", encoding="utf-8") as handle:
+            handle.write(f"publish={'true' if publish else 'false'}\n")
+            handle.write(f"state={decision.state}\n")
+            handle.write(f"reasons={','.join(decision.reasons)}\n")
+
+    invalid = decision.state == "ERROR_INVALID_ARTIFACT_SET"
+    rc = 1 if invalid or (args.require_ready and not publish) else 0
+    return CommandResult(
+        exit_code=rc,
+        warnings=list(validation.warnings),
+        errors=list(validation.errors) if invalid else [],
+        extra={
+            "step": "publication_status",
+            "state": decision.state,
+            "reasons": list(decision.reasons),
+            "publish": publish,
+            "require_ready": bool(args.require_ready),
         },
     )
 
@@ -420,6 +494,22 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to collected-data JSON fixture. Skips live GitHub API calls.",
     )
     generate_cmd.set_defaults(func=_cmd_generate_profile)
+
+    publication_cmd = subparsers.add_parser(
+        "publication-status",
+        help="Report the publication decision for the stored profile artifact set.",
+    )
+    publication_cmd.add_argument(
+        "--github-output",
+        default=None,
+        help="Append publish/state/reasons to this GitHub Actions output file.",
+    )
+    publication_cmd.add_argument(
+        "--require-ready",
+        action="store_true",
+        help="Exit non-zero unless the stored artifact set is READY to publish.",
+    )
+    publication_cmd.set_defaults(func=_cmd_publication_status)
 
     metrics_cmd = subparsers.add_parser(
         "check-metrics",
