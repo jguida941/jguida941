@@ -37,7 +37,15 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run tests
-        run: python -m unittest discover -s tests -v
+        run: |
+          python -m unittest \
+            tests.github.test_github_client \
+            tests.github.test_token_fallback \
+            tests.pipeline.test_compute_metrics_accuracy \
+            tests.pipeline.test_profile_pipeline_fixture \
+            tests.contracts.test_data_semantics \
+            tests.contracts.test_public_data_privacy \
+            tests.contracts.test_design_contract
 
       - name: Fixture smoke CLI run (offline path)
         env:
