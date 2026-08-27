@@ -101,7 +101,9 @@ def _workflow_steps(path):
 
 
 def _step_field(step, field):
-    pattern = re.compile(rf"^\s+(?:-\s+)?{re.escape(field)}:\s*(.*?)\s*$")
+    key = re.escape(field)
+    spellings = "|".join((key, f"'{key}'", f'"{key}"'))
+    pattern = re.compile(rf"^\s+(?:-\s+)?(?:{spellings})\s*:\s*(.*?)\s*$")
     for line in step:
         match = pattern.match(line)
         if match:
@@ -623,37 +625,115 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
         )
 
     def _assert_bounded_product_test_step(self, step):
-        run_text = "\n".join(_step_run_lines(step))
-        self.assertIn("python -m unittest", run_text)
-        self.assertNotIn("discover", run_text)
-        for module in PROFILE_PRODUCT_TEST_MODULES:
-            self.assertIn(module, run_text)
+        self.assertIsNone(
+            _step_field(step, "if"),
+            "the product test step must run unconditionally",
+        )
+        self.assertIsNone(
+            _step_field(step, "continue-on-error"),
+            "the product test step must not be allowed to fail",
+        )
+        self.assertIsNone(
+            _step_field(step, "shell"),
+            "the product test step must use the runner's default shell",
+        )
+        command = " ".join(
+            line.rstrip("\\").strip() for line in _step_run_lines(step)
+        ).split()
+        self.assertEqual(
+            ["python", "-m", "unittest", *PROFILE_PRODUCT_TEST_MODULES],
+            command,
+            "the product test step must run exactly the approved product modules",
+        )
 
-    def test_generation_workflows_run_tests_before_generation(self):
+    def test_generation_workflows_generate_before_tests_that_gate_publication(self):
         for workflow in self._generation_workflows():
             with self.subTest(workflow=workflow.name):
                 text = workflow.read_text(encoding="utf-8")
                 self.assertIn("  workflow_dispatch:", text)
                 if workflow.name == "metrics.yml":
                     self.assertIn("  schedule:", text)
+                shell_keys = [
+                    line
+                    for line in text.splitlines()
+                    if re.match(
+                        r"^\s*(?:-\s+)?(?:shell|'shell'|\"shell\")\s*:", line
+                    )
+                ]
+                self.assertEqual(
+                    [],
+                    shell_keys,
+                    "generation workflows must not configure a custom shell",
+                )
 
                 steps = _workflow_steps(workflow)
                 test_index = _step_index(
                     steps,
                     lambda step: _step_runs(step, "python -m unittest"),
                 )
-                generate_index = _step_index(
+                generation_occurrences = [
+                    (index, line)
+                    for index, step in enumerate(steps)
+                    for line in _step_run_lines(step)
+                    if "python scripts/profile_cli.py generate-profile" in line
+                ]
+                generation_invocations = sum(
+                    line.count("python scripts/profile_cli.py generate-profile")
+                    for _index, line in generation_occurrences
+                )
+                decision_index = _step_index(
                     steps,
-                    lambda step: _step_runs(
-                        step, "python scripts/profile_cli.py generate-profile"
+                    lambda step: any(
+                        "python scripts/profile_cli.py" in line
+                        and "publication" in line
+                        and "status" in line
+                        for line in _step_run_lines(step)
                     ),
                 )
+                upload_index = _step_index(
+                    steps,
+                    lambda step: _step_field(step, "uses") == "actions/upload-artifact@v4"
+                    and "README.md" in "\n".join(step),
+                )
+                commit_index = _step_index(
+                    steps,
+                    lambda step: _step_field(step, "uses")
+                    == "stefanzweifel/git-auto-commit-action@v5",
+                )
                 self.assertIsNotNone(test_index, "ordinary product tests must run")
-                self.assertIsNotNone(generate_index, "profile generation must run")
-                self.assertLess(test_index, generate_index)
+                self.assertEqual(
+                    1,
+                    generation_invocations,
+                    "the workflow must invoke candidate generation exactly once",
+                )
+                generate_index, generation_command = generation_occurrences[0]
+                self.assertEqual(
+                    "python scripts/profile_cli.py generate-profile",
+                    generation_command,
+                    "the sole generation invocation must be the exact canonical command",
+                )
+                self.assertIsNotNone(decision_index, "the publication decision must run")
+                self.assertIsNotNone(upload_index, "the canonical artifact upload must run")
+                self.assertIsNotNone(commit_index, "verified outputs must be published")
+                self.assertLess(
+                    generate_index,
+                    test_index,
+                    "candidate generation must run before the fatal product tests so a"
+                    " stale committed artifact is regenerated instead of failing every"
+                    " scheduled run",
+                )
+                for boundary_name, boundary_index in (
+                    ("publication decision", decision_index),
+                    ("canonical artifact upload", upload_index),
+                    ("auto-commit", commit_index),
+                ):
+                    self.assertLess(
+                        test_index,
+                        boundary_index,
+                        f"the fatal product tests must complete before the {boundary_name}",
+                    )
                 test_step = steps[test_index]
                 self._assert_bounded_product_test_step(test_step)
-                self.assertNotEqual(_step_field(test_step, "continue-on-error"), "true")
                 self.assertNotIn("|| true", "\n".join(_step_run_lines(test_step)))
 
     def test_generation_workflows_keep_generation_and_publish_steps(self):

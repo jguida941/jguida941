@@ -39,18 +39,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Bounded to the product surfaces published by this checkpoint.
-      - name: Run profile product tests
-        run: |
-          python -m unittest \
-            tests.github.test_github_client \
-            tests.github.test_token_fallback \
-            tests.pipeline.test_compute_metrics_accuracy \
-            tests.pipeline.test_profile_pipeline_fixture \
-            tests.contracts.test_data_semantics \
-            tests.contracts.test_public_data_privacy \
-            tests.contracts.test_design_contract
-
       - name: Resolve GitHub token
         env:
           CANDIDATE_PAT: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
@@ -95,6 +83,18 @@ jobs:
           GITHUB_USERNAME: jguida941
           PROFILE_TIMEZONE: America/New_York
         run: python scripts/profile_cli.py validate
+
+      # Bounded to the product surfaces published by this checkpoint.
+      - name: Run profile product tests
+        run: |
+          python -m unittest \
+            tests.github.test_github_client \
+            tests.github.test_token_fallback \
+            tests.pipeline.test_compute_metrics_accuracy \
+            tests.pipeline.test_profile_pipeline_fixture \
+            tests.contracts.test_data_semantics \
+            tests.contracts.test_public_data_privacy \
+            tests.contracts.test_design_contract
 
       # The same typed product decision this repository uses everywhere else.
       - name: Decide whether to publish
