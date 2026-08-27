@@ -86,6 +86,13 @@ jobs:
 
       # Bounded to the product surfaces published by this checkpoint.
       - name: Run profile product tests
+        env:
+          PERSONAL_GITHUB_TOKEN: ""
+          GITHUB_TOKEN: ""
+          GH_TOKEN: ""
+          PROFILE_TOKEN_MODE: none
+          CACHE_DIR: ${{ runner.temp }}/profile-product-tests
+          BYPASS_GITHUB_CACHE: "true"
         run: |
           python -m unittest \
             tests.github.test_github_client \
