@@ -716,12 +716,35 @@ class BuilderScorecardContract(unittest.TestCase):
     def test_ci_coverage_is_labeled_gauge(self):
         import tempfile
 
+        from scripts.contracts.profile_contract import metric_claim
+        from scripts.rendering.generate_builder_scorecard import generate
+        from tests.contracts.test_label_legibility import _compact_gauge_errors
+
+        scorecard = self._scorecard()
+        claim = metric_claim(
+            "ci_coverage_pct",
+            value=scorecard["ci_coverage_pct"],
+            scope="owned-public-private-nonfork-profile-excluded-exact",
+            status="exact",
+        )
         with tempfile.TemporaryDirectory() as d:
-            svg = self._render(str(Path(d) / "score.svg"))
-        # gauge center label rides at a scale token (20) and shows a percent in [0,100]
-        self.assertRegex(
-            svg, r'<text[^>]*font-size="20"[^>]*>[^<]*%</text>',
+            out = Path(d) / "score.svg"
+            generate(scorecard, output_path=str(out), ci_claim=claim)
+            svg = out.read_text(encoding="utf-8")
+        labels = re.findall(
+            r'<text[^>]*font-size="([0-9.]+)"[^>]*text-anchor="middle"[^>]*>([^<]*%)</text>',
+            svg,
+        )
+        self.assertTrue(labels, "CI coverage must render a centered percentage label")
+        self.assertTrue(
+            all(float(size) >= 12.0 for size, _label in labels),
             "CI coverage must render as a >=12px labeled gauge",
+        )
+        self.assertEqual(
+            [],
+            _compact_gauge_errors(svg),
+            "the shipped gauge must keep its ring, centered value, and copy column"
+            " visible, untransformed, and inside the tile",
         )
 
     def test_empty_state(self):
@@ -1085,11 +1108,36 @@ class EngineeringCadenceContract(unittest.TestCase):
     def test_ci_coverage_is_labeled_gauge(self):
         import tempfile
 
+        from scripts.contracts.profile_contract import metric_claim
+        from scripts.rendering.generate_engineering_cadence import generate
+        from tests.contracts.test_label_legibility import _compact_gauge_errors
+
+        data = self._data()
+        eligible = data["public_nonfork_repos"] + data.get("private_nonfork_repos", 0)
+        claim = metric_claim(
+            "ci_coverage_pct",
+            value=data["automation_repos"] / eligible * 100.0,
+            scope="owned-public-private-nonfork-profile-excluded-exact",
+            status="exact",
+        )
         with tempfile.TemporaryDirectory() as d:
-            svg = self._render(str(Path(d) / "eng.svg"))
-        self.assertRegex(
-            svg, r'<text[^>]*font-size="20"[^>]*>[^<]*%</text>',
+            out = Path(d) / "eng.svg"
+            generate(data, output_path=str(out), ci_claim=claim)
+            svg = out.read_text(encoding="utf-8")
+        labels = re.findall(
+            r'<text[^>]*font-size="([0-9.]+)"[^>]*text-anchor="middle"[^>]*>([^<]*%)</text>',
+            svg,
+        )
+        self.assertTrue(labels, "CI coverage must render a centered percentage label")
+        self.assertTrue(
+            all(float(size) >= 12.0 for size, _label in labels),
             "CI coverage must render as a >=12px labeled gauge",
+        )
+        self.assertEqual(
+            [],
+            _compact_gauge_errors(svg),
+            "the shipped gauge must keep its ring, centered value, and copy column"
+            " visible, untransformed, and inside the tile",
         )
 
     def test_ci_coverage_uses_the_same_repository_scope_for_both_terms(self):

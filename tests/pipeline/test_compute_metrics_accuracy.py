@@ -660,6 +660,12 @@ class AccuracyTests(unittest.TestCase):
 
     def test_general_metrics_footer_labels_public_and_all_owned_domains(self):
         from scripts.rendering.generate_metrics_general import generate
+        from scripts.rendering.svg_utils import fmt_int
+        from tests.contracts.test_label_legibility import (
+            _exact_total_count,
+            _footer_layout_errors,
+            _positioned_text_lines,
+        )
 
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "metrics.general.svg"
@@ -670,30 +676,81 @@ class AccuracyTests(unittest.TestCase):
                 generated_at="2026-08-26T12:00:00Z",
                 output_path=str(output),
             )
-            root = ET.fromstring(output.read_text(encoding="utf-8"))
+            svg = output.read_text(encoding="utf-8")
 
-        footer = next(
-            (node.text or "")
-            for node in root.iter()
-            if node.tag.endswith("text")
-            and "Repositories" in (node.text or "")
-            and "Stargazers" in (node.text or "")
-            and "Releases" in (node.text or "")
+        semantic_markers = ("Repositories", "Stargazers", "Releases", "Languages")
+        # One shared, visibility-aware extractor decides what the reader can read.
+        _root, text_lines = _positioned_text_lines(svg)
+        semantic_lines = [
+            line
+            for line in text_lines
+            if any(marker in line.text for marker in semantic_markers)
+        ]
+        self.assertTrue(semantic_lines, "the generated footer must remain visible")
+        self.assertEqual(
+            [],
+            [line.text for line in semantic_lines if not line.visible],
+            "footer claims may not be satisfied by hidden text",
         )
+        self.assertEqual(
+            [],
+            [line.text for line in semantic_lines if line.squeezed],
+            "footer claims may not be squeezed with textLength/lengthAdjust",
+        )
+        footer = " ".join(
+            line.text
+            for line in semantic_lines
+            if line.visible and not line.transformed
+        )
+
+        totals = (
+            f"{fmt_int(self.model['snapshot']['total_repos'])} Repositories",
+            f"{fmt_int(self.model['snapshot']['total_stars'])} Stargazers",
+            f"{fmt_int(self.model['snapshot']['releases'])} Releases",
+        )
+        for claim in totals:
+            self.assertEqual(
+                1,
+                _exact_total_count(footer, claim),
+                f"the wrapped footer must conserve {claim!r} exactly once as a complete"
+                " numeric total, never as a substring of a larger number",
+            )
         self.assertNotIn(self.model["data_scope"]["repos_included"], footer)
-        self.assertIn(
-            "Repositories/Stargazers/Releases: public-owned-nonfork",
-            footer,
+        readable_lines = [
+            line.text
+            for line in semantic_lines
+            if line.visible and not line.transformed
+        ]
+        public_scope_line = "Repositories/Stargazers/Releases: public-owned-nonfork"
+        self.assertEqual(
+            1,
+            readable_lines.count(public_scope_line),
+            "the public totals scope must read back as one complete line, so a broadened"
+            " variant cannot satisfy it",
         )
-        self.assertIn(
-            f"Languages: {self.model['data_scope']['metric_scopes']['languages_count']}",
-            footer,
+        language_scope_line = (
+            f"Languages: {self.model['data_scope']['metric_scopes']['languages_count']}"
+        )
+        self.assertEqual(
+            1,
+            readable_lines.count(language_scope_line),
+            "the all-owned language scope must read back as one complete line",
         )
         self.assertTrue(
             _scope_names_profile_exclusion(
                 self.model["data_scope"]["metric_scopes"]["languages_count"]
             ),
             "the language scope must name exclusion of the profile repository",
+        )
+        self.assertEqual(
+            [],
+            _footer_layout_errors(
+                svg,
+                totals,
+                expected_scope_lines=(public_scope_line, language_scope_line),
+            ),
+            "the shared footer oracle must accept the rendered footer's wrapping,"
+            " geometry, visibility, and conserved totals",
         )
 
     def test_now_reflects_recent_pushes(self):

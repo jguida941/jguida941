@@ -43,16 +43,17 @@ def _gauge_cell(
     parts = [glass_tile(x, y, w, h)]
     parts.append(
         donut_gauge(
-            x + 32,
+            x + 33,
             y + h / 2,
             value=float(value or 0),
             label=display_value,
-            radius=24,
-            stroke=6,
+            radius=21.5,
+            stroke=4,
+            label_size=12,
         )
     )
-    parts.append(text("CI coverage", x + 64, y + h / 2 - 2, token="caption", color=TEXT))
-    parts.append(text(detail, x + 64, y + h / 2 + 14, token="caption", color=TEXT_DIM))
+    parts.append(text("CI coverage", x + 69, y + h / 2 - 2, token="caption", color=TEXT))
+    parts.append(text(detail, x + 69, y + h / 2 + 14, token="caption", color=TEXT_DIM))
     return "".join(parts)
 
 
@@ -175,7 +176,7 @@ def generate(
                 detail=(
                     "Unavailable"
                     if ci_status == "unavailable"
-                    else f"{fmt_int(automation_repos)} repos automated"
+                    else f"{fmt_int(automation_repos)} automated"
                 ),
                 display_value=(
                     ci_claim["display_value"]

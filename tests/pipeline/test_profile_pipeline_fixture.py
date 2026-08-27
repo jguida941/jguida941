@@ -36,6 +36,7 @@ PROFILE_PRODUCT_TEST_MODULES = (
     "tests.contracts.test_data_semantics",
     "tests.contracts.test_public_data_privacy",
     "tests.contracts.test_design_contract",
+    "tests.contracts.test_label_legibility",
 )
 PROFILE_PRODUCT_TEST_ENV = (
     ("PERSONAL_GITHUB_TOKEN", ""),

@@ -177,6 +177,7 @@ def donut_gauge(
     radius: float = 34,
     stroke: float = 8,
     color: str = CYAN,
+    label_size: float = 20,
 ) -> str:
     """A single value in [0, max_value] as a part-to-whole ring with a token-sized
     (>=12) center label. DESIGN_SPEC 3.9 — the only sanctioned circular chart here;
@@ -184,7 +185,9 @@ def donut_gauge(
     mv = float(max_value) or 1.0
     pct = max(0.0, min(100.0, float(value) / mv * 100.0))
     center = label if label is not None else f"{round(pct)}%"
-    return _progress_ring(cx, cy, radius, pct, color=color, stroke=stroke, label=center, label_size=20)
+    return _progress_ring(
+        cx, cy, radius, pct, color=color, stroke=stroke, label=center, label_size=label_size
+    )
 
 
 def repository_row(
