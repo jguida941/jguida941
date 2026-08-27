@@ -2,9 +2,9 @@
 
 Power BI information architecture (DESIGN_SPEC): one dominant KPI top-left
 (12-month contributions at `display` size), a supporting grid of secondary
-engineering metrics, and a scope/provenance footer. The footer carries the three
-totals as a single text node ("67 Repositories", "78 Stargazers", "0 Releases")
-so the metrics validator (scripts/quality/metrics_svg.py) reads them back.
+engineering metrics, and a scope/provenance footer. The footer renders the three
+totals ("67 Repositories", "78 Stargazers", "0 Releases") as semantic footer
+lines that the metrics validator (scripts/quality/metrics_svg.py) reads back.
 """
 
 from __future__ import annotations
@@ -137,8 +137,8 @@ def generate(
             metric_tile(x, y, col_w, tile_h, value=value, label=label, icon_name=icon_name)
         )
 
-    # --- scope / provenance footer (single text node; carries the 3 totals the
-    #     metrics validator reads back: "<n> Repositories/Stargazers/Releases") --
+    # --- scope / provenance footer (three lines: the totals the metrics validator
+    #     reads back, then one exact scope line per metric family) ---------------
     metric_scopes = (
         data_scope.get("metric_scopes", {})
         if isinstance(data_scope, dict)
@@ -147,23 +147,33 @@ def generate(
     language_scope = xml_escape(
         str(metric_scopes.get("languages_count", "public-owned-nonfork"))
     )
-    footer = (
+    grid_bottom = content_top + 2 * tile_h + row_gap
+    footer_lines = (
         f"{fmt_int(total_repos)} Repositories · {fmt_int(total_stars)} Stargazers · "
-        f"{fmt_int(releases)} Releases · "
-        "Repositories/Stargazers/Releases: public-owned-nonfork · "
-        f"Languages: {language_scope} · last 12 months"
+        f"{fmt_int(releases)} Releases · last 12 months",
+        "Repositories/Stargazers/Releases: public-owned-nonfork",
+        f"Languages: {language_scope}",
     )
+    for index, footer_line in enumerate(footer_lines):
+        parts.append(
+            text(
+                footer_line,
+                pad,
+                grid_bottom + 30 + index * 18,
+                token="caption",
+                color=TEXT_DIM,
+            )
+        )
     for index, quality_line in enumerate(quality_lines):
         parts.append(
             text(
                 xml_escape(quality_line),
                 pad,
-                304 + index * 18,
+                grid_bottom + 84 + index * 18,
                 token="caption",
                 color=TEXT_DIM,
             )
         )
-    parts.append(text(footer, pad, height - 18, token="caption", color=TEXT_DIM))
 
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '

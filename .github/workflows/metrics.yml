@@ -97,7 +97,8 @@ jobs:
             tests.pipeline.test_profile_pipeline_fixture \
             tests.contracts.test_data_semantics \
             tests.contracts.test_public_data_privacy \
-            tests.contracts.test_design_contract
+            tests.contracts.test_design_contract \
+            tests.contracts.test_label_legibility
 
       # One typed product decision governs every canonical publish effect below.
       # Readiness is evidence about the artifact set, never a rendered repository

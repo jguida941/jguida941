@@ -101,7 +101,8 @@ jobs:
             tests.pipeline.test_profile_pipeline_fixture \
             tests.contracts.test_data_semantics \
             tests.contracts.test_public_data_privacy \
-            tests.contracts.test_design_contract
+            tests.contracts.test_design_contract \
+            tests.contracts.test_label_legibility
 
       # The same typed product decision this repository uses everywhere else.
       - name: Decide whether to publish

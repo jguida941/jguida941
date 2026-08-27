@@ -40,6 +40,34 @@ mixed policy (only hero + streak had `width="100%"`) was the visible offset; it 
 intrinsic SVG width = `SVG_WIDTH` (840), `viewBox="0 0 840 H"`. Enforced by
 `tests/contracts/test_readme_projection.py` + `test_card_contracts.py`.
 
+**Generated-SVG fit and compact-composition doctrine (operator decision, 2026-08-27):** visible ink,
+not merely element coordinates, must fit its assigned region. This specializes the spacing and
+legibility laws for the two compact layouts the live README exposed:
+
+1. **Hero scope/provenance footer.** `metrics.general.svg` keeps the readable repository, stargazer,
+   and release totals exactly once and keeps the public/private scope meaning visible. With the longest
+   live all-owned language scope, it wraps or humanizes at semantic boundaries into at least two
+   discrete lines; every line's conservative glyph-width estimate stays inside the 28–812 content
+   bounds. Ellipsis, clipping, and `textLength`/`lengthAdjust` compression are not wrapping. The first
+   footer ink begins 12–32px below the 3×2 metric grid, using the existing spacing scale; this removes
+   the unbalanced dead band without inventing horizontal centering.
+2. **Compact CI donut tile.** In both Builder Scorecard and Engineering Cadence, the painted ring
+   radius (`r + stroke/2`) stays at least 8px from every tile edge. The copy column begins at least 12px
+   after the painted ring and ends at least 8px before the tile edge. The centered percentage remains
+   at the ≥12px secondary-text floor and its conservative glyph-width estimate, including `100%`, fits
+   inside the ring hole with 2px clear space on both sides. These bounds apply to the live `21%` /
+   `53`-automated-repository case and the whole valid 0–100% boundary, not just the current string.
+
+The deterministic test proxy uses conservative glyph classes because the system-font stack resolves
+differently by host; the live GitHub render remains the visual receipt. This is grounded in Microsoft's
+[clean, glanceable, labeled dashboard guidance](https://learn.microsoft.com/en-us/power-bi/create-reports/service-dashboards-design-tips),
+Apple's [fit-without-horizontal-scroll and no-text-overlap guidance](https://developer.apple.com/design/tips/),
+and SVG 2's [text layout model](https://www.w3.org/TR/SVG2/text.html). Named wrong examples:
+`WRONG-FOOTER-ONE-LINE` (the raw scopes run beyond x=812), `WRONG-FOOTER-SQUASH` (`textLength` hides
+the overflow), `WRONG-FOOTER-DEAD-BAND` (grid bottom 227 to footer ink near 296),
+`WRONG-GAUGE-EDGE-HUG` (r=24/stroke=6 leaves only 5–6px), `WRONG-GAUGE-COPY-COLLISION` (copy starts
+5px after ring paint), and `WRONG-GAUGE-21-ONLY` (a 20px `21%` happens to fit while `100%` does not).
+
 **Authority boundary:** DESIGN_SPEC = intended law; `config.py`/`design_tokens`/components =
 implementation; `templates/README.md.tpl` + generated `README.md` + the web generator = projection code;
 the **live GitHub README / HTML render is the rendered receipt** — the truth. Tests are an admissibility
