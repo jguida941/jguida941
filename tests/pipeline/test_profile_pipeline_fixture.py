@@ -37,6 +37,14 @@ PROFILE_PRODUCT_TEST_MODULES = (
     "tests.contracts.test_public_data_privacy",
     "tests.contracts.test_design_contract",
 )
+PROFILE_PRODUCT_TEST_ENV = (
+    ("PERSONAL_GITHUB_TOKEN", ""),
+    ("GITHUB_TOKEN", ""),
+    ("GH_TOKEN", ""),
+    ("PROFILE_TOKEN_MODE", "none"),
+    ("CACHE_DIR", "${{ runner.temp }}/profile-product-tests"),
+    ("BYPASS_GITHUB_CACHE", "true"),
+)
 PROFILE_PAYLOAD_PATHS = (
     "README.md",
     "metrics.general.svg",
@@ -109,6 +117,49 @@ def _step_field(step, field):
         if match:
             return match.group(1)
     return None
+
+
+def _key_spellings(field):
+    key = re.escape(field)
+    return "|".join((key, f"'{key}'", f'"{key}"'))
+
+
+def _mapping_key_occurrences(text, field):
+    pattern = re.compile(
+        rf"(?:^[ \t]*(?:-[ \t]+)*|[{{,][ \t]*)(?:{_key_spellings(field)})[ \t]*:",
+        re.MULTILINE,
+    )
+    return [match.group(0).strip() for match in pattern.finditer(text)]
+
+
+def _env_scalar(raw):
+    if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in "'\"":
+        return raw[1:-1]
+    return raw
+
+
+def _step_env_entries(step):
+    entries = []
+    env_indent = None
+    for line in step:
+        if not line.strip():
+            continue
+        if env_indent is None:
+            opener = re.match(
+                rf"^(\s*(?:-\s+)?)(?:{_key_spellings('env')})\s*:\s*$", line
+            )
+            if opener is not None:
+                env_indent = len(opener.group(1))
+            continue
+        indent = len(line) - len(line.lstrip())
+        if indent <= env_indent:
+            break
+        entry = re.match(
+            r"^\s*([A-Za-z0-9_.-]+|'[^']*'|\"[^\"]*\")\s*:\s*(.*?)\s*$", line
+        )
+        if entry is not None:
+            entries.append((_env_scalar(entry.group(1)), entry.group(2)))
+    return entries
 
 
 def _step_run_lines(step):
@@ -646,6 +697,32 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
             "the product test step must run exactly the approved product modules",
         )
 
+    def _assert_hermetic_product_test_env(self, step):
+        step_text = "\n".join(step)
+        declared = {}
+        for key, raw in _step_env_entries(step):
+            declared.setdefault(key, []).append(raw)
+        expected = dict(PROFILE_PRODUCT_TEST_ENV)
+        extra_keys = [key for key in declared if key not in expected]
+        observed = {}
+        for key in list(expected) + extra_keys:
+            declarations = _mapping_key_occurrences(step_text, key)
+            values = declared.get(key, [])
+            if len(declarations) == 1 and len(values) == 1 and values[0]:
+                observed[key] = _env_scalar(values[0])
+            else:
+                observed[key] = {
+                    "declarations": len(declarations),
+                    "env_values": values,
+                }
+        self.assertEqual(
+            expected,
+            observed,
+            "the product test step's env block must declare exactly the hermetic"
+            " keys, each once with its exact value, so ordinary product tests can"
+            " neither inherit nor restore the live generator credentials or cache",
+        )
+
     def test_generation_workflows_generate_before_tests_that_gate_publication(self):
         for workflow in self._generation_workflows():
             with self.subTest(workflow=workflow.name):
@@ -653,17 +730,17 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
                 self.assertIn("  workflow_dispatch:", text)
                 if workflow.name == "metrics.yml":
                     self.assertIn("  schedule:", text)
-                shell_keys = [
-                    line
-                    for line in text.splitlines()
-                    if re.match(
-                        r"^\s*(?:-\s+)?(?:shell|'shell'|\"shell\")\s*:", line
-                    )
-                ]
                 self.assertEqual(
                     [],
-                    shell_keys,
-                    "generation workflows must not configure a custom shell",
+                    _mapping_key_occurrences(text, "shell"),
+                    "generation workflows must not configure a custom shell in any"
+                    " block or flow mapping, including workflow or job defaults",
+                )
+                self.assertEqual(
+                    [],
+                    [line for line in text.splitlines() if "BASH_ENV" in line],
+                    "generation workflows must not name BASH_ENV anywhere, so no"
+                    " bash startup file can restore live credentials or cache",
                 )
 
                 steps = _workflow_steps(workflow)
@@ -734,6 +811,7 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
                     )
                 test_step = steps[test_index]
                 self._assert_bounded_product_test_step(test_step)
+                self._assert_hermetic_product_test_env(test_step)
                 self.assertNotIn("|| true", "\n".join(_step_run_lines(test_step)))
 
     def test_generation_workflows_keep_generation_and_publish_steps(self):
