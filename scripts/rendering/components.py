@@ -218,7 +218,7 @@ def repository_row(
         parts.append(_icon("lock", text_x, name_y - 11, size=12, color=TEXT_DIM))
         text_x += 17
     name_node = text(_xml_escape(_truncate(name, 42)), text_x, name_y, token="body", color=TEXT_BRIGHT)
-    if url and not is_private:
+    if url:
         name_node = f'<a href="{_xml_escape(url)}">{name_node}</a>'
     parts.append(name_node)
     if detail:

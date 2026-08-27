@@ -43,7 +43,7 @@ def _lane(focus: dict, key: str, label: str, x: float, y: float, w: float, h: fl
         title = truncate(str(item.get("title") or "item"), name_max)
         url = str(item.get("url") or "").strip()
         node = text(xml_escape(title), tx, iy, token="body", color=TEXT_BRIGHT)
-        parts.append(f'<a href="{xml_escape(url)}">{node}</a>' if url and not item.get("is_private") else node)
+        parts.append(f'<a href="{xml_escape(url)}">{node}</a>' if url else node)
         detail = truncate(str(item.get("detail") or "").strip(), name_max + 4)
         if detail:
             parts.append(text(xml_escape(detail), x + pad, iy + 16, token="caption", color=TEXT_DIM))

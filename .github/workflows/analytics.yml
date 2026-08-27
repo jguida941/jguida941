@@ -39,6 +39,17 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Run profile product tests
+        run: |
+          python -m unittest \
+            tests.github.test_github_client \
+            tests.github.test_token_fallback \
+            tests.pipeline.test_compute_metrics_accuracy \
+            tests.pipeline.test_profile_pipeline_fixture \
+            tests.contracts.test_data_semantics \
+            tests.contracts.test_public_data_privacy \
+            tests.contracts.test_design_contract
+
       - name: Resolve GitHub token
         env:
           CANDIDATE_PAT: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
@@ -75,9 +86,25 @@ jobs:
         run: |
           echo "Token mode: ${PROFILE_TOKEN_MODE}"
           python scripts/profile_cli.py doctor --fail-on critical
-          python scripts/profile_cli.py generate-profile --validate
+          python scripts/profile_cli.py generate-profile
           python scripts/profile_cli.py triage --workflow "Generate Metrics" --limit 20 --fail-on critical
 
+      - name: Validate generated profile artifacts
+        env:
+          GITHUB_USERNAME: jguida941
+          PROFILE_TIMEZONE: America/New_York
+        run: python scripts/profile_cli.py validate
+
+      # The same typed product decision this repository uses everywhere else.
+      - name: Decide whether to publish
+        id: gate
+        env:
+          GITHUB_USERNAME: jguida941
+          PROFILE_TIMEZONE: America/New_York
+        run: python scripts/profile_cli.py publication-status --github-output "$GITHUB_OUTPUT"
+
+      # Diagnostics carry no canonical README/SVG/JSON bytes, so a held run may
+      # still publish them for inspection.
       - name: Upload diagnostics artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -88,20 +115,33 @@ jobs:
             site/data/run_diagnostics.json
             site/data/run_diagnostics_history.jsonl
 
-      - name: Upload rendered profile artifacts
+      - name: Upload canonical profile artifacts
+        if: ${{ success() && steps.gate.outputs.publish == 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: profile-rendered-artifacts
           path: |
             README.md
-            assets/*.svg
-            site/data/profile_snapshot.json
+            assets/activity_heatmap.svg
+            assets/badges.svg
+            assets/builder_scorecard.svg
+            assets/contribution_calendar.svg
+            assets/currently_working.svg
+            assets/engineering_cadence.svg
+            assets/lang_breakdown.svg
+            assets/now_next_shipped.svg
+            assets/raw_snapshot.svg
+            assets/repo_spotlight.svg
+            assets/streak_summary.svg
             metrics.general.svg
+            site/data/profile_snapshot.json
+            site/data/profile_artifact_manifest.json
 
       - uses: stefanzweifel/git-auto-commit-action@v5
+        if: ${{ success() && steps.gate.outputs.publish == 'true' }}
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           commit_message: "update analytics & readme"
           branch: main
-          file_pattern: "README.md assets/*.svg site/data/profile_snapshot.json metrics.general.svg"
+          file_pattern: "README.md assets/activity_heatmap.svg assets/badges.svg assets/builder_scorecard.svg assets/contribution_calendar.svg assets/currently_working.svg assets/engineering_cadence.svg assets/lang_breakdown.svg assets/now_next_shipped.svg assets/raw_snapshot.svg assets/repo_spotlight.svg assets/streak_summary.svg metrics.general.svg site/data/profile_snapshot.json site/data/profile_artifact_manifest.json"

@@ -1,8 +1,10 @@
-"""Metric definitions and formatting rules for profile outputs."""
+"""Metric definitions, claim carriers, and formatting rules for profile outputs."""
 
 from __future__ import annotations
 
 from typing import Any
+
+from scripts.rendering.svg_utils import xml_escape
 
 
 # Curated backend-developer scorecard (8 tiles -> clean 4x2 grid). Each value is
@@ -151,7 +153,154 @@ SNAPSHOT_METRICS = [
 ]
 
 
+# --- Machine-readable metric claims -------------------------------------------
+# A card that repeats a published number carries the claim itself: metric key,
+# the exact value it displays, the population scope, and the completeness status.
+# The visible text and the declared display value are the same string, so a card
+# can never drift from the JSON it repeats.
+
+METRIC_CLAIM_KEY_ATTRIBUTE = "data-metric-key"
+METRIC_CLAIM_VALUE_ATTRIBUTE = "data-metric-display-value"
+METRIC_CLAIM_SCOPE_ATTRIBUTE = "data-metric-scope"
+METRIC_CLAIM_STATUS_ATTRIBUTE = "data-metric-status"
+
+
+# --- Field-specific qualification of retained partial values -------------------
+# A partial family keeps its known value only where every registered visible
+# consumer names that exact field's partial basis. A generic "partial" word in
+# scope metadata is not disclosure: the reader sees the card, so the card says it.
+#
+# `line` is what a card renders. `disclosures` is what one visible line must
+# actually mean, stated independently of that string: the field it is about, its
+# partial status, and each meaning the retained number owes. Validation proves the
+# meanings, never the string, so weakening the rendered line to a bare word cannot
+# also weaken the proof that the line was a real qualification.
+
+PARTIAL_QUALIFICATION_CONSUMERS: dict[str, dict[str, Any]] = {
+    "active_repos_7d": {
+        "line": "Active repos · Partial · known minimum · unknown pushes",
+        "consumers": ("assets/builder_scorecard.svg",),
+        "disclosures": (
+            (
+                "the active-repository field",
+                ("active repos", "active repositories", "repository activity"),
+            ),
+            ("partial status", ("partial",)),
+            ("the retained known minimum", ("known minimum", "minimum known")),
+            (
+                "the unobserved pushes behind it",
+                ("unknown push", "unobserved push", "missing push"),
+            ),
+        ),
+    },
+    "ci_coverage_pct": {
+        "line": "CI · Partial · known minimum · unknown repositories",
+        "consumers": (
+            "assets/builder_scorecard.svg",
+            "assets/engineering_cadence.svg",
+        ),
+        "disclosures": (
+            ("the CI coverage field", ("ci",)),
+            ("partial status", ("partial",)),
+            ("the retained known minimum", ("known minimum", "minimum known")),
+            (
+                "the unobserved repositories behind it",
+                ("unknown repositor", "unobserved repositor", "missing repositor"),
+            ),
+        ),
+    },
+    "primary_lang_share_pct": {
+        "line": "Language · Partial · observed bytes",
+        "consumers": (
+            "assets/builder_scorecard.svg",
+            "assets/engineering_cadence.svg",
+        ),
+        "disclosures": (
+            ("the language field", ("language",)),
+            ("partial status", ("partial",)),
+            ("the observed byte basis", ("observed bytes",)),
+        ),
+    },
+}
+
+
+def partial_qualification_line(metric_key: str) -> str:
+    """The exact visible line a partial value owes its readers, or an empty string."""
+    registered = PARTIAL_QUALIFICATION_CONSUMERS.get(metric_key)
+    return str(registered["line"]) if registered else ""
+
+
+def partial_qualification_consumers(metric_key: str) -> tuple[str, ...]:
+    """The rendered surfaces that display this metric's known value."""
+    registered = PARTIAL_QUALIFICATION_CONSUMERS.get(metric_key)
+    return tuple(registered["consumers"]) if registered else ()
+
+
+def partial_qualification_disclosures(
+    metric_key: str,
+) -> tuple[tuple[str, tuple[str, ...]], ...]:
+    """Each meaning one visible line must carry, independent of its wording."""
+    registered = PARTIAL_QUALIFICATION_CONSUMERS.get(metric_key)
+    if not registered:
+        return ()
+    return tuple(
+        (str(meaning), tuple(str(phrase) for phrase in phrases))
+        for meaning, phrases in registered.get("disclosures", ())
+    )
+
+
+# The visible source label. Fixture output is a legitimate local surface, but it
+# never presents its values as a live provider observation.
+SOURCE_PROVENANCE_LABELS = {
+    "github-api": "GitHub API",
+    "fixture": "fixture data",
+}
+
+
+def source_provenance_label(source_kind: Any) -> str:
+    return SOURCE_PROVENANCE_LABELS.get(
+        str(source_kind or ""), SOURCE_PROVENANCE_LABELS["github-api"]
+    )
+
+
+def gauge_display_value(value: Any) -> str:
+    """The gauge centre label: one whole percent, or an honest n/a."""
+    if value is None:
+        return "n/a"
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return "n/a"
+    return f"{round(numeric)}%"
+
+
+def metric_claim(key: str, *, value: Any, scope: Any, status: Any) -> dict[str, Any]:
+    """One published claim, shared by every surface that repeats the metric."""
+    return {
+        "metric_key": str(key),
+        "value": value,
+        "display_value": gauge_display_value(value),
+        "scope": str(scope or ""),
+        "status": str(status or ""),
+    }
+
+
+def metric_claim_group(claim: dict[str, Any] | None, inner_svg: str) -> str:
+    """Wrap a rendered value in its machine-readable claim, when one exists."""
+    if not claim or not claim.get("scope"):
+        return inner_svg
+    return (
+        f'<g {METRIC_CLAIM_KEY_ATTRIBUTE}="{xml_escape(claim["metric_key"])}" '
+        f'{METRIC_CLAIM_VALUE_ATTRIBUTE}="{xml_escape(claim["display_value"])}" '
+        f'{METRIC_CLAIM_SCOPE_ATTRIBUTE}="{xml_escape(claim["scope"])}" '
+        f'{METRIC_CLAIM_STATUS_ATTRIBUTE}="{xml_escape(claim["status"])}">'
+        f"{inner_svg}</g>"
+    )
+
+
 def format_metric_value(value: Any, definition: dict[str, Any]) -> str:
+    if type(definition) is not dict:
+        return "n/a"
     fmt = definition.get("format", "int")
     suffix = str(definition.get("suffix", ""))
 
@@ -175,17 +324,12 @@ def format_metric_value(value: Any, definition: dict[str, Any]) -> str:
             return "n/a"
         return f"{numeric:.{digits}f}{suffix}"
 
-    if fmt == "int_or_na":
-        if value is None:
-            return "n/a"
-        try:
-            numeric = int(value)
-        except (TypeError, ValueError):
-            return "n/a"
-        return f"{numeric:,}{suffix}"
-
-    try:
-        numeric = int(value)
-    except (TypeError, ValueError):
-        numeric = 0
-    return f"{numeric:,}{suffix}"
+    if type(value) is not int or value < 0:
+        return "n/a"
+    groups = []
+    remaining = value
+    while remaining:
+        remaining, group = divmod(remaining, 1000)
+        groups.append(f"{group:03d}" if remaining else f"{group:d}")
+    grouped = ",".join(reversed(groups)) if groups else "0"
+    return f"{grouped}{suffix}"

@@ -29,11 +29,10 @@ def _fmt_iso_date(iso_value: str | None) -> str:
     return dt.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 
-def _int(value: object) -> int:
-    try:
-        return int(value)  # type: ignore[arg-type]
-    except (TypeError, ValueError):
-        return 0
+def _optional_int(value: object) -> int | None:
+    if type(value) is not int or value < 0:
+        return None
+    return value
 
 
 def generate(
@@ -41,22 +40,46 @@ def generate(
     username: str,
     snapshot: dict,
     data_scope: dict | None = None,
+    data_quality: dict | None = None,
     generated_at: str | None = None,
     output_path: str = "metrics.general.svg",
 ) -> str:
-    contributions = _int(snapshot.get("last_year_contributions"))
-    commits = _int(snapshot.get("public_scope_commits"))
-    total_repos = _int(snapshot.get("total_repos"))
-    private_owned = _int(snapshot.get("private_owned_repos"))
-    total_stars = _int(snapshot.get("total_stars"))
-    languages_count = _int(snapshot.get("languages_count"))
-    prs_merged = _int(snapshot.get("prs_merged"))
-    releases = _int(snapshot.get("releases"))
-    ci_repos = _int(snapshot.get("ci_repos"))
-    streak_days = _int(snapshot.get("streak_days"))
+    contributions = _optional_int(snapshot.get("last_year_contributions"))
+    commits = _optional_int(snapshot.get("public_scope_commits"))
+    total_repos = _optional_int(snapshot.get("total_repos"))
+    private_owned = _optional_int(snapshot.get("private_owned_repos"))
+    total_stars = _optional_int(snapshot.get("total_stars"))
+    languages_count = _optional_int(snapshot.get("languages_count"))
+    prs_merged = _optional_int(snapshot.get("prs_merged"))
+    releases = _optional_int(snapshot.get("releases"))
+    ci_repos = _optional_int(snapshot.get("ci_repos"))
+    streak_days = _optional_int(snapshot.get("streak_days"))
+
+    quality = data_quality if isinstance(data_quality, dict) else {}
+    metric_statuses = quality.get("metric_statuses", {})
+    if not isinstance(metric_statuses, dict):
+        metric_statuses = {}
+    ci_status = str(metric_statuses.get("ci_repos", "exact")).casefold()
+    language_status = str(
+        metric_statuses.get("languages_count", "exact")
+    ).casefold()
+    if ci_status == "unavailable":
+        ci_repos = None
+    if language_status == "unavailable":
+        languages_count = None
+
+    quality_lines = []
+    if ci_status == "partial":
+        quality_lines.append("CI · Partial · known minimum · unknown repositories")
+    elif ci_status == "unavailable":
+        quality_lines.append("CI · Unavailable · n/a")
+    if language_status == "partial":
+        quality_lines.append("Language · Partial · observed bytes")
+    elif language_status == "unavailable":
+        quality_lines.append("Language · Unavailable · n/a")
 
     width = SVG_WIDTH
-    height = 326
+    height = 326 + 18 * len(quality_lines)
     pad = 28
     name = xml_escape(truncate(str(username), 28))
     generated = xml_escape(_fmt_iso_date(generated_at))
@@ -116,13 +139,30 @@ def generate(
 
     # --- scope / provenance footer (single text node; carries the 3 totals the
     #     metrics validator reads back: "<n> Repositories/Stargazers/Releases") --
-    scope_bits = "public · owned · non-fork" if not (
-        isinstance(data_scope, dict) and data_scope.get("repos_included")
-    ) else xml_escape(str(data_scope["repos_included"]))
+    metric_scopes = (
+        data_scope.get("metric_scopes", {})
+        if isinstance(data_scope, dict)
+        else {}
+    )
+    language_scope = xml_escape(
+        str(metric_scopes.get("languages_count", "public-owned-nonfork"))
+    )
     footer = (
         f"{fmt_int(total_repos)} Repositories · {fmt_int(total_stars)} Stargazers · "
-        f"{fmt_int(releases)} Releases · {scope_bits} · last 12 months"
+        f"{fmt_int(releases)} Releases · "
+        "Repositories/Stargazers/Releases: public-owned-nonfork · "
+        f"Languages: {language_scope} · last 12 months"
     )
+    for index, quality_line in enumerate(quality_lines):
+        parts.append(
+            text(
+                xml_escape(quality_line),
+                pad,
+                304 + index * 18,
+                token="caption",
+                color=TEXT_DIM,
+            )
+        )
     parts.append(text(footer, pad, height - 18, token="caption", color=TEXT_DIM))
 
     svg = (

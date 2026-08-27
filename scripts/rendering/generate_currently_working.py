@@ -11,6 +11,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from scripts.core.config import SPACE, SVG_WIDTH, TEXT_DIM
+from scripts.pipeline.profile_helpers import contains_credential_material
 from scripts.rendering.components import (
     empty_state,
     primary_kpi,
@@ -23,6 +24,12 @@ PAD = 28
 KPI_W = 200
 ROW_PITCH = 56
 ROW_H = 50
+
+def _publishable_detail(value: object) -> str | None:
+    detail = str(value or "").strip()
+    if not detail or contains_credential_material(detail):
+        return None
+    return detail
 
 
 def _time_ago(iso_str: str) -> str:
@@ -88,6 +95,7 @@ def generate(repos: list, output_path: str = "assets/currently_working.svg"):
     )
     for i, repo in enumerate(repos):
         is_private = bool(repo.get("is_private"))
+        detail = _publishable_detail(repo.get("last_commit_msg"))
         parts.append(
             repository_row(
                 rows_x,
@@ -96,7 +104,7 @@ def generate(repos: list, output_path: str = "assets/currently_working.svg"):
                 name=str(repo.get("name", "")),
                 language=repo.get("language"),
                 timestamp=_time_ago(repo.get("pushed_at", "")),
-                detail=None if is_private else (repo.get("last_commit_msg") or None),
+                detail=detail,
                 is_private=is_private,
                 url=(repo.get("html_url") or "").strip() or None,
                 row_h=ROW_H,

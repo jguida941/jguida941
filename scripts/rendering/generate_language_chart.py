@@ -37,14 +37,37 @@ def _segments(language_bytes: dict, total: float) -> list[tuple[str, float]]:
     return segs
 
 
-def generate(language_bytes: dict, output_path: str = "assets/lang_breakdown.svg", top_n: int | None = None):
+def generate(
+    language_bytes: dict,
+    output_path: str = "assets/lang_breakdown.svg",
+    top_n: int | None = None,
+    data_quality: dict | None = None,
+):
     _ = top_n  # capping is fixed by the design contract (<=6 + Other)
+    quality = data_quality if isinstance(data_quality, dict) else {}
+    metric_statuses = quality.get("metric_statuses", {})
+    if not isinstance(metric_statuses, dict):
+        metric_statuses = {}
+    language_status = str(
+        metric_statuses.get("top_languages", "exact")
+    ).casefold()
+    quality_label = None
+    if language_status == "partial":
+        quality_label = "Partial · observed bytes"
+    elif language_status == "unavailable":
+        quality_label = "Unavailable"
     width = SVG_WIDTH
     pad = 28
     total = sum((language_bytes or {}).values())
 
     header_svg, content_top = section_header(
-        pad, 46, TITLE, width=width, eyebrow="Repository Composition", pad=pad
+        pad,
+        46,
+        TITLE,
+        width=width,
+        eyebrow="Repository Composition",
+        right_text=quality_label,
+        pad=pad,
     )
 
     if total <= 0:
@@ -78,7 +101,10 @@ def generate(language_bytes: dict, output_path: str = "assets/lang_breakdown.svg
             content_top + 58,
             value=f"{round(lead_pct)}%",
             label=lead_name,
-            sublabel=f"{fmt_int(len(language_bytes))} languages · {_human_bytes(total)}",
+            sublabel=(
+                f"{fmt_int(len(language_bytes))} languages · {_human_bytes(total)}"
+                + (" · Partial · observed bytes" if language_status == "partial" else "")
+            ),
         )
     )
     parts.append(bar_svg)

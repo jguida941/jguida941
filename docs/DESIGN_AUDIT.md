@@ -5,10 +5,10 @@ Audit ahead of the design-system refactor: from ad-hoc per-card styling to a sha
 architecture) feeding **two projections** of one analytics contract — README SVG cards
 (`scripts/rendering/`) and the web dashboard (`site/index.html`).
 
-This is the *evidence*. The binding artifacts are the **red-first contracts** in
-`tests/test_design_contract.py` (+ siblings): each finding below is encoded as a failing test,
-driven green by the refactor, and kept as a permanent guard. RED→GREEN proofs live in
-`docs/receipts/`.
+This is the *evidence*. The binding artifacts are the executable contracts in
+`tests/contracts/test_design_contract.py` and its product-test siblings. Each finding below is
+encoded as an observable assertion and kept as a permanent guard. Visual acceptance evidence
+lives in `docs/receipts/`.
 
 ## 1. What the current design does well
 - One **centralized glass surface system** (`glass_kit.glass_defs/glass_panel/glass_tile`) — not 13
@@ -17,7 +17,9 @@ driven green by the refactor, and kept as a permanent guard. RED→GREEN proofs 
 - The **de-AI passes already landed**: no per-tile accent stripe, chips are fill-OR-label (no outline),
   one calm ribbon instead of the tri-color underline, neutral icons on the scorecard.
 - **Self-enforcing structure** (the new `scripts/organization/` layout guard) and **honest data**
-  (no bot/self/fabricated rows; private repos named but never leaking commit text; coarse token mode).
+  (no bot/self/fabricated rows). Public and private repository metadata may be published, including
+  names, ordinary commit headlines, languages, activity timestamps, repository URLs, and aggregate
+  metrics. Source or file bodies and credentials, tokens, or secrets must never be published.
 
 ## 2. Why it still reads AI-generated
 The unifying tell: **almost every card is a flat grid of equal-weight metric tiles with a colored
@@ -45,16 +47,16 @@ header (~12 copies) · `StatusChip` (primitive exists; status vocab split SVG vs
 (3 sparkline impls incl. the browser one) · `LanguageBar` (SVG bar vs web list) · `ActivityRow`/
 `RepositoryRow` (~4) · `EmptyState` (~8) · `ProgressRing`/`ProgressBar` (SVG vs CSS conic).
 
-## 5. Assumptions that need proof from the code (→ red contracts)
-| Assumption | Tested today? | Contract to add (RED first) |
+## 5. Assumptions that need proof from the code
+| Assumption | Tested today? | Executable contract |
 |---|---|---|
 | Every SVG has a viewBox / one title / inside frame / no banned tags | ✅ | keep (`test_card_contracts`) |
-| **No raw color literals outside tokens** | ❌ | `test_design_contract.DesignTokenContract` (RED now) |
-| **No sub-legibility font size** | ❌ | `test_design_contract.FontLegibilityContract` (RED now) |
-| **Primary KPI larger than secondary** | ❌ | hierarchy contract (RED) |
-| **SVG↔web token parity** | ❌ | parity contract (RED) |
-| **Metric defs single-source** (labels drift: web "Releases (Recent)" vs contract "Releases (30d)") | ❌ | metric-parity contract (RED) |
-| **Every metric None→"n/a"** in both projections (web coerces missing→"0") | ❌ | empty-state parity contract (RED) |
+| **No raw color literals outside tokens** | ❌ | `test_design_contract.DesignTokenContract` |
+| **No sub-legibility font size** | ❌ | `test_design_contract.FontLegibilityContract` |
+| **Primary KPI larger than secondary** | ❌ | hierarchy contract |
+| **SVG↔web token parity** | ❌ | parity contract |
+| **Metric defs single-source** (labels drift: web "Releases (Recent)" vs contract "Releases (30d)") | ❌ | metric-parity contract |
+| **Every metric None→"n/a"** in both projections (web coerces missing→"0") | ❌ | empty-state parity contract |
 | text-width / blob overflow | partial | extend `_right_edge` |
 
 ## 6. Token reality
@@ -68,5 +70,5 @@ dead legacy `card_theme.card_bg`/`title_accent` (the old tri-color underline) re
 Single highest-leverage move: one `MetricTile`/`PrimaryKpiCard`/`SectionPanel`/`StatusChip` kit + a
 single metric-definition source consumed by **both** projections — deletes 5 tile + ~12 header + the JS
 metric duplication at once, and makes Power-BI hierarchy (one hero KPI, grouped supporting metrics)
-expressible. Each element is fixed via the owner's loop: *cite DESIGN_SPEC rule → RED contract →
-implement → receipt*.
+expressible. Each element cites its DESIGN_SPEC rule, maps it to an executable contract, and carries
+the corresponding implementation and receipt.

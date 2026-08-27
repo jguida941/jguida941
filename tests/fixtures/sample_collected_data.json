@@ -171,5 +171,142 @@
   "cache_mode": {
     "bypass": false,
     "ttl_seconds": 21600
+  },
+  "metric_observations": {
+    "public_scope_commits": {
+      "schema": "profile-provider-observation/v1",
+      "metric_id": "public_scope_commits",
+      "source_metric_id": "owned_public_nonfork_authored_commits",
+      "value": 123,
+      "status": "ok",
+      "complete": true,
+      "population_id": "owned-public-nonfork-repositories",
+      "population_signature": "fixture-public-population",
+      "window_start": null,
+      "window_end": null,
+      "observed_at": "2026-03-06T00:30:00Z",
+      "source_id": "github_rest_repo_commits",
+      "source_mode": "live",
+      "completion_reason": "all_components_observed"
+    },
+    "last_year_contributions": {
+      "schema": "profile-provider-observation/v1",
+      "metric_id": "last_year_contributions",
+      "source_metric_id": "github_contribution_calendar_total_and_days",
+      "value": {
+        "total": 321,
+        "days": [
+          {"date": "2026-03-01", "count": 1},
+          {"date": "2026-03-02", "count": 2},
+          {"date": "2026-03-03", "count": 3},
+          {"date": "2026-03-04", "count": 0},
+          {"date": "2026-03-05", "count": 1},
+          {"date": "2026-03-06", "count": 1},
+          {"date": "2026-03-07", "count": 1}
+        ]
+      },
+      "status": "ok",
+      "complete": true,
+      "population_id": "github-contribution-calendar-visible-to-provider",
+      "population_signature": null,
+      "window_start": "2025-03-07T00:00:00Z",
+      "window_end": "2026-03-06T23:59:59Z",
+      "observed_at": "2026-03-06T00:30:00Z",
+      "source_id": "github_graphql_contribution_calendar",
+      "source_mode": "live",
+      "completion_reason": "all_components_observed"
+    },
+    "releases_30d": {
+      "schema": "profile-provider-observation/v1",
+      "metric_id": "releases_30d",
+      "source_metric_id": "owned_public_nonfork_releases",
+      "value": 1,
+      "status": "ok",
+      "complete": true,
+      "population_id": "owned-public-nonfork-repositories",
+      "population_signature": "fixture-public-population",
+      "window_start": "2026-02-05T00:00:00Z",
+      "window_end": "2026-03-06T23:59:59Z",
+      "observed_at": "2026-03-06T00:30:00Z",
+      "source_id": "github_rest_repo_releases",
+      "source_mode": "live",
+      "completion_reason": "all_components_observed"
+    },
+    "prs_merged": {
+      "schema": "profile-provider-observation/v1",
+      "metric_id": "prs_merged",
+      "source_metric_id": "merged_prs_primary_visible_population",
+      "value": 9,
+      "status": "ok",
+      "complete": true,
+      "population_id": "owned-repositories-visible-to-primary-pr-search",
+      "population_signature": null,
+      "window_start": "2025-03-07T00:00:00Z",
+      "window_end": "2026-03-06T23:59:59Z",
+      "observed_at": "2026-03-06T00:30:00Z",
+      "source_id": "github_rest_merged_pr_search_primary",
+      "source_mode": "live",
+      "completion_reason": "all_components_observed"
+    },
+    "recent_public_events": {
+      "schema": "profile-provider-observation/v1",
+      "metric_id": "recent_public_events",
+      "source_metric_id": "github_public_event_metadata_rows",
+      "value": [
+        {
+          "event_id": "fixture-event-push",
+          "event_type": "PushEvent",
+          "repo_full_name": "jguida941/ci-cd-hub",
+          "repo_url": "https://github.com/jguida941/ci-cd-hub",
+          "actor_login": "jguida941",
+          "occurred_at": "2026-03-06T00:30:00Z",
+          "is_private": false,
+          "source_id": "github_rest_public_events",
+          "evidence_status": "ok",
+          "commit_headlines": ["ship triage layer"]
+        },
+        {
+          "event_id": "fixture-event-release",
+          "event_type": "ReleaseEvent",
+          "repo_full_name": "jguida941/ci-cd-hub",
+          "repo_url": "https://github.com/jguida941/ci-cd-hub",
+          "actor_login": "jguida941",
+          "occurred_at": "2026-03-05T20:00:00Z",
+          "is_private": false,
+          "source_id": "github_rest_public_events",
+          "evidence_status": "ok",
+          "action": "published",
+          "tag_name": "v1.2.0",
+          "url": "https://github.com/jguida941/ci-cd-hub/releases/tag/v1.2.0"
+        },
+        {
+          "event_id": "fixture-event-pr",
+          "event_type": "PullRequestEvent",
+          "repo_full_name": "jguida941/ci-cd-hub",
+          "repo_url": "https://github.com/jguida941/ci-cd-hub",
+          "actor_login": "jguida941",
+          "occurred_at": "2026-03-05T19:00:00Z",
+          "is_private": false,
+          "source_id": "github_rest_public_events",
+          "evidence_status": "ok",
+          "action": "closed",
+          "number": 42,
+          "title": "Add triage command",
+          "state": "closed",
+          "merged": true,
+          "url": "https://github.com/jguida941/ci-cd-hub/pull/42"
+        }
+      ],
+      "status": "ok",
+      "complete": true,
+      "population_id": "public-user-events-feed",
+      "population_signature": "jguida941:100:3:300",
+      "window_start": null,
+      "window_end": null,
+      "observed_at": "2026-03-06T00:30:00Z",
+      "source_id": "github_rest_public_events",
+      "source_mode": "live",
+      "completion_reason": "terminal_page"
+    }
   }
 }
