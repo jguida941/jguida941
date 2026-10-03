@@ -9,7 +9,7 @@
 
 <div align="center">
 
-<img src="metrics.general.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="GitHub Stats" />
+<img src="metrics.general.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="GitHub Stats" />
 
 </div>
 
@@ -17,7 +17,7 @@
 
 <div align="center">
 
-<img src="assets/streak_summary.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Streak Summary" />
+<img src="assets/streak_summary.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Streak Summary" />
 
 </div>
 
@@ -25,7 +25,7 @@
 
 <div align="center">
 
-<img src="assets/badges.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Profile Badges" />
+<img src="assets/badges.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Profile Badges" />
 
 </div>
 
@@ -33,7 +33,7 @@
 
 <div align="center">
 
-<img src="assets/builder_scorecard.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Builder Scorecard" />
+<img src="assets/builder_scorecard.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Builder Scorecard" />
 
 </div>
 
@@ -41,7 +41,7 @@
 
 <div align="center">
 
-<img src="assets/engineering_cadence.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Engineering Cadence" />
+<img src="assets/engineering_cadence.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Engineering Cadence" />
 
 </div>
 
@@ -49,7 +49,7 @@
 
 <div align="center">
 
-<img src="assets/contribution_calendar.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Contribution Calendar" />
+<img src="assets/contribution_calendar.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Contribution Calendar" />
 
 </div>
 
@@ -57,7 +57,7 @@
 
 <div align="center">
 
-<img src="assets/now_next_shipped.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Current Focus" />
+<img src="assets/now_next_shipped.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Current Focus" />
 
 </div>
 
@@ -65,7 +65,7 @@
 
 <div align="center">
 
-<img src="assets/currently_working.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Currently Working On" />
+<img src="assets/currently_working.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Currently Working On" />
 
 </div>
 
@@ -73,7 +73,7 @@
 
 <div align="center">
 
-<img src="assets/lang_breakdown.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Language Breakdown" />
+<img src="assets/lang_breakdown.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Language Breakdown" />
 
 </div>
 
@@ -81,7 +81,7 @@
 
 <div align="center">
 
-<img src="assets/activity_heatmap.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Activity Heatmap" />
+<img src="assets/activity_heatmap.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Activity Heatmap" />
 
 </div>
 
@@ -89,7 +89,7 @@
 
 <div align="center">
 
-<img src="assets/repo_spotlight.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Flagship Projects" />
+<img src="assets/repo_spotlight.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Flagship Projects" />
 
 </div>
 
@@ -97,7 +97,7 @@
 
 <div align="center">
 
-<img src="assets/raw_snapshot.svg?v=e80d74ff54d3d52553767f3e2bed4ad34b08987f15acb2604c292e986ee58c78" width="100%" alt="Raw Data Snapshot" />
+<img src="assets/raw_snapshot.svg?v=b8c4ada99a1a1a6bb0eefb05a3e0b7cfad1f828a4d1d3edbc59ae4ad5cefd150" width="100%" alt="Raw Data Snapshot" />
 
 </div>
 
