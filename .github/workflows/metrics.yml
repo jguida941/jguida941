@@ -3,7 +3,7 @@ name: Generate Metrics
 on:
   schedule:
     # Run hourly off the top of the hour to reduce scheduler delay.
-    - cron: "25 * * * *"
+    - cron: "45 * * * *"
   workflow_dispatch:
 
 concurrency:
