@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-06T03:21:37.914945Z",
+  "generated_at": "2026-10-06T04:00:53.353415Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,7 +18,7 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 11877,
+    "last_year_contributions": 11806,
     "public_scope_commits": 7263,
     "total_repos": 56,
     "public_forks": 0,
@@ -28,15 +28,15 @@
     "prs_merged": 56,
     "releases": 0,
     "ci_repos": 55,
-    "streak_days": 4
+    "streak_days": 5
   },
   "snapshot_rows": [
     {
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 11877,
-      "display_value": "11,877"
+      "value": 11806,
+      "display_value": "11,806"
     },
     {
       "key": "public_scope_commits",
@@ -105,16 +105,16 @@
       "key": "streak_days",
       "label": "Current Streak Days",
       "dashboard_label": "Current Streak Days",
-      "value": 4,
-      "display_value": "4"
+      "value": 5,
+      "display_value": "5"
     }
   ],
   "snapshot_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 11877,
-      "display_value": "11,877"
+      "value": 11806,
+      "display_value": "11,806"
     },
     {
       "key": "public_scope_commits",
@@ -173,8 +173,8 @@
     {
       "key": "streak_days",
       "label": "Current Streak Days",
-      "value": 4,
-      "display_value": "4"
+      "value": 5,
+      "display_value": "5"
     }
   ],
   "data_quality": {
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-06T03:21:12Z",
+        "observed_at": "2026-10-06T04:00:29Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -227,9 +227,9 @@
         "complete": true,
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
-        "window_start": "2025-10-06T04:00:00Z",
-        "window_end": "2026-10-06T03:21:18Z",
-        "observed_at": "2026-10-06T03:21:18Z",
+        "window_start": "2025-10-07T04:00:00Z",
+        "window_end": "2026-10-06T04:00:35Z",
+        "observed_at": "2026-10-06T04:00:36Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -242,9 +242,9 @@
         "complete": true,
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
-        "window_start": "2026-09-06T04:00:00Z",
-        "window_end": "2026-10-06T03:21:15Z",
-        "observed_at": "2026-10-06T03:21:17Z",
+        "window_start": "2026-09-07T04:00:00Z",
+        "window_end": "2026-10-06T04:00:33Z",
+        "observed_at": "2026-10-06T04:00:35Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -257,9 +257,9 @@
         "complete": true,
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
-        "window_start": "2025-10-06T04:00:00Z",
-        "window_end": "2026-10-06T03:21:17Z",
-        "observed_at": "2026-10-06T03:21:18Z",
+        "window_start": "2025-10-07T04:00:00Z",
+        "window_end": "2026-10-06T04:00:35Z",
+        "observed_at": "2026-10-06T04:00:35Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-06T03:21:11Z",
+        "observed_at": "2026-10-06T04:00:29Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -289,8 +289,8 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0357142857142858,
     "ci_coverage_pct": 21.31782945736434,
-    "last_year_contributions": 11877,
-    "active_days_last_year": 324,
+    "last_year_contributions": 11806,
+    "active_days_last_year": 323,
     "automation_workflows": 166,
     "primary_lang_share_pct": 61.9,
     "median_days_since_push": 346.5,
@@ -301,16 +301,16 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 11877,
-      "display_value": "11,877",
+      "value": 11806,
+      "display_value": "11,806",
       "accent": "#7dcfff"
     },
     {
       "key": "active_days_last_year",
       "label": "Active Days",
       "detail": "days shipped in last 12mo",
-      "value": 324,
-      "display_value": "324",
+      "value": 323,
+      "display_value": "323",
       "accent": "#9ece6a"
     },
     {
@@ -545,6 +545,22 @@
       "featured": true
     },
     {
+      "name": "sembridge",
+      "full_name": "jguida941/sembridge",
+      "url": "https://github.com/jguida941/sembridge",
+      "language": "Rust",
+      "stars": 0,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-10-06",
+      "pushed_at_raw": "2026-10-06T03:41:50Z",
+      "pushed_ago": "today",
+      "created_at": "2026-08-09",
+      "last_commit_msg": "chore: close raw Git path identity slice",
+      "is_private": true,
+      "featured": false
+    },
+    {
       "name": "CS405",
       "full_name": "jguida941/CS405",
       "url": "https://github.com/jguida941/CS405",
@@ -557,22 +573,6 @@
       "pushed_ago": "today",
       "created_at": "2026-09-06",
       "last_commit_msg": "Complete numeric overflow activity with tests and submission files",
-      "is_private": true,
-      "featured": false
-    },
-    {
-      "name": "sembridge",
-      "full_name": "jguida941/sembridge",
-      "url": "https://github.com/jguida941/sembridge",
-      "language": "Rust",
-      "stars": 0,
-      "forks": 0,
-      "ci": "yes",
-      "pushed_at": "2026-10-06",
-      "pushed_at_raw": "2026-10-06T02:49:53Z",
-      "pushed_ago": "today",
-      "created_at": "2026-08-09",
-      "last_commit_msg": "chore: close raw Git path identity slice",
       "is_private": true,
       "featured": false
     },
@@ -1037,15 +1037,15 @@
   "focus": {
     "now": [
       {
-        "title": "CS405",
-        "detail": "C++ \u00b7 pushed today",
-        "url": "https://github.com/jguida941/CS405",
-        "is_private": true
-      },
-      {
         "title": "sembridge",
         "detail": "Rust \u00b7 pushed today",
         "url": "https://github.com/jguida941/sembridge",
+        "is_private": true
+      },
+      {
+        "title": "CS405",
+        "detail": "C++ \u00b7 pushed today",
+        "url": "https://github.com/jguida941/CS405",
         "is_private": true
       },
       {
@@ -1080,6 +1080,18 @@
   "activity_feed": [
     {
       "kind": "activity",
+      "title": "chore: close raw Git path identity slice",
+      "url": "https://github.com/jguida941/sembridge",
+      "repo": "jguida941/sembridge",
+      "repo_url": "https://github.com/jguida941/sembridge",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-10-06T03:41:50Z",
+      "is_private": true,
+      "observation_source": "repository push metadata"
+    },
+    {
+      "kind": "activity",
       "title": "Complete numeric overflow activity with tests and submission files",
       "url": "https://github.com/jguida941/CS405",
       "repo": "jguida941/CS405",
@@ -1087,18 +1099,6 @@
       "state": "PUSH",
       "time_ago": "today",
       "created_at": "2026-10-06T02:58:50Z",
-      "is_private": true,
-      "observation_source": "repository push metadata"
-    },
-    {
-      "kind": "activity",
-      "title": "chore: close raw Git path identity slice",
-      "url": "https://github.com/jguida941/sembridge",
-      "repo": "jguida941/sembridge",
-      "repo_url": "https://github.com/jguida941/sembridge",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-10-06T02:49:53Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1202,7 +1202,7 @@
   "recent_releases": [],
   "recent_pull_requests": [],
   "engineering": {
-    "active_days_last_year": 324,
+    "active_days_last_year": 323,
     "weekly_cadence": [
       195,
       123,
@@ -1215,7 +1215,7 @@
       41,
       15,
       93,
-      36
+      37
     ],
     "automation_workflows": 166,
     "automation_repos": 55,
@@ -1231,13 +1231,9 @@
     "recent_private_count": 203
   },
   "contribution_calendar": {
-    "total": 11877,
+    "total": 11806,
     "weeks": [
       [
-        {
-          "date": "2025-10-06",
-          "count": 72
-        },
         {
           "date": "2025-10-07",
           "count": 15
@@ -2800,18 +2796,18 @@
         },
         {
           "date": "2026-10-06",
-          "count": 4
+          "count": 5
         }
       ]
     ]
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-06T03:21:37.914945Z",
-    "generator_revision": "eb1a9f905805e104370b02bc6f2a2bca95a2cc96",
+    "generated_at": "2026-10-06T04:00:53.353415Z",
+    "generator_revision": "8832060d9d9560e103df2be5c739405c5388d248",
     "generator_source_digest": "db997c52e2c54af0ad3f24042af27d89d473de6271e4012c48352a65f103c2a8",
-    "claim_input_digest": "5bbab69c3587aa141e78a3194f89564ecb9b6bce683c23e8de19f044efc5beed",
-    "render_key": "a2b4278a3018e67c4b968f953a9e0d924cf40b5374ebe49df63363d39be816f4",
+    "claim_input_digest": "cbbb31c1bf1cd761e51bdd3272e0256151761716654a9741f9dc6a437aa025d9",
+    "render_key": "30c1239607f4eca4a8153c9971af0cbce5ee53c41c0991d313d77b162619e0ae",
     "schema": "profile-artifact-generation/v1"
   }
 }
