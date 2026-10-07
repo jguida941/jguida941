@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-07T03:00:54.142058Z",
+  "generated_at": "2026-10-07T04:00:54.386396Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 11832,
-    "public_scope_commits": 7290,
+    "last_year_contributions": 11818,
+    "public_scope_commits": 7292,
     "total_repos": 56,
     "public_forks": 0,
     "private_owned_repos": 203,
@@ -28,22 +28,22 @@
     "prs_merged": 56,
     "releases": 0,
     "ci_repos": 55,
-    "streak_days": 5
+    "streak_days": 6
   },
   "snapshot_rows": [
     {
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 11832,
-      "display_value": "11,832"
+      "value": 11818,
+      "display_value": "11,818"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 7290,
-      "display_value": "7,290"
+      "value": 7292,
+      "display_value": "7,292"
     },
     {
       "key": "total_repos",
@@ -105,22 +105,22 @@
       "key": "streak_days",
       "label": "Current Streak Days",
       "dashboard_label": "Current Streak Days",
-      "value": 5,
-      "display_value": "5"
+      "value": 6,
+      "display_value": "6"
     }
   ],
   "snapshot_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 11832,
-      "display_value": "11,832"
+      "value": 11818,
+      "display_value": "11,818"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 7290,
-      "display_value": "7,290"
+      "value": 7292,
+      "display_value": "7,292"
     },
     {
       "key": "total_repos",
@@ -173,8 +173,8 @@
     {
       "key": "streak_days",
       "label": "Current Streak Days",
-      "value": 5,
-      "display_value": "5"
+      "value": 6,
+      "display_value": "6"
     }
   ],
   "data_quality": {
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-07T03:00:26Z",
+        "observed_at": "2026-10-07T04:00:23Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -227,9 +227,9 @@
         "complete": true,
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
-        "window_start": "2025-10-07T04:00:00Z",
-        "window_end": "2026-10-07T03:00:33Z",
-        "observed_at": "2026-10-07T03:00:33Z",
+        "window_start": "2025-10-08T04:00:00Z",
+        "window_end": "2026-10-07T04:00:30Z",
+        "observed_at": "2026-10-07T04:00:31Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -242,9 +242,9 @@
         "complete": true,
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
-        "window_start": "2026-09-07T04:00:00Z",
-        "window_end": "2026-10-07T03:00:30Z",
-        "observed_at": "2026-10-07T03:00:32Z",
+        "window_start": "2026-09-08T04:00:00Z",
+        "window_end": "2026-10-07T04:00:28Z",
+        "observed_at": "2026-10-07T04:00:30Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -257,9 +257,9 @@
         "complete": true,
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
-        "window_start": "2025-10-07T04:00:00Z",
-        "window_end": "2026-10-07T03:00:32Z",
-        "observed_at": "2026-10-07T03:00:33Z",
+        "window_start": "2025-10-08T04:00:00Z",
+        "window_end": "2026-10-07T04:00:30Z",
+        "observed_at": "2026-10-07T04:00:30Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-07T03:00:25Z",
+        "observed_at": "2026-10-07T04:00:23Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -289,8 +289,8 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0357142857142858,
     "ci_coverage_pct": 21.31782945736434,
-    "last_year_contributions": 11832,
-    "active_days_last_year": 325,
+    "last_year_contributions": 11818,
+    "active_days_last_year": 324,
     "automation_workflows": 166,
     "primary_lang_share_pct": 61.9,
     "median_days_since_push": 347.5,
@@ -301,16 +301,16 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 11832,
-      "display_value": "11,832",
+      "value": 11818,
+      "display_value": "11,818",
       "accent": "#7dcfff"
     },
     {
       "key": "active_days_last_year",
       "label": "Active Days",
       "detail": "days shipped in last 12mo",
-      "value": 325,
-      "display_value": "325",
+      "value": 324,
+      "display_value": "324",
       "accent": "#9ece6a"
     },
     {
@@ -545,22 +545,6 @@
       "featured": true
     },
     {
-      "name": "blambridge",
-      "full_name": "jguida941/blambridge",
-      "url": "https://github.com/jguida941/blambridge",
-      "language": "Python",
-      "stars": 1,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-10-07",
-      "pushed_at_raw": "2026-10-07T02:58:36Z",
-      "pushed_ago": "today",
-      "created_at": "2026-09-11",
-      "last_commit_msg": "feat: retain scoped local and cloud continuation inputs",
-      "is_private": true,
-      "featured": false
-    },
-    {
       "name": "CS405",
       "full_name": "jguida941/CS405",
       "url": "https://github.com/jguida941/CS405",
@@ -569,10 +553,42 @@
       "forks": 0,
       "ci": "no",
       "pushed_at": "2026-10-07",
-      "pushed_at_raw": "2026-10-07T02:46:52Z",
+      "pushed_at_raw": "2026-10-07T03:53:07Z",
       "pushed_ago": "today",
       "created_at": "2026-09-06",
       "last_commit_msg": "Complete numeric overflow activity with tests and submission files",
+      "is_private": true,
+      "featured": false
+    },
+    {
+      "name": "semloop",
+      "full_name": "jguida941/semloop",
+      "url": "https://github.com/jguida941/semloop",
+      "language": "Python",
+      "stars": 1,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-10-07",
+      "pushed_at_raw": "2026-10-07T03:53:06Z",
+      "pushed_ago": "today",
+      "created_at": "2026-08-16",
+      "last_commit_msg": "lease 4: seven attacks killed and restored",
+      "is_private": true,
+      "featured": false
+    },
+    {
+      "name": "blambridge",
+      "full_name": "jguida941/blambridge",
+      "url": "https://github.com/jguida941/blambridge",
+      "language": "Python",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-10-07",
+      "pushed_at_raw": "2026-10-07T03:40:29Z",
+      "pushed_ago": "today",
+      "created_at": "2026-09-11",
+      "last_commit_msg": "feat: retain scoped local and cloud continuation inputs",
       "is_private": true,
       "featured": false
     },
@@ -586,25 +602,9 @@
       "ci": "no",
       "pushed_at": "2026-10-07",
       "pushed_at_raw": "2026-10-07T01:23:17Z",
-      "pushed_ago": "today",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-08-05",
       "last_commit_msg": "chore: preserve S0 substrate baseline",
-      "is_private": true,
-      "featured": false
-    },
-    {
-      "name": "semloop",
-      "full_name": "jguida941/semloop",
-      "url": "https://github.com/jguida941/semloop",
-      "language": "Python",
-      "stars": 1,
-      "forks": 0,
-      "ci": "yes",
-      "pushed_at": "2026-10-07",
-      "pushed_at_raw": "2026-10-07T01:08:20Z",
-      "pushed_ago": "today",
-      "created_at": "2026-08-16",
-      "last_commit_msg": "lease 4: seven attacks killed and restored",
       "is_private": true,
       "featured": false
     },
@@ -618,7 +618,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-06",
       "pushed_at_raw": "2026-10-06T22:06:09Z",
-      "pushed_ago": "4 hours ago",
+      "pushed_ago": "5 hours ago",
       "created_at": "2026-08-09",
       "last_commit_msg": "chore: close raw Git path identity slice",
       "is_private": true,
@@ -814,7 +814,7 @@
       "visibility": "private",
       "description": "BlamBridge: source-to-engine reconstruction framework. Halo 2 first, Godot implemented in slices, Unreal planned. Typed recipes and source-bound verification.",
       "html_url": "https://github.com/jguida941/blambridge",
-      "pushed_at": "2026-10-07T02:58:36Z",
+      "pushed_at": "2026-10-07T03:40:29Z",
       "created_at": "2026-09-11T20:25:26Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -868,7 +868,7 @@
       "visibility": "private",
       "description": null,
       "html_url": "https://github.com/jguida941/CS405",
-      "pushed_at": "2026-10-07T02:46:52Z",
+      "pushed_at": "2026-10-07T03:53:07Z",
       "created_at": "2026-09-06T12:36:16Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -1037,35 +1037,35 @@
   "focus": {
     "now": [
       {
-        "title": "blambridge",
-        "detail": "Python \u00b7 pushed today",
-        "url": "https://github.com/jguida941/blambridge",
-        "is_private": true
-      },
-      {
         "title": "CS405",
         "detail": "C++ \u00b7 pushed today",
         "url": "https://github.com/jguida941/CS405",
         "is_private": true
       },
       {
-        "title": "semvariants",
+        "title": "semloop",
         "detail": "Python \u00b7 pushed today",
-        "url": "https://github.com/jguida941/semvariants",
+        "url": "https://github.com/jguida941/semloop",
+        "is_private": true
+      },
+      {
+        "title": "blambridge",
+        "detail": "Python \u00b7 pushed today",
+        "url": "https://github.com/jguida941/blambridge",
         "is_private": true
       }
     ],
     "next": [],
     "shipped": [
       {
-        "title": "lease 4: seven attacks killed and restored",
-        "detail": "semloop \u00b7 today",
-        "url": "https://github.com/jguida941/semloop",
+        "title": "chore: preserve S0 substrate baseline",
+        "detail": "semvariants \u00b7 2 hours ago",
+        "url": "https://github.com/jguida941/semvariants",
         "is_private": true
       },
       {
         "title": "chore: close raw Git path identity slice",
-        "detail": "sembridge \u00b7 4 hours ago",
+        "detail": "sembridge \u00b7 5 hours ago",
         "url": "https://github.com/jguida941/sembridge",
         "is_private": true
       },
@@ -1080,37 +1080,13 @@
   "activity_feed": [
     {
       "kind": "activity",
-      "title": "feat: retain scoped local and cloud continuation inputs",
-      "url": "https://github.com/jguida941/blambridge",
-      "repo": "jguida941/blambridge",
-      "repo_url": "https://github.com/jguida941/blambridge",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-10-07T02:58:36Z",
-      "is_private": true,
-      "observation_source": "repository push metadata"
-    },
-    {
-      "kind": "activity",
       "title": "Complete numeric overflow activity with tests and submission files",
       "url": "https://github.com/jguida941/CS405",
       "repo": "jguida941/CS405",
       "repo_url": "https://github.com/jguida941/CS405",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-07T02:46:52Z",
-      "is_private": true,
-      "observation_source": "repository push metadata"
-    },
-    {
-      "kind": "activity",
-      "title": "chore: preserve S0 substrate baseline",
-      "url": "https://github.com/jguida941/semvariants",
-      "repo": "jguida941/semvariants",
-      "repo_url": "https://github.com/jguida941/semvariants",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-10-07T01:23:17Z",
+      "created_at": "2026-10-07T03:53:07Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1122,7 +1098,31 @@
       "repo_url": "https://github.com/jguida941/semloop",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-07T01:08:20Z",
+      "created_at": "2026-10-07T03:53:06Z",
+      "is_private": true,
+      "observation_source": "repository push metadata"
+    },
+    {
+      "kind": "activity",
+      "title": "feat: retain scoped local and cloud continuation inputs",
+      "url": "https://github.com/jguida941/blambridge",
+      "repo": "jguida941/blambridge",
+      "repo_url": "https://github.com/jguida941/blambridge",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-10-07T03:40:29Z",
+      "is_private": true,
+      "observation_source": "repository push metadata"
+    },
+    {
+      "kind": "activity",
+      "title": "chore: preserve S0 substrate baseline",
+      "url": "https://github.com/jguida941/semvariants",
+      "repo": "jguida941/semvariants",
+      "repo_url": "https://github.com/jguida941/semvariants",
+      "state": "PUSH",
+      "time_ago": "2 hours ago",
+      "created_at": "2026-10-07T01:23:17Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1133,7 +1133,7 @@
       "repo": "jguida941/sembridge",
       "repo_url": "https://github.com/jguida941/sembridge",
       "state": "PUSH",
-      "time_ago": "4 hours ago",
+      "time_ago": "5 hours ago",
       "created_at": "2026-10-06T22:06:09Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1202,7 +1202,7 @@
   "recent_releases": [],
   "recent_pull_requests": [],
   "engineering": {
-    "active_days_last_year": 325,
+    "active_days_last_year": 324,
     "weekly_cadence": [
       195,
       123,
@@ -1215,7 +1215,7 @@
       41,
       15,
       93,
-      63
+      64
     ],
     "automation_workflows": 166,
     "automation_repos": 55,
@@ -1231,13 +1231,9 @@
     "recent_private_count": 203
   },
   "contribution_calendar": {
-    "total": 11832,
+    "total": 11818,
     "weeks": [
       [
-        {
-          "date": "2025-10-07",
-          "count": 15
-        },
         {
           "date": "2025-10-08",
           "count": 12
@@ -2800,18 +2796,18 @@
         },
         {
           "date": "2026-10-07",
-          "count": 4
+          "count": 5
         }
       ]
     ]
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-07T03:00:54.142058Z",
-    "generator_revision": "b4a66454e1c68bc15acd46210b160b5e5bdc3475",
+    "generated_at": "2026-10-07T04:00:54.386396Z",
+    "generator_revision": "8a84c8c0e4c592b44505e9098feccce7929cf342",
     "generator_source_digest": "db997c52e2c54af0ad3f24042af27d89d473de6271e4012c48352a65f103c2a8",
-    "claim_input_digest": "2fe2b3a5d954e601e0cead06f5f1e39cae06f67715907054f21894fa315fa0bc",
-    "render_key": "96748077e9aef1fcf7b73f0567ab6a0cd15520cf71d69662b31203cadfda6e4b",
+    "claim_input_digest": "cabfe38f7833a3d70f6ffdc48019780888b5c80b269b9abc9293f5f47cf48d67",
+    "render_key": "2a9ebd3156795ee752e611d6cef7eb364908b771c8003fde7283002bf6da9029",
     "schema": "profile-artifact-generation/v1"
   }
 }
