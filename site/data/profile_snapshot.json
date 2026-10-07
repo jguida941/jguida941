@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-07T13:01:16.961149Z",
+  "generated_at": "2026-10-07T14:37:45.014854Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 11828,
-    "public_scope_commits": 7302,
+    "last_year_contributions": 11829,
+    "public_scope_commits": 7303,
     "total_repos": 56,
     "public_forks": 0,
     "private_owned_repos": 203,
@@ -27,7 +27,7 @@
     "languages_count": 35,
     "prs_merged": 59,
     "releases": 0,
-    "ci_repos": 55,
+    "ci_repos": 42,
     "streak_days": 6
   },
   "snapshot_rows": [
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 11828,
-      "display_value": "11,828"
+      "value": 11829,
+      "display_value": "11,829"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 7302,
-      "display_value": "7,302"
+      "value": 7303,
+      "display_value": "7,303"
     },
     {
       "key": "total_repos",
@@ -98,8 +98,8 @@
       "key": "ci_repos",
       "label": "Repos With CI/CD",
       "dashboard_label": "Repos With CI",
-      "value": 55,
-      "display_value": "55"
+      "value": 42,
+      "display_value": "42"
     },
     {
       "key": "streak_days",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 11828,
-      "display_value": "11,828"
+      "value": 11829,
+      "display_value": "11,829"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 7302,
-      "display_value": "7,302"
+      "value": 7303,
+      "display_value": "7,303"
     },
     {
       "key": "total_repos",
@@ -167,8 +167,8 @@
     {
       "key": "ci_repos",
       "label": "Repos With CI",
-      "value": 55,
-      "display_value": "55"
+      "value": 42,
+      "display_value": "42"
     },
     {
       "key": "streak_days",
@@ -178,8 +178,8 @@
     }
   ],
   "data_quality": {
-    "ci_status": "ok",
-    "ci_note": "CI workflow detection complete.",
+    "ci_status": "partial",
+    "ci_note": "CI workflow detection partial for this run; showing known minimum with unknown repos noted (55/258).",
     "commits_status": "ok",
     "commits_note": "Public-scope commit aggregation complete.",
     "releases_status": "ok",
@@ -194,14 +194,14 @@
     "metric_statuses": {
       "active_repos_7d": "exact",
       "days_since_last_push": "exact",
-      "automation_repos": "exact",
-      "automation_workflows": "exact",
-      "ci_coverage_pct": "exact",
-      "ci_repos": "exact",
-      "top_languages": "exact",
-      "primary_lang_share_pct": "exact",
-      "languages_over_5pct": "exact",
-      "languages_count": "exact"
+      "automation_repos": "partial",
+      "automation_workflows": "partial",
+      "ci_coverage_pct": "partial",
+      "ci_repos": "partial",
+      "top_languages": "partial",
+      "primary_lang_share_pct": "partial",
+      "languages_over_5pct": "partial",
+      "languages_count": "partial"
     },
     "metric_provenance": {
       "public_scope_commits": {
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-07T13:00:36Z",
+        "observed_at": "2026-10-07T14:37:11Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -228,8 +228,8 @@
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-10-08T04:00:00Z",
-        "window_end": "2026-10-07T13:00:45Z",
-        "observed_at": "2026-10-07T13:00:46Z",
+        "window_end": "2026-10-07T14:37:19Z",
+        "observed_at": "2026-10-07T14:37:20Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -243,8 +243,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-09-08T04:00:00Z",
-        "window_end": "2026-10-07T13:00:41Z",
-        "observed_at": "2026-10-07T13:00:43Z",
+        "window_end": "2026-10-07T14:37:15Z",
+        "observed_at": "2026-10-07T14:37:17Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -258,8 +258,8 @@
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-10-08T04:00:00Z",
-        "window_end": "2026-10-07T13:00:43Z",
-        "observed_at": "2026-10-07T13:00:45Z",
+        "window_end": "2026-10-07T14:37:17Z",
+        "observed_at": "2026-10-07T14:37:17Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-07T13:00:35Z",
+        "observed_at": "2026-10-07T14:37:10Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -288,11 +288,11 @@
     "active_repos_7d": 7,
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0357142857142858,
-    "ci_coverage_pct": 21.31782945736434,
-    "last_year_contributions": 11828,
+    "ci_coverage_pct": 16.27906976744186,
+    "last_year_contributions": 11829,
     "active_days_last_year": 324,
-    "automation_workflows": 166,
-    "primary_lang_share_pct": 61.9,
+    "automation_workflows": 106,
+    "primary_lang_share_pct": 62.3,
     "median_days_since_push": 348.0,
     "days_since_last_push": 0.0
   },
@@ -301,8 +301,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 11828,
-      "display_value": "11,828",
+      "value": 11829,
+      "display_value": "11,829",
       "accent": "#7dcfff"
     },
     {
@@ -325,16 +325,16 @@
       "key": "ci_coverage_pct",
       "label": "CI Coverage",
       "detail": "repos with pipelines",
-      "value": 21.31782945736434,
-      "display_value": "21.3%",
+      "value": 16.27906976744186,
+      "display_value": "16.3%",
       "accent": "#ff9e64"
     },
     {
       "key": "automation_workflows",
       "label": "CI Pipelines",
       "detail": "workflow files across repos",
-      "value": 166,
-      "display_value": "166",
+      "value": 106,
+      "display_value": "106",
       "accent": "#7aa2f7"
     },
     {
@@ -349,8 +349,8 @@
       "key": "primary_lang_share_pct",
       "label": "Primary Language",
       "detail": "share of code by bytes",
-      "value": 61.9,
-      "display_value": "61.9%",
+      "value": 62.3,
+      "display_value": "62.3%",
       "accent": "#7aa2f7"
     },
     {
@@ -373,14 +373,14 @@
     "metric_scopes": {
       "active_repos_7d": "owned-public-private-nonfork-profile-excluded-exact",
       "days_since_last_push": "owned-public-private-nonfork-profile-excluded-exact",
-      "automation_repos": "owned-public-private-nonfork-profile-excluded-exact",
-      "automation_workflows": "owned-public-private-nonfork-profile-excluded-exact",
-      "ci_coverage_pct": "owned-public-private-nonfork-profile-excluded-exact",
-      "ci_repos": "owned-public-private-nonfork-profile-excluded-exact",
-      "top_languages": "owned-public-private-nonfork-profile-excluded-exact",
-      "primary_lang_share_pct": "owned-public-private-nonfork-profile-excluded-exact",
-      "languages_over_5pct": "owned-public-private-nonfork-profile-excluded-exact",
-      "languages_count": "owned-public-private-nonfork-profile-excluded-exact"
+      "automation_repos": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "automation_workflows": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "ci_coverage_pct": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "ci_repos": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "top_languages": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "primary_lang_share_pct": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "languages_over_5pct": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "languages_count": "owned-public-private-nonfork-profile-excluded-partial-observation"
     }
   },
   "featured_repo_facts": [
@@ -391,7 +391,7 @@
       "language": "Python",
       "stars": 3,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-04-13",
       "pushed_at_raw": "2026-04-13T07:49:48Z",
       "pushed_ago": "5 months ago",
@@ -407,12 +407,12 @@
       "language": "Rust",
       "stars": 1,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-08-25",
       "pushed_at_raw": "2026-08-25T17:53:29Z",
       "pushed_ago": "1 month ago",
       "created_at": "2025-11-06",
-      "last_commit_msg": "docs: remove historical implementation pointer",
+      "last_commit_msg": "recent push detected",
       "is_private": false,
       "featured": true
     },
@@ -423,7 +423,7 @@
       "language": "Java",
       "stars": 3,
       "forks": 1,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-04-06",
       "pushed_at_raw": "2026-04-06T20:57:12Z",
       "pushed_ago": "6 months ago",
@@ -436,58 +436,58 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 66699175,
-      "percent": 61.9
+      "bytes": 68203919,
+      "percent": 62.3
     },
     {
       "name": "Rust",
       "bytes": 11030983,
-      "percent": 10.24
+      "percent": 10.08
     },
     {
       "name": "C++",
       "bytes": 7919971,
-      "percent": 7.35
+      "percent": 7.23
     },
     {
       "name": "Swift",
       "bytes": 6142050,
-      "percent": 5.7
+      "percent": 5.61
     },
     {
       "name": "Makefile",
       "bytes": 5877107,
-      "percent": 5.45
+      "percent": 5.37
     },
     {
       "name": "Java",
       "bytes": 2124950,
-      "percent": 1.97
+      "percent": 1.94
     },
     {
       "name": "HTML",
-      "bytes": 1483010,
-      "percent": 1.38
+      "bytes": 1697303,
+      "percent": 1.55
     },
     {
       "name": "JavaScript",
       "bytes": 1326420,
-      "percent": 1.23
+      "percent": 1.21
     },
     {
       "name": "Shell",
       "bytes": 1227253,
-      "percent": 1.14
+      "percent": 1.12
     },
     {
       "name": "GDScript",
       "bytes": 1129648,
-      "percent": 1.05
+      "percent": 1.03
     },
     {
       "name": "Jupyter Notebook",
       "bytes": 899502,
-      "percent": 0.83
+      "percent": 0.82
     },
     {
       "name": "C",
@@ -503,7 +503,7 @@
       "language": "Python",
       "stars": 3,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-04-13",
       "pushed_at_raw": "2026-04-13T07:49:48Z",
       "pushed_ago": "5 months ago",
@@ -519,12 +519,12 @@
       "language": "Rust",
       "stars": 1,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-08-25",
       "pushed_at_raw": "2026-08-25T17:53:29Z",
       "pushed_ago": "1 month ago",
       "created_at": "2025-11-06",
-      "last_commit_msg": "docs: remove historical implementation pointer",
+      "last_commit_msg": "recent push detected",
       "is_private": false,
       "featured": true
     },
@@ -535,7 +535,7 @@
       "language": "Java",
       "stars": 3,
       "forks": 1,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-04-06",
       "pushed_at_raw": "2026-04-06T20:57:12Z",
       "pushed_ago": "6 months ago",
@@ -554,7 +554,7 @@
       "ci": "no",
       "pushed_at": "2026-10-07",
       "pushed_at_raw": "2026-10-07T08:46:21Z",
-      "pushed_ago": "4 hours ago",
+      "pushed_ago": "5 hours ago",
       "created_at": "2026-09-11",
       "last_commit_msg": "feat: retain scoped local and cloud continuation inputs",
       "is_private": true,
@@ -570,7 +570,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-07",
       "pushed_at_raw": "2026-10-07T05:08:48Z",
-      "pushed_ago": "7 hours ago",
+      "pushed_ago": "9 hours ago",
       "created_at": "2026-08-09",
       "last_commit_msg": "chore: close raw Git path identity slice",
       "is_private": true,
@@ -586,7 +586,7 @@
       "ci": "no",
       "pushed_at": "2026-10-07",
       "pushed_at_raw": "2026-10-07T03:53:07Z",
-      "pushed_ago": "9 hours ago",
+      "pushed_ago": "10 hours ago",
       "created_at": "2026-09-06",
       "last_commit_msg": "Complete numeric overflow activity with tests and submission files",
       "is_private": true,
@@ -602,7 +602,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-07",
       "pushed_at_raw": "2026-10-07T03:53:06Z",
-      "pushed_ago": "9 hours ago",
+      "pushed_ago": "10 hours ago",
       "created_at": "2026-08-16",
       "last_commit_msg": "lease 4: seven attacks killed and restored",
       "is_private": true,
@@ -618,7 +618,7 @@
       "ci": "no",
       "pushed_at": "2026-10-07",
       "pushed_at_raw": "2026-10-07T01:23:17Z",
-      "pushed_ago": "11 hours ago",
+      "pushed_ago": "13 hours ago",
       "created_at": "2026-08-05",
       "last_commit_msg": "chore: preserve S0 substrate baseline",
       "is_private": true,
@@ -695,12 +695,12 @@
       "language": "Swift",
       "stars": 1,
       "forks": 0,
-      "ci": "no",
+      "ci": "n/a",
       "pushed_at": "2026-09-23",
       "pushed_at_raw": "2026-09-23T02:34:24Z",
       "pushed_ago": "2 weeks ago",
       "created_at": "2026-09-03",
-      "last_commit_msg": "Add bounded metadata reads and clarify size observation limits",
+      "last_commit_msg": "recent push detected",
       "is_private": false,
       "featured": false
     },
@@ -775,12 +775,12 @@
       "language": "Swift",
       "stars": 1,
       "forks": 0,
-      "ci": "no",
+      "ci": "n/a",
       "pushed_at": "2026-08-26",
       "pushed_at_raw": "2026-08-26T02:17:19Z",
       "pushed_ago": "1 month ago",
       "created_at": "2025-05-18",
-      "last_commit_msg": "Rebuild MemLite as native macOS preview",
+      "last_commit_msg": "recent push detected",
       "is_private": false,
       "featured": false
     }
@@ -914,27 +914,115 @@
       "latest_commit_message": "Record what the mod established, and the gaps that were living in a c\u2026"
     },
     {
+      "id": 1356002851,
+      "node_id": "R_kgDOUNL2Iw",
       "name": "build-sweep",
-      "fork": false,
+      "full_name": "jguida941/build-sweep",
       "private": false,
-      "visibility": "public",
-      "description": "A simple native macOS utility that reclaims space by cleaning regenerable development files.",
-      "html_url": "https://github.com/jguida941/build-sweep",
-      "pushed_at": "2026-09-23T02:34:24Z",
-      "created_at": "2026-09-03T13:21:01Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "language": "Swift",
       "owner": {
-        "login": "jguida941"
+        "login": "jguida941",
+        "id": 197367371,
+        "node_id": "U_kgDOC8OWSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/197367371?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/jguida941",
+        "html_url": "https://github.com/jguida941",
+        "followers_url": "https://api.github.com/users/jguida941/followers",
+        "following_url": "https://api.github.com/users/jguida941/following{/other_user}",
+        "gists_url": "https://api.github.com/users/jguida941/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/jguida941/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/jguida941/subscriptions",
+        "organizations_url": "https://api.github.com/users/jguida941/orgs",
+        "repos_url": "https://api.github.com/users/jguida941/repos",
+        "events_url": "https://api.github.com/users/jguida941/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/jguida941/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
       },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "Swift": 47963
+      "html_url": "https://github.com/jguida941/build-sweep",
+      "description": "A simple native macOS utility that reclaims space by cleaning regenerable development files.",
+      "fork": false,
+      "url": "https://api.github.com/repos/jguida941/build-sweep",
+      "forks_url": "https://api.github.com/repos/jguida941/build-sweep/forks",
+      "keys_url": "https://api.github.com/repos/jguida941/build-sweep/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/jguida941/build-sweep/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/jguida941/build-sweep/teams",
+      "hooks_url": "https://api.github.com/repos/jguida941/build-sweep/hooks",
+      "issue_events_url": "https://api.github.com/repos/jguida941/build-sweep/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/jguida941/build-sweep/events",
+      "assignees_url": "https://api.github.com/repos/jguida941/build-sweep/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/jguida941/build-sweep/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/jguida941/build-sweep/tags",
+      "blobs_url": "https://api.github.com/repos/jguida941/build-sweep/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/jguida941/build-sweep/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/jguida941/build-sweep/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/jguida941/build-sweep/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/jguida941/build-sweep/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/jguida941/build-sweep/languages",
+      "stargazers_url": "https://api.github.com/repos/jguida941/build-sweep/stargazers",
+      "contributors_url": "https://api.github.com/repos/jguida941/build-sweep/contributors",
+      "subscribers_url": "https://api.github.com/repos/jguida941/build-sweep/subscribers",
+      "subscription_url": "https://api.github.com/repos/jguida941/build-sweep/subscription",
+      "commits_url": "https://api.github.com/repos/jguida941/build-sweep/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/jguida941/build-sweep/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/jguida941/build-sweep/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/jguida941/build-sweep/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/jguida941/build-sweep/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/jguida941/build-sweep/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/jguida941/build-sweep/merges",
+      "archive_url": "https://api.github.com/repos/jguida941/build-sweep/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/jguida941/build-sweep/downloads",
+      "issues_url": "https://api.github.com/repos/jguida941/build-sweep/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/jguida941/build-sweep/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/jguida941/build-sweep/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/jguida941/build-sweep/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/jguida941/build-sweep/labels{/name}",
+      "releases_url": "https://api.github.com/repos/jguida941/build-sweep/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/jguida941/build-sweep/deployments",
+      "created_at": "2026-09-03T13:21:01Z",
+      "updated_at": "2026-10-02T14:58:09Z",
+      "pushed_at": "2026-09-23T02:34:24Z",
+      "git_url": "git://github.com/jguida941/build-sweep.git",
+      "ssh_url": "git@github.com:jguida941/build-sweep.git",
+      "clone_url": "https://github.com/jguida941/build-sweep.git",
+      "svn_url": "https://github.com/jguida941/build-sweep",
+      "homepage": "",
+      "size": 1275,
+      "stargazers_count": 1,
+      "watchers_count": 1,
+      "language": "Swift",
+      "has_issues": true,
+      "has_projects": true,
+      "has_downloads": false,
+      "has_wiki": false,
+      "has_pages": false,
+      "has_discussions": false,
+      "forks_count": 0,
+      "mirror_url": null,
+      "archived": false,
+      "disabled": false,
+      "open_issues_count": 0,
+      "license": null,
+      "allow_forking": true,
+      "is_template": false,
+      "web_commit_signoff_required": false,
+      "has_pull_requests": true,
+      "pull_request_creation_policy": "all",
+      "topics": [],
+      "visibility": "public",
+      "forks": 0,
+      "open_issues": 0,
+      "watchers": 1,
+      "default_branch": "main",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "push": true,
+        "triage": true,
+        "pull": true
       },
-      "language_bytes_complete": true,
-      "latest_commit_message": "Add bounded metadata reads and clarify size observation limits"
+      "latest_commit_message": ""
     },
     {
       "name": "github-control-plane",
@@ -1011,46 +1099,147 @@
       "latest_commit_message": "Document test-driven development workflow"
     },
     {
+      "id": 1344194524,
+      "node_id": "R_kgDOUB7H3A",
       "name": "warehouse-inventory-android",
-      "fork": false,
+      "full_name": "jguida941/warehouse-inventory-android",
       "private": false,
-      "visibility": "public",
-      "description": "Responsive Android inventory manager with local SQLite persistence, item CRUD, account sign-in, adaptive Material UI, and optional zero-stock SMS alerts.",
-      "html_url": "https://github.com/jguida941/warehouse-inventory-android",
-      "pushed_at": "2026-08-25T13:34:01Z",
-      "created_at": "2026-08-23T20:33:44Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "language": "Java",
       "owner": {
-        "login": "jguida941"
+        "login": "jguida941",
+        "id": 197367371,
+        "node_id": "U_kgDOC8OWSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/197367371?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/jguida941",
+        "html_url": "https://github.com/jguida941",
+        "followers_url": "https://api.github.com/users/jguida941/followers",
+        "following_url": "https://api.github.com/users/jguida941/following{/other_user}",
+        "gists_url": "https://api.github.com/users/jguida941/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/jguida941/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/jguida941/subscriptions",
+        "organizations_url": "https://api.github.com/users/jguida941/orgs",
+        "repos_url": "https://api.github.com/users/jguida941/repos",
+        "events_url": "https://api.github.com/users/jguida941/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/jguida941/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
       },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "Java": 38290
+      "html_url": "https://github.com/jguida941/warehouse-inventory-android",
+      "description": "Responsive Android inventory manager with local SQLite persistence, item CRUD, account sign-in, adaptive Material UI, and optional zero-stock SMS alerts.",
+      "fork": false,
+      "url": "https://api.github.com/repos/jguida941/warehouse-inventory-android",
+      "forks_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/forks",
+      "keys_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/teams",
+      "hooks_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/hooks",
+      "issue_events_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/events",
+      "assignees_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/tags",
+      "blobs_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/languages",
+      "stargazers_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/stargazers",
+      "contributors_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/contributors",
+      "subscribers_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/subscribers",
+      "subscription_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/subscription",
+      "commits_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/merges",
+      "archive_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/downloads",
+      "issues_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/labels{/name}",
+      "releases_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/jguida941/warehouse-inventory-android/deployments",
+      "created_at": "2026-08-23T20:33:44Z",
+      "updated_at": "2026-10-02T14:58:09Z",
+      "pushed_at": "2026-08-25T13:34:01Z",
+      "git_url": "git://github.com/jguida941/warehouse-inventory-android.git",
+      "ssh_url": "git@github.com:jguida941/warehouse-inventory-android.git",
+      "clone_url": "https://github.com/jguida941/warehouse-inventory-android.git",
+      "svn_url": "https://github.com/jguida941/warehouse-inventory-android",
+      "homepage": null,
+      "size": 921,
+      "stargazers_count": 1,
+      "watchers_count": 1,
+      "language": "Java",
+      "has_issues": true,
+      "has_projects": true,
+      "has_downloads": false,
+      "has_wiki": true,
+      "has_pages": false,
+      "has_discussions": false,
+      "forks_count": 0,
+      "mirror_url": null,
+      "archived": false,
+      "disabled": false,
+      "open_issues_count": 0,
+      "license": null,
+      "allow_forking": true,
+      "is_template": false,
+      "web_commit_signoff_required": false,
+      "has_pull_requests": true,
+      "pull_request_creation_policy": "all",
+      "topics": [
+        "android",
+        "crud",
+        "inventory-management",
+        "java",
+        "material-design",
+        "mobile-app",
+        "recyclerview",
+        "responsive-design",
+        "sms",
+        "sqlite",
+        "test-driven-development",
+        "warehouse-management"
+      ],
+      "visibility": "public",
+      "forks": 0,
+      "open_issues": 0,
+      "watchers": 1,
+      "default_branch": "main",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "push": true,
+        "triage": true,
+        "pull": true
       },
-      "language_bytes_complete": true,
-      "latest_commit_message": "Update README.md"
+      "latest_commit_message": ""
     }
   ],
   "focus": {
     "now": [
       {
         "title": "blambridge",
-        "detail": "Python \u00b7 pushed 4 hours ago",
+        "detail": "Python \u00b7 pushed 5 hours ago",
         "url": "https://github.com/jguida941/blambridge",
         "is_private": true
       },
       {
         "title": "sembridge",
-        "detail": "Rust \u00b7 pushed 7 hours ago",
+        "detail": "Rust \u00b7 pushed 9 hours ago",
         "url": "https://github.com/jguida941/sembridge",
         "is_private": true
       },
       {
         "title": "CS405",
-        "detail": "C++ \u00b7 pushed 9 hours ago",
+        "detail": "C++ \u00b7 pushed 10 hours ago",
         "url": "https://github.com/jguida941/CS405",
         "is_private": true
       }
@@ -1059,13 +1248,13 @@
     "shipped": [
       {
         "title": "lease 4: seven attacks killed and restored",
-        "detail": "semloop \u00b7 9 hours ago",
+        "detail": "semloop \u00b7 10 hours ago",
         "url": "https://github.com/jguida941/semloop",
         "is_private": true
       },
       {
         "title": "chore: preserve S0 substrate baseline",
-        "detail": "semvariants \u00b7 11 hours ago",
+        "detail": "semvariants \u00b7 13 hours ago",
         "url": "https://github.com/jguida941/semvariants",
         "is_private": true
       },
@@ -1085,7 +1274,7 @@
       "repo": "jguida941/blambridge",
       "repo_url": "https://github.com/jguida941/blambridge",
       "state": "PUSH",
-      "time_ago": "4 hours ago",
+      "time_ago": "5 hours ago",
       "created_at": "2026-10-07T08:46:21Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1097,7 +1286,7 @@
       "repo": "jguida941/sembridge",
       "repo_url": "https://github.com/jguida941/sembridge",
       "state": "PUSH",
-      "time_ago": "7 hours ago",
+      "time_ago": "9 hours ago",
       "created_at": "2026-10-07T05:08:48Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1109,7 +1298,7 @@
       "repo": "jguida941/CS405",
       "repo_url": "https://github.com/jguida941/CS405",
       "state": "PUSH",
-      "time_ago": "9 hours ago",
+      "time_ago": "10 hours ago",
       "created_at": "2026-10-07T03:53:07Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1121,7 +1310,7 @@
       "repo": "jguida941/semloop",
       "repo_url": "https://github.com/jguida941/semloop",
       "state": "PUSH",
-      "time_ago": "9 hours ago",
+      "time_ago": "10 hours ago",
       "created_at": "2026-10-07T03:53:06Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1133,7 +1322,7 @@
       "repo": "jguida941/semvariants",
       "repo_url": "https://github.com/jguida941/semvariants",
       "state": "PUSH",
-      "time_ago": "11 hours ago",
+      "time_ago": "13 hours ago",
       "created_at": "2026-10-07T01:23:17Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1215,11 +1404,11 @@
       41,
       15,
       93,
-      74
+      75
     ],
-    "automation_workflows": 166,
-    "automation_repos": 55,
-    "primary_lang_share_pct": 61.9,
+    "automation_workflows": 106,
+    "automation_repos": 42,
+    "primary_lang_share_pct": 62.3,
     "languages_over_5pct": 5,
     "median_days_since_push": 348.0,
     "days_since_last_push": 0.0,
@@ -1231,7 +1420,7 @@
     "recent_private_count": 203
   },
   "contribution_calendar": {
-    "total": 11828,
+    "total": 11829,
     "weeks": [
       [
         {
@@ -2796,18 +2985,18 @@
         },
         {
           "date": "2026-10-07",
-          "count": 15
+          "count": 16
         }
       ]
     ]
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-07T13:01:16.961149Z",
-    "generator_revision": "50fa431e99f13d2222fe69cf6923306488fdc409",
+    "generated_at": "2026-10-07T14:37:45.014854Z",
+    "generator_revision": "5d46a4524792208b82cca9c44f896ed175db2ae3",
     "generator_source_digest": "db997c52e2c54af0ad3f24042af27d89d473de6271e4012c48352a65f103c2a8",
-    "claim_input_digest": "1d5952e732ff858926406281581e3d6ec616ff6aec5f73299afd279e29b408ed",
-    "render_key": "30cb5b30478d66224643a0868ea44957bc6503a9a886d4effd076d98fe9a2a7f",
+    "claim_input_digest": "9baff89e66d2f357c8c59b91f3e99b7432fdae56040790f627623d4bf5f54f69",
+    "render_key": "31a9e88ce195f931c782e7466adb704fb1d4cdeedab78cf4ba2225bbb2d7fab8",
     "schema": "profile-artifact-generation/v1"
   }
 }
