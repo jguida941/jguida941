@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-08T04:01:05.637220Z",
+  "generated_at": "2026-10-08T03:54:10.055775Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,7 +18,7 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 11838,
+    "last_year_contributions": 11850,
     "public_scope_commits": 7322,
     "total_repos": 56,
     "public_forks": 0,
@@ -28,15 +28,15 @@
     "prs_merged": 61,
     "releases": 0,
     "ci_repos": 55,
-    "streak_days": 7
+    "streak_days": 6
   },
   "snapshot_rows": [
     {
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 11838,
-      "display_value": "11,838"
+      "value": 11850,
+      "display_value": "11,850"
     },
     {
       "key": "public_scope_commits",
@@ -105,16 +105,16 @@
       "key": "streak_days",
       "label": "Current Streak Days",
       "dashboard_label": "Current Streak Days",
-      "value": 7,
-      "display_value": "7"
+      "value": 6,
+      "display_value": "6"
     }
   ],
   "snapshot_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 11838,
-      "display_value": "11,838"
+      "value": 11850,
+      "display_value": "11,850"
     },
     {
       "key": "public_scope_commits",
@@ -173,8 +173,8 @@
     {
       "key": "streak_days",
       "label": "Current Streak Days",
-      "value": 7,
-      "display_value": "7"
+      "value": 6,
+      "display_value": "6"
     }
   ],
   "data_quality": {
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-08T04:00:35Z",
+        "observed_at": "2026-10-08T03:53:40Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -227,9 +227,9 @@
         "complete": true,
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
-        "window_start": "2025-10-09T04:00:00Z",
-        "window_end": "2026-10-08T04:00:43Z",
-        "observed_at": "2026-10-08T04:00:44Z",
+        "window_start": "2025-10-08T04:00:00Z",
+        "window_end": "2026-10-08T03:53:46Z",
+        "observed_at": "2026-10-08T03:53:46Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -242,9 +242,9 @@
         "complete": true,
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
-        "window_start": "2026-09-09T04:00:00Z",
-        "window_end": "2026-10-08T04:00:40Z",
-        "observed_at": "2026-10-08T04:00:42Z",
+        "window_start": "2026-09-08T04:00:00Z",
+        "window_end": "2026-10-08T03:53:43Z",
+        "observed_at": "2026-10-08T03:53:45Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -257,9 +257,9 @@
         "complete": true,
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
-        "window_start": "2025-10-09T04:00:00Z",
-        "window_end": "2026-10-08T04:00:42Z",
-        "observed_at": "2026-10-08T04:00:43Z",
+        "window_start": "2025-10-08T04:00:00Z",
+        "window_end": "2026-10-08T03:53:45Z",
+        "observed_at": "2026-10-08T03:53:46Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-08T04:00:35Z",
+        "observed_at": "2026-10-08T03:53:39Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -289,8 +289,8 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0357142857142858,
     "ci_coverage_pct": 21.31782945736434,
-    "last_year_contributions": 11838,
-    "active_days_last_year": 324,
+    "last_year_contributions": 11850,
+    "active_days_last_year": 325,
     "automation_workflows": 166,
     "primary_lang_share_pct": 61.9,
     "median_days_since_push": 348.5,
@@ -301,16 +301,16 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 11838,
-      "display_value": "11,838",
+      "value": 11850,
+      "display_value": "11,850",
       "accent": "#7dcfff"
     },
     {
       "key": "active_days_last_year",
       "label": "Active Days",
       "detail": "days shipped in last 12mo",
-      "value": 324,
-      "display_value": "324",
+      "value": 325,
+      "display_value": "325",
       "accent": "#9ece6a"
     },
     {
@@ -553,7 +553,7 @@
       "forks": 0,
       "ci": "no",
       "pushed_at": "2026-10-08",
-      "pushed_at_raw": "2026-10-08T03:58:23Z",
+      "pushed_at_raw": "2026-10-08T03:42:53Z",
       "pushed_ago": "today",
       "created_at": "2026-09-06",
       "last_commit_msg": "Complete numeric overflow activity with tests and submission files",
@@ -868,7 +868,7 @@
       "visibility": "private",
       "description": null,
       "html_url": "https://github.com/jguida941/CS405",
-      "pushed_at": "2026-10-08T03:58:23Z",
+      "pushed_at": "2026-10-08T03:42:53Z",
       "created_at": "2026-09-06T12:36:16Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -1086,7 +1086,7 @@
       "repo_url": "https://github.com/jguida941/CS405",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-08T03:58:23Z",
+      "created_at": "2026-10-08T03:42:53Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1202,7 +1202,7 @@
   "recent_releases": [],
   "recent_pull_requests": [],
   "engineering": {
-    "active_days_last_year": 324,
+    "active_days_last_year": 325,
     "weekly_cadence": [
       195,
       123,
@@ -1217,6 +1217,127 @@
       93,
       96
     ],
+    "contribution_trend": {
+      "status": "available",
+      "unit": "contributions",
+      "bucket": "iso_week",
+      "week_start_day": "Monday",
+      "timezone": "UTC",
+      "completeness": "known",
+      "window_start": "2026-07-20",
+      "window_end": "2026-10-08",
+      "points": [
+        {
+          "week_start": "2026-07-20",
+          "week_end": "2026-07-26",
+          "observed_start": "2026-07-20",
+          "observed_end": "2026-07-26",
+          "days_observed": 7,
+          "contributions": 195,
+          "partial": false
+        },
+        {
+          "week_start": "2026-07-27",
+          "week_end": "2026-08-02",
+          "observed_start": "2026-07-27",
+          "observed_end": "2026-08-02",
+          "days_observed": 7,
+          "contributions": 123,
+          "partial": false
+        },
+        {
+          "week_start": "2026-08-03",
+          "week_end": "2026-08-09",
+          "observed_start": "2026-08-03",
+          "observed_end": "2026-08-09",
+          "days_observed": 7,
+          "contributions": 145,
+          "partial": false
+        },
+        {
+          "week_start": "2026-08-10",
+          "week_end": "2026-08-16",
+          "observed_start": "2026-08-10",
+          "observed_end": "2026-08-16",
+          "days_observed": 7,
+          "contributions": 485,
+          "partial": false
+        },
+        {
+          "week_start": "2026-08-17",
+          "week_end": "2026-08-23",
+          "observed_start": "2026-08-17",
+          "observed_end": "2026-08-23",
+          "days_observed": 7,
+          "contributions": 473,
+          "partial": false
+        },
+        {
+          "week_start": "2026-08-24",
+          "week_end": "2026-08-30",
+          "observed_start": "2026-08-24",
+          "observed_end": "2026-08-30",
+          "days_observed": 7,
+          "contributions": 95,
+          "partial": false
+        },
+        {
+          "week_start": "2026-08-31",
+          "week_end": "2026-09-06",
+          "observed_start": "2026-08-31",
+          "observed_end": "2026-09-06",
+          "days_observed": 7,
+          "contributions": 71,
+          "partial": false
+        },
+        {
+          "week_start": "2026-09-07",
+          "week_end": "2026-09-13",
+          "observed_start": "2026-09-07",
+          "observed_end": "2026-09-13",
+          "days_observed": 7,
+          "contributions": 120,
+          "partial": false
+        },
+        {
+          "week_start": "2026-09-14",
+          "week_end": "2026-09-20",
+          "observed_start": "2026-09-14",
+          "observed_end": "2026-09-20",
+          "days_observed": 7,
+          "contributions": 41,
+          "partial": false
+        },
+        {
+          "week_start": "2026-09-21",
+          "week_end": "2026-09-27",
+          "observed_start": "2026-09-21",
+          "observed_end": "2026-09-27",
+          "days_observed": 7,
+          "contributions": 15,
+          "partial": false
+        },
+        {
+          "week_start": "2026-09-28",
+          "week_end": "2026-10-04",
+          "observed_start": "2026-09-28",
+          "observed_end": "2026-10-04",
+          "days_observed": 7,
+          "contributions": 93,
+          "partial": false
+        },
+        {
+          "week_start": "2026-10-05",
+          "week_end": "2026-10-11",
+          "observed_start": "2026-10-05",
+          "observed_end": "2026-10-08",
+          "days_observed": 4,
+          "contributions": 96,
+          "partial": true
+        }
+      ],
+      "reason": "dated_calendar"
+    },
     "automation_workflows": 166,
     "automation_repos": 55,
     "primary_lang_share_pct": 61.9,
@@ -1303,9 +1424,13 @@
     }
   },
   "contribution_calendar": {
-    "total": 11838,
+    "total": 11850,
     "weeks": [
       [
+        {
+          "date": "2025-10-08",
+          "count": 12
+        },
         {
           "date": "2025-10-09",
           "count": 0
@@ -3066,11 +3191,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-08T04:01:05.637220Z",
-    "generator_revision": "09e2eb1fc0c034348784dbefbe53fbb54de1435b",
-    "generator_source_digest": "b2809832054c3b6f9f80ccd0a127049943b07cfb3dd9f0e1dc6436e0fb21bfae",
-    "claim_input_digest": "d9aaec2192ec773238444de6c2ffb8614d2613f14eac3b2bf97e1b3894cdbc01",
-    "render_key": "65f286dacd44ba454ebd5700e037ec386e17327e54e4d1c47c791591b87d81aa",
+    "generated_at": "2026-10-08T03:54:10.055775Z",
+    "generator_revision": "6e595164b179f8e4d7c387cebe4c731906e5d179",
+    "generator_source_digest": "d7aff1e4a5c468f87602e5963c3efd896bdee81630b9cba14351eabb23f0937e",
+    "claim_input_digest": "1e27322a4ad1f6598ab045ef554126b4be96d6ce852f28a0bb231dc52b7d93df",
+    "render_key": "6f1c0ec2d42c4fa1b0dbaa3227b578518b71a00a800c35ffdb94f3d98516d424",
     "schema": "profile-artifact-generation/v1"
   }
 }

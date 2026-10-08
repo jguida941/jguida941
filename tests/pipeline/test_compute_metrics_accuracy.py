@@ -2735,5 +2735,104 @@ class StreakTimezoneTests(unittest.TestCase):
         self.assertEqual(streak, 2)
 
 
+class ContributionTrendTests(unittest.TestCase):
+    def _input(self, length=17, *, zero=False):
+        from types import SimpleNamespace
+        first = date(2026, 9, 21)
+        rows = [{"date": (first + timedelta(days=i)).isoformat(),
+                 "contributionCount": 0 if zero else i + 1} for i in range(length)]
+        # Deliberately non-week containers: dates, not input ordering, own buckets.
+        calendar = {"weeks": [{"contributionDays": rows}]}
+        observation = {
+            "schema": "profile-provider-observation/v1", "metric_id": "last_year_contributions",
+            "source_metric_id": "github_contribution_calendar_total_and_days",
+            "value": {"total": sum(row["contributionCount"] for row in rows),
+                      "days": tuple({"date": row["date"], "count": row["contributionCount"]} for row in rows)},
+            "status": "ok", "complete": True,
+            "population_id": "github-contribution-calendar-visible-to-provider", "population_signature": None,
+            "window_start": "2026-09-21T00:00:00Z", "window_end": "2026-10-07T18:00:00Z",
+            "observed_at": "2026-10-07T18:00:00Z", "source_id": "github_graphql_contribution_calendar",
+            "source_mode": "live", "completion_reason": "all_components_observed",
+        }
+        return SimpleNamespace(calendar=calendar, metric_observations={"last_year_contributions": observation})
+
+    def _trend(self, value):
+        from scripts.pipeline.compute_metrics import _build_contribution_trend
+        return _build_contribution_trend(value)
+
+    def test_dated_sums_and_partial_week(self):
+        value = self._input()
+        result = self._trend(value)
+        self.assertEqual([28, 77, 48], [point["contributions"] for point in result["points"]])
+        self.assertEqual([False, False, True], [point["partial"] for point in result["points"]])
+        self.assertEqual(("2026-09-21", "2026-10-07", "UTC"),
+                         (result["window_start"], result["window_end"], result["timezone"]))
+        value.calendar["weeks"][0]["contributionDays"].reverse()
+        self.assertEqual(result, self._trend(value))
+
+    def test_zero_is_available_and_missing_cutoff_is_unknown(self):
+        value = self._input(7, zero=True)
+        value.metric_observations = {}
+        result = self._trend(value)
+        self.assertEqual(("available", "unknown"), (result["status"], result["completeness"]))
+        self.assertEqual((0, True), (result["points"][0]["contributions"], result["points"][0]["partial"]))
+
+    def test_observation_not_generation_establishes_coverage(self):
+        value = self._input(7)
+        observation = value.metric_observations["last_year_contributions"]
+        observation["window_end"] = observation["observed_at"] = "2026-09-27T23:59:59Z"
+        self.assertTrue(self._trend(value)["points"][0]["partial"])
+        observation["window_end"] = observation["observed_at"] = "2026-09-28T00:00:00Z"
+        self.assertFalse(self._trend(value)["points"][0]["partial"])
+        observation["window_start"] = "2026-09-21T12:00:00Z"
+        self.assertTrue(self._trend(value)["points"][0]["partial"])
+
+    def test_unmatched_and_naive_observations_cannot_certify_coverage(self):
+        for change in ("different", "naive", "order", "observed_before_window"):
+            value = self._input(7)
+            observation = value.metric_observations["last_year_contributions"]
+            if change == "different":
+                observation["value"]["days"][0]["count"] = 100
+            elif change == "naive":
+                observation["window_end"] = "2026-10-07T18:00:00"
+            elif change == "order":
+                observation["window_end"] = "2026-01-01T00:00:00Z"
+            else:
+                observation["observed_at"] = "2026-01-01T00:00:00Z"
+            self.assertEqual("unknown", self._trend(value)["completeness"])
+
+    def test_invalid_dates_counts_duplicates_and_gaps_are_unavailable(self):
+        for invalid in (True, -1, 1.5, "2", None):
+            value = self._input()
+            value.calendar["weeks"][0]["contributionDays"][0]["contributionCount"] = invalid
+            self.assertEqual("unavailable", self._trend(value)["status"])
+        for change in ("gap", "duplicate", "malformed", "outside_window"):
+            value = self._input()
+            rows = value.calendar["weeks"][0]["contributionDays"]
+            if change == "gap":
+                rows.pop(3)
+            elif change == "duplicate":
+                rows.append(dict(rows[0]))
+            elif change == "malformed":
+                rows[0]["date"] = "2026-9-21"
+            else:
+                value.metric_observations["last_year_contributions"]["window_end"] = "2026-10-06T18:00:00Z"
+            self.assertEqual("unavailable", self._trend(value)["status"])
+
+    def test_latest_twelve_weeks_and_viewer_zone_invariance(self):
+        value = self._input(98)
+        value.metric_observations = {}
+        expected = self._trend(value)
+        self.assertEqual(12, len(expected["points"]))
+        self.assertEqual("2026-10-05", expected["window_start"])
+        self.assertEqual([sum(range(i + 1, i + 8)) for i in range(14, 98, 7)],
+                         [point["contributions"] for point in expected["points"]])
+        for zone in ("UTC", "America/New_York", "Asia/Tokyo"):
+            with patch.dict(os.environ, {"PROFILE_TIMEZONE": zone, "TZ": zone}):
+                self.assertEqual(expected, self._trend(value))
+
+
+
+
 if __name__ == "__main__":
     unittest.main()

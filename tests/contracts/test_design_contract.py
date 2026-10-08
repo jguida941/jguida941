@@ -1049,7 +1049,18 @@ class EngineeringCadenceContract(unittest.TestCase):
 
     def _data(self):
         return {
-            "weekly_cadence": [2, 5, 3, 8, 4, 6, 9, 5, 7, 4, 6, 8],
+            "weekly_cadence": [2, 5],
+            "contribution_trend": {
+                "status": "available", "unit": "contributions", "bucket": "iso_week",
+                "week_start_day": "Monday", "timezone": "UTC", "completeness": "known",
+                "reason": "dated_calendar", "window_start": "2026-09-21", "window_end": "2026-09-29",
+                "points": [
+                    {"week_start": "2026-09-21", "week_end": "2026-09-27", "observed_start": "2026-09-21",
+                     "observed_end": "2026-09-27", "days_observed": 7, "contributions": 2, "partial": False},
+                    {"week_start": "2026-09-28", "week_end": "2026-10-04", "observed_start": "2026-09-28",
+                     "observed_end": "2026-09-29", "days_observed": 2, "contributions": 5, "partial": True},
+                ],
+            },
             "active_days_last_year": 287,
             "automation_workflows": 16,
             "automation_repos": 12,
@@ -1095,6 +1106,25 @@ class EngineeringCadenceContract(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             svg = self._render(str(Path(d) / "eng.svg"))
         self.assertNotIn("gk-ribbon", svg, "gradient ribbon must be replaced by a hairline")
+
+    def test_trend_context_has_separate_clear_baselines(self):
+        import tempfile
+        import xml.etree.ElementTree as ET
+        with tempfile.TemporaryDirectory() as directory:
+            svg = self._render(str(Path(directory) / "eng.svg"))
+        tree = ET.fromstring(svg)
+        group = next(node for node in tree.iter() if node.get("data-series") == "weekly-contributions")
+        texts = list(group.findall("{*}text"))
+        self.assertEqual([108, 132, 320], [float(texts[i].get("y")) for i in (0, -2, -1)])
+        self.assertTrue(all(float(n.get("font-size")) == 14 for n in texts))
+        ticks = [n for n in texts if n.get("data-role") == "y-tick"]
+        self.assertEqual(["0", "2", "4", "6"], [n.text for n in ticks])
+        markers = [n for n in group if n.get("data-role") == "week-point"]
+        self.assertEqual(2, len(markers))
+        self.assertAlmostEqual(float(markers[0].get("cy")), 272 - 2 / 6 * 112, places=2)
+        self.assertAlmostEqual(float(markers[1].get("cy")), 272 - 5 / 6 * 112, places=2)
+        self.assertEqual(494, int(tree.get("height")))
+        self.assertGreaterEqual(344 - float(texts[-1].get("y")), 24)
 
     def test_trend_stroke_legible(self):
         import tempfile

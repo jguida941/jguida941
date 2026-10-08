@@ -1236,6 +1236,98 @@ def _build_commit_stats(
     return None, "unavailable", "Public-scope commit observation unavailable for this run."
 
 
+def _contribution_observation_bounds(
+    collected: CollectedProfileData, days: dict[date, int],
+) -> tuple[datetime, datetime] | None:
+    """Only a matching native observation can certify coverage of dated values."""
+    observation = _validated_metric_observations(collected).get("last_year_contributions")
+    if not observation or observation.get("status") != "ok" or observation.get("complete") is not True:
+        return None
+    if (observation.get("source_metric_id") != "github_contribution_calendar_total_and_days"
+            or observation.get("source_id") != "github_graphql_contribution_calendar"):
+        return None
+    rows = observation["value"]["days"]
+    native = {date.fromisoformat(row["date"]): row["count"] for row in rows}
+    if len(native) != len(rows) or native != days:
+        return None
+    try:
+        bounds = [datetime.fromisoformat(observation[key].replace("Z", "+00:00"))
+                  for key in ("window_start", "window_end", "observed_at")]
+    except (TypeError, ValueError, AttributeError):
+        return None
+    if any(value.tzinfo is None or value.utcoffset() is None for value in bounds):
+        return None
+    start, end, observed = [value.astimezone(timezone.utc) for value in bounds]
+    cutoff = min(end, observed)
+    return (start, cutoff) if start <= cutoff else None
+
+
+def _build_contribution_trend(collected: CollectedProfileData) -> dict[str, Any]:
+    """Preserve GitHub's UTC date labels; never rebucket them by viewer timezone.
+
+    Raw dated values can outlive their observation metadata. They remain useful,
+    but generation time cannot establish that their weeks are complete.
+    """
+    unavailable = {
+        "status": "unavailable", "unit": "contributions", "bucket": "iso_week",
+        "week_start_day": "Monday", "timezone": "UTC", "completeness": "unknown",
+        "window_start": None, "window_end": None, "points": [],
+        "reason": "calendar_unavailable",
+    }
+    calendar = collected.calendar
+    if not isinstance(calendar, dict):
+        return unavailable
+    days: dict[date, int] = {}
+    try:
+        weeks = calendar.get("weeks")
+        if not isinstance(weeks, list):
+            raise ValueError("invalid weeks")
+        for week in weeks:
+            rows = week.get("contributionDays") if isinstance(week, dict) else None
+            if not isinstance(rows, list):
+                raise ValueError("invalid days")
+            for row in rows:
+                if not isinstance(row, dict):
+                    raise ValueError("invalid day")
+                label, count = row.get("date"), row.get("contributionCount")
+                day = date.fromisoformat(label)
+                if day.isoformat() != label or type(count) is not int or count < 0 or day in days:
+                    raise ValueError("invalid dated count")
+                days[day] = count
+        if not days:
+            return {**unavailable, "reason": "no_dated_days"}
+        ordered = sorted(days)
+        if (ordered[-1] - ordered[0]).days + 1 != len(ordered):
+            raise ValueError("missing date")
+    except (TypeError, ValueError):
+        return {**unavailable, "reason": "invalid_calendar"}
+
+    bounds = _contribution_observation_bounds(collected, days)
+    if bounds and not (bounds[0].date() <= ordered[0] <= ordered[-1] <= bounds[1].date()):
+        return {**unavailable, "reason": "invalid_calendar"}
+    buckets: dict[date, list[date]] = {}
+    for day in ordered:
+        monday = day - timedelta(days=day.weekday())
+        buckets.setdefault(monday, []).append(day)
+    points = []
+    for monday, observed_days in list(buckets.items())[-12:]:
+        start = datetime.combine(monday, datetime.min.time(), tzinfo=timezone.utc)
+        end = start + timedelta(days=7)
+        partial = (len(observed_days) != 7 or bounds is None
+                   or bounds[0] > start or bounds[1] < end)
+        points.append({
+            "week_start": monday.isoformat(), "week_end": (monday + timedelta(days=6)).isoformat(),
+            "observed_start": observed_days[0].isoformat(), "observed_end": observed_days[-1].isoformat(),
+            "days_observed": len(observed_days), "contributions": sum(days[day] for day in observed_days),
+            "partial": partial,
+        })
+    return {
+        **unavailable, "status": "available", "reason": "dated_calendar",
+        "completeness": "known" if bounds else "unknown", "points": points,
+        "window_start": points[0]["observed_start"], "window_end": points[-1]["observed_end"],
+    }
+
+
 def _build_engineering_metrics(
     collected: CollectedProfileData,
     push_repos: list[dict[str, Any]],
@@ -1258,16 +1350,8 @@ def _build_engineering_metrics(
             except (TypeError, ValueError):
                 continue
 
-    weekly_cadence: list[int] = []
-    for week in weeks[-12:]:
-        total = 0
-        days = week.get("contributionDays", []) if isinstance(week, dict) else []
-        for day in days:
-            try:
-                total += int(day.get("contributionCount", 0))
-            except (TypeError, ValueError):
-                pass
-        weekly_cadence.append(total)
+    contribution_trend = _build_contribution_trend(collected)
+    weekly_cadence = [point["contributions"] for point in contribution_trend["points"]]
 
     automation = automation or _build_automation_summary(
         collected.repo_counts, getattr(collected, "repos", push_repos), collected.private_repos
@@ -1308,6 +1392,7 @@ def _build_engineering_metrics(
     return {
         "active_days_last_year": active_days,
         "weekly_cadence": weekly_cadence,
+        "contribution_trend": contribution_trend,
         "automation_workflows": workflow["workflow_files"],
         "automation_repos": workflow["configured_repos"],
         "primary_lang_share_pct": round(primary_lang_share_pct, 1),
