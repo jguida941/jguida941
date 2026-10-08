@@ -167,7 +167,7 @@ class DashboardFlatOverviewTests(unittest.TestCase):
             value=next(n for n in active.iter(ns+"text") if n.get("data-role")=="value")
             self.assertEqual(label.get("font-size"),"14")
             self.assertEqual(value.text,"8")
-            self.assertEqual(value.get("font-size"),"48")
+            self.assertEqual(value.get("font-size"),"42")
             self.assertAlmostEqual(float(label.get("y"))-float(value.get("y")),24)
             window=next(n for n in active.iter(ns+"text") if n.text=="last 7 days")
             self.assertAlmostEqual(float(window.get("y"))-float(label.get("y")),19)
@@ -233,3 +233,19 @@ class DashboardShortInventoryLabelsTests(unittest.TestCase):
                 self.assertIn(fact["label"], context)
                 self.assertIn(fact["population_id"], context)
         self.assertEqual(summary, original)
+
+
+
+class DashboardHeaderScaleTests(unittest.TestCase):
+    def test_header_numbers_are_larger_without_scaling_avatar_or_other_facts(self):
+        ns = "{http://www.w3.org/2000/svg}"
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({"username": "jguida941"}, mobile=mobile))
+            image = next(root.iter(ns+"image"))
+            self.assertEqual(image.get("width"), "64" if mobile else "104")
+            self.assertEqual(image.get("height"), image.get("width"))
+            for owner in (n for n in root.iter() if n.get("data-metric-id")):
+                key = owner.get("data-metric-id")
+                value = next(n for n in owner.iter(ns+"text") if n.get("data-role")=="value")
+                expected = 56 if key=="calendar.total" else 29 if key in ("inventory.public_nonfork","inventory.private_owned","inventory.stargazers") else 42 if key=="activity.active_repos_7d" else 25
+                self.assertEqual(float(value.get("font-size")), expected)

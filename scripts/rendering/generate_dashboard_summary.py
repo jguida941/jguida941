@@ -104,10 +104,10 @@ class Canvas:
             fact = {**fact, "label": display_label}
         if compact:
             # The activity rail uses the reference's number / label / window hierarchy.
-            self.text(fact["display_value"], x, y+48, size=48, weight=600, data_role="value")
-            self.text("active repos", x, y+72, size=14, color="muted")
-            self.text("last 7 days", x, y+91, size=14, color="muted")
-            bottom = y+106
+            self.text(fact["display_value"], x, y+42, size=42, weight=600, data_role="value")
+            self.text("active repos", x, y+66, size=14, color="muted")
+            self.text("last 7 days", x, y+85, size=14, color="muted")
+            bottom = y+100
             if qualify and fact["quality"].get("qualification"):
                 bottom = self.wrap(fact["quality"]["qualification"], x, bottom+14, width, size=14, color="muted")
             self.last_fact_box = None
@@ -149,7 +149,7 @@ class Canvas:
         self.end()
         return bottom
 
-    def fact_grid(self, facts, x, y, width, *, columns, qualify=False, fill="surface", framed=True):
+    def fact_grid(self, facts, x, y, width, *, columns, qualify=False, fill="surface", framed=True, size=25):
         gap=12 if self.mobile else 18
         cell_width=(width-(columns-1)*gap)/columns
         for start in range(0,len(facts),columns):
@@ -158,7 +158,7 @@ class Canvas:
             boxes=[]
             bottom=y
             for i,fact in enumerate(row):
-                end=self.fact(fact,x+i*(cell_width+gap),y,cell_width,qualify=qualify,fill=fill,header_rows=header_rows,framed=framed)
+                end=self.fact(fact,x+i*(cell_width+gap),y,cell_width,size=size,qualify=qualify,fill=fill,header_rows=header_rows,framed=framed)
                 if self.last_fact_box:
                     boxes.append(self.last_fact_box)
                 bottom=max(bottom,end)
@@ -215,13 +215,13 @@ def render_svg(summary, *, mobile=False, generation=None):
         except (KeyError, TypeError, ValueError):
             pass
     total = fact("calendar.total")
-    y = c.fact(total,pad,146,content,size=50,fill="panel",framed=False,
+    y = c.fact(total,pad,146,content,size=56,fill="panel",framed=False,
                qualify=total["quality"].get("status") not in ("exact","ok"),
                caption="Last 12 months" if full_year else calendar.get("window","Calendar unavailable"))+12
     c.parts.append('<title>'+escape("Snapshot "+timestamp+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
     inventory = ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers")
     y = c.fact_grid([fact(key) for key in inventory],pad,y,content,
-                    columns=2 if mobile else 3,fill="panel",framed=False)
+                    columns=2 if mobile else 3,fill="panel",framed=False,size=29)
     if any(fact(key)["quality"].get("qualification") for key in inventory):
         y = c.wrap("Inventory · unverified",pad,y+c.secondary,content,size=c.secondary,color="muted")
     c.end()
