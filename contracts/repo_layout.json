@@ -60,13 +60,13 @@
       "root_allowlist": ["__init__.py", "build_readme.py", "profile_cli.py", "validate_generated_profile.py"],
       "groups": [
         {"id": "cli", "target_dir": "cli", "members": ["profile_cli.py"]},
-        {"id": "contracts", "target_dir": "contracts", "members": ["design_predicates.py", "page_manifest.py", "profile_contract.py"]},
+        {"id": "contracts", "target_dir": "contracts", "members": ["design_predicates.py", "page_manifest.py", "profile_contract.py", "dashboard_summary.py"]},
         {"id": "core", "target_dir": "core", "members": ["config.py", "runtime_env.py", "settings.py"]},
         {"id": "github", "target_dir": "github", "members": ["actions_audit.py", "branch_protection.py", "gh_cli.py", "github_cache.py", "github_client.py", "github_graphql.py", "github_transport.py"]},
         {"id": "organization", "target_dir": "organization", "members": ["bootstrap_red_ref.py", "layout_audit.py", "layout_contract.py", "migrate_scripts_layout.py", "tests_layout_contract.py"]},
         {"id": "pipeline", "target_dir": "pipeline", "members": ["collect_data.py", "compute_metrics.py", "profile_helpers.py", "profile_pipeline.py", "render_outputs.py", "web_render.py"]},
         {"id": "quality", "target_dir": "quality", "members": ["design_invariants.py", "diagnostics.py", "headless_receipts.py", "metrics_svg.py", "settings_admissibility.py", "severity.py", "triage.py", "validate_generated_profile.py", "visual_receipts.py"]},
-        {"id": "rendering", "target_dir": "rendering", "members": ["card_theme.py", "components.py", "design_tokens.py", "generate_activity_heatmap.py", "generate_badges.py", "generate_builder_scorecard.py", "generate_contribution_panel.py", "generate_currently_working.py", "generate_engineering_cadence.py", "generate_focus_board.py", "generate_language_chart.py", "generate_metrics_general.py", "generate_repo_spotlight.py", "generate_snapshot_panel.py", "generate_streak_summary.py", "glass_kit.py", "icons.py", "svg_utils.py"]},
+        {"id": "rendering", "target_dir": "rendering", "members": ["card_theme.py", "components.py", "design_tokens.py", "generate_activity_heatmap.py", "generate_dashboard_summary.py", "generate_badges.py", "generate_builder_scorecard.py", "generate_contribution_panel.py", "generate_currently_working.py", "generate_engineering_cadence.py", "generate_focus_board.py", "generate_language_chart.py", "generate_metrics_general.py", "generate_repo_spotlight.py", "generate_snapshot_panel.py", "generate_streak_summary.py", "glass_kit.py", "icons.py", "svg_utils.py"]},
         {"id": "design", "target_dir": "rendering/design", "members": ["loader.py"]},
         {"id": "webkit", "target_dir": "rendering/webkit", "members": ["archetype.py", "components.py", "design_render_adapter.py"]},
         {"id": "showcase", "target_dir": "rendering/showcase", "members": ["showcase.py"]},
@@ -85,7 +85,7 @@
         {"id": "contracts", "target_dir": "contracts", "members": ["test_bootstrap_red_ref.py", "test_card_contracts.py", "test_data_semantics.py", "test_design_button.py", "test_design_card.py", "test_design_character.py", "test_design_chip.py", "test_design_conformance.py", "test_design_contract.py", "test_design_distinctness.py", "test_design_profiles_schema.py", "test_glass_preserved.py", "test_icon_system.py", "test_label_legibility.py", "test_page_shell.py",
           "test_page_manifest.py",
           "test_design_motion.py",
-          "test_design_nav.py", "test_public_data_privacy.py", "test_readme_projection.py", "test_scripts_layout_contract.py", "test_settings_composition.py", "test_showcase_coverage.py", "test_skill_structure.py", "test_structural_layout.py", "test_studio.py", "test_tests_layout_contract.py", "test_theme_roster_authority.py", "test_theme_system.py", "test_tile_composition.py", "test_typography_restraint.py", "test_visual_receipt_provenance.py", "test_web_dashboard.py"]},
+          "test_design_nav.py", "test_public_data_privacy.py", "test_readme_projection.py", "test_dashboard_summary.py", "test_dashboard_destinations.py", "test_scripts_layout_contract.py", "test_settings_composition.py", "test_showcase_coverage.py", "test_skill_structure.py", "test_structural_layout.py", "test_studio.py", "test_tests_layout_contract.py", "test_theme_roster_authority.py", "test_theme_system.py", "test_tile_composition.py", "test_typography_restraint.py", "test_visual_receipt_provenance.py", "test_web_dashboard.py"]},
         {"id": "core", "target_dir": "core", "members": ["test_profile_cli.py", "test_runtime_env.py"]},
         {"id": "github", "target_dir": "github", "members": ["test_actions_audit.py", "test_branch_protection.py", "test_github_client.py", "test_settings_tokens.py", "test_token_fallback.py"]},
         {"id": "pipeline", "target_dir": "pipeline", "members": ["test_compute_metrics_accuracy.py", "test_compute_metrics_integration.py", "test_profile_pipeline_fixture.py"]},
@@ -106,6 +106,12 @@
       "glob": "**/*.html",
       "root_allowlist": ["index.html", "settings.html", "showcase.html", "studio.html"],
       "group_dirs": []
+    },
+    "static_asset_layout": {
+      "purpose": "Checked-in identity artwork consumed and byte-bound as generator source, not generated output.",
+      "root": "assets",
+      "glob": "*.jpg",
+      "root_allowlist": ["profile-avatar.jpg"]
     },
     "receipts_layout": {
       "purpose": "1b (codex must-fix #1) + D-SHELL MF1: closed cover over design-system conformance and page receipts so `assets/` is no longer ungoverned. Profile receipts live under `assets/receipts/<lang>/` where `<lang>` is a KNOWN design profile (active OR reserved) — the allowlist is `design_profiles/_index.json` (single source, read by the guard, NOT hardcoded here). Page layout receipts live under `assets/receipts/pages/<page>/`, where page is declared here. A receipt for an unknown profile or page reddens, so producers can't drop artifacts into an ungoverned tree. Only `assets/receipts/` is gated (the bot-regenerated `assets/*.svg` cards are a separate concern).",

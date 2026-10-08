@@ -2152,7 +2152,7 @@ def compute_profile_model(
     dashboard_data["contribution_rhythm"] = rhythm
     dashboard_data["contribution_rhythm_display"] = contribution_rhythm_display(rhythm)
 
-    return {
+    model = {
         "now_utc": now_utc,
         "contribution_rhythm": rhythm,
         "automation": automation,
@@ -2185,3 +2185,8 @@ def compute_profile_model(
         "cache_mode": collected.cache_mode,
         "publication_hold_reasons": publication_hold_reasons,
     }
+    from scripts.contracts.dashboard_summary import build_dashboard_summary
+    summary = build_dashboard_summary(model, profile_date=_profile_today())
+    model["dashboard_summary"] = summary
+    model["dashboard_data"]["dashboard_summary"] = summary
+    return model

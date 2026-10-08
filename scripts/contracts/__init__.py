@@ -149,6 +149,9 @@ class SnapshotRow(TypedDict):
 
 
 REQUIRED_README_MARKERS = (
+    "assets/dashboard_summary.svg",
+    "assets/dashboard_summary_mobile.svg",
+    "<picture>",
     "metrics.general.svg",
     "assets/streak_summary.svg",
     "assets/badges.svg",
@@ -537,6 +540,8 @@ PROFILE_GENERATION_SCHEMA = "profile-artifact-generation/v1"
 # The exact canonical payload set. Generation writes these first, then seals them
 # in the external manifest below; no upload or commit may use a wildcard.
 PROFILE_PAYLOAD_PATHS = (
+    "assets/dashboard_summary.svg",
+    "assets/dashboard_summary_mobile.svg",
     "README.md",
     "assets/activity_heatmap.svg",
     "assets/badges.svg",
@@ -566,6 +571,7 @@ GENERATOR_SOURCE_ROOTS = (
     "scripts/rendering",
 )
 GENERATOR_SOURCE_FILES = (
+    "assets/profile-avatar.jpg",
     "pyproject.toml",
     "requirements.txt",
     "scripts/quality/metrics_svg.py",

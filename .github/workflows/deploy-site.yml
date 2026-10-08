@@ -54,6 +54,9 @@ jobs:
             tests.contracts.test_data_semantics \
             tests.contracts.test_public_data_privacy \
             tests.contracts.test_design_contract \
+            tests.contracts.test_dashboard_summary \
+            tests.contracts.test_dashboard_destinations \
+            tests.contracts.test_readme_projection \
             tests.contracts.test_label_legibility
 
       - name: Validate profile site artifacts

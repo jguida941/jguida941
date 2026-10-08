@@ -102,6 +102,9 @@ jobs:
             tests.contracts.test_data_semantics \
             tests.contracts.test_public_data_privacy \
             tests.contracts.test_design_contract \
+            tests.contracts.test_dashboard_summary \
+            tests.contracts.test_dashboard_destinations \
+            tests.contracts.test_readme_projection \
             tests.contracts.test_label_legibility
 
       # The same typed product decision this repository uses everywhere else.
@@ -132,6 +135,8 @@ jobs:
           path: |
             README.md
             assets/activity_heatmap.svg
+            assets/dashboard_summary.svg
+            assets/dashboard_summary_mobile.svg
             assets/badges.svg
             assets/builder_scorecard.svg
             assets/contribution_calendar.svg
@@ -153,4 +158,4 @@ jobs:
         with:
           commit_message: "update analytics & readme"
           branch: main
-          file_pattern: "README.md assets/activity_heatmap.svg assets/badges.svg assets/builder_scorecard.svg assets/contribution_calendar.svg assets/currently_working.svg assets/engineering_cadence.svg assets/lang_breakdown.svg assets/now_next_shipped.svg assets/raw_snapshot.svg assets/repo_spotlight.svg assets/streak_summary.svg metrics.general.svg site/data/profile_snapshot.json site/data/profile_artifact_manifest.json"
+          file_pattern: "README.md assets/dashboard_summary.svg assets/dashboard_summary_mobile.svg assets/activity_heatmap.svg assets/badges.svg assets/builder_scorecard.svg assets/contribution_calendar.svg assets/currently_working.svg assets/engineering_cadence.svg assets/lang_breakdown.svg assets/now_next_shipped.svg assets/raw_snapshot.svg assets/repo_spotlight.svg assets/streak_summary.svg metrics.general.svg site/data/profile_snapshot.json site/data/profile_artifact_manifest.json"
