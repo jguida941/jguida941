@@ -56,3 +56,52 @@ class DashboardVisualTests(unittest.TestCase):
             self.assertEqual([(node.get("width"), node.get("height")) for node in cells], [("11", "11"), ("11", "11")])
             self.assertEqual(cells[-1].get("fill"), CONTRIB_RAMP[-1])
             self.assertNotIn("Observation complete", " ".join(root.itertext()))
+
+
+
+class DashboardFinalFitTests(unittest.TestCase):
+    def test_avatar_is_owner_only_and_exact_registered_source(self):
+        import base64
+        import hashlib
+        from pathlib import Path
+        from unittest.mock import patch
+        from scripts import contracts
+        from scripts.rendering import generate_dashboard_summary as renderer
+        ns = "{http://www.w3.org/2000/svg}"
+        path = Path(renderer.__file__).resolve().parents[2] / "assets/profile-avatar.jpg"
+        expected = path.read_bytes()
+        self.assertEqual(hashlib.sha256(expected).hexdigest(), "19a99e5853bc9337a224a2fdfc4063d70020817cb9d2a5085d5bdd91586f0d6e")
+        self.assertIn("assets/profile-avatar.jpg", contracts.GENERATOR_SOURCE_FILES)
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({"username": "jguida941"}, mobile=mobile))
+            images = list(root.iter(ns+"image"))
+            self.assertEqual(len(images), 1)
+            self.assertEqual(base64.b64decode(images[0].get("href").split(",", 1)[1]), expected)
+            with patch.object(Path, "is_file", return_value=False):
+                with self.assertRaises(FileNotFoundError):
+                    render_svg({"username": "jguida941"}, mobile=mobile)
+                for username in ("", "another-user"):
+                    other = ET.fromstring(render_svg({"username": username}, mobile=mobile))
+                    self.assertEqual(list(other.iter(ns+"image")), [])
+
+    def test_project_status_passthrough_and_semantic_icon_owners(self):
+        from datetime import date
+        from scripts.contracts.dashboard_summary import build_dashboard_summary
+        from scripts.rendering.generate_dashboard_summary import SEMANTIC_ICONS
+        rows = [{"name": "one", "status": "active"}, {"name": "two", "status": "maintained"}, {"name": "three"}]
+        summary = build_dashboard_summary({"spotlight_data": rows}, profile_date=date(2026, 10, 8))
+        self.assertEqual([r.get("status") for r in summary["projects"]], ["active", "maintained", None])
+        for identity, glyph in (("inventory.private_owned", "lock"), ("inventory.public_nonfork", "globe"), ("activity.public_commits", "commit"), ("calendar.current_streak", "fire")):
+            self.assertEqual(SEMANTIC_ICONS[identity], glyph)
+
+    def test_common_focus_metadata_and_short_window_truth(self):
+        ns = "{http://www.w3.org/2000/svg}"
+        details = ("Python · pushed 2 hours ago", "C++ · pushed 2 hours ago", "ci-cd-hub · 2 hours ago")
+        summary = {"focus": {key: [{"title": "A genuinely long title "*8, "detail": detail}] for key, detail in zip(("now", "next", "updates"), details)}}
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg(summary, mobile=mobile))
+            painted = ["".join(n.itertext()) for n in root.iter(ns+"text")]
+            for detail in details:
+                self.assertIn(detail, painted)
+            self.assertNotIn("Last 12 months", painted)
+            self.assertIn("Developer Analytics · Backend", painted)

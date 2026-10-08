@@ -147,3 +147,7 @@ LEVEL_XP_SCALE = 1.5  # multiplier per level
 # Unified dashboard palette; kept independent of the existing website themes.
 DASHBOARD_SUMMARY_COLORS = {"surface": "#111827", "panel": "#172236", "line": "#35425b", "track": "#26314a",
           "text": "#e6ebf5", "muted": "#a7b6ce", "blue": "#63b5fa", "teal": "#79cacf"}
+
+# Identity-owned, checked-in artwork; never fetched during rendering.
+DASHBOARD_AVATAR_OWNER = "jguida941"
+DASHBOARD_AVATAR_PATH = "assets/profile-avatar.jpg"

@@ -158,7 +158,7 @@ def build_dashboard_summary(model, *, profile_date):
                 row["push_age"] = "pushed <1h ago" if elapsed < 3600 else f"pushed {int(elapsed / 3600)}h ago" if elapsed < 86400 else f"pushed {int(elapsed / 86400)}d ago"
         except (TypeError, ValueError):
             pass
-    projects = _rows(model.get("spotlight_data"), ("name", "description", "language", "stars", "forks", "url", "html_url", "is_private"))
+    projects = _rows(model.get("spotlight_data"), ("name", "description", "language", "stars", "forks", "url", "html_url", "is_private", "status"))
     for row in projects:
         row["url"] = _url(row.get("url") or row.pop("html_url", ""))
     focus = {key: _rows((model.get("focus") or {}).get(native), ("title", "detail", "url", "is_private"))

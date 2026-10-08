@@ -107,6 +107,12 @@
       "root_allowlist": ["index.html", "settings.html", "showcase.html", "studio.html"],
       "group_dirs": []
     },
+    "static_asset_layout": {
+      "purpose": "Checked-in identity artwork consumed and byte-bound as generator source, not generated output.",
+      "root": "assets",
+      "glob": "*.jpg",
+      "root_allowlist": ["profile-avatar.jpg"]
+    },
     "receipts_layout": {
       "purpose": "1b (codex must-fix #1) + D-SHELL MF1: closed cover over design-system conformance and page receipts so `assets/` is no longer ungoverned. Profile receipts live under `assets/receipts/<lang>/` where `<lang>` is a KNOWN design profile (active OR reserved) — the allowlist is `design_profiles/_index.json` (single source, read by the guard, NOT hardcoded here). Page layout receipts live under `assets/receipts/pages/<page>/`, where page is declared here. A receipt for an unknown profile or page reddens, so producers can't drop artifacts into an ungoverned tree. Only `assets/receipts/` is gated (the bot-regenerated `assets/*.svg` cards are a separate concern).",
       "root": "assets/receipts",

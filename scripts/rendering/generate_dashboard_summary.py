@@ -1,20 +1,38 @@
 """Responsive, static SVG projections of the public dashboard presentation."""
 from __future__ import annotations
 
-from datetime import date, timedelta
+import base64
+from datetime import date, datetime, timedelta
 from html import escape
 import math
 from pathlib import Path
 import textwrap
 
 from scripts.contracts.dashboard_summary import summary_facts
-from scripts.core.config import CONTRIB_EMPTY, CONTRIB_RAMP, DASHBOARD_SUMMARY_COLORS
+from scripts.core.config import (CONTRIB_EMPTY, CONTRIB_RAMP, DASHBOARD_SUMMARY_COLORS,
+                                 DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH)
 from scripts.rendering.components import donut_gauge
 from scripts.rendering.icons import render as icon
 from scripts.rendering.svg_utils import lang_color, truncate
 
 COLORS = DASHBOARD_SUMMARY_COLORS
 FONT = '-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif'
+
+
+# Semantic owners share the vendored Lucide system; numeric facts stay unchanged.
+SEMANTIC_ICONS = {
+    "calendar.total": "calendar", "inventory.public_nonfork": "globe",
+    "inventory.private_owned": "lock", "inventory.stargazers": "star",
+    "inventory.public_forks": "fork", "activity.public_commits": "commit",
+    "activity.merged_prs": "pr_merged", "activity.releases_30d": "release",
+    "activity.active_repos_7d": "commit", "language.count": "code",
+    "calendar.current_streak": "fire", "calendar.longest_streak": "fire",
+    "calendar.active_days": "calendar", "Weekly contributions": "trend_up",
+    "Contribution Rhythm": "calendar", "Language composition": "code",
+    "Workflow configuration": "workflow", "Currently Working On": "commit",
+    "Current Focus": "rocket", "Flagship Projects": "star",
+    "Profile facts": "code", "Contribution calendar": "calendar",
+}
 
 
 def _attrs(values):
@@ -56,13 +74,21 @@ class Canvas:
         self.parts.append('</g>')
 
     def heading(self, title, y, x=None):
-        self.text(title, self.pad if x is None else x, y, size=22, weight=600)
+        x = self.pad if x is None else x
+        if glyph := SEMANTIC_ICONS.get(title):
+            self.parts.append(icon(glyph, x, y-17, size=19, color=COLORS["muted"]))
+            x += 27
+        self.text(title, x, y, size=22, weight=600)
         return y + 30
 
     def fact(self, fact, x, y, width, *, size=25, qualify=False):
         self.group(data_metric_id=fact["metric_id"])
         self.text(fact["display_value"], x, y, size=size, weight=600, data_role="value")
-        y = self.wrap(fact["label"], x, y + 25, width, size=self.secondary, color="muted")
+        label_x, label_width = x, width
+        if glyph := SEMANTIC_ICONS.get(fact["metric_id"]):
+            self.parts.append(icon(glyph, x, y+12, size=16, color=COLORS["muted"]))
+            label_x, label_width = x+23, width-23
+        y = self.wrap(fact["label"], label_x, y + 25, label_width, size=self.secondary, color="muted")
         if qualify and fact["quality"].get("qualification"):
             qualifier = "Reported · unverified" if fact["quality"].get("status") == "unknown" and fact["metric_id"].startswith("inventory.") else fact["quality"]["qualification"]
             y = self.wrap(qualifier, x, y + 1, width, size=self.secondary, color="muted")
@@ -91,10 +117,37 @@ def render_svg(summary, *, mobile=False, generation=None):
     width, pad = c.width, c.pad
     content = width - pad * 2
     c.group(data_section="overview")
-    y = c.wrap("@" + str(summary.get("username", "")), pad, 34, content, weight=600)
-    y = c.wrap("Snapshot " + str(summary.get("generated_at", "")), pad, y, content, size=c.secondary, color="muted") + 10
-    y = c.fact(fact("calendar.total"), pad, y + 44, content, size=50, qualify=True)
-    y = c.wrap(summary.get("calendar", {}).get("window", "Calendar unavailable"), pad, y, content, size=c.secondary, color="muted") + 18
+    username = str(summary.get("username", ""))
+    timestamp = str(summary.get("generated_at", ""))
+    calendar = summary.get("calendar") or {}
+    c.text("Developer Analytics · Backend", pad, 34, size=15, color="muted", weight=500)
+    c.text(username, pad, 69, size=26, weight=600)
+    try:
+        observed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        snapshot_date = observed.strftime("%b %-d, %Y")
+    except ValueError:
+        snapshot_date = "date unavailable"
+    c.text("Snapshot " + snapshot_date, pad, 96, size=14 if mobile else 16, color="muted")
+    if username == DASHBOARD_AVATAR_OWNER:
+        avatar_path = Path(__file__).resolve().parents[2] / DASHBOARD_AVATAR_PATH
+        if not avatar_path.is_file():
+            raise FileNotFoundError("Required owner avatar is missing: " + DASHBOARD_AVATAR_PATH)
+        encoded = base64.b64encode(avatar_path.read_bytes()).decode("ascii")
+        avatar_size = 64 if mobile else 104
+        avatar_x, avatar_y = width-pad-avatar_size, 49 if mobile else 30
+        c.parts.append('<defs><clipPath id="profile-avatar-clip"><circle '+_attrs(dict(cx=avatar_x+avatar_size/2,cy=avatar_y+avatar_size/2,r=avatar_size/2))+'/></clipPath></defs>')
+        c.parts.append('<image '+_attrs(dict(x=avatar_x,y=avatar_y,width=avatar_size,height=avatar_size,href="data:image/jpeg;base64,"+encoded,clip_path="url(#profile-avatar-clip)",preserveAspectRatio="xMidYMid slice"))+'><title>'+escape(username+" profile artwork")+'</title></image>')
+    days = calendar.get("days") or []
+    full_year = False
+    if len(days) in (365, 366) and calendar.get("status") != "unavailable":
+        try:
+            full_year = all(date.fromisoformat(row["date"]) == date.fromisoformat(days[0]["date"])+timedelta(days=i) for i,row in enumerate(days))
+        except (KeyError, TypeError, ValueError):
+            pass
+    total = fact("calendar.total")
+    y = c.fact(total, pad, 170, content, size=50, qualify=total["quality"].get("status") not in ("exact", "ok"))
+    y = c.wrap("Last 12 months" if full_year else calendar.get("window", "Calendar unavailable"), pad, y, content, size=c.secondary, color="muted") + 18
+    c.parts.append('<title>'+escape("Snapshot "+timestamp+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
     inventory = ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers")
     cell = (content - 24) / 3
     bottoms = [c.fact(fact(key), pad + i*(cell + 12), y + 22, cell, size=25) for i, key in enumerate(inventory)]
@@ -282,8 +335,9 @@ def render_svg(summary, *, mobile=False, generation=None):
                     tx+=19
                 title_text=str(row.get("title") or "")
                 detail_text=str(row.get("detail") or "")
-                c.text(truncate(title_text,max(1,int((xx+lane_w-12-tx)/(c.body*.6)))),tx,pos,size=c.body)
-                c.text(truncate(detail_text,max(1,int((lane_w-24)/(c.secondary*.6)))),xx+12,pos+22,size=c.secondary,color="muted")
+                title_size, detail_size = 16, 14 if mobile else 13
+                c.text(truncate(title_text,max(1,int((xx+lane_w-12-tx)/(title_size*.6)))),tx,pos,size=title_size)
+                c.text(truncate(detail_text,max(1,int((lane_w-24)/(detail_size*.52)))),xx+12,pos+22,size=detail_size,color="muted")
                 c.parts.append('<title>'+escape(title_text+" · "+detail_text)+'</title>')
                 pos+=52
             bottom=max(top+72+52*len(rows),top+92)
@@ -302,15 +356,38 @@ def render_svg(summary, *, mobile=False, generation=None):
             c.rect(x,yy,span,96,fill="surface",radius=16,stroke=COLORS["line"])
             name=str(row.get("name") or "")
             description=str(row.get("description") or "")
-            metadata=f'{row.get("language") or "Language unreported"} · {row.get("stars", 0)} stars · {row.get("forks", 0)} forks'
-            c.text(truncate(name,max(1,int((span-26)/(c.body*.6)))),x+13,yy+25,weight=500)
+            language=str(row.get("language") or "Language unreported")
+            status={"active":"Active", "maintained":"Maintained"}.get(row.get("status"), "")
+            name_width=span-26-(112 if status else 0)
+            c.text(truncate(name,max(1,int(name_width/(c.body*.6)))),x+13,yy+25,weight=500)
+            if status:
+                badge_width=28+len(status)*14*.56
+                badge_x=x+span-13-badge_width
+                c.rect(badge_x,yy+9,badge_width,23,fill="panel",radius=11.5)
+                c.parts.append(icon("dot",badge_x+8,yy+17,size=7,color=COLORS["muted"]))
+                c.text(status,badge_x+20,yy+25,size=14,color="muted")
             c.text(truncate(description,max(1,int((span-26)/(c.secondary*.6)))),x+13,yy+49,size=c.secondary,color="muted")
-            c.text(truncate(metadata,max(1,int((span-26)/(c.secondary*.55)))),x+13,yy+73,size=c.secondary,color="muted")
-            c.parts.append('<title>'+escape(name+" · "+description+" · "+metadata)+'</title>')
+            c.parts.append(icon("lang_dot",x+13,yy+68,size=9,color=lang_color(language)))
+            metric_size=14 if mobile else 16
+            stars, forks = row.get("stars",0), row.get("forks",0)
+            stars_text, forks_text = f"{stars:,}", f"{forks:,}"
+            fork_width=22+len(forks_text)*metric_size*.62
+            star_width=22+len(stars_text)*metric_size*.62
+            language_width=span-26-star_width-fork_width-50
+            language_text=truncate(language,max(1,int(language_width/(metric_size*.55))))
+            star_x=x+29+len(language_text)*metric_size*.55+18
+            fork_x=star_x+star_width+16
+            c.text(language_text,x+29,yy+77,size=metric_size,color="muted")
+            for glyph,value,tx in (("star",stars_text,star_x),("fork",forks_text,fork_x)):
+                c.parts.append(icon(glyph,tx,yy+64,size=16,color=COLORS["muted"]))
+                c.text(value,tx+22,yy+77,size=metric_size,color="muted")
+            metadata=f"{language} · {stars} stars · {forks} forks"
+            limitation=" · "+status+" is a reported legacy push-recency status, not verified maintenance" if status else ""
+            c.parts.append('<title>'+escape(name+" · "+description+" · "+metadata+" · "+str(row.get("url") or "")+limitation)+'</title>')
             c.end()
             yy+=116
         return yy if rows else c.wrap("No curated projects supplied",x,yy+10,span,color="muted")
-    y=c.panel("projects","Curated projects",y,projects)
+    y=c.panel("projects","Flagship Projects",y,projects)
 
     def metrics(x,yy,span):
         keys=("activity.public_commits","activity.merged_prs","activity.releases_30d","inventory.public_forks","language.count")

@@ -571,6 +571,7 @@ GENERATOR_SOURCE_ROOTS = (
     "scripts/rendering",
 )
 GENERATOR_SOURCE_FILES = (
+    "assets/profile-avatar.jpg",
     "pyproject.toml",
     "requirements.txt",
     "scripts/quality/metrics_svg.py",
