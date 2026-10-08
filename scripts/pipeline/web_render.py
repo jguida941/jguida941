@@ -187,6 +187,11 @@ body {
   .rhythm-row { grid-template-columns: 3ch minmax(24px, 1fr) auto; gap: 6px 10px; }
 }
 
+#snapshot-notice:empty { display:none; }
+#weekly-chart svg { display:block; width:100%; height:auto; font:16px var(--font-sans); fill:var(--ink); }
+#weekly-table table { border-collapse:collapse; width:100%; font-size:var(--type-body); }
+#weekly-table th, #weekly-table td { padding:10px 4px; text-align:left; border-bottom:1px solid var(--hairline); }
+[id][tabindex="-1"]:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
 footer { text-align: center; color: var(--ink-dim); font-size: var(--type-caption); margin-top: 26px; }
 footer a { color: var(--ink); text-decoration: none; }
 
@@ -257,11 +262,12 @@ def _hero() -> str:
         for name in THEMES
     )
     return f"""
-  <header class="panel hero">
+  <header class="panel hero" id="overview" tabindex="-1">
     <div class="topline">
       <div>
         <p class="eyebrow">GitHub Analytics · Live</p>
         <h1 id="hero-name">@jguida941</h1>
+        <p id="snapshot-notice" class="section-meta" role="status"></p>
         <p class="tag" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p>
         {_nav_band_html()}
       </div>
@@ -302,7 +308,7 @@ def _workflow_breakdown() -> str:
 
 def _scorecard() -> str:
     return f"""
-  <section class="panel">
+  <section class="panel" id="automation" tabindex="-1">
     <div class="section-head"><div><p class="eyebrow">GitHub Signals · 12 Months</p><h2 class="title">Builder Scorecard</h2></div></div>
     <hr class="hairline">
     <div class="ring-row" style="margin-bottom:14px">
@@ -328,7 +334,7 @@ def _scorecard() -> str:
 
 def _languages() -> str:
     return """
-  <section class="panel">
+  <section class="panel" id="languages" tabindex="-1">
     <div class="section-head"><div><p class="eyebrow">Code Composition</p><h2 class="title">Language Breakdown</h2></div><span class="section-meta" id="lang-count">—</span></div>
     <hr class="hairline">
     <div class="lang-bars">
@@ -340,11 +346,24 @@ def _languages() -> str:
 
 def _calendar() -> str:
     return """
-  <section class="panel" id="calendar-panel" hidden>
+  <section class="panel" id="calendar-panel" tabindex="-1">
     <div class="section-head"><div><p class="eyebrow">Last 12 Months</p><h2 class="title">Contribution Calendar</h2></div><span class="section-meta" id="cal-total">—</span></div>
     <hr class="hairline">
+    <p id="calendar-status" role="status">Loading contribution calendar…</p>
     <div class="cal-wrap"><div class="cal" id="cal"></div></div>
     <div class="cal-foot"><span id="cal-months"></span><span class="cal-scale">Less <span class="cal-swatches" id="cal-scale"></span> More</span></div>
+  </section>"""
+
+
+def _weekly() -> str:
+    return """
+  <section class="panel" id="weekly-contributions" tabindex="-1">
+    <div class="section-head"><div><p class="eyebrow">Contribution calendar</p><h2 class="title">Weekly contributions</h2></div></div>
+    <hr class="hairline">
+    <p id="weekly-window" class="section-meta"></p>
+    <p id="weekly-status" role="status">Loading weekly contributions…</p>
+    <div id="weekly-chart"></div>
+    <details class="rhythm-detail"><summary>Weekly numbers</summary><div id="weekly-table"></div></details>
   </section>"""
 
 
@@ -364,7 +383,7 @@ def _rhythm() -> str:
 def _repos_focus() -> str:
     return """
   <div class="bento">
-    <section class="panel">
+    <section class="panel" id="projects" tabindex="-1">
       <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
       <hr class="hairline">
       <div class="rows" id="flagship"></div>
@@ -379,7 +398,7 @@ def _repos_focus() -> str:
 
 def _snapshot() -> str:
     return """
-  <section class="panel">
+  <section class="panel" id="snapshot" tabindex="-1">
     <div class="section-head"><div><p class="eyebrow">Live GitHub Data</p><h2 class="title">Raw Data Snapshot</h2></div></div>
     <hr class="hairline">
     <div class="mgroup" id="snap-tiles"></div>
@@ -425,6 +444,23 @@ def _script() -> str:
     const t = urlTheme || localStorage.getItem("dash-theme");
     if (t && THEMES.includes(t)) setTheme(t);
   } catch (e) { if (urlTheme && THEMES.includes(urlTheme)) setTheme(urlTheme); }
+
+
+  let selectedHash = location.hash;
+  let interruptedScroll = false;
+  addEventListener("wheel", () => { interruptedScroll = true; }, {passive:true});
+  addEventListener("touchstart", () => { interruptedScroll = true; }, {passive:true});
+  addEventListener("pointerdown", () => { interruptedScroll = true; }, {passive:true});
+  addEventListener("keydown", e => { if (["PageDown","PageUp","ArrowDown","ArrowUp","Home","End"," "].includes(e.key)) interruptedScroll = true; });
+  addEventListener("hashchange", () => { selectedHash = location.hash; interruptedScroll = false; });
+  function realignSelectedHash() {
+    if (!selectedHash || interruptedScroll || selectedHash !== location.hash) return;
+    let id;
+    try { id = decodeURIComponent(selectedHash.slice(1)); } catch (_) { return; }
+    const target = document.getElementById(id);
+    if (!target) return;
+    requestAnimationFrame(() => { if (!interruptedScroll && location.hash === selectedHash) target.scrollIntoView({block:"start"}); });
+  }
 
   function hydrate(d) {
     document.querySelectorAll("[data-bind]").forEach(el => {
@@ -492,7 +528,7 @@ def _script() -> str:
     }).join("");
     // contribution calendar (intensity = accent opacity by level)
     const cal = d.contribution_calendar;
-    if (cal && Array.isArray(cal.weeks) && cal.weeks.length && (cal.total || 0) > 0) {
+    if (cal && Array.isArray(cal.weeks) && cal.weeks.length) {
       const days = cal.weeks.flat().filter(x => x && x.date);
       const maxc = Math.max(1, ...days.map(x => x.count || 0));
       const op = [0, 38, 58, 78, 100];
@@ -507,8 +543,38 @@ def _script() -> str:
       const mlabel = (s) => { const t = new Date(s + "T00:00:00Z"); return isNaN(t) ? esc(s) : t.toLocaleString("en-US", {month:"short", year:"numeric"}); };
       document.getElementById("cal-months").textContent = mlabel(days[0].date) + " – " + mlabel(days[days.length-1].date);
       document.getElementById("cal-scale").innerHTML = [0,1,2,3,4].map(l => `<i style="${fill(l)}"></i>`).join("");
-      document.getElementById("calendar-panel").hidden = false;
+      document.getElementById("calendar-status").textContent = cal.total === 0 ? "No contributions in the observed dates" : "";
+    } else {
+      document.getElementById("calendar-status").textContent = "Contribution calendar unavailable";
     }
+
+    const selectedWeekly = d.dashboard_summary?.weekly;
+    const wt = selectedWeekly?.model;
+    const wd = selectedWeekly?.display;
+    const availableWeekly = wd?.available === true && wt?.status === "available" &&
+      Array.isArray(wt.points) && wt.points.length > 0;
+    document.getElementById("weekly-status").textContent = availableWeekly ? wd.qualification : "Contribution trend unavailable";
+    document.getElementById("weekly-window").textContent = availableWeekly ? wd.window : "";
+    if (availableWeekly) {
+      const points = wt.points;
+      const upper = Math.max(1, Math.ceil(Math.max(...points.map(p => p.contributions)) / 3)) * 3;
+      const xy = points.map((p, i) => [56 + i / Math.max(1, points.length - 1) * 700, 192 - p.contributions / upper * 156]);
+      let drawing = [0,1,2,3].map(i => `<line x1="56" x2="756" y1="${192-i*52}" y2="${192-i*52}" stroke="var(--hairline)"/><text x="48" y="${197-i*52}" text-anchor="end">${(upper*i/3).toLocaleString("en-US")}</text>`).join("");
+      drawing += `<polyline points="${xy.map(p=>p.join(",")).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="3"/>`;
+      drawing += points.map((p,i)=>`<circle cx="${xy[i][0]}" cy="${xy[i][1]}" r="4" fill="var(--accent)"><title>${esc(p.observed_start)} to ${esc(p.observed_end)}: ${esc(p.contributions)} contributions${p.partial?" (partial)":""}</title></circle>`).join("");
+      drawing += [...new Set([0,Math.floor(points.length/2),points.length-1])].map(i=>`<text x="${xy[i][0]}" y="224" text-anchor="${i===0?"start":i===points.length-1?"end":"middle"}">${esc(points[i].observed_start.slice(5))}</text>`).join("");
+      document.getElementById("weekly-chart").innerHTML = `<svg viewBox="0 0 800 240" role="img" aria-label="Weekly contributions; exact values in the table below">${drawing}</svg>`;
+      document.getElementById("weekly-table").innerHTML = `<table><thead><tr><th>Observed UTC dates</th><th>Contributions</th><th>Week</th></tr></thead><tbody>${points.map(p=>`<tr><td>${esc(p.observed_start)} – ${esc(p.observed_end)}</td><td>${p.contributions.toLocaleString("en-US")}</td><td>${p.partial?"Partial":"Complete"}</td></tr>`).join("")}</tbody></table>`;
+    } else {
+      document.getElementById("weekly-chart").replaceChildren();
+      document.getElementById("weekly-table").replaceChildren();
+    }
+    const requested = new URLSearchParams(location.search).get("from_snapshot");
+    const actual = d.generation?.render_key;
+    document.getElementById("snapshot-notice").textContent = requested && actual && requested !== actual
+      ? "Website shows a newer/different snapshot. Website snapshot: " + (d.generated_at || "time unavailable") + "." : "";
+    realignSelectedHash();
+
     // Display the serialized calendar projection; dates are labels, never local instants.
     const rh = d.contribution_rhythm;
     const rd = d.contribution_rhythm_display;
@@ -529,8 +595,11 @@ def _script() -> str:
     }
   }
 
-  fetch(DATA_URL, { cache: "no-store" }).then(r => r.json()).then(hydrate).catch(e => {
+  fetch(DATA_URL, { cache: "no-store" }).then(r => { if (!r.ok) throw new Error("Snapshot request failed"); return r.json(); }).then(hydrate).catch(e => {
     document.getElementById("hero-tag").textContent = "Could not load profile_snapshot.json";
+    document.getElementById("weekly-status").textContent = "Contribution trend unavailable";
+    document.getElementById("calendar-status").textContent = "Contribution calendar unavailable";
+    realignSelectedHash();
   });
   </script>"""
 
@@ -551,7 +620,7 @@ def render_dashboard(default_theme: str = DEFAULT_THEME) -> str:
         .replace("__LANG_COLORS__", _lang_colors_json())
         .replace("__THEME_NAMES__", json.dumps(list(THEMES)))
     )
-    body = "".join([_hero(), _scorecard(), _calendar(), _languages(), _rhythm(), _repos_focus(), _snapshot()])
+    body = "".join([_hero(), _scorecard(), _weekly(), _calendar(), _languages(), _rhythm(), _repos_focus(), _snapshot()])
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>

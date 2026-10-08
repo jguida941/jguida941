@@ -5,105 +5,94 @@
 
 </div>
 
----
+<a href="{{ dashboard_url }}?from_snapshot={{ cache_bust }}#overview">
+<picture>
+  <source media="(max-width: 767px)" srcset="assets/dashboard_summary_mobile.svg?v={{ cache_bust }}">
+  <img src="assets/dashboard_summary.svg?v={{ cache_bust }}" width="100%" alt="GitHub profile analytics: contributions, workflow configuration, language composition, recent repositories and projects. Exact values and definitions below.">
+</picture>
+</a>
 
-<div align="center">
+[Weekly trend]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#weekly-contributions) · [Calendar]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#calendar-panel) · [Weekday totals]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#rhythm-panel) · [Languages]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#languages) · [Workflow configuration]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#automation)
 
-<img src="metrics.general.svg?v={{ cache_bust }}" width="100%" alt="GitHub Stats" />
+<details>
+<summary>Read the numbers and definitions</summary>
 
-</div>
+Reported inventory means its completeness and freshness are unverified. Repository push dates and reported headlines are independent observations, with no inferred branch or delivery status. Snapshot {{ dashboard_summary.generated_at | e }}.
 
----
+| Metric | Value | Population / period | Qualification |
+| --- | ---: | --- | --- |
+{% for fact in dashboard_summary.facts %}| {{ fact.label | e }} | {{ fact.display_value | e }} | {{ fact.population_id | replace('-', ' ') | e }}; {{ fact.window | e }} | {{ fact.quality.qualification | e }}{% if fact.range_start is defined and fact.range_start %}; {{ fact.range_start }} – {{ fact.range_end }}{% endif %} |
+{% endfor %}
 
-<div align="center">
+{{ dashboard_summary.automation.display.scope | e }} {{ dashboard_summary.automation.display.meaning | e }}
 
-<img src="assets/streak_summary.svg?v={{ cache_bust }}" width="100%" alt="Streak Summary" />
+| Workflow population | Configured repositories | Eligible repositories | Workflow files | Observation |
+| --- | ---: | ---: | ---: | --- |
+{% for key in ['public','private','combined'] %}{% set row = dashboard_summary.automation.display[key] %}| {{ key | title }} | {{ row.configured_repos }} | {{ row.eligible_repos }} | {{ row.workflow_files }} | {{ row.qualification | e }} |
+{% endfor %}
 
-</div>
+| Observed UTC dates | Weekly contributions | Week |
+| --- | ---: | --- |
+{% if dashboard_summary.weekly.display.available %}{% for row in dashboard_summary.weekly.model.points %}| {{ row.observed_start }} – {{ row.observed_end }} | {{ '{:,}'.format(row.contributions) }} | {{ 'Partial' if row.partial else 'Complete' }} |
+{% endfor %}{% else %}Contribution trend unavailable.
+{% endif %}
 
----
+{{ dashboard_summary.rhythm.display.scope | e }} {{ dashboard_summary.rhythm.display.explanation | e }}
 
-<div align="center">
+| Weekday | Contributions | Observed dates |
+| --- | ---: | ---: |
+{% for row in dashboard_summary.rhythm.display.rows %}| {{ row.weekday }} | {{ row.count_text }} | {{ row.days_observed }} |
+{% endfor %}
 
-<img src="assets/badges.svg?v={{ cache_bust }}" width="100%" alt="Profile Badges" />
+| Language | Observed bytes | Share |
+| --- | ---: | ---: |
+{% for row in dashboard_summary.languages.all_rows %}| {{ row.name | e }} | {{ '{:,}'.format(row.bytes) }} | {{ row.display_value }} |
+{% endfor %}
 
-</div>
+<details><summary>Daily calendar values</summary>
 
----
+| UTC date | Contributions |
+| --- | ---: |
+{% for row in dashboard_summary.calendar.days %}| {{ row.date }} | {{ '{:,}'.format(row.count) }} |
+{% endfor %}
 
-<div align="center">
+</details>
+</details>
 
-<img src="assets/builder_scorecard.svg?v={{ cache_bust }}" width="100%" alt="Builder Scorecard" />
+<details>
+<summary>Repository details and project links</summary>
 
-</div>
+{% for row in dashboard_summary.working %}- {% if row.url %}[{{ row.name | e }}]({{ row.url | e }}){% else %}{{ row.name | e }}{% endif %} — {{ row.language | default('Language unreported', true) | e }}; {{ 'private' if row.is_private else 'public' }}; repository pushed {{ row.pushed_at | e }}. {% if row.last_commit_msg is defined %}Reported headline: {{ row.last_commit_msg | e }}.{% endif %}
+{% endfor %}
 
----
+{% for row in dashboard_summary.projects %}- {% if row.url %}[{{ row.name | e }}]({{ row.url | e }}){% else %}{{ row.name | e }}{% endif %}: {{ row.description | default('') | e }} {{ row.language | default('Language unreported', true) | e }}; {{ row.stars | default('n/a') }} stars; {{ row.forks | default('n/a') }} forks.
+{% endfor %}
 
-<div align="center">
+{% for key,label in [('now','Now'),('next','Next'),('updates','Recent Updates')] %}{{ label }}:
+{% for row in dashboard_summary.focus[key] %}- {% if row.url %}[{{ row.title | e }}]({{ row.url | e }}){% else %}{{ row.title | e }}{% endif %} — {{ row.detail | default('') | e }}
+{% else %}- No planned item supplied.
+{% endfor %}{% endfor %}
 
-<img src="assets/engineering_cadence.svg?v={{ cache_bust }}" width="100%" alt="Engineering Cadence" />
+Recently created:
+{% for row in dashboard_summary.recent_created %}- {{ row.name | e }} — {{ row.created_at | default('Date unavailable') | e }}
+{% else %}- No recent creations observed.
+{% endfor %}
 
-</div>
+</details>
 
----
+<details>
+<summary>Legacy visual detail</summary>
 
-<div align="center">
+These compatibility images retain their existing presentation.
 
-<img src="assets/contribution_calendar.svg?v={{ cache_bust }}" width="100%" alt="Contribution Calendar" />
+{% for label,path in legacy_visuals %}- [{{ label }}]({{ path }}?v={{ cache_bust }})
+{% endfor %}
 
-</div>
-
----
-
-<div align="center">
-
-<img src="assets/now_next_shipped.svg?v={{ cache_bust }}" width="100%" alt="Current Focus" />
-
-</div>
-
----
-
-<div align="center">
-
-<img src="assets/currently_working.svg?v={{ cache_bust }}" width="100%" alt="Currently Working On" />
-
-</div>
-
----
-
-<div align="center">
-
-<img src="assets/lang_breakdown.svg?v={{ cache_bust }}" width="100%" alt="Language Breakdown" />
-
-</div>
-
----
-
-<div align="center">
-
-<img src="assets/activity_heatmap.svg?v={{ cache_bust }}" width="100%" alt="Contribution Rhythm" />
-
-</div>
-
----
-
-<div align="center">
-
-<img src="assets/repo_spotlight.svg?v={{ cache_bust }}" width="100%" alt="Flagship Projects" />
-
-</div>
-
----
-
-<div align="center">
-
-<img src="assets/raw_snapshot.svg?v={{ cache_bust }}" width="100%" alt="Raw Data Snapshot" />
-
-</div>
+</details>
 
 ### Deep Dive Data
 
-- [Open the full dashboard]({{ dashboard_url }})
+- [Open the full dashboard]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#overview)
 - [Open raw profile snapshot JSON](site/data/profile_snapshot.json)
 - Generated by `python scripts/profile_cli.py generate-profile --validate` {{ generation_provenance }}
 - A curated project matrix, recent delivery feed, top-language summary, and recent repository list are available in the dashboard + JSON.

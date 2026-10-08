@@ -241,3 +241,18 @@ sanitizer allowlist; inline-CSS-animation reliability; a published min font-size
 - **SVG-projection suite**: valid XML + viewBox, explicit bg rect, width 400–880, no script/on*/external
   refs/fonts, stroke ≥1.5, effective font ≥12/14, token-only colors.
 - **Cross-projection suite**: tier parity, status-semantics parity, token parity, README ⊆ web.
+
+## Generated unified summary
+
+The active README uses one linked picture with 840-unit desktop and 360-unit phone
+projections. The phone source is selected below 768 viewport pixels; its content
+reflows. Counts are exact grouped integers, language shares one decimal, and workflow
+adoption keeps its existing rounding alongside numerator/denominator. Twelve earlier
+SVGs remain generated compatibility details, not additional mounted headline panels.
+The shared public dashboard_summary value owns selected facts, qualification, calendar
+and project rows. Unknown inventory is labeled Reported, with its definition in text.
+Working repositories use a full-width count/row container followed by full-width Focus,
+projects and remaining facts. Calendar dates and weekly points retain their associations.
+Rounded outer corners stay transparent; no shadow or filter paints outside the surface.
+Main's three website themes are unchanged. The weekly destination and section anchors
+are generated separately; SVG images provide native README links and text equivalents.

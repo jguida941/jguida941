@@ -696,6 +696,26 @@ def _contribution_rhythm_claim_errors(profile_snapshot: dict) -> list[str]:
     return [f"{path}: {problem}" for problem in problems]
 
 
+def _dashboard_summary_errors(payload):
+    """The public model and the actual composed SVG bytes must describe one view."""
+    from scripts.contracts.dashboard_summary import SCHEMA
+    from scripts.rendering.generate_dashboard_summary import render_svg
+    errors = []
+    summary = payload.get("dashboard_summary")
+    if not isinstance(summary, dict) or summary.get("schema") != SCHEMA:
+        return ["public dashboard summary missing or invalid"]
+    generation = payload.get("generation") or {}
+    for mobile, name in ((False, "assets/dashboard_summary.svg"), (True, "assets/dashboard_summary_mobile.svg")):
+        path = Path(name)
+        try:
+            text = path.read_text(encoding="utf-8")
+            if text != render_svg(summary, mobile=mobile, generation=generation):
+                errors.append(name + ": composed drawing does not match the public presentation")
+        except (OSError, ValueError, TypeError, KeyError):
+            errors.append(name + ": composed drawing unavailable or malformed")
+    return errors
+
+
 def validate_profile() -> ValidationResult:
     errors: list[str] = []
     warnings: list[str] = []
@@ -716,12 +736,14 @@ def validate_profile() -> ValidationResult:
         if heading in readme:
             errors.append(f"README should not contain duplicate heading: {heading}")
 
+    if readme.count("<picture>") != 1 or 'media="(max-width: 767px)"' not in readme:
+        errors.append("README must mount one responsive dashboard picture")
     if "assets/now_next_shipped.svg" not in readme:
-        errors.append("README does not embed assets/now_next_shipped.svg")
+        errors.append("README does not retain legacy detail link assets/now_next_shipped.svg")
     if "assets/raw_snapshot.svg" not in readme:
-        errors.append("README does not embed assets/raw_snapshot.svg")
+        errors.append("README does not retain legacy detail link assets/raw_snapshot.svg")
     if "assets/contribution_calendar.svg" not in readme:
-        errors.append("README does not embed assets/contribution_calendar.svg")
+        errors.append("README does not retain legacy detail link assets/contribution_calendar.svg")
     if "site/data/profile_snapshot.json" not in readme:
         errors.append("README does not link site/data/profile_snapshot.json")
 
@@ -756,6 +778,7 @@ def validate_profile() -> ValidationResult:
         errors.append("site/data/profile_snapshot.json not found")
 
     if profile_snapshot:
+        errors.extend(_dashboard_summary_errors(profile_snapshot))
         try:
             if _public_dashboard_data(profile_snapshot) != profile_snapshot:
                 errors.append(

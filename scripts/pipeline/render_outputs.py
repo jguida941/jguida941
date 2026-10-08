@@ -246,6 +246,9 @@ def generate_assets(
         output_path="metrics.general.svg",
     )
     logger("  -> metrics.general.svg")
+    from scripts.rendering.generate_dashboard_summary import generate as generate_summary
+    generate_summary(_public_dashboard_data(model.get("dashboard_summary") or {}), generation=generation)
+    logger("  -> assets/dashboard_summary.svg + assets/dashboard_summary_mobile.svg")
 
 
 def _public_dashboard_data(dashboard_data: dict) -> dict:
@@ -384,7 +387,18 @@ def render_readme(model: dict, logger=print, *, generation: dict | None = None) 
 
     featured_links = [row for row in model["repo_overview_rows"] if row.get("featured")][:6]
 
+    public_summary = _public_dashboard_data(model.get("dashboard_summary") or {})
+    legacy_visuals = [
+        ("Overview", "metrics.general.svg"), ("Streaks", "assets/streak_summary.svg"),
+        ("Badges", "assets/badges.svg"), ("Scorecard", "assets/builder_scorecard.svg"),
+        ("Cadence", "assets/engineering_cadence.svg"), ("Calendar", "assets/contribution_calendar.svg"),
+        ("Focus", "assets/now_next_shipped.svg"), ("Recent work", "assets/currently_working.svg"),
+        ("Languages", "assets/lang_breakdown.svg"), ("Rhythm", "assets/activity_heatmap.svg"),
+        ("Projects", "assets/repo_spotlight.svg"), ("Snapshot", "assets/raw_snapshot.svg"),
+    ]
     readme = template.render(
+        dashboard_summary=public_summary,
+        legacy_visuals=legacy_visuals,
         username=model["dashboard_data"]["username"],
         dashboard_url=model["dashboard_data"]["dashboard_url"],
         cache_bust=cache_bust,

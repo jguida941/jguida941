@@ -36,6 +36,9 @@ PROFILE_PRODUCT_TEST_MODULES = (
     "tests.contracts.test_data_semantics",
     "tests.contracts.test_public_data_privacy",
     "tests.contracts.test_design_contract",
+    "tests.contracts.test_dashboard_summary",
+    "tests.contracts.test_dashboard_destinations",
+    "tests.contracts.test_readme_projection",
     "tests.contracts.test_label_legibility",
 )
 PROFILE_PRODUCT_TEST_ENV = (
@@ -51,6 +54,8 @@ PROFILE_PAYLOAD_PATHS = (
     "metrics.general.svg",
     "site/data/profile_snapshot.json",
     "assets/activity_heatmap.svg",
+            "assets/dashboard_summary.svg",
+            "assets/dashboard_summary_mobile.svg",
     "assets/badges.svg",
     "assets/builder_scorecard.svg",
     "assets/contribution_calendar.svg",
@@ -1643,6 +1648,11 @@ class ProfilePublicationAcceptanceTests(unittest.TestCase):
             snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
             snapshot["generation"] = contracts.public_generation_record(generation)
             self._write_json(snapshot_path, snapshot)
+            from scripts.rendering.generate_dashboard_summary import render_svg
+            for mobile, name in ((False, "dashboard_summary.svg"), (True, "dashboard_summary_mobile.svg")):
+                (output_root / "assets" / name).write_text(
+                    render_svg(snapshot["dashboard_summary"], mobile=mobile, generation=generation), encoding="utf-8"
+                )
             manifest = contracts.build_artifact_manifest(
                 generation,
                 root=output_root,
