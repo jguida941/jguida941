@@ -49,7 +49,7 @@ class GeneratedCardTruthTests(unittest.TestCase):
         ci_unavailable = ci_status == "unavailable"
         language_partial = language_status == "partial"
         ci_repositories = None if ci_unavailable else 1
-        ci_percentage = None if ci_unavailable else 33.3
+        ci_percentage = None if ci_unavailable else 100 / 3
         scope_suffix = {
             "exact": "exact",
             "partial": "partial-observation",
@@ -145,7 +145,21 @@ class GeneratedCardTruthTests(unittest.TestCase):
             "private_repos_total": 1,
             "private_nonfork_repos": 1,
         }
+        # Qualified standalone fixture: public two + private one, with a
+        # single configured repository and a distinct unknown-pair scenario.
+        from scripts.pipeline.compute_metrics import _build_automation_summary
+        public = [
+            {"name": "public-config", "has_ci_workflows": None if ci_unavailable else True,
+             "workflow_file_count": None if ci_unavailable else 1},
+            {"name": "public-other", "has_ci_workflows": None if ci_partial or ci_unavailable else False,
+             "workflow_file_count": None if ci_partial or ci_unavailable else 0},
+        ]
+        private = [{"name": "private-other", "has_ci_workflows": None if ci_unavailable else False,
+                    "workflow_file_count": None if ci_unavailable else 0}]
+        automation = _build_automation_summary(
+            {"public_owned_nonfork": 2, "private_owned_nonfork": 1}, public, private)
         return {
+            "automation": automation,
             "dashboard_data": {
                 "username": "jguida941",
                 "generated_at": "2026-08-26T12:00:00Z",
@@ -495,9 +509,9 @@ class GeneratedCardTruthTests(unittest.TestCase):
         card_claims = {
             "push": (("scorecard", "Active Repos (7d)"),),
             "automation": (
-                ("scorecard", "CI Pipelines"),
-                ("cadence", "CI pipelines"),
-                ("general", "CI pipelines"),
+                ("scorecard", "Workflow files"),
+                ("cadence", "Workflow files"),
+                ("general", "Workflow repos"),
             ),
             "language": (
                 ("scorecard", "Primary Language"),
@@ -522,7 +536,7 @@ class GeneratedCardTruthTests(unittest.TestCase):
 
         status_label = {
             "push": "Push · Unavailable",
-            "automation": "Automation · Unavailable",
+            "automation": "Workflows · Unavailable",
             "language": "Language · Unavailable",
         }[family]
         with self.subTest(family=family, evidence="visible unavailable status"):
@@ -674,6 +688,7 @@ class GeneratedCardTruthTests(unittest.TestCase):
                 public_data["snapshot_rows"],
                 public_data["data_quality"],
                 data_scope=public_data.get("data_scope"),
+                automation=public_data.get("automation"),
                 output_path=str(generated_path),
             )
             current_renderer_output = generated_path.read_bytes()
@@ -799,10 +814,10 @@ class GeneratedCardTruthTests(unittest.TestCase):
             self._card_model(ci_status="unavailable", language_status="exact")
         )
         card_labels = {
-            "scorecard": "CI coverage",
-            "cadence": "CI coverage",
-            "general": "CI pipelines",
-            "snapshot": "CI",
+            "scorecard": "Repo adoption",
+            "cadence": "Repo adoption",
+            "general": "Workflow repos",
+            "snapshot": "Workflow observation",
         }
 
         for card, label in card_labels.items():
@@ -873,7 +888,7 @@ class GeneratedCardTruthTests(unittest.TestCase):
                 (
                     "Private · Unavailable",
                     "Push · Partial",
-                    "Automation · Partial",
+                    "Workflows · Partial",
                     "Language · Partial",
                 ),
             ),
@@ -892,7 +907,7 @@ class GeneratedCardTruthTests(unittest.TestCase):
                 (
                     "Private · Partial",
                     "Push · Partial",
-                    "Automation · Partial",
+                    "Workflows · Partial",
                     "Language · Partial",
                 ),
             ),
@@ -902,7 +917,7 @@ class GeneratedCardTruthTests(unittest.TestCase):
                 (
                     "Private · Exact",
                     "Push · Exact",
-                    "Automation · Exact",
+                    "Workflows · Exact",
                     "Language · Exact",
                 ),
             ),
@@ -928,7 +943,7 @@ class GeneratedCardTruthTests(unittest.TestCase):
                 for word in normalized_population.split():
                     self.assertIn(word, svg.casefold())
             with self.subTest(scenario=name, assertion="existing pipeline labels"):
-                for label in ("CI · OK", "Commits · OK", "Releases · OK", "Events · OK"):
+                for label in ("Workflow observation · OK", "Commits · OK", "Releases · OK", "Events · OK"):
                     self.assertIn(label, svg)
 
 

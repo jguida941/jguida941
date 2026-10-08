@@ -9,6 +9,12 @@ renders when there is no snapshot data.
 
 from __future__ import annotations
 
+from scripts.contracts.profile_contract import (
+    AUTOMATION_REPOS_LABEL, AUTOMATION_FILES_LABEL, AUTOMATION_ADOPTION_LABEL,
+    AUTOMATION_SCOPE, AUTOMATION_MEANING,
+    automation_description, automation_display,
+)
+
 from scripts.core.config import SPACE, SVG_WIDTH, TEXT_DIM
 from scripts.rendering.components import (
     empty_state,
@@ -57,7 +63,7 @@ _TILE_LABEL = {
     "languages_count": "Languages",
     "prs_merged": "PRs Merged",
     "public_forks": "Forks",
-    "ci_repos": "CI Repos",
+    "ci_repos": AUTOMATION_REPOS_LABEL,
     "releases": "Releases",
     "streak_days": "Streak",
 }
@@ -129,6 +135,7 @@ def generate(
     snapshot_rows: list,
     data_quality: dict,
     data_scope: dict | None = None,
+    automation: dict | None = None,
     output_path: str = "assets/raw_snapshot.svg",
 ) -> str:
     width = SVG_WIDTH
@@ -169,7 +176,7 @@ def generate(
     if not isinstance(metric_statuses, dict):
         metric_statuses = {}
     status_items = [
-        ("CI", quality.get("ci_status")),
+        ("Workflow observation", quality.get("ci_status")),
         ("Commits", quality.get("commits_status")),
         ("Releases", quality.get("releases_status")),
         ("Events", quality.get("events_status")),
@@ -198,19 +205,15 @@ def generate(
     family_status_items = [
         ("Private", quality.get("private_aggregate_status")),
         ("Push", metric_statuses.get("active_repos_7d")),
-        ("Automation", metric_statuses.get("automation_repos")),
+        ("Workflows", metric_statuses.get("automation_repos")),
         ("Language", metric_statuses.get("top_languages")),
     ]
     scope = data_scope if isinstance(data_scope, dict) else {}
     population = str(scope.get("repos_included") or "repository scope unavailable")
-    evidence_notes = []
-    ci_family_status = str(metric_statuses.get("automation_repos", "")).casefold()
-    if ci_family_status == "partial":
-        evidence_notes.append(
-            str(quality.get("ci_note") or "CI Partial: known minimum; unknown repositories remain.")
-        )
-    elif ci_family_status == "unavailable":
-        evidence_notes.append("CI Unavailable: no usable repository observation.")
+    evidence_notes = [
+        "Workflow: owned public + private nonfork; profile excluded",
+        automation_display(automation)["combined"]["qualification"],
+    ]
     language_status = str(metric_statuses.get("top_languages", "")).casefold()
     if language_status == "partial":
         evidence_notes.append(
@@ -233,7 +236,8 @@ def generate(
     notes_start_y = scope_y + 18
     height = int(notes_start_y + len(evidence_notes) * 16 + 18)
 
-    parts: list[str] = [glass_panel(width, height), header_svg]
+    parts: list[str] = [glass_panel(width, height), header_svg,
+        f"<desc>{xml_escape(automation_description(automation))}</desc>"]
 
     # PrimaryKpiCard top-left.
     kpi_y = content_top + 58

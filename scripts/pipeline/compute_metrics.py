@@ -34,7 +34,9 @@ from scripts.contracts import (
     activity_timezone_name,
     profile_timezone_name,
 )
-from scripts.contracts.profile_contract import SCORECARD_METRICS, SNAPSHOT_METRICS, format_metric_value
+from scripts.contracts.profile_contract import (
+    SCORECARD_METRICS, SNAPSHOT_METRICS, automation_display, format_metric_value,
+)
 from scripts.pipeline.profile_helpers import (
     activity_label,
     ci_text,
@@ -387,7 +389,7 @@ def _build_ci_quality(
     repos: list[dict],
     *,
     allow_network_calls: bool,
-) -> tuple[dict[tuple[str, str], bool | None], dict[str, Any]]:
+) -> dict[tuple[str, str], bool | None]:
     repo_ci_lookup: dict[tuple[str, str], bool | None] = {}
     for repo in repos:
         name = repo.get("name", "")
@@ -397,41 +399,7 @@ def _build_ci_quality(
             repo, allow_network_calls=allow_network_calls
         )
 
-    ci_total_repos = len(repo_ci_lookup)
-    ci_unknown_count = sum(1 for state in repo_ci_lookup.values() if state is None)
-    ci_true_count = sum(1 for state in repo_ci_lookup.values() if state is True)
-    ci_known_count = ci_total_repos - ci_unknown_count
-
-    if ci_total_repos == 0:
-        ci_status = "empty"
-        ci_note = "No repositories in scope."
-        ci_count_effective = 0
-        ci_coverage_pct = 0.0
-    elif ci_unknown_count == 0:
-        ci_status = "ok"
-        ci_note = "CI workflow detection complete."
-        ci_count_effective = ci_true_count
-        ci_coverage_pct = (ci_true_count / ci_total_repos * 100) if ci_total_repos else 0.0
-    elif ci_known_count == 0:
-        ci_status = "fallback"
-        ci_note = "CI workflow detection unavailable for this run; showing a known minimum of 0."
-        ci_count_effective = 0
-        ci_coverage_pct = 0.0
-    else:
-        ci_status = "partial"
-        ci_note = (
-            "CI workflow detection partial for this run; showing known minimum with unknown repos noted "
-            f"({ci_unknown_count}/{ci_total_repos})."
-        )
-        ci_count_effective = ci_true_count
-        ci_coverage_pct = (ci_true_count / ci_total_repos * 100) if ci_total_repos else 0.0
-
-    return repo_ci_lookup, {
-        "ci_status": ci_status,
-        "ci_note": ci_note,
-        "ci_count_effective": ci_count_effective,
-        "ci_coverage_pct": ci_coverage_pct,
-    }
+    return repo_ci_lookup
 
 
 def _build_repo_overview_rows(
@@ -980,6 +948,61 @@ def _has_valid_automation_fact(repository: dict[str, Any]) -> bool:
     )
 
 
+def _build_automation_summary(
+    repo_counts: dict[str, int | None],
+    public_repos: list[dict[str, Any]],
+    private_repos: list[dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Workflow configuration at observed HEAD, from valid paired facts only.
+
+    Inventory completeness and workflow observation completeness are independent.
+    Missing inventory never supplies an adoption denominator. Unknown workflow
+    pairs never contribute to either the repository or file subtotal.
+    """
+    def finish(observed, eligible, known, configured, files, inventory):
+        empty = inventory == "exact" and eligible == 0
+        status = ("exact" if inventory == "exact" and known == observed
+                  else "partial" if known else "unavailable")
+        return {
+            "observed_eligible_repos": observed,
+            "eligible_repos": eligible,
+            "observed_workflow_repos": known,
+            "unknown_workflow_repos": observed - known,
+            "configured_repos": configured if known or empty else None,
+            "workflow_files": files if known or empty else None,
+            "adoption_pct": configured / eligible * 100 if eligible and known else None,
+            "inventory_status": inventory,
+            "status": status,
+        }
+
+    def partition(repositories, expected):
+        nonfork = [repo for repo in repositories if repo.get("fork") is not True]
+        inventory = _inventory_quality(expected, nonfork)
+        eligible = [repo for repo in nonfork if not is_self_repo(repo.get("name"))]
+        valid = [repo for repo in eligible if _has_valid_automation_fact(repo)]
+        return finish(
+            len(eligible), len(eligible) if inventory == "exact" else None,
+            len(valid), sum(repo["has_ci_workflows"] is True for repo in valid),
+            sum(repo["workflow_file_count"] for repo in valid), inventory,
+        )
+
+    public = partition(public_repos, repo_counts.get("public_owned_nonfork"))
+    private = partition(private_repos, repo_counts.get("private_owned_nonfork"))
+    rows = (public, private)
+    inventory = ("exact" if all(row["inventory_status"] == "exact" for row in rows)
+                 else "unavailable" if all(row["inventory_status"] == "unavailable" for row in rows)
+                 else "partial")
+    combined = finish(
+        sum(row["observed_eligible_repos"] for row in rows),
+        sum(row["eligible_repos"] for row in rows) if inventory == "exact" else None,
+        sum(row["observed_workflow_repos"] for row in rows),
+        sum(row["configured_repos"] for row in rows if row["configured_repos"] is not None),
+        sum(row["workflow_files"] for row in rows if row["workflow_files"] is not None),
+        inventory,
+    )
+    return {"public": public, "private": private, "combined": combined}
+
+
 def _has_valid_language_fact(
     repository: dict[str, Any],
     *,
@@ -1027,7 +1050,6 @@ def _metric_family_statuses(
     )
     validators = {
         "push": _has_valid_push_fact,
-        "automation": _has_valid_automation_fact,
         "language": lambda repository: _has_valid_language_fact(
             repository,
             completeness_markers_present=language_markers_present,
@@ -1220,7 +1242,7 @@ def _build_engineering_metrics(
     top_languages: list[dict[str, Any]],
     now_utc: datetime,
     *,
-    automation_scope_repos: list[dict[str, Any]] | None = None,
+    automation: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Backend-developer analytics derived from already-fetched data."""
     calendar = collected.calendar if isinstance(collected.calendar, dict) else {}
@@ -1247,23 +1269,10 @@ def _build_engineering_metrics(
                 pass
         weekly_cadence.append(total)
 
-    automation_population_source = (
-        push_repos if automation_scope_repos is None else automation_scope_repos
+    automation = automation or _build_automation_summary(
+        collected.repo_counts, getattr(collected, "repos", push_repos), collected.private_repos
     )
-    automation_population = [
-        repository
-        for repository in automation_population_source
-        if not is_self_repo(repository.get("name"))
-    ]
-    automation_workflows = sum(
-        int(repository.get("workflow_file_count", 0) or 0)
-        for repository in automation_population
-    )
-    automation_repos = sum(
-        1
-        for repository in automation_population
-        if repository.get("has_ci_workflows") is True
-    )
+    workflow = automation["combined"]
 
     primary_lang_share_pct = float(top_languages[0]["percent"]) if top_languages else 0.0
     languages_over_5pct = sum(1 for lang in top_languages if float(lang.get("percent", 0)) >= 5.0)
@@ -1299,8 +1308,8 @@ def _build_engineering_metrics(
     return {
         "active_days_last_year": active_days,
         "weekly_cadence": weekly_cadence,
-        "automation_workflows": automation_workflows,
-        "automation_repos": automation_repos,
+        "automation_workflows": workflow["workflow_files"],
+        "automation_repos": workflow["configured_repos"],
         "primary_lang_share_pct": round(primary_lang_share_pct, 1),
         "languages_over_5pct": languages_over_5pct,
         "median_days_since_push": round(median_days_since_push, 1),
@@ -1313,7 +1322,7 @@ def _build_engineering_metrics(
             if isinstance(private_nonfork_count, int)
             else None
         ),
-        "automation_eligible_repos": len(automation_population),
+        "automation_eligible_repos": workflow["eligible_repos"],
         "recent_private_count": len(collected.private_repos),
     }
 
@@ -1567,7 +1576,12 @@ def compute_profile_model(
         for repository in [*public_nonfork_repos, *private_nonfork_repos]
         if not is_self_repo(repository.get("name"))
     ]
-    automation_scope_repos = list(push_repos)
+    automation = _build_automation_summary(
+        repo_counts, public_nonfork_repos, private_nonfork_repos
+    )
+    workflow = automation["combined"]
+    family_statuses["automation"] = workflow["status"]
+    workflow_display = automation_display(automation)
     language_bytes = _aggregate_language_bytes(
         public_nonfork_repos,
         private_nonfork_repos,
@@ -1612,16 +1626,16 @@ def compute_profile_model(
         if pushed_dt >= seven_days_ago:
             active_repos_7d += 1
 
-    # --- CI quality ---
-    repo_ci_lookup, ci_quality = _build_ci_quality(
-        automation_scope_repos,
-        allow_network_calls=allow_network_calls,
-    )
-    ci_count_effective = ci_quality["ci_count_effective"]
-    ci_coverage_pct = ci_quality["ci_coverage_pct"]
-    if family_statuses["automation"] == "unavailable":
-        ci_count_effective = None
-        ci_coverage_pct = None
+    # Aggregate values use retained paired facts; per-repo fallback is separate.
+    repo_ci_lookup = _build_ci_quality(push_repos, allow_network_calls=allow_network_calls)
+    ci_count_effective = workflow["configured_repos"]
+    ci_coverage_pct = workflow["adoption_pct"]
+    ci_quality = {
+        "ci_status": "empty" if workflow["eligible_repos"] == 0 else {
+            "exact": "ok", "partial": "partial", "unavailable": "unavailable",
+        }[workflow["status"]],
+        "ci_note": workflow_display["combined"]["qualification"],
+    }
 
     # --- commit stats ---
     public_scope_commits, commits_status, commits_note = _build_commit_stats(
@@ -1683,15 +1697,12 @@ def compute_profile_model(
         push_repos,
         top_languages,
         now_utc,
-        automation_scope_repos=automation_scope_repos,
+        automation=automation,
     )
     if family_statuses["push"] == "unavailable":
         active_repos_7d = None
         engineering["median_days_since_push"] = None
         engineering["days_since_last_push"] = None
-    if family_statuses["automation"] == "unavailable":
-        engineering["automation_workflows"] = None
-        engineering["automation_repos"] = None
     if family_statuses["language"] == "unavailable":
         engineering["primary_lang_share_pct"] = None
         engineering["languages_over_5pct"] = None
@@ -1980,6 +1991,8 @@ def compute_profile_model(
         pr_list=pr_list,
     )
     dashboard_data["engineering"] = engineering
+    dashboard_data["automation"] = automation
+    dashboard_data["automation_display"] = workflow_display
     calendar_public = _public_contribution_calendar(calendar)
     if calendar_public:
         dashboard_data["contribution_calendar"] = calendar_public
@@ -1989,6 +2002,7 @@ def compute_profile_model(
 
     return {
         "now_utc": now_utc,
+        "automation": automation,
         "lang_count": lang_count,
         "snapshot": snapshot,
         "snapshot_rows": snapshot_rows,

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-08T00:01:05.595637Z",
+  "generated_at": "2026-10-08T00:15:45.879148Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,7 +18,7 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 11842,
+    "last_year_contributions": 11843,
     "public_scope_commits": 7315,
     "total_repos": 56,
     "public_forks": 0,
@@ -35,8 +35,8 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 11842,
-      "display_value": "11,842"
+      "value": 11843,
+      "display_value": "11,843"
     },
     {
       "key": "public_scope_commits",
@@ -96,8 +96,8 @@
     },
     {
       "key": "ci_repos",
-      "label": "Repos With CI/CD",
-      "dashboard_label": "Repos With CI",
+      "label": "Workflow repos",
+      "dashboard_label": "Workflow repos",
       "value": 55,
       "display_value": "55"
     },
@@ -113,8 +113,8 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 11842,
-      "display_value": "11,842"
+      "value": 11843,
+      "display_value": "11,843"
     },
     {
       "key": "public_scope_commits",
@@ -166,7 +166,7 @@
     },
     {
       "key": "ci_repos",
-      "label": "Repos With CI",
+      "label": "Workflow repos",
       "value": 55,
       "display_value": "55"
     },
@@ -179,7 +179,7 @@
   ],
   "data_quality": {
     "ci_status": "ok",
-    "ci_note": "CI workflow detection complete.",
+    "ci_note": "Workflow observation complete",
     "commits_status": "ok",
     "commits_note": "Public-scope commit aggregation complete.",
     "releases_status": "ok",
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-08T00:00:34Z",
+        "observed_at": "2026-10-08T00:15:24Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -228,8 +228,8 @@
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-10-08T04:00:00Z",
-        "window_end": "2026-10-08T00:00:40Z",
-        "observed_at": "2026-10-08T00:00:41Z",
+        "window_end": "2026-10-08T00:15:30Z",
+        "observed_at": "2026-10-08T00:15:30Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -243,8 +243,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-09-08T04:00:00Z",
-        "window_end": "2026-10-08T00:00:38Z",
-        "observed_at": "2026-10-08T00:00:40Z",
+        "window_end": "2026-10-08T00:15:27Z",
+        "observed_at": "2026-10-08T00:15:29Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -258,8 +258,8 @@
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-10-08T04:00:00Z",
-        "window_end": "2026-10-08T00:00:40Z",
-        "observed_at": "2026-10-08T00:00:40Z",
+        "window_end": "2026-10-08T00:15:29Z",
+        "observed_at": "2026-10-08T00:15:30Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-08T00:00:33Z",
+        "observed_at": "2026-10-08T00:15:24Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -289,8 +289,8 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0357142857142858,
     "ci_coverage_pct": 21.31782945736434,
-    "last_year_contributions": 11842,
-    "active_days_last_year": 324,
+    "last_year_contributions": 11843,
+    "active_days_last_year": 325,
     "automation_workflows": 166,
     "primary_lang_share_pct": 61.9,
     "median_days_since_push": 348.5,
@@ -301,16 +301,16 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 11842,
-      "display_value": "11,842",
+      "value": 11843,
+      "display_value": "11,843",
       "accent": "#7dcfff"
     },
     {
       "key": "active_days_last_year",
       "label": "Active Days",
       "detail": "days shipped in last 12mo",
-      "value": 324,
-      "display_value": "324",
+      "value": 325,
+      "display_value": "325",
       "accent": "#9ece6a"
     },
     {
@@ -323,15 +323,15 @@
     },
     {
       "key": "ci_coverage_pct",
-      "label": "CI Coverage",
-      "detail": "repos with pipelines",
+      "label": "Repo adoption",
+      "detail": "owned public + private nonfork repositories",
       "value": 21.31782945736434,
       "display_value": "21.3%",
       "accent": "#ff9e64"
     },
     {
       "key": "automation_workflows",
-      "label": "CI Pipelines",
+      "label": "Workflow files",
       "detail": "workflow files across repos",
       "value": 166,
       "display_value": "166",
@@ -552,8 +552,8 @@
       "stars": 0,
       "forks": 0,
       "ci": "no",
-      "pushed_at": "2026-10-07",
-      "pushed_at_raw": "2026-10-07T23:58:08Z",
+      "pushed_at": "2026-10-08",
+      "pushed_at_raw": "2026-10-08T00:07:48Z",
       "pushed_ago": "today",
       "created_at": "2026-09-06",
       "last_commit_msg": "Complete numeric overflow activity with tests and submission files",
@@ -618,7 +618,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-07",
       "pushed_at_raw": "2026-10-07T05:08:48Z",
-      "pushed_ago": "18 hours ago",
+      "pushed_ago": "19 hours ago",
       "created_at": "2026-08-09",
       "last_commit_msg": "chore: close raw Git path identity slice",
       "is_private": true,
@@ -868,7 +868,7 @@
       "visibility": "private",
       "description": null,
       "html_url": "https://github.com/jguida941/CS405",
-      "pushed_at": "2026-10-07T23:58:08Z",
+      "pushed_at": "2026-10-08T00:07:48Z",
       "created_at": "2026-09-06T12:36:16Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -1065,7 +1065,7 @@
       },
       {
         "title": "chore: close raw Git path identity slice",
-        "detail": "sembridge \u00b7 18 hours ago",
+        "detail": "sembridge \u00b7 19 hours ago",
         "url": "https://github.com/jguida941/sembridge",
         "is_private": true
       },
@@ -1086,7 +1086,7 @@
       "repo_url": "https://github.com/jguida941/CS405",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-07T23:58:08Z",
+      "created_at": "2026-10-08T00:07:48Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1133,7 +1133,7 @@
       "repo": "jguida941/sembridge",
       "repo_url": "https://github.com/jguida941/sembridge",
       "state": "PUSH",
-      "time_ago": "18 hours ago",
+      "time_ago": "19 hours ago",
       "created_at": "2026-10-07T05:08:48Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1202,7 +1202,7 @@
   "recent_releases": [],
   "recent_pull_requests": [],
   "engineering": {
-    "active_days_last_year": 324,
+    "active_days_last_year": 325,
     "weekly_cadence": [
       195,
       123,
@@ -1215,7 +1215,7 @@
       41,
       15,
       93,
-      88
+      89
     ],
     "automation_workflows": 166,
     "automation_repos": 55,
@@ -1230,8 +1230,80 @@
     "automation_eligible_repos": 258,
     "recent_private_count": 203
   },
+  "automation": {
+    "public": {
+      "observed_eligible_repos": 55,
+      "eligible_repos": 55,
+      "observed_workflow_repos": 55,
+      "unknown_workflow_repos": 0,
+      "configured_repos": 13,
+      "workflow_files": 60,
+      "adoption_pct": 23.636363636363637,
+      "inventory_status": "exact",
+      "status": "exact"
+    },
+    "private": {
+      "observed_eligible_repos": 203,
+      "eligible_repos": 203,
+      "observed_workflow_repos": 203,
+      "unknown_workflow_repos": 0,
+      "configured_repos": 42,
+      "workflow_files": 106,
+      "adoption_pct": 20.689655172413794,
+      "inventory_status": "exact",
+      "status": "exact"
+    },
+    "combined": {
+      "observed_eligible_repos": 258,
+      "eligible_repos": 258,
+      "observed_workflow_repos": 258,
+      "unknown_workflow_repos": 0,
+      "configured_repos": 55,
+      "workflow_files": 166,
+      "adoption_pct": 21.31782945736434,
+      "inventory_status": "exact",
+      "status": "exact"
+    }
+  },
+  "automation_display": {
+    "scope": "Owned public + private nonfork repositories; profile excluded.",
+    "meaning": "GitHub workflow configuration at observed default-branch HEAD. Configuration does not imply successful runs.",
+    "public": {
+      "configured_repos": "13",
+      "eligible_repos": "55",
+      "workflow_files": "60",
+      "unknown_workflow_repos": "0",
+      "observed_eligible_repos": "55",
+      "status": "Exact",
+      "qualification": "Workflow observation complete",
+      "adoption": "24%",
+      "gauge_detail": "13/55 repos"
+    },
+    "private": {
+      "configured_repos": "42",
+      "eligible_repos": "203",
+      "workflow_files": "106",
+      "unknown_workflow_repos": "0",
+      "observed_eligible_repos": "203",
+      "status": "Exact",
+      "qualification": "Workflow observation complete",
+      "adoption": "21%",
+      "gauge_detail": "42/203 repos"
+    },
+    "combined": {
+      "configured_repos": "55",
+      "eligible_repos": "258",
+      "workflow_files": "166",
+      "unknown_workflow_repos": "0",
+      "observed_eligible_repos": "258",
+      "status": "Exact",
+      "qualification": "Workflow observation complete",
+      "adoption": "21%",
+      "gauge_detail": "55/258 repos"
+    }
+  },
   "contribution_calendar": {
-    "total": 11842,
+    "total": 11843,
     "weeks": [
       [
         {
@@ -2800,18 +2872,18 @@
         },
         {
           "date": "2026-10-08",
-          "count": 0
+          "count": 1
         }
       ]
     ]
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-08T00:01:05.595637Z",
-    "generator_revision": "0c37715fd4a61b5727e34cb61cae02253d159245",
-    "generator_source_digest": "db997c52e2c54af0ad3f24042af27d89d473de6271e4012c48352a65f103c2a8",
-    "claim_input_digest": "903974b1b6474dd1104249043435e1e662c4253bc4e66c1e9e488938e11b3625",
-    "render_key": "0249ebbd6fbb9324f15b4ae65b9d4d0eabe966a91ee48c5d1ba14ba7b5480e1f",
+    "generated_at": "2026-10-08T00:15:45.879148Z",
+    "generator_revision": "fd626b9d12fdb1f188a388ccf3c79cfa6f6d84ee",
+    "generator_source_digest": "b2809832054c3b6f9f80ccd0a127049943b07cfb3dd9f0e1dc6436e0fb21bfae",
+    "claim_input_digest": "8e10e29782e9c19e351d73dbca79315b41886f76bff643ae44cf58c88ebe6d62",
+    "render_key": "2a863cb9d5662df5e37e5f13560cceae29b0b4d33ccac396da60edddee5094f0",
     "schema": "profile-artifact-generation/v1"
   }
 }

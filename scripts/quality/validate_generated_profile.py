@@ -103,6 +103,8 @@ def _rendered_metric_claim(svg_text: str, metric_key: str) -> dict[str, str] | N
             "scope": node.attrib.get(METRIC_CLAIM_SCOPE_ATTRIBUTE, ""),
             "status": node.attrib.get(METRIC_CLAIM_STATUS_ATTRIBUTE, ""),
             "visible_text": " ".join(node.itertext()),
+            "visible_values": ["".join(child.itertext()).strip() for child in node.iter()
+                               if child.tag.rsplit("}", 1)[-1] == "text"],
         }
     return None
 
@@ -151,6 +153,14 @@ def _partial_qualification_errors(profile_snapshot: dict) -> list[str]:
         if statuses.get(metric_key) != "partial":
             continue
         disclosures = partial_qualification_disclosures(metric_key)
+        workflow = (profile_snapshot.get("automation") or {}).get("combined") or {}
+        if metric_key == "ci_coverage_pct" and workflow and workflow.get("eligible_repos") is None:
+            disclosures = (
+                ("the workflow field", ("workflow",)),
+                ("partial status", ("partial",)),
+                ("observed subtotal", ("observed subtotal",)),
+                ("unknown eligible inventory", ("eligible inventory unknown",)),
+            )
         if not disclosures:
             continue
         for relative_path in partial_qualification_consumers(metric_key):
@@ -203,15 +213,31 @@ def _ci_coverage_claim_errors(profile_snapshot: dict) -> list[str]:
         if not card_path.exists():
             continue
         card_text = card_path.read_text(encoding="utf-8")
-        if CI_CLAIM_LABEL not in card_text:
-            # An honest empty card repeats no CI number, so it makes no claim.
-            continue
+        # Artifact role and the source model govern this requirement. Renaming a
+        # label or deleting a carrier must never disable semantic validation.
+        if card_path.name == "builder_scorecard.svg":
+            renders_gauge = bool(profile_snapshot.get("automation")) or any(
+                scorecard.get(key) for key in (
+                    "last_year_contributions", "active_days_last_year", "active_repos_7d",
+                    "automation_workflows", "releases_30d", "primary_lang_share_pct",
+                )
+            ) or scorecard.get("ci_coverage_pct") is not None
+        else:
+            engineering = profile_snapshot.get("engineering") or {}
+            renders_gauge = bool(profile_snapshot.get("automation")) or any(
+                engineering.get(key) for key in (
+                    "weekly_cadence", "active_days_last_year", "automation_workflows",
+                    "public_repos_total", "private_repos_total",
+                )
+            ) or scorecard.get("ci_coverage_pct") is not None
         try:
             claim = _rendered_metric_claim(card_text, "ci_coverage_pct")
         except ET.ParseError:
             errors.append(f"{card_path} is not parsable SVG for claim comparison")
             continue
         if claim is None:
+            if not renders_gauge:
+                continue
             errors.append(
                 f"{card_path} repeats CI coverage without a machine-readable claim "
                 "naming its value, population scope, and completeness status"
@@ -224,7 +250,7 @@ def _ci_coverage_claim_errors(profile_snapshot: dict) -> list[str]:
                 f"{card_path} CI coverage claim {observed} does not match the "
                 f"published claim {expected}"
             )
-        elif claim["display_value"] not in claim["visible_text"]:
+        elif claim["display_value"] not in claim["visible_values"]:
             errors.append(
                 f"{card_path} shows a CI coverage value its own claim does not declare"
             )

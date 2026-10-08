@@ -813,7 +813,8 @@ def _compact_gauge_errors(svg: str) -> list[str]:
             "exactly two (subject line + detail line)"
         )
     if copy_lines and not any(
-        "coverage" in line.text.casefold() or re.search(r"\bci\b", line.text, re.I)
+        "coverage" in line.text.casefold() or "repo adoption" in line.text.casefold()
+        or re.search(r"\bci\b", line.text, re.I)
         for line in copy_lines
     ):
         errors.append("compact CI copy column never names its CI coverage subject")
@@ -916,14 +917,20 @@ def _render_compact_gauge_cases() -> dict[str, str]:
             score = dict(scorecard)
             score["ci_coverage_pct"] = value
             score_path = Path(directory) / f"score-{label}.svg"
-            builder(score, output_path=str(score_path), ci_claim=claim)
+            automation = {"combined": {
+                "configured_repos": 53,
+                "eligible_repos": 53 if label == "boundary" else 251,
+                "workflow_files": 164, "adoption_pct": value,
+                "status": "exact", "unknown_workflow_repos": 0,
+            }}
+            builder(score, output_path=str(score_path), ci_claim=claim, automation=automation)
             cases[f"builder-{label}"] = score_path.read_text(encoding="utf-8")
 
             eng = dict(engineering)
             if label == "boundary":
                 eng["automation_eligible_repos"] = 53
             cadence_path = Path(directory) / f"cadence-{label}.svg"
-            cadence(eng, output_path=str(cadence_path), ci_claim=claim)
+            cadence(eng, output_path=str(cadence_path), ci_claim=claim, automation=automation)
             cases[f"cadence-{label}"] = cadence_path.read_text(encoding="utf-8")
     return cases
 
@@ -1339,8 +1346,8 @@ class LabelLegibilityContract(unittest.TestCase):
         cadence_live_text = " ".join(
             line.text for line in _positioned_text_lines(cases["cadence-live"])[1]
         ).casefold()
-        self.assertIn("53", cadence_live_text)
-        self.assertIn("automated", cadence_live_text)
+        self.assertIn("53/251 repos", cadence_live_text)
+        self.assertIn("repo adoption", cadence_live_text)
         self.assertIn(
             "100%",
             " ".join(line.text for line in _positioned_text_lines(cases["builder-boundary"])[1]),

@@ -345,6 +345,109 @@ def _mapping_errors(
     return errors
 
 
+def _automation_contract_errors(payload: dict[str, Any]) -> list[str]:
+    """Check the aggregate summary and every compatibility projection.
+
+    Legacy snapshots may omit this additive summary. When supplied, all three
+    partitions and their projections are required and internally consistent.
+    """
+    import math
+    from scripts.contracts.profile_contract import automation_display, format_metric_value
+
+    if "automation" not in payload:
+        return []
+    errors = []
+    summary = payload["automation"]
+    names = {"public", "private", "combined"}
+    if type(summary) is not dict or set(summary) != names:
+        return ["automation must contain public, private and combined partitions"]
+    counts = ("observed_eligible_repos", "observed_workflow_repos", "unknown_workflow_repos")
+    nullable = ("eligible_repos", "configured_repos", "workflow_files")
+    fields = {*counts, *nullable, "adoption_pct", "inventory_status", "status"}
+    for name in sorted(names):
+        row = summary[name]
+        path = "automation." + name
+        if type(row) is not dict or set(row) != fields:
+            errors.append(path + " has an invalid field roster")
+            continue
+        if (any(not _is_count(row[key]) for key in counts)
+                or any(row[key] is not None and not _is_count(row[key]) for key in nullable)
+                or row["inventory_status"] not in COMPLETENESS_VALUES
+                or row["status"] not in COMPLETENESS_VALUES):
+            errors.append(path + " has invalid counts or statuses")
+            continue
+        observed, known, unknown = (row[key] for key in counts)
+        eligible, configured, files = (row[key] for key in nullable)
+        exact_inventory = row["inventory_status"] == "exact"
+        expected_status = ("exact" if exact_inventory and known == observed
+                           else "partial" if known else "unavailable")
+        if known + unknown != observed or (eligible != observed if exact_inventory else eligible is not None):
+            errors.append(path + " inventory and observation counts disagree")
+        if row["status"] != expected_status:
+            errors.append(path + " status disagrees with its evidence")
+        if known or exact_inventory and eligible == 0:
+            if configured is None or files is None or configured > known or files < configured or (configured == 0 and files != 0):
+                errors.append(path + " configuration counts disagree")
+        elif configured is not None or files is not None:
+            errors.append(path + " unavailable observations must have null counts")
+        ratio = row["adoption_pct"]
+        expected_ratio = configured / eligible * 100 if eligible and known and configured is not None else None
+        if expected_ratio is None:
+            if ratio is not None:
+                errors.append(path + " adoption must be null without a known denominator and observation")
+        elif (type(ratio) not in (int, float) or not math.isfinite(ratio)
+              or not math.isclose(ratio, expected_ratio, rel_tol=1e-12, abs_tol=1e-12)):
+            errors.append(path + " adoption disagrees with configured/eligible repositories")
+    if errors:
+        return errors
+    public, private, combined = (summary[key] for key in ("public", "private", "combined"))
+    inventory = ("exact" if public["inventory_status"] == private["inventory_status"] == "exact"
+                 else "unavailable" if public["inventory_status"] == private["inventory_status"] == "unavailable"
+                 else "partial")
+    if combined["inventory_status"] != inventory:
+        errors.append("automation.combined inventory disagrees with its partitions")
+    for key in counts + nullable:
+        values = [row[key] for row in (public, private)]
+        expected = (sum(values) if inventory == "exact" else None) if key == "eligible_repos" else (
+            sum(value for value in values if value is not None)
+            if any(value is not None for value in values) else None
+        )
+        # An exact-empty sibling contributes no observation to an unavailable row.
+        if key in ("configured_repos", "workflow_files") and combined["status"] == "unavailable":
+            expected = None
+        if combined[key] != expected:
+            errors.append("automation.combined." + key + " disagrees with its partitions")
+    for section, key, field in (
+        ("snapshot", "ci_repos", "configured_repos"),
+        ("engineering", "automation_repos", "configured_repos"),
+        ("engineering", "automation_workflows", "workflow_files"),
+        ("engineering", "automation_eligible_repos", "eligible_repos"),
+        ("scorecard", "automation_workflows", "workflow_files"),
+        ("scorecard", "ci_coverage_pct", "adoption_pct"),
+    ):
+        projection = payload.get(section)
+        if not isinstance(projection, dict) or key not in projection or projection[key] != combined[field]:
+            errors.append(section + "." + key + " disagrees with automation.combined." + field)
+    statuses = (payload.get("data_quality") or {}).get("metric_statuses") or {}
+    scopes = (payload.get("data_scope") or {}).get("metric_scopes") or {}
+    expected_scope = "owned-public-private-nonfork-profile-excluded-" + {
+        "exact": "exact", "partial": "partial-observation", "unavailable": "unavailable",
+    }[combined["status"]]
+    for key in ("ci_repos", "automation_repos", "automation_workflows", "ci_coverage_pct"):
+        if statuses.get(key) != combined["status"]:
+            errors.append("data_quality.metric_statuses." + key + " disagrees with automation")
+        if scopes.get(key) != expected_scope:
+            errors.append("data_scope.metric_scopes." + key + " disagrees with automation")
+    for collection in ("snapshot_rows", "snapshot_cards"):
+        rows = [row for row in payload.get(collection, []) if isinstance(row, dict) and row.get("key") == "ci_repos"]
+        if (len(rows) != 1 or rows[0].get("value") != combined["configured_repos"]
+                or rows[0].get("display_value") != format_metric_value(combined["configured_repos"], {"format": "int_or_na"})):
+            errors.append(collection + " workflow repository projection disagrees with automation")
+    if payload.get("automation_display") != automation_display(summary):
+        errors.append("automation_display disagrees with automation")
+    return errors
+
+
 def public_snapshot_contract_errors(payload: dict[str, Any]) -> list[str]:
     """Return path-qualified errors for the published scope/quality contract."""
     errors: list[str] = []
@@ -420,6 +523,7 @@ def public_snapshot_contract_errors(payload: dict[str, Any]) -> list[str]:
                 f"data_quality.{field} is internal diagnostics and is never published"
             )
 
+    errors.extend(_automation_contract_errors(payload))
     return errors
 
 

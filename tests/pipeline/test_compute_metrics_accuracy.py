@@ -2682,6 +2682,45 @@ class AccuracyTests(unittest.TestCase):
         self.assertEqual("n/a", contributions["display_value"])
 
 
+    def test_workflow_summary_uses_valid_pairs_in_both_visibility_partitions(self):
+        collected = self._collected()
+        invalid = dict(collected.private_repos[0], has_ci_workflows=False, workflow_file_count=7)
+        model = compute_profile_model(replace(collected, private_repos=[invalid]),
+                                      logger=_noop, allow_network_calls=False)
+        public, private, combined = (model["automation"][key] for key in ("public", "private", "combined"))
+        self.assertEqual((1, 2, 2), (public["configured_repos"], public["eligible_repos"], public["workflow_files"]))
+        self.assertEqual((None, None, 1), (private["configured_repos"], private["workflow_files"], private["unknown_workflow_repos"]))
+        self.assertEqual((1, 2, 3, "partial"), (combined["configured_repos"], combined["workflow_files"], combined["eligible_repos"], combined["status"]))
+        self.assertAlmostEqual(100 / 3, combined["adoption_pct"])
+        self.assertEqual(combined["workflow_files"], model["scorecard"]["automation_workflows"])
+        self.assertEqual(combined["configured_repos"], model["snapshot"]["ci_repos"])
+
+    def test_missing_private_inventory_preserves_public_subtotal_without_ratio(self):
+        collected = self._collected()
+        counts = dict(collected.repo_counts, private_owned=None, private_owned_nonfork=None)
+        model = compute_profile_model(replace(collected, repo_counts=counts, private_repos=[]),
+                                      logger=_noop, allow_network_calls=False)
+        self.assertEqual("exact", model["automation"]["public"]["status"])
+        self.assertEqual(1, model["automation"]["combined"]["configured_repos"])
+        self.assertIsNone(model["automation"]["combined"]["eligible_repos"])
+        self.assertIsNone(model["scorecard"]["ci_coverage_pct"])
+
+    def test_workflow_projection_contract_rejects_independent_scalar_or_display_edits(self):
+        from scripts.contracts import _automation_contract_errors
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+        model = compute_profile_model(self._collected(), logger=_noop, allow_network_calls=False)
+        payload = _public_dashboard_data(model["dashboard_data"])
+        self.assertEqual([], _automation_contract_errors(payload))
+        for section, key in (("engineering", "automation_workflows"),
+                             ("scorecard", "ci_coverage_pct"), ("snapshot", "ci_repos")):
+            altered = copy.deepcopy(payload)
+            altered[section][key] = 999
+            self.assertTrue(_automation_contract_errors(altered))
+        altered = copy.deepcopy(payload)
+        altered["automation_display"]["combined"]["workflow_files"] = "999"
+        self.assertTrue(_automation_contract_errors(altered))
+
+
 class StreakTimezoneTests(unittest.TestCase):
     def test_streak_counts_back_from_local_today(self):
         today = date(2026, 6, 28)

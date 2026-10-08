@@ -9,10 +9,16 @@ is no data at all.
 
 from __future__ import annotations
 
+from scripts.contracts.profile_contract import (
+    AUTOMATION_REPOS_LABEL, AUTOMATION_FILES_LABEL, AUTOMATION_ADOPTION_LABEL,
+    AUTOMATION_SCOPE, AUTOMATION_MEANING,
+    automation_description, automation_display,
+)
+
 from scripts.core.config import SVG_WIDTH, SPACE, TEXT_DIM
-from scripts.rendering.components import empty_state, metric_tile, primary_kpi, section_header
+from scripts.rendering.components import empty_state, metric_tile, primary_kpi, section_header, text
 from scripts.rendering.glass_kit import glass_panel
-from scripts.rendering.svg_utils import fmt_compact
+from scripts.rendering.svg_utils import fmt_compact, xml_escape
 
 
 def _empty(value: object) -> bool:
@@ -26,7 +32,17 @@ def generate(
     ci_count: int | None,
     last_year_contributions: int | None,
     output_path: str = "assets/badges.svg",
+    *,
+    automation: dict | None = None,
+    data_quality: dict | None = None,
 ):
+    display = automation_display(automation)
+    if automation is not None:
+        ci_count = automation["combined"]["configured_repos"]
+    workflow_lines = [
+        "Workflow: owned public + private nonfork; profile excluded",
+        display["combined"]["qualification"],
+    ]
     width = SVG_WIDTH
     pad = 28
 
@@ -43,11 +59,11 @@ def generate(
         ("code", fmt_compact(public_nonfork_repos), "public repos"),
         ("fork", fmt_compact(public_forks), "forks"),
         ("lock", fmt_compact(private_owned_repos), "private repos"),
-        ("workflow", fmt_compact(ci_count), "CI pipelines"),
+        ("workflow", fmt_compact(ci_count), AUTOMATION_REPOS_LABEL),
     ]
 
     # Honest empty state: nothing to show -> one explanatory line, no fabricated tiles.
-    if all(
+    if automation is None and all(
         _empty(v)
         for v in (
             last_year_contributions,
@@ -75,7 +91,7 @@ def generate(
             f.write(svg)
         return output_path
 
-    height = int(content_top + 124)
+    height = int(content_top + 124 + len(workflow_lines) * 18)
     parts = [glass_panel(width, height), header_svg]
 
     # PrimaryKpiCard: the one dominant metric, top-left.
@@ -104,8 +120,14 @@ def generate(
     for i, (icon_name, value, label) in enumerate(secondary):
         x = grid_x + i * (col_w + gap)
         parts.append(
-            metric_tile(x, tile_y, col_w, tile_h, value=value, label=label, icon_name=icon_name)
+            metric_tile(x, tile_y, col_w, tile_h, value=value, label=label,
+                        icon_name=None if label == AUTOMATION_REPOS_LABEL else icon_name)
         )
+
+    parts.append(f"<desc>{xml_escape(automation_description(automation))}</desc>")
+    for index, line in enumerate(workflow_lines):
+        parts.append(text(xml_escape(line), pad, content_top + 122 + index * 18,
+                          token="caption", color=TEXT_DIM))
 
     svg = (
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '

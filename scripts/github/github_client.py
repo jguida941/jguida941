@@ -1870,9 +1870,8 @@ def get_repos(include_forks: bool = False) -> list:
         print(f"  Warning: REST repo listing unavailable ({status}); falling back to GraphQL")
         try:
             return _graphql_public_owned_repos(include_forks)
-        except Exception:
-            print("  Warning: GraphQL fallback unavailable; returning empty repo list")
-            return []
+        except Exception as exc:
+            raise RuntimeError("public repository inventory unavailable") from exc
 
 
 def get_owned_repo_scope_counts() -> dict:

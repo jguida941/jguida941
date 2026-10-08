@@ -267,6 +267,105 @@ def _observe_missing_workflow_directory_from_rest_listing(
 
 
 class GitHubClientTests(unittest.TestCase):
+    def test_exhausted_public_listing_retains_the_final_provider_cause(self):
+        for include_forks in (False, True):
+            first = RuntimeError("initial GraphQL failure")
+            final = RuntimeError("final GraphQL failure")
+            with self.subTest(include_forks=include_forks), patch.object(
+                gh, "_get_cached", return_value=None
+            ), patch.object(gh, "_set_cached") as cache, patch.object(
+                gh, "_graphql_public_owned_repos", side_effect=[first, final]
+            ) as graphql, patch.object(
+                gh, "paginated_get", side_effect=requests.ConnectionError("REST unavailable")
+            ) as rest:
+                with self.assertRaisesRegex(RuntimeError, "public repository inventory unavailable") as raised:
+                    gh.get_repos(include_forks)
+                self.assertIs(final, raised.exception.__cause__)
+                self.assertEqual([((include_forks,), {}), ((include_forks,), {})], graphql.call_args_list)
+                rest.assert_called_once()
+                cache.assert_not_called()
+
+    def test_failed_public_listing_does_not_cache_fabricated_zero_counts(self):
+        with patch.object(gh, "TOKEN", ""), patch.object(
+            gh, "_get_cached", return_value=None
+        ), patch.object(gh, "_set_cached") as cache, patch.object(
+            gh, "_graphql_public_owned_repos", side_effect=RuntimeError("GraphQL unavailable")
+        ), patch.object(
+            gh, "paginated_get", side_effect=requests.ConnectionError("REST unavailable")
+        ):
+            with self.assertRaisesRegex(RuntimeError, "public repository inventory unavailable"):
+                gh.get_owned_repo_scope_counts()
+            cache.assert_not_called()
+
+    def test_public_listing_preserves_successful_empty_and_nonempty_results(self):
+        for rows in ([], [_rest_public_repository("observed-public")]):
+            with self.subTest(rows=rows), patch.object(
+                gh, "_get_cached", return_value=None
+            ), patch.object(
+                gh, "_graphql_public_owned_repos", return_value=copy.deepcopy(rows)
+            ) as graphql, patch.object(gh, "paginated_get") as rest:
+                self.assertEqual(rows, gh.get_repos(False))
+                graphql.assert_called_once_with(False)
+                rest.assert_not_called()
+
+    def test_public_listing_rest_recovery_preserves_empty_and_nonempty_results(self):
+        for rows in ([], [_rest_public_repository("rest-recovered")]):
+            with self.subTest(rows=rows), patch.object(
+                gh, "_get_cached", return_value=None
+            ), patch.object(
+                gh, "_graphql_public_owned_repos", side_effect=RuntimeError("GraphQL unavailable")
+            ) as graphql, patch.object(
+                gh, "paginated_get", return_value=copy.deepcopy(rows)
+            ) as rest:
+                self.assertEqual(rows, gh.get_repos(False))
+                graphql.assert_called_once_with(False)
+                rest.assert_called_once()
+
+    def test_public_listing_final_retry_preserves_empty_and_nonempty_results(self):
+        for include_forks in (False, True):
+            for rows in ([], [_rest_public_repository("retry-recovered")]):
+                with self.subTest(include_forks=include_forks, rows=rows), patch.object(
+                    gh, "_get_cached", return_value=None
+                ), patch.object(
+                    gh, "_graphql_public_owned_repos",
+                    side_effect=[RuntimeError("initial failure"), copy.deepcopy(rows)],
+                ) as graphql, patch.object(
+                    gh, "paginated_get", side_effect=requests.ConnectionError("REST unavailable")
+                ) as rest:
+                    self.assertEqual(rows, gh.get_repos(include_forks))
+                    self.assertEqual([((include_forks,), {}), ((include_forks,), {})], graphql.call_args_list)
+                    rest.assert_called_once()
+
+    def test_complete_empty_public_cache_preserves_successful_enumeration(self):
+        writes = []
+        with patch.object(gh, "_get_cached", return_value=None), patch.object(
+            gh, "_set_cached", side_effect=lambda key, value: writes.append(copy.deepcopy(value))
+        ), patch.object(gh, "_graphql_query", return_value=_graphql_repository_page([])):
+            self.assertEqual([], gh._graphql_public_owned_repos(False))
+        self.assertEqual(1, len(writes))
+        with patch.object(gh, "_get_cached", return_value=writes[0]), patch.object(
+            gh, "_graphql_public_owned_repos"
+        ) as graphql, patch.object(gh, "paginated_get") as rest:
+            self.assertEqual([], gh.get_repos(False))
+            graphql.assert_not_called()
+            rest.assert_not_called()
+
+    def test_successful_empty_listing_caches_observed_zero_counts(self):
+        with patch.object(gh, "TOKEN", ""), patch.object(
+            gh, "_get_cached", return_value=None
+        ), patch.object(gh, "_set_cached") as cache, patch.object(
+            gh, "_graphql_public_owned_repos", return_value=[]
+        ), patch.object(gh, "paginated_get") as rest:
+            counts = gh.get_owned_repo_scope_counts()
+            self.assertEqual({"public_owned_total": 0, "public_owned_forks": 0,
+                              "public_owned_nonfork": 0, "private_owned": None,
+                              "private_owned_nonfork": None}, counts)
+            cache.assert_called_once()
+            self.assertEqual("owned_repo_scope_counts", cache.call_args.args[0])
+            self.assertEqual(counts, cache.call_args.args[1]["counts"])
+            self.assertIs(True, cache.call_args.args[1]["complete"])
+            rest.assert_not_called()
+
     def test_graphql_repository_listing_requires_explicit_public_identity(self):
         repository = "identity-fields-target"
         valid = _graphql_public_repository(repository)

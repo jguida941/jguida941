@@ -10,6 +10,12 @@ empty state renders when there is no scorecard data.
 from __future__ import annotations
 
 from scripts.contracts.profile_contract import (
+    AUTOMATION_REPOS_LABEL, AUTOMATION_FILES_LABEL, AUTOMATION_ADOPTION_LABEL,
+    AUTOMATION_SCOPE, AUTOMATION_MEANING,
+    automation_description, automation_display,
+)
+
+from scripts.contracts.profile_contract import (
     SCORECARD_METRICS,
     format_metric_value,
     metric_claim_group,
@@ -26,6 +32,7 @@ from scripts.rendering.components import (
     text,
 )
 from scripts.rendering.glass_kit import glass_panel, glass_tile
+from scripts.rendering.svg_utils import xml_escape
 
 # Neutral monochrome icon per scorecard metric key (icon color is set by the kit).
 ICON_BY_KEY = {
@@ -83,7 +90,7 @@ def _gauge_cell(
             label_size=12,
         )
     )
-    parts.append(text("CI coverage", x + 69, y + h / 2 - 2, token="caption", color=TEXT))
+    parts.append(text(AUTOMATION_ADOPTION_LABEL, x + 69, y + h / 2 - 2, token="caption", color=TEXT))
     parts.append(text(detail, x + 69, y + h / 2 + 14, token="caption", color=TEXT_DIM))
     return "".join(parts)
 
@@ -95,10 +102,14 @@ def generate(
     primary_language: str = "",
     data_quality: dict | None = None,
     ci_claim: dict | None = None,
+    automation: dict | None = None,
     source_kind: str = "github-api",
 ) -> str:
     _ = tiles  # back-compat; the card is driven by the scorecard + metric contract
-    data = scorecard if isinstance(scorecard, dict) else {}
+    data = dict(scorecard) if isinstance(scorecard, dict) else {}
+    if automation is not None:
+        data["automation_workflows"] = automation["combined"]["workflow_files"]
+        data["ci_coverage_pct"] = automation["combined"]["adoption_pct"]
     quality = data_quality if isinstance(data_quality, dict) else {}
     metric_statuses = quality.get("metric_statuses", {})
     if not isinstance(metric_statuses, dict):
@@ -108,15 +119,16 @@ def generate(
     language_status = str(
         metric_statuses.get("primary_lang_share_pct", "exact")
     ).casefold()
-    quality_lines = []
+    display = automation_display(automation)
+    workflow_display = display["combined"]
+    quality_lines = ["Workflow: owned public + private nonfork; profile excluded",
+                     workflow_display["qualification"]]
     # The active-repository tile keeps its known value, so this card owes the
     # reader that field's own partial basis rather than a bare number.
     if activity_status == "partial":
         quality_lines.append(partial_qualification_line("active_repos_7d"))
-    if ci_status == "partial":
-        quality_lines.append(partial_qualification_line("ci_coverage_pct"))
-    elif ci_status == "unavailable":
-        quality_lines.append("CI · Unavailable · n/a")
+    if automation is None and ci_status == "partial":
+        quality_lines[-1] = "Workflow · Partial · known minimum · unknown repositories"
     if language_status == "partial":
         quality_lines.append(partial_qualification_line("primary_lang_share_pct"))
     elif language_status == "unavailable":
@@ -135,7 +147,7 @@ def generate(
     )
 
     # Honest empty state: no real signal -> one explanatory line, no fabricated tiles.
-    if not any(data.get(k) for k in (_KPI_KEY, *_GRID_KEYS)):
+    if automation is None and not any(data.get(k) for k in (_KPI_KEY, *_GRID_KEYS)):
         empty_header, _ = section_header(
             pad, 46, "Builder Scorecard", width=width, eyebrow="GitHub Signals", pad=pad
         )
@@ -155,7 +167,7 @@ def generate(
     # --- geometry (KPI top-left + 3x2 supporting grid) ---
     cols, row_gap = 3, SPACE["md"]
     tile_h = 66
-    kpi_w = 244
+    kpi_w = 238  # Room for the workflow adoption label at the existing type size.
     grid_x = pad + kpi_w + SPACE["xl"]
     gap = SPACE["md"]
     col_w = (width - pad - grid_x - gap * (cols - 1)) / cols
@@ -163,7 +175,8 @@ def generate(
     grid_bottom = content_top + rows * tile_h + (rows - 1) * row_gap
     height = int(grid_bottom + 30 + len(quality_lines) * 18)
 
-    parts: list[str] = [glass_panel(width, height), header_svg]
+    parts: list[str] = [glass_panel(width, height), header_svg,
+        f"<desc>{xml_escape(automation_description(automation))}</desc>"]
 
     # PrimaryKpiCard: contributions, top-left.
     kpi_y = content_top + 58
@@ -201,16 +214,12 @@ def generate(
                         y,
                         col_w,
                         tile_h,
-                        value=data.get(key) or 0,
-                        detail=(
-                            "Unavailable"
-                            if ci_status == "unavailable"
-                            else "observed"
-                        ),
+                        value=(ci_claim or {}).get("value") or 0,
+                        detail=workflow_display["gauge_detail"],
                         display_value=(
                             ci_claim["display_value"]
                             if ci_claim
-                            else ("n/a" if ci_status == "unavailable" else None)
+                            else "n/a"
                         ),
                     ),
                 )
