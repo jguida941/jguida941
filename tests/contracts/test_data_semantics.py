@@ -21,6 +21,146 @@ from scripts.pipeline.collect_data import CollectedProfileData
 from scripts.pipeline.compute_metrics import compute_profile_model
 
 
+class ContributionRhythmRenderingTests(unittest.TestCase):
+    def _rhythm(self, length=17, zero=False):
+        from tests.pipeline.test_compute_metrics_accuracy import ContributionRhythmTests
+        fixture = ContributionRhythmTests()
+        return fixture._rhythm(fixture._input(length, zero))
+
+    def _svg(self, rhythm):
+        import io
+        from scripts.rendering.generate_activity_heatmap import generate
+        class Sink(io.StringIO):
+            def close(self): pass
+        sink = Sink()
+        with patch("builtins.open", return_value=sink):
+            generate(rhythm)
+        return sink.getvalue()
+
+    def _errors(self, rhythm, svg):
+        from scripts.contracts.profile_contract import contribution_rhythm_display
+        from scripts.quality.validate_generated_profile import _contribution_rhythm_claim_errors
+        snapshot = {"contribution_rhythm": rhythm, "contribution_rhythm_display": contribution_rhythm_display(rhythm)}
+        with patch.object(Path, "exists", return_value=True), patch.object(Path, "read_text", return_value=svg):
+            return _contribution_rhythm_claim_errors(snapshot)
+
+    def test_positive_zero_single_unknown_and_unavailable_native_output(self):
+        from scripts.contracts.profile_contract import contribution_rhythm_unavailable
+        for rhythm in (self._rhythm(), self._rhythm(zero=True), self._rhythm(1), contribution_rhythm_unavailable()):
+            svg = self._svg(rhythm)
+            self.assertEqual([], self._errors(rhythm, svg))
+            self.assertIn("Contribution Rhythm", svg)
+            self.assertNotIn("When I Code", svg)
+        self.assertIn("Completeness unknown", self._svg(self._rhythm()))
+
+    def test_rows_keep_totals_and_move_coverage_into_shared_detail(self):
+        from scripts.contracts.profile_contract import contribution_rhythm_display, contribution_rhythm_unavailable
+        rhythm = self._rhythm()
+        display = contribution_rhythm_display(rhythm)
+        svg = self._svg(rhythm)
+        root = ET.fromstring(svg)
+        ns = "{http://www.w3.org/2000/svg}"
+        rows = root.findall(f'.//{ns}g[@data-weekday]')
+        self.assertEqual(7, len(rows))
+        for row, words in zip(rows, display["rows"]):
+            self.assertEqual([words["weekday"], words["count_text"]],
+                             [node.text for node in row.findall(ns + "text")])
+        painted = " ".join(node.text or "" for node in root.iter(ns + "text"))
+        self.assertNotIn("observed days", painted)
+        self.assertNotIn("Observed dates", painted)
+        description = root.find(ns + "desc").text
+        self.assertIn(display["scope"], description)
+        self.assertIn(display["explanation"], description)
+        self.assertIn("totals, not daily averages", description)
+        self.assertIn("Observed dates — Mon: 3; Tue: 3; Wed: 3; Thu: 2; Fri: 2; Sat: 2; Sun: 2.", description)
+        self.assertEqual("", contribution_rhythm_display(contribution_rhythm_unavailable())["coverage_summary"])
+        self.assertTrue(self._errors(rhythm, svg.replace("Thu: 2", "Thu: 3")))
+
+    def test_carrier_refuses_wrong_coverage_sum_and_unobserved_counts(self):
+        from copy import deepcopy
+        from scripts.contracts.profile_contract import contribution_rhythm_errors
+        for key in ("contributions", "days_observed"):
+            rhythm = deepcopy(self._rhythm())
+            rhythm["weekdays"][0][key] += 1
+            self.assertTrue(contribution_rhythm_errors(rhythm))
+        rhythm = self._rhythm(1)
+        rhythm["weekdays"][1]["contributions"] = 2
+        rhythm["total"] += 2
+        self.assertTrue(contribution_rhythm_errors(rhythm))
+
+    def test_validator_rejects_visible_and_geometry_poison(self):
+        rhythm = self._rhythm()
+        source = self._svg(rhythm)
+        poisons = (
+            source.replace('>24</text>', '>25</text>', 1),
+            source.replace('width="512.000"', 'width="0.000"', 1),
+            source.replace('2026-09-21 – 2026-10-07', '2026-09-22 – 2026-10-07'),
+            source.replace('data-series="weekday-contributions"', 'data-series="weekday-contributions" opacity="0"'),
+            source.replace('data-series="weekday-contributions"', 'data-series="weekday-contributions" xmlns="urn:not-svg"'),
+            source.replace('</svg>', '<rect width="840" height="480" fill="black"/></svg>'),
+            source.replace('role="img"', 'role="img" style="display:none"'),
+            source.replace('font-size="14"', 'font-size="10"'),
+            source.replace('>Completeness unknown</text>', '>Complete</text>'),
+        )
+        for poison in poisons:
+            with self.subTest(poison=poison[-100:]):
+                self.assertNotEqual(source, poison)
+                self.assertTrue(self._errors(rhythm, poison))
+
+    def test_validator_requires_display_identity_and_zero_semantics(self):
+        from scripts.contracts.profile_contract import contribution_rhythm_display
+        from scripts.quality.validate_generated_profile import _contribution_rhythm_claim_errors
+        rhythm = self._rhythm(zero=True)
+        svg = self._svg(rhythm)
+        self.assertTrue(self._errors(rhythm, svg.replace("No contributions in the observed dates", "Unavailable")))
+        display = contribution_rhythm_display(rhythm)
+        display["caption"] = "Different dates"
+        with patch.object(Path, "exists", return_value=True), patch.object(Path, "read_text", return_value=svg):
+            self.assertTrue(_contribution_rhythm_claim_errors({"contribution_rhythm": rhythm, "contribution_rhythm_display": display}))
+
+    def test_production_validator_propagates_visible_claim_failures(self):
+        from scripts.contracts.profile_contract import contribution_rhythm_display
+        from scripts.quality import validate_generated_profile as validator
+        rhythm = self._rhythm()
+        svg = self._svg(rhythm)
+        files = {
+            "assets/activity_heatmap.svg": svg,
+            "README.md": " ".join(("assets/now_next_shipped.svg", "assets/raw_snapshot.svg",
+                                   "assets/contribution_calendar.svg", "site/data/profile_snapshot.json")),
+            "site/data/profile_snapshot.json": json.dumps({"contribution_rhythm": rhythm,
+                "contribution_rhythm_display": contribution_rhythm_display(rhythm)}),
+        }
+        with patch.object(Path, "exists", lambda p: str(p) in files), \
+             patch.object(Path, "read_text", lambda p, *a, **k: files[str(p)]):
+            baseline = set(validator.validate_profile().errors)
+            self.assertTrue(baseline)  # Other omitted artifacts remain errors.
+            self.assertFalse(any(item.startswith("assets/activity_heatmap.svg") for item in baseline), baseline)
+            files["assets/activity_heatmap.svg"] = svg.replace('>24</text>', '>25</text>', 1)
+            self.assertTrue(any("contribution rhythm visible" in item
+                                for item in set(validator.validate_profile().errors) - baseline))
+
+    def test_public_projection_retains_only_closed_calendar_source(self):
+        from copy import deepcopy
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+        rhythm = self._rhythm()
+        payload = {"contribution_rhythm": rhythm, "other": {"source": "private file body"}}
+        published = _public_dashboard_data(payload)
+        self.assertEqual(rhythm, published["contribution_rhythm"])
+        self.assertEqual({}, published["other"])
+        wrong = deepcopy(payload)
+        wrong["contribution_rhythm"]["source"] = "private file body"
+        self.assertNotIn("source", _public_dashboard_data(wrong)["contribution_rhythm"])
+
+    def test_malformed_carrier_qualifiers_refuse_without_exception(self):
+        from scripts.contracts.profile_contract import contribution_rhythm_errors, contribution_rhythm_unavailable
+        for key in ("completeness", "reason"):
+            for malformed in ([], {}):
+                rhythm = contribution_rhythm_unavailable()
+                rhythm[key] = malformed
+                with self.subTest(key=key, malformed=malformed):
+                    self.assertTrue(contribution_rhythm_errors(rhythm))
+
+
 class OptionalIntegerMetricTests(unittest.TestCase):
     def test_optional_integer_format_rejects_inexact_or_invalid_values(self):
         from scripts.contracts.profile_contract import format_metric_value

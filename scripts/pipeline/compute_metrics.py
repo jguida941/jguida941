@@ -36,6 +36,7 @@ from scripts.contracts import (
 )
 from scripts.contracts.profile_contract import (
     SCORECARD_METRICS, SNAPSHOT_METRICS, automation_display, format_metric_value,
+    CONTRIBUTION_WEEKDAYS, contribution_rhythm_unavailable, contribution_rhythm_display,
 )
 from scripts.pipeline.profile_helpers import (
     activity_label,
@@ -1262,6 +1263,72 @@ def _contribution_observation_bounds(
     return (start, cutoff) if start <= cutoff else None
 
 
+def _build_contribution_rhythm(collected: CollectedProfileData) -> dict[str, Any]:
+    """Sum the full dated calendar, retaining observation uncertainty explicitly."""
+    unavailable = contribution_rhythm_unavailable()
+    calendar = collected.calendar
+    if not isinstance(calendar, dict):
+        return unavailable
+    days: dict[date, int] = {}
+    try:
+        weeks = calendar.get("weeks")
+        if not isinstance(weeks, list):
+            raise ValueError("invalid weeks")
+        for week in weeks:
+            rows = week.get("contributionDays") if isinstance(week, dict) else None
+            if not isinstance(rows, list):
+                raise ValueError("invalid days")
+            for row in rows:
+                if not isinstance(row, dict):
+                    raise ValueError("invalid day")
+                label, count = row.get("date"), row.get("contributionCount")
+                day = date.fromisoformat(label)
+                if day.isoformat() != label or type(count) is not int or count < 0 or day in days:
+                    raise ValueError("invalid dated count")
+                days[day] = count
+        if not days:
+            return contribution_rhythm_unavailable("no_dated_days")
+        ordered = sorted(days)
+        total = calendar.get("totalContributions")
+        if (type(total) is not int or total < 0 or total != sum(days.values())
+                or (ordered[-1] - ordered[0]).days + 1 != len(ordered)):
+            raise ValueError("inconsistent calendar")
+    except (TypeError, ValueError):
+        return contribution_rhythm_unavailable("invalid_calendar")
+
+    # Inspect the original carrier as well as its validated form: malformed or
+    # stale supplied metadata must not disappear into the raw-data-only state.
+    observations = getattr(collected, "metric_observations", {})
+    if not isinstance(observations, dict):
+        return contribution_rhythm_unavailable("observation_unavailable")
+    bounds = None
+    if "last_year_contributions" in observations:
+        observation = _validated_metric_observations(collected).get("last_year_contributions")
+        try:
+            bounds = _contribution_observation_bounds(collected, days)
+        except (KeyError, TypeError, ValueError):
+            return contribution_rhythm_unavailable("observation_unavailable")
+        if (not observation or not bounds or observation["value"]["total"] != total
+                or not bounds[0].date() <= ordered[0] <= ordered[-1] <= bounds[1].date()):
+            return contribution_rhythm_unavailable("observation_unavailable")
+        end = datetime.fromisoformat(observation["window_end"].replace("Z", "+00:00")).astimezone(timezone.utc)
+        observed = datetime.fromisoformat(observation["observed_at"].replace("Z", "+00:00")).astimezone(timezone.utc)
+        if observed < end:
+            return contribution_rhythm_unavailable("observation_unavailable")
+    buckets = [{"weekday": name, "contributions": 0, "days_observed": 0}
+               for name in CONTRIBUTION_WEEKDAYS]
+    for day, count in days.items():
+        buckets[day.weekday()]["contributions"] += count
+        buckets[day.weekday()]["days_observed"] += 1
+    return {
+        **unavailable, "status": "available", "reason": "dated_calendar",
+        "completeness": "known" if bounds else "unknown",
+        "window_start": ordered[0].isoformat(), "window_end": ordered[-1].isoformat(),
+        "days_observed": len(days), "total": total, "weekdays": buckets,
+        "last_day_in_progress": bounds[1].date() <= ordered[-1] if bounds else None,
+    }
+
+
 def _build_contribution_trend(collected: CollectedProfileData) -> dict[str, Any]:
     """Preserve GitHub's UTC date labels; never rebucket them by viewer timezone.
 
@@ -2081,12 +2148,13 @@ def compute_profile_model(
     calendar_public = _public_contribution_calendar(calendar)
     if calendar_public:
         dashboard_data["contribution_calendar"] = calendar_public
-    rhythm = _activity_rhythm(events)
-    if rhythm:
-        dashboard_data["activity_rhythm"] = rhythm
+    rhythm = _build_contribution_rhythm(collected)
+    dashboard_data["contribution_rhythm"] = rhythm
+    dashboard_data["contribution_rhythm_display"] = contribution_rhythm_display(rhythm)
 
     return {
         "now_utc": now_utc,
+        "contribution_rhythm": rhythm,
         "automation": automation,
         "lang_count": lang_count,
         "snapshot": snapshot,

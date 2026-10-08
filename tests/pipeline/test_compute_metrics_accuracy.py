@@ -95,6 +95,78 @@ def _scope_names_profile_exclusion(scope):
     )
 
 
+class ContributionRhythmTests(unittest.TestCase):
+    def _input(self, length=17, zero=False):
+        from types import SimpleNamespace
+        rows = [{"date": str(date(2026, 9, 21) + timedelta(days=i)),
+                 "contributionCount": 0 if zero else i + 1} for i in range(length)]
+        return SimpleNamespace(calendar={"totalContributions": sum(r["contributionCount"] for r in rows),
+                                        "weeks": [{"contributionDays": rows}]}, metric_observations={})
+
+    def _rhythm(self, value):
+        from scripts.pipeline.compute_metrics import _build_contribution_rhythm
+        return _build_contribution_rhythm(value)
+
+    def test_full_calendar_sums_and_unequal_coverage(self):
+        value = self._input()
+        result = self._rhythm(value)
+        self.assertEqual([24, 27, 30, 15, 17, 19, 21], [r["contributions"] for r in result["weekdays"]])
+        self.assertEqual([3, 3, 3, 2, 2, 2, 2], [r["days_observed"] for r in result["weekdays"]])
+        self.assertEqual((153, 17, "unknown"), (result["total"], result["days_observed"], result["completeness"]))
+        value.calendar["weeks"][0]["contributionDays"].reverse()
+        self.assertEqual(result, self._rhythm(value))
+        self.assertEqual(5050, self._rhythm(self._input(100))["total"])
+
+    def test_zero_single_day_and_missing_are_distinct(self):
+        from scripts.contracts.profile_contract import contribution_rhythm_display
+        zero = self._rhythm(self._input(1, zero=True))
+        self.assertEqual("available", zero["status"])
+        self.assertEqual([1, 0, 0, 0, 0, 0, 0], [r["days_observed"] for r in zero["weekdays"]])
+        self.assertEqual("No contributions in the observed dates", contribution_rhythm_display(zero)["message"])
+        value = self._input()
+        value.calendar = None
+        missing = self._rhythm(value)
+        self.assertEqual(("unavailable", None, []), (missing["status"], missing["total"], missing["weekdays"]))
+        self.assertEqual("Contribution rhythm unavailable", contribution_rhythm_display(missing)["message"])
+
+    def test_invalid_calendar_refuses_without_coercion(self):
+        for kind in ("boolean", "float", "string", "negative", "date", "gap", "duplicate", "total"):
+            value = self._input()
+            rows = value.calendar["weeks"][0]["contributionDays"]
+            if kind in {"boolean", "float", "string", "negative"}:
+                rows[0]["contributionCount"] = {"boolean": True, "float": 1.0, "string": "1", "negative": -1}[kind]
+            elif kind == "date": rows[0]["date"] = "20260921"
+            elif kind == "gap": rows.pop(4)
+            elif kind == "duplicate": rows.append(dict(rows[0]))
+            else: value.calendar["totalContributions"] = 152
+            with self.subTest(kind=kind):
+                self.assertEqual("unavailable", self._rhythm(value)["status"])
+
+    def test_supplied_invalid_observation_cannot_disappear(self):
+        for observation in (None, {}, {"status": "ok", "complete": True}):
+            value = self._input()
+            value.metric_observations = {"last_year_contributions": observation}
+            self.assertEqual("unavailable", self._rhythm(value)["status"])
+
+    def test_matching_observation_progress_and_malformed_date(self):
+        value = ContributionTrendTests()._input()
+        value.calendar["totalContributions"] = 153
+        result = self._rhythm(value)
+        self.assertEqual(("available", "known", True),
+                         (result["status"], result["completeness"], result["last_day_in_progress"]))
+        obs = value.metric_observations["last_year_contributions"]
+        obs["window_end"] = obs["observed_at"] = "2026-10-08T00:00:00Z"
+        self.assertFalse(self._rhythm(value)["last_day_in_progress"])
+        obs["value"]["days"][0]["date"] = "2026-9-21"
+        self.assertEqual("unavailable", self._rhythm(value)["status"])
+
+    def test_last_supported_date_does_not_require_following_date(self):
+        value = self._input(1)
+        value.calendar["weeks"][0]["contributionDays"][0]["date"] = "9999-12-31"
+        result = self._rhythm(value)
+        self.assertEqual(("available", "9999-12-31"), (result["status"], result["window_end"]))
+
+
 class AccuracyTests(unittest.TestCase):
     def _collected(self):
         now = datetime.now(timezone.utc)

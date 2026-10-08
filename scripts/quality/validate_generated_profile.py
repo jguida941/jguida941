@@ -28,6 +28,7 @@ from scripts.contracts import (
 )
 from scripts.contracts.profile_contract import (
     contribution_trend_errors, contribution_trend_display,
+    contribution_rhythm_errors, contribution_rhythm_display,
     METRIC_CLAIM_KEY_ATTRIBUTE,
     METRIC_CLAIM_SCOPE_ATTRIBUTE,
     METRIC_CLAIM_STATUS_ATTRIBUTE,
@@ -67,7 +68,7 @@ EXPECTED_CARD_TITLES = {
     Path("assets/now_next_shipped.svg"): "Current Focus",
     Path("assets/currently_working.svg"): "Currently Working On",
     Path("assets/lang_breakdown.svg"): "Language Breakdown",
-    Path("assets/activity_heatmap.svg"): "When I Code",
+    Path("assets/activity_heatmap.svg"): "Contribution Rhythm",
     Path("assets/repo_spotlight.svg"): "Flagship Projects",
     Path("assets/raw_snapshot.svg"): "Raw Data Snapshot",
     Path("assets/streak_summary.svg"): "Streak Summary",
@@ -605,6 +606,96 @@ def _contribution_trend_claim_errors(profile_snapshot: dict) -> list[str]:
     return [f"{path}: {problem}" for problem in problems]
 
 
+def _contribution_rhythm_claim_errors(profile_snapshot: dict) -> list[str]:
+    """Verify native SVG paint, text and geometry against the published weekday model.
+
+    The supported representation is deliberately small: native chrome followed
+    by one untransformed group of text and seven linear bars. Exact topology
+    prevents hidden, replaced or later-overpainted quantitative claims. This is
+    not a validator for arbitrary SVGs or a font/palette certification.
+    """
+    from scripts.core.config import CYAN, FONT_SANS, SVG_WIDTH, TEXT, TEXT_BRIGHT, TEXT_DIM
+    from scripts.rendering.components import section_header
+    from scripts.rendering.glass_kit import glass_panel
+
+    path = Path("assets/activity_heatmap.svg")
+    rhythm = profile_snapshot.get("contribution_rhythm")
+    problems = contribution_rhythm_errors(rhythm)
+    if problems:
+        return [f"{path}: {problem}" for problem in problems]
+    display = contribution_rhythm_display(rhythm)
+    if profile_snapshot.get("contribution_rhythm_display") != display:
+        return [f"{path}: serialized contribution rhythm display disagrees"]
+    if not path.exists():
+        return [f"{path}: contribution rhythm missing"]
+    try:
+        root = ET.fromstring(path.read_text(encoding="utf-8"))
+    except (ET.ParseError, OSError):
+        return [f"{path}: contribution rhythm is not readable SVG"]
+    namespace = "http://www.w3.org/2000/svg"
+    width, height = SVG_WIDTH, 480 if display["available"] else 232
+    expected_root = {"width": str(width), "height": str(height), "viewBox": f"0 0 {width} {height}",
+                     "role": "img", "aria-labelledby": "rhythm-title rhythm-description"}
+    if root.tag != f"{{{namespace}}}svg" or root.attrib != expected_root or (root.text or "").strip():
+        return [f"{path}: unsupported contribution rhythm root/effects"]
+
+    def signature(node):
+        return (node.tag, node.attrib, node.text or "", node.tail or "",
+                [signature(child) for child in node])
+
+    children = list(root)
+    if len(children) < 3:
+        return [f"{path}: contribution rhythm content missing"]
+    title, description = children[:2]
+    expected_description = " ".join(display[key] for key in ("scope", "explanation", "coverage_summary") if display[key])
+    if (title.tag != f"{{{namespace}}}title" or title.attrib != {"id": "rhythm-title"}
+            or title.text != "Contribution Rhythm" or list(title) or (title.tail or "")
+            or description.tag != f"{{{namespace}}}desc" or description.attrib != {"id": "rhythm-description"}
+            or description.text != expected_description or list(description) or (description.tail or "")):
+        problems.append("contribution rhythm accessible meaning disagrees")
+    # Only the established native backdrop/header may precede the final chart.
+    # Matching real paint geometry (not role metadata) rules out later overlays.
+    header, _ = section_header(28, 46, "Contribution Rhythm", width=width,
+                               eyebrow="Contribution calendar", pad=28)
+    chrome = ET.fromstring(f'<svg xmlns="{namespace}">' + glass_panel(width, height) + header + '</svg>')
+    if [signature(node) for node in children[2:-1]] != [signature(node) for node in chrome]:
+        problems.append("contribution rhythm native chrome/topology disagrees")
+    chart = children[-1]
+    expected = ET.Element(f"{{{namespace}}}g", {"data-series": "weekday-contributions"})
+
+    def text(parent, value, x, y, color=TEXT, anchor="start"):
+        node = ET.SubElement(parent, f"{{{namespace}}}text", {
+            "x": str(x), "y": str(y), "font-size": "14", "font-family": FONT_SANS,
+            "fill": color, "text-anchor": anchor,
+        })
+        node.text = value
+
+    text(expected, "Contributions by weekday", 28, 116, TEXT_BRIGHT)
+    if display["available"]:
+        text(expected, display["caption"], 28, 142, TEXT_DIM)
+        maximum = max(row["contributions"] for row in rhythm["weekdays"]) or 1
+        for i, row in enumerate(rhythm["weekdays"]):
+            y = 178 + 34 * i
+            group = ET.SubElement(expected, f"{{{namespace}}}g", {
+                "data-weekday": row["weekday"], "data-contributions": str(row["contributions"]),
+                "data-days-observed": str(row["days_observed"]),
+            })
+            text(group, row["weekday"], 28, y + 5)
+            ET.SubElement(group, f"{{{namespace}}}rect", {
+                "x": "92", "y": str(y - 8), "width": f'{row["contributions"] / maximum * (width - 200):.3f}',
+                "height": "12", "rx": "3", "fill": CYAN,
+            })
+            text(group, f'{row["contributions"]:,}', width - 28, y + 5, TEXT_BRIGHT, "end")
+        text(expected, display["message"], 28, 416, TEXT_DIM)
+        text(expected, display["qualification"], 28, 438, TEXT_DIM)
+    else:
+        text(expected, "Contribution rhythm unavailable", 28, 160, TEXT_BRIGHT)
+        text(expected, display["qualification"], 28, 192, TEXT_DIM)
+    if signature(chart) != signature(expected):
+        problems.append("contribution rhythm visible text/counts/geometry/effects disagree")
+    return [f"{path}: {problem}" for problem in problems]
+
+
 def validate_profile() -> ValidationResult:
     errors: list[str] = []
     warnings: list[str] = []
@@ -775,6 +866,7 @@ def validate_profile() -> ValidationResult:
         errors.extend(_partial_qualification_errors(profile_snapshot))
         errors.extend(_ci_coverage_claim_errors(profile_snapshot))
         errors.extend(_contribution_trend_claim_errors(profile_snapshot))
+        errors.extend(_contribution_rhythm_claim_errors(profile_snapshot))
 
         stars_value = _parse_int(snapshot.get("total_stars"))
         if stars_value is None:
