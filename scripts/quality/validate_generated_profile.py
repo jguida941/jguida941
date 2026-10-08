@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
+import math
 import os
 import re
 import xml.etree.ElementTree as ET
@@ -26,6 +27,7 @@ from scripts.contracts import (
     public_snapshot_contract_errors,
 )
 from scripts.contracts.profile_contract import (
+    contribution_trend_errors, contribution_trend_display,
     METRIC_CLAIM_KEY_ATTRIBUTE,
     METRIC_CLAIM_SCOPE_ATTRIBUTE,
     METRIC_CLAIM_STATUS_ATTRIBUTE,
@@ -257,6 +259,352 @@ def _ci_coverage_claim_errors(profile_snapshot: dict) -> list[str]:
     return errors
 
 
+def _native_path_vertical_bounds(data: str) -> tuple[float, float]:
+    """Conservative bounds for the straight segments and unrotated native arcs.
+
+    This deliberately excludes curves and SVG's arc-radius correction. The
+    lower-row icons use this small grammar; unsupported paths cannot establish
+    clearance from the chart. Arc bounds overestimate, rather than sample, paint.
+    """
+    tokens = re.findall(r"[MmLlHhVvAaZz]|[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?", data)
+    if re.sub(r"[\s,]", "", data) != "".join(tokens):
+        raise ValueError("unsupported native path")
+    x = y = start_x = start_y = 0.0
+    lower = math.inf
+    upper = -math.inf
+    command = ""
+    index = 0
+    while index < len(tokens):
+        if tokens[index].isalpha():
+            command = tokens[index]
+            index += 1
+        if not command or (lower == math.inf and command not in "Mm"):
+            raise ValueError("native path must start with move")
+        kind = command.upper()
+        if kind == "Z":
+            x, y = start_x, start_y
+            lower, upper = min(lower, y), max(upper, y)
+            command = ""
+            continue
+        size = {"M": 2, "L": 2, "H": 1, "V": 1, "A": 7}[kind]
+        args = [float(token) for token in tokens[index:index + size]]
+        if len(args) != size or not all(math.isfinite(value) for value in args):
+            raise ValueError("invalid native path coordinates")
+        index += size
+        previous_x, previous_y = x, y
+        relative = command.islower()
+        if kind in {"M", "L", "A"}:
+            x, y = args[-2:]
+            if relative:
+                x, y = x + previous_x, y + previous_y
+        elif kind == "H":
+            x = args[0] + (x if relative else 0)
+        else:
+            y = args[0] + (y if relative else 0)
+        if kind == "M":
+            start_x, start_y = x, y
+            command = "l" if relative else "L"
+            previous_y = y
+        low, high = min(previous_y, y), max(previous_y, y)
+        if kind == "A":
+            rx, ry, rotation, large, sweep = args[:5]
+            if (rx <= 0 or ry <= 0 or rotation != 0 or large not in {0, 1} or sweep not in {0, 1}
+                    or ((x - previous_x) / (2 * rx)) ** 2 + ((y - previous_y) / (2 * ry)) ** 2 > 1):
+                raise ValueError("unsupported native arc")
+            low, high = low - 2 * ry, high + 2 * ry
+        lower, upper = min(lower, low), max(upper, high)
+    if not math.isfinite(lower) or not math.isfinite(upper):
+        raise ValueError("empty native path")
+    return lower, upper
+
+
+def _contribution_topology_errors(root: ET.Element, chart: ET.Element) -> list[str]:
+    """Keep later native paint below the chart's reserved region (through y=334).
+
+    Earlier panel effects remain valid because they paint beneath the chart.
+    Later paint is limited to the native lower-row primitives and simple icon
+    transforms, with conservative stroke/path/text clearance. Unknown effects
+    fail closed; this is neither arbitrary SVG layout nor font measurement.
+    """
+    local = lambda node: node.tag.rsplit("}", 1)[-1]
+    siblings = list(root)
+    if chart not in siblings:
+        return ["unsupported contribution painter topology"]
+    position = siblings.index(chart)
+
+    def number(node, key, default=None):
+        value = float(node.get(key, default))
+        if not math.isfinite(value):
+            raise ValueError("nonfinite sibling geometry")
+        return value
+
+    # Geometry, not a self-reported role, establishes the native full-card base.
+    def backdrop(node):
+        if local(node) != "rect":
+            return False
+        try:
+            return (number(node, "x") <= 252 and number(node, "y") <= 92
+                    and number(node, "x") + number(node, "width") >= 812
+                    and number(node, "y") + number(node, "height") >= 334)
+        except (TypeError, ValueError):
+            return False
+
+    if not any(backdrop(node) for node in siblings[:position]):
+        return ["contribution chart precedes its native backdrop"]
+    paint = {"fill", "fill-opacity", "stroke", "stroke-opacity", "stroke-width", "stroke-linecap",
+             "stroke-linejoin", "opacity"}
+    metric = {METRIC_CLAIM_KEY_ATTRIBUTE, METRIC_CLAIM_SCOPE_ATTRIBUTE,
+              METRIC_CLAIM_STATUS_ATTRIBUTE, METRIC_CLAIM_VALUE_ATTRIBUTE}
+    shapes = {
+        "rect": {"x", "y", "width", "height", "rx", "ry"},
+        "circle": {"cx", "cy", "r", "stroke-dasharray", "transform"},
+        "line": {"x1", "x2", "y1", "y2"},
+        "path": {"d"},
+        "text": {"x", "y", "font-size", "font-family", "font-weight", "text-anchor", "letter-spacing"},
+    }
+
+    def below(node, offset=0.0, scale=1.0, stroke=1.0, join="miter", cap="butt"):
+        kind = local(node)
+        if kind in {"desc", "title", "metadata", "defs", "clipPath", "linearGradient", "radialGradient"}:
+            return True  # These nodes do not paint themselves.
+        if set(node.attrib) - (paint | (metric | {"transform"} if kind == "g" else shapes.get(kind, set()))):
+            return False
+        own_stroke = number(node, "stroke-width", stroke)
+        join = node.get("stroke-linejoin", join)
+        cap = node.get("stroke-linecap", cap)
+        if join not in {"miter", "round", "bevel"} or cap not in {"butt", "round", "square"}:
+            return False
+        if own_stroke < 0:
+            return False
+        for attribute in ("opacity", "fill-opacity", "stroke-opacity"):
+            if attribute in node.attrib and not 0 <= number(node, attribute) <= 1:
+                return False
+        if kind == "g":
+            if "transform" in node.attrib:
+                # Native icon transform order is translation followed by scale.
+                match = re.fullmatch(r"translate\(([-+\d.eE]+),([-+\d.eE]+)\) scale\(([-+\d.eE]+)\)", node.get("transform", ""))
+                if not match:
+                    return False
+                x, y, factor = map(float, match.groups())
+                if not all(math.isfinite(value) for value in (x, y, factor)) or not 0 < factor <= 1:
+                    return False
+                offset, scale = offset + scale * y, scale * factor
+            return all(below(child, offset, scale, own_stroke, join, cap) for child in node)
+        if kind not in shapes or list(node):
+            return False
+        if kind == "rect":
+            top = number(node, "y")
+            if number(node, "width") < 0 or number(node, "height") < 0:
+                return False
+        elif kind == "circle":
+            radius = number(node, "r")
+            if radius < 0:
+                return False
+            top = number(node, "cy") - radius
+            if "transform" in node.attrib:
+                rotation = re.fullmatch(r"rotate\(-90 ([-+\d.eE]+) ([-+\d.eE]+)\)", node.get("transform", ""))
+                if not rotation or tuple(map(float, rotation.groups())) != (number(node, "cx"), number(node, "cy")):
+                    return False  # Centered rotation preserves a ring's bounds.
+        elif kind == "line":
+            top = min(number(node, "y1"), number(node, "y2"))
+        elif kind == "path":
+            top, _ = _native_path_vertical_bounds(node.get("d", ""))
+        else:
+            size = number(node, "font-size")
+            if not 0 < size <= 32:
+                return False
+            top = number(node, "y") - 1.5 * size
+        # Default miter limit is four half-widths; round native icons need only
+        # a half-width. Square caps also use the conservative larger allowance.
+        margin = own_stroke * (0.5 if join == "round" and cap != "square" else 2)
+        return offset + scale * (top - margin) >= 334
+
+    try:
+        if not all(below(node) for node in siblings[position + 1:]):
+            return ["unsupported contribution sibling paint or chart overlap"]
+    except (TypeError, ValueError, KeyError, OverflowError):
+        return ["unresolved contribution sibling geometry"]
+    return []
+
+
+def _contribution_trend_claim_errors(profile_snapshot: dict) -> list[str]:
+    """Certify the generated chart grammar, including its actual rendered effects.
+
+    This bounded checker cannot resolve arbitrary CSS or transforms. Unsupported
+    effects fail closed here while unrelated native panel/icon effects stay valid.
+    """
+    path = Path("assets/engineering_cadence.svg")
+    engineering = profile_snapshot.get("engineering") or {}
+    trend = engineering.get("contribution_trend")
+    problems = contribution_trend_errors(trend)
+    if problems:
+        return [f"{path}: {problem}" for problem in problems]
+    display = contribution_trend_display(trend)
+    if engineering.get("weekly_cadence") != display["values"]:
+        return [f"{path}: compatibility contribution values disagree"]
+    if not path.exists():
+        return [f"{path}: contribution trend artifact missing"]
+    try:
+        source = path.read_text(encoding="utf-8")
+        root = ET.fromstring(source)
+    except ET.ParseError:
+        return [f"{path}: invalid contribution SVG"]
+    svg_namespace = "{http://www.w3.org/2000/svg}"
+    if root.tag != svg_namespace + "svg":
+        return [f"{path}: contribution document must be SVG"]
+    tag = lambda node: node.tag.rsplit("}", 1)[-1]
+    groups = [node for node in root.iter() if node.get("data-series") == "weekly-contributions"]
+    renders_body = bool(profile_snapshot.get("automation")) or any(engineering.get(key) for key in (
+        "weekly_cadence", "active_days_last_year", "automation_workflows", "public_repos_total", "private_repos_total"))
+    if len(groups) != 1:
+        if not display["available"] and not renders_body and not groups:
+            return []
+        return [f"{path}: one contribution trend group required"]
+    group = groups[0]
+    if group.tag != svg_namespace + "g" or any(
+            not node.tag.startswith(svg_namespace) for node in group.iter()):
+        problems.append("contribution chart requires SVG element identities")
+    problems.extend(_contribution_topology_errors(root, group))
+    parents = {child: parent for parent in root.iter() for child in parent}
+    ancestor = group
+    while ancestor is not None:
+        allowed = {"data-series"} if ancestor is group else {"width", "height", "viewBox", "version"} if ancestor is root else set()
+        if set(ancestor.attrib) - allowed:
+            problems.append("unsupported contribution ancestor effect")
+        ancestor = parents.get(ancestor)
+    if ("<?xml-stylesheet" in source or any(tag(node) in {
+            "style", "script", "animate", "animateTransform", "set", "foreignObject"} for node in root.iter())):
+        problems.append("unsupported contribution dynamic or stylesheet effect")
+    attributes = {
+        "desc": set(),
+        "text": {"data-role", "x", "y", "fill", "font-size", "font-family", "font-weight", "text-anchor"},
+        "line": {"x1", "x2", "y1", "y2", "stroke", "stroke-opacity", "stroke-width"},
+        "polyline": {"data-role", "points", "fill", "stroke", "stroke-width"},
+        "polygon": {"data-role", "points", "fill"},
+        "circle": {"data-role", "cx", "cy", "r", "fill", "stroke", "stroke-width"},
+        "linearGradient": {"id", "x1", "x2", "y1", "y2"},
+        "stop": {"offset", "stop-color", "stop-opacity"},
+    }
+    for node in group.iter():
+        if node is group:
+            continue
+        kind = tag(node)
+        if kind not in attributes or set(node.attrib) - attributes.get(kind, set()):
+            problems.append("unsupported contribution primitive effect")
+        if list(node) and kind != "linearGradient":
+            problems.append("unsupported nested contribution primitive")
+        if kind == "linearGradient" and any(tag(child) != "stop" for child in node):
+            problems.append("unsupported contribution gradient")
+    def number(node, key, expected):
+        try:
+            value = float(node.get(key, ""))
+            return math.isfinite(value) and abs(value - expected) <= 0.011
+        except (TypeError, ValueError):
+            return False
+    def paint(value):
+        # Generated native palettes are opaque RGB. No implicit inherited paint.
+        return isinstance(value, str) and re.fullmatch(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?", value) is not None
+    try:
+        viewport = [float(value) for value in root.get("viewBox", "").split()]
+        height = float(root.get("height", ""))
+        if (not number(root, "width", 840) or not math.isfinite(height) or height < 344
+                or viewport != [0, 0, 840, height] or parents.get(group) is not root):
+            problems.append("unsupported contribution viewport")
+    except (TypeError, ValueError):
+        problems.append("invalid contribution viewport")
+    def geometry(node, expected):
+        try:
+            pairs = [tuple(map(float, pair.split(","))) for pair in node.get("points", "").split()]
+            return len(pairs) == len(expected) and all(
+                len(actual) == 2 and all(math.isfinite(a) and abs(a - b) <= 0.011 for a, b in zip(actual, wanted))
+                for actual, wanted in zip(pairs, expected))
+        except (TypeError, ValueError):
+            return False
+    children = list(group)
+    kinds = lambda kind: [node for node in children if tag(node) == kind]
+    texts = kinds("text")
+    expected_text = [(display["title"], 252, 108, "start", None)]
+    lines, areas, markers = kinds("polyline"), kinds("polygon"), kinds("circle")
+    grids, gradients = kinds("line"), kinds("linearGradient")
+    if display["available"]:
+        values = display["values"]
+        # Independently derive the zero scale from source values, not SVG metadata.
+        step = 1
+        required = max(1, (max(values) + 2) // 3)
+        while step < required:
+            power = 10 ** (len(str(step)) - 1)
+            step = next(candidate for candidate in (2 * power, 5 * power, 10 * power) if candidate > step)
+        top = 3 * step
+        expected_points = [(546 if len(values) == 1 else 312 + index / (len(values) - 1) * 468,
+                            272 - value / top * 112) for index, value in enumerate(values)]
+        for count in (0, step, 2 * step, top):
+            expected_text.append((count, 300, 272 - count / top * 112 + 4.76, "end", "y-tick"))
+        if len(grids) != 4 or any(not all(number(node, key, expected) for key, expected in (
+                ("x1", 312), ("x2", 780), ("y1", 272 - i * 112 / 3), ("y2", 272 - i * 112 / 3),
+                ("stroke-width", 1), ("stroke-opacity", .18))) or not paint(node.get("stroke"))
+                for i, node in enumerate(grids)):
+            problems.append("contribution grid geometry disagrees")
+        if len(values) >= 2:
+            if (len(lines) != 1 or not geometry(lines[0], expected_points)
+                    or lines[0].get("data-role") != "trend-line" or lines[0].get("fill") != "none"
+                    or not paint(lines[0].get("stroke")) or not number(lines[0], "stroke-width", 2.5)):
+                problems.append("contribution plotted values or stroke disagree")
+            if (len(areas) != 1 or not geometry(areas[0], [(312, 272), *expected_points, (780, 272)])
+                    or areas[0].get("data-role") != "trend-area"
+                    or areas[0].get("fill") != "url(#eng-contribution-area)"):
+                problems.append("contribution zero-baseline area disagrees")
+            if (len(gradients) != 1 or gradients[0].get("id") != "eng-contribution-area"
+                    or sum(node.get("id") == "eng-contribution-area" for node in root.iter()) != 1
+                    or not all(number(gradients[0], key, value) for key, value in (("x1", 0), ("x2", 0), ("y1", 0), ("y2", 1)))):
+                problems.append("contribution area gradient disagrees")
+            else:
+                stops = list(gradients[0])
+                if len(stops) != 2 or any(node.get("offset") != offset or not paint(node.get("stop-color"))
+                        or not number(node, "stop-opacity", opacity)
+                        for node, offset, opacity in zip(stops, ("0%", "100%"), (.16, 0))):
+                    problems.append("contribution gradient stops disagree")
+        elif lines or areas or gradients:
+            problems.append("singleton contribution has an invented interval")
+        from scripts.core.config import BG_DARK
+        if len(markers) != len(expected_points):
+            problems.append("contribution weekly marker count disagrees")
+        for node, (x, y), point in zip(markers, expected_points, trend["points"]):
+            hollow = node.get("fill", "").lower() == BG_DARK.lower()
+            if (node.get("data-role") != "week-point" or not all(number(node, key, value) for key, value in (
+                    ("cx", x), ("cy", y), ("r", 3), ("stroke-width", 1.5)))
+                    or not paint(node.get("fill")) or not paint(node.get("stroke"))
+                    or node.get("stroke", "").lower() == BG_DARK.lower() or hollow != point["partial"]):
+                problems.append("contribution weekly marker geometry or completeness disagrees")
+        from datetime import date
+        months = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        for index in sorted({0, (len(values) - 1) // 2, len(values) - 1}):
+            day = date.fromisoformat(trend["points"][index]["week_start"])
+            expected_text.append((f"{months[day.month - 1]} {day.day}", expected_points[index][0], 296, "middle", "x-tick"))
+        expected_text.append((display["window"], 252, 132, "start", None))
+        if ["".join(node.itertext()) for node in kinds("desc")] != [display["description"]]:
+            problems.append("contribution point descriptions disagree")
+    elif lines or areas or markers or grids or gradients or kinds("desc"):
+        problems.append("unavailable contribution trend has quantitative geometry")
+    expected_text.append((display["qualification"], 252, 320, "start", None))
+    if len(texts) != len(expected_text):
+        problems.append("contribution visible context count disagrees")
+    for node, (content, x, y, anchor, role) in zip(texts, expected_text):
+        actual = "".join(node.itertext())
+        if isinstance(content, int):
+            try:
+                matches = float(actual.replace(",", "")) == content
+            except ValueError:
+                matches = False
+        else:
+            matches = actual == content
+        if (not matches or not all(number(node, key, value) for key, value in (
+                ("x", x), ("y", y), ("font-size", 14), ("font-weight", 400)))
+                or node.get("text-anchor", "start") != anchor or node.get("data-role") != role
+                or not paint(node.get("fill")) or not node.get("font-family")):
+            problems.append("contribution visible unit/window/axis/qualification disagrees")
+    return [f"{path}: {problem}" for problem in problems]
+
+
 def validate_profile() -> ValidationResult:
     errors: list[str] = []
     warnings: list[str] = []
@@ -426,6 +774,7 @@ def validate_profile() -> ValidationResult:
 
         errors.extend(_partial_qualification_errors(profile_snapshot))
         errors.extend(_ci_coverage_claim_errors(profile_snapshot))
+        errors.extend(_contribution_trend_claim_errors(profile_snapshot))
 
         stars_value = _parse_int(snapshot.get("total_stars"))
         if stars_value is None:

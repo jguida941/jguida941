@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date, timedelta
 from typing import Any
 
 from scripts.rendering.svg_utils import xml_escape
@@ -54,6 +55,73 @@ def automation_display(automation: dict | None) -> dict[str, Any]:
 def automation_description(automation: dict | None) -> str:
     display = automation_display(automation)
     return " ".join((display["scope"], display["meaning"], display["combined"]["qualification"]))
+
+
+def contribution_trend_errors(trend: object) -> list[str]:
+    """Validate the small public dated-series shape before a consumer trusts it."""
+    if not isinstance(trend, dict):
+        return ["dated contribution trend missing"]
+    if any(trend.get(key) != value for key, value in (
+        ("unit", "contributions"), ("bucket", "iso_week"),
+        ("week_start_day", "Monday"), ("timezone", "UTC"),
+    )) or trend.get("completeness") not in {"known", "unknown"}:
+        return ["invalid contribution trend meaning"]
+    points = trend.get("points")
+    if trend.get("status") == "unavailable":
+        return ([] if points == [] and trend.get("window_start") is None
+                and trend.get("window_end") is None else ["unavailable trend contains values"])
+    if trend.get("status") != "available" or not isinstance(points, list) or not 1 <= len(points) <= 12:
+        return ["invalid contribution trend points"]
+    try:
+        previous_end = None
+        previous_monday = None
+        for point in points:
+            start, end, first, last = [date.fromisoformat(point[key]) for key in (
+                "week_start", "week_end", "observed_start", "observed_end")]
+            if any(value.isoformat() != point[key] for value, key in zip(
+                (start, end, first, last), ("week_start", "week_end", "observed_start", "observed_end"))):
+                raise ValueError("noncanonical date")
+            count, size, partial = point["contributions"], point["days_observed"], point["partial"]
+            if (start.weekday() != 0 or end != start + timedelta(days=6)
+                    or not start <= first <= last <= end
+                    or type(size) is not int or size != (last - first).days + 1
+                    or type(count) is not int or count < 0 or type(partial) is not bool
+                    or (size != 7 or trend["completeness"] == "unknown") and not partial
+                    or previous_end is not None and first != previous_end + timedelta(days=1)
+                    or previous_monday is not None and start != previous_monday + timedelta(days=7)):
+                raise ValueError("inconsistent point")
+            previous_end, previous_monday = last, start
+        if (trend.get("window_start") != points[0]["observed_start"]
+                or trend.get("window_end") != points[-1]["observed_end"]):
+            raise ValueError("inconsistent window")
+    except (KeyError, ValueError, TypeError):
+        return ["invalid contribution trend dates or counts"]
+    return []
+
+
+def contribution_trend_display(trend: object) -> dict[str, Any]:
+    """Shared wording, not an independent contribution calculator."""
+    if contribution_trend_errors(trend) or trend["status"] != "available":
+        return {"available": False, "title": "Contribution trend unavailable",
+                "qualification": "Dated calendar data required", "values": []}
+    start, end = (date.fromisoformat(trend[key]) for key in ("window_start", "window_end"))
+    # Explicit English month names avoid host-locale-dependent public captions.
+    months = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+    first = f"{months[start.month - 1]} {start.day}" + (f", {start.year}" if start.year != end.year else "")
+    last = f"{months[end.month - 1]} {end.day}, {end.year}"
+    points = trend["points"]
+    values = [point["contributions"] for point in points]
+    completeness = ("completeness unknown" if trend["completeness"] == "unknown" else
+                    "partial weeks included" if any(point["partial"] for point in points) else "complete weeks")
+    description = "; ".join(
+        f'{point["observed_start"]} to {point["observed_end"]}: {point["contributions"]} contributions'
+        + (" (partial)" if point["partial"] else " (complete)") for point in points
+    )
+    return {"available": True, "title": "Weekly contributions", "values": values,
+            "peak": f"Peak {max(values):,} contributions/week",
+            "window": f"{first} – {last} · {len(points)} {'week' if len(points) == 1 else 'weeks'}",
+            "qualification": "Mon–Sun · UTC · " + completeness,
+            "description": "UTC contribution calendar. " + description}
 
 
 # Curated backend-developer scorecard (8 tiles -> clean 4x2 grid). Each value is

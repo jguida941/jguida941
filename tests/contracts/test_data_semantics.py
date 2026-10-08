@@ -997,5 +997,203 @@ class DataSemanticsContract(unittest.TestCase):
                       "the dashboard must bind the honest last-push metric (days_since_last_push)")
 
 
+class ContributionTrendRenderingTests(unittest.TestCase):
+    def _engineering(self, *, zero=False, missing=False):
+        from tests.pipeline.test_compute_metrics_accuracy import ContributionTrendTests
+        fixture = ContributionTrendTests()
+        value = fixture._input(zero=zero)
+        trend = fixture._trend(value)
+        return {"active_days_last_year": 0 if zero else 17,
+                "weekly_cadence": [p["contributions"] for p in trend["points"]],
+                **({} if missing else {"contribution_trend": trend})}
+
+    def _svg(self, engineering):
+        import io
+        from scripts.rendering.generate_engineering_cadence import generate
+        class Sink(io.StringIO):
+            def close(self):
+                pass
+        sink = Sink()
+        with patch("builtins.open", return_value=sink):
+            generate(engineering)
+        return sink.getvalue()
+
+    def _errors(self, engineering, svg):
+        from scripts.quality.validate_generated_profile import _contribution_trend_claim_errors
+        with patch.object(Path, "exists", return_value=True), patch.object(Path, "read_text", return_value=svg):
+            return _contribution_trend_claim_errors({"engineering": engineering})
+
+    def test_visible_context_and_plot_match_the_dated_values(self):
+        for zero in (False, True):
+            engineering = self._engineering(zero=zero)
+            svg = self._svg(engineering)
+            self.assertIn("Weekly contributions", svg)
+            self.assertIn("Sep 21 – Oct 7, 2026 · 3 weeks", svg)
+            self.assertIn("Mon–Sun · UTC · partial weeks included", svg)
+            self.assertEqual([], self._errors(engineering, svg))
+
+    def test_missing_dated_input_is_not_an_undated_line(self):
+        svg = self._svg(self._engineering(missing=True))
+        self.assertIn("Contribution trend unavailable", svg)
+        self.assertNotIn("<polyline", svg)
+        self.assertNotIn("Peak", svg)
+
+    def test_guard_rejects_renamed_missing_and_corrupted_plot(self):
+        engineering = self._engineering()
+        svg = self._svg(engineering)
+        corruptions = (
+            svg.replace('data-series="weekly-contributions"', 'data-series="other"'),
+            re.sub(r'<g data-series="weekly-contributions">.*?</g>', '', svg),
+            svg.replace("Weekly contributions", "Weekly commits"),
+            svg.replace("Mon–Sun · UTC · partial weeks included", "Mon–Sun · UTC · complete weeks"),
+            re.sub(r'(<polyline[^>]*points=")[^"]+', r'\g<1>252,117 532,117 812,117', svg),
+        )
+        for altered in corruptions:
+            with self.subTest(svg=altered):
+                self.assertTrue(self._errors(engineering, altered))
+
+    def test_rendered_effects_cannot_be_certified_by_correct_raw_text(self):
+        import xml.etree.ElementTree as ET
+        engineering = self._engineering()
+        svg = self._svg(engineering)
+        self.assertEqual([], self._errors(engineering, svg))
+        mutations = (
+            ("text", "display", "none"), ("text", "font-size", "0"),
+            ("text", "x", "9999"), ("polyline", "opacity", "0"),
+            ("polyline", "stroke-width", "0"), ("polyline", "transform", "scale(1,-1)"),
+            ("polygon", "points", "312,272 780,160 780,272"),
+            ("circle", "cy", "999"), ("circle", "r", "0"),
+        )
+        for kind, attribute, value in mutations:
+            with self.subTest(kind=kind, attribute=attribute):
+                root = ET.fromstring(svg)
+                chart = next(n for n in root.iter() if n.get("data-series") == "weekly-contributions")
+                chart.find("{*}" + kind).set(attribute, value)
+                self.assertTrue(self._errors(engineering, ET.tostring(root, encoding="unicode")))
+        for kind in ("root", "group"):
+            root = ET.fromstring(svg)
+            node = root if kind == "root" else next(n for n in root.iter() if n.get("data-series"))
+            node.set("transform", "translate(0 10000)")
+            self.assertTrue(self._errors(engineering, ET.tostring(root, encoding="unicode")))
+        root = ET.fromstring(svg)
+        root.set("viewBox", "10000 10000 840 494")
+        self.assertTrue(self._errors(engineering, ET.tostring(root, encoding="unicode")))
+
+    def test_real_axes_and_every_marker_are_guarded(self):
+        import xml.etree.ElementTree as ET
+        engineering = self._engineering()
+        svg = self._svg(engineering)
+        for role, attribute, value in (("y-tick", "text", "999"), ("x-tick", "x", "999"),
+                                       ("week-point", "cx", "500"), ("y-tick", "visibility", "hidden")):
+            root = ET.fromstring(svg)
+            nodes = [n for n in root.iter() if n.get("data-role") == role]
+            for index in range(len(nodes)):
+                altered = ET.fromstring(svg)
+                node = [n for n in altered.iter() if n.get("data-role") == role][index]
+                if attribute == "text":
+                    node.text = value
+                else:
+                    node.set(attribute, value)
+                self.assertTrue(self._errors(engineering, ET.tostring(altered, encoding="unicode")))
+        root = ET.fromstring(svg)
+        points = [n for n in root.iter() if n.get("data-role") == "week-point"]
+        points[-1].set("fill", points[-1].get("stroke"))
+        self.assertTrue(self._errors(engineering, ET.tostring(root, encoding="unicode")))
+
+    def test_visible_palette_and_transparent_gradient_base_are_valid(self):
+        import xml.etree.ElementTree as ET
+        engineering = self._engineering()
+        root = ET.fromstring(self._svg(engineering))
+        chart = next(n for n in root.iter() if n.get("data-series") == "weekly-contributions")
+        chart.find("{*}polyline").set("stroke", "#abcdef")
+        chart.find("{*}circle").set("fill", "#abcdef")
+        self.assertTrue(any(n.get("stop-opacity") == "0" for n in chart.iter()))
+        self.assertEqual([], self._errors(engineering, ET.tostring(root, encoding="unicode")))
+
+    def test_unavailable_context_still_requires_visible_text(self):
+        import xml.etree.ElementTree as ET
+        from types import SimpleNamespace
+        from scripts.pipeline.compute_metrics import _build_contribution_trend
+        engineering = {"active_days_last_year": 17, "weekly_cadence": [],
+                       "contribution_trend": _build_contribution_trend(SimpleNamespace(calendar=None))}
+        root = ET.fromstring(self._svg(engineering))
+        self.assertEqual([], self._errors(engineering, ET.tostring(root, encoding="unicode")))
+        chart = next(n for n in root.iter() if n.get("data-series"))
+        chart.findall("{*}text")[-1].set("fill", "transparent")
+        self.assertTrue(self._errors(engineering, ET.tostring(root, encoding="unicode")))
+
+    def test_surrounding_paint_cannot_cover_a_valid_chart(self):
+        from copy import deepcopy
+        engineering = self._engineering()
+        svg = self._svg(engineering)
+        self.assertEqual([], self._errors(engineering, svg))
+        for effect in ("chart-first", "panel-last", "panel-copy", "nested-panel", "moved-tile", "moved-icon", "large-path"):
+            with self.subTest(effect=effect):
+                root = ET.fromstring(svg)
+                chart = next(n for n in root if n.get("data-series"))
+                panel = next(n for n in root if n.get("filter") == "url(#gk-shadow)")
+                if effect == "chart-first":
+                    root.remove(chart)
+                    root.insert(0, chart)
+                elif effect == "panel-last":
+                    root.remove(panel)
+                    root.append(panel)
+                elif effect == "panel-copy":
+                    root.append(deepcopy(panel))
+                elif effect == "nested-panel":
+                    ET.SubElement(root, "{http://www.w3.org/2000/svg}g").append(deepcopy(panel))
+                elif effect == "moved-tile":
+                    tile = next(n for n in list(root)[list(root).index(chart) + 1:] if n.get("fill-opacity") == "0.55")
+                    tile.set("y", "100")
+                else:
+                    icon = next(n for n in list(root)[list(root).index(chart) + 1:] if "translate" in n.get("transform", ""))
+                    if effect == "moved-icon":
+                        icon.set("transform", "translate(252,96) scale(0.667)")
+                    else:
+                        icon.find("{*}path").set("d", "M0 -999 L24 -999")
+                self.assertTrue(self._errors(engineering, ET.tostring(root, encoding="unicode")))
+
+    def test_document_and_chart_elements_require_svg_identity(self):
+        engineering = self._engineering()
+        svg = self._svg(engineering)
+        for kind in ("svg", "g", "text", "polyline", "circle", "linearGradient", "stop"):
+            with self.subTest(kind=kind):
+                root = ET.fromstring(svg)
+                chart = next(n for n in root if n.get("data-series"))
+                node = root if kind == "svg" else chart if kind == "g" else chart.find(".//{*}" + kind)
+                node.tag = "{urn:not-svg}" + kind
+                self.assertTrue(self._errors(engineering, ET.tostring(root, encoding="unicode")))
+        for state in ("unavailable", "empty"):
+            from types import SimpleNamespace
+            from scripts.pipeline.compute_metrics import _build_contribution_trend
+            engineering = {"active_days_last_year": 17 if state == "unavailable" else 0,
+                           "weekly_cadence": [], "contribution_trend": _build_contribution_trend(SimpleNamespace(calendar=None))}
+            root = ET.fromstring(self._svg(engineering))
+            self.assertEqual([], self._errors(engineering, ET.tostring(root, encoding="unicode")))
+            root.tag = "{urn:not-svg}svg"
+            self.assertTrue(self._errors(engineering, ET.tostring(root, encoding="unicode")))
+
+    def test_svg_prefix_alias_and_native_lower_row_effects_remain_valid(self):
+        engineering = self._engineering()
+        root = ET.fromstring(self._svg(engineering))
+        self.assertTrue(any("translate" in n.get("transform", "") for n in root.iter()))
+        self.assertTrue(any(n.get("filter") == "url(#gk-shadow)" for n in root.iter()))
+        ET.register_namespace("svg", "http://www.w3.org/2000/svg")
+        try:
+            prefixed = ET.tostring(root, encoding="unicode")
+            self.assertIn("<svg:svg", prefixed)
+            self.assertEqual([], self._errors(engineering, prefixed))
+        finally:
+            ET.register_namespace("", "http://www.w3.org/2000/svg")
+
+    def test_compatibility_values_cannot_disagree_with_dated_points(self):
+        engineering = self._engineering()
+        svg = self._svg(engineering)
+        engineering["weekly_cadence"] = [999]
+        self.assertTrue(self._errors(engineering, svg))
+
+
+
+
 if __name__ == "__main__":
     unittest.main()

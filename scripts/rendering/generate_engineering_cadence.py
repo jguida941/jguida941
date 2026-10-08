@@ -1,21 +1,23 @@
 """Build the Engineering Cadence card.
 
 Power BI information architecture (DESIGN_SPEC): active days is the one dominant
-KPI top-left, the weekly cadence renders as a restrained TrendPanel, CI coverage
+KPI top-left, the dated contributions render on a zero-based weekly chart, CI coverage
 as a labeled DonutGauge, and the remaining signals as uniform secondary metric
 tiles. An honest empty state renders when there is no engineering data.
 """
 
 from __future__ import annotations
 
+from datetime import date
+
 from scripts.contracts.profile_contract import (
     AUTOMATION_REPOS_LABEL, AUTOMATION_FILES_LABEL, AUTOMATION_ADOPTION_LABEL,
     AUTOMATION_SCOPE, AUTOMATION_MEANING,
-    automation_description, automation_display,
+    automation_description, automation_display, contribution_trend_display,
 )
 
 from scripts.contracts.profile_contract import metric_claim_group
-from scripts.core.config import SPACE, SVG_WIDTH, TEXT, TEXT_DIM
+from scripts.core.config import BG_DARK, CYAN, SPACE, SVG_WIDTH, TEXT, TEXT_DIM
 from scripts.rendering.components import (
     donut_gauge,
     empty_state,
@@ -23,7 +25,6 @@ from scripts.rendering.components import (
     primary_kpi,
     section_header,
     text,
-    trend_panel,
 )
 from scripts.rendering.glass_kit import glass_panel, glass_tile
 from scripts.rendering.svg_utils import fmt_int, xml_escape
@@ -63,6 +64,58 @@ def _gauge_cell(
     return "".join(parts)
 
 
+def _contribution_chart(trend: dict, points: list[dict]) -> str:
+    """Draw the dated series against zero; missing weeks never become intervals."""
+    parts = ['<g data-series="weekly-contributions">']
+    parts.append(text(xml_escape(trend["title"]), 252, 108, token="body", color=TEXT_DIM))
+    if trend["available"]:
+        parts.append(f'<desc>{xml_escape(trend["description"])}</desc>')
+        values = trend["values"]
+        required = max(1, (max(values) + 2) // 3)
+        magnitude = 1
+        while 10 * magnitude < required:
+            magnitude *= 10
+        step = next(multiplier * magnitude for multiplier in (1, 2, 5, 10)
+                    if multiplier * magnitude >= required)
+        top = 3 * step
+        coordinates = [(546 if len(values) == 1 else 312 + index * 468 / (len(values) - 1),
+                        272 - value * 112 / top) for index, value in enumerate(values)]
+        for tick in (0, step, 2 * step, top):
+            y = 272 - tick * 112 / top
+            parts.append(f'<line x1="312" x2="780" y1="{y:.2f}" y2="{y:.2f}" '
+                         f'stroke="{TEXT_DIM}" stroke-opacity="0.18" stroke-width="1"/>')
+            label = str(tick)
+            if len(label) > 6:
+                coefficient = label.rstrip("0")
+                label = f"{coefficient}e{len(label) - len(coefficient)}"
+            parts.append(text(label, 300, y + 4.76, token="body", color=TEXT_DIM,
+                              anchor="end").replace("<text ", '<text data-role="y-tick" ', 1))
+        if len(values) >= 2:
+            line_points = " ".join(f"{x:.2f},{y:.2f}" for x, y in coordinates)
+            parts.append(f'<linearGradient id="eng-contribution-area" x1="0" y1="0" x2="0" y2="1">'
+                         f'<stop offset="0%" stop-color="{CYAN}" stop-opacity="0.16"/>'
+                         f'<stop offset="100%" stop-color="{CYAN}" stop-opacity="0"/></linearGradient>')
+            parts.append(f'<polygon data-role="trend-area" points="312,272 {line_points} 780,272" '
+                         'fill="url(#eng-contribution-area)"/>')
+            parts.append(f'<polyline data-role="trend-line" points="{line_points}" '
+                         f'fill="none" stroke="{CYAN}" stroke-width="2.5"/>')
+        for (x, y), point in zip(coordinates, points):
+            fill = BG_DARK if point["partial"] else CYAN
+            parts.append(f'<circle data-role="week-point" cx="{x:.2f}" cy="{y:.2f}" r="3" '
+                         f'fill="{fill}" stroke="{CYAN}" stroke-width="1.5"/>')
+        months = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        for index in sorted({0, (len(points) - 1) // 2, len(points) - 1}):
+            day = date.fromisoformat(points[index]["week_start"])
+            label = f"{months[day.month - 1]} {day.day}"
+            parts.append(text(label, coordinates[index][0], 296, token="body", color=TEXT_DIM,
+                              anchor="middle").replace("<text ", '<text data-role="x-tick" ', 1))
+        # Keep the full dated window and qualification as real final text nodes.
+        parts.append(text(xml_escape(trend["window"]), 252, 132, token="body", color=TEXT_DIM))
+    parts.append(text(xml_escape(trend["qualification"]), 252, 320, token="body", color=TEXT_DIM))
+    parts.append("</g>")
+    return "".join(parts)
+
+
 def generate(
     engineering: dict,
     output_path: str = "assets/engineering_cadence.svg",
@@ -90,7 +143,8 @@ def generate(
         quality_lines.append("Language · Partial · observed bytes")
     elif language_status == "unavailable":
         quality_lines.append("Language · Unavailable · n/a")
-    cadence = [float(v) for v in (data.get("weekly_cadence") or []) if v is not None]
+    trend = contribution_trend_display(data.get("contribution_trend"))
+    cadence = trend["values"]
     active_days = _int(data.get("active_days_last_year"))
     workflows = _int(data.get("automation_workflows"))
     automation_repos = _int(data.get("automation_repos"))
@@ -136,14 +190,14 @@ def generate(
     kpi_w = 200
     gap = SPACE["md"]
     tile_h = 84
-    row2_y = content_top + 116
+    row2_y = 344
     row2_bottom = row2_y + tile_h
     height = int(row2_bottom + 30 + len(quality_lines) * 18)
 
     parts: list[str] = [glass_panel(width, height), header_svg,
         f"<desc>{xml_escape(automation_description(automation))}</desc>"]
 
-    # Row 1: KPI (active days) + weekly-cadence TrendPanel.
+    # Row 1: KPI (active days) + dated contribution chart.
     parts.append(
         primary_kpi(
             pad, content_top + 58,
@@ -154,15 +208,7 @@ def generate(
         f'<rect x="{pad + kpi_w:g}" y="{content_top + 6:g}" width="1" height="90" '
         f'fill="{TEXT_DIM}" fill-opacity="0.16"/>'
     )
-    trend_x = pad + kpi_w + SPACE["xl"]
-    trend_w = width - pad - trend_x
-    peak = f"peak {fmt_int(int(max(cadence)))} / wk" if cadence else None
-    parts.append(
-        trend_panel(
-            trend_x, content_top + 18, trend_w, 80,
-            series=cadence, axis_label="weekly commits", peak_label=peak, uid="eng-spark",
-        )
-    )
+    parts.append(_contribution_chart(trend, (data.get("contribution_trend") or {}).get("points", [])))
 
     # Row 2: CI-coverage gauge + 3 secondary metric tiles.
     cols, gap = 4, SPACE["md"]
