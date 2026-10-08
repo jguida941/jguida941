@@ -1,57 +1,318 @@
-name: Test Profile Pipeline
+name: Qualify Profile Release
 
-on:
-  push:
-    branches: ["main"]
-    paths:
-      - "scripts/**"
-      - "tests/**"
-      - "site/**"
-      - "contracts/**"
-      - "assets/receipts/**"
-      - "docs/design/**"
-      - ".github/workflows/tests.yml"
-      - ".github/workflows/analytics.yml"
-      - ".github/workflows/metrics.yml"
+"on":
   workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Exact independently reviewed qualification commit
+        required: true
+        type: string
+
+permissions:
+  contents: read
 
 concurrency:
-  group: profile-pipeline-tests
-  cancel-in-progress: true
+  group: profile-release-qualification-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  test:
+  qualify:
     runs-on: ubuntu-latest
-
+    env:
+      EXPECTED_SHA: ${{ inputs.expected_sha }}
+      QUALIFICATION_DIR: ${{ runner.temp }}/profile-qualification-${{ github.run_id }}-${{ github.run_attempt }}
+      CACHE_DIR: ${{ runner.temp }}/profile-qualification-${{ github.run_id }}-${{ github.run_attempt }}/collection-cache
+      BYPASS_GITHUB_CACHE: "true"
+      GITHUB_USERNAME: jguida941
+      PROFILE_TIMEZONE: America/New_York
+      PROFILE_ACTIVITY_TZ: America/New_York
+      PYTHONDONTWRITEBYTECODE: "1"
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12.15"
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Bind reviewed source and run identity
+        id: prepare
         run: |
-          python -m unittest \
-            tests.github.test_github_client \
-            tests.github.test_token_fallback \
-            tests.pipeline.test_compute_metrics_accuracy \
-            tests.pipeline.test_profile_pipeline_fixture \
-            tests.contracts.test_data_semantics \
-            tests.contracts.test_public_data_privacy \
-            tests.contracts.test_design_contract \
-            tests.contracts.test_label_legibility
+          python - <<'PY'
+          import hashlib, json, os, re, subprocess, sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+          from scripts import contracts
 
-      - name: Fixture smoke CLI run (offline path)
+          def hex_value(value, size):
+              return value if re.fullmatch(r"[0-9a-f]{%d}" % size, value or "") else None
+
+          def identity_errors(expected, run_sha, checkout, ref, event):
+              return (not hex_value(expected, 40) or expected != run_sha or expected != checkout
+                      or event != "workflow_dispatch" or ref == "refs/heads/main"
+                      or not ref.startswith("refs/heads/"))
+
+          receipt_path = Path(os.environ["QUALIFICATION_DIR"]) / "receipt.json"
+          receipt_path.parent.mkdir(parents=True, exist_ok=False)
+          head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          expected = os.environ.get("EXPECTED_SHA", "")
+          record = {
+              "run_id": os.environ["GITHUB_RUN_ID"], "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "expected_sha": hex_value(expected, 40), "run_sha": hex_value(os.environ["GITHUB_SHA"], 40),
+              "checkout_sha": hex_value(head, 40), "started_at": datetime.now(timezone.utc).isoformat(),
+              "python_version": sys.version.split()[0], "exit_codes": {},
+              "generation_state": "UNKNOWN", "stored_state": "UNKNOWN", "qualified": False,
+          }
+          receipt_path.write_text(json.dumps(record, sort_keys=True))
+          if identity_errors(expected, os.environ["GITHUB_SHA"], head, os.environ["GITHUB_REF"], os.environ["GITHUB_EVENT_NAME"]):
+              raise SystemExit("Qualification requires the exact reviewed non-main dispatch SHA")
+          subprocess.run(["git", "diff", "--quiet", "HEAD", "--"], check=True)
+          paths = subprocess.check_output(["git", "ls-files", "-z"]).decode().split("\0")
+          record["reviewed_file_hashes"] = {
+              path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+              for path in paths if path and path not in contracts.PROFILE_ARTIFACT_PATHS
+          }
+          record["generator_source_digest"] = contracts.generator_source_digest()
+          record["initial_manifest_sha"] = hashlib.sha256(Path(contracts.PROFILE_ARTIFACT_MANIFEST_PATH).read_bytes()).hexdigest()
+          receipt_path.write_text(json.dumps(record, sort_keys=True))
+          PY
+
+      - name: Resolve GitHub token
         env:
-          GITHUB_TOKEN: ""
-          GH_TOKEN: ""
-          PERSONAL_GITHUB_TOKEN: ""
+          CANDIDATE_PAT: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          DEFAULT_TOKEN: ${{ github.token }}
         run: |
-          python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json
+          use_default() {
+            {
+              echo "PERSONAL_GITHUB_TOKEN="
+              echo "GITHUB_TOKEN=${DEFAULT_TOKEN}"
+              echo "GH_TOKEN=${DEFAULT_TOKEN}"
+              echo "PROFILE_TOKEN_MODE=github_token"
+            } >> "$GITHUB_ENV"
+          }
+          if [ -z "${CANDIDATE_PAT}" ]; then
+            echo "No PERSONAL_GITHUB_TOKEN secret set; using github.token."
+            use_default
+            exit 0
+          fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer ${CANDIDATE_PAT}" https://api.github.com/user || echo 000)
+          if [ "${code}" = "200" ]; then
+            exp=$(curl -sS -D - -o /dev/null \
+              -H "Authorization: Bearer ${CANDIDATE_PAT}" https://api.github.com/user \
+              | tr -d '\r' | awk -F': ' 'tolower($1)=="github-authentication-token-expiration"{print $2}')
+            echo "PERSONAL_GITHUB_TOKEN healthy (expires: ${exp:-unknown})"
+            echo "::notice::PERSONAL_GITHUB_TOKEN healthy; expires ${exp:-unknown}"
+            {
+              echo "PERSONAL_GITHUB_TOKEN=${CANDIDATE_PAT}"
+              echo "GITHUB_TOKEN=${DEFAULT_TOKEN}"
+              echo "GH_TOKEN=${CANDIDATE_PAT}"
+              echo "PROFILE_TOKEN_MODE=personal_github_token"
+            } >> "$GITHUB_ENV"
+          else
+            echo "::warning::PERSONAL_GITHUB_TOKEN returned HTTP ${code}; using github.token. Private repos + contribution calendar fall back to last-known-good."
+            use_default
+          fi
+
+      - name: Generate, test, and qualify the exact live set
+        id: qualification
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, re, subprocess, sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+          from scripts import contracts
+
+          STATES = {"READY", "HOLD_NONLIVE_SOURCE", "HOLD_INCOMPLETE_PRIVATE_EVIDENCE",
+                    "HOLD_NONCURRENT_CONTRIBUTIONS", "ERROR_INVALID_ARTIFACT_SET"}
+          ARTIFACT_PATHS = ('README.md', 'assets/activity_heatmap.svg', 'assets/badges.svg', 'assets/builder_scorecard.svg', 'assets/contribution_calendar.svg', 'assets/currently_working.svg', 'assets/engineering_cadence.svg', 'assets/lang_breakdown.svg', 'assets/now_next_shipped.svg', 'assets/raw_snapshot.svg', 'assets/repo_spotlight.svg', 'assets/streak_summary.svg', 'metrics.general.svg', 'site/data/profile_snapshot.json', 'site/data/profile_artifact_manifest.json')
+          TEST_MODULES = ('tests.github.test_github_client', 'tests.github.test_token_fallback', 'tests.pipeline.test_compute_metrics_accuracy', 'tests.pipeline.test_profile_pipeline_fixture', 'tests.contracts.test_data_semantics', 'tests.contracts.test_public_data_privacy', 'tests.contracts.test_design_contract', 'tests.contracts.test_label_legibility')
+
+          def timestamp(value):
+              result = datetime.fromisoformat(value.replace("Z", "+00:00"))
+              if result.tzinfo is None:
+                  raise ValueError("timestamp requires timezone")
+              return result
+
+          def command_decision(diagnostics, command, code, started, finished):
+              try:
+                  extra = diagnostics["extra"]
+                  valid = (diagnostics["command"] == command and diagnostics["exit_code"] == code
+                           and timestamp(started) <= timestamp(diagnostics["generated_at"]) <= timestamp(finished))
+                  if command == "generate-profile":
+                      valid = valid and extra.get("step") == "generate_profile" and extra.get("validated") is True and extra.get("fixture") is None
+                      state = extra.get("publication_state")
+                  else:
+                      valid = valid and extra.get("step") == "publication_status" and extra.get("require_ready") is True
+                      state = extra.get("state")
+                  return state if valid and state in STATES else "UNKNOWN"
+              except (KeyError, TypeError, ValueError, AttributeError):
+                  return "UNKNOWN"
+
+          def qualification_errors(record, manifest, current_files, current_digest, current_head, actual_paths):
+              errors = []
+              expected = record.get("expected_sha")
+              if (not isinstance(expected, str) or not re.fullmatch("[0-9a-f]{40}", expected)
+                      or any(value != expected for value in (record.get("run_sha"), record.get("checkout_sha"), current_head))):
+                  errors.append("revision mismatch")
+              if record.get("generation_state") != "READY" or record.get("stored_state") != "READY":
+                  errors.append("generation or stored set not READY")
+              if record.get("exit_codes") != {"generation": 0, "tests": 0, "readiness": 0}:
+                  errors.append("command failed or missing")
+              if manifest.get("source_kind") != "github-api" or manifest.get("generator_revision") != expected:
+                  errors.append("generation origin mismatch")
+              if manifest.get("generator_source_digest") != current_digest or record.get("generator_source_digest") != current_digest:
+                  errors.append("source digest mismatch")
+              if not record.get("reviewed_file_hashes") or record["reviewed_file_hashes"] != current_files:
+                  errors.append("reviewed file bytes changed")
+              if tuple(actual_paths) != ARTIFACT_PATHS:
+                  errors.append("artifact roster mismatch")
+              for key in ("initial_manifest_sha", "produced_manifest_sha"):
+                  if not re.fullmatch("[0-9a-f]{64}", str(record.get(key, ""))):
+                      errors.append("manifest digest missing")
+              if record.get("initial_manifest_sha") == record.get("produced_manifest_sha"):
+                  errors.append("retained old manifest")
+              try:
+                  if not timestamp(record["started_at"]) <= timestamp(record["generation_started_at"]) <= timestamp(manifest["generated_at"]) <= timestamp(record["generation_finished_at"]) <= timestamp(record["finished_at"]):
+                      errors.append("generation outside invocation")
+              except (KeyError, TypeError, ValueError, AttributeError):
+                  errors.append("invalid generation time")
+              return errors
+
+          def now():
+              return datetime.now(timezone.utc).isoformat()
+
+          def digest(path):
+              return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+          def read_diagnostics():
+              try:
+                  return json.loads(Path("site/data/run_diagnostics.json").read_text())
+              except (OSError, ValueError):
+                  return {}
+
+          receipt_path = Path(os.environ["QUALIFICATION_DIR"]) / "receipt.json"
+          record = json.loads(receipt_path.read_text())
+          record["qualified"] = False
+          try:
+              record["generation_started_at"] = now()
+              generated = subprocess.run(["python", "scripts/profile_cli.py", "generate-profile", "--validate"])
+              record["generation_finished_at"] = now()
+              record["exit_codes"]["generation"] = generated.returncode
+              record["generation_state"] = command_decision(read_diagnostics(), "generate-profile", generated.returncode,
+                  record["generation_started_at"], record["generation_finished_at"])
+              receipt_path.write_text(json.dumps(record, sort_keys=True))
+              if generated.returncode:
+                  raise SystemExit(generated.returncode)
+              if record["generation_state"] != "READY":
+                  raise SystemExit("This generation did not return READY")
+
+              test_env = dict(os.environ, PERSONAL_GITHUB_TOKEN="", GITHUB_TOKEN="", GH_TOKEN="",
+                              PROFILE_TOKEN_MODE="none", BYPASS_GITHUB_CACHE="true",
+                              CACHE_DIR=str(Path(os.environ["QUALIFICATION_DIR"]) / "test-cache"))
+              tested = subprocess.run(["python", "-m", "unittest", *TEST_MODULES], env=test_env)
+              record["exit_codes"]["tests"] = tested.returncode
+              if tested.returncode:
+                  raise SystemExit(tested.returncode)
+
+              readiness_start = now()
+              ready = subprocess.run(["python", "scripts/profile_cli.py", "publication-status", "--require-ready",
+                                      "--github-output", os.environ["GITHUB_OUTPUT"]], env=test_env)
+              record["exit_codes"]["readiness"] = ready.returncode
+              record["stored_state"] = command_decision(read_diagnostics(), "publication-status", ready.returncode,
+                                                         readiness_start, now())
+              if ready.returncode:
+                  raise SystemExit(ready.returncode)
+
+              record["finished_at"] = now()
+              record["produced_manifest_sha"] = digest(contracts.PROFILE_ARTIFACT_MANIFEST_PATH)
+              manifest = json.loads(Path(contracts.PROFILE_ARTIFACT_MANIFEST_PATH).read_text())
+              paths = subprocess.check_output(["git", "ls-files", "-z"]).decode().split("\0")
+              current_files = {path: digest(path) for path in paths if path and path not in contracts.PROFILE_ARTIFACT_PATHS}
+              current_head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+              current_digest = contracts.generator_source_digest()
+              record["after_file_hash_digest"] = contracts.canonical_digest(current_files)
+              record["artifact_files"] = [{"path": path, "sha256": digest(path), "byte_length": Path(path).stat().st_size}
+                                          for path in ARTIFACT_PATHS]
+              errors = qualification_errors(record, manifest, current_files, current_digest, current_head, contracts.PROFILE_ARTIFACT_PATHS)
+              unexpected = set(subprocess.check_output(["git", "ls-files", "--others", "--exclude-standard", "-z"]).decode().split("\0")) - {"", "site/data/run_diagnostics.json", "site/data/run_diagnostics_history.jsonl"}
+              if unexpected:
+                  errors.append("unexpected untracked files")
+              if errors:
+                  raise SystemExit("Qualification freshness/source checks failed")
+              record["qualified"] = True
+              with open(os.environ["GITHUB_OUTPUT"], "a") as output:
+                  output.write("qualified=true\n")
+          finally:
+              record["finished_at"] = now()
+              receipt_path.write_text(json.dumps(record, sort_keys=True))
+          PY
+
+      - name: Upload qualified canonical artifacts
+        if: ${{ success() && steps.qualification.outputs.publish == 'true' && steps.qualification.outputs.qualified == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualified-profile-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          path: |
+            README.md
+            assets/activity_heatmap.svg
+            assets/badges.svg
+            assets/builder_scorecard.svg
+            assets/contribution_calendar.svg
+            assets/currently_working.svg
+            assets/engineering_cadence.svg
+            assets/lang_breakdown.svg
+            assets/now_next_shipped.svg
+            assets/raw_snapshot.svg
+            assets/repo_spotlight.svg
+            assets/streak_summary.svg
+            metrics.general.svg
+            site/data/profile_snapshot.json
+            site/data/profile_artifact_manifest.json
+
+      - name: Prepare sanitized diagnostic receipt
+        if: ${{ always() }}
+        run: |
+          python - <<'PY'
+          import json, os, re, sys
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          path = Path(os.environ["QUALIFICATION_DIR"]) / "receipt.json"
+          path.parent.mkdir(parents=True, exist_ok=True)
+          try:
+              record = json.loads(path.read_text())
+          except (OSError, ValueError):
+              record = {}
+          # Never upload the CLI diagnostics/history: only fields owned by this workflow.
+          allowed = {"run_id", "run_attempt", "expected_sha", "run_sha", "checkout_sha", "started_at",
+                     "finished_at", "generation_started_at", "generation_finished_at", "python_version",
+                     "exit_codes", "generation_state", "stored_state", "qualified", "reviewed_file_hashes",
+                     "generator_source_digest", "initial_manifest_sha", "produced_manifest_sha",
+                     "after_file_hash_digest", "artifact_files"}
+          record = {key: value for key, value in record.items() if key in allowed}
+          record.setdefault("run_id", os.environ["GITHUB_RUN_ID"])
+          record.setdefault("run_attempt", os.environ["GITHUB_RUN_ATTEMPT"])
+          for key, name in (("expected_sha", "EXPECTED_SHA"), ("run_sha", "GITHUB_SHA")):
+              value = os.environ.get(name, "")
+              record.setdefault(key, value if re.fullmatch("[0-9a-f]{40}", value) else None)
+          record.setdefault("qualified", False)
+          record.setdefault("exit_codes", {})
+          record.setdefault("python_version", sys.version.split()[0])
+          record.setdefault("finished_at", datetime.now(timezone.utc).isoformat())
+          path.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
+          PY
+
+      - name: Upload sanitized diagnostic receipt
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualification-receipt-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          path: ${{ env.QUALIFICATION_DIR }}/receipt.json

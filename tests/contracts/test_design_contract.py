@@ -1140,14 +1140,14 @@ class EngineeringCadenceContract(unittest.TestCase):
             " visible, untransformed, and inside the tile",
         )
 
-    def test_ci_coverage_uses_the_same_repository_scope_for_both_terms(self):
+    def test_standalone_adoption_requires_an_explicit_qualified_claim(self):
         from scripts.rendering import generate_engineering_cadence as cadence
 
         def gauge_value(data):
             captured = []
 
             def capture(*_args, **kwargs):
-                captured.append(kwargs["value"])
+                captured.append((kwargs["value"], kwargs["display_value"]))
                 return "<g/>"
 
             import tempfile
@@ -1174,7 +1174,7 @@ class EngineeringCadenceContract(unittest.TestCase):
         }
 
         observed = (gauge_value(all_owned), gauge_value(public_only))
-        self.assertEqual((100.0, 100.0), observed)
+        self.assertEqual(((0.0, "n/a"), (0.0, "n/a")), observed)
 
     def test_empty_state(self):
         import tempfile
@@ -1313,6 +1313,33 @@ class CurrentlyWorkingContract(unittest.TestCase):
         self.assertIsNone(
             re.search(r"\d", _text_contents(svg)), "empty state must not fabricate numbers"
         )
+
+
+class WorkflowClaimValidationTests(unittest.TestCase):
+    def test_renamed_adoption_gauge_still_requires_matching_visible_claim(self):
+        from scripts.quality import validate_generated_profile as validator
+        payload = {
+            "scorecard": {"ci_coverage_pct": 25.0},
+            "data_scope": {"metric_scopes": {"ci_coverage_pct": "owned-public-private"}},
+            "data_quality": {"metric_statuses": {"ci_coverage_pct": "exact"}},
+        }
+        valid = ('<svg xmlns="http://www.w3.org/2000/svg">'
+                 '<g data-metric-key="ci_coverage_pct" data-metric-display-value="25%" '
+                 'data-metric-scope="owned-public-private" data-metric-status="exact">'
+                 '<text>25%</text><text>Repo adoption</text></g></svg>')
+        with tempfile.TemporaryDirectory() as directory:
+            card = Path(directory) / "builder_scorecard.svg"
+            with patch.object(validator, "CI_CLAIM_CARD_PATHS", (card,)):
+                card.write_text(valid)
+                self.assertEqual([], validator._ci_coverage_claim_errors(payload))
+                for altered in (
+                    valid.replace("25%", "99%"),
+                    valid.replace("<text>25%</text>", "<text>125%</text>"),
+                    valid.replace('data-metric-key="ci_coverage_pct"', ''),
+                    valid.replace('data-metric-status="exact"', 'data-metric-status="partial"'),
+                ):
+                    card.write_text(altered)
+                    self.assertTrue(validator._ci_coverage_claim_errors(payload))
 
 
 if __name__ == "__main__":

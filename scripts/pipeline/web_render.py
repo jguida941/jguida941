@@ -18,6 +18,13 @@ counts/metadata. The page is static (GitHub Pages safe): no inline secrets, no s
 from __future__ import annotations
 
 from pathlib import Path
+from html import escape
+from scripts.contracts.profile_contract import (
+    AUTOMATION_REPOS_LABEL, AUTOMATION_FILES_LABEL, AUTOMATION_ADOPTION_LABEL,
+    AUTOMATION_SCOPE, AUTOMATION_MEANING,
+    automation_description, automation_display,
+)
+
 
 from scripts.rendering.design_tokens import DEFAULT_THEME, THEME_META, THEMES, emit_css_root
 
@@ -280,23 +287,47 @@ def _hero() -> str:
   </header>"""
 
 
+def _workflow_breakdown() -> str:
+    rows = []
+    fields = (("configured_repos", "Configured repositories"),
+              ("eligible_repos", "Eligible repositories"),
+              ("workflow_files", "Workflow files"),
+              ("unknown_workflow_repos", "Unknown workflow observations"),
+              ("status", "Observation status"))
+    for key, label in (("public", "Public"), ("private", "Private"), ("combined", "Combined")):
+        items = "".join(
+            f'<div class="mrow"><span class="ms">{caption}</span>'
+            f'<span class="num" data-bind="automation_display.{key}.{field}">n/a</span></div>'
+            for field, caption in fields
+        )
+        rows.append(f'<h3 class="mt">{label}</h3><div class="mgroup">{items}</div>'
+                    f'<p class="ms" data-bind="automation_display.{key}.qualification">Workflow observation unavailable</p>')
+    return "".join(rows)
+
+
 def _scorecard() -> str:
     return f"""
   <section class="panel">
     <div class="section-head"><div><p class="eyebrow">GitHub Signals · 12 Months</p><h2 class="title">Builder Scorecard</h2></div></div>
     <hr class="hairline">
     <div class="ring-row" style="margin-bottom:14px">
-      <div class="ring" id="ci-ring"><span class="num" data-bind="scorecard.ci_coverage_pct" data-suffix="%" data-round="0">—</span></div>
-      <div><div class="mt">CI coverage</div><div class="ms">of public repos automated</div></div>
+      <div class="ring" id="ci-ring"><span class="num" data-bind="automation_display.combined.adoption">—</span></div>
+      <div><div class="mt">{AUTOMATION_ADOPTION_LABEL}</div><div class="ms" data-bind="automation_display.combined.gauge_detail">Workflow observation unavailable</div></div>
     </div>
     <div class="mgroup">
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['fire'])} active days</span><span class="ms">last 12 months</span></span><span class="mv num" data-bind="scorecard.active_days_last_year">—</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['commit'])} active repos</span><span class="ms">last 7 days</span></span><span class="mv num" data-bind="scorecard.active_repos_7d">—</span></div>
-      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['workflow'])} workflows</span><span class="ms">CI/CD pipelines</span></span><span class="mv num" data-bind="scorecard.automation_workflows">—</span></div>
+      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['workflow'])} {AUTOMATION_FILES_LABEL}</span><span class="ms">observed default-branch HEAD</span></span><span class="mv num" data-bind="automation_display.combined.workflow_files">—</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['release'])} releases</span><span class="ms">last 30 days</span></span><span class="mv num" data-bind="scorecard.releases_30d">—</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['code'])} <span id="lang-name">primary language</span></span><span class="ms">share of code</span></span><span class="mv num" data-bind="scorecard.primary_lang_share_pct" data-suffix="%" data-round="0">—</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['calendar'])} last push</span><span class="ms">days since last commit</span></span><span class="mv num" data-bind="scorecard.days_since_last_push" data-suffix="d" data-round="0">—</span></div>
     </div>
+    <p class="ms" data-bind="automation_display.combined.qualification">Workflow observation unavailable</p>
+    <details>
+      <summary class="mt">Workflow configuration breakdown</summary>
+      <p class="ms">{escape(AUTOMATION_SCOPE)} {escape(AUTOMATION_MEANING)}</p>
+      {_workflow_breakdown()}
+    </details>
   </section>"""
 
 
@@ -447,14 +478,14 @@ def _script() -> str:
     }).join("");
     // snapshot tiles (deduped: contributions is the hero, not repeated here)
     const TILE = {public_scope_commits:"Commits", total_repos:"Public Repos", private_owned_repos:"Private",
-      total_stars:"Stars", prs_merged:"PRs Merged", ci_repos:"CI Repos"};
+      total_stars:"Stars", prs_merged:"PRs Merged", ci_repos:"Workflow repos"};
     const rows = (d.snapshot_rows || []).filter(r => TILE[r.key]);
     document.getElementById("snap-tiles").innerHTML = rows.slice(0, 6).map(r =>
-      `<div class="mrow"><span class="ml"><span class="mt">${esc(TILE[r.key])}</span></span><span class="mv num">${esc(r.display_value)}</span></div>`).join("");
+      `<div class="mrow"><span class="ml"><span class="mt">${esc(TILE[r.key])}</span>${r.key==="ci_repos"?`<span class="ms">${esc(get(d,"automation_display.combined.qualification")||"Workflow observation unavailable")}</span>`:""}</span><span class="mv num">${esc(r.display_value)}</span></div>`).join("");
     // pipeline status — public source health only (never auth/credential fields)
     const q = d.data_quality || {};
     const cls = (s) => s==="ok"?"ok":(["error","failed","missing"].includes(s)?"bad":"warn");
-    const PIPE = [["CI","ci_status"],["Commits","commits_status"],["Releases","releases_status"],["Events","events_status"]];
+    const PIPE = [["Workflow observation","ci_status"],["Commits","commits_status"],["Releases","releases_status"],["Events","events_status"]];
     document.getElementById("pipeline").innerHTML = PIPE.map(([nm,k]) => {
       const s = q[k] || "unknown";
       const state = cls(s);

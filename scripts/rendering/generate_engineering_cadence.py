@@ -8,6 +8,12 @@ tiles. An honest empty state renders when there is no engineering data.
 
 from __future__ import annotations
 
+from scripts.contracts.profile_contract import (
+    AUTOMATION_REPOS_LABEL, AUTOMATION_FILES_LABEL, AUTOMATION_ADOPTION_LABEL,
+    AUTOMATION_SCOPE, AUTOMATION_MEANING,
+    automation_description, automation_display,
+)
+
 from scripts.contracts.profile_contract import metric_claim_group
 from scripts.core.config import SPACE, SVG_WIDTH, TEXT, TEXT_DIM
 from scripts.rendering.components import (
@@ -20,7 +26,7 @@ from scripts.rendering.components import (
     trend_panel,
 )
 from scripts.rendering.glass_kit import glass_panel, glass_tile
-from scripts.rendering.svg_utils import fmt_int
+from scripts.rendering.svg_utils import fmt_int, xml_escape
 
 
 def _int(value: object) -> int:
@@ -52,7 +58,7 @@ def _gauge_cell(
             label_size=12,
         )
     )
-    parts.append(text("CI coverage", x + 69, y + h / 2 - 2, token="caption", color=TEXT))
+    parts.append(text(AUTOMATION_ADOPTION_LABEL, x + 69, y + h / 2 - 2, token="caption", color=TEXT))
     parts.append(text(detail, x + 69, y + h / 2 + 14, token="caption", color=TEXT_DIM))
     return "".join(parts)
 
@@ -63,6 +69,7 @@ def generate(
     primary_language: str = "",
     data_quality: dict | None = None,
     ci_claim: dict | None = None,
+    automation: dict | None = None,
 ) -> str:
     data = engineering if isinstance(engineering, dict) else {}
     quality = data_quality if isinstance(data_quality, dict) else {}
@@ -73,11 +80,12 @@ def generate(
     language_status = str(
         metric_statuses.get("primary_lang_share_pct", "exact")
     ).casefold()
-    quality_lines = []
-    if ci_status == "partial":
-        quality_lines.append("CI · Partial · known minimum · unknown repositories")
-    elif ci_status == "unavailable":
-        quality_lines.append("CI · Unavailable · n/a")
+    display = automation_display(automation)
+    workflow_display = display["combined"]
+    quality_lines = ["Workflow: owned public + private nonfork; profile excluded",
+                     workflow_display["qualification"]]
+    if automation is None and ci_status == "partial":
+        quality_lines[-1] = "Workflow · Partial · known minimum · unknown repositories"
     if language_status == "partial":
         quality_lines.append("Language · Partial · observed bytes")
     elif language_status == "unavailable":
@@ -93,18 +101,12 @@ def generate(
     private_total = data.get("private_repos_total")
     private_total = _int(private_total) if private_total is not None else None
 
-    # The published CI-coverage claim is the single source for this gauge. Only a
-    # standalone render without a claim falls back to the all-owned automation
-    # population this card already carries; there is no second denominator.
-    eligible_repos = data.get("automation_eligible_repos")
-    if eligible_repos is None:
-        eligible_repos = public_nonfork + private_nonfork
-    else:
-        eligible_repos = _int(eligible_repos)
-    if ci_claim is not None:
-        ci_pct = float(ci_claim.get("value") or 0.0)
-    else:
-        ci_pct = automation_repos / eligible_repos * 100.0 if eligible_repos else 0.0
+    # Production receives the owning summary and its exact prepared claim.
+    # Standalone compatibility values require an explicit claim to show a ratio.
+    ci_pct = float((ci_claim or {}).get("value") or 0.0)
+    if automation is not None:
+        workflows = automation["combined"]["workflow_files"]
+        automation_repos = automation["combined"]["configured_repos"]
 
     width = SVG_WIDTH
     pad = 28
@@ -115,7 +117,7 @@ def generate(
     )
 
     # Honest empty state.
-    if not any((cadence, active_days, workflows, public_total, private_total)):
+    if automation is None and not any((cadence, active_days, workflows, public_total, private_total)):
         empty_header, _ = section_header(
             pad, 46, "Engineering Cadence", width=width, eyebrow="Workflow Analytics", pad=pad
         )
@@ -138,7 +140,8 @@ def generate(
     row2_bottom = row2_y + tile_h
     height = int(row2_bottom + 30 + len(quality_lines) * 18)
 
-    parts: list[str] = [glass_panel(width, height), header_svg]
+    parts: list[str] = [glass_panel(width, height), header_svg,
+        f"<desc>{xml_escape(automation_description(automation))}</desc>"]
 
     # Row 1: KPI (active days) + weekly-cadence TrendPanel.
     parts.append(
@@ -173,15 +176,11 @@ def generate(
                 col_w,
                 tile_h,
                 value=ci_pct,
-                detail=(
-                    "Unavailable"
-                    if ci_status == "unavailable"
-                    else f"{fmt_int(automation_repos)} automated"
-                ),
+                detail=workflow_display["gauge_detail"],
                 display_value=(
                     ci_claim["display_value"]
                     if ci_claim
-                    else ("n/a" if ci_status == "unavailable" else None)
+                    else "n/a"
                 ),
             ),
         )
@@ -190,7 +189,7 @@ def generate(
         metric_tile(
             pad + (col_w + gap), row2_y, col_w, tile_h,
             value=("n/a" if ci_status == "unavailable" else fmt_int(workflows)),
-            label="CI pipelines",
+            label=AUTOMATION_FILES_LABEL,
             caption=(
                 "Unavailable"
                 if ci_status == "unavailable"

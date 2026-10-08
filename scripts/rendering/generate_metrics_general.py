@@ -9,6 +9,12 @@ lines that the metrics validator (scripts/quality/metrics_svg.py) reads back.
 
 from __future__ import annotations
 
+from scripts.contracts.profile_contract import (
+    AUTOMATION_REPOS_LABEL, AUTOMATION_FILES_LABEL, AUTOMATION_ADOPTION_LABEL,
+    AUTOMATION_SCOPE, AUTOMATION_MEANING,
+    automation_description, automation_display,
+)
+
 from datetime import datetime, timezone
 
 from scripts.core.config import SVG_WIDTH, SPACE, TEXT_DIM
@@ -41,6 +47,7 @@ def generate(
     snapshot: dict,
     data_scope: dict | None = None,
     data_quality: dict | None = None,
+    automation: dict | None = None,
     generated_at: str | None = None,
     output_path: str = "metrics.general.svg",
 ) -> str:
@@ -53,6 +60,8 @@ def generate(
     prs_merged = _optional_int(snapshot.get("prs_merged"))
     releases = _optional_int(snapshot.get("releases"))
     ci_repos = _optional_int(snapshot.get("ci_repos"))
+    if automation is not None:
+        ci_repos = automation["combined"]["configured_repos"]
     streak_days = _optional_int(snapshot.get("streak_days"))
 
     quality = data_quality if isinstance(data_quality, dict) else {}
@@ -68,11 +77,11 @@ def generate(
     if language_status == "unavailable":
         languages_count = None
 
-    quality_lines = []
-    if ci_status == "partial":
-        quality_lines.append("CI · Partial · known minimum · unknown repositories")
-    elif ci_status == "unavailable":
-        quality_lines.append("CI · Unavailable · n/a")
+    display = automation_display(automation)
+    quality_lines = [
+        "Workflow: owned public + private nonfork; profile excluded",
+        display["combined"]["qualification"],
+    ]
     if language_status == "partial":
         quality_lines.append("Language · Partial · observed bytes")
     elif language_status == "unavailable":
@@ -84,7 +93,8 @@ def generate(
     name = xml_escape(truncate(str(username), 28))
     generated = xml_escape(_fmt_iso_date(generated_at))
 
-    parts: list[str] = [glass_panel(width, height)]
+    parts: list[str] = [glass_panel(width, height),
+        f"<desc>{xml_escape(automation_description(automation))}</desc>"]
 
     # --- header: eyebrow + single title + "Updated <date>" + hairline ----------
     header_svg, content_top = section_header(
@@ -126,7 +136,7 @@ def generate(
         ("lock", fmt_int(private_owned), "private repos"),
         ("pr_merged", fmt_int(prs_merged), "PRs merged"),
         ("globe", fmt_int(languages_count), "languages"),
-        ("workflow", fmt_int(ci_repos), "CI pipelines"),
+        ("workflow", fmt_int(ci_repos), AUTOMATION_REPOS_LABEL),
         ("fire", fmt_int(streak_days), "day streak"),
     ]
     for i, (icon_name, value, label) in enumerate(secondary):

@@ -7,6 +7,55 @@ from typing import Any
 from scripts.rendering.svg_utils import xml_escape
 
 
+# Workflow configuration describes files present at observed default-branch HEAD.
+# These labels and display strings do not calculate an alternative aggregate.
+AUTOMATION_REPOS_LABEL = "Workflow repos"
+AUTOMATION_FILES_LABEL = "Workflow files"
+AUTOMATION_ADOPTION_LABEL = "Repo adoption"
+AUTOMATION_SCOPE = "Owned public + private nonfork repositories; profile excluded."
+AUTOMATION_MEANING = (
+    "GitHub workflow configuration at observed default-branch HEAD. "
+    "Configuration does not imply successful runs."
+)
+
+
+def automation_display(automation: dict | None) -> dict[str, Any]:
+    """Prepare honest display text once for SVG and browser consumers."""
+    summary = automation if isinstance(automation, dict) else {}
+    displays = {}
+    for key in ("public", "private", "combined"):
+        row = summary.get(key) or {}
+        status = row.get("status", "unavailable")
+        eligible = row.get("eligible_repos")
+        if status == "unavailable":
+            qualification = "Workflow · Unavailable · n/a"
+        elif status == "partial" and eligible is None:
+            qualification = "Workflow · Partial · observed subtotal · eligible inventory unknown"
+        elif status == "partial":
+            qualification = "Workflow · Partial · known minimum · unknown repositories"
+        elif eligible == 0:
+            qualification = "No eligible repositories"
+        else:
+            qualification = "Workflow observation complete"
+        counts = {name: format_metric_value(row.get(name), {"format": "int_or_na"})
+                  for name in ("configured_repos", "eligible_repos", "workflow_files",
+                               "unknown_workflow_repos", "observed_eligible_repos")}
+        displays[key] = {
+            **counts,
+            "status": str(status).title(),
+            "qualification": qualification,
+            "adoption": gauge_display_value(row.get("adoption_pct")),
+            "gauge_detail": (f'{counts["configured_repos"]}/{counts["eligible_repos"]} repos'
+                             if eligible else "No eligible" if eligible == 0 else "Unknown total"),
+        }
+    return {"scope": AUTOMATION_SCOPE, "meaning": AUTOMATION_MEANING, **displays}
+
+
+def automation_description(automation: dict | None) -> str:
+    display = automation_display(automation)
+    return " ".join((display["scope"], display["meaning"], display["combined"]["qualification"]))
+
+
 # Curated backend-developer scorecard (8 tiles -> clean 4x2 grid). Each value is
 # wired in compute_metrics.compute_profile_model's `scorecard` dict.
 SCORECARD_METRICS = [
@@ -36,8 +85,8 @@ SCORECARD_METRICS = [
     },
     {
         "key": "ci_coverage_pct",
-        "label": "CI Coverage",
-        "detail": "repos with pipelines",
+        "label": AUTOMATION_ADOPTION_LABEL,
+        "detail": "owned public + private nonfork repositories",
         "format": "fixed_or_na",
         "digits": 1,
         "suffix": "%",
@@ -46,7 +95,7 @@ SCORECARD_METRICS = [
     },
     {
         "key": "automation_workflows",
-        "label": "CI Pipelines",
+        "label": AUTOMATION_FILES_LABEL,
         "detail": "workflow files across repos",
         "format": "int",
         "accent": "BLUE",
@@ -140,8 +189,8 @@ SNAPSHOT_METRICS = [
     },
     {
         "key": "ci_repos",
-        "label": "Repos With CI/CD",
-        "dashboard_label": "Repos With CI",
+        "label": AUTOMATION_REPOS_LABEL,
+        "dashboard_label": AUTOMATION_REPOS_LABEL,
         "format": "int_or_na",
     },
     {
@@ -194,13 +243,13 @@ PARTIAL_QUALIFICATION_CONSUMERS: dict[str, dict[str, Any]] = {
         ),
     },
     "ci_coverage_pct": {
-        "line": "CI · Partial · known minimum · unknown repositories",
+        "line": "Workflow · Partial · known minimum · unknown repositories",
         "consumers": (
             "assets/builder_scorecard.svg",
             "assets/engineering_cadence.svg",
         ),
         "disclosures": (
-            ("the CI coverage field", ("ci",)),
+            ("the workflow adoption field", ("workflow", "repo adoption", "ci")),
             ("partial status", ("partial",)),
             ("the retained known minimum", ("known minimum", "minimum known")),
             (

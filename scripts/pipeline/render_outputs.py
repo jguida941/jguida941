@@ -148,7 +148,8 @@ def _ci_coverage_claim(model: dict) -> dict:
     statuses = data_quality.get("metric_statuses") or {}
     return metric_claim(
         "ci_coverage_pct",
-        value=(model.get("scorecard") or {}).get("ci_coverage_pct"),
+        value=((model.get("automation") or {}).get("combined", {}).get("adoption_pct")
+               if "automation" in model else (model.get("scorecard") or {}).get("ci_coverage_pct")),
         scope=scopes.get("ci_coverage_pct"),
         status=statuses.get("ci_coverage_pct"),
     )
@@ -174,6 +175,8 @@ def generate_assets(
         private_owned_repos=collected.repo_counts["private_owned"],
         ci_count=model["snapshot"]["ci_repos"],
         last_year_contributions=collected.total_contributions,
+        automation=model.get("automation"),
+        data_quality=model.get("data_quality"),
     )
     logger("  -> assets/badges.svg")
 
@@ -201,6 +204,7 @@ def generate_assets(
         primary_language=primary_language,
         data_quality=model.get("data_quality"),
         ci_claim=ci_claim,
+        automation=model.get("automation"),
         source_kind=source_kind,
     )
     logger("  -> assets/builder_scorecard.svg")
@@ -210,6 +214,7 @@ def generate_assets(
         primary_language=primary_language,
         data_quality=model.get("data_quality"),
         ci_claim=ci_claim,
+        automation=model.get("automation"),
     )
     logger("  -> assets/engineering_cadence.svg")
 
@@ -227,6 +232,7 @@ def generate_assets(
         model["snapshot_rows"],
         model["data_quality"],
         data_scope=model["data_scope"],
+        automation=model.get("automation"),
     )
     logger("  -> assets/raw_snapshot.svg")
 
@@ -234,6 +240,7 @@ def generate_assets(
         username=model["dashboard_data"]["username"],
         snapshot=model["snapshot"],
         data_scope=model["data_scope"],
+        automation=model.get("automation"),
         data_quality=model.get("data_quality"),
         generated_at=model["dashboard_data"]["generated_at"],
         output_path="metrics.general.svg",
@@ -394,6 +401,7 @@ def render_readme(model: dict, logger=print, *, generation: dict | None = None) 
         scorecard=model["scorecard"],
         scorecard_cards=model["scorecard_cards"],
         data_scope=model["data_scope"],
+        automation=model.get("automation"),
         top_languages=model["top_languages"],
         repo_overview_rows=model["repo_overview_rows"],
         activity_feed=model["activity_feed"],
