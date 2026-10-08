@@ -20,14 +20,21 @@ jobs:
     runs-on: ubuntu-latest
     env:
       EXPECTED_SHA: ${{ inputs.expected_sha }}
-      QUALIFICATION_DIR: ${{ runner.temp }}/profile-qualification-${{ github.run_id }}-${{ github.run_attempt }}
-      CACHE_DIR: ${{ runner.temp }}/profile-qualification-${{ github.run_id }}-${{ github.run_attempt }}/collection-cache
       BYPASS_GITHUB_CACHE: "true"
       GITHUB_USERNAME: jguida941
       PROFILE_TIMEZONE: America/New_York
       PROFILE_ACTIVITY_TZ: America/New_York
       PYTHONDONTWRITEBYTECODE: "1"
     steps:
+      - name: Initialize qualification paths
+        shell: bash
+        run: |
+          qualification_dir="${RUNNER_TEMP}/profile-qualification-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          {
+            printf 'QUALIFICATION_DIR=%s\n' "$qualification_dir"
+            printf 'CACHE_DIR=%s/collection-cache\n' "$qualification_dir"
+          } >> "$GITHUB_ENV"
+
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
