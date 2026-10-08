@@ -146,3 +146,65 @@ class DashboardMetricCellTests(unittest.TestCase):
         self.assertEqual(boxes[0].get("y"),boxes[1].get("y"))
         self.assertEqual(boxes[0].get("height"),boxes[1].get("height"))
         self.assertEqual(values[0].get("y"),values[1].get("y"))
+
+
+
+class DashboardFlatOverviewTests(unittest.TestCase):
+    def test_only_selected_five_owners_are_flat_and_active_label_is_one_line(self):
+        ns="{http://www.w3.org/2000/svg}"
+        from scripts.contracts.dashboard_summary import _fact
+        summary={"facts":[_fact("activity.active_repos_7d",8,"active repos","owned",status="exact")]}
+        flat={"calendar.total","inventory.public_nonfork","inventory.private_owned","inventory.stargazers","activity.active_repos_7d"}
+        for mobile in (False,True):
+            root=ET.fromstring(render_svg(summary,mobile=mobile))
+            owners=[n for n in root.iter() if n.get("data-metric-id")]
+            self.assertEqual(len(owners),13)
+            for owner in owners:
+                cells=[n for n in owner.iter(ns+"rect") if n.get("data-role")=="metric-cell"]
+                self.assertEqual(len(cells),0 if owner.get("data-metric-id") in flat else 1)
+            active=next(n for n in owners if n.get("data-metric-id")=="activity.active_repos_7d")
+            label=next(n for n in active.iter(ns+"text") if n.text=="active repos")
+            value=next(n for n in active.iter(ns+"text") if n.get("data-role")=="value")
+            self.assertEqual(label.get("font-size"),"14")
+            self.assertEqual(value.text,"8")
+            self.assertEqual(value.get("font-size"),"30")
+            self.assertGreaterEqual(float(value.get("y"))-float(label.get("y")),28)
+
+    def test_calendar_copy_preserves_original_context_and_unknown_progress_warning(self):
+        import copy
+        from scripts.contracts.dashboard_summary import _fact
+        ns="{http://www.w3.org/2000/svg}"
+        benign="Last date may be in progress"
+        for status in ("exact","ok","unknown","partial","unavailable"):
+            fact=_fact("calendar.current_streak",4,"current observed streak","calendar",status=status,qualification=benign)
+            fact.update(profile_date_cutoff="2026-10-08",range_start="2026-10-05",range_end="2026-10-08")
+            summary={"facts":[fact]}
+            original=copy.deepcopy(summary)
+            for mobile in (False,True):
+                root=ET.fromstring(render_svg(summary,mobile=mobile))
+                owner=next(n for n in root.iter() if n.get("data-metric-id")=="calendar.current_streak")
+                paint=" ".join(n.text or "" for n in owner.iter(ns+"text"))
+                context=" ".join(n.text or "" for n in owner.iter(ns+"title"))
+                self.assertIn("Current streak",paint)
+                self.assertEqual(benign in paint,status not in ("exact","ok"))
+                self.assertIn(benign,context)
+                self.assertIn("current observed streak",context)
+                self.assertIn("2026-10-08",context)
+                self.assertIn("2026-10-05",paint)
+            self.assertEqual(summary,original)
+
+
+
+class DashboardCalendarLabelMeasureTests(unittest.TestCase):
+    def test_calendar_grid_measures_the_painted_short_headers(self):
+        from scripts.rendering.generate_dashboard_summary import Canvas
+        from scripts.contracts.dashboard_summary import _fact
+        ns="{http://www.w3.org/2000/svg}"
+        facts=[_fact(key,4,label,"calendar",status="exact") for key,label in (("calendar.current_streak","current observed streak"),("calendar.longest_streak","longest observed streak"),("calendar.active_days","active days"))]
+        canvas=Canvas(False)
+        canvas.fact_grid(facts,28,20,784,columns=3)
+        root=ET.fromstring('<svg xmlns="http://www.w3.org/2000/svg">'+''.join(canvas.parts)+'</svg>')
+        for owner in (n for n in root.iter() if n.get("data-metric-id")):
+            ink=list(owner.iter(ns+"text"))
+            label,value=ink[0],next(n for n in ink if n.get("data-role")=="value")
+            self.assertEqual(float(value.get("y"))-float(label.get("y")),29)

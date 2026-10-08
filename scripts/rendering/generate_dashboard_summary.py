@@ -35,6 +35,8 @@ SEMANTIC_ICONS = {
 }
 
 
+CALENDAR_DISPLAY_LABELS = {"calendar.current_streak":"Current streak", "calendar.longest_streak":"Longest streak", "calendar.active_days":"Active days"}
+
 def _attrs(values):
     return " ".join(f'{name.replace("_", "-")}="{escape(str(value), quote=True)}"' for name, value in values.items() if value is not None)
 
@@ -86,20 +88,28 @@ class Canvas:
                                     fill=COLORS[fill],stroke=COLORS["line"],data_role="metric-cell"))+'/>'
 
     def fact_label_lines(self, fact, width):
-        return textwrap.wrap(str(fact["label"]),max(1,int((width-28-24)/(self.secondary*.62))),
+        return textwrap.wrap(str(CALENDAR_DISPLAY_LABELS.get(fact["metric_id"],fact["label"])),max(1,int((width-28-24)/(self.secondary*.62))),
                              break_long_words=True,break_on_hyphens=False) or [""]
 
-    def fact(self, fact, x, y, width, *, size=25, qualify=False, caption="", fill="surface", header_rows=0):
+    def fact(self, fact, x, y, width, *, size=25, qualify=False, caption="", fill="surface", header_rows=0, framed=True, compact=False):
         self.group(data_metric_id=fact["metric_id"])
+        calendar_label=CALENDAR_DISPLAY_LABELS.get(fact["metric_id"])
+        if calendar_label:
+            qualification=fact["quality"].get("qualification", "")
+            context=" · ".join(str(fact.get(key) or "") for key in ("label","profile_date_cutoff","range_start","range_end"))
+            self.parts.append('<title>'+escape(context+" · "+qualification)+'</title>')
+            hide_normal_day=qualification=="Last date may be in progress" and fact["quality"].get("status") in ("exact","ok")
+            fact={**fact,"label":calendar_label,"quality":{**fact["quality"],"qualification":"" if hide_normal_day else qualification}}
         box_index=len(self.parts)
         self.parts.append("")
-        left, header_y = x+14, y+14+self.secondary
+        label_size=14 if compact else self.secondary
+        left, header_y = (x,y+14) if compact else (x+14,y+14+label_size)
         if glyph := SEMANTIC_ICONS.get(fact["metric_id"]):
             self.parts.append(icon(glyph,left,header_y-14,size=17,color=COLORS["muted"]))
-        lines=self.fact_label_lines(fact,width)
+        lines=[fact["label"]] if compact else self.fact_label_lines(fact,width)
         for i,line in enumerate(lines):
-            self.text(line,left+24,header_y+i*self.secondary*1.4,size=self.secondary,color="muted")
-        value_y=header_y+(max(len(lines),header_rows)-1)*self.secondary*1.4+size*.8+9
+            self.text(line,left+24,header_y+i*label_size*1.4,size=label_size,color="muted")
+        value_y=header_y+(max(len(lines),header_rows)-1)*label_size*1.4+size*.8+(10 if compact else 9)
         self.text(fact["display_value"],left,value_y,size=size,weight=600,data_role="value")
         bottom=value_y+size*.2
         captions=[]
@@ -114,12 +124,12 @@ class Canvas:
             next_y=self.wrap(text,left,bottom+self.secondary+7,width-28,size=self.secondary,color="muted")
             bottom=next_y-self.secondary*1.2
         bottom+=14
-        self.parts[box_index]=self.metric_box(x,y,width,bottom-y,fill)
-        self.last_fact_box=(box_index,x,y,width,fill)
+        self.parts[box_index]=self.metric_box(x,y,width,bottom-y,fill) if framed else ""
+        self.last_fact_box=(box_index,x,y,width,fill) if framed else None
         self.end()
         return bottom
 
-    def fact_grid(self, facts, x, y, width, *, columns, qualify=False, fill="surface"):
+    def fact_grid(self, facts, x, y, width, *, columns, qualify=False, fill="surface", framed=True):
         gap=12 if self.mobile else 18
         cell_width=(width-(columns-1)*gap)/columns
         for start in range(0,len(facts),columns):
@@ -128,8 +138,9 @@ class Canvas:
             boxes=[]
             bottom=y
             for i,fact in enumerate(row):
-                end=self.fact(fact,x+i*(cell_width+gap),y,cell_width,qualify=qualify,fill=fill,header_rows=header_rows)
-                boxes.append(self.last_fact_box)
+                end=self.fact(fact,x+i*(cell_width+gap),y,cell_width,qualify=qualify,fill=fill,header_rows=header_rows,framed=framed)
+                if self.last_fact_box:
+                    boxes.append(self.last_fact_box)
                 bottom=max(bottom,end)
             for index,xx,top,span,color in boxes:
                 self.parts[index]=self.metric_box(xx,top,span,bottom-top,color)
@@ -184,13 +195,13 @@ def render_svg(summary, *, mobile=False, generation=None):
         except (KeyError, TypeError, ValueError):
             pass
     total = fact("calendar.total")
-    y = c.fact(total,pad,146,content,size=50,fill="panel",
+    y = c.fact(total,pad,146,content,size=50,fill="panel",framed=False,
                qualify=total["quality"].get("status") not in ("exact","ok"),
                caption="Last 12 months" if full_year else calendar.get("window","Calendar unavailable"))+12
     c.parts.append('<title>'+escape("Snapshot "+timestamp+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
     inventory = ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers")
     y = c.fact_grid([fact(key) for key in inventory],pad,y,content,
-                    columns=2 if mobile else 3,fill="panel")
+                    columns=2 if mobile else 3,fill="panel",framed=False)
     if any(fact(key)["quality"].get("qualification") for key in inventory):
         y = c.wrap("Inventory · unverified",pad,y+c.secondary,content,size=c.secondary,color="muted")
     c.end()
@@ -314,7 +325,7 @@ def render_svg(summary, *, mobile=False, generation=None):
     def working(x, yy, span):
         rows = summary.get("working") or []
         yy = c.wrap("Recently pushed repositories · last 7 days",x,yy,span,size=c.secondary,color="muted")+8
-        counter_bottom = c.fact(fact("activity.active_repos_7d"), x, yy, span if mobile else 126, size=30, qualify=True)
+        counter_bottom = c.fact(fact("activity.active_repos_7d"), x, yy, span if mobile else 126, size=30, qualify=True,framed=False,compact=True)
         row_x, row_w = (x,span) if mobile else (x+158,span-158)
         row_y = counter_bottom+12 if mobile else yy
         first_y = row_y
