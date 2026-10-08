@@ -81,20 +81,59 @@ class Canvas:
         self.text(title, x, y, size=22, weight=600)
         return y + 30
 
-    def fact(self, fact, x, y, width, *, size=25, qualify=False):
+    def metric_box(self, x, y, width, height, fill):
+        return '<rect '+_attrs(dict(x=x,y=y,width=width,height=height,rx=11,
+                                    fill=COLORS[fill],stroke=COLORS["line"],data_role="metric-cell"))+'/>'
+
+    def fact_label_lines(self, fact, width):
+        return textwrap.wrap(str(fact["label"]),max(1,int((width-28-24)/(self.secondary*.62))),
+                             break_long_words=True,break_on_hyphens=False) or [""]
+
+    def fact(self, fact, x, y, width, *, size=25, qualify=False, caption="", fill="surface", header_rows=0):
         self.group(data_metric_id=fact["metric_id"])
-        self.text(fact["display_value"], x, y, size=size, weight=600, data_role="value")
-        label_x, label_width = x, width
+        box_index=len(self.parts)
+        self.parts.append("")
+        left, header_y = x+14, y+14+self.secondary
         if glyph := SEMANTIC_ICONS.get(fact["metric_id"]):
-            self.parts.append(icon(glyph, x, y+12, size=16, color=COLORS["muted"]))
-            label_x, label_width = x+23, width-23
-        y = self.wrap(fact["label"], label_x, y + 25, label_width, size=self.secondary, color="muted")
+            self.parts.append(icon(glyph,left,header_y-14,size=17,color=COLORS["muted"]))
+        lines=self.fact_label_lines(fact,width)
+        for i,line in enumerate(lines):
+            self.text(line,left+24,header_y+i*self.secondary*1.4,size=self.secondary,color="muted")
+        value_y=header_y+(max(len(lines),header_rows)-1)*self.secondary*1.4+size*.8+9
+        self.text(fact["display_value"],left,value_y,size=size,weight=600,data_role="value")
+        bottom=value_y+size*.2
+        captions=[]
+        if caption:
+            captions.append(caption)
         if qualify and fact["quality"].get("qualification"):
             qualifier = "Reported · unverified" if fact["quality"].get("status") == "unknown" and fact["metric_id"].startswith("inventory.") else fact["quality"]["qualification"]
-            y = self.wrap(qualifier, x, y + 1, width, size=self.secondary, color="muted")
+            captions.append(qualifier)
         if fact.get("range_start"):
-            y = self.wrap(fact["range_start"] + " – " + fact["range_end"], x, y, width, size=self.secondary, color="muted")
+            captions.append(fact["range_start"]+" – "+fact["range_end"])
+        for text in captions:
+            next_y=self.wrap(text,left,bottom+self.secondary+7,width-28,size=self.secondary,color="muted")
+            bottom=next_y-self.secondary*1.2
+        bottom+=14
+        self.parts[box_index]=self.metric_box(x,y,width,bottom-y,fill)
+        self.last_fact_box=(box_index,x,y,width,fill)
         self.end()
+        return bottom
+
+    def fact_grid(self, facts, x, y, width, *, columns, qualify=False, fill="surface"):
+        gap=12 if self.mobile else 18
+        cell_width=(width-(columns-1)*gap)/columns
+        for start in range(0,len(facts),columns):
+            row=facts[start:start+columns]
+            header_rows=max(len(self.fact_label_lines(fact,cell_width)) for fact in row)
+            boxes=[]
+            bottom=y
+            for i,fact in enumerate(row):
+                end=self.fact(fact,x+i*(cell_width+gap),y,cell_width,qualify=qualify,fill=fill,header_rows=header_rows)
+                boxes.append(self.last_fact_box)
+                bottom=max(bottom,end)
+            for index,xx,top,span,color in boxes:
+                self.parts[index]=self.metric_box(xx,top,span,bottom-top,color)
+            y=bottom+12
         return y
 
     def panel(self, section, title, y, body):
@@ -145,17 +184,15 @@ def render_svg(summary, *, mobile=False, generation=None):
         except (KeyError, TypeError, ValueError):
             pass
     total = fact("calendar.total")
-    y = c.fact(total, pad, 170, content, size=50, qualify=total["quality"].get("status") not in ("exact", "ok"))
-    y = c.wrap("Last 12 months" if full_year else calendar.get("window", "Calendar unavailable"), pad, y, content, size=c.secondary, color="muted") + 18
+    y = c.fact(total,pad,146,content,size=50,fill="panel",
+               qualify=total["quality"].get("status") not in ("exact","ok"),
+               caption="Last 12 months" if full_year else calendar.get("window","Calendar unavailable"))+12
     c.parts.append('<title>'+escape("Snapshot "+timestamp+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
     inventory = ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers")
-    cell = (content - 24) / 3
-    bottoms = [c.fact(fact(key), pad + i*(cell + 12), y + 22, cell, size=25) for i, key in enumerate(inventory)]
-    y = max(bottoms) + 4
-    qualifiers = list(dict.fromkeys(fact(key)["quality"].get("qualification", "") for key in inventory))
-    for qualifier in qualifiers:
-        if qualifier:
-            y = c.wrap("Inventory · unverified", pad, y, content, size=c.secondary, color="muted")
+    y = c.fact_grid([fact(key) for key in inventory],pad,y,content,
+                    columns=2 if mobile else 3,fill="panel")
+    if any(fact(key)["quality"].get("qualification") for key in inventory):
+        y = c.wrap("Inventory · unverified",pad,y+c.secondary,content,size=c.secondary,color="muted")
     c.end()
     y += 12
 
@@ -277,7 +314,7 @@ def render_svg(summary, *, mobile=False, generation=None):
     def working(x, yy, span):
         rows = summary.get("working") or []
         yy = c.wrap("Recently pushed repositories · last 7 days",x,yy,span,size=c.secondary,color="muted")+8
-        counter_bottom = c.fact(fact("activity.active_repos_7d"), x, yy+28, span if mobile else 126, size=30, qualify=True)
+        counter_bottom = c.fact(fact("activity.active_repos_7d"), x, yy, span if mobile else 126, size=30, qualify=True)
         row_x, row_w = (x,span) if mobile else (x+158,span-158)
         row_y = counter_bottom+12 if mobile else yy
         first_y = row_y
@@ -391,10 +428,8 @@ def render_svg(summary, *, mobile=False, generation=None):
 
     def metrics(x,yy,span):
         keys=("activity.public_commits","activity.merged_prs","activity.releases_30d","inventory.public_forks","language.count")
-        cols=2 if mobile else 3
-        cw=(span-(cols-1)*18)/cols
-        for start in range(0,len(keys),cols):
-            yy=max(c.fact(fact(key),x+i*(cw+18),yy+25,cw,qualify=True) for i,key in enumerate(keys[start:start+cols]))+18
+        yy=c.fact_grid([fact(key) for key in keys],x,yy,span,columns=2 if mobile else 3,qualify=True)
+        yy+=c.secondary
         total=(summary.get("languages") or {}).get("total_bytes")
         return c.wrap(f'{total:,} observed language bytes' if type(total) is int else "Language bytes unavailable",x,yy,span,size=c.secondary,color="muted")
     y=c.panel("metrics","Profile facts",y,metrics)
@@ -446,19 +481,13 @@ def render_svg(summary, *, mobile=False, generation=None):
         c.text("More",legend_x+82,y+10,size=c.secondary,color="muted")
         y+=40
         keys=("calendar.current_streak","calendar.longest_streak","calendar.active_days")
-        cw=content if mobile else (content-32)/3
-        bottoms=[]
-        for i,key in enumerate(keys):
-            xx=pad if mobile else pad+i*(cw+16)
-            yy=y if mobile else y
-            yy=c.fact(fact(key),xx,yy+25,cw,qualify=True)
-            if mobile:y=yy+18
-            bottoms.append(yy)
-        y=max(bottoms)+12
+        y=c.fact_grid([fact(key) for key in keys],pad,y,content,
+                      columns=1 if mobile else 3,qualify=True,fill="panel")
     else:
         y=c.wrap("Contribution calendar unavailable",pad,y,content,color="muted")
-        for key in ("calendar.current_streak","calendar.longest_streak","calendar.active_days"):
-            y=c.fact(fact(key),pad,y+30,content,qualify=True)+8
+        keys=("calendar.current_streak","calendar.longest_streak","calendar.active_days")
+        y=c.fact_grid([fact(key) for key in keys],pad,y+12,content,
+                      columns=1 if mobile else 3,qualify=True,fill="panel")
     c.end()
     height=math.ceil(y+22)
     description=" ".join(filter(None,["One generated analytics summary.",(summary.get("rhythm") or {}).get("display",{}).get("scope"),

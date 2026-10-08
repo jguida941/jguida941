@@ -105,3 +105,44 @@ class DashboardFinalFitTests(unittest.TestCase):
                 self.assertIn(detail, painted)
             self.assertNotIn("Last 12 months", painted)
             self.assertIn("Developer Analytics · Backend", painted)
+
+
+
+class DashboardMetricCellTests(unittest.TestCase):
+    def test_fact_header_value_and_qualifications_share_one_inset(self):
+        from scripts.rendering.generate_dashboard_summary import Canvas
+        from scripts.contracts.dashboard_summary import _fact
+        ns="{http://www.w3.org/2000/svg}"
+        fact=_fact("activity.public_commits",None,"Public commits","public")
+        for mobile in (False,True):
+            canvas=Canvas(mobile)
+            bottom=canvas.fact(fact,18,20,140,qualify=True)
+            root=ET.fromstring('<svg xmlns="http://www.w3.org/2000/svg">'+''.join(canvas.parts)+'</svg>')
+            box=next(n for n in root.iter(ns+"rect") if n.get("data-role")=="metric-cell")
+            ink=list(root.iter(ns+"text"))
+            value=next(n for n in ink if n.get("data-role")=="value")
+            headers=[n for n in ink if float(n.get("y"))<float(value.get("y"))]
+            self.assertEqual(" ".join(n.text for n in headers),"Public commits")
+            self.assertEqual(value.text,"n/a")
+            self.assertIn("Unavailable",[n.text for n in ink])
+            self.assertEqual(float(box.get("height")),bottom-20)
+            for node in ink:
+                self.assertGreaterEqual(float(node.get("font-size")),14)
+                self.assertGreaterEqual(float(node.get("x")),28)
+                self.assertLess(float(node.get("y")),bottom)
+
+    def test_mobile_metric_grid_keeps_odd_cell_width_and_aligned_values(self):
+        from scripts.rendering.generate_dashboard_summary import Canvas
+        from scripts.contracts.dashboard_summary import _fact
+        ns="{http://www.w3.org/2000/svg}"
+        facts=[_fact("inventory."+str(i),i,label,"public") for i,label in enumerate(("public non-fork repos","private owned repos","stargazers"))]
+        canvas=Canvas(True)
+        canvas.fact_grid(facts,34,20,292,columns=2)
+        root=ET.fromstring('<svg xmlns="http://www.w3.org/2000/svg">'+''.join(canvas.parts)+'</svg>')
+        boxes=[n for n in root.iter(ns+"rect") if n.get("data-role")=="metric-cell"]
+        values=[n for n in root.iter(ns+"text") if n.get("data-role")=="value"]
+        self.assertEqual(len(boxes),3)
+        self.assertEqual({float(n.get("width")) for n in boxes},{140})
+        self.assertEqual(boxes[0].get("y"),boxes[1].get("y"))
+        self.assertEqual(boxes[0].get("height"),boxes[1].get("height"))
+        self.assertEqual(values[0].get("y"),values[1].get("y"))
