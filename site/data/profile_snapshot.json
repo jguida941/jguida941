@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-08T06:10:13.172799Z",
+  "generated_at": "2026-10-08T07:01:05.860385Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 11958,
-    "public_scope_commits": 7326,
+    "last_year_contributions": 11962,
+    "public_scope_commits": 7332,
     "total_repos": 56,
     "public_forks": 0,
     "private_owned_repos": 203,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 11958,
-      "display_value": "11,958"
+      "value": 11962,
+      "display_value": "11,962"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 7326,
-      "display_value": "7,326"
+      "value": 7332,
+      "display_value": "7,332"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 11958,
-      "display_value": "11,958"
+      "value": 11962,
+      "display_value": "11,962"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 7326,
-      "display_value": "7,326"
+      "value": 7332,
+      "display_value": "7,332"
     },
     {
       "key": "total_repos",
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-08T06:09:46Z",
+        "observed_at": "2026-10-08T07:00:33Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -228,8 +228,8 @@
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-10-09T04:00:00Z",
-        "window_end": "2026-10-08T06:09:51Z",
-        "observed_at": "2026-10-08T06:09:52Z",
+        "window_end": "2026-10-08T07:00:39Z",
+        "observed_at": "2026-10-08T07:00:40Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -243,8 +243,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-09-09T04:00:00Z",
-        "window_end": "2026-10-08T06:09:49Z",
-        "observed_at": "2026-10-08T06:09:51Z",
+        "window_end": "2026-10-08T07:00:37Z",
+        "observed_at": "2026-10-08T07:00:39Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -258,8 +258,8 @@
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-10-09T04:00:00Z",
-        "window_end": "2026-10-08T06:09:51Z",
-        "observed_at": "2026-10-08T06:09:51Z",
+        "window_end": "2026-10-08T07:00:39Z",
+        "observed_at": "2026-10-08T07:00:39Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-08T06:09:45Z",
+        "observed_at": "2026-10-08T07:00:32Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -285,11 +285,11 @@
   },
   "scorecard": {
     "releases_30d": 0,
-    "active_repos_7d": 7,
+    "active_repos_7d": 8,
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0357142857142858,
     "ci_coverage_pct": 21.705426356589147,
-    "last_year_contributions": 11958,
+    "last_year_contributions": 11962,
     "active_days_last_year": 324,
     "automation_workflows": 167,
     "primary_lang_share_pct": 61.9,
@@ -301,8 +301,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 11958,
-      "display_value": "11,958",
+      "value": 11962,
+      "display_value": "11,962",
       "accent": "#7dcfff"
     },
     {
@@ -317,8 +317,8 @@
       "key": "active_repos_7d",
       "label": "Active Repos (7d)",
       "detail": "pushed in last week",
-      "value": 7,
-      "display_value": "7",
+      "value": 8,
+      "display_value": "8",
       "accent": "#7dcfff"
     },
     {
@@ -553,11 +553,27 @@
       "forks": 0,
       "ci": "no",
       "pushed_at": "2026-10-08",
-      "pushed_at_raw": "2026-10-08T05:48:31Z",
+      "pushed_at_raw": "2026-10-08T06:59:32Z",
       "pushed_ago": "today",
       "created_at": "2026-09-06",
       "last_commit_msg": "Complete numeric overflow activity with tests and submission files",
       "is_private": true,
+      "featured": false
+    },
+    {
+      "name": "build-sweep",
+      "full_name": "jguida941/build-sweep",
+      "url": "https://github.com/jguida941/build-sweep",
+      "language": "Swift",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-10-08",
+      "pushed_at_raw": "2026-10-08T06:52:27Z",
+      "pushed_ago": "today",
+      "created_at": "2026-09-03",
+      "last_commit_msg": "Explain BuildSweep's artifact evidence and current Cargo inspection",
+      "is_private": false,
       "featured": false
     },
     {
@@ -586,7 +602,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-08",
       "pushed_at_raw": "2026-10-08T04:35:47Z",
-      "pushed_ago": "today",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-08-05",
       "last_commit_msg": "plan: the working projections track dev (D-M5); the release moved mai\u2026",
       "is_private": true,
@@ -602,7 +618,7 @@
       "ci": "no",
       "pushed_at": "2026-10-07",
       "pushed_at_raw": "2026-10-07T08:46:21Z",
-      "pushed_ago": "21 hours ago",
+      "pushed_ago": "22 hours ago",
       "created_at": "2026-09-11",
       "last_commit_msg": "feat: retain scoped local and cloud continuation inputs",
       "is_private": true,
@@ -686,22 +702,6 @@
       "created_at": "2026-09-07",
       "last_commit_msg": "Organize coursework into module folders and prepare Module 2",
       "is_private": true,
-      "featured": false
-    },
-    {
-      "name": "build-sweep",
-      "full_name": "jguida941/build-sweep",
-      "url": "https://github.com/jguida941/build-sweep",
-      "language": "Swift",
-      "stars": 1,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-09-23",
-      "pushed_at_raw": "2026-09-23T02:34:24Z",
-      "pushed_ago": "2 weeks ago",
-      "created_at": "2026-09-03",
-      "last_commit_msg": "Add bounded metadata reads and clarify size observation limits",
-      "is_private": false,
       "featured": false
     },
     {
@@ -868,7 +868,7 @@
       "visibility": "private",
       "description": null,
       "html_url": "https://github.com/jguida941/CS405",
-      "pushed_at": "2026-10-08T05:48:31Z",
+      "pushed_at": "2026-10-08T06:59:32Z",
       "created_at": "2026-09-06T12:36:16Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -920,7 +920,7 @@
       "visibility": "public",
       "description": "A simple native macOS utility that reclaims space by cleaning regenerable development files.",
       "html_url": "https://github.com/jguida941/build-sweep",
-      "pushed_at": "2026-09-23T02:34:24Z",
+      "pushed_at": "2026-10-08T06:52:27Z",
       "created_at": "2026-09-03T13:21:01Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -934,7 +934,7 @@
         "Swift": 47963
       },
       "language_bytes_complete": true,
-      "latest_commit_message": "Add bounded metadata reads and clarify size observation limits"
+      "latest_commit_message": "Explain BuildSweep's artifact evidence and current Cargo inspection"
     },
     {
       "name": "github-control-plane",
@@ -1043,23 +1043,29 @@
         "is_private": true
       },
       {
+        "title": "build-sweep",
+        "detail": "Swift \u00b7 pushed today",
+        "url": "https://github.com/jguida941/build-sweep",
+        "is_private": false
+      },
+      {
         "title": "semloop",
         "detail": "Python \u00b7 pushed today",
         "url": "https://github.com/jguida941/semloop",
-        "is_private": true
-      },
-      {
-        "title": "semvariants",
-        "detail": "Python \u00b7 pushed today",
-        "url": "https://github.com/jguida941/semvariants",
         "is_private": true
       }
     ],
     "next": [],
     "shipped": [
       {
+        "title": "plan: the working projections track dev (D-M5); the rel...",
+        "detail": "semvariants \u00b7 2 hours ago",
+        "url": "https://github.com/jguida941/semvariants",
+        "is_private": true
+      },
+      {
         "title": "feat: retain scoped local and cloud continuation inputs",
-        "detail": "blambridge \u00b7 21 hours ago",
+        "detail": "blambridge \u00b7 22 hours ago",
         "url": "https://github.com/jguida941/blambridge",
         "is_private": true
       },
@@ -1067,12 +1073,6 @@
         "title": "chore: close raw Git path identity slice",
         "detail": "sembridge \u00b7 1 day ago",
         "url": "https://github.com/jguida941/sembridge",
-        "is_private": true
-      },
-      {
-        "title": "docs: put setup choices first in the usage guide",
-        "detail": "semcompose \u00b7 4 days ago",
-        "url": "https://github.com/jguida941/semcompose",
         "is_private": true
       }
     ]
@@ -1086,8 +1086,20 @@
       "repo_url": "https://github.com/jguida941/CS405",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-08T05:48:31Z",
+      "created_at": "2026-10-08T06:59:32Z",
       "is_private": true,
+      "observation_source": "repository push metadata"
+    },
+    {
+      "kind": "activity",
+      "title": "Explain BuildSweep's artifact evidence and current Cargo inspection",
+      "url": "https://github.com/jguida941/build-sweep",
+      "repo": "jguida941/build-sweep",
+      "repo_url": "https://github.com/jguida941/build-sweep",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-10-08T06:52:27Z",
+      "is_private": false,
       "observation_source": "repository push metadata"
     },
     {
@@ -1109,7 +1121,7 @@
       "repo": "jguida941/semvariants",
       "repo_url": "https://github.com/jguida941/semvariants",
       "state": "PUSH",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-10-08T04:35:47Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1121,7 +1133,7 @@
       "repo": "jguida941/blambridge",
       "repo_url": "https://github.com/jguida941/blambridge",
       "state": "PUSH",
-      "time_ago": "21 hours ago",
+      "time_ago": "22 hours ago",
       "created_at": "2026-10-07T08:46:21Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1215,7 +1227,7 @@
       41,
       25,
       121,
-      147
+      151
     ],
     "contribution_trend": {
       "status": "available",
@@ -1332,7 +1344,7 @@
           "observed_start": "2026-10-05",
           "observed_end": "2026-10-08",
           "days_observed": 4,
-          "contributions": 147,
+          "contributions": 151,
           "partial": true
         }
       ],
@@ -1424,7 +1436,7 @@
     }
   },
   "contribution_calendar": {
-    "total": 11958,
+    "total": 11962,
     "weeks": [
       [
         {
@@ -2989,7 +3001,7 @@
         },
         {
           "date": "2026-10-08",
-          "count": 13
+          "count": 17
         }
       ]
     ]
@@ -3004,7 +3016,7 @@
     "window_start": "2025-10-09",
     "window_end": "2026-10-08",
     "days_observed": 365,
-    "total": 11958,
+    "total": 11962,
     "weekdays": [
       {
         "weekday": "Mon",
@@ -3023,7 +3035,7 @@
       },
       {
         "weekday": "Thu",
-        "contributions": 2060,
+        "contributions": 2064,
         "days_observed": 53
       },
       {
@@ -3076,9 +3088,9 @@
       },
       {
         "weekday": "Thu",
-        "contributions": 2060,
+        "contributions": 2064,
         "days_observed": 53,
-        "count_text": "2,060"
+        "count_text": "2,064"
       },
       {
         "weekday": "Fri",
@@ -3102,11 +3114,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-08T06:10:13.172799Z",
-    "generator_revision": "50e6be0544caad5228b6a96a619220cb71afc760",
+    "generated_at": "2026-10-08T07:01:05.860385Z",
+    "generator_revision": "8aea5dd356e4e585dd8dab114483e2f0ab4ce139",
     "generator_source_digest": "c6fd15289be08c592eb594bea48ee1d67084803b3df2508c793b041ab8fa9a58",
-    "claim_input_digest": "129a12fcd387373c61dff7229169b9221738e0884c4cc8c7cb8e8f8578b56f82",
-    "render_key": "e054220bea20baf4c156f46162a5b03f7767d24dfdd102fdd2d4dc6df351f2de",
+    "claim_input_digest": "e081ca77853dd24add3aa184477f3c8154714310e3564a38d3655b40f7a3948c",
+    "render_key": "996e1b9e80401704f907e64f8379d33c0079cb11fb6ecbadc514361f51675d8a",
     "schema": "profile-artifact-generation/v1"
   }
 }
