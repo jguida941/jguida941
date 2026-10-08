@@ -81,7 +81,7 @@
 
 <div align="center">
 
-<img src="assets/activity_heatmap.svg?v={{ cache_bust }}" width="100%" alt="Activity Heatmap" />
+<img src="assets/activity_heatmap.svg?v={{ cache_bust }}" width="100%" alt="Contribution Rhythm" />
 
 </div>
 

@@ -57,6 +57,104 @@ def automation_description(automation: dict | None) -> str:
     return " ".join((display["scope"], display["meaning"], display["combined"]["qualification"]))
 
 
+CONTRIBUTION_WEEKDAYS = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+CONTRIBUTION_RHYTHM_REASONS = {
+    "calendar_unavailable": "Calendar data unavailable",
+    "no_dated_days": "No dated calendar observations",
+    "invalid_calendar": "Calendar dates or counts could not be verified",
+    "observation_unavailable": "Current calendar observation could not be verified",
+}
+CONTRIBUTION_RHYTHM_SCOPE = (
+    "Counts reported by the GitHub contribution calendar. Private contributions are included "
+    "only when returned; no public/private split or coding hours are inferred."
+)
+
+
+def contribution_rhythm_unavailable(reason: str = "calendar_unavailable") -> dict[str, Any]:
+    """Unavailable evidence carries no numerical distribution."""
+    if reason not in CONTRIBUTION_RHYTHM_REASONS:
+        raise ValueError("unknown contribution rhythm reason")
+    return {
+        "status": "unavailable", "reason": reason,
+        "source": "github_contribution_calendar", "unit": "contributions", "bucket": "weekday",
+        "timezone": "UTC", "completeness": "unknown", "window_start": None, "window_end": None,
+        "days_observed": None, "total": None, "weekdays": [], "last_day_in_progress": None,
+    }
+
+
+def contribution_rhythm_errors(rhythm: object) -> list[str]:
+    """Validate weekday counts and their date-interval coverage before display."""
+    if not isinstance(rhythm, dict):
+        return ["contribution rhythm missing"]
+    if any(rhythm.get(key) != value for key, value in (
+        ("source", "github_contribution_calendar"), ("unit", "contributions"),
+        ("bucket", "weekday"), ("timezone", "UTC"),
+    )) or rhythm.get("completeness") not in ("known", "unknown"):
+        return ["invalid contribution rhythm meaning"]
+    if rhythm.get("status") == "unavailable":
+        expected = contribution_rhythm_unavailable()
+        return ([] if rhythm.get("reason") in tuple(CONTRIBUTION_RHYTHM_REASONS)
+                and all(rhythm.get(key) == value for key, value in expected.items() if key != "reason")
+                else ["unavailable contribution rhythm contains values"])
+    try:
+        if rhythm.get("status") != "available" or rhythm.get("reason") != "dated_calendar":
+            raise ValueError("invalid status")
+        first, last = [date.fromisoformat(rhythm[key]) for key in ("window_start", "window_end")]
+        if first.isoformat() != rhythm["window_start"] or last.isoformat() != rhythm["window_end"] or first > last:
+            raise ValueError("invalid window")
+        total, observed = rhythm["total"], rhythm["days_observed"]
+        size = (last - first).days + 1
+        if type(total) is not int or total < 0 or type(observed) is not int or observed != size:
+            raise ValueError("invalid totals")
+        progress = rhythm["last_day_in_progress"]
+        if ((rhythm["completeness"] == "known" and type(progress) is not bool)
+                or (rhythm["completeness"] == "unknown" and progress is not None)):
+            raise ValueError("unsupported day completion")
+        rows = rhythm["weekdays"]
+        if not isinstance(rows, list) or len(rows) != 7:
+            raise ValueError("invalid weekdays")
+        for i, (name, row) in enumerate(zip(CONTRIBUTION_WEEKDAYS, rows)):
+            coverage = size // 7 + int((i - first.weekday()) % 7 < size % 7)
+            if (not isinstance(row, dict) or row.get("weekday") != name
+                    or type(row.get("contributions")) is not int or row["contributions"] < 0
+                    or type(row.get("days_observed")) is not int or row["days_observed"] != coverage
+                    or coverage == 0 and row["contributions"] != 0):
+                raise ValueError("invalid weekday counts")
+        if sum(row["contributions"] for row in rows) != total:
+            raise ValueError("weekday sum disagrees")
+    except (KeyError, ValueError, TypeError):
+        return ["invalid contribution rhythm dates or counts"]
+    return []
+
+
+def contribution_rhythm_display(rhythm: object) -> dict[str, Any]:
+    """Shared wording and formatted rows; no second calculation of contributions."""
+    if contribution_rhythm_errors(rhythm):
+        rhythm = contribution_rhythm_unavailable("invalid_calendar")
+    available = rhythm["status"] == "available"
+    display = {
+        "available": available, "title": "Contribution Rhythm", "subtitle": "Contributions by weekday",
+        "scope": CONTRIBUTION_RHYTHM_SCOPE,
+        "explanation": ("These bars show contribution totals, not daily averages. "
+                        "Weekdays may occur a different number of times in this date window."),
+        "coverage_summary": "", "caption": "", "qualification": "", "message": "", "rows": [],
+    }
+    if not available:
+        return {**display, "message": "Contribution rhythm unavailable",
+                "qualification": CONTRIBUTION_RHYTHM_REASONS[rhythm["reason"]]}
+    qualification = ("Completeness unknown" if rhythm["completeness"] == "unknown" else
+                     "Last date may be in progress" if rhythm["last_day_in_progress"] else "")
+    return {
+        **display,
+        "caption": f'{rhythm["window_start"]} – {rhythm["window_end"]} · UTC calendar dates',
+        "qualification": qualification,
+        "message": "No contributions in the observed dates" if rhythm["total"] == 0 else "",
+        "coverage_summary": "Observed dates — " + "; ".join(
+            f'{row["weekday"]}: {row["days_observed"]}' for row in rhythm["weekdays"]) + ".",
+        "rows": [{**row, "count_text": f'{row["contributions"]:,}'} for row in rhythm["weekdays"]],
+    }
+
+
 def contribution_trend_errors(trend: object) -> list[str]:
     """Validate the small public dated-series shape before a consumer trusts it."""
     if not isinstance(trend, dict):

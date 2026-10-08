@@ -189,7 +189,7 @@ def generate_assets(
     gen_working(model["recent_repos"])
     logger("  -> assets/currently_working.svg")
 
-    gen_heatmap(collected.events)
+    gen_heatmap(model.get("contribution_rhythm"))
     logger("  -> assets/activity_heatmap.svg")
 
     gen_contribution_panel(collected.calendar)
@@ -298,6 +298,12 @@ def _public_dashboard_data(dashboard_data: dict) -> dict:
     projected = project(dashboard_data)
     if type(projected) is not dict:
         raise ValueError("public dashboard projection did not produce a mapping")
+    # The one closed source identifier is public metric provenance, not a file
+    # body. Keep the recursive content/credential filter unchanged elsewhere.
+    from scripts.contracts.profile_contract import contribution_rhythm_errors
+    rhythm = dashboard_data.get("contribution_rhythm")
+    if not contribution_rhythm_errors(rhythm):
+        projected["contribution_rhythm"]["source"] = "github_contribution_calendar"
     return projected
 
 

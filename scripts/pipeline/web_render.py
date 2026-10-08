@@ -171,25 +171,21 @@ body {
 .cal-swatches { display: inline-flex; gap: 3px; }
 .cal-swatches i { width: 11px; height: 11px; border-radius: 3px; }
 
-/* --- activity rhythm heatmap (square-ish cells, left-aligned punch card) --- */
-.heat { display: grid; grid-template-columns: 30px 1fr; gap: 4px 8px; align-items: start; max-width: 560px; }
-.heat-days { display: grid; grid-auto-rows: 16px; gap: 4px; }
-.heat-days span { font-size: var(--type-caption); color: var(--ink-dim); line-height: 16px; }
-.heat-grid { display: grid; grid-template-columns: repeat(24, 1fr); grid-auto-rows: 16px; gap: 4px; }
-.heat-grid i { border-radius: 3px; background: color-mix(in srgb, var(--hairline) 9%, transparent); display: block; }
-.heat-hours { grid-column: 2; display: grid; grid-template-columns: repeat(24, 1fr); font-size: var(--type-caption); color: var(--ink-dim); margin-top: 7px; }
-.heat-hours span { grid-row: 1; text-align: center; }
-.mix { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 22px; }
-.mix .m { display: inline-flex; align-items: center; gap: 8px; font-size: var(--type-caption); color: var(--ink); }
-.mix .m b { color: var(--ink-strong); font-weight: 600; }
-.mix .bar { width: 52px; height: 7px; border-radius: 4px; background: color-mix(in srgb, var(--hairline) 12%, transparent); overflow: hidden; }
-.mix .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
-/* RETIRED (was: Apple drops the dense heatmap). That distinctness invariant deleted the rhythm
-   visualization and left a near-empty "When I Code" panel — the exact content-to-chrome
-   anti-pattern. Distinctness never trumps content-to-chrome: Apple shows the rhythm like every
-   theme; its distinctness comes from colour/type/density/material. The heatmap is legitimate,
-   filled content (GitHub's own contribution grid is a dense grid). */
-.heat-wrap { overflow-x: auto; }
+/* --- contribution rhythm: one dated model, seven readable weekday rows --- */
+.rhythm-list { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 16px; }
+.rhythm-row { display: grid; grid-template-columns: 3ch minmax(24px, 1fr) minmax(4ch, auto); gap: 12px; align-items: center; font-size: var(--type-body); }
+.rhythm-bar { height: 10px; border-radius: 4px; background: color-mix(in srgb, var(--hairline) 9%, transparent); }
+.rhythm-bar i { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+.rhythm-count { text-align: right; color: var(--ink-strong); font-weight: 600; }
+.rhythm-caption, .rhythm-status, .rhythm-detail { color: var(--ink-dim); font-size: var(--type-body); }
+.rhythm-caption { margin: 0; }
+.rhythm-status:empty { display: none; }
+.rhythm-detail { margin-top: 18px; }
+.rhythm-detail summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+.rhythm-detail p { margin: 0 0 8px; }
+@media (max-width: 480px) {
+  .rhythm-row { grid-template-columns: 3ch minmax(24px, 1fr) auto; gap: 6px 10px; }
+}
 
 footer { text-align: center; color: var(--ink-dim); font-size: var(--type-caption); margin-top: 26px; }
 footer a { color: var(--ink); text-decoration: none; }
@@ -204,7 +200,7 @@ footer a { color: var(--ink); text-decoration: none; }
   .hero .stats { gap: 18px; }
 }
 /* Phone tier (Apple HIG / WCAG 2.5.5): >=44px touch targets, tighter margins, the dense
-   heatmap scrolls inside .heat-wrap (min-width keeps cells square instead of distorting). */
+   contribution rows reflow at the phone breakpoint. */
 @media (max-width: 480px) {
   .wrap { padding: 16px 12px 48px; }
   .section-head { flex-wrap: wrap; }
@@ -212,7 +208,6 @@ footer a { color: var(--ink); text-decoration: none; }
   .switcher { width: 100%; }
   .switcher button { flex: 1; min-height: 44px; }
   .rrow { min-height: 44px; }
-  .heat { min-width: 460px; }
 }
 """ + _nav_parts()[1] + """
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
@@ -355,11 +350,14 @@ def _calendar() -> str:
 
 def _rhythm() -> str:
     return """
-  <section class="panel" id="rhythm-panel" hidden>
-    <div class="section-head"><div><p class="eyebrow">Activity Rhythm</p><h2 class="title">When I Code</h2></div><span class="section-meta" id="rhythm-meta">—</span></div>
+  <section class="panel" id="rhythm-panel">
+    <div class="section-head"><div><p class="eyebrow">Contributions by weekday</p><h2 class="title">Contribution Rhythm</h2></div></div>
     <hr class="hairline">
-    <div class="heat-wrap"><div class="heat"><div class="heat-days" id="heat-days"></div><div class="heat-grid" id="heat-grid"></div><div class="heat-hours" id="heat-hours"></div></div></div>
-    <div class="mix" id="event-mix"></div>
+    <p class="rhythm-caption" id="rhythm-caption"></p>
+    <ul class="rhythm-list" id="rhythm-list"></ul>
+    <p class="rhythm-status" id="rhythm-message">Contribution rhythm unavailable</p>
+    <p class="rhythm-status" id="rhythm-qualification"></p>
+    <details class="rhythm-detail"><summary>How to read this</summary><p id="rhythm-explanation"></p><p id="rhythm-coverage"></p><p id="rhythm-scope"></p></details>
   </section>"""
 
 
@@ -511,23 +509,23 @@ def _script() -> str:
       document.getElementById("cal-scale").innerHTML = [0,1,2,3,4].map(l => `<i style="${fill(l)}"></i>`).join("");
       document.getElementById("calendar-panel").hidden = false;
     }
-    // activity rhythm heatmap (7 weekday rows x 24 hours)
-    const rh = d.activity_rhythm;
-    if (rh && Array.isArray(rh.matrix) && rh.total) {
-      const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-      const maxm = Math.max(1, ...rh.matrix.flat());
-      const hop = [0, 30, 52, 76, 100];
-      const hlvl = (c) => c <= 0 ? 0 : (c/maxm <= .25 ? 1 : c/maxm <= .5 ? 2 : c/maxm <= .75 ? 3 : 4);
-      document.getElementById("heat-days").innerHTML = DAYS.map(x => `<span>${x}</span>`).join("");
-      document.getElementById("heat-grid").innerHTML = rh.matrix.map((row, di) =>
-        row.map((c, hi) => `<i style="${hlvl(c) ? `background:color-mix(in srgb, var(--accent) ${hop[hlvl(c)]}%, transparent)` : ""}" title="${DAYS[di]} ${String(hi).padStart(2,"0")}:00 · ${fmt(c)} events"></i>`).join("")).join("");
-      document.getElementById("heat-hours").innerHTML = [0,6,12,18,23].map(h => `<span style="grid-column:${h+1}">${String(h).padStart(2,"0")}</span>`).join("");
-      document.getElementById("rhythm-meta").textContent = fmt(rh.total) + " events · " + esc(rh.timezone || "");
-      const mix = Object.entries(rh.event_mix || {});
-      const maxmix = Math.max(1, ...mix.map(([,v]) => v));
-      document.getElementById("event-mix").innerHTML = mix.map(([k,v]) =>
-        `<span class="m"><span class="bar"><i style="width:${(v/maxmix*100).toFixed(0)}%"></i></span>${esc(k)} <b>${fmt(v)}</b></span>`).join("");
-      document.getElementById("rhythm-panel").hidden = false;
+    // Display the serialized calendar projection; dates are labels, never local instants.
+    const rh = d.contribution_rhythm;
+    const rd = d.contribution_rhythm_display;
+    const rhythmAvailable = rh?.status === "available" && rd?.available === true &&
+      Array.isArray(rh.weekdays) && rh.weekdays.length === 7 && Array.isArray(rd.rows) && rd.rows.length === 7;
+    document.getElementById("rhythm-caption").textContent = rhythmAvailable ? rd.caption : "";
+    document.getElementById("rhythm-message").textContent = rhythmAvailable ? rd.message : "Contribution rhythm unavailable";
+    document.getElementById("rhythm-qualification").textContent = rd?.qualification || "";
+    document.getElementById("rhythm-scope").textContent = rd?.scope || "Calendar data unavailable";
+    document.getElementById("rhythm-explanation").textContent = rd?.explanation || "";
+    document.getElementById("rhythm-coverage").textContent = rhythmAvailable ? rd.coverage_summary : "";
+    if (rhythmAvailable) {
+      const maximum = Math.max(1, ...rh.weekdays.map(row => row.contributions));
+      document.getElementById("rhythm-list").innerHTML = rh.weekdays.map((row, i) =>
+        `<li class="rhythm-row" data-weekday="${esc(row.weekday)}"><span>${esc(row.weekday)}</span><span class="rhythm-bar" aria-hidden="true"><i style="width:${row.contributions / maximum * 100}%"></i></span><span class="rhythm-count num">${esc(rd.rows[i].count_text)}</span></li>`).join("");
+    } else {
+      document.getElementById("rhythm-list").replaceChildren();
     }
   }
 

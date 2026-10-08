@@ -75,7 +75,7 @@ def _render(card, out):
         return generate(c.language_bytes, output_path=out)
     if card == "heatmap":
         from scripts.rendering.generate_activity_heatmap import generate
-        return generate(c.events, output_path=out)
+        return generate(m["contribution_rhythm"], output_path=out)
     if card == "contribution":
         from scripts.rendering.generate_contribution_panel import generate
         return generate(c.calendar, output_path=out)
@@ -95,7 +95,7 @@ CARDS = {
     "streak": "Streak Summary",
     "snapshot": "Raw Data Snapshot",
     "lang": "Language Breakdown",
-    "heatmap": "When I Code",
+    "heatmap": "Contribution Rhythm",
     "contribution": "Contribution Calendar",
     "spotlight": "Flagship Projects",
 }

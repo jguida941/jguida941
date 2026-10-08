@@ -99,6 +99,33 @@ def _validate_snapshot_payload(payload: dict):
             os.chdir(original_cwd)
 
 
+class ContributionRhythmGeometryTests(unittest.TestCase):
+    def test_chart_clearance_text_and_single_panel(self):
+        import xml.etree.ElementTree as ET
+        from tests.contracts.test_data_semantics import ContributionRhythmRenderingTests
+        fixture = ContributionRhythmRenderingTests()
+        root = ET.fromstring(fixture._svg(fixture._rhythm()))
+        ns = "{http://www.w3.org/2000/svg}"
+        chart = root.find(f'{ns}g[@data-series="weekday-contributions"]')
+        self.assertIsNotNone(chart)
+        texts = list(chart.iter(ns + "text"))
+        self.assertTrue(all(float(node.get("font-size")) >= 14 for node in texts))
+        rule = next(node for node in root if node.tag == ns + "rect" and node.get("height") == "1")
+        self.assertGreaterEqual(min(float(node.get("y")) - 14 for node in texts) - (float(rule.get("y")) + 1), 16)
+        self.assertGreaterEqual(float(root.get("height")) - max(float(node.get("y")) + 14 for node in texts), 24)
+        rows = list(chart.findall(ns + "g"))
+        self.assertEqual(7, len(rows))
+        self.assertTrue(all(len(row.findall(ns + "text")) == 2 for row in rows))
+        unavailable = ET.fromstring(fixture._svg(None))
+        panel = unavailable.find(f".//{ns}clipPath[@id='gk-clip']/{ns}rect")
+        # Native glyph clearance is measured in browser receipts. This guard
+        # preserves its corrected baseline and the actual inset-panel edge.
+        final_text = list(unavailable.iter(ns + "text"))[-1]
+        self.assertEqual("192", final_text.get("y"))
+        self.assertGreaterEqual(float(panel.get("y")) + float(panel.get("height")) - float(final_text.get("y")), 28)
+        self.assertEqual({"92"}, {row.find(ns + "rect").get("x") for row in rows})
+
+
 class PublishedProfileContract(unittest.TestCase):
     def _valid_nested_payload(self):
         payload = json.loads(
