@@ -37,6 +37,11 @@ SEMANTIC_ICONS = {
 
 CALENDAR_DISPLAY_LABELS = {"calendar.current_streak":"Current streak", "calendar.longest_streak":"Longest streak", "calendar.active_days":"Active days"}
 
+INVENTORY_DISPLAY_LABELS = {
+    "inventory.public_nonfork": "public repos",
+    "inventory.private_owned": "private repos",
+}
+
 def _attrs(values):
     return " ".join(f'{name.replace("_", "-")}="{escape(str(value), quote=True)}"' for name, value in values.items() if value is not None)
 
@@ -88,11 +93,26 @@ class Canvas:
                                     fill=COLORS[fill],stroke=COLORS["line"],data_role="metric-cell"))+'/>'
 
     def fact_label_lines(self, fact, width):
-        return textwrap.wrap(str(CALENDAR_DISPLAY_LABELS.get(fact["metric_id"],fact["label"])),max(1,int((width-28-24)/(self.secondary*.62))),
+        return textwrap.wrap(str(INVENTORY_DISPLAY_LABELS.get(fact["metric_id"], CALENDAR_DISPLAY_LABELS.get(fact["metric_id"], fact["label"]))),max(1,int((width-28-24)/(self.secondary*.62))),
                              break_long_words=True,break_on_hyphens=False) or [""]
 
     def fact(self, fact, x, y, width, *, size=25, qualify=False, caption="", fill="surface", header_rows=0, framed=True, compact=False):
         self.group(data_metric_id=fact["metric_id"])
+        if display_label := INVENTORY_DISPLAY_LABELS.get(fact["metric_id"]):
+            context = " · ".join(str(fact.get(key) or "") for key in ("label", "population_id", "window"))
+            self.parts.append('<title>'+escape(context)+'</title>')
+            fact = {**fact, "label": display_label}
+        if compact:
+            # The activity rail uses the reference's number / label / window hierarchy.
+            self.text(fact["display_value"], x, y+48, size=48, weight=600, data_role="value")
+            self.text("active repos", x, y+72, size=14, color="muted")
+            self.text("last 7 days", x, y+91, size=14, color="muted")
+            bottom = y+106
+            if qualify and fact["quality"].get("qualification"):
+                bottom = self.wrap(fact["quality"]["qualification"], x, bottom+14, width, size=14, color="muted")
+            self.last_fact_box = None
+            self.end()
+            return bottom
         calendar_label=CALENDAR_DISPLAY_LABELS.get(fact["metric_id"])
         if calendar_label:
             qualification=fact["quality"].get("qualification", "")
@@ -102,14 +122,14 @@ class Canvas:
             fact={**fact,"label":calendar_label,"quality":{**fact["quality"],"qualification":"" if hide_normal_day else qualification}}
         box_index=len(self.parts)
         self.parts.append("")
-        label_size=14 if compact else self.secondary
-        left, header_y = (x,y+14) if compact else (x+14,y+14+label_size)
+        label_size=self.secondary
+        left, header_y = x+14,y+14+label_size
         if glyph := SEMANTIC_ICONS.get(fact["metric_id"]):
             self.parts.append(icon(glyph,left,header_y-14,size=17,color=COLORS["muted"]))
-        lines=[fact["label"]] if compact else self.fact_label_lines(fact,width)
+        lines=self.fact_label_lines(fact,width)
         for i,line in enumerate(lines):
             self.text(line,left+24,header_y+i*label_size*1.4,size=label_size,color="muted")
-        value_y=header_y+(max(len(lines),header_rows)-1)*label_size*1.4+size*.8+(10 if compact else 9)
+        value_y=header_y+(max(len(lines),header_rows)-1)*label_size*1.4+size*.8+9
         self.text(fact["display_value"],left,value_y,size=size,weight=600,data_role="value")
         bottom=value_y+size*.2
         captions=[]

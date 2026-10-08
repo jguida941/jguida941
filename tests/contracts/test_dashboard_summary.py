@@ -167,8 +167,11 @@ class DashboardFlatOverviewTests(unittest.TestCase):
             value=next(n for n in active.iter(ns+"text") if n.get("data-role")=="value")
             self.assertEqual(label.get("font-size"),"14")
             self.assertEqual(value.text,"8")
-            self.assertEqual(value.get("font-size"),"30")
-            self.assertGreaterEqual(float(value.get("y"))-float(label.get("y")),28)
+            self.assertEqual(value.get("font-size"),"48")
+            self.assertAlmostEqual(float(label.get("y"))-float(value.get("y")),24)
+            window=next(n for n in active.iter(ns+"text") if n.text=="last 7 days")
+            self.assertAlmostEqual(float(window.get("y"))-float(label.get("y")),19)
+            self.assertEqual(list(active.iter(ns+"path")), [])
 
     def test_calendar_copy_preserves_original_context_and_unknown_progress_warning(self):
         import copy
@@ -208,3 +211,25 @@ class DashboardCalendarLabelMeasureTests(unittest.TestCase):
             ink=list(owner.iter(ns+"text"))
             label,value=ink[0],next(n for n in ink if n.get("data-role")=="value")
             self.assertEqual(float(value.get("y"))-float(label.get("y")),29)
+
+
+
+class DashboardShortInventoryLabelsTests(unittest.TestCase):
+    def test_short_labels_preserve_values_scopes_and_input(self):
+        import copy
+        ns = "{http://www.w3.org/2000/svg}"
+        facts = [_fact("inventory.public_nonfork", 56, "public non-fork repos", "public-owned-nonfork-profile-included"),
+                 _fact("inventory.private_owned", 203, "private owned repos", "private-owned-including-forks")]
+        summary = {"facts": facts}
+        original = copy.deepcopy(summary)
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg(summary, mobile=mobile))
+            for fact, label in zip(facts, ("public repos", "private repos")):
+                owner = next(n for n in root.iter() if n.get("data-metric-id") == fact["metric_id"])
+                painted = [n.text for n in owner.iter(ns+"text")]
+                self.assertEqual(" ".join(painted[:-1]), label)
+                self.assertEqual(painted[-1], fact["display_value"])
+                context = " ".join(n.text or "" for n in owner.iter(ns+"title"))
+                self.assertIn(fact["label"], context)
+                self.assertIn(fact["population_id"], context)
+        self.assertEqual(summary, original)
