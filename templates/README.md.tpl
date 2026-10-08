@@ -85,6 +85,8 @@ Recently created:
 
 These compatibility images retain their existing presentation.
 
+<img src="assets/raw_snapshot.svg?v={{ cache_bust }}" width="100%" alt="Raw Snapshot: the generated profile metric values and their qualifications.">
+
 {% for label,path in legacy_visuals %}- [{{ label }}]({{ path }}?v={{ cache_bust }})
 {% endfor %}
 

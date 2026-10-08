@@ -143,3 +143,7 @@ FEATURED_REPOS = [
 # RPG Game Card config
 LEVEL_XP_BASE = 50  # XP needed for level 1
 LEVEL_XP_SCALE = 1.5  # multiplier per level
+
+# Unified dashboard palette; kept independent of the existing website themes.
+DASHBOARD_SUMMARY_COLORS = {"surface": "#111827", "panel": "#172236", "line": "#35425b", "track": "#26314a",
+          "text": "#e6ebf5", "muted": "#a7b6ce", "blue": "#63b5fa", "teal": "#79cacf"}

@@ -8,13 +8,12 @@ from pathlib import Path
 import textwrap
 
 from scripts.contracts.dashboard_summary import summary_facts
-from scripts.core.config import CONTRIB_EMPTY, CONTRIB_RAMP
+from scripts.core.config import CONTRIB_EMPTY, CONTRIB_RAMP, DASHBOARD_SUMMARY_COLORS
 from scripts.rendering.components import donut_gauge
 from scripts.rendering.icons import render as icon
 from scripts.rendering.svg_utils import lang_color, truncate
 
-COLORS = {"surface": "#111827", "panel": "#172236", "line": "#35425b", "track": "#26314a",
-          "text": "#e6ebf5", "muted": "#a7b6ce", "blue": "#63b5fa", "teal": "#79cacf"}
+COLORS = DASHBOARD_SUMMARY_COLORS
 FONT = '-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif'
 
 
@@ -281,16 +280,18 @@ def render_svg(summary, *, mobile=False, generation=None):
                 if row.get("is_private"):
                     c.parts.append(icon("lock",tx,pos-13,size=14,color=COLORS["muted"]))
                     tx+=19
-                pos=c.wrap(row.get("title", ""),tx,pos,xx+lane_w-12-tx,size=c.body)
-                if row.get("detail"):
-                    pos=c.wrap(row["detail"],xx+12,pos,lane_w-24,size=c.secondary,color="muted")
-                pos+=12
-            bottom=max(pos+3,top+92)
+                title_text=str(row.get("title") or "")
+                detail_text=str(row.get("detail") or "")
+                c.text(truncate(title_text,max(1,int((xx+lane_w-12-tx)/(c.body*.6)))),tx,pos,size=c.body)
+                c.text(truncate(detail_text,max(1,int((lane_w-24)/(c.secondary*.6)))),xx+12,pos+22,size=c.secondary,color="muted")
+                c.parts.append('<title>'+escape(title_text+" · "+detail_text)+'</title>')
+                pos+=52
+            bottom=max(top+72+52*len(rows),top+92)
             boxes.append((index,xx,top,bottom))
             if mobile:yy=bottom+12
         last=max(box[3] for box in boxes)
         for index,xx,top,bottom in boxes:
-            c.parts[index]='<rect '+_attrs(dict(x=xx,y=top,width=lane_w,height=(bottom if mobile else last)-top,rx=11,fill=COLORS["surface"],stroke=COLORS["line"]))+'/>'
+            c.parts[index]='<rect '+_attrs(dict(x=xx,y=top,width=lane_w,height=(bottom if mobile else last)-top,rx=15,fill=COLORS["surface"],stroke=COLORS["line"]))+'/>'
         return last+8
     y = c.panel("focus","Current Focus",y,focus)
 
@@ -298,14 +299,16 @@ def render_svg(summary, *, mobile=False, generation=None):
         rows = summary.get("projects") or []
         for row in rows:
             c.group(data_role="project-row",data_repository=row.get("name",""))
-            idx=len(c.parts);c.parts.append("")
-            top=yy
-            yy=c.wrap(row.get("name",""),x+13,yy+25,span-26,weight=500)
-            if row.get("description"):
-                yy=c.wrap(row["description"],x+13,yy+3,span-26,size=c.secondary,color="muted")
-            yy=c.wrap(f'{row.get("language") or "Language unreported"} · {row.get("stars", 0)} stars · {row.get("forks", 0)} forks',x+13,yy+4,span-26,size=c.secondary,color="muted")+4
-            c.parts[idx]='<rect '+_attrs(dict(x=x,y=top,width=span,height=yy-top+6,rx=11,fill=COLORS["surface"],stroke=COLORS["line"]))+'/>'
-            c.end();yy+=20
+            c.rect(x,yy,span,96,fill="surface",radius=16,stroke=COLORS["line"])
+            name=str(row.get("name") or "")
+            description=str(row.get("description") or "")
+            metadata=f'{row.get("language") or "Language unreported"} · {row.get("stars", 0)} stars · {row.get("forks", 0)} forks'
+            c.text(truncate(name,max(1,int((span-26)/(c.body*.6)))),x+13,yy+25,weight=500)
+            c.text(truncate(description,max(1,int((span-26)/(c.secondary*.6)))),x+13,yy+49,size=c.secondary,color="muted")
+            c.text(truncate(metadata,max(1,int((span-26)/(c.secondary*.55)))),x+13,yy+73,size=c.secondary,color="muted")
+            c.parts.append('<title>'+escape(name+" · "+description+" · "+metadata)+'</title>')
+            c.end()
+            yy+=116
         return yy if rows else c.wrap("No curated projects supplied",x,yy+10,span,color="muted")
     y=c.panel("projects","Curated projects",y,projects)
 
