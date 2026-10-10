@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-10T04:01:03.934319Z",
+  "generated_at": "2026-10-10T05:00:52.133086Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,7 +18,7 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 12023,
+    "last_year_contributions": 12025,
     "public_scope_commits": 7399,
     "total_repos": 56,
     "public_forks": 0,
@@ -27,7 +27,7 @@
     "languages_count": 35,
     "prs_merged": 66,
     "releases": 0,
-    "ci_repos": 57,
+    "ci_repos": 56,
     "streak_days": 9
   },
   "snapshot_rows": [
@@ -35,8 +35,8 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 12023,
-      "display_value": "12,023"
+      "value": 12025,
+      "display_value": "12,025"
     },
     {
       "key": "public_scope_commits",
@@ -98,8 +98,8 @@
       "key": "ci_repos",
       "label": "Workflow repos",
       "dashboard_label": "Workflow repos",
-      "value": 57,
-      "display_value": "57"
+      "value": 56,
+      "display_value": "56"
     },
     {
       "key": "streak_days",
@@ -113,8 +113,8 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 12023,
-      "display_value": "12,023"
+      "value": 12025,
+      "display_value": "12,025"
     },
     {
       "key": "public_scope_commits",
@@ -167,8 +167,8 @@
     {
       "key": "ci_repos",
       "label": "Workflow repos",
-      "value": 57,
-      "display_value": "57"
+      "value": 56,
+      "display_value": "56"
     },
     {
       "key": "streak_days",
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-10T04:00:33Z",
+        "observed_at": "2026-10-10T05:00:27Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -228,8 +228,8 @@
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-10-11T04:00:00Z",
-        "window_end": "2026-10-10T04:00:39Z",
-        "observed_at": "2026-10-10T04:00:40Z",
+        "window_end": "2026-10-10T05:00:33Z",
+        "observed_at": "2026-10-10T05:00:34Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -243,8 +243,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-09-11T04:00:00Z",
-        "window_end": "2026-10-10T04:00:37Z",
-        "observed_at": "2026-10-10T04:00:39Z",
+        "window_end": "2026-10-10T05:00:30Z",
+        "observed_at": "2026-10-10T05:00:32Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -258,8 +258,8 @@
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-10-11T04:00:00Z",
-        "window_end": "2026-10-10T04:00:39Z",
-        "observed_at": "2026-10-10T04:00:39Z",
+        "window_end": "2026-10-10T05:00:32Z",
+        "observed_at": "2026-10-10T05:00:33Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-10T04:00:32Z",
+        "observed_at": "2026-10-10T05:00:26Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -288,10 +288,10 @@
     "active_repos_7d": 8,
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0357142857142858,
-    "ci_coverage_pct": 22.093023255813954,
-    "last_year_contributions": 12023,
+    "ci_coverage_pct": 21.705426356589147,
+    "last_year_contributions": 12025,
     "active_days_last_year": 325,
-    "automation_workflows": 168,
+    "automation_workflows": 167,
     "primary_lang_share_pct": 61.9,
     "median_days_since_push": 350.5,
     "days_since_last_push": 0.0
@@ -301,8 +301,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 12023,
-      "display_value": "12,023",
+      "value": 12025,
+      "display_value": "12,025",
       "accent": "#7dcfff"
     },
     {
@@ -325,16 +325,16 @@
       "key": "ci_coverage_pct",
       "label": "Repo adoption",
       "detail": "owned public + private nonfork repositories",
-      "value": 22.093023255813954,
-      "display_value": "22.1%",
+      "value": 21.705426356589147,
+      "display_value": "21.7%",
       "accent": "#ff9e64"
     },
     {
       "key": "automation_workflows",
       "label": "Workflow files",
       "detail": "workflow files across repos",
-      "value": 168,
-      "display_value": "168",
+      "value": 167,
+      "display_value": "167",
       "accent": "#7aa2f7"
     },
     {
@@ -551,12 +551,12 @@
       "language": "C++",
       "stars": 0,
       "forks": 0,
-      "ci": "yes",
+      "ci": "no",
       "pushed_at": "2026-10-10",
-      "pushed_at_raw": "2026-10-10T03:57:58Z",
+      "pushed_at_raw": "2026-10-10T04:55:06Z",
       "pushed_ago": "today",
       "created_at": "2026-09-06",
-      "last_commit_msg": "Register opt-in CF2 experiment on default branch without automatic tr\u2026",
+      "last_commit_msg": "Remove unapproved CF2 workflow registration from main",
       "is_private": true,
       "featured": false
     },
@@ -569,7 +569,7 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-10-10",
-      "pushed_at_raw": "2026-10-10T03:35:39Z",
+      "pushed_at_raw": "2026-10-10T04:26:17Z",
       "pushed_ago": "today",
       "created_at": "2026-08-09",
       "last_commit_msg": "chore: close raw Git path identity slice",
@@ -586,7 +586,7 @@
       "ci": "no",
       "pushed_at": "2026-10-10",
       "pushed_at_raw": "2026-10-10T00:15:03Z",
-      "pushed_ago": "3 hours ago",
+      "pushed_ago": "4 hours ago",
       "created_at": "2026-09-11",
       "last_commit_msg": "feat: retain scoped local and cloud continuation inputs",
       "is_private": true,
@@ -634,7 +634,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-08",
       "pushed_at_raw": "2026-10-08T04:35:47Z",
-      "pushed_ago": "1 day ago",
+      "pushed_ago": "2 days ago",
       "created_at": "2026-08-05",
       "last_commit_msg": "plan: the working projections track dev (D-M5); the release moved mai\u2026",
       "is_private": true,
@@ -868,7 +868,7 @@
       "visibility": "private",
       "description": null,
       "html_url": "https://github.com/jguida941/CS405",
-      "pushed_at": "2026-10-10T03:57:58Z",
+      "pushed_at": "2026-10-10T04:55:06Z",
       "created_at": "2026-09-06T12:36:16Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -876,15 +876,15 @@
       "owner": {
         "login": "jguida941"
       },
-      "has_ci_workflows": true,
-      "workflow_file_count": 1,
+      "has_ci_workflows": false,
+      "workflow_file_count": 0,
       "language_bytes": {
         "C++": 25795,
         "Python": 4647,
         "CMake": 1490
       },
       "language_bytes_complete": true,
-      "latest_commit_message": "Register opt-in CF2 experiment on default branch without automatic tr\u2026"
+      "latest_commit_message": "Remove unapproved CF2 workflow registration from main"
     },
     {
       "name": "geometry-dash-mods",
@@ -1050,7 +1050,7 @@
       },
       {
         "title": "blambridge",
-        "detail": "Python \u00b7 pushed 3 hours ago",
+        "detail": "Python \u00b7 pushed 4 hours ago",
         "url": "https://github.com/jguida941/blambridge",
         "is_private": true
       }
@@ -1071,7 +1071,7 @@
       },
       {
         "title": "plan: the working projections track dev (D-M5); the rel...",
-        "detail": "semvariants \u00b7 1 day ago",
+        "detail": "semvariants \u00b7 2 days ago",
         "url": "https://github.com/jguida941/semvariants",
         "is_private": true
       }
@@ -1080,13 +1080,13 @@
   "activity_feed": [
     {
       "kind": "activity",
-      "title": "Register opt-in CF2 experiment on default branch without automatic tr\u2026",
+      "title": "Remove unapproved CF2 workflow registration from main",
       "url": "https://github.com/jguida941/CS405",
       "repo": "jguida941/CS405",
       "repo_url": "https://github.com/jguida941/CS405",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-10T03:57:58Z",
+      "created_at": "2026-10-10T04:55:06Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1098,7 +1098,7 @@
       "repo_url": "https://github.com/jguida941/sembridge",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-10T03:35:39Z",
+      "created_at": "2026-10-10T04:26:17Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1109,7 +1109,7 @@
       "repo": "jguida941/blambridge",
       "repo_url": "https://github.com/jguida941/blambridge",
       "state": "PUSH",
-      "time_ago": "3 hours ago",
+      "time_ago": "4 hours ago",
       "created_at": "2026-10-10T00:15:03Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1181,7 +1181,7 @@
       "repo": "jguida941/semvariants",
       "repo_url": "https://github.com/jguida941/semvariants",
       "state": "PUSH",
-      "time_ago": "1 day ago",
+      "time_ago": "2 days ago",
       "created_at": "2026-10-08T04:35:47Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1263,7 +1263,7 @@
       41,
       25,
       121,
-      216
+      218
     ],
     "contribution_trend": {
       "status": "available",
@@ -1380,14 +1380,14 @@
           "observed_start": "2026-10-05",
           "observed_end": "2026-10-10",
           "days_observed": 6,
-          "contributions": 216,
+          "contributions": 218,
           "partial": true
         }
       ],
       "reason": "dated_calendar"
     },
-    "automation_workflows": 168,
-    "automation_repos": 57,
+    "automation_workflows": 167,
+    "automation_repos": 56,
     "primary_lang_share_pct": 61.9,
     "languages_over_5pct": 5,
     "median_days_since_push": 350.5,
@@ -1416,9 +1416,9 @@
       "eligible_repos": 203,
       "observed_workflow_repos": 203,
       "unknown_workflow_repos": 0,
-      "configured_repos": 44,
-      "workflow_files": 108,
-      "adoption_pct": 21.67487684729064,
+      "configured_repos": 43,
+      "workflow_files": 107,
+      "adoption_pct": 21.182266009852217,
       "inventory_status": "exact",
       "status": "exact"
     },
@@ -1427,9 +1427,9 @@
       "eligible_repos": 258,
       "observed_workflow_repos": 258,
       "unknown_workflow_repos": 0,
-      "configured_repos": 57,
-      "workflow_files": 168,
-      "adoption_pct": 22.093023255813954,
+      "configured_repos": 56,
+      "workflow_files": 167,
+      "adoption_pct": 21.705426356589147,
       "inventory_status": "exact",
       "status": "exact"
     }
@@ -1449,30 +1449,30 @@
       "gauge_detail": "13/55 repos"
     },
     "private": {
-      "configured_repos": "44",
+      "configured_repos": "43",
       "eligible_repos": "203",
-      "workflow_files": "108",
+      "workflow_files": "107",
       "unknown_workflow_repos": "0",
       "observed_eligible_repos": "203",
       "status": "Exact",
       "qualification": "Workflow observation complete",
-      "adoption": "22%",
-      "gauge_detail": "44/203 repos"
+      "adoption": "21%",
+      "gauge_detail": "43/203 repos"
     },
     "combined": {
-      "configured_repos": "57",
+      "configured_repos": "56",
       "eligible_repos": "258",
-      "workflow_files": "168",
+      "workflow_files": "167",
       "unknown_workflow_repos": "0",
       "observed_eligible_repos": "258",
       "status": "Exact",
       "qualification": "Workflow observation complete",
       "adoption": "22%",
-      "gauge_detail": "57/258 repos"
+      "gauge_detail": "56/258 repos"
     }
   },
   "contribution_calendar": {
-    "total": 12023,
+    "total": 12025,
     "weeks": [
       [
         {
@@ -3033,11 +3033,11 @@
         },
         {
           "date": "2026-10-09",
-          "count": 26
+          "count": 27
         },
         {
           "date": "2026-10-10",
-          "count": 5
+          "count": 6
         }
       ]
     ]
@@ -3052,7 +3052,7 @@
     "window_start": "2025-10-11",
     "window_end": "2026-10-10",
     "days_observed": 365,
-    "total": 12023,
+    "total": 12025,
     "weekdays": [
       {
         "weekday": "Mon",
@@ -3076,12 +3076,12 @@
       },
       {
         "weekday": "Fri",
-        "contributions": 1679,
+        "contributions": 1680,
         "days_observed": 52
       },
       {
         "weekday": "Sat",
-        "contributions": 1962,
+        "contributions": 1963,
         "days_observed": 53
       },
       {
@@ -3130,15 +3130,15 @@
       },
       {
         "weekday": "Fri",
-        "contributions": 1679,
+        "contributions": 1680,
         "days_observed": 52,
-        "count_text": "1,679"
+        "count_text": "1,680"
       },
       {
         "weekday": "Sat",
-        "contributions": 1962,
+        "contributions": 1963,
         "days_observed": 53,
-        "count_text": "1,962"
+        "count_text": "1,963"
       },
       {
         "weekday": "Sun",
@@ -3151,12 +3151,12 @@
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-10-10T04:01:03.934319Z",
+    "generated_at": "2026-10-10T05:00:52.133086Z",
     "facts": [
       {
         "metric_id": "calendar.total",
-        "value": 12023,
-        "display_value": "12,023",
+        "value": 12025,
+        "display_value": "12,025",
         "label": "contributions",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
@@ -3244,7 +3244,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "owned-repositories-visible-to-primary-pr-search",
-        "window": "2025-10-11T04:00:00Z \u2013 2026-10-10T04:00:39Z",
+        "window": "2025-10-11T04:00:00Z \u2013 2026-10-10T05:00:32Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -3258,7 +3258,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-09-11T04:00:00Z \u2013 2026-10-10T04:00:37Z",
+        "window": "2026-09-11T04:00:00Z \u2013 2026-10-10T05:00:30Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -3467,7 +3467,7 @@
             "observed_start": "2026-10-05",
             "observed_end": "2026-10-10",
             "days_observed": 6,
-            "contributions": 216,
+            "contributions": 218,
             "partial": true
           }
         ],
@@ -3488,12 +3488,12 @@
           41,
           25,
           121,
-          216
+          218
         ],
         "peak": "Peak 505 contributions/week",
         "window": "Jul 20 \u2013 Oct 10, 2026 \u00b7 12 weeks",
         "qualification": "Mon\u2013Sun \u00b7 UTC \u00b7 partial weeks included",
-        "description": "UTC contribution calendar. 2026-07-20 to 2026-07-26: 195 contributions (complete); 2026-07-27 to 2026-08-02: 123 contributions (complete); 2026-08-03 to 2026-08-09: 147 contributions (complete); 2026-08-10 to 2026-08-16: 505 contributions (complete); 2026-08-17 to 2026-08-23: 473 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 75 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-10: 216 contributions (partial)"
+        "description": "UTC contribution calendar. 2026-07-20 to 2026-07-26: 195 contributions (complete); 2026-07-27 to 2026-08-02: 123 contributions (complete); 2026-08-03 to 2026-08-09: 147 contributions (complete); 2026-08-10 to 2026-08-16: 505 contributions (complete); 2026-08-17 to 2026-08-23: 473 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 75 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-10: 218 contributions (partial)"
       }
     },
     "rhythm": {
@@ -3507,7 +3507,7 @@
         "window_start": "2025-10-11",
         "window_end": "2026-10-10",
         "days_observed": 365,
-        "total": 12023,
+        "total": 12025,
         "weekdays": [
           {
             "weekday": "Mon",
@@ -3531,12 +3531,12 @@
           },
           {
             "weekday": "Fri",
-            "contributions": 1679,
+            "contributions": 1680,
             "days_observed": 52
           },
           {
             "weekday": "Sat",
-            "contributions": 1962,
+            "contributions": 1963,
             "days_observed": 53
           },
           {
@@ -3584,15 +3584,15 @@
           },
           {
             "weekday": "Fri",
-            "contributions": 1679,
+            "contributions": 1680,
             "days_observed": 52,
-            "count_text": "1,679"
+            "count_text": "1,680"
           },
           {
             "weekday": "Sat",
-            "contributions": 1962,
+            "contributions": 1963,
             "days_observed": 53,
-            "count_text": "1,962"
+            "count_text": "1,963"
           },
           {
             "weekday": "Sun",
@@ -3882,9 +3882,9 @@
           "eligible_repos": 203,
           "observed_workflow_repos": 203,
           "unknown_workflow_repos": 0,
-          "configured_repos": 44,
-          "workflow_files": 108,
-          "adoption_pct": 21.67487684729064,
+          "configured_repos": 43,
+          "workflow_files": 107,
+          "adoption_pct": 21.182266009852217,
           "inventory_status": "exact",
           "status": "exact"
         },
@@ -3893,9 +3893,9 @@
           "eligible_repos": 258,
           "observed_workflow_repos": 258,
           "unknown_workflow_repos": 0,
-          "configured_repos": 57,
-          "workflow_files": 168,
-          "adoption_pct": 22.093023255813954,
+          "configured_repos": 56,
+          "workflow_files": 167,
+          "adoption_pct": 21.705426356589147,
           "inventory_status": "exact",
           "status": "exact"
         }
@@ -3915,26 +3915,26 @@
           "gauge_detail": "13/55 repos"
         },
         "private": {
-          "configured_repos": "44",
+          "configured_repos": "43",
           "eligible_repos": "203",
-          "workflow_files": "108",
+          "workflow_files": "107",
           "unknown_workflow_repos": "0",
           "observed_eligible_repos": "203",
           "status": "Exact",
           "qualification": "Workflow observation complete",
-          "adoption": "22%",
-          "gauge_detail": "44/203 repos"
+          "adoption": "21%",
+          "gauge_detail": "43/203 repos"
         },
         "combined": {
-          "configured_repos": "57",
+          "configured_repos": "56",
           "eligible_repos": "258",
-          "workflow_files": "168",
+          "workflow_files": "167",
           "unknown_workflow_repos": "0",
           "observed_eligible_repos": "258",
           "status": "Exact",
           "qualification": "Workflow observation complete",
           "adoption": "22%",
-          "gauge_detail": "57/258 repos"
+          "gauge_detail": "56/258 repos"
         }
       }
     },
@@ -5394,11 +5394,11 @@
         },
         {
           "date": "2026-10-09",
-          "count": 26
+          "count": 27
         },
         {
           "date": "2026-10-10",
-          "count": 5
+          "count": 6
         }
       ],
       "window": "2025-10-11 \u2013 2026-10-10 \u00b7 UTC",
@@ -5408,8 +5408,8 @@
       {
         "name": "CS405",
         "language": "C++",
-        "pushed_at": "2026-10-10T03:57:58Z",
-        "last_commit_msg": "Register opt-in CF2 experiment on default branch without automatic tr\u2026",
+        "pushed_at": "2026-10-10T04:55:06Z",
+        "last_commit_msg": "Remove unapproved CF2 workflow registration from main",
         "is_private": true,
         "url": "https://github.com/jguida941/CS405",
         "push_age": "pushed <1h ago"
@@ -5417,7 +5417,7 @@
       {
         "name": "sembridge",
         "language": "Rust",
-        "pushed_at": "2026-10-10T03:35:39Z",
+        "pushed_at": "2026-10-10T04:26:17Z",
         "last_commit_msg": "chore: close raw Git path identity slice",
         "is_private": true,
         "url": "https://github.com/jguida941/sembridge",
@@ -5430,7 +5430,7 @@
         "last_commit_msg": "feat: retain scoped local and cloud continuation inputs",
         "is_private": true,
         "url": "https://github.com/jguida941/blambridge",
-        "push_age": "pushed 3h ago"
+        "push_age": "pushed 4h ago"
       },
       {
         "name": "semloop",
@@ -5457,7 +5457,7 @@
         "last_commit_msg": "plan: the working projections track dev (D-M5); the release moved mai\u2026",
         "is_private": true,
         "url": "https://github.com/jguida941/semvariants",
-        "push_age": "pushed 1d ago"
+        "push_age": "pushed 2d ago"
       },
       {
         "name": "semcompose",
@@ -5494,7 +5494,7 @@
         },
         {
           "title": "blambridge",
-          "detail": "Python \u00b7 pushed 3 hours ago",
+          "detail": "Python \u00b7 pushed 4 hours ago",
           "url": "https://github.com/jguida941/blambridge",
           "is_private": true
         }
@@ -5515,7 +5515,7 @@
         },
         {
           "title": "plan: the working projections track dev (D-M5); the rel...",
-          "detail": "semvariants \u00b7 1 day ago",
+          "detail": "semvariants \u00b7 2 days ago",
           "url": "https://github.com/jguida941/semvariants",
           "is_private": true
         }
@@ -5625,11 +5625,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-10T04:01:03.934319Z",
-    "generator_revision": "fe58d5f88bb408786c16061e53fa2dbd4764302e",
+    "generated_at": "2026-10-10T05:00:52.133086Z",
+    "generator_revision": "ea15ffed3c3eeda8c4ee7154ee3bb90588c2a6e6",
     "generator_source_digest": "91e90aadc7fa3b8053f0a80d97b74d52395f1667f7adfc94dc769240d4aa43b0",
-    "claim_input_digest": "123abf3135fb8af089645775ae86cd8c5e31ca913c2979f94f8d506c6ca06d0d",
-    "render_key": "8d15d13d2e9fa8a37b9399f959a3f756360c5de20ec82586eec68876936f4eeb",
+    "claim_input_digest": "522f2460876f52fdbc35edb6a061f8fdddae9ce185df2e94c592acb1f7e8b0a6",
+    "render_key": "32ee7ba1004bdc38c2280cdd099124656765af3ef42380d0ac7b7690a0cd8d4c",
     "schema": "profile-artifact-generation/v1"
   }
 }
