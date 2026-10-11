@@ -235,6 +235,99 @@ def _code_changes(c, x, y, span, data):
         y = c.wrap("Partial history · missing dates/stats are not zero", x, y, span, size=c.secondary, color="muted")
     return c.wrap("Summed non-merge commit line changes reachable from this head; not net tree size or all branches.", x, y, span, size=c.secondary, color="muted")
 
+def _code_changes_desktop(c, x, y, span, data):
+    """Display existing observations with a shared magnitude scale and time bins."""
+    code = data.get("code_changes") or {}
+    start, end = data.get("window_start"), data.get("window_end")
+    try:
+        days = (date.fromisoformat(str(end)[:10]) - date.fromisoformat(str(start)[:10])).days + 1
+        scope = f"Last {days} days" if days > 0 else "Observation window unavailable"
+    except ValueError:
+        scope = "Observation window unavailable"
+    if data.get("current_day_partial"):
+        scope += " · today partial"
+    unavailable = code.get("status") == "unavailable" or code.get("additions") is None
+    if not unavailable and not code.get("complete"):
+        scope += " · partial data"
+    c.text(scope, x, y, size=16, color="muted")
+    identity = " · ".join(str(code.get(key) or "") for key in ("repository", "ref", "head_sha"))
+    c.parts.append('<title>'+escape(identity+f" · {start} – {end} UTC · "+scope)+'</title>')
+    if unavailable:
+        c.text("Code changes unavailable", x, y+44, color="muted")
+        return y+64
+
+    # Exact signed totals share the title row; the legend carries their labels.
+    added, deleted = f"+{code['additions']:,}", f"−{code['deletions']:,}"
+    c.text(added, x+span-max(130, len(deleted)*14+24), y-30, size=24, color=GREEN, weight=600, anchor="end")
+    c.text(deleted, x+span, y-30, size=24, color=RED, weight=600, anchor="end")
+    branch = str(code.get("ref") or "").removeprefix("refs/heads/")
+    short_identity = f"Latest observed pushed branch · {code.get('repository') or ''} · {branch} · {str(code.get('head_sha') or '')[:7]}"
+    c.text(truncate(short_identity, int(span/(14*.6))), x, y+25, size=14, color="muted")
+
+    # Bins are display-only observed subtotals; an all-unknown sign stays unknown.
+    daily = code.get("daily") or []
+    bucket_size = max(1, math.ceil(len(daily)/60))
+    buckets = []
+    for first in range(0, len(daily), bucket_size):
+        rows = daily[first:first+bucket_size]
+        bucket = {"date": rows[0]["date"], "end_date": rows[-1]["date"],
+                  "complete": all(row.get("complete") for row in rows)}
+        for kind in ("additions", "deletions"):
+            known = [row.get(kind) for row in rows if type(row.get(kind)) is int]
+            bucket[kind] = sum(known) if known else None
+            bucket["complete"] = bucket["complete"] and len(known) == len(rows)
+        buckets.append(bucket)
+    maximum = max((bucket[kind] or 0 for bucket in buckets for kind in ("additions", "deletions")), default=0)
+    cap = 10**math.ceil(math.log10(max(1, maximum)))
+    half_height = 116
+    magnitude = lambda value: half_height*math.log1p(value)/math.log1p(cap)
+    left, right = x+48, x+span
+    chart_span = right-left
+    zero = y+53+half_height
+    middle = 10**(int(math.log10(cap))//2)
+    tick_values = sorted({0, middle, cap, -middle, -cap})
+    for value in tick_values:
+        py = zero-math.copysign(magnitude(abs(value)), value) if value else zero
+        c.line(left, py, right, py, stroke_opacity=1 if value == 0 else .45)
+        label = f"{abs(value)//1000}k" if abs(value) >= 1000 else str(abs(value))
+        c.text(("−" if value < 0 else "")+label, left-9, py+4, size=12, color="muted", anchor="end")
+
+    step = chart_span/max(1, len(buckets))
+    bar_width = min(18, step*.7)
+    for i, bucket in enumerate(buckets):
+        for kind in ("additions", "deletions"):
+            value = bucket[kind]
+            if type(value) is not int or value <= 0:
+                continue
+            height = magnitude(value)
+            dates = bucket["date"] + (" – "+bucket["end_date"] if bucket_size > 1 else "")
+            title = f"{dates}: {value:,} observed {kind}" + (" (partial)" if not bucket["complete"] else "")
+            c.parts.append('<rect '+_attrs(dict(x=left+(i+.5)*step-bar_width/2,
+                y=zero-height if kind == "additions" else zero, width=bar_width, height=height,
+                fill=GREEN if kind == "additions" else RED, data_role="code-change-bar",
+                data_date=bucket["date"], data_end_date=bucket["end_date"] if bucket_size > 1 else None,
+                data_kind=kind, data_value=value))+'><title>'+escape(title)+'</title></rect>')
+    if not any(type(bucket[kind]) is int and bucket[kind] > 0 for bucket in buckets for kind in ("additions", "deletions")):
+        known = any(type(bucket[kind]) is int for bucket in buckets for kind in ("additions", "deletions"))
+        c.text("No line changes observed" if known else "Line counts unavailable", (left+right)/2, zero-18, size=16, color="muted", anchor="middle")
+
+    label_y = zero+half_height+25
+    if daily:
+        indices = sorted({round((len(daily)-1)*i/4) for i in range(5)})
+        for i in indices:
+            day = date.fromisoformat(daily[i]["date"])
+            label = day.strftime("%b")+f" {day.day}"
+            c.text(label, left+chart_span*i/max(1, len(daily)-1), label_y, size=14, color="muted",
+                   anchor="start" if i == 0 else "end" if i == len(daily)-1 else "middle")
+    legend_y = label_y+30
+    for label, color, offset in (("Additions", GREEN, 0), ("Deletions", RED, 140)):
+        c.rect(x+offset, legend_y-10, 10, 10, fill=color, radius=5)
+        c.text(label, x+offset+18, legend_y, size=14, color="muted")
+    resolution = "Log scale" + (f" · {bucket_size}-day totals" if bucket_size > 1 else "")
+    c.text(resolution, right, legend_y, size=14, color="muted", anchor="end")
+    return legend_y+8
+
+
 def render_svg(summary, *, mobile=False, generation=None):
     c = Canvas(mobile)
     facts = summary_facts(summary)
@@ -474,7 +567,8 @@ def render_svg(summary, *, mobile=False, generation=None):
     y = c.panel("focus","Current Focus",y,focus)
     analytics = summary.get("activity_analytics")
     if isinstance(analytics, dict):
-        y = c.panel("code-changes", "Code changes", y, lambda x, yy, span: _code_changes(c, x, yy, span, analytics))
+        paint_code = _code_changes if mobile else _code_changes_desktop
+        y = c.panel("code-changes", "Code changes", y, lambda x, yy, span: paint_code(c, x, yy, span, analytics))
 
     def projects(x,yy,span):
         rows = summary.get("projects") or []
