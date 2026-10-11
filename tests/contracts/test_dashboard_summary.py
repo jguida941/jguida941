@@ -249,3 +249,29 @@ class DashboardHeaderScaleTests(unittest.TestCase):
                 value = next(n for n in owner.iter(ns+"text") if n.get("data-role")=="value")
                 expected = 56 if key=="calendar.total" else 29 if key in ("inventory.public_nonfork","inventory.private_owned","inventory.stargazers") else 42 if key=="activity.active_repos_7d" else 25
                 self.assertEqual(float(value.get("font-size")), expected)
+
+
+class CodeChangeSvgTests(unittest.TestCase):
+    def test_chart_keeps_focus_and_signed_proportional_bars(self):
+        import xml.etree.ElementTree as ET
+        from scripts.rendering.generate_dashboard_summary import render_svg
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        from tests.pipeline.test_compute_metrics_accuracy import CodeChangeAggregationTests
+        data=build_activity_analytics(CodeChangeAggregationTests.source())
+        # The normal contract fixture supplies unchanged surrounding sections.
+        from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
+        from scripts.pipeline.compute_metrics import compute_profile_model
+        model=compute_profile_model(AccuracyTests()._collected(),logger=lambda *_:None,allow_network_calls=False)
+        summary={**model['dashboard_summary'],'activity_analytics':data}
+        for mobile in (False,True):
+            tree=ET.fromstring(render_svg(summary,mobile=mobile))
+            sections=[n.get('data-section') for n in tree.iter() if n.get('data-section')]
+            self.assertEqual(sections.index('focus')+1,sections.index('code-changes'))
+            self.assertEqual(sections.index('code-changes')+1,sections.index('projects'))
+            bars=[n for n in tree.iter() if n.get('data-role')=='code-change-bar']
+            self.assertEqual(4,len(bars))
+            ratios=[float(n.get('height'))/int(n.get('data-value')) for n in bars]
+            self.assertLess(max(ratios)-min(ratios),.001)
+            zeros=[float(n.get('y'))+(float(n.get('height')) if n.get('data-kind')=='additions' else 0) for n in bars]
+            self.assertLess(max(zeros)-min(zeros),.001)
+            self.assertEqual({'#9ece6a','#f7768e'},{n.get('fill') for n in bars})

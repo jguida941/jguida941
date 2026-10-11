@@ -134,5 +134,19 @@ class WebDashboardContract(unittest.TestCase):
             self.assertIn(THEME_META[name]["label"], self.html, f"switcher missing label for {name}")
 
 
+
+class CodeChangeWebsiteTests(unittest.TestCase):
+    def test_code_section_preserves_focus_and_configuration(self):
+        from scripts.pipeline.web_render import render_dashboard
+        html=render_dashboard()
+        self.assertIn('Current Focus',html)
+        self.assertIn('Workflow configuration',html)
+        self.assertIn('Code changes',html)
+        self.assertIn('hydrateCodeChanges(d.activity_analytics)',html)
+        self.assertIn('daily.map(d=>',html)
+        self.assertNotIn('Most active repositories',html)
+        self.assertLess(html.index('Current Focus'),html.index('Code changes'))
+        self.assertLess(html.index('Code changes'),html.index('Flagship Projects'))
+
 if __name__ == "__main__":
     unittest.main()

@@ -179,6 +179,62 @@ class Canvas:
         return y + height + 18
 
 
+
+def _code_changes(c, x, y, span, data):
+    code = data.get("code_changes") or {}
+    start, end = data.get("window_start"), data.get("window_end")
+    cohort = data.get("cohort") or {}
+    scope = f"Last 30 days · {str(start)[:10]} – {str(end)[:10]} UTC · today partial" if start and end else "Observation window unavailable"
+    y = c.wrap(scope, x, y, span, size=c.secondary, color="muted")
+    y = c.wrap(f"Inspected {cohort.get('queried', 'unknown')} of {cohort.get('eligible', 'unknown')} eligible recently pushed repositories", x, y, span, size=c.secondary, color="muted")
+    selection = code.get("selection") or {}
+    if code.get("status") == "unavailable" or code.get("additions") is None:
+        y = c.wrap("Code changes unavailable", x, y+8, span, color="muted")
+        return c.wrap("Selection: "+str(selection.get("reason", "unavailable")), x, y, span, size=c.secondary, color="muted")
+    identity = f"{code.get('repository')} · {code.get('ref')} · {code.get('head_sha')}"
+    c.parts.append('<title>'+escape(identity+' · '+scope)+'</title>')
+    y = c.wrap("Latest observed pushed branch", x, y+8, span, size=c.secondary, color="muted")
+    y = c.wrap(str(code.get("repository") or ""), x, y, span, weight=600)
+    branch = str(code.get("ref") or "").removeprefix("refs/heads/")
+    y = c.wrap(truncate(branch, 62 if c.mobile else 110)+" · "+str(code.get("head_sha") or "")[:7], x, y, span, size=c.secondary, color="muted")
+    y += 10
+    c.text(f"+{code['additions']:,}", x, y+24, size=26, color="#9ece6a", weight=600)
+    c.text(f"−{code.get('deletions', 0):,}", x+span/2, y+24, size=26, color="#f7768e", weight=600)
+    c.text("additions", x, y+46, size=c.secondary, color="#9ece6a")
+    c.text("deletions", x+span/2, y+46, size=c.secondary, color="#f7768e")
+    y += 65
+    if not code.get("complete"):
+        y = c.wrap("Observed / partial", x, y, span, size=c.secondary, color="muted")
+    daily = code.get("daily") or []
+    maximum = max((day.get(kind) or 0 for day in daily for kind in ("additions", "deletions")), default=0) or 1
+    left = x+48
+    chart_span = span-48
+    zero = y+66
+    c.line(left, zero, x+span, zero)
+    for value, py in ((maximum, zero-52), (0, zero), (-maximum, zero+52)):
+        c.text(str(value), left-7, py+5, size=12, color="muted", anchor="end")
+    step = chart_span/max(1, len(daily))
+    for i, day in enumerate(daily):
+        for kind in ("additions", "deletions"):
+            value = day.get(kind)
+            if type(value) is not int or value <= 0:
+                continue
+            height = value*52/maximum
+            c.rect(left+i*step+step*.15, zero-height if kind=="additions" else zero, step*.7, height,
+                fill="#9ece6a" if kind=="additions" else "#f7768e", radius=0, data_role="code-change-bar",
+                data_date=day["date"], data_kind=kind, data_value=value)
+    y = zero+78
+    if daily:
+        c.text(daily[0]["date"][5:], left, y, size=c.secondary, color="muted")
+        c.text(daily[-1]["date"][5:], x+span, y, size=c.secondary, color="muted", anchor="end")
+        y += 25
+    y = c.wrap(f"{code.get('stats_observed', 0)} of {code.get('commit_count', 0)} observed non-merge commits have line stats; {code.get('excluded_merges', 0)} merges excluded.", x, y, span, size=c.secondary, color="muted")
+    if not selection.get("complete"):
+        y = c.wrap("Selection limited: "+str(selection.get("reason", "coverage unknown")), x, y, span, size=c.secondary, color="muted")
+    if not (code.get("history") or {}).get("complete", code.get("complete")):
+        y = c.wrap("Partial history · missing dates/stats are not zero", x, y, span, size=c.secondary, color="muted")
+    return c.wrap("Summed non-merge commit line changes reachable from this head; not net tree size or all branches.", x, y, span, size=c.secondary, color="muted")
+
 def render_svg(summary, *, mobile=False, generation=None):
     c = Canvas(mobile)
     facts = summary_facts(summary)
@@ -416,6 +472,9 @@ def render_svg(summary, *, mobile=False, generation=None):
             c.parts[index]='<rect '+_attrs(dict(x=xx,y=top,width=lane_w,height=(bottom if mobile else last)-top,rx=15,fill=COLORS["surface"],stroke=COLORS["line"]))+'/>'
         return last+8
     y = c.panel("focus","Current Focus",y,focus)
+    analytics = summary.get("activity_analytics")
+    if isinstance(analytics, dict):
+        y = c.panel("code-changes", "Code changes", y, lambda x, yy, span: _code_changes(c, x, yy, span, analytics))
 
     def projects(x,yy,span):
         rows = summary.get("projects") or []

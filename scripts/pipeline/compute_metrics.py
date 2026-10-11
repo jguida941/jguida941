@@ -2185,6 +2185,10 @@ def compute_profile_model(
         "cache_mode": collected.cache_mode,
         "publication_hold_reasons": publication_hold_reasons,
     }
+    from scripts.pipeline.activity_analytics import build_activity_analytics
+    activity_analytics = build_activity_analytics(collected.activity_observations)
+    model["activity_analytics"] = activity_analytics
+    model["dashboard_data"]["activity_analytics"] = activity_analytics
     from scripts.contracts.dashboard_summary import build_dashboard_summary
     summary = build_dashboard_summary(model, profile_date=_profile_today())
     model["dashboard_summary"] = summary

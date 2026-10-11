@@ -195,6 +195,14 @@ body {
 footer { text-align: center; color: var(--ink-dim); font-size: var(--type-caption); margin-top: 26px; }
 footer a { color: var(--ink); text-decoration: none; }
 
+.code-projects { display: grid; gap: 16px; }
+.code-changes { overflow-wrap: anywhere; min-width: 0; }
+.code-chart { display: block; width: 100%; max-width: 640px; height: auto; color: var(--ink-dim); }
+.code-chart .additions { fill: var(--status-success); }
+.code-chart .deletions { fill: var(--status-danger); }
+.code-totals { display: flex; flex-wrap: wrap; gap: 12px 24px; font-weight: 600; }
+.code-additions { color: var(--status-success); }
+.code-deletions { color: var(--status-danger); }
 /* --- a11y + responsive --- */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 @media (max-width: 760px) {
@@ -382,16 +390,17 @@ def _rhythm() -> str:
 
 def _repos_focus() -> str:
     return """
-  <div class="bento">
-    <section class="panel" id="projects" tabindex="-1">
-      <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
-      <hr class="hairline">
-      <div class="rows" id="flagship"></div>
-    </section>
+  <div class="code-projects">
     <section class="panel">
       <div class="section-head"><div><p class="eyebrow">Active Focus</p><h2 class="title">Current Focus</h2></div></div>
       <hr class="hairline">
       <div class="lanes" id="focus"></div>
+    </section>
+    <section class="panel code-changes"><h2 class="title">Code changes</h2><div id="activity-code"></div></section>
+    <section class="panel" id="projects" tabindex="-1">
+      <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
+      <hr class="hairline">
+      <div class="rows" id="flagship"></div>
     </section>
   </div>"""
 
@@ -462,7 +471,28 @@ def _script() -> str:
     requestAnimationFrame(() => { if (!interruptedScroll && location.hash === selectedHash) target.scrollIntoView({block:"start"}); });
   }
 
+
+  function hydrateCodeChanges(a) {
+    a=a||{};
+    const code=a.code_changes||{}, cohort=a.cohort||{}, selection=code.selection||{}, history=code.history||{};
+    const windowText=`Last 30 days · ${esc((a.window_start||"unavailable").slice(0,10))} – ${esc((a.window_end||"unavailable").slice(0,10))} UTC · today partial`;
+    let html=`<p class="section-meta">${windowText}</p><p class="section-meta">Inspected ${esc(cohort.queried??"unknown")} of ${esc(cohort.eligible??"unknown")} eligible recently pushed repositories</p>`;
+    const repository=r=>typeof r==="string"&&/^[A-Za-z0-9_.-]+\\/[A-Za-z0-9_.-]+$/.test(r);
+    const commitLink=repository(code.repository)&&/^[0-9a-f]{40}$/.test(code.head_sha||"")?`https://github.com/${code.repository}/commit/${code.head_sha}`:"#";
+    if(code.additions==null||code.status==="unavailable") html+='<p>Code changes unavailable</p>';
+    else {
+      html+=`<p>Latest observed pushed branch</p><p><b>${esc(code.repository)}</b><br>${esc(code.ref)} · <a href="${commitLink}" title="${esc(code.head_sha)}">${esc((code.head_sha||"").slice(0,7))}</a></p><p class="code-totals"><span class="code-additions">+${esc(code.additions)} additions</span><span class="code-deletions">−${esc(code.deletions)} deletions</span></p>${code.complete?"":"<p>Observed / partial</p>"}`;
+      const daily=code.daily||[], maximum=Math.max(1,...daily.flatMap(d=>[d.additions||0,d.deletions||0])), step=280/Math.max(1,daily.length);
+      let bars=''; daily.forEach((d,i)=>{ for(const kind of ["additions","deletions"]) { const v=d[kind]; if(!(v>0)) continue; const h=v*45/maximum; bars+=`<rect x="${40+i*step+step*.15}" y="${kind==="additions"?55-h:55}" width="${step*.7}" height="${h}" class="${kind}" data-role="code-change-bar" data-value="${v}"><title>${esc(d.date)} ${kind}: ${v}</title></rect>`; } });
+      html+=`<svg class="code-chart" viewBox="0 0 320 125" role="img" aria-label="Daily additions above zero and deletions below"><line x1="40" y1="55" x2="320" y2="55" stroke="currentColor"/><g fill="currentColor" font-size="10" text-anchor="end"><text x="34" y="14">${maximum}</text><text x="34" y="59">0</text><text x="34" y="104">−${maximum}</text></g>${bars}<text x="40" y="120" fill="currentColor" font-size="11">${esc((daily[0]?.date||"").slice(5))}</text><text x="320" y="120" text-anchor="end" fill="currentColor" font-size="11">${esc((daily.at(-1)?.date||"").slice(5))}</text></svg><p>${esc(code.stats_observed??0)} of ${esc(code.commit_count??0)} observed non-merge commits have line stats; ${esc(code.excluded_merges??0)} merges excluded.</p><p>Summed non-merge commit line changes reachable from this head; not net tree size or all branches. Missing history is not zero.</p>`;
+      html+=`<details><summary>Daily line changes</summary><ul>${daily.map(d=>`<li>${esc(d.date)}: ${esc(d.additions??"unavailable")} additions; ${esc(d.deletions??"unavailable")} deletions</li>`).join("")}</ul></details>`;
+    }
+    html+=`<p class="section-meta">Selection: ${esc(selection.status||"unavailable")} · ${esc(selection.reason||"coverage unknown")}. History: ${esc(history.status||"unavailable")}.</p>`;
+    document.getElementById("activity-code").innerHTML=html;
+  }
+
   function hydrate(d) {
+    hydrateCodeChanges(d.activity_analytics);
     document.querySelectorAll("[data-bind]").forEach(el => {
       let v = get(d, el.getAttribute("data-bind"));
       if (v == null) return;
