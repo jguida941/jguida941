@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-11T17:06:13.959047Z",
+  "generated_at": "2026-10-11T18:27:41.453325Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-11T17:05:14Z",
+        "observed_at": "2026-10-11T18:26:15Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -228,8 +228,8 @@
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-10-12T04:00:00Z",
-        "window_end": "2026-10-11T17:05:22Z",
-        "observed_at": "2026-10-11T17:05:23Z",
+        "window_end": "2026-10-11T18:26:24Z",
+        "observed_at": "2026-10-11T18:26:25Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -243,8 +243,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-09-12T04:00:00Z",
-        "window_end": "2026-10-11T17:05:18Z",
-        "observed_at": "2026-10-11T17:05:22Z",
+        "window_end": "2026-10-11T18:26:21Z",
+        "observed_at": "2026-10-11T18:26:24Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -258,8 +258,8 @@
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-10-12T04:00:00Z",
-        "window_end": "2026-10-11T17:05:22Z",
-        "observed_at": "2026-10-11T17:05:22Z",
+        "window_end": "2026-10-11T18:26:24Z",
+        "observed_at": "2026-10-11T18:26:24Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-11T17:05:13Z",
+        "observed_at": "2026-10-11T18:26:14Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -545,22 +545,6 @@
       "featured": true
     },
     {
-      "name": "CS465",
-      "full_name": "jguida941/CS465",
-      "url": "https://github.com/jguida941/CS465",
-      "language": "HTML",
-      "stars": 0,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-10-11",
-      "pushed_at_raw": "2026-10-11T16:49:27Z",
-      "pushed_ago": "today",
-      "created_at": "2026-09-07",
-      "last_commit_msg": "Organize coursework into module folders and prepare Module 2",
-      "is_private": true,
-      "featured": false
-    },
-    {
       "name": "semloop",
       "full_name": "jguida941/semloop",
       "url": "https://github.com/jguida941/semloop",
@@ -569,7 +553,7 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-10-11",
-      "pushed_at_raw": "2026-10-11T16:44:11Z",
+      "pushed_at_raw": "2026-10-11T18:26:14Z",
       "pushed_ago": "today",
       "created_at": "2026-08-16",
       "last_commit_msg": "lease 4: seven attacks killed and restored",
@@ -585,7 +569,7 @@
       "forks": 0,
       "ci": "no",
       "pushed_at": "2026-10-11",
-      "pushed_at_raw": "2026-10-11T16:25:14Z",
+      "pushed_at_raw": "2026-10-11T18:20:31Z",
       "pushed_ago": "today",
       "created_at": "2026-09-11",
       "last_commit_msg": "feat: retain scoped local and cloud continuation inputs",
@@ -601,10 +585,26 @@
       "forks": 0,
       "ci": "no",
       "pushed_at": "2026-10-11",
-      "pushed_at_raw": "2026-10-11T16:10:15Z",
+      "pushed_at_raw": "2026-10-11T18:18:17Z",
       "pushed_ago": "today",
       "created_at": "2026-09-06",
       "last_commit_msg": "Remove unapproved CF2 workflow registration from main",
+      "is_private": true,
+      "featured": false
+    },
+    {
+      "name": "CS465",
+      "full_name": "jguida941/CS465",
+      "url": "https://github.com/jguida941/CS465",
+      "language": "HTML",
+      "stars": 0,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-10-11",
+      "pushed_at_raw": "2026-10-11T17:54:16Z",
+      "pushed_ago": "today",
+      "created_at": "2026-09-07",
+      "last_commit_msg": "Organize coursework into module folders and prepare Module 2",
       "is_private": true,
       "featured": false
     },
@@ -618,7 +618,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-11",
       "pushed_at_raw": "2026-10-11T16:08:28Z",
-      "pushed_ago": "today",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-08-09",
       "last_commit_msg": "chore: close raw Git path identity slice",
       "is_private": true,
@@ -814,7 +814,7 @@
       "visibility": "private",
       "description": "BlamBridge: source-to-engine reconstruction framework. Halo 2 first, Godot implemented in slices, Unreal planned. Typed recipes and source-bound verification.",
       "html_url": "https://github.com/jguida941/blambridge",
-      "pushed_at": "2026-10-11T16:25:14Z",
+      "pushed_at": "2026-10-11T18:20:31Z",
       "created_at": "2026-09-11T20:25:26Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -842,7 +842,7 @@
       "visibility": "private",
       "description": "CS 465 Full Stack Development",
       "html_url": "https://github.com/jguida941/CS465",
-      "pushed_at": "2026-10-11T16:49:27Z",
+      "pushed_at": "2026-10-11T17:54:16Z",
       "created_at": "2026-09-07T00:59:57Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -868,7 +868,7 @@
       "visibility": "private",
       "description": null,
       "html_url": "https://github.com/jguida941/CS405",
-      "pushed_at": "2026-10-11T16:10:15Z",
+      "pushed_at": "2026-10-11T18:18:17Z",
       "created_at": "2026-09-06T12:36:16Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -1037,12 +1037,6 @@
   "focus": {
     "now": [
       {
-        "title": "CS465",
-        "detail": "HTML \u00b7 pushed today",
-        "url": "https://github.com/jguida941/CS465",
-        "is_private": true
-      },
-      {
         "title": "semloop",
         "detail": "Python \u00b7 pushed today",
         "url": "https://github.com/jguida941/semloop",
@@ -1053,19 +1047,25 @@
         "detail": "Python \u00b7 pushed today",
         "url": "https://github.com/jguida941/blambridge",
         "is_private": true
+      },
+      {
+        "title": "CS405",
+        "detail": "C++ \u00b7 pushed today",
+        "url": "https://github.com/jguida941/CS405",
+        "is_private": true
       }
     ],
     "next": [],
     "shipped": [
       {
-        "title": "Remove unapproved CF2 workflow registration from main",
-        "detail": "CS405 \u00b7 today",
-        "url": "https://github.com/jguida941/CS405",
+        "title": "Organize coursework into module folders and prepare Mod...",
+        "detail": "CS465 \u00b7 today",
+        "url": "https://github.com/jguida941/CS465",
         "is_private": true
       },
       {
         "title": "chore: close raw Git path identity slice",
-        "detail": "sembridge \u00b7 today",
+        "detail": "sembridge \u00b7 2 hours ago",
         "url": "https://github.com/jguida941/sembridge",
         "is_private": true
       },
@@ -1080,25 +1080,13 @@
   "activity_feed": [
     {
       "kind": "activity",
-      "title": "Organize coursework into module folders and prepare Module 2",
-      "url": "https://github.com/jguida941/CS465",
-      "repo": "jguida941/CS465",
-      "repo_url": "https://github.com/jguida941/CS465",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-10-11T16:49:27Z",
-      "is_private": true,
-      "observation_source": "repository push metadata"
-    },
-    {
-      "kind": "activity",
       "title": "lease 4: seven attacks killed and restored",
       "url": "https://github.com/jguida941/semloop",
       "repo": "jguida941/semloop",
       "repo_url": "https://github.com/jguida941/semloop",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-11T16:44:11Z",
+      "created_at": "2026-10-11T18:26:14Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1110,7 +1098,7 @@
       "repo_url": "https://github.com/jguida941/blambridge",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-11T16:25:14Z",
+      "created_at": "2026-10-11T18:20:31Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1122,7 +1110,19 @@
       "repo_url": "https://github.com/jguida941/CS405",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-11T16:10:15Z",
+      "created_at": "2026-10-11T18:18:17Z",
+      "is_private": true,
+      "observation_source": "repository push metadata"
+    },
+    {
+      "kind": "activity",
+      "title": "Organize coursework into module folders and prepare Module 2",
+      "url": "https://github.com/jguida941/CS465",
+      "repo": "jguida941/CS465",
+      "repo_url": "https://github.com/jguida941/CS465",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-10-11T17:54:16Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1133,7 +1133,7 @@
       "repo": "jguida941/sembridge",
       "repo_url": "https://github.com/jguida941/sembridge",
       "state": "PUSH",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-10-11T16:08:28Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -3115,7 +3115,7 @@
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
     "window_start": "2026-09-12T00:00:00Z",
-    "window_end": "2026-10-11T17:05:45.624819Z",
+    "window_end": "2026-10-11T18:26:44.532221Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 259,
@@ -3143,34 +3143,34 @@
         "status": "partial",
         "complete": false,
         "reason": "activity_incomplete",
-        "occurred_at": "2026-10-11T16:49:27Z"
+        "occurred_at": "2026-10-11T18:26:14Z"
       },
       "history": {
         "status": "ok",
         "complete": true,
         "reason": "end_of_connection"
       },
-      "repository": "jguida941/CS465",
-      "ref": "refs/heads/module5",
-      "head_sha": "63c7840c8a33e992aaccdf7c76d65ca058f7558e",
-      "commit_url": "https://github.com/jguida941/CS465/commit/63c7840c8a33e992aaccdf7c76d65ca058f7558e",
-      "additions": 10731,
-      "deletions": 414,
-      "commit_count": 13,
-      "observed_commits": 13,
-      "stats_observed": 13,
+      "repository": "jguida941/semloop",
+      "ref": "refs/heads/feature/research-assurance-composition",
+      "head_sha": "f167a85361ba7778c56ceff2d99a0bb9abad32d1",
+      "commit_url": "https://github.com/jguida941/semloop/commit/f167a85361ba7778c56ceff2d99a0bb9abad32d1",
+      "additions": 102028,
+      "deletions": 8750,
+      "commit_count": 88,
+      "observed_commits": 88,
+      "stats_observed": 88,
       "excluded_merges": 0,
       "daily": [
         {
           "date": "2026-09-12",
-          "additions": null,
-          "deletions": null,
+          "additions": 971,
+          "deletions": 176,
           "complete": false
         },
         {
           "date": "2026-09-13",
-          "additions": 0,
-          "deletions": 7,
+          "additions": 2928,
+          "deletions": 205,
           "complete": false
         },
         {
@@ -3211,26 +3211,26 @@
         },
         {
           "date": "2026-09-20",
-          "additions": 3090,
-          "deletions": 0,
+          "additions": null,
+          "deletions": null,
           "complete": false
         },
         {
           "date": "2026-09-21",
-          "additions": null,
-          "deletions": null,
+          "additions": 4130,
+          "deletions": 59,
           "complete": false
         },
         {
           "date": "2026-09-22",
-          "additions": null,
-          "deletions": null,
+          "additions": 10201,
+          "deletions": 640,
           "complete": false
         },
         {
           "date": "2026-09-23",
-          "additions": null,
-          "deletions": null,
+          "additions": 1896,
+          "deletions": 3,
           "complete": false
         },
         {
@@ -3241,20 +3241,20 @@
         },
         {
           "date": "2026-09-25",
-          "additions": 329,
-          "deletions": 166,
-          "complete": false
-        },
-        {
-          "date": "2026-09-26",
           "additions": null,
           "deletions": null,
           "complete": false
         },
         {
+          "date": "2026-09-26",
+          "additions": 7949,
+          "deletions": 2029,
+          "complete": false
+        },
+        {
           "date": "2026-09-27",
-          "additions": 342,
-          "deletions": 2,
+          "additions": null,
+          "deletions": null,
           "complete": false
         },
         {
@@ -3283,20 +3283,20 @@
         },
         {
           "date": "2026-10-02",
-          "additions": null,
-          "deletions": null,
+          "additions": 13202,
+          "deletions": 150,
           "complete": false
         },
         {
           "date": "2026-10-03",
-          "additions": null,
-          "deletions": null,
+          "additions": 11771,
+          "deletions": 369,
           "complete": false
         },
         {
           "date": "2026-10-04",
-          "additions": null,
-          "deletions": null,
+          "additions": 4131,
+          "deletions": 939,
           "complete": false
         },
         {
@@ -3307,20 +3307,20 @@
         },
         {
           "date": "2026-10-06",
-          "additions": null,
-          "deletions": null,
+          "additions": 2797,
+          "deletions": 12,
           "complete": false
         },
         {
           "date": "2026-10-07",
-          "additions": null,
-          "deletions": null,
+          "additions": 7877,
+          "deletions": 56,
           "complete": false
         },
         {
           "date": "2026-10-08",
-          "additions": null,
-          "deletions": null,
+          "additions": 29804,
+          "deletions": 4109,
           "complete": false
         },
         {
@@ -3337,8 +3337,8 @@
         },
         {
           "date": "2026-10-11",
-          "additions": 6970,
-          "deletions": 239,
+          "additions": 4371,
+          "deletions": 3,
           "complete": false
         }
       ],
@@ -3348,7 +3348,7 @@
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-10-11T17:06:13.959047Z",
+    "generated_at": "2026-10-11T18:27:41.453325Z",
     "facts": [
       {
         "metric_id": "calendar.total",
@@ -3441,7 +3441,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "owned-repositories-visible-to-primary-pr-search",
-        "window": "2025-10-12T04:00:00Z \u2013 2026-10-11T17:05:22Z",
+        "window": "2025-10-12T04:00:00Z \u2013 2026-10-11T18:26:24Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -3455,7 +3455,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-09-12T04:00:00Z \u2013 2026-10-11T17:05:18Z",
+        "window": "2026-09-12T04:00:00Z \u2013 2026-10-11T18:26:21Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -5603,18 +5603,9 @@
     },
     "working": [
       {
-        "name": "CS465",
-        "language": "HTML",
-        "pushed_at": "2026-10-11T16:49:27Z",
-        "last_commit_msg": "Organize coursework into module folders and prepare Module 2",
-        "is_private": true,
-        "url": "https://github.com/jguida941/CS465",
-        "push_age": "pushed <1h ago"
-      },
-      {
         "name": "semloop",
         "language": "Python",
-        "pushed_at": "2026-10-11T16:44:11Z",
+        "pushed_at": "2026-10-11T18:26:14Z",
         "last_commit_msg": "lease 4: seven attacks killed and restored",
         "is_private": true,
         "url": "https://github.com/jguida941/semloop",
@@ -5623,7 +5614,7 @@
       {
         "name": "blambridge",
         "language": "Python",
-        "pushed_at": "2026-10-11T16:25:14Z",
+        "pushed_at": "2026-10-11T18:20:31Z",
         "last_commit_msg": "feat: retain scoped local and cloud continuation inputs",
         "is_private": true,
         "url": "https://github.com/jguida941/blambridge",
@@ -5632,10 +5623,19 @@
       {
         "name": "CS405",
         "language": "C++",
-        "pushed_at": "2026-10-11T16:10:15Z",
+        "pushed_at": "2026-10-11T18:18:17Z",
         "last_commit_msg": "Remove unapproved CF2 workflow registration from main",
         "is_private": true,
         "url": "https://github.com/jguida941/CS405",
+        "push_age": "pushed <1h ago"
+      },
+      {
+        "name": "CS465",
+        "language": "HTML",
+        "pushed_at": "2026-10-11T17:54:16Z",
+        "last_commit_msg": "Organize coursework into module folders and prepare Module 2",
+        "is_private": true,
+        "url": "https://github.com/jguida941/CS465",
         "push_age": "pushed <1h ago"
       },
       {
@@ -5645,7 +5645,7 @@
         "last_commit_msg": "chore: close raw Git path identity slice",
         "is_private": true,
         "url": "https://github.com/jguida941/sembridge",
-        "push_age": "pushed <1h ago"
+        "push_age": "pushed 2h ago"
       },
       {
         "name": "build-sweep",
@@ -5669,12 +5669,6 @@
     "focus": {
       "now": [
         {
-          "title": "CS465",
-          "detail": "HTML \u00b7 pushed today",
-          "url": "https://github.com/jguida941/CS465",
-          "is_private": true
-        },
-        {
           "title": "semloop",
           "detail": "Python \u00b7 pushed today",
           "url": "https://github.com/jguida941/semloop",
@@ -5685,19 +5679,25 @@
           "detail": "Python \u00b7 pushed today",
           "url": "https://github.com/jguida941/blambridge",
           "is_private": true
+        },
+        {
+          "title": "CS405",
+          "detail": "C++ \u00b7 pushed today",
+          "url": "https://github.com/jguida941/CS405",
+          "is_private": true
         }
       ],
       "next": [],
       "updates": [
         {
-          "title": "Remove unapproved CF2 workflow registration from main",
-          "detail": "CS405 \u00b7 today",
-          "url": "https://github.com/jguida941/CS405",
+          "title": "Organize coursework into module folders and prepare Mod...",
+          "detail": "CS465 \u00b7 today",
+          "url": "https://github.com/jguida941/CS465",
           "is_private": true
         },
         {
           "title": "chore: close raw Git path identity slice",
-          "detail": "sembridge \u00b7 today",
+          "detail": "sembridge \u00b7 2 hours ago",
           "url": "https://github.com/jguida941/sembridge",
           "is_private": true
         },
@@ -5813,7 +5813,7 @@
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
       "window_start": "2026-09-12T00:00:00Z",
-      "window_end": "2026-10-11T17:05:45.624819Z",
+      "window_end": "2026-10-11T18:26:44.532221Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 259,
@@ -5841,34 +5841,34 @@
           "status": "partial",
           "complete": false,
           "reason": "activity_incomplete",
-          "occurred_at": "2026-10-11T16:49:27Z"
+          "occurred_at": "2026-10-11T18:26:14Z"
         },
         "history": {
           "status": "ok",
           "complete": true,
           "reason": "end_of_connection"
         },
-        "repository": "jguida941/CS465",
-        "ref": "refs/heads/module5",
-        "head_sha": "63c7840c8a33e992aaccdf7c76d65ca058f7558e",
-        "commit_url": "https://github.com/jguida941/CS465/commit/63c7840c8a33e992aaccdf7c76d65ca058f7558e",
-        "additions": 10731,
-        "deletions": 414,
-        "commit_count": 13,
-        "observed_commits": 13,
-        "stats_observed": 13,
+        "repository": "jguida941/semloop",
+        "ref": "refs/heads/feature/research-assurance-composition",
+        "head_sha": "f167a85361ba7778c56ceff2d99a0bb9abad32d1",
+        "commit_url": "https://github.com/jguida941/semloop/commit/f167a85361ba7778c56ceff2d99a0bb9abad32d1",
+        "additions": 102028,
+        "deletions": 8750,
+        "commit_count": 88,
+        "observed_commits": 88,
+        "stats_observed": 88,
         "excluded_merges": 0,
         "daily": [
           {
             "date": "2026-09-12",
-            "additions": null,
-            "deletions": null,
+            "additions": 971,
+            "deletions": 176,
             "complete": false
           },
           {
             "date": "2026-09-13",
-            "additions": 0,
-            "deletions": 7,
+            "additions": 2928,
+            "deletions": 205,
             "complete": false
           },
           {
@@ -5909,26 +5909,26 @@
           },
           {
             "date": "2026-09-20",
-            "additions": 3090,
-            "deletions": 0,
+            "additions": null,
+            "deletions": null,
             "complete": false
           },
           {
             "date": "2026-09-21",
-            "additions": null,
-            "deletions": null,
+            "additions": 4130,
+            "deletions": 59,
             "complete": false
           },
           {
             "date": "2026-09-22",
-            "additions": null,
-            "deletions": null,
+            "additions": 10201,
+            "deletions": 640,
             "complete": false
           },
           {
             "date": "2026-09-23",
-            "additions": null,
-            "deletions": null,
+            "additions": 1896,
+            "deletions": 3,
             "complete": false
           },
           {
@@ -5939,20 +5939,20 @@
           },
           {
             "date": "2026-09-25",
-            "additions": 329,
-            "deletions": 166,
-            "complete": false
-          },
-          {
-            "date": "2026-09-26",
             "additions": null,
             "deletions": null,
             "complete": false
           },
           {
+            "date": "2026-09-26",
+            "additions": 7949,
+            "deletions": 2029,
+            "complete": false
+          },
+          {
             "date": "2026-09-27",
-            "additions": 342,
-            "deletions": 2,
+            "additions": null,
+            "deletions": null,
             "complete": false
           },
           {
@@ -5981,20 +5981,20 @@
           },
           {
             "date": "2026-10-02",
-            "additions": null,
-            "deletions": null,
+            "additions": 13202,
+            "deletions": 150,
             "complete": false
           },
           {
             "date": "2026-10-03",
-            "additions": null,
-            "deletions": null,
+            "additions": 11771,
+            "deletions": 369,
             "complete": false
           },
           {
             "date": "2026-10-04",
-            "additions": null,
-            "deletions": null,
+            "additions": 4131,
+            "deletions": 939,
             "complete": false
           },
           {
@@ -6005,20 +6005,20 @@
           },
           {
             "date": "2026-10-06",
-            "additions": null,
-            "deletions": null,
+            "additions": 2797,
+            "deletions": 12,
             "complete": false
           },
           {
             "date": "2026-10-07",
-            "additions": null,
-            "deletions": null,
+            "additions": 7877,
+            "deletions": 56,
             "complete": false
           },
           {
             "date": "2026-10-08",
-            "additions": null,
-            "deletions": null,
+            "additions": 29804,
+            "deletions": 4109,
             "complete": false
           },
           {
@@ -6035,8 +6035,8 @@
           },
           {
             "date": "2026-10-11",
-            "additions": 6970,
-            "deletions": 239,
+            "additions": 4371,
+            "deletions": 3,
             "complete": false
           }
         ],
@@ -6046,11 +6046,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-11T17:06:13.959047Z",
-    "generator_revision": "75143238d097d2a9b68beb9ffd7badf249618494",
-    "generator_source_digest": "d21cc14aa47f73296b0494cdbcddfca5eabd497774f10819b6ef1bb8aa483844",
-    "claim_input_digest": "32cb25a3e8e9dbabfd47ffd82cc6bbc29048329c46c5c187ce1424ee50639d3f",
-    "render_key": "1682961089169f45eed3c4f627e202d42c7ba09f7f0a4cb5443bf90b251c060f",
+    "generated_at": "2026-10-11T18:27:41.453325Z",
+    "generator_revision": "5f1b4e3a43144b5eb6663394aec4ce353276a3f1",
+    "generator_source_digest": "703e5923688835fd628741eec8d6d3966363a7876746d631d96831f44ec80aa2",
+    "claim_input_digest": "8306828356869fed3772355a9472644ac881e588093a2417d178d8cec04d6efb",
+    "render_key": "428c8bad3475469fe5067987f20b0834ea13a389de187999d58f61c482163024",
     "schema": "profile-artifact-generation/v1"
   }
 }
