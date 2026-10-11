@@ -331,7 +331,7 @@ class P024RecentPushWebsiteTests(unittest.TestCase):
     """Ordinary public-side guards; native method evidence remains separate."""
 
     @staticmethod
-    def _hydrate(activity):
+    def _hydrate(activity, working=None):
         import json
         import subprocess
         from scripts.pipeline.web_render import render_dashboard
@@ -348,11 +348,11 @@ const context = {
   URLSearchParams, addEventListener() {}, requestAnimationFrame() {}, fetch() {return idle;},
   activity: input.activity,
 };
-vm.runInNewContext(input.script + "\nhydrateRecentPushes(activity);", context, {timeout: 5000});
+vm.runInNewContext(input.script + "\nhydrateRecentPushes(activity, input.working);", context, {timeout: 5000});
 process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, activity: context.activity}));
 '''
         result = subprocess.run(["node", "-e", harness],
-                                input=json.dumps({"script": script[0], "activity": activity}),
+                                input=json.dumps({"script": script[0], "activity": activity, "working": working}),
                                 text=True, capture_output=True, timeout=10, check=True)
         parsed = json.loads(result.stdout)
         assert parsed["activity"] == activity, "hydration must not mutate shared calculations"
@@ -417,6 +417,48 @@ process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, a
         self.assertIn("Change totals unverified", html)
         self.assertNotIn("+888", html)
         self.assertNotIn("Tree diff", html)
+
+    def test_real_repository_metadata_fallback_keeps_unknowns_unverified(self):
+        working = [
+            {"name": "older", "url": "https://github.com/owner/older", "pushed_at": "2026-10-09T12:00:00Z"},
+            {"name": "newer", "url": "https://github.com/owner/newer", "pushed_at": "2026-10-11T12:00:00Z"},
+            {"name": "middle", "url": "https://github.com/owner/middle", "pushed_at": "2026-10-10T12:00:00Z"},
+            {"name": "last", "url": "https://github.com/owner/last", "pushed_at": "2026-10-08T12:00:00Z"},
+        ]
+        html = self._hydrate({"recent_pushes": {"status": "unavailable", "complete": False, "rows": []}}, working)
+        self.assertEqual(3, html.count('class="recent-push-item"'))
+        self.assertLess(html.index("owner/newer"), html.index("owner/middle"))
+        self.assertLess(html.index("owner/middle"), html.index("owner/older"))
+        self.assertNotIn("owner/last", html)
+        self.assertIn("Reported repository push dates", html)
+        self.assertIn("Branch and push commits not verified", html)
+        self.assertNotIn("Tree diff", html)
+        self.assertNotIn("+0", html)
+
+    def test_verified_events_take_precedence_over_repo_metadata(self):
+        head = "a" * 40
+        ev = {"repository": "owner/actual", "ref": "refs/heads/dev", "after": head,
+              "activity_type": "push", "diff_status": "unavailable",
+              "timestamp": "2026-10-11T12:00:00Z"}
+        metadata = [{"name": "other", "url": "https://github.com/owner/other",
+                     "pushed_at": "2026-10-11T13:00:00Z"}]
+        html = self._hydrate({"recent_pushes": {"status": "partial", "rows": [ev]}}, metadata)
+        self.assertIn("owner/actual", html)
+        self.assertNotIn("owner/other", html)
+        self.assertNotIn("Reported repository push dates", html)
+
+    def test_metadata_fallback_rejects_hostile_url_and_false_timestamps(self):
+        rows = [
+            {"name": "attack", "url": "javascript:alert(1)", "pushed_at": "2026-10-11T12:00:00Z"},
+            {"name": "attack2", "url": "https://github.com/evil/attack3", "pushed_at": "2026-10-11T12:00:00Z"},
+            {"name": "good", "url": "https://github.com/owner/good", "pushed_at": "2026-10-11T12:00:00Z"},
+            {"name": "future", "url": "https://github.com/owner/future", "pushed_at": "invalid-time"},
+        ]
+        html = self._hydrate({"recent_pushes": {"status": "unavailable", "rows": []}}, rows)
+        self.assertEqual(1, html.count('class="recent-push-item"'))
+        self.assertIn("owner/good", html)
+        self.assertNotIn("javascript:", html)
+        self.assertNotIn("attack3", html)
 
     def test_untrusted_markup_cannot_become_dom_or_url(self):
         row = {"repository": "owner/<svg/onload=alert(1)>",
