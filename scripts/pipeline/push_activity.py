@@ -10,9 +10,9 @@ from datetime import datetime, timezone
 import re
 from typing import Any
 
-_REPO = re.compile(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9_.-]{1,100}\\Z")
-_OID = re.compile(r"[0-9a-f]{40}\\Z")
-_ID = re.compile(r"[A-Za-z0-9_-]{1,200}\\Z")
+_REPO = re.compile(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}/[A-Za-z0-9_.-]{1,100}\Z")
+_OID = re.compile(r"[0-9a-f]{40}\Z")
+_ID = re.compile(r"[A-Za-z0-9_-]{1,200}\Z")
 _PUSH_TYPES = frozenset(("push", "force_push"))
 _MAX_COMPARE_COMMITS = 25
 
