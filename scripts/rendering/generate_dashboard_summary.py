@@ -328,6 +328,63 @@ def _code_changes_desktop(c, x, y, span, data):
     return legend_y+8
 
 
+def _recent_pushes(c, x, y, span, data):
+    """Shared qualified push facts, but independent mobile/desktop composition."""
+    payload = data.get("recent_pushes") if isinstance(data, dict) else None
+    payload = payload if isinstance(payload, dict) else {}
+    rows = payload.get("rows") or []
+    if not isinstance(rows, list):
+        rows = []
+    state = payload.get("status", "unavailable")
+    if state != "ok":
+        y = c.wrap("Push observations incomplete · latest three not guaranteed",
+                   x, y, span, size=c.secondary, color="muted") + 6
+    else:
+        y = c.wrap("Latest observed push per repository · UTC",
+                   x, y, span, size=c.secondary, color="muted") + 6
+    if not rows:
+        return c.wrap("Recent pushes unavailable", x, y+10, span, color="muted")
+
+    cols = 1 if c.mobile else 3
+    gutter = 12
+    width = (span - (cols-1)*gutter)/cols
+    row_height = 151 if c.mobile else 157
+    for index, row in enumerate(rows[:3]):
+        xx = x + (0 if c.mobile else index*(width+gutter))
+        yy = y + (index*(row_height+10) if c.mobile else 0)
+        repo = str(row.get("repository") or "")
+        branch = str(row.get("ref") or "").removeprefix("refs/heads/")
+        timestamp = str(row.get("timestamp") or "")[:16].replace("T", " ")+" UTC"
+        head = str(row.get("after") or "")
+        commits = row.get("commits") or []
+        if not isinstance(commits, list):
+            commits = []
+        verified = row.get("diff_status") == "ok"
+        c.group(data_role="recent-push-row", data_repository=repo)
+        c.rect(xx, yy, width, row_height, fill="surface", radius=12, stroke=COLORS["line"])
+        inset = xx+13
+        c.text(truncate(repo, 25 if c.mobile else 22), inset, yy+27, size=17, weight=600)
+        c.text(truncate(branch, 31 if c.mobile else 24), inset, yy+51,
+               size=14, color="muted", data_role="recent-push-branch")
+        c.text(timestamp, inset, yy+74, size=13, color="muted")
+        c.text("head "+head[:7], inset, yy+94, size=13, color="muted")
+        if verified:
+            c.text(f"+{row['additions']:,}  −{row['deletions']:,}",
+                   inset, yy+119, size=17, weight=600, data_role="recent-push-diff")
+            c.text(f"{len(commits)} related commits · tree diff",
+                   inset, yy+140, size=12, color="muted")
+        else:
+            c.text("Code changes not verified", inset, yy+119,
+                   size=14, color="muted", data_role="recent-push-unverified")
+        related = ", ".join(sha[:12] for sha in commits)
+        c.parts.append("<title>"+escape(
+            f"{repo} · {row.get('ref')} · {timestamp} · "
+            + ("verified before/after tree diff; commits: "+related if verified
+               else "commit relationship / diff unavailable"))+"</title>")
+        c.end()
+    return y + (len(rows[:3])*(row_height+10) if c.mobile else row_height) + 6
+
+
 def render_svg(summary, *, mobile=False, generation=None):
     c = Canvas(mobile)
     facts = summary_facts(summary)
@@ -569,6 +626,8 @@ def render_svg(summary, *, mobile=False, generation=None):
     if isinstance(analytics, dict):
         paint_code = _code_changes if mobile else _code_changes_desktop
         y = c.panel("code-changes", "Code changes", y, lambda x, yy, span: paint_code(c, x, yy, span, analytics))
+    y = c.panel("recent-pushes", "Recent repository pushes", y,
+                lambda x, yy, span: _recent_pushes(c, x, yy, span, analytics or {}))
 
     def projects(x,yy,span):
         rows = summary.get("projects") or []
