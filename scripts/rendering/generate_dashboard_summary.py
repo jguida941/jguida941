@@ -5,6 +5,7 @@ import base64
 from datetime import date, datetime, timedelta
 from html import escape
 import math
+import re
 from pathlib import Path
 import textwrap
 
@@ -328,15 +329,56 @@ def _code_changes_desktop(c, x, y, span, data):
     return legend_y+8
 
 
-def _recent_pushes(c, x, y, span, data):
+def _recent_pushes(c, x, y, span, data, working=None, generated_at=None):
     """Shared qualified push facts, but independent mobile/desktop composition."""
     payload = data.get("recent_pushes") if isinstance(data, dict) else None
     payload = payload if isinstance(payload, dict) else {}
     rows = payload.get("rows") or []
     if not isinstance(rows, list):
         rows = []
+    # Reuse the dashboard's observed repository metadata when the separate
+    # push-event route has no rows. Do not fabricate branch, commit or line stats.
+    reported = False
+    if not rows:
+        candidates, seen = [], set()
+        try:
+            as_of = datetime.fromisoformat(str(generated_at).replace("Z", "+00:00"))
+            if as_of.tzinfo is None:
+                as_of = None
+        except (TypeError, ValueError):
+            as_of = None
+        for item in working if isinstance(working, list) else []:
+            if not isinstance(item, dict):
+                continue
+            name, url, pushed_at = (item.get(key) for key in ("name", "url", "pushed_at"))
+            if not all(isinstance(v, str) for v in (name, url, pushed_at)):
+                continue
+            if not url.startswith("https://github.com/"):
+                continue
+            fullname = url.removeprefix("https://github.com/")
+            parts = fullname.split("/")
+            if (len(parts) != 2 or parts[1] != name or name in {".", ".."}
+                    or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}", parts[0])
+                    or not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}", name)
+                    or fullname.casefold() in seen):
+                continue
+            try:
+                when = datetime.fromisoformat(pushed_at.replace("Z", "+00:00"))
+            except ValueError:
+                continue
+            if when.tzinfo is None or (as_of is not None and when > as_of):
+                continue
+            seen.add(fullname.casefold())
+            candidates.append((when, fullname, pushed_at))
+        candidates.sort(key=lambda entry: (-entry[0].timestamp(), entry[1].casefold(), entry[1]))
+        rows = [{"repository": repo, "timestamp": pushed, "metadata_only": True,
+                 "activity_type": "repository_metadata"} for _, repo, pushed in candidates[:3]]
+        reported = bool(rows)
     state = payload.get("status", "unavailable")
-    if state != "ok":
+    if reported:
+        y = c.wrap("Reported repository push dates · branches and commits unverified",
+                   x, y, span, size=c.secondary, color="muted") + 6
+    elif state != "ok":
         y = c.wrap("Push observations incomplete · latest three not guaranteed",
                    x, y, span, size=c.secondary, color="muted") + 6
     else:
@@ -353,34 +395,45 @@ def _recent_pushes(c, x, y, span, data):
         xx = x + (0 if c.mobile else index*(width+gutter))
         yy = y + (index*(row_height+10) if c.mobile else 0)
         repo = str(row.get("repository") or "")
-        branch = str(row.get("ref") or "").removeprefix("refs/heads/")
         timestamp = str(row.get("timestamp") or "")[:16].replace("T", " ")+" UTC"
+        metadata_only = row.get("metadata_only") is True
         head = str(row.get("after") or "")
         commits = row.get("commits") or []
-        if not isinstance(commits, list):
-            commits = []
-        verified = row.get("diff_status") == "ok"
+        commits = commits if isinstance(commits, list) else []
+        verified = (not metadata_only and row.get("activity_type") == "push"
+                    and row.get("diff_status") == "ok"
+                    and type(row.get("additions")) is int and row["additions"] >= 0
+                    and type(row.get("deletions")) is int and row["deletions"] >= 0
+                    and bool(commits) and commits[-1] == head)
         c.group(data_role="recent-push-row", data_repository=repo)
         c.rect(xx, yy, width, row_height, fill="surface", radius=12, stroke=COLORS["line"])
-        inset = xx+13
+        inset = xx + 13
         c.text(truncate(repo, 25 if c.mobile else 22), inset, yy+27, size=17, weight=600)
-        c.text(truncate(branch, 31 if c.mobile else 24), inset, yy+51,
-               size=14, color="muted", data_role="recent-push-branch")
-        c.text(timestamp, inset, yy+74, size=13, color="muted")
-        c.text("head "+head[:7], inset, yy+94, size=13, color="muted")
-        if verified:
-            c.text(f"+{row['additions']:,}  −{row['deletions']:,}",
-                   inset, yy+119, size=17, weight=600, data_role="recent-push-diff")
-            c.text(f"{len(commits)} related commits · tree diff",
-                   inset, yy+140, size=12, color="muted")
+        if metadata_only:
+            c.text("Repository push date", inset, yy+51, size=14, color="muted")
+            c.text(timestamp, inset, yy+74, size=13, color="muted")
+            c.text("Branch / commits unverified", inset, yy+94, size=13, color="muted")
+            c.text("Change totals unavailable", inset, yy+119, size=14,
+                   color="muted", data_role="recent-push-unverified")
+            title = repo+" · "+timestamp+" · repository metadata; not a verified push event"
         else:
-            c.text("Code changes not verified", inset, yy+119,
-                   size=14, color="muted", data_role="recent-push-unverified")
-        related = ", ".join(sha[:12] for sha in commits)
-        c.parts.append("<title>"+escape(
-            f"{repo} · {row.get('ref')} · {timestamp} · "
-            + ("verified before/after tree diff; commits: "+related if verified
-               else "commit relationship / diff unavailable"))+"</title>")
+            branch = str(row.get("ref") or "").removeprefix("refs/heads/")
+            c.text(truncate(branch, 31 if c.mobile else 24), inset, yy+51,
+                   size=14, color="muted", data_role="recent-push-branch")
+            c.text(timestamp, inset, yy+74, size=13, color="muted")
+            c.text("head "+head[:7], inset, yy+94, size=13, color="muted")
+            if verified:
+                c.text(f"+{row['additions']:,}  −{row['deletions']:,}",
+                       inset, yy+119, size=17, weight=600, data_role="recent-push-diff")
+                c.text(f"{len(commits)} related commits · tree diff",
+                       inset, yy+140, size=12, color="muted")
+            else:
+                c.text("Code changes not verified", inset, yy+119,
+                       size=14, color="muted", data_role="recent-push-unverified")
+            title = (f"{repo} · {row.get('ref')} · {timestamp} · "+
+                     ("verified before/after tree diff; commits: "+", ".join(sha[:12] for sha in commits)
+                      if verified else "commit relationship / diff unavailable"))
+        c.parts.append("<title>"+escape(title)+"</title>")
         c.end()
     return y + (len(rows[:3])*(row_height+10) if c.mobile else row_height) + 6
 
@@ -627,7 +680,8 @@ def render_svg(summary, *, mobile=False, generation=None):
         paint_code = _code_changes if mobile else _code_changes_desktop
         y = c.panel("code-changes", "Code changes", y, lambda x, yy, span: paint_code(c, x, yy, span, analytics))
     y = c.panel("recent-pushes", "Recent repository pushes", y,
-                lambda x, yy, span: _recent_pushes(c, x, yy, span, analytics or {}))
+                lambda x, yy, span: _recent_pushes(c, x, yy, span, analytics or {},
+                                                   summary.get("working"), summary.get("generated_at")))
 
     def projects(x,yy,span):
         rows = summary.get("projects") or []
