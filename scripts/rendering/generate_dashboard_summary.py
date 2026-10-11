@@ -10,7 +10,7 @@ import textwrap
 
 from scripts.contracts.dashboard_summary import summary_facts
 from scripts.core.config import (CONTRIB_EMPTY, CONTRIB_RAMP, DASHBOARD_SUMMARY_COLORS,
-                                 DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH)
+                                 DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH, GREEN, RED)
 from scripts.rendering.components import donut_gauge
 from scripts.rendering.icons import render as icon
 from scripts.rendering.svg_utils import lang_color, truncate
@@ -198,10 +198,10 @@ def _code_changes(c, x, y, span, data):
     branch = str(code.get("ref") or "").removeprefix("refs/heads/")
     y = c.wrap(truncate(branch, 62 if c.mobile else 110)+" · "+str(code.get("head_sha") or "")[:7], x, y, span, size=c.secondary, color="muted")
     y += 10
-    c.text(f"+{code['additions']:,}", x, y+24, size=26, color="#9ece6a", weight=600)
-    c.text(f"−{code.get('deletions', 0):,}", x+span/2, y+24, size=26, color="#f7768e", weight=600)
-    c.text("additions", x, y+46, size=c.secondary, color="#9ece6a")
-    c.text("deletions", x+span/2, y+46, size=c.secondary, color="#f7768e")
+    c.text(f"+{code['additions']:,}", x, y+24, size=26, color=GREEN, weight=600)
+    c.text(f"−{code.get('deletions', 0):,}", x+span/2, y+24, size=26, color=RED, weight=600)
+    c.text("additions", x, y+46, size=c.secondary, color=GREEN)
+    c.text("deletions", x+span/2, y+46, size=c.secondary, color=RED)
     y += 65
     if not code.get("complete"):
         y = c.wrap("Observed / partial", x, y, span, size=c.secondary, color="muted")
@@ -221,7 +221,7 @@ def _code_changes(c, x, y, span, data):
                 continue
             height = value*52/maximum
             c.rect(left+i*step+step*.15, zero-height if kind=="additions" else zero, step*.7, height,
-                fill="#9ece6a" if kind=="additions" else "#f7768e", radius=0, data_role="code-change-bar",
+                fill=GREEN if kind=="additions" else RED, radius=0, data_role="code-change-bar",
                 data_date=day["date"], data_kind=kind, data_value=value)
     y = zero+78
     if daily:
