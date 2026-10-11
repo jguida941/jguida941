@@ -365,7 +365,7 @@ process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, a
         self.assertIn('id="activity-pushes"', html)
         self.assertLess(html.index('id="activity-code"'), html.index('id="activity-pushes"'))
         self.assertLess(html.index('id="activity-pushes"'), html.index('id="projects"'))
-        self.assertIn("hydrateRecentPushes(d.activity_analytics)", html)
+        self.assertIn("hydrateRecentPushes(d.activity_analytics, d.dashboard_summary?.working, d.generated_at)", html)
         self.assertIn("Workflow configuration", html)
 
     def test_mobile_recent_push_layout_and_axis_size_are_independent(self):
