@@ -379,7 +379,7 @@ process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, a
 
     def test_verified_tree_diff_and_related_commits_are_explicit(self):
         sha_a, sha_b = "a" * 40, "b" * 40
-        event = {"repository": "owner/alpha", "ref": "refs/heads/feature/mobile",
+        event = {"repository": "owner/alpha", "activity_type": "push", "ref": "refs/heads/feature/mobile",
                  "timestamp": "2026-10-11T15:30:00Z", "after": sha_b, "id": "push-1",
                  "diff_status": "ok", "additions": 1207, "deletions": 33,
                  "commits": [sha_a, sha_b],
@@ -404,6 +404,19 @@ process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, a
         self.assertNotIn("−0", html)
         none = self._hydrate({"recent_pushes": {"status": "unavailable", "complete": False, "rows": []}})
         self.assertIn("Recent pushes unavailable", none)
+
+    def test_force_push_and_duplicate_repository_cannot_fake_verified_rows(self):
+        head = "b" * 40
+        source = {"repository": "owner/alpha", "activity_type": "force_push",
+                  "ref": "refs/heads/dev", "timestamp": "2026-10-11T15:30:00Z",
+                  "after": head, "id": "event1", "diff_status": "ok",
+                  "additions": 888, "deletions": 2, "commits": ["a" * 40, head]}
+        html = self._hydrate({"recent_pushes": {
+            "status": "ok", "complete": True, "rows": [source, {**source, "id": "event2"}]}})
+        self.assertEqual(1, html.count('data-repository="owner/alpha"'))
+        self.assertIn("Change totals unverified", html)
+        self.assertNotIn("+888", html)
+        self.assertNotIn("Tree diff", html)
 
     def test_untrusted_markup_cannot_become_dom_or_url(self):
         row = {"repository": "owner/<svg/onload=alert(1)>",
