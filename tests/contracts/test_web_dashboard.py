@@ -326,5 +326,96 @@ process.stdout.write(JSON.stringify({html: nodes['activity-code'].innerHTML, act
 
 
 
+
+class P024RecentPushWebsiteTests(unittest.TestCase):
+    """Ordinary public-side guards; native method evidence remains separate."""
+
+    @staticmethod
+    def _hydrate(activity):
+        import json
+        import subprocess
+        from scripts.pipeline.web_render import render_dashboard
+        script = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)
+        assert len(script) == 1
+        harness = r'''
+const fs = require("node:fs"), vm = require("node:vm");
+const input = JSON.parse(fs.readFileSync(0, "utf8")), nodes = {};
+const idle = {then() {return this;}, catch() {return this;}};
+const context = {
+  document: {documentElement: {dataset: {}}, querySelectorAll() {return [];},
+    getElementById(id) {return nodes[id] ||= {innerHTML: "", textContent: "", style: {setProperty() {}}, setAttribute() {}, replaceChildren() {}};}},
+  location: {hash: "", search: ""}, localStorage: {getItem() {return null;}, setItem() {}},
+  URLSearchParams, addEventListener() {}, requestAnimationFrame() {}, fetch() {return idle;},
+  activity: input.activity,
+};
+vm.runInNewContext(input.script + "\nhydrateRecentPushes(activity);", context, {timeout: 5000});
+process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, activity: context.activity}));
+'''
+        result = subprocess.run(["node", "-e", harness],
+                                input=json.dumps({"script": script[0], "activity": activity}),
+                                text=True, capture_output=True, timeout=10, check=True)
+        parsed = json.loads(result.stdout)
+        assert parsed["activity"] == activity, "hydration must not mutate shared calculations"
+        return parsed["html"]
+
+    def test_separate_section_does_not_replace_code_changes(self):
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        self.assertIn('id="activity-code"', html)
+        self.assertIn('id="activity-pushes"', html)
+        self.assertLess(html.index('id="activity-code"'), html.index('id="activity-pushes"'))
+        self.assertLess(html.index('id="activity-pushes"'), html.index('id="projects"'))
+        self.assertIn("hydrateRecentPushes(d.activity_analytics)", html)
+        self.assertIn("Workflow configuration", html)
+
+    def test_mobile_recent_push_layout_and_axis_size_are_independent(self):
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        self.assertIn(".recent-push-list { grid-template-columns: 1fr; }", html)
+        self.assertIn(".recent-push-list { display: grid;", html)
+        # P023-WEB-002: oversized phone tick glyphs clipped the minus sign.
+        self.assertNotIn(".code-chart text { font-size: 24px; }", html)
+        self.assertIn(".code-chart text { font-size: 14px; }", html)
+
+    def test_verified_tree_diff_and_related_commits_are_explicit(self):
+        sha_a, sha_b = "a" * 40, "b" * 40
+        event = {"repository": "owner/alpha", "ref": "refs/heads/feature/mobile",
+                 "timestamp": "2026-10-11T15:30:00Z", "after": sha_b, "id": "push-1",
+                 "diff_status": "ok", "additions": 1207, "deletions": 33,
+                 "commits": [sha_a, sha_b],
+                 "compare_url": "https://github.com/owner/alpha/compare/" + "c" * 40 + "..." + sha_b,
+                 "head_url": "https://github.com/owner/alpha/commit/" + sha_b}
+        html = self._hydrate({"recent_pushes": {"status": "ok", "complete": True, "rows": [event]}})
+        for expected in ("owner/alpha", "feature/mobile", "+1,207", "−33", "2 commits", sha_a[:7], sha_b[:7], "Tree diff"):
+            self.assertIn(expected, html)
+        self.assertIn("github.com/owner/alpha/commit/", html)
+
+    def test_unverified_partial_and_unavailable_never_invent_zero(self):
+        row = {"repository": "owner/beta", "ref": "refs/heads/dev",
+               "timestamp": "2026-10-11T14:20:00Z", "after": "c" * 40,
+               "id": "push-2", "diff_status": "unavailable",
+               "additions": None, "deletions": None, "commits": [],
+               "head_url": "https://github.com/owner/beta/commit/" + "c" * 40}
+        html = self._hydrate({"recent_pushes": {"status": "partial", "complete": False, "rows": [row]}})
+        self.assertIn("owner/beta", html)
+        self.assertIn("Observation incomplete", html)
+        self.assertIn("Change totals unverified", html)
+        self.assertNotIn("+0", html)
+        self.assertNotIn("−0", html)
+        none = self._hydrate({"recent_pushes": {"status": "unavailable", "complete": False, "rows": []}})
+        self.assertIn("Recent pushes unavailable", none)
+
+    def test_untrusted_markup_cannot_become_dom_or_url(self):
+        row = {"repository": "owner/<svg/onload=alert(1)>",
+               "ref": "refs/heads/<img src=x>", "id": "hack",
+               "timestamp": "2026-10-11T14:20:00Z", "after": "d" * 40,
+               "diff_status": "unavailable", "commits": []}
+        html = self._hydrate({"recent_pushes": {"status": "partial", "rows": [row]}})
+        self.assertNotIn("<img", html)
+        self.assertNotIn("<svg", html)
+        self.assertNotIn("javascript:", html)
+        self.assertNotIn("href=\"https://github.com/owner/<", html)
+
+
 if __name__ == "__main__":
     unittest.main()
