@@ -2,6 +2,7 @@
 from datetime import timedelta
 from scripts.github import github_client as gh
 from scripts.github.activity_observations import count, iso, repository_name, timestamp
+from scripts.pipeline.push_activity import present_recent_pushes
 
 
 def _status(complete, observed):
@@ -85,4 +86,5 @@ def build_activity_analytics(source):
             "excluded_merges": excluded_merges, "daily": list(days.values()) if code_available else [],
             "meaning": "Summed non-merge commit line changes reachable from the selected head; not net tree size or all branches"}
     return {"schema": "profile-activity-analytics/v1", "window_start": iso(start) if valid else None, "window_end": iso(end) if valid else None,
-            "current_day_partial": True, "cohort": cohort, "code_changes": code}
+            "current_day_partial": True, "cohort": cohort, "code_changes": code,
+            "recent_pushes": present_recent_pushes(source.get("recent_pushes") if valid else None)}
