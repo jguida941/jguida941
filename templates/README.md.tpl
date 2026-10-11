@@ -8,7 +8,7 @@
 <a href="{{ dashboard_url }}?from_snapshot={{ cache_bust }}#overview">
 <picture>
   <source media="(max-width: 767px)" srcset="assets/dashboard_summary_mobile.svg?v={{ cache_bust }}">
-  <img src="assets/dashboard_summary.svg?v={{ cache_bust }}" width="100%" alt="GitHub profile analytics: contributions, workflow configuration, language composition, recent repositories and projects. Exact values and definitions below.">
+  <img src="assets/dashboard_summary.svg?v={{ cache_bust }}" width="100%" alt="GitHub profile analytics: contributions, workflow configuration, code changes, language composition, recent repositories and projects. Exact values and definitions below.">
 </picture>
 </a>
 
@@ -68,10 +68,30 @@ Reported inventory means its completeness and freshness are unverified. Reposito
 {% for row in dashboard_summary.projects %}- {% if row.url %}[{{ row.name | e }}]({{ row.url | e }}){% else %}{{ row.name | e }}{% endif %}: {{ row.description | default('') | e }} {{ row.language | default('Language unreported', true) | e }}; {{ row.stars | default('n/a') }} stars; {{ row.forks | default('n/a') }} forks.
 {% endfor %}
 
+**Current Focus**
+
 {% for key,label in [('now','Now'),('next','Next'),('updates','Recent Updates')] %}{{ label }}:
 {% for row in dashboard_summary.focus[key] %}- {% if row.url %}[{{ row.title | e }}]({{ row.url | e }}){% else %}{{ row.title | e }}{% endif %} — {{ row.detail | default('') | e }}
 {% else %}- No planned item supplied.
 {% endfor %}{% endfor %}
+
+{% set analytics = dashboard_summary.get('activity_analytics', {}) %}
+### Code changes
+
+Last 30 days · {{ (analytics.get('window_start') or 'unavailable')[:10] }} – {{ (analytics.get('window_end') or 'unavailable')[:10] }} UTC; today is partial. Inspected {{ analytics.get('cohort', {}).get('queried', 'unknown') }} of {{ analytics.get('cohort', {}).get('eligible', 'unknown') }} eligible recently pushed repositories.
+
+{% set code = analytics.get('code_changes', {}) %}
+{% if code.get('additions') is none %}Code changes unavailable.
+{% else %}Latest observed pushed branch: {{ code.repository | e }} · {{ code.ref | e }} · {% if code.get('commit_url') %}[{{ code.head_sha | e }}]({{ code.commit_url | e }}){% else %}{{ code.head_sha | e }}{% endif %}.
+
+{{ code.additions }} additions · {{ code.deletions }} deletions{% if not code.complete %} · observed / partial{% endif %}. {{ code.get('stats_observed', 0) }} of {{ code.get('commit_count', 0) }} observed non-merge commits have line stats; {{ code.get('excluded_merges', 0) }} merges excluded. Summed non-merge commit line changes reachable from the selected head, not net tree size or all branches.
+
+| UTC date | Additions | Deletions |
+| --- | ---: | ---: |
+{% for day in code.get('daily', []) %}| {{ day.date }} | {{ day.additions if day.additions is not none else 'unavailable' }} | {{ day.deletions if day.deletions is not none else 'unavailable' }} |
+{% endfor %}{% endif %}
+
+Selection: {{ code.get('selection', {}).get('status', 'unavailable') }} · {{ code.get('selection', {}).get('reason', 'coverage unknown') | e }}. History: {{ code.get('history', {}).get('status', 'unavailable') }}. Missing history is not zero.
 
 Recently created:
 {% for row in dashboard_summary.recent_created %}- {{ row.name | e }} — {{ row.created_at | default('Date unavailable') | e }}

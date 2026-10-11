@@ -249,3 +249,149 @@ class DashboardHeaderScaleTests(unittest.TestCase):
                 value = next(n for n in owner.iter(ns+"text") if n.get("data-role")=="value")
                 expected = 56 if key=="calendar.total" else 29 if key in ("inventory.public_nonfork","inventory.private_owned","inventory.stargazers") else 42 if key=="activity.active_repos_7d" else 25
                 self.assertEqual(float(value.get("font-size")), expected)
+
+
+class CodeChangeSvgTests(unittest.TestCase):
+    def test_chart_keeps_focus_and_signed_proportional_bars(self):
+        import xml.etree.ElementTree as ET
+        from scripts.rendering.generate_dashboard_summary import render_svg
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        from tests.pipeline.test_compute_metrics_accuracy import CodeChangeAggregationTests
+        data=build_activity_analytics(CodeChangeAggregationTests.source())
+        # The normal contract fixture supplies unchanged surrounding sections.
+        from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
+        from scripts.pipeline.compute_metrics import compute_profile_model
+        model=compute_profile_model(AccuracyTests()._collected(),logger=lambda *_:None,allow_network_calls=False)
+        summary={**model['dashboard_summary'],'activity_analytics':data}
+        for mobile in (False,True):
+            tree=ET.fromstring(render_svg(summary,mobile=mobile))
+            sections=[n.get('data-section') for n in tree.iter() if n.get('data-section')]
+            self.assertEqual(sections.index('focus')+1,sections.index('code-changes'))
+            self.assertEqual(sections.index('code-changes')+1,sections.index('projects'))
+            bars=[n for n in tree.iter() if n.get('data-role')=='code-change-bar']
+            self.assertEqual(4,len(bars))
+            import math
+            ratios=[float(n.get('height'))/(int(n.get('data-value')) if mobile else math.log1p(int(n.get('data-value')))) for n in bars]
+            self.assertLess(max(ratios)-min(ratios),.001)
+            zeros=[float(n.get('y'))+(float(n.get('height')) if n.get('data-kind')=='additions' else 0) for n in bars]
+            self.assertLess(max(zeros)-min(zeros),.001)
+            self.assertEqual({'#9ece6a','#f7768e'},{n.get('fill') for n in bars})
+
+
+class CodeChangeDesktopPresentationTests(unittest.TestCase):
+    @staticmethod
+    def summary(count=30):
+        from datetime import date, timedelta
+        start = date(2025, 10, 12)
+        daily = [{"date": str(start+timedelta(days=i)), "additions": (i % 5)+1,
+                  "deletions": (i % 3)+1, "complete": True} for i in range(count)]
+        daily[-1]["additions"] = 6970
+        daily[1].update(additions=None, deletions=None, complete=False)
+        code = {"repository": "owner/project", "ref": "refs/heads/develop", "head_sha": "a"*40,
+                "status": "partial", "complete": False, "daily": daily,
+                "additions": sum(row["additions"] or 0 for row in daily),
+                "deletions": sum(row["deletions"] or 0 for row in daily)}
+        return {"activity_analytics": {"window_start": str(start)+"T00:00:00Z",
+                "window_end": str(start+timedelta(days=count-1))+"T17:00:00Z",
+                "current_day_partial": True, "code_changes": code}}
+
+    @staticmethod
+    def chart(summary):
+        tree = ET.fromstring(render_svg(summary))
+        return next(node for node in tree.iter() if node.get("data-section") == "code-changes")
+
+    def test_desktop_has_compact_context_legend_and_readable_common_scale(self):
+        import math
+        from scripts.core.config import DASHBOARD_SUMMARY_COLORS
+        summary = self.summary()
+        chart = self.chart(summary)
+        ink = list(chart.iter("{http://www.w3.org/2000/svg}text"))
+        paint = " ".join(node.text or "" for node in ink)
+        bars = [node for node in chart.iter() if node.get("data-role") == "code-change-bar"]
+        panel = next(node for node in chart.iter() if node.get("data-role") == "panel")
+        self.assertLessEqual(float(panel.get("height")), 440)
+        self.assertGreaterEqual(min(float(node.get("height")) for node in bars), 3)
+        self.assertGreaterEqual(max(float(node.get("height")) for node in bars), 100)
+        scale = [float(node.get("height"))/math.log1p(int(node.get("data-value"))) for node in bars]
+        self.assertAlmostEqual(min(scale), max(scale), places=5)
+        for label in ("Last 30 days", "today partial", "partial data", "Log scale", "Additions", "Deletions"):
+            self.assertIn(label, paint)
+        for internal in ("Inspected", "Selection limited", "non-merge commits", "activity_incomplete"):
+            self.assertNotIn(internal, paint)
+        identity = next(node for node in ink if (node.text or "").startswith("Latest observed pushed branch"))
+        self.assertIn("owner/project · develop · aaaaaaa", identity.text)
+        self.assertEqual(identity.get("fill"), DASHBOARD_SUMMARY_COLORS["muted"])
+        self.assertEqual(identity.get("font-weight"), "400")
+        for key, sign in (("additions", "+"), ("deletions", "−")):
+            total = next(node for node in ink if node.text == f"{sign}{summary['activity_analytics']['code_changes'][key]:,}")
+            self.assertGreater(float(total.get("x")), float(panel.get("x"))+float(panel.get("width"))*.55)
+            self.assertLess(float(total.get("y")), float(panel.get("y"))+65)
+        self.assertIn("refs/heads/develop", " ".join(chart.itertext()))
+        self.assertIn("a"*40, " ".join(chart.itertext()))
+
+    def test_supplied_ranges_group_without_losing_observed_counts(self):
+        import copy
+        from datetime import date, timedelta
+        for count in (7, 30, 365):
+            with self.subTest(days=count):
+                summary = self.summary(count)
+                original = copy.deepcopy(summary)
+                chart = self.chart(summary)
+                paint = " ".join(node.text or "" for node in chart.iter("{http://www.w3.org/2000/svg}text"))
+                self.assertIn(f"Last {count} days", paint)
+                bars = [node for node in chart.iter() if node.get("data-role") == "code-change-bar"]
+                self.assertLessEqual(len({node.get("data-date") for node in bars}), 60)
+                self.assertGreaterEqual(min(float(node.get("width")) for node in bars), 5)
+                for kind in ("additions", "deletions"):
+                    self.assertEqual(sum(int(node.get("data-value")) for node in bars if node.get("data-kind") == kind),
+                                     summary["activity_analytics"]["code_changes"][kind])
+                if count == 365:
+                    self.assertIn("7-day totals", paint)
+                    self.assertEqual(len({node.get("data-date") for node in bars}), 53)
+                    final = [node for node in bars if node.get("data-date") == str(date(2025, 10, 12)+timedelta(days=364))]
+                    self.assertEqual(len(final), 2)
+                    self.assertTrue(all(node.get("data-end-date") == node.get("data-date") for node in final))
+                else:
+                    self.assertNotIn("day totals", paint)
+                    self.assertTrue(all(node.get("data-end-date") is None for node in bars))
+                self.assertEqual(original, summary)
+
+    def test_unknown_and_zero_buckets_stay_distinct_from_observed_subtotals(self):
+        summary = self.summary(365)
+        code = summary["activity_analytics"]["code_changes"]
+        for row in code["daily"]:
+            row.update(additions=None, deletions=None, complete=False)
+        for row in code["daily"][7:14]:
+            row.update(additions=0, deletions=0, complete=True)
+        code["daily"][14].update(additions=1, deletions=7, complete=True)
+        code["daily"][15].update(additions=31, deletions=None)
+        code.update(additions=32, deletions=7)
+        chart = self.chart(summary)
+        bars = [node for node in chart.iter() if node.get("data-role") == "code-change-bar"]
+        self.assertEqual(sorted((node.get("data-date"), node.get("data-kind"), node.get("data-value")) for node in bars),
+                         [("2025-10-26", "additions", "32"), ("2025-10-26", "deletions", "7")])
+        self.assertTrue(all("partial" in " ".join(node.itertext()) for node in bars))
+        self.assertTrue(all(node.get("data-end-date") == "2025-11-01" for node in bars))
+
+    def test_complete_zero_and_unavailable_context_are_honest(self):
+        summary = self.summary()
+        data = summary["activity_analytics"]
+        code = data["code_changes"]
+        code.update(additions=0, deletions=0, complete=True, status="ok")
+        for row in code["daily"]:
+            row.update(additions=0, deletions=0, complete=True)
+        data["current_day_partial"] = False
+        chart = self.chart(summary)
+        paint = " ".join(node.text or "" for node in chart.iter("{http://www.w3.org/2000/svg}text"))
+        self.assertIn("+0", paint)
+        self.assertIn("−0", paint)
+        self.assertNotIn("partial", paint)
+        self.assertFalse(any(node.get("data-role") == "code-change-bar" for node in chart.iter()))
+        code.update(additions=None, deletions=None, status="unavailable", complete=False, daily=[])
+        data.update(window_start=None, window_end=None)
+        chart = self.chart(summary)
+        paint = " ".join(node.text or "" for node in chart.iter("{http://www.w3.org/2000/svg}text"))
+        self.assertIn("Observation window unavailable", paint)
+        self.assertIn("Code changes unavailable", paint)
+        self.assertNotIn("+0", paint)
+        self.assertFalse(any(node.get("data-role") == "code-change-bar" for node in chart.iter()))

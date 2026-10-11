@@ -2906,5 +2906,40 @@ class ContributionTrendTests(unittest.TestCase):
 
 
 
+
+class CodeChangeAggregationTests(unittest.TestCase):
+    @staticmethod
+    def source():
+        return {'schema':'profile-activity-observations/v1','window_start':'2026-09-11T00:00:00Z','window_end':'2026-10-10T16:30:00Z','observed_at':'2026-10-10T16:30:00Z',
+          'cohort':{'inventory':1,'inventory_complete':True,'inventory_fresh':True,'eligible':1,'selected':1,'queried':1,'complete':1,'partial':0,'unavailable':0,'excluded':{}},
+          'selection':{'status':'ok','complete':True,'reason':'observed','occurred_at':'2026-10-10T12:00:00Z'},
+          'code_changes':{'status':'ok','complete':True,'reason':'end_of_connection','repository':'owner/project','ref':'refs/heads/dev/feature','head_sha':'a'*40,'commits':[
+            {'oid':'a'*40,'committed_at':'2026-10-10T12:00:00Z','additions':20,'deletions':7,'parent_count':1},
+            {'oid':'b'*40,'committed_at':'2026-10-09T12:00:00Z','additions':5,'deletions':2,'parent_count':0}]}}
+
+    def test_distinct_nonmerge_commits_and_thirty_date_window(self):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        source=self.source();rows=source['code_changes']['commits']
+        rows.extend([dict(rows[0]),{**rows[0],'oid':'c'*40,'parent_count':2,'additions':900},{**rows[0],'oid':'d'*40,'committed_at':'2026-09-10T12:00:00Z'}])
+        code=build_activity_analytics(source)['code_changes']
+        self.assertEqual((25,9,2,1,True),(code['additions'],code['deletions'],code['commit_count'],code['excluded_merges'],code['complete']))
+        self.assertEqual(30,len(code['daily']))
+        self.assertEqual(0,code['daily'][0]['additions'])
+
+    def test_invalid_stats_and_unknown_history_are_not_exact_zero(self):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        for invalid in (True,-1,'5',None):
+            source=self.source();source['code_changes']['commits'][0]['additions']=invalid
+            code=build_activity_analytics(source)['code_changes']
+            self.assertFalse(code['complete']);self.assertFalse(code['history']['complete'])
+            self.assertEqual(5,code['additions'])
+        source=self.source();source['code_changes'].update(status='unavailable',complete=False)
+        self.assertIsNone(build_activity_analytics(source)['code_changes']['additions'])
+
+    def test_projection_has_only_code_change_family(self):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        result=build_activity_analytics(self.source())
+        for unrelated in ('ci','repositories','system'):self.assertNotIn(unrelated,result)
+
 if __name__ == "__main__":
     unittest.main()

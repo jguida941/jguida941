@@ -31,3 +31,20 @@ class ReadmeProjectionContract(unittest.TestCase):
         root = Path(__file__).resolve().parents[2]
         for name in ("templates/README.md.tpl", "README.md"):
             assert_projection(self, (root / name).read_text())
+
+
+class CodeChangeReadmeTests(unittest.TestCase):
+    def test_code_text_has_full_branch_commit_and_daily_equivalent(self):
+        from jinja2 import Environment
+        from pathlib import Path
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        from tests.pipeline.test_compute_metrics_accuracy import CodeChangeAggregationTests, AccuracyTests
+        from scripts.pipeline.compute_metrics import compute_profile_model
+        model=compute_profile_model(AccuracyTests()._collected(),logger=lambda *_:None,allow_network_calls=False)
+        model['dashboard_summary']['activity_analytics']=build_activity_analytics(CodeChangeAggregationTests.source())
+        template=Path('templates/README.md.tpl').read_text()
+        rendered=Environment().from_string(template).render(dashboard_summary=model['dashboard_summary'],legacy_visuals=[])
+        self.assertIn('Current Focus',rendered)
+        self.assertIn('refs/heads/dev/feature',rendered)
+        self.assertIn('https://github.com/owner/project/commit/'+'a'*40,rendered)
+        self.assertIn('| 2026-10-10 | 20 | 7 |',rendered)

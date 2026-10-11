@@ -326,6 +326,32 @@ body {
 footer { text-align: center; color: var(--ink-dim); font-size: var(--type-caption); margin-top: 26px; }
 footer a { color: var(--ink); text-decoration: none; }
 
+.code-projects { display: grid; gap: 16px; }
+.code-changes { overflow-wrap: anywhere; min-width: 0; }
+.code-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; }
+.code-heading .title { margin: 0; }
+.code-totals { display: flex; flex-wrap: wrap; gap: 12px 24px; margin: 0; font-size: 24px; font-weight: 600; }
+.code-additions { color: var(--status-success); }
+.code-deletions { color: var(--status-danger); }
+.code-branch { color: var(--ink-dim); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 8px 0 16px; }
+.code-branch a { color: inherit; }
+.code-chart { display: block; width: 100%; height: auto; color: var(--ink-dim); }
+.code-chart text { fill: currentColor; font-size: 14px; }
+.code-chart .additions { fill: var(--status-success); }
+.code-chart .deletions { fill: var(--status-danger); }
+.code-legend { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 24px; color: var(--ink-dim); font-size: var(--type-body); }
+.code-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.code-legend i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.code-legend .additions { background: var(--status-success); }
+.code-legend .deletions { background: var(--status-danger); }
+.code-legend .code-scale { margin-left: auto; }
+.code-details { margin-top: 12px; }
+.code-details ul { padding-left: 20px; }
+@media (max-width: 480px) {
+  .code-totals { font-size: 20px; }
+  .code-chart text { font-size: 24px; }
+  .code-legend { gap: 8px 16px; }
+}
 /* --- a11y + responsive --- */
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
 @media (max-width: 760px) {
@@ -437,16 +463,17 @@ footer a { color: var(--ink); text-decoration: none; }
     <p class="rhythm-status" id="rhythm-qualification"></p>
     <details class="rhythm-detail"><summary>How to read this</summary><p id="rhythm-explanation"></p><p id="rhythm-coverage"></p><p id="rhythm-scope"></p></details>
   </section>
-  <div class="bento">
-    <section class="panel" id="projects" tabindex="-1">
-      <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
-      <hr class="hairline">
-      <div class="rows" id="flagship"></div>
-    </section>
+  <div class="code-projects">
     <section class="panel">
       <div class="section-head"><div><p class="eyebrow">Active Focus</p><h2 class="title">Current Focus</h2></div></div>
       <hr class="hairline">
       <div class="lanes" id="focus"></div>
+    </section>
+    <section class="panel code-changes"><div id="activity-code"><h2 class="title">Code changes</h2></div></section>
+    <section class="panel" id="projects" tabindex="-1">
+      <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
+      <hr class="hairline">
+      <div class="rows" id="flagship"></div>
     </section>
   </div>
   <section class="panel" id="snapshot" tabindex="-1">
@@ -511,7 +538,69 @@ footer a { color: var(--ink); text-decoration: none; }
     requestAnimationFrame(() => { if (!interruptedScroll && location.hash === selectedHash) target.scrollIntoView({block:"start"}); });
   }
 
+
+  function hydrateCodeChanges(a) {
+    a=a||{};
+    const code=a.code_changes||{}, cohort=a.cohort||{}, selection=code.selection||{}, history=code.history||{};
+    const start=Date.parse((a.window_start||"").slice(0,10)+"T00:00:00Z"), end=Date.parse((a.window_end||"").slice(0,10)+"T00:00:00Z");
+    const days=Math.round((end-start)/86400000)+1;
+    const unavailable=code.additions==null||code.status==="unavailable";
+    const windowText=(Number.isFinite(days)&&days>0?`Last ${days} days`:"Observation window unavailable")+(a.current_day_partial?" · today partial":"")+(!unavailable&&!code.complete?" · partial data":"");
+    const repository=r=>typeof r==="string"&&/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(r);
+    const commitLink=repository(code.repository)&&/^[0-9a-f]{40}$/.test(code.head_sha||"")?`https://github.com/${code.repository}/commit/${code.head_sha}`:"#";
+    const identity=`${code.repository||""} · ${code.ref||""} · ${code.head_sha||""}`;
+    const totals=unavailable?"":`<p class="code-totals"><span class="code-additions">+${esc(code.additions.toLocaleString("en-US"))}</span><span class="code-deletions">−${esc(code.deletions.toLocaleString("en-US"))}</span></p>`;
+    let html=`<div class="code-heading"><h2 class="title">Code changes</h2>${totals}</div><p class="section-meta">${windowText}</p>`;
+    const daily=code.daily||[];
+    if(unavailable) html+='<p>Code changes unavailable</p>';
+    else {
+      const branch=(code.ref||"").startsWith("refs/heads/")?code.ref.slice(11):(code.ref||"");
+      html+=`<p class="code-branch" title="${esc(identity)}">Latest observed pushed branch · ${esc(code.repository)} · ${esc(branch)} · <a href="${commitLink}" title="${esc(code.head_sha)}">${esc((code.head_sha||"").slice(0,7))}</a></p>`;
+      // Presentation bins retain only observed counts; missing signs stay unknown.
+      const bucketSize=Math.max(1,Math.ceil(daily.length/60)), buckets=[];
+      for(let i=0;i<daily.length;i+=bucketSize) {
+        const rows=daily.slice(i,i+bucketSize), bucket={date:rows[0].date,endDate:rows.at(-1).date,complete:rows.every(d=>d.complete)};
+        for(const kind of ["additions","deletions"]) {
+          const known=rows.map(d=>d[kind]).filter(Number.isInteger);
+          bucket[kind]=known.length?known.reduce((sum,v)=>sum+v,0):null;
+          bucket.complete=bucket.complete&&known.length===rows.length;
+        }
+        buckets.push(bucket);
+      }
+      const maximum=Math.max(1,...buckets.flatMap(d=>[d.additions||0,d.deletions||0]));
+      const cap=10**Math.ceil(Math.log10(maximum)), halfHeight=116, zero=132, left=64, right=632;
+      const magnitude=v=>halfHeight*Math.log1p(v)/Math.log1p(cap);
+      const middle=10**Math.floor(Math.log10(cap)/2), ticks=[...new Set([-cap,-middle,0,middle,cap])];
+      let guides=ticks.map(v=>{
+        const y=zero-Math.sign(v)*magnitude(Math.abs(v)), value=Math.abs(v), label=(v<0?"−":"")+(value>=1000?`${value/1000}k`:value);
+        return `<line x1="${left}" y1="${y}" x2="${right}" y2="${y}" stroke="currentColor" stroke-opacity="${v===0?.65:.2}"/><text x="${left-8}" y="${y+5}" text-anchor="end">${label}</text>`;
+      }).join("");
+      const step=(right-left)/Math.max(1,buckets.length), width=Math.min(18,step*.7);
+      let bars=''; buckets.forEach((d,i)=>{
+        for(const kind of ["additions","deletions"]) {
+          const v=d[kind]; if(!Number.isInteger(v)||v<=0) continue;
+          const h=magnitude(v), dates=d.date+(bucketSize>1?` – ${d.endDate}`:"");
+          bars+=`<rect x="${left+(i+.5)*step-width/2}" y="${kind==="additions"?zero-h:zero}" width="${width}" height="${h}" class="${kind}" data-role="code-change-bar" data-kind="${kind}" data-date="${esc(d.date)}"${bucketSize>1?` data-end-date="${esc(d.endDate)}"`:""} data-value="${v}"><title>${esc(dates)}: ${v} observed ${kind}${d.complete?"":" (partial)"}</title></rect>`;
+        }
+      });
+      if(!bars) {
+        const known=buckets.some(d=>Number.isInteger(d.additions)||Number.isInteger(d.deletions));
+        bars=`<text x="${(left+right)/2}" y="${zero-20}" text-anchor="middle">${known?"No line changes observed":"Line counts unavailable"}</text>`;
+      }
+      const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const dates=daily.length?[...new Set([0,1,2,3,4].map(i=>Math.round((daily.length-1)*i/4)))].map(i=>{
+        const day=new Date(daily[i].date+"T00:00:00Z"), label=`${months[day.getUTCMonth()]} ${day.getUTCDate()}`;
+        return `<text x="${left+(right-left)*i/Math.max(1,daily.length-1)}" y="280" text-anchor="${i===0?"start":i===daily.length-1?"end":"middle"}">${label}</text>`;
+      }).join(""):"";
+      html+=`<svg class="code-chart" viewBox="0 0 640 300" role="img" aria-label="Observed additions above zero and deletions below, logarithmic magnitude scale">${guides}${bars}${dates}</svg><div class="code-legend"><span><i class="additions" aria-hidden="true"></i>Additions</span><span><i class="deletions" aria-hidden="true"></i>Deletions</span><span class="code-scale">Log scale${bucketSize>1?` · ${bucketSize}-day totals`:""}</span></div>`;
+    }
+    html+=`<details class="rhythm-detail code-details"><summary>How to read this</summary><p>${esc(a.window_start||"unavailable")} – ${esc(a.window_end||"unavailable")} UTC</p><p>Latest observed pushed branch · ${esc(identity)}</p><p>Inspected ${esc(cohort.queried??"unknown")} of ${esc(cohort.eligible??"unknown")} eligible recently pushed repositories</p><p>${esc(code.stats_observed??0)} of ${esc(code.commit_count??0)} observed non-merge commits have line stats; ${esc(code.excluded_merges??0)} merges excluded.</p><p>Selection: ${esc(selection.status||"unavailable")} · ${esc(selection.reason||"coverage unknown")}. History: ${esc(history.status||"unavailable")} · ${esc(history.reason||"coverage unknown")}.</p><p>Summed non-merge commit line changes reachable from this head; not net tree size or all branches. Missing history is not zero.</p><ul>${daily.map(d=>`<li>${esc(d.date)}: ${esc(d.additions??"unavailable")} additions; ${esc(d.deletions??"unavailable")} deletions</li>`).join("")}</ul></details>`;
+    document.getElementById("activity-code").innerHTML=html;
+  }
+
+
   function hydrate(d) {
+    hydrateCodeChanges(d.activity_analytics);
     document.querySelectorAll("[data-bind]").forEach(el => {
       let v = get(d, el.getAttribute("data-bind"));
       if (v == null) return;

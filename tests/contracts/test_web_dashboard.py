@@ -134,5 +134,197 @@ class WebDashboardContract(unittest.TestCase):
             self.assertIn(THEME_META[name]["label"], self.html, f"switcher missing label for {name}")
 
 
+
+class CodeChangeWebsiteTests(unittest.TestCase):
+    def test_code_section_preserves_focus_and_configuration(self):
+        from scripts.pipeline.web_render import render_dashboard
+        html=render_dashboard()
+        self.assertIn('Current Focus',html)
+        self.assertIn('Workflow configuration',html)
+        self.assertIn('Code changes',html)
+        self.assertIn('hydrateCodeChanges(d.activity_analytics)',html)
+        self.assertIn('daily.map(d=>',html)
+        self.assertNotIn('Most active repositories',html)
+        self.assertLess(html.index('Current Focus'),html.index('Code changes'))
+        self.assertLess(html.index('Code changes'),html.index('Flagship Projects'))
+
+class CodeChangeHydrationTests(unittest.TestCase):
+    @staticmethod
+    def activity(count=30):
+        from datetime import date, timedelta
+        start = date(2025, 10, 12)
+        daily = [{"date": str(start+timedelta(days=i)), "additions": 0, "deletions": 0, "complete": True}
+                 for i in range(count)]
+        for i, additions, deletions in ((0, 1, 1), (count//2, 31, 7), (count-1, 6970, 166)):
+            daily[i].update(additions=additions, deletions=deletions)
+        daily[1].update(additions=None, deletions=None, complete=False)
+        return {"window_start": str(start)+"T00:00:00Z", "window_end": str(start+timedelta(days=count-1))+"T17:00:00Z",
+                "current_day_partial": True, "cohort": {"queried": 13, "eligible": 13},
+                "code_changes": {"repository": "owner/project", "ref": "refs/heads/develop", "head_sha": "a"*40,
+                    "status": "partial", "complete": False, "stats_observed": 13, "commit_count": 15,
+                    "excluded_merges": 2, "selection": {"status": "partial", "reason": "activity_incomplete"},
+                    "history": {"status": "ok", "reason": "end_of_connection"}, "daily": daily,
+                    "additions": sum(row["additions"] or 0 for row in daily),
+                    "deletions": sum(row["deletions"] or 0 for row in daily)}}
+
+    def hydrate(self, activity):
+        import json
+        import subprocess
+        import xml.etree.ElementTree as ET
+        from html.parser import HTMLParser
+        from scripts.pipeline.web_render import render_dashboard
+        script = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)
+        self.assertEqual(len(script), 1)
+        harness = r'''
+const fs = require('node:fs'), vm = require('node:vm');
+const input = JSON.parse(fs.readFileSync(0, 'utf8')), nodes = {};
+const idle = {then() {return this;}, catch() {return this;}};
+const context = {document: {documentElement: {dataset: {}}, querySelectorAll() {return [];},
+  getElementById(id) {return nodes[id] ||= {innerHTML: '', textContent: '', style: {setProperty() {}}, setAttribute() {}, replaceChildren() {}};}},
+  location: {hash: '', search: ''}, localStorage: {getItem() {return null;}, setItem() {}},
+  URLSearchParams, addEventListener() {}, requestAnimationFrame() {}, fetch() {return idle;}, activity: input.activity};
+vm.runInNewContext(input.script + '\nhydrateCodeChanges(activity);', context, {timeout: 5000});
+process.stdout.write(JSON.stringify({html: nodes['activity-code'].innerHTML, activity: context.activity}));
+'''
+        result = subprocess.run(["node", "-e", harness], input=json.dumps({"script": script[0], "activity": activity}),
+                                text=True, capture_output=True, check=True, timeout=10)
+        observed = json.loads(result.stdout)
+        self.assertEqual(activity, observed["activity"])
+        class Fragment(HTMLParser):
+            def __init__(self):
+                super().__init__(convert_charrefs=True)
+                self.root = ET.Element("root")
+                self.stack = [self.root]
+            def handle_starttag(self, tag, attrs):
+                node = ET.SubElement(self.stack[-1], tag, dict(attrs))
+                if tag not in ("br", "hr", "img", "input", "meta", "link"):
+                    self.stack.append(node)
+            def handle_startendtag(self, tag, attrs):
+                ET.SubElement(self.stack[-1], tag, dict(attrs))
+            def handle_endtag(self, tag):
+                for index in range(len(self.stack)-1, 0, -1):
+                    if self.stack[index].tag == tag:
+                        del self.stack[index:]
+                        break
+            def handle_data(self, value):
+                parent = self.stack[-1]
+                if len(parent):
+                    parent[-1].tail = (parent[-1].tail or "")+value
+                else:
+                    parent.text = (parent.text or "")+value
+        parsed = Fragment()
+        parsed.feed(observed["html"])
+        return parsed.root
+
+    @staticmethod
+    def visible(tree):
+        import copy
+        visible = copy.deepcopy(tree)
+        for parent in visible.iter():
+            for child in list(parent):
+                if child.tag in ("details", "title"):
+                    parent.remove(child)
+        return " ".join(visible.itertext())
+
+    @staticmethod
+    def bars(tree):
+        return [node for node in tree.iter() if node.get("data-role") == "code-change-bar"]
+
+    def test_readable_signed_chart_has_compact_header_and_reachable_details(self):
+        import math
+        tree = self.hydrate(self.activity())
+        paint, bars = self.visible(tree), self.bars(tree)
+        self.assertGreaterEqual(min(float(bar.get("height")) for bar in bars), 5)
+        self.assertGreaterEqual(max(float(bar.get("height")) for bar in bars), 90)
+        ratios = [float(bar.get("height"))/math.log1p(int(bar.get("data-value"))) for bar in bars]
+        self.assertAlmostEqual(min(ratios), max(ratios), places=5)
+        zeros = [float(bar.get("y"))+(float(bar.get("height")) if bar.get("data-kind") == "additions" else 0) for bar in bars]
+        self.assertAlmostEqual(min(zeros), max(zeros), places=5)
+        header = tree.find(".//*[@class='code-heading']")
+        self.assertIsNotNone(header)
+        self.assertIn("Code changes", " ".join(header.itertext()))
+        self.assertIsNotNone(header.find(".//*[@class='code-additions']"))
+        self.assertIsNotNone(header.find(".//*[@class='code-deletions']"))
+        identity = tree.find(".//*[@class='code-branch']")
+        self.assertIn("owner/project · develop", " ".join(identity.itertext()))
+        for label in ("Last 30 days", "today partial", "partial data", "Log scale", "Additions", "Deletions"):
+            self.assertIn(label, paint)
+        for diagnostic in ("Inspected", "activity_incomplete", "Summed non-merge", "non-merge commits"):
+            self.assertNotIn(diagnostic, paint)
+        details = tree.findall(".//details")
+        self.assertEqual(len(details), 1)
+        self.assertIsNotNone(details[0].find("summary"))
+        detail_text = " ".join(details[0].itertext())
+        for value in ("13 of 13", "13 of 15", "2 merges excluded", "activity_incomplete", "History: ok", "Summed non-merge", "Missing history is not zero", "a"*40, "6970 additions", "unavailable"):
+            self.assertIn(value, detail_text)
+
+    def test_supplied_ranges_keep_observed_totals_and_unknown_bins(self):
+        from datetime import date, timedelta
+        for count in (7, 30, 365):
+            with self.subTest(days=count):
+                activity = self.activity(count)
+                tree = self.hydrate(activity)
+                self.assertIn(f"Last {count} days", self.visible(tree))
+                bars = self.bars(tree)
+                self.assertLessEqual(len({bar.get("data-date") for bar in bars}), 60)
+                for kind in ("additions", "deletions"):
+                    self.assertEqual(sum(int(bar.get("data-value")) for bar in bars if (bar.get("data-kind") or bar.get("class")) == kind), activity["code_changes"][kind])
+                if count == 365:
+                    self.assertIn("7-day totals", self.visible(tree))
+                    self.assertTrue(all(bar.get("data-end-date") for bar in bars))
+                else:
+                    self.assertTrue(all(bar.get("data-end-date") is None for bar in bars))
+        activity = self.activity(365)
+        code = activity["code_changes"]
+        for row in code["daily"]:
+            row.update(additions=None, deletions=None, complete=False)
+        for row in code["daily"][7:14]:
+            row.update(additions=0, deletions=0, complete=True)
+        code["daily"][14].update(additions=1, deletions=7, complete=True)
+        code["daily"][15].update(additions=31)
+        code.update(additions=32, deletions=7)
+        bars = self.bars(self.hydrate(activity))
+        self.assertEqual(sorted((bar.get("data-date"), bar.get("data-kind"), bar.get("data-value")) for bar in bars),
+                         [("2025-10-26", "additions", "32"), ("2025-10-26", "deletions", "7")])
+        self.assertTrue(all(bar.get("data-end-date") == "2025-11-01" for bar in bars))
+        self.assertTrue(all("partial" in " ".join(bar.itertext()) for bar in bars))
+
+    def test_header_keeps_large_totals_exact(self):
+        activity = self.activity()
+        code = activity["code_changes"]
+        code["daily"][-1].update(additions=10699, deletions=406)
+        code.update(additions=10731, deletions=414)
+        tree = self.hydrate(activity)
+        header = tree.find(".//*[@class='code-heading']")
+        self.assertIsNotNone(header)
+        paint = " ".join(header.itertext())
+        self.assertIn("+10,731", paint)
+        self.assertIn("−414", paint)
+        self.assertNotIn("+11k", paint)
+
+    def test_complete_zero_and_unavailable_remain_distinct(self):
+        activity = self.activity()
+        activity["current_day_partial"] = False
+        code = activity["code_changes"]
+        code.update(additions=0, deletions=0, status="ok", complete=True)
+        for row in code["daily"]:
+            row.update(additions=0, deletions=0, complete=True)
+        tree = self.hydrate(activity)
+        paint = self.visible(tree)
+        self.assertIn("+0", paint)
+        self.assertIn("−0", paint)
+        self.assertNotIn("partial", paint)
+        self.assertEqual(self.bars(tree), [])
+        code.update(additions=None, deletions=None, status="unavailable", complete=False, daily=[])
+        activity.update(window_start=None, window_end=None)
+        tree = self.hydrate(activity)
+        paint = self.visible(tree)
+        self.assertIn("Observation window unavailable", paint)
+        self.assertIn("Code changes unavailable", paint)
+        self.assertNotIn("+0", paint)
+        self.assertEqual(self.bars(tree), [])
+
+
+
 if __name__ == "__main__":
     unittest.main()

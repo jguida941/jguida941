@@ -54,6 +54,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/contracts/design_predicates.py", "scripts/contracts/design_predicates.py", "contracts", "pure design-conformance predicates (button radius/anatomy/material/mechanic/focus)"),
     ModuleHome("scripts/contracts/page_manifest.py", "scripts/contracts/page_manifest.py", "contracts", "page manifest render_source parser and committed-route producer check"),
     # --- github: API facade, transports and repo auditing ----------------------
+    ModuleHome("scripts/github/activity_observations.py", "scripts/github/activity_observations.py", "github", "bounded branch and commit observations"),
     ModuleHome("scripts/github/client.py", "scripts/github/github_client.py", "github", "GitHub API facade"),
     ModuleHome("scripts/github/transport.py", "scripts/github/github_transport.py", "github", "GitHub HTTP transport"),
     ModuleHome("scripts/github/graphql.py", "scripts/github/github_graphql.py", "github", "GitHub GraphQL transport"),
@@ -62,6 +63,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/diagnostics/actions_audit.py", "scripts/github/actions_audit.py", "github", "GitHub Actions run auditing"),
     ModuleHome("scripts/diagnostics/branch_protection.py", "scripts/github/branch_protection.py", "github", "branch protection auditing and updates"),
     # --- pipeline: data collection, modelling and output orchestration ---------
+    ModuleHome("scripts/pipeline/activity_analytics.py", "scripts/pipeline/activity_analytics.py", "pipeline", "pure code change aggregation"),
     ModuleHome("scripts/analytics/collect.py", "scripts/pipeline/collect_data.py", "pipeline", "GitHub data collection"),
     ModuleHome("scripts/analytics/model.py", "scripts/pipeline/compute_metrics.py", "pipeline", "profile model computation"),
     ModuleHome("scripts/analytics/helpers.py", "scripts/pipeline/profile_helpers.py", "pipeline", "profile pipeline helpers"),

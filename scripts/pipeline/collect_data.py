@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from scripts.github import github_client as gh
+from scripts.github.activity_observations import collect_activity_observations
 from scripts.core.runtime_env import cache_mode_from_env, token_mode_from_env
 
 
@@ -37,6 +38,7 @@ class CollectedProfileData:
     cache_mode: dict[str, Any]
     private_repos: list[dict[str, Any]] = field(default_factory=list)
     metric_observations: dict[str, dict[str, Any]] = field(default_factory=dict)
+    activity_observations: dict[str, Any] = field(default_factory=dict)
 
 
 def collect_profile_data(logger=print) -> CollectedProfileData:
@@ -166,7 +168,23 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
     if private_repos:
         logger(f"  {len(private_repos)} private non-fork repos observed for profile metrics")
 
+    # Selection gets fresh discovery hints; other metrics retain their own caches.
+    activity_observed_at = datetime.now(timezone.utc)
+    try:
+        activity_repos = gh.get_repos(include_forks=False, fresh=True)
+        activity_private = gh.get_private_repos(fresh=True)
+        activity_counts = gh.get_owned_repo_scope_counts(fresh=True)
+        inventory_fresh = True
+    except (RuntimeError, ValueError):
+        activity_repos, activity_private, activity_counts = repos, private_repos, repo_counts
+        inventory_fresh = False
+    activity_observations = collect_activity_observations(
+        activity_repos, activity_private, activity_counts,
+        observed_at=activity_observed_at, inventory_fresh=inventory_fresh,
+    )
+
     return CollectedProfileData(
+        activity_observations=activity_observations,
         repo_counts=repo_counts,
         repos=repos,
         all_repos=all_repos,

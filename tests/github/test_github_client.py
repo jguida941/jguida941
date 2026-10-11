@@ -2456,5 +2456,144 @@ class GitHubClientTests(unittest.TestCase):
         self.assertEqual(observed_at, replay.get("observed_at"))
 
 
+
+class CodeChangeCollectionTests(unittest.TestCase):
+    """Branch updates choose immutable history, independently of default branches."""
+    def observe(self, failure=None, generation=1, count=2, inventory_fresh=True):
+        import copy
+        from datetime import datetime, timezone
+        from unittest.mock import patch
+        from scripts.github import github_client as gh
+        from scripts.github.activity_observations import collect_activity_observations
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        now=datetime(2026,10,10,16,30,tzinfo=timezone.utc)
+        repos=[{'name':n,'owner':{'login':gh.USERNAME},'private':False,'fork':False,'pushed_at':'2026-10-10T12:00:00Z'} for n in ['alpha','beta']+[f'extra-{i}' for i in range(max(0,count-2))]]
+        requests=[];queries=[]
+        class Response:
+            headers={};links={}
+            def __init__(self, rows, status=200): self.rows,self.status_code=rows,status
+            def json(self): return copy.deepcopy(self.rows)
+        def request(url, **kwargs):
+            requests.append(url)
+            self.assertTrue(url.endswith('/activity'))
+            name=url.split('/')[-2]
+            if name=='beta' and failure=='denied':return Response({},403)
+            stamp='2026-10-10T16:00:00Z' if name==('beta' if generation==1 else 'alpha') else '2026-10-10T11:00:00Z'
+            event={'id':name,'activity_type':'push','ref':'refs/heads/dev/'+name,'before':'b'*40,'after':('c' if name=='alpha' else 'd')*40,'timestamp':'bad' if name=='beta' and failure=='malformed' else stamp}
+            return Response([event])
+        def graphql(query, variables):
+            queries.append(copy.deepcopy(variables));self.assertNotIn('defaultBranchRef',query)
+            second=variables['cursor'] is not None
+            return {'repository':{'nameWithOwner':gh.USERNAME+'/'+variables['name'],'object':{'oid':'f'*40 if failure=='history_mismatch' else variables['oid'],'history':{'nodes':[{'oid':'e'*40 if second else variables['oid'],'committedDate':'2026-10-10T11:00:00Z','additions':5 if second else 20,'deletions':2 if second else 7,'parents':{'totalCount':1}}],'pageInfo':{'hasNextPage':failure=='history_cap' or not second,'endCursor':'page'+str(len(queries))}}}}}
+        with patch.object(gh,'_request_with_retry',side_effect=request),patch.object(gh,'_graphql_query',side_effect=graphql):
+            source=collect_activity_observations(repos,[],{'public_owned_nonfork':None if failure=='inventory_denied' else len(repos),'private_owned_nonfork':0},observed_at=now,inventory_fresh=inventory_fresh)
+        return source,build_activity_analytics(source)['code_changes'],queries
+
+    def test_each_refresh_selects_latest_branch_and_pins_both_pages(self):
+        for generation,name,oid in ((1,'beta','d'),(2,'alpha','c')):
+            source,code,queries=self.observe(generation=generation)
+            self.assertEqual(('ok',True,25,9),(code['status'],code['complete'],code['additions'],code['deletions']))
+            self.assertEqual('refs/heads/dev/'+name,code['ref'])
+            self.assertEqual([oid*40,oid*40],[row['oid'] for row in queries])
+            self.assertTrue(code['selection']['complete'])
+            self.assertTrue(code['history']['complete'])
+
+    def test_competing_failure_cannot_certify_latest_selection(self):
+        for failure in ('denied','malformed'):
+            _,code,_=self.observe(failure=failure)
+            self.assertEqual(('partial',False),(code['status'],code['complete']))
+            self.assertFalse(code['selection']['complete'])
+            self.assertTrue(code['history']['complete'])
+            self.assertEqual(25,code['additions'])
+
+    def test_inventory_freshness_and_candidate_cap_remain_visible(self):
+        for kwargs,reason in (({'inventory_fresh':False},'inventory_not_fresh'),({'count':21},'candidate_limit')):
+            source,code,_=self.observe(**kwargs)
+            self.assertFalse(code['complete'])
+            self.assertIn(reason,code['selection']['reason'])
+            self.assertLessEqual(source['cohort']['selected'],20)
+
+    def test_history_bound_and_identity_are_independent_of_selection(self):
+        for failure in ('history_mismatch','history_cap'):
+            source,code,queries=self.observe(failure=failure)
+            self.assertFalse(code['complete'])
+            self.assertFalse(code['history']['complete'])
+            self.assertTrue(code['selection']['complete'])
+            self.assertLessEqual(len(queries),10)
+            if failure=='history_mismatch':self.assertIsNone(code['additions'])
+        _,code,_=self.observe(failure='inventory_denied')
+        self.assertFalse(code['selection']['complete'])
+        self.assertIn('inventory_incomplete',code['selection']['reason'])
+
+    def test_branch_updates_deletions_and_tags(self):
+        from datetime import datetime,timezone
+        from scripts.github.activity_observations import activity_row,_latest_activity
+        from scripts.github import github_client as gh
+        repository=gh.USERNAME+'/alpha';now=datetime(2026,10,10,16,30,tzinfo=timezone.utc)
+        event={'id':'a','activity_type':'push','ref':'refs/heads/dev/alpha','before':'b'*40,'after':'a'*40,'timestamp':'2026-10-10T12:00:00Z'}
+        for kind in ('push','force_push','branch_creation','pr_merge','merge_queue_merge'):
+            row=activity_row({**event,'activity_type':kind},repository,now)
+            self.assertEqual(kind,_latest_activity({'selection_valid':True,'rows':[row]})['activity_type'])
+        self.assertEqual({},activity_row({**event,'ref':'refs/tags/v1'},repository,now))
+        deletion=activity_row({**event,'id':'del','activity_type':'branch_deletion','after':'0'*40,'timestamp':'2026-10-10T13:00:00Z'},repository,now)
+        self.assertIsNone(_latest_activity({'selection_valid':True,'rows':[activity_row(event,repository,now),deletion]}))
+
+    def test_fresh_public_inventory_does_not_read_cached_metadata(self):
+        from unittest.mock import patch
+        from scripts.github import github_client as gh
+        with patch.object(gh,'_get_cached',side_effect=AssertionError('cache read')),patch.object(gh,'_graphql_public_owned_repos',return_value=[]) as fetch:
+            self.assertEqual([],gh.get_repos(fresh=True))
+            fetch.assert_called_once_with(False,fresh=True)
+
+
+class CodeChangeHistorySizingTests(unittest.TestCase):
+    def collect(self, mode):
+        import copy,re
+        from datetime import datetime,timezone
+        from unittest.mock import patch
+        import requests
+        from scripts.github import activity_observations as observed
+        now=datetime(2026,10,10,16,30,tzinfo=timezone.utc)
+        start=now.replace(day=1,hour=0,minute=0)
+        event={'ref':'refs/heads/dev/feature','after':'a'*40,'timestamp':'2026-10-10T12:00:00Z'}
+        calls=[]
+        def graphql(query,variables):
+            calls.append((query,copy.deepcopy(variables)))
+            size=int(re.search(r'history\(first: (\d+)',query)[1])
+            if mode in ('small','small_exception','small_cap') and size>10:
+                if mode=='small_exception':raise requests.exceptions.JSONDecodeError('invalid JSON','<html>bad gateway</html>',0)
+                return None
+            if mode=='denied':return None
+            if mode=='malformed':return {'repository':{'object':{}}}
+            rows=[{'oid':format(len(calls)*100+i,'040x'),'committedDate':'2026-10-10T12:00:00Z','additions':2,'deletions':1,'parents':{'totalCount':1}} for i in range(size)]
+            more=mode in ('cap','small_cap')
+            return {'repository':{'nameWithOwner':'owner/project','object':{'oid':'b'*40 if mode=='wrong_oid' else event['after'],'history':{'nodes':rows,'pageInfo':{'hasNextPage':more,'endCursor':'page-'+str(len(calls)) if more else None}}}}}
+        with patch.object(observed.gh,'_graphql_query',side_effect=graphql):
+            result=observed._code_history(('owner/project',event),start,now,observed._Requests(now))
+        return result,calls
+
+    def test_smaller_retry_preserves_anchor_and_shared_budget(self):
+        for mode in ('small','small_exception'):
+            result,calls=self.collect(mode)
+            self.assertEqual(('ok',True,10),(result['status'],result['complete'],len(result['commits'])))
+            self.assertEqual(2,len(calls));self.assertEqual(calls[0][1],calls[1][1])
+            self.assertIn('first: 100',calls[0][0]);self.assertIn('first: 10,',calls[1][0])
+            self.assertEqual(20,sum(row['additions'] for row in result['commits']))
+        result,calls=self.collect('small_cap')
+        self.assertEqual(('partial',False,'page_limit',90,10),(result['status'],result['complete'],result['reason'],len(result['commits']),len(calls)))
+        self.assertTrue(all(variables['oid']=='a'*40 for _,variables in calls))
+        self.assertEqual(calls[0][1],calls[1][1])
+
+    def test_responsive_size_and_invalid_identity_keep_their_meanings(self):
+        result,calls=self.collect('responsive')
+        self.assertEqual(('ok',True,100,1),(result['status'],result['complete'],len(result['commits']),len(calls)))
+        self.assertIn('first: 100',calls[0][0])
+        result,calls=self.collect('cap')
+        self.assertEqual((False,1000,10),(result['complete'],len(result['commits']),len(calls)))
+        for mode in ('denied','malformed','wrong_oid'):
+            result,calls=self.collect(mode)
+            self.assertEqual(('unavailable',False,[]),(result['status'],result['complete'],result['commits']))
+            self.assertEqual(2 if mode=='denied' else 1,len(calls))
+
 if __name__ == "__main__":
     unittest.main()

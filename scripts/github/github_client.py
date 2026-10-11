@@ -1093,9 +1093,9 @@ def _normalize_graphql_repo(
     }
 
 
-def _graphql_public_owned_repos(include_forks: bool) -> list:
+def _graphql_public_owned_repos(include_forks: bool, *, fresh: bool = False) -> list:
     cache_key = f"graphql_public_owned_repos_{int(include_forks)}"
-    cached = _get_cached(cache_key)
+    cached = None if fresh else _get_cached(cache_key)
     cached_repositories = _cached_graphql_public_repositories(
         cached,
         include_forks=include_forks,
@@ -1283,11 +1283,11 @@ def _graphql_public_owned_repos(include_forks: bool) -> list:
     return repos
 
 
-def _graphql_private_owned_repos(limit: int = 40) -> list:
+def _graphql_private_owned_repos(limit: int = 40, *, fresh: bool = False) -> list:
     """Fetch the complete private-owned non-fork repository inventory."""
     cache_limit = int(limit)
     cache_key = f"graphql_private_owned_repos_{cache_limit}"
-    cached = _get_cached(cache_key)
+    cached = None if fresh else _get_cached(cache_key)
     cached_repositories = _cached_graphql_private_repositories(
         cached,
         limit=cache_limit,
@@ -1748,10 +1748,10 @@ def get_private_workflow_observations() -> dict:
     return _collect_workflow_provider_observation("PRIVATE")
 
 
-def get_private_repos(limit: int = 40) -> list:
+def get_private_repos(limit: int = 40, *, fresh: bool = False) -> list:
     """Public wrapper: recently-pushed private owned repos (metadata only)."""
     try:
-        return _graphql_private_owned_repos(limit=limit)
+        return _graphql_private_owned_repos(limit=limit, fresh=True) if fresh else _graphql_private_owned_repos(limit=limit)
     except Exception:
         return []
 
@@ -1783,11 +1783,11 @@ def _cached_paginated_results(
     return results if type(results) is list else None
 
 
-def paginated_get(endpoint: str, params: dict | None = None, per_page: int = 100) -> list:
+def paginated_get(endpoint: str, params: dict | None = None, per_page: int = 100, *, fresh: bool = False) -> list:
     """Fetch all pages from a REST endpoint."""
     request_params = dict(params or {})
     cache_key = f"paginated_{endpoint}_{json.dumps(request_params, sort_keys=True)}"
-    cached = _get_cached(cache_key)
+    cached = None if fresh else _get_cached(cache_key)
     cached_results = _cached_paginated_results(
         cached,
         endpoint=endpoint,
@@ -1835,9 +1835,9 @@ def paginated_get(endpoint: str, params: dict | None = None, per_page: int = 100
     return results
 
 
-def get_repos(include_forks: bool = False) -> list:
+def get_repos(include_forks: bool = False, *, fresh: bool = False) -> list:
     """Get public repos owned by USERNAME, optionally including forks."""
-    cached_graphql = _get_cached(f"graphql_public_owned_repos_{int(include_forks)}")
+    cached_graphql = None if fresh else _get_cached(f"graphql_public_owned_repos_{int(include_forks)}")
     cached_repositories = _cached_graphql_public_repositories(
         cached_graphql,
         include_forks=include_forks,
@@ -1846,7 +1846,7 @@ def get_repos(include_forks: bool = False) -> list:
         return cached_repositories
 
     try:
-        repos = _graphql_public_owned_repos(include_forks)
+        repos = _graphql_public_owned_repos(include_forks, fresh=True) if fresh else _graphql_public_owned_repos(include_forks)
         return repos
     except Exception as exc:
         print(f"  Warning: GraphQL repo listing failed; falling back to REST ({exc})")
@@ -1855,6 +1855,7 @@ def get_repos(include_forks: bool = False) -> list:
         repos = paginated_get(
             f"users/{USERNAME}/repos",
             {"sort": "created", "direction": "desc", "type": "owner"},
+            **({"fresh": True} if fresh else {}),
         )
         _validate_rest_repository_identities(repos)
         repos = [r for r in repos if _is_public_owned_repo(r)]
@@ -1869,12 +1870,12 @@ def get_repos(include_forks: bool = False) -> list:
         )
         print(f"  Warning: REST repo listing unavailable ({status}); falling back to GraphQL")
         try:
-            return _graphql_public_owned_repos(include_forks)
+            return _graphql_public_owned_repos(include_forks, fresh=True) if fresh else _graphql_public_owned_repos(include_forks)
         except Exception as exc:
             raise RuntimeError("public repository inventory unavailable") from exc
 
 
-def get_owned_repo_scope_counts() -> dict:
+def get_owned_repo_scope_counts(*, fresh: bool = False) -> dict:
     """
     Return repo counts with explicit scope splits.
 
@@ -1886,7 +1887,7 @@ def get_owned_repo_scope_counts() -> dict:
       - private_owned_nonfork (None when unavailable)
     """
     cache_key = "owned_repo_scope_counts"
-    cached = _get_cached(cache_key)
+    cached = None if fresh else _get_cached(cache_key)
     cached_counts = _cached_owned_repo_scope_counts(cached)
     if cached_counts is not None:
         return cached_counts
@@ -1963,8 +1964,8 @@ def get_owned_repo_scope_counts() -> dict:
                     return counts
 
     # Fallback: public REST only.
-    all_public = get_repos(include_forks=True)
-    public_nonfork = get_repos(include_forks=False)
+    all_public = get_repos(include_forks=True, **({"fresh": True} if fresh else {}))
+    public_nonfork = get_repos(include_forks=False, **({"fresh": True} if fresh else {}))
     public_total = len(all_public)
     public_nonfork_total = len(public_nonfork)
     counts = {
@@ -3851,3 +3852,44 @@ def get_repo_ci_state(owner: str, repo: str) -> bool | None:
     observation = get_repo_workflow_observation(owner, repo)
     value = observation.get("has_actions_config")
     return value if isinstance(value, bool) else None
+
+
+_BRANCH_ACTIVITY_TYPES = {"push", "force_push", "branch_creation", "pr_merge", "merge_queue_merge"}
+
+
+def _branch_activity_time(value: object) -> datetime | None:
+    if type(value) is not str:
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
+
+def _branch_repository_name(owner: object, name: object) -> str | None:
+    if (type(owner) is not str or type(name) is not str
+            or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}", owner)
+            or not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}", name) or name in {".", ".."}):
+        return None
+    return f"{owner}/{name}"
+
+
+def _valid_branch_ref(value: object) -> bool:
+    from scripts.pipeline.profile_helpers import contains_credential_material
+    if type(value) is not str or not value.startswith("refs/heads/") or len(value) > 255:
+        return False
+    branch = value[len("refs/heads/"):]
+    return bool(branch) and not (
+        contains_credential_material(value)
+        or any(ord(char) < 33 or ord(char) == 127 or char in "~^:?*[\\" for char in value)
+        or ".." in branch or "@{" in branch or branch.endswith(".")
+        or any(not part or part.startswith(".") or part.endswith(".lock") for part in branch.split("/"))
+    )
+
+
+def _valid_branch_oid(value: object, *, allow_zero: bool = False) -> bool:
+    return (type(value) is str and re.fullmatch(r"[0-9a-f]{40}", value) is not None
+            and (allow_zero or value != "0" * 40))
