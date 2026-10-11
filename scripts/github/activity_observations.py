@@ -6,6 +6,7 @@ from urllib.parse import parse_qs, urlparse
 import requests
 from scripts.github import github_client as gh
 from scripts.pipeline.profile_helpers import contains_credential_material, is_self_repo
+from scripts.pipeline.push_activity import select_recent_pushes, interpret_fast_forward_comparison
 
 
 def timestamp(value):
@@ -335,6 +336,26 @@ def collect_activity_observations(public_repos, private_repos, repo_counts, *, o
     selection = {"status": "ok" if not reasons else "partial" if spotlight else "unavailable",
                  "complete": not reasons, "reason": ", ".join(reasons) or "observed",
                  "activity_failures": failures, "occurred_at": code.get("occurred_at")}
+    # A push is a separate event, not the whole history of its after-head.
+    # Only a bounded verified fast-forward can yield honest tree-diff totals.
+    recent_pushes = select_recent_pushes(
+        rows, observed_at=iso(now), coverage_complete=selection["complete"])
+    for pushed in recent_pushes["rows"]:
+        if pushed["activity_type"] != "push" or pushed["before"] == "0" * 40:
+            continue
+        url = (f"{gh.API}/repos/{pushed['repository']}/compare/"
+               f"{pushed['before']}...{pushed['after']}")
+        response, _reason = context.get(url, {})
+        if response is None:
+            continue
+        try:
+            comparison = response.json()
+        except ValueError:
+            comparison = None
+        pushed["diff"] = interpret_fast_forward_comparison(
+            comparison, before=pushed["before"], after=pushed["after"],
+            has_next_page=bool((getattr(response, "links", {}) or {}).get("next")))
     return {"schema": "profile-activity-observations/v1", "window_start": iso(start), "window_end": iso(now), "observed_at": iso(now),
             "cohort": cohort, "repositories": rows, "code_changes": code, "selection": selection,
+            "recent_pushes": recent_pushes,
             "requests": {"status": "partial" if context.stopped or context.failed else "ok", "rest_core": context.quota}}
