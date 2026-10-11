@@ -570,7 +570,7 @@ def _script() -> str:
 
   function hydrateRecentPushes(a) {
     const state = a && a.recent_pushes || {};
-    const rows = Array.isArray(state.rows) ? state.rows.slice(0, 3) : [];
+    const rows = Array.isArray(state.rows) ? state.rows : [];
     const validRepo = value => {
       if (typeof value !== "string") return false;
       const parts = value.split("/");
@@ -578,7 +578,12 @@ def _script() -> str:
         /^[A-Za-z0-9_.-]{1,100}$/.test(parts[1]) && parts[1] !== "." && parts[1] !== "..";
     };
     const validSha = value => typeof value === "string" && /^[0-9a-f]{40}$/.test(value);
-    const items = rows.filter(row => row && validRepo(row.repository) && validSha(row.after));
+    const seen = new Set();
+    const items = rows.filter(row => {
+      if (!row || !validRepo(row.repository) || !validSha(row.after) || seen.has(row.repository)) return false;
+      seen.add(row.repository);
+      return true;
+    }).slice(0, 3);
     let html = '<div class="code-heading"><h2 class="title">Recent repository pushes</h2></div>';
     html += '<p class="section-meta">Latest observed push in each repository · not all-branch totals</p>';
     if (state.status !== "ok" || state.complete !== true) {
@@ -594,7 +599,7 @@ def _script() -> str:
         const timestamp = typeof row.timestamp === "string" ? row.timestamp.slice(0, 16).replace("T", " ") + " UTC" : "time unavailable";
         const headURL = repoURL + "/commit/" + row.after;
         const commits = Array.isArray(row.commits) ? row.commits : [];
-        const verified = row.diff_status === "ok" && Number.isSafeInteger(row.additions) && row.additions >= 0 &&
+        const verified = row.activity_type === "push" && row.diff_status === "ok" && Number.isSafeInteger(row.additions) && row.additions >= 0 &&
           Number.isSafeInteger(row.deletions) && row.deletions >= 0 &&
           commits.length > 0 && commits.length <= 25 &&
           commits.every(validSha) && new Set(commits).size === commits.length && commits.at(-1) === row.after;
