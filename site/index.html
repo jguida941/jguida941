@@ -615,7 +615,7 @@ footer a { color: var(--ink); text-decoration: none; }
   }
 
 
-  function hydrateRecentPushes(a) {
+  function hydrateRecentPushes(a, working, generatedAt) {
     const state = a && a.recent_pushes || {};
     const rows = Array.isArray(state.rows) ? state.rows : [];
     const validRepo = value => {
@@ -631,12 +631,41 @@ footer a { color: var(--ink); text-decoration: none; }
       seen.add(row.repository);
       return true;
     }).slice(0, 3);
+    const fallback = Array.isArray(working) ? working : [];
+    const asOf = typeof generatedAt === "string" ? Date.parse(generatedAt) : NaN;
+    const reported = [];
+    const reportedSeen = new Set();
+    for (const item of fallback) {
+      if (!item || typeof item.name !== "string" || typeof item.url !== "string" ||
+          typeof item.pushed_at !== "string") continue;
+      const match = /^https:\/\/github\.com\/([A-Za-z0-9][A-Za-z0-9-]{0,38})\/([A-Za-z0-9_.-]{1,100})$/.exec(item.url);
+      if (!match || match[2] !== item.name || match[2] === "." || match[2] === "..") continue;
+      const when = Date.parse(item.pushed_at);
+      if (!Number.isFinite(when) || (Number.isFinite(asOf) && when > asOf)) continue;
+      if (reportedSeen.has(item.url)) continue;
+      reportedSeen.add(item.url);
+      reported.push({url: item.url, name: match[1]+"/"+match[2], pushed_at: item.pushed_at, when});
+    }
+    reported.sort((left, right) => right.when-left.when ||
+      (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
     let html = '<div class="code-heading"><h2 class="title">Recent repository pushes</h2></div>';
-    html += '<p class="section-meta">Latest observed push in each repository · not all-branch totals</p>';
+    html += items.length ? '<p class="section-meta">Latest observed push per repository · not an all-branch total</p>' :
+      '<p class="section-meta">Reported repository push dates · branches and commits unverified</p>';
     if (state.status !== "ok" || state.complete !== true) {
       html += '<p class="section-meta">Observation incomplete · exact global ranking not guaranteed</p>';
     }
-    if (!items.length) {
+    if (!items.length && reported.length) {
+      html += '<div class="recent-push-list">';
+      for (const row of reported.slice(0, 3)) {
+        html += '<article class="recent-push-item" data-repository="' + esc(row.name) + '">';
+        html += '<p class="recent-push-name"><a href="' + row.url + '">' + esc(row.name) + '</a></p>';
+        html += '<p class="recent-push-meta">Repository pushed · ' + esc(row.pushed_at.slice(0,16).replace("T"," ") + " UTC") + '</p>';
+        html += '<p class="recent-push-meta">Branch and push commits not verified</p>';
+        html += '<p class="recent-push-meta">Change totals unavailable</p>';
+        html += '</article>';
+      }
+      html += '</div>';
+    } else if (!items.length) {
       html += '<p>Recent pushes unavailable</p>';
     } else {
       html += '<div class="recent-push-list">';
@@ -676,7 +705,7 @@ footer a { color: var(--ink); text-decoration: none; }
 
   function hydrate(d) {
     hydrateCodeChanges(d.activity_analytics);
-    hydrateRecentPushes(d.activity_analytics);
+    hydrateRecentPushes(d.activity_analytics, d.dashboard_summary?.working, d.generated_at);
     document.querySelectorAll("[data-bind]").forEach(el => {
       let v = get(d, el.getAttribute("data-bind"));
       if (v == null) return;
