@@ -347,9 +347,24 @@ footer a { color: var(--ink); text-decoration: none; }
 .code-legend .code-scale { margin-left: auto; }
 .code-details { margin-top: 12px; }
 .code-details ul { padding-left: 20px; }
+.recent-push-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.recent-push-item { min-width: 0; border: 1px solid color-mix(in srgb, var(--hairline) 16%, transparent); border-radius: var(--radius-tile); padding: 14px; }
+.recent-push-name { font-weight: 600; overflow-wrap: anywhere; margin: 0 0 6px; }
+.recent-push-name a, .recent-push-commit a { color: var(--ink); }
+.recent-push-meta { margin: 4px 0; color: var(--ink-dim); font-size: var(--type-caption); overflow-wrap: anywhere; }
+.recent-push-total { display: flex; gap: 12px; flex-wrap: wrap; align-items: baseline; font-variant-numeric: tabular-nums; font-weight: 600; margin: 10px 0 4px; }
+.recent-push-additions { color: var(--status-success); }
+.recent-push-deletions { color: var(--status-danger); }
+.recent-push-commits { margin-top: 7px; }
+.recent-push-commits summary { cursor: pointer; min-height: 28px; }
+.recent-push-commits ul { margin: 4px 0 0; padding-left: 20px; }
+@media (max-width: 760px) {
+  .recent-push-list { grid-template-columns: 1fr; }
+  .recent-push-item { padding: 12px; }
+}
 @media (max-width: 480px) {
   .code-totals { font-size: 20px; }
-  .code-chart text { font-size: 24px; }
+  .code-chart text { font-size: 14px; }
   .code-legend { gap: 8px 16px; }
 }
 /* --- a11y + responsive --- */
@@ -470,6 +485,7 @@ footer a { color: var(--ink); text-decoration: none; }
       <div class="lanes" id="focus"></div>
     </section>
     <section class="panel code-changes"><div id="activity-code"><h2 class="title">Code changes</h2></div></section>
+    <section class="panel recent-pushes" id="recent-pushes" tabindex="-1"><div id="activity-pushes"><h2 class="title">Recent repository pushes</h2></div></section>
     <section class="panel" id="projects" tabindex="-1">
       <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
       <hr class="hairline">
@@ -599,8 +615,68 @@ footer a { color: var(--ink); text-decoration: none; }
   }
 
 
+  function hydrateRecentPushes(a) {
+    const state = a && a.recent_pushes || {};
+    const rows = Array.isArray(state.rows) ? state.rows : [];
+    const validRepo = value => {
+      if (typeof value !== "string") return false;
+      const parts = value.split("/");
+      return parts.length === 2 && /^[A-Za-z0-9][A-Za-z0-9-]{0,38}$/.test(parts[0]) &&
+        /^[A-Za-z0-9_.-]{1,100}$/.test(parts[1]) && parts[1] !== "." && parts[1] !== "..";
+    };
+    const validSha = value => typeof value === "string" && /^[0-9a-f]{40}$/.test(value);
+    const seen = new Set();
+    const items = rows.filter(row => {
+      if (!row || !validRepo(row.repository) || !validSha(row.after) || seen.has(row.repository)) return false;
+      seen.add(row.repository);
+      return true;
+    }).slice(0, 3);
+    let html = '<div class="code-heading"><h2 class="title">Recent repository pushes</h2></div>';
+    html += '<p class="section-meta">Latest observed push in each repository · not all-branch totals</p>';
+    if (state.status !== "ok" || state.complete !== true) {
+      html += '<p class="section-meta">Observation incomplete · exact global ranking not guaranteed</p>';
+    }
+    if (!items.length) {
+      html += '<p>Recent pushes unavailable</p>';
+    } else {
+      html += '<div class="recent-push-list">';
+      for (const row of items) {
+        const name = row.repository, repoURL = "https://github.com/" + name;
+        const ref = typeof row.ref === "string" && row.ref.startsWith("refs/heads/") ? row.ref.slice(11) : "branch unavailable";
+        const timestamp = typeof row.timestamp === "string" ? row.timestamp.slice(0, 16).replace("T", " ") + " UTC" : "time unavailable";
+        const headURL = repoURL + "/commit/" + row.after;
+        const commits = Array.isArray(row.commits) ? row.commits : [];
+        const verified = row.activity_type === "push" && row.diff_status === "ok" && Number.isSafeInteger(row.additions) && row.additions >= 0 &&
+          Number.isSafeInteger(row.deletions) && row.deletions >= 0 &&
+          commits.length > 0 && commits.length <= 25 &&
+          commits.every(validSha) && new Set(commits).size === commits.length && commits.at(-1) === row.after;
+        html += '<article class="recent-push-item" data-repository="' + esc(name) + '">';
+        html += '<p class="recent-push-name"><a href="' + repoURL + '">' + esc(name) + '</a></p>';
+        html += '<p class="recent-push-meta">Branch · ' + esc(ref) + '</p>';
+        html += '<p class="recent-push-meta">' + esc(timestamp) + '</p>';
+        html += '<p class="recent-push-meta recent-push-commit">Head · <a href="' + headURL + '">' + esc(row.after.slice(0, 7)) + '</a></p>';
+        if (verified) {
+          html += '<p class="recent-push-total"><span class="recent-push-additions">+' + row.additions.toLocaleString("en-US") +
+            '</span><span class="recent-push-deletions">−' + row.deletions.toLocaleString("en-US") + '</span></p>';
+          html += '<p class="recent-push-meta">Tree diff · verified before/after</p>';
+          html += '<details class="recent-push-commits"><summary>' + commits.length + ' commits related to this push</summary><ul>';
+          for (const sha of commits) {
+            html += '<li class="recent-push-commit"><a href="' + repoURL + '/commit/' + sha + '">' + esc(sha.slice(0, 7)) + '</a></li>';
+          }
+          html += '</ul></details>';
+        } else {
+          html += '<p class="recent-push-meta">Change totals unverified · related commits unavailable</p>';
+        }
+        html += '</article>';
+      }
+      html += '</div>';
+    }
+    document.getElementById("activity-pushes").innerHTML = html;
+  }
+
   function hydrate(d) {
     hydrateCodeChanges(d.activity_analytics);
+    hydrateRecentPushes(d.activity_analytics);
     document.querySelectorAll("[data-bind]").forEach(el => {
       let v = get(d, el.getAttribute("data-bind"));
       if (v == null) return;
