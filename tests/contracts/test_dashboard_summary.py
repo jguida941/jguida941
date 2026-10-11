@@ -395,3 +395,77 @@ class CodeChangeDesktopPresentationTests(unittest.TestCase):
         self.assertIn("Code changes unavailable", paint)
         self.assertNotIn("+0", paint)
         self.assertFalse(any(node.get("data-role") == "code-change-bar" for node in chart.iter()))
+
+
+class RecentPushSvgProjectionTests(unittest.TestCase):
+    """Same observed repository facts rendered independently at desktop and phone widths."""
+
+    @staticmethod
+    def _paint(*, mobile, working, recent=None):
+        from scripts.rendering.generate_dashboard_summary import Canvas, _recent_pushes
+        c = Canvas(mobile)
+        payload = {"recent_pushes": recent or {"status": "unavailable", "rows": []}}
+        end = _recent_pushes(c, 34, 40, 292 if mobile else 752, payload, working,
+                            "2026-10-11T21:00:00Z")
+        root = ET.fromstring("<svg>" + "".join(c.parts) + "</svg>")
+        return root, end
+
+    def test_metadata_fallback_uses_real_reported_repositories_without_invented_totals(self):
+        working = [
+            {"name": "third", "url": "https://github.com/owner/third", "pushed_at": "2026-10-10T12:00:00Z"},
+            {"name": "first", "url": "https://github.com/owner/first", "pushed_at": "2026-10-11T20:00:00Z"},
+            {"name": "second", "url": "https://github.com/owner/second", "pushed_at": "2026-10-11T19:00:00Z"},
+            {"name": "old", "url": "https://github.com/owner/old", "pushed_at": "2026-10-09T12:00:00Z"},
+        ]
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root, bottom = self._paint(mobile=mobile, working=working)
+                rows = [n for n in root.iter() if n.get("data-role") == "recent-push-row"]
+                self.assertEqual(3, len(rows))
+                self.assertEqual(["owner/first", "owner/second", "owner/third"],
+                                 [row.get("data-repository") for row in rows])
+                self.assertGreater(bottom, 0)
+                text = " ".join(root.itertext())
+                self.assertIn("Reported repository push dates", text)
+                self.assertIn("Branch / commits unverified", text)
+                self.assertIn("Change totals unavailable", text)
+                self.assertFalse(any(n.get("data-role") == "recent-push-diff" for n in root.iter()))
+                self.assertNotIn("+0", text)
+
+    def test_forged_force_push_diff_cannot_become_verified_in_either_svg(self):
+        row = {"repository": "owner/live", "ref": "refs/heads/feature/test",
+               "activity_type": "force_push", "after": "b" * 40, "timestamp": "2026-10-11T19:00:00Z",
+               "diff_status": "ok", "additions": 900, "deletions": 2,
+               "commits": ["a" * 40, "b" * 40]}
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root, _ = self._paint(mobile=mobile, working=[], recent={
+                    "status": "ok", "rows": [row]})
+                self.assertFalse(any(n.get("data-role") == "recent-push-diff" for n in root.iter()))
+                self.assertIn("Code changes not verified", " ".join(root.itertext()))
+
+    def test_verified_event_precedes_repository_metadata_and_keeps_exact_values(self):
+        live = {"repository": "owner/live", "ref": "refs/heads/dev",
+                "activity_type": "push", "after": "b" * 40, "timestamp": "2026-10-11T20:00:00Z",
+                "diff_status": "ok", "additions": 42, "deletions": 3,
+                "commits": ["a" * 40, "b" * 40]}
+        for mobile in (False, True):
+            root, _ = self._paint(mobile=mobile,
+                                  working=[{"name": "other", "url": "https://github.com/owner/other",
+                                            "pushed_at": "2026-10-11T20:00:00Z"}],
+                                  recent={"status": "ok", "rows": [live]})
+            text = " ".join(root.itertext())
+            self.assertIn("owner/live", text)
+            self.assertNotIn("owner/other", text)
+            self.assertIn("+42", text)
+            self.assertIn("−3", text)
+
+    def test_invalid_metadata_url_or_future_hint_cannot_fill_panel(self):
+        rows = [
+            {"name": "fake", "url": "https://github.com/other/nope", "pushed_at": "2026-10-11T20:00:00Z"},
+            {"name": "future", "url": "https://github.com/owner/future", "pushed_at": "2026-10-12T20:00:00Z"},
+            {"name": "valid", "url": "https://github.com/owner/valid", "pushed_at": "2026-10-11T20:00:00Z"},
+        ]
+        root, _ = self._paint(mobile=True, working=rows)
+        subjects = [n.get("data-repository") for n in root.iter() if n.get("data-role") == "recent-push-row"]
+        self.assertEqual(["owner/valid"], subjects)
