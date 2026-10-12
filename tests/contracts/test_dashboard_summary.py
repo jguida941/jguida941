@@ -17,7 +17,7 @@ class DashboardSummaryTests(unittest.TestCase):
             root=ET.fromstring(render_svg({},mobile=mobile))
             self.assertEqual(root.get("width"),width)
             sections=[node.get("data-section") for node in root.iter() if node.get("data-section")]
-            self.assertEqual(sections,["overview","weekly","rhythm","languages","automation","working","focus","projects","metrics","calendar"])
+            self.assertEqual(sections,["overview","weekly","rhythm","languages","automation","working","focus","recent-pushes","projects","metrics","calendar"])
             self.assertIn("Contribution calendar unavailable", " ".join(root.itertext()))
             self.assertFalse(any(node.tag.endswith("filter") for node in root.iter()))
 
@@ -267,7 +267,8 @@ class CodeChangeSvgTests(unittest.TestCase):
             tree=ET.fromstring(render_svg(summary,mobile=mobile))
             sections=[n.get('data-section') for n in tree.iter() if n.get('data-section')]
             self.assertEqual(sections.index('focus')+1,sections.index('code-changes'))
-            self.assertEqual(sections.index('code-changes')+1,sections.index('projects'))
+            self.assertEqual(sections.index('code-changes')+1,sections.index('recent-pushes'))
+            self.assertEqual(sections.index('recent-pushes')+1,sections.index('projects'))
             bars=[n for n in tree.iter() if n.get('data-role')=='code-change-bar']
             self.assertEqual(4,len(bars))
             import math
@@ -395,3 +396,130 @@ class CodeChangeDesktopPresentationTests(unittest.TestCase):
         self.assertIn("Code changes unavailable", paint)
         self.assertNotIn("+0", paint)
         self.assertFalse(any(node.get("data-role") == "code-change-bar" for node in chart.iter()))
+
+
+    def test_supplied_year_preserves_proportional_bars_and_exact_totals(self):
+        """The real desktop README SVG uses the same annual magnitude semantics."""
+        import math
+        for count in (365, 366):
+            with self.subTest(days=count):
+                summary = self.summary(count)
+                code = summary["activity_analytics"]["code_changes"]
+                for row in code["daily"]:
+                    row.update(additions=0, deletions=0, complete=True)
+                code["daily"][14].update(additions=100, deletions=50)
+                code["daily"][251].update(additions=10000, deletions=5000)
+                code.update(additions=10100, deletions=5050, status="ok", complete=True)
+                chart = self.chart(summary)
+                paint = " ".join(chart.itertext())
+                self.assertIn("Proportional scale", paint)
+                self.assertNotIn("Log scale", paint)
+                bars = [node for node in chart.iter() if node.get("data-role") == "code-change-bar"]
+                additions = {int(node.get("data-value")): float(node.get("height"))
+                             for node in bars if node.get("data-kind") == "additions"}
+                self.assertEqual({100, 10000}, set(additions))
+                self.assertGreaterEqual(additions[10000], 115)
+                self.assertTrue(math.isclose(.01, additions[100] / additions[10000], rel_tol=1e-9))
+                self.assertEqual(10100, sum(int(node.get("data-value")) for node in bars
+                                            if node.get("data-kind") == "additions"))
+                self.assertEqual(5050, sum(int(node.get("data-value")) for node in bars
+                                           if node.get("data-kind") == "deletions"))
+
+
+class RecentPushSvgProjectionTests(unittest.TestCase):
+    """Same observed repository facts rendered independently at desktop and phone widths."""
+
+    @staticmethod
+    def _paint(*, mobile, working, recent=None):
+        from scripts.rendering.generate_dashboard_summary import Canvas, _recent_pushes
+        c = Canvas(mobile)
+        from scripts.pipeline.push_activity import qualify_recent_pushes
+        source = recent if recent is not None else {"status": "unavailable", "rows": []}
+        payload = {"recent_pushes": qualify_recent_pushes(source, working, "2026-10-11T21:00:00Z")}
+        end = _recent_pushes(c, 34, 40, 292 if mobile else 752, payload)
+        root = ET.fromstring("<svg>" + "".join(c.parts) + "</svg>")
+        return root, end
+
+    def test_metadata_fallback_uses_real_reported_repositories_without_invented_totals(self):
+        working = [
+            {"name": "third", "url": "https://github.com/owner/third", "pushed_at": "2026-10-10T12:00:00Z"},
+            {"name": "first", "url": "https://github.com/owner/first", "pushed_at": "2026-10-11T20:00:00Z"},
+            {"name": "second", "url": "https://github.com/owner/second", "pushed_at": "2026-10-11T19:00:00Z"},
+            {"name": "old", "url": "https://github.com/owner/old", "pushed_at": "2026-10-09T12:00:00Z"},
+        ]
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root, bottom = self._paint(mobile=mobile, working=working)
+                rows = [n for n in root.iter() if n.get("data-role") == "recent-push-row"]
+                self.assertEqual(3, len(rows))
+                self.assertEqual(["owner/first", "owner/second", "owner/third"],
+                                 [row.get("data-repository") for row in rows])
+                self.assertGreater(bottom, 0)
+                text = " ".join(root.itertext())
+                self.assertIn("Reported repository push dates", text)
+                self.assertIn("Branch / commits unverified", text)
+                self.assertIn("Change totals unavailable", text)
+                self.assertFalse(any(n.get("data-role") == "recent-push-diff" for n in root.iter()))
+                self.assertNotIn("+0", text)
+
+    def test_forged_force_push_diff_cannot_become_verified_in_either_svg(self):
+        row = {"repository": "owner/live", "ref": "refs/heads/feature/test",
+               "activity_type": "force_push", "after": "b" * 40, "timestamp": "2026-10-11T19:00:00Z",
+               "diff_status": "ok", "additions": 900, "deletions": 2,
+               "commits": ["a" * 40, "b" * 40]}
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root, _ = self._paint(mobile=mobile, working=[], recent={
+                    "status": "ok", "rows": [row]})
+                self.assertFalse(any(n.get("data-role") == "recent-push-diff" for n in root.iter()))
+                self.assertIn("Code changes not verified", " ".join(root.itertext()))
+
+    def test_verified_event_precedes_repository_metadata_and_keeps_exact_values(self):
+        live = {"repository": "owner/live", "ref": "refs/heads/dev",
+                "activity_type": "push", "after": "b" * 40, "timestamp": "2026-10-11T20:00:00Z",
+                "diff_status": "ok", "additions": 42, "deletions": 3,
+                "commits": ["a" * 40, "b" * 40]}
+        for mobile in (False, True):
+            root, _ = self._paint(mobile=mobile,
+                                  working=[{"name": "other", "url": "https://github.com/owner/other",
+                                            "pushed_at": "2026-10-11T20:00:00Z"}],
+                                  recent={"status": "ok", "rows": [live]})
+            text = " ".join(root.itertext())
+            self.assertIn("owner/live", text)
+            self.assertNotIn("owner/other", text)
+            self.assertIn("+42", text)
+            self.assertIn("−3", text)
+
+    def test_invalid_metadata_url_or_future_hint_cannot_fill_panel(self):
+        rows = [
+            {"name": "fake", "url": "https://github.com/other/nope", "pushed_at": "2026-10-11T20:00:00Z"},
+            {"name": "future", "url": "https://github.com/owner/future", "pushed_at": "2026-10-12T20:00:00Z"},
+            {"name": "valid", "url": "https://github.com/owner/valid", "pushed_at": "2026-10-11T20:00:00Z"},
+        ]
+        root, _ = self._paint(mobile=True, working=rows)
+        subjects = [n.get("data-repository") for n in root.iter() if n.get("data-role") == "recent-push-row"]
+        self.assertEqual(["owner/valid"], subjects)
+
+
+    def test_known_empty_and_unavailable_are_distinct_in_both_svgs(self):
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                zero, _ = self._paint(
+                    mobile=mobile, working=[],
+                    recent={"status": "ok", "complete": True, "rows": []})
+                text = " ".join(zero.itertext())
+                self.assertIn("Complete observation", text)
+                self.assertIn("No recent pushes observed", text)
+                self.assertNotIn("Recent pushes unavailable", text)
+                unknown, _ = self._paint(
+                    mobile=mobile, working=[],
+                    recent={"status": "partial", "complete": False, "rows": []})
+                unknown_text = " ".join(unknown.itertext())
+                self.assertIn("Recent pushes unavailable", unknown_text)
+                self.assertNotIn("No recent pushes observed", unknown_text)
+                incomplete_ok, _ = self._paint(
+                    mobile=mobile, working=[],
+                    recent={"status": "ok", "complete": False, "rows": []})
+                incomplete_text = " ".join(incomplete_ok.itertext())
+                self.assertIn("Recent pushes unavailable", incomplete_text)
+                self.assertNotIn("No recent pushes observed", incomplete_text)

@@ -216,9 +216,25 @@ footer a { color: var(--ink); text-decoration: none; }
 .code-legend .code-scale { margin-left: auto; }
 .code-details { margin-top: 12px; }
 .code-details ul { padding-left: 20px; }
+
+.recent-push-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.recent-push-item { min-width: 0; border: 1px solid color-mix(in srgb, var(--hairline) 16%, transparent); border-radius: var(--radius-tile); padding: 14px; }
+.recent-push-name { font-weight: 600; overflow-wrap: anywhere; margin: 0 0 6px; }
+.recent-push-name a, .recent-push-commit a { color: var(--ink); }
+.recent-push-meta { margin: 4px 0; color: var(--ink-dim); font-size: var(--type-caption); overflow-wrap: anywhere; }
+.recent-push-total { display: flex; gap: 12px; flex-wrap: wrap; align-items: baseline; font-variant-numeric: tabular-nums; font-weight: 600; margin: 10px 0 4px; }
+.recent-push-additions { color: var(--status-success); }
+.recent-push-deletions { color: var(--status-danger); }
+.recent-push-commits { margin-top: 7px; }
+.recent-push-commits summary { cursor: pointer; min-height: 28px; }
+.recent-push-commits ul { margin: 4px 0 0; padding-left: 20px; }
+@media (max-width: 760px) {
+  .recent-push-list { grid-template-columns: 1fr; }
+  .recent-push-item { padding: 12px; }
+}
 @media (max-width: 480px) {
   .code-totals { font-size: 20px; }
-  .code-chart text { font-size: 24px; }
+  .code-chart text { font-size: 14px; }
   .code-legend { gap: 8px 16px; }
 }
 /* --- a11y + responsive --- */
@@ -415,6 +431,7 @@ def _repos_focus() -> str:
       <div class="lanes" id="focus"></div>
     </section>
     <section class="panel code-changes"><div id="activity-code"><h2 class="title">Code changes</h2></div></section>
+    <section class="panel recent-pushes" id="recent-pushes" tabindex="-1"><div id="activity-pushes"><h2 class="title">Recent repository pushes</h2></div></section>
     <section class="panel" id="projects" tabindex="-1">
       <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
       <hr class="hairline">
@@ -519,12 +536,21 @@ def _script() -> str:
         buckets.push(bucket);
       }
       const maximum=Math.max(1,...buckets.flatMap(d=>[d.additions||0,d.deletions||0]));
-      const cap=10**Math.ceil(Math.log10(maximum)), halfHeight=116, zero=132, left=64, right=632;
-      const magnitude=v=>halfHeight*Math.log1p(v)/Math.log1p(cap);
-      const middle=10**Math.floor(Math.log10(cap)/2), ticks=[...new Set([-cap,-middle,0,middle,cap])];
+      const isYear=Number.isFinite(days)&&days>=365&&daily.length>=365;
+      const cap=isYear?maximum:10**Math.ceil(Math.log10(maximum)), halfHeight=116, zero=132, right=632;
+      const middle=isYear?Math.floor(cap/2):10**Math.floor(Math.log10(cap)/2), ticks=[...new Set([-cap,-middle,0,middle,cap])];
+      const tickLabel=v=>{
+        const value=Math.abs(v);
+        return (v<0?"−":"")+(value>=1000?`${value/1000}k`:value);
+      };
+      // The 14px theme font needs room for the longest signed Y-axis tick.
+      // Reserve the same chart-scale inset on phone and desktop without dropping the minus sign.
+      const longestTick=Math.max(...ticks.map(v=>tickLabel(v).length));
+      const left=Math.min(right-160, Math.max(64, 24+14*longestTick));
+      const magnitude=v=>isYear?halfHeight*v/cap:halfHeight*Math.log1p(v)/Math.log1p(cap);
       let guides=ticks.map(v=>{
-        const y=zero-Math.sign(v)*magnitude(Math.abs(v)), value=Math.abs(v), label=(v<0?"−":"")+(value>=1000?`${value/1000}k`:value);
-        return `<line x1="${left}" y1="${y}" x2="${right}" y2="${y}" stroke="currentColor" stroke-opacity="${v===0?.65:.2}"/><text x="${left-8}" y="${y+5}" text-anchor="end">${label}</text>`;
+        const y=zero-Math.sign(v)*magnitude(Math.abs(v)), label=tickLabel(v);
+        return `<line x1="${left}" y1="${y}" x2="${right}" y2="${y}" stroke="currentColor" stroke-opacity="${v===0?.65:.2}"/><text data-role="code-y-tick" x="${left-8}" y="${y+5}" text-anchor="end">${label}</text>`;
       }).join("");
       const step=(right-left)/Math.max(1,buckets.length), width=Math.min(18,step*.7);
       let bars=''; buckets.forEach((d,i)=>{
@@ -543,15 +569,94 @@ def _script() -> str:
         const day=new Date(daily[i].date+"T00:00:00Z"), label=`${months[day.getUTCMonth()]} ${day.getUTCDate()}`;
         return `<text x="${left+(right-left)*i/Math.max(1,daily.length-1)}" y="280" text-anchor="${i===0?"start":i===daily.length-1?"end":"middle"}">${label}</text>`;
       }).join(""):"";
-      html+=`<svg class="code-chart" viewBox="0 0 640 300" role="img" aria-label="Observed additions above zero and deletions below, logarithmic magnitude scale">${guides}${bars}${dates}</svg><div class="code-legend"><span><i class="additions" aria-hidden="true"></i>Additions</span><span><i class="deletions" aria-hidden="true"></i>Deletions</span><span class="code-scale">Log scale${bucketSize>1?` · ${bucketSize}-day totals`:""}</span></div>`;
+      html+=`<svg class="code-chart" viewBox="0 0 640 300" role="img" aria-label="Observed additions above zero and deletions below, ${isYear?"proportional":"logarithmic"} magnitude scale">${guides}${bars}${dates}</svg><div class="code-legend"><span><i class="additions" aria-hidden="true"></i>Additions</span><span><i class="deletions" aria-hidden="true"></i>Deletions</span><span class="code-scale">${isYear?"Proportional scale":"Log scale"}${bucketSize>1?` · ${bucketSize}-day totals`:""}</span></div>`;
     }
     html+=`<details class="rhythm-detail code-details"><summary>How to read this</summary><p>${esc(a.window_start||"unavailable")} – ${esc(a.window_end||"unavailable")} UTC</p><p>Latest observed pushed branch · ${esc(identity)}</p><p>Inspected ${esc(cohort.queried??"unknown")} of ${esc(cohort.eligible??"unknown")} eligible recently pushed repositories</p><p>${esc(code.stats_observed??0)} of ${esc(code.commit_count??0)} observed non-merge commits have line stats; ${esc(code.excluded_merges??0)} merges excluded.</p><p>Selection: ${esc(selection.status||"unavailable")} · ${esc(selection.reason||"coverage unknown")}. History: ${esc(history.status||"unavailable")} · ${esc(history.reason||"coverage unknown")}.</p><p>Summed non-merge commit line changes reachable from this head; not net tree size or all branches. Missing history is not zero.</p><ul>${daily.map(d=>`<li>${esc(d.date)}: ${esc(d.additions??"unavailable")} additions; ${esc(d.deletions??"unavailable")} deletions</li>`).join("")}</ul></details>`;
     document.getElementById("activity-code").innerHTML=html;
   }
 
 
+
+  function hydrateRecentPushes(a) {
+    const state = a && a.recent_pushes || {};
+    const rows = Array.isArray(state.rows) ? state.rows : [];
+    const validRepo = value => {
+      if (typeof value !== "string") return false;
+      const parts = value.split("/");
+      return parts.length === 2 && /^[A-Za-z0-9][A-Za-z0-9-]{0,38}$/.test(parts[0]) &&
+        /^[A-Za-z0-9_.-]{1,100}$/.test(parts[1]) && parts[1] !== "." && parts[1] !== "..";
+    };
+    const validSha = value => typeof value === "string" && /^[0-9a-f]{40}$/.test(value);
+    const seen = new Set();
+    const items = rows.filter(row => {
+      if (!row || !validRepo(row.repository) || seen.has(row.repository.toLowerCase())) return false;
+      if (row.metadata_only === true) {
+        if (row.activity_type !== "repository_metadata" || typeof row.timestamp !== "string") return false;
+      } else if (!validSha(row.after)) return false;
+      seen.add(row.repository.toLowerCase());
+      return true;
+    }).slice(0, 3);
+    let html = '<div class="code-heading"><h2 class="title">Recent repository pushes</h2></div>';
+    const knownEmpty = Array.isArray(state.rows) && state.rows.length === 0 &&
+      state.status === "ok" && state.complete === true;
+    html += knownEmpty ? '<p class="section-meta">Complete observation · no recent push events</p>' :
+      items.length && items[0].metadata_only !== true ? '<p class="section-meta">Latest observed push per repository · not an all-branch total</p>' :
+      '<p class="section-meta">Reported repository push dates · branches and commits unverified</p>';
+    if (state.status !== "ok" || state.complete !== true) {
+      html += '<p class="section-meta">Observation incomplete · exact global ranking not guaranteed</p>';
+    }
+    if (!items.length) {
+      html += knownEmpty ? '<p>No recent pushes observed</p>' : '<p>Recent pushes unavailable</p>';
+    } else {
+      html += '<div class="recent-push-list">';
+      for (const row of items) {
+        if (row.metadata_only === true) {
+          const name = row.repository, repoURL = "https://github.com/" + name;
+          const timestamp = row.timestamp.slice(0, 16).replace("T", " ") + " UTC";
+          html += '<article class="recent-push-item" data-repository="' + esc(name) + '">';
+          html += '<p class="recent-push-name"><a href="' + repoURL + '">' + esc(name) + '</a></p>';
+          html += '<p class="recent-push-meta">Repository pushed · ' + esc(timestamp) + '</p>';
+          html += '<p class="recent-push-meta">Branch and push commits not verified</p>';
+          html += '<p class="recent-push-meta">Change totals unavailable</p>';
+          html += '</article>';
+          continue;
+        }
+        const name = row.repository, repoURL = "https://github.com/" + name;
+        const ref = typeof row.ref === "string" && row.ref.startsWith("refs/heads/") ? row.ref.slice(11) : "branch unavailable";
+        const timestamp = typeof row.timestamp === "string" ? row.timestamp.slice(0, 16).replace("T", " ") + " UTC" : "time unavailable";
+        const headURL = repoURL + "/commit/" + row.after;
+        const commits = Array.isArray(row.commits) ? row.commits : [];
+        const verified = row.activity_type === "push" && row.diff_status === "ok" && Number.isSafeInteger(row.additions) && row.additions >= 0 &&
+          Number.isSafeInteger(row.deletions) && row.deletions >= 0 &&
+          commits.length > 0 && commits.length <= 25 &&
+          commits.every(validSha) && new Set(commits).size === commits.length && commits.at(-1) === row.after;
+        html += '<article class="recent-push-item" data-repository="' + esc(name) + '">';
+        html += '<p class="recent-push-name"><a href="' + repoURL + '">' + esc(name) + '</a></p>';
+        html += '<p class="recent-push-meta">Branch · ' + esc(ref) + '</p>';
+        html += '<p class="recent-push-meta">' + esc(timestamp) + '</p>';
+        html += '<p class="recent-push-meta recent-push-commit">Head · <a href="' + headURL + '">' + esc(row.after.slice(0, 7)) + '</a></p>';
+        if (verified) {
+          html += '<p class="recent-push-total"><span class="recent-push-additions">+' + row.additions.toLocaleString("en-US") +
+            '</span><span class="recent-push-deletions">−' + row.deletions.toLocaleString("en-US") + '</span></p>';
+          html += '<p class="recent-push-meta">Tree diff · verified before/after</p>';
+          html += '<details class="recent-push-commits"><summary>' + commits.length + ' commits related to this push</summary><ul>';
+          for (const sha of commits) {
+            html += '<li class="recent-push-commit"><a href="' + repoURL + '/commit/' + sha + '">' + esc(sha.slice(0, 7)) + '</a></li>';
+          }
+          html += '</ul></details>';
+        } else {
+          html += '<p class="recent-push-meta">Change totals unverified · related commits unavailable</p>';
+        }
+        html += '</article>';
+      }
+      html += '</div>';
+    }
+    document.getElementById("activity-pushes").innerHTML = html;
+  }
+
   function hydrate(d) {
     hydrateCodeChanges(d.activity_analytics);
+    hydrateRecentPushes(d.activity_analytics);
     document.querySelectorAll("[data-bind]").forEach(el => {
       let v = get(d, el.getAttribute("data-bind"));
       if (v == null) return;

@@ -5,6 +5,7 @@ import base64
 from datetime import date, datetime, timedelta
 from html import escape
 import math
+import re
 from pathlib import Path
 import textwrap
 
@@ -278,13 +279,16 @@ def _code_changes_desktop(c, x, y, span, data):
             bucket["complete"] = bucket["complete"] and len(known) == len(rows)
         buckets.append(bucket)
     maximum = max((bucket[kind] or 0 for bucket in buckets for kind in ("additions", "deletions")), default=0)
-    cap = 10**math.ceil(math.log10(max(1, maximum)))
+    # Preserve a proportional scale for supplied year-long observations.
+    # The earlier 30-day view retains its accepted logarithmic scale.
+    year_view = len(daily) >= 365
+    cap = max(1, maximum) if year_view else 10**math.ceil(math.log10(max(1, maximum)))
     half_height = 116
-    magnitude = lambda value: half_height*math.log1p(value)/math.log1p(cap)
+    magnitude = (lambda value: half_height*value/cap) if year_view else (lambda value: half_height*math.log1p(value)/math.log1p(cap))
     left, right = x+48, x+span
     chart_span = right-left
     zero = y+53+half_height
-    middle = 10**(int(math.log10(cap))//2)
+    middle = cap//2 if year_view else 10**(int(math.log10(cap))//2)
     tick_values = sorted({0, middle, cap, -middle, -cap})
     for value in tick_values:
         py = zero-math.copysign(magnitude(abs(value)), value) if value else zero
@@ -323,9 +327,87 @@ def _code_changes_desktop(c, x, y, span, data):
     for label, color, offset in (("Additions", GREEN, 0), ("Deletions", RED, 140)):
         c.rect(x+offset, legend_y-10, 10, 10, fill=color, radius=5)
         c.text(label, x+offset+18, legend_y, size=14, color="muted")
-    resolution = "Log scale" + (f" · {bucket_size}-day totals" if bucket_size > 1 else "")
+    resolution = ("Proportional scale" if year_view else "Log scale") + (f" · {bucket_size}-day totals" if bucket_size > 1 else "")
     c.text(resolution, right, legend_y, size=14, color="muted", anchor="end")
     return legend_y+8
+
+
+def _recent_pushes(c, x, y, span, data):
+    """Render shared qualified push rows, with SVG-specific responsive layout."""
+    payload = data.get("recent_pushes") if isinstance(data, dict) else None
+    payload = payload if isinstance(payload, dict) else {}
+    rows = payload.get("rows") or []
+    if not isinstance(rows, list):
+        rows = []
+    reported = bool(rows) and rows[0].get("metadata_only") is True
+    state = payload.get("status", "unavailable")
+    known_empty = (not rows and state == "ok" and payload.get("complete") is True
+                   and payload.get("rows") == [])
+    if known_empty:
+        y = c.wrap("Complete observation · no recent push events",
+                   x, y, span, size=c.secondary, color="muted") + 6
+    elif reported:
+        y = c.wrap("Reported repository push dates · branches and commits unverified",
+                   x, y, span, size=c.secondary, color="muted") + 6
+    elif state != "ok":
+        y = c.wrap("Push observations incomplete · latest three not guaranteed",
+                   x, y, span, size=c.secondary, color="muted") + 6
+    else:
+        y = c.wrap("Latest observed push per repository · UTC",
+                   x, y, span, size=c.secondary, color="muted") + 6
+    if not rows:
+        caption = "No recent pushes observed" if known_empty else "Recent pushes unavailable"
+        return c.wrap(caption, x, y+10, span, color="muted")
+
+    cols = 1 if c.mobile else 3
+    gutter = 12
+    width = (span - (cols-1)*gutter)/cols
+    row_height = 151 if c.mobile else 157
+    for index, row in enumerate(rows[:3]):
+        xx = x + (0 if c.mobile else index*(width+gutter))
+        yy = y + (index*(row_height+10) if c.mobile else 0)
+        repo = str(row.get("repository") or "")
+        timestamp = str(row.get("timestamp") or "")[:16].replace("T", " ")+" UTC"
+        metadata_only = row.get("metadata_only") is True
+        head = str(row.get("after") or "")
+        commits = row.get("commits") or []
+        commits = commits if isinstance(commits, list) else []
+        verified = (not metadata_only and row.get("activity_type") == "push"
+                    and row.get("diff_status") == "ok"
+                    and type(row.get("additions")) is int and row["additions"] >= 0
+                    and type(row.get("deletions")) is int and row["deletions"] >= 0
+                    and bool(commits) and commits[-1] == head)
+        c.group(data_role="recent-push-row", data_repository=repo)
+        c.rect(xx, yy, width, row_height, fill="surface", radius=12, stroke=COLORS["line"])
+        inset = xx + 13
+        c.text(truncate(repo, 25 if c.mobile else 22), inset, yy+27, size=17, weight=600)
+        if metadata_only:
+            c.text("Repository push date", inset, yy+51, size=14, color="muted")
+            c.text(timestamp, inset, yy+74, size=13, color="muted")
+            c.text("Branch / commits unverified", inset, yy+94, size=13, color="muted")
+            c.text("Change totals unavailable", inset, yy+119, size=14,
+                   color="muted", data_role="recent-push-unverified")
+            title = repo+" · "+timestamp+" · repository metadata; not a verified push event"
+        else:
+            branch = str(row.get("ref") or "").removeprefix("refs/heads/")
+            c.text(truncate(branch, 31 if c.mobile else 24), inset, yy+51,
+                   size=14, color="muted", data_role="recent-push-branch")
+            c.text(timestamp, inset, yy+74, size=13, color="muted")
+            c.text("head "+head[:7], inset, yy+94, size=13, color="muted")
+            if verified:
+                c.text(f"+{row['additions']:,}  −{row['deletions']:,}",
+                       inset, yy+119, size=17, weight=600, data_role="recent-push-diff")
+                c.text(f"{len(commits)} related commits · tree diff",
+                       inset, yy+140, size=12, color="muted")
+            else:
+                c.text("Code changes not verified", inset, yy+119,
+                       size=14, color="muted", data_role="recent-push-unverified")
+            title = (f"{repo} · {row.get('ref')} · {timestamp} · "+
+                     ("verified before/after tree diff; commits: "+", ".join(sha[:12] for sha in commits)
+                      if verified else "commit relationship / diff unavailable"))
+        c.parts.append("<title>"+escape(title)+"</title>")
+        c.end()
+    return y + (len(rows[:3])*(row_height+10) if c.mobile else row_height) + 6
 
 
 def render_svg(summary, *, mobile=False, generation=None):
@@ -569,6 +651,8 @@ def render_svg(summary, *, mobile=False, generation=None):
     if isinstance(analytics, dict):
         paint_code = _code_changes if mobile else _code_changes_desktop
         y = c.panel("code-changes", "Code changes", y, lambda x, yy, span: paint_code(c, x, yy, span, analytics))
+    y = c.panel("recent-pushes", "Recent repository pushes", y,
+                lambda x, yy, span: _recent_pushes(c, x, yy, span, analytics or {}))
 
     def projects(x,yy,span):
         rows = summary.get("projects") or []
