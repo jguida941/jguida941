@@ -2475,6 +2475,17 @@ class CodeChangeCollectionTests(unittest.TestCase):
             def json(self): return copy.deepcopy(self.rows)
         def request(url, **kwargs):
             requests.append(url)
+            if '/compare/' in url:
+                self.assertTrue(url.startswith(f'{gh.API}/repos/{gh.USERNAME}/'))
+                before, after = url.rsplit('/compare/', 1)[1].split('...', 1)
+                self.assertEqual('b'*40, before)
+                self.assertIn(after, ('c'*40, 'd'*40))
+                return Response({'status': 'ahead', 'total_commits': 1,
+                    'ahead_by': 1, 'behind_by': 0,
+                    'base_commit': {'sha': before},
+                    'merge_base_commit': {'sha': before},
+                    'commits': [{'sha': after}],
+                    'files': [{'additions': 6, 'deletions': 2}]})
             self.assertTrue(url.endswith('/activity'))
             name=url.split('/')[-2]
             if name=='beta' and failure=='denied':return Response({},403)
@@ -2497,6 +2508,10 @@ class CodeChangeCollectionTests(unittest.TestCase):
             self.assertEqual([oid*40,oid*40],[row['oid'] for row in queries])
             self.assertTrue(code['selection']['complete'])
             self.assertTrue(code['history']['complete'])
+            observed = source['recent_pushes']['rows'][0]
+            self.assertEqual((gh.USERNAME+'/'+name, 'ok', 6, 2),
+                             (observed['repository'], observed['diff']['status'],
+                              observed['diff']['additions'], observed['diff']['deletions']))
 
     def test_competing_failure_cannot_certify_latest_selection(self):
         for failure in ('denied','malformed'):
