@@ -2,7 +2,8 @@
 
 Repository push timestamps, push events, commits, and before/after tree diffs are
 separate observations.  A commit is never inferred to belong to a push from a
-branch head alone.
+branch head alone.  Repository-metadata hints remain partial observations and
+cannot certify branch identity, the push's commit set, or an all-repository rank.
 """
 from __future__ import annotations
 
