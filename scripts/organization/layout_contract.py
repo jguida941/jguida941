@@ -54,6 +54,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/contracts/design_predicates.py", "scripts/contracts/design_predicates.py", "contracts", "pure design-conformance predicates (button radius/anatomy/material/mechanic/focus)"),
     ModuleHome("scripts/contracts/page_manifest.py", "scripts/contracts/page_manifest.py", "contracts", "page manifest render_source parser and committed-route producer check"),
     ModuleHome("scripts/contracts/dashboard_summary.py", "scripts/contracts/dashboard_summary.py", "contracts", "shared dashboard facts and projections"),
+    ModuleHome("scripts/contracts/publication.py", "scripts/contracts/publication.py", "contracts", "publication subjects and decisions for candidate and stored artifacts"),
     # --- github: API facade, transports and repo auditing ----------------------
     ModuleHome("scripts/github/activity_observations.py", "scripts/github/activity_observations.py", "github", "bounded branch and commit observations"),
     ModuleHome("scripts/github/client.py", "scripts/github/github_client.py", "github", "GitHub API facade"),

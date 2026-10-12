@@ -49,6 +49,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_design_motion.py",
             "test_design_nav.py",
             "test_public_data_privacy.py",
+            "test_publication_contract.py",
             "test_readme_projection.py",
             "test_scripts_layout_contract.py",
             "test_settings_composition.py",
@@ -168,6 +169,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
     ),
     "data_semantics": (
         "test_data_semantics.py",       # P5-DATA: the computed metrics are honest (value+label match meaning)
+        "test_publication_contract.py",  # publication decisions, caller compatibility and ownership
     ),
     "design_profiles": (
         "test_design_profiles_schema.py",  # P5-PROFILE-SPINE: design profiles are DATA w/ a closed aspect cover
