@@ -356,6 +356,35 @@ process.stdout.write(JSON.stringify({html: nodes['activity-code'].innerHTML, act
 
 
 
+    def test_supplied_year_keeps_proportional_change_sizes(self):
+        """Render through the actual website hydrator and retain relative values."""
+        for count in (365, 366):
+            with self.subTest(days=count):
+                activity = self.activity(count)
+                code = activity["code_changes"]
+                for row in code["daily"]:
+                    row.update(additions=0, deletions=0, complete=True)
+                code["daily"][14].update(additions=100, deletions=50)
+                code["daily"][251].update(additions=10000, deletions=5000)
+                code.update(additions=10100, deletions=5050, status="ok", complete=True)
+                tree = self.hydrate(activity)
+                paint = self.visible(tree)
+                self.assertIn("Proportional scale", paint)
+                self.assertNotIn("Log scale", paint)
+                bars = self.bars(tree)
+                additions = {int(node.get("data-value")): float(node.get("height"))
+                             for node in bars if node.get("data-kind") == "additions"}
+                self.assertEqual({100, 10000}, set(additions))
+                self.assertGreaterEqual(additions[10000], 115)
+                self.assertAlmostEqual(.01, additions[100] / additions[10000], places=6)
+                self.assertEqual(10100, sum(int(node.get("data-value")) for node in bars
+                                            if node.get("data-kind") == "additions"))
+                self.assertEqual(5050, sum(int(node.get("data-value")) for node in bars
+                                           if node.get("data-kind") == "deletions"))
+                self.assertEqual(2, len([node for node in tree.iter("text")
+                                         if node.get("data-role") == "code-y-tick"
+                                         and (node.text or "").startswith("−")]))
+
 
 class P024RecentPushWebsiteTests(unittest.TestCase):
     """Ordinary public-side guards; native method evidence remains separate."""

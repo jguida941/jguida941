@@ -279,13 +279,16 @@ def _code_changes_desktop(c, x, y, span, data):
             bucket["complete"] = bucket["complete"] and len(known) == len(rows)
         buckets.append(bucket)
     maximum = max((bucket[kind] or 0 for bucket in buckets for kind in ("additions", "deletions")), default=0)
-    cap = 10**math.ceil(math.log10(max(1, maximum)))
+    # Preserve a proportional scale for supplied year-long observations.
+    # The earlier 30-day view retains its accepted logarithmic scale.
+    year_view = len(daily) >= 365
+    cap = max(1, maximum) if year_view else 10**math.ceil(math.log10(max(1, maximum)))
     half_height = 116
-    magnitude = lambda value: half_height*math.log1p(value)/math.log1p(cap)
+    magnitude = (lambda value: half_height*value/cap) if year_view else (lambda value: half_height*math.log1p(value)/math.log1p(cap))
     left, right = x+48, x+span
     chart_span = right-left
     zero = y+53+half_height
-    middle = 10**(int(math.log10(cap))//2)
+    middle = cap//2 if year_view else 10**(int(math.log10(cap))//2)
     tick_values = sorted({0, middle, cap, -middle, -cap})
     for value in tick_values:
         py = zero-math.copysign(magnitude(abs(value)), value) if value else zero
@@ -324,7 +327,7 @@ def _code_changes_desktop(c, x, y, span, data):
     for label, color, offset in (("Additions", GREEN, 0), ("Deletions", RED, 140)):
         c.rect(x+offset, legend_y-10, 10, 10, fill=color, radius=5)
         c.text(label, x+offset+18, legend_y, size=14, color="muted")
-    resolution = "Log scale" + (f" · {bucket_size}-day totals" if bucket_size > 1 else "")
+    resolution = ("Proportional scale" if year_view else "Log scale") + (f" · {bucket_size}-day totals" if bucket_size > 1 else "")
     c.text(resolution, right, legend_y, size=14, color="muted", anchor="end")
     return legend_y+8
 

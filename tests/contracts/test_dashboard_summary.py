@@ -398,6 +398,34 @@ class CodeChangeDesktopPresentationTests(unittest.TestCase):
         self.assertFalse(any(node.get("data-role") == "code-change-bar" for node in chart.iter()))
 
 
+    def test_supplied_year_preserves_proportional_bars_and_exact_totals(self):
+        """The real desktop README SVG uses the same annual magnitude semantics."""
+        import math
+        for count in (365, 366):
+            with self.subTest(days=count):
+                summary = self.summary(count)
+                code = summary["activity_analytics"]["code_changes"]
+                for row in code["daily"]:
+                    row.update(additions=0, deletions=0, complete=True)
+                code["daily"][14].update(additions=100, deletions=50)
+                code["daily"][251].update(additions=10000, deletions=5000)
+                code.update(additions=10100, deletions=5050, status="ok", complete=True)
+                chart = self.chart(summary)
+                paint = " ".join(chart.itertext())
+                self.assertIn("Proportional scale", paint)
+                self.assertNotIn("Log scale", paint)
+                bars = [node for node in chart.iter() if node.get("data-role") == "code-change-bar"]
+                additions = {int(node.get("data-value")): float(node.get("height"))
+                             for node in bars if node.get("data-kind") == "additions"}
+                self.assertEqual({100, 10000}, set(additions))
+                self.assertGreaterEqual(additions[10000], 115)
+                self.assertTrue(math.isclose(.01, additions[100] / additions[10000], rel_tol=1e-9))
+                self.assertEqual(10100, sum(int(node.get("data-value")) for node in bars
+                                            if node.get("data-kind") == "additions"))
+                self.assertEqual(5050, sum(int(node.get("data-value")) for node in bars
+                                           if node.get("data-kind") == "deletions"))
+
+
 class RecentPushSvgProjectionTests(unittest.TestCase):
     """Same observed repository facts rendered independently at desktop and phone widths."""
 

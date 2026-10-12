@@ -536,8 +536,9 @@ def _script() -> str:
         buckets.push(bucket);
       }
       const maximum=Math.max(1,...buckets.flatMap(d=>[d.additions||0,d.deletions||0]));
-      const cap=10**Math.ceil(Math.log10(maximum)), halfHeight=116, zero=132, right=632;
-      const middle=10**Math.floor(Math.log10(cap)/2), ticks=[...new Set([-cap,-middle,0,middle,cap])];
+      const isYear=Number.isFinite(days)&&days>=365&&daily.length>=365;
+      const cap=isYear?maximum:10**Math.ceil(Math.log10(maximum)), halfHeight=116, zero=132, right=632;
+      const middle=isYear?Math.floor(cap/2):10**Math.floor(Math.log10(cap)/2), ticks=[...new Set([-cap,-middle,0,middle,cap])];
       const tickLabel=v=>{
         const value=Math.abs(v);
         return (v<0?"−":"")+(value>=1000?`${value/1000}k`:value);
@@ -546,7 +547,7 @@ def _script() -> str:
       // Reserve the same chart-scale inset on phone and desktop without dropping the minus sign.
       const longestTick=Math.max(...ticks.map(v=>tickLabel(v).length));
       const left=Math.min(right-160, Math.max(64, 24+14*longestTick));
-      const magnitude=v=>halfHeight*Math.log1p(v)/Math.log1p(cap);
+      const magnitude=v=>isYear?halfHeight*v/cap:halfHeight*Math.log1p(v)/Math.log1p(cap);
       let guides=ticks.map(v=>{
         const y=zero-Math.sign(v)*magnitude(Math.abs(v)), label=tickLabel(v);
         return `<line x1="${left}" y1="${y}" x2="${right}" y2="${y}" stroke="currentColor" stroke-opacity="${v===0?.65:.2}"/><text data-role="code-y-tick" x="${left-8}" y="${y+5}" text-anchor="end">${label}</text>`;
@@ -568,7 +569,7 @@ def _script() -> str:
         const day=new Date(daily[i].date+"T00:00:00Z"), label=`${months[day.getUTCMonth()]} ${day.getUTCDate()}`;
         return `<text x="${left+(right-left)*i/Math.max(1,daily.length-1)}" y="280" text-anchor="${i===0?"start":i===daily.length-1?"end":"middle"}">${label}</text>`;
       }).join(""):"";
-      html+=`<svg class="code-chart" viewBox="0 0 640 300" role="img" aria-label="Observed additions above zero and deletions below, logarithmic magnitude scale">${guides}${bars}${dates}</svg><div class="code-legend"><span><i class="additions" aria-hidden="true"></i>Additions</span><span><i class="deletions" aria-hidden="true"></i>Deletions</span><span class="code-scale">Log scale${bucketSize>1?` · ${bucketSize}-day totals`:""}</span></div>`;
+      html+=`<svg class="code-chart" viewBox="0 0 640 300" role="img" aria-label="Observed additions above zero and deletions below, ${isYear?"proportional":"logarithmic"} magnitude scale">${guides}${bars}${dates}</svg><div class="code-legend"><span><i class="additions" aria-hidden="true"></i>Additions</span><span><i class="deletions" aria-hidden="true"></i>Deletions</span><span class="code-scale">${isYear?"Proportional scale":"Log scale"}${bucketSize>1?` · ${bucketSize}-day totals`:""}</span></div>`;
     }
     html+=`<details class="rhythm-detail code-details"><summary>How to read this</summary><p>${esc(a.window_start||"unavailable")} – ${esc(a.window_end||"unavailable")} UTC</p><p>Latest observed pushed branch · ${esc(identity)}</p><p>Inspected ${esc(cohort.queried??"unknown")} of ${esc(cohort.eligible??"unknown")} eligible recently pushed repositories</p><p>${esc(code.stats_observed??0)} of ${esc(code.commit_count??0)} observed non-merge commits have line stats; ${esc(code.excluded_merges??0)} merges excluded.</p><p>Selection: ${esc(selection.status||"unavailable")} · ${esc(selection.reason||"coverage unknown")}. History: ${esc(history.status||"unavailable")} · ${esc(history.reason||"coverage unknown")}.</p><p>Summed non-merge commit line changes reachable from this head; not net tree size or all branches. Missing history is not zero.</p><ul>${daily.map(d=>`<li>${esc(d.date)}: ${esc(d.additions??"unavailable")} additions; ${esc(d.deletions??"unavailable")} deletions</li>`).join("")}</ul></details>`;
     document.getElementById("activity-code").innerHTML=html;
