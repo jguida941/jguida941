@@ -5,6 +5,91 @@ from scripts.rendering.generate_dashboard_summary import render_svg
 from scripts.contracts.dashboard_summary import _fact
 
 
+def owned_activity_presentation():
+    """A varied, supplied annual dataset for renderer contract tests, not user data."""
+    from datetime import date, timedelta
+    from scripts.pipeline.activity_analytics import build_activity_analytics
+    from tests.pipeline.test_compute_metrics_accuracy import CodeChangeAggregationTests
+
+    activity = build_activity_analytics(CodeChangeAggregationTests.source())
+    start = date(2025, 10, 11)
+    daily = [{"date": str(start + timedelta(days=index)), "additions": 0,
+              "deletions": 0, "complete": True} for index in range(365)]
+    for index, added, deleted in ((14, 7, 3), (70, 70, 30), (140, 700, 300),
+                                  (280, 7000, 3000), (364, 21, 9)):
+        daily[index].update(additions=added, deletions=deleted)
+
+    def window(days, bucket_size):
+        rows = daily[-days:]
+        bins = []
+        for index in range(0, len(rows), bucket_size):
+            group = rows[index:index + bucket_size]
+            bins.append({"date": group[0]["date"], "end_date": group[-1]["date"],
+                         "day_index": index, "end_day_index": index + len(group) - 1,
+                         "additions": sum(row["additions"] for row in group),
+                         "deletions": sum(row["deletions"] for row in group), "complete": True})
+        months = [{"date": row["date"], "day_index": index,
+                   "label": date.fromisoformat(row["date"]).strftime("%b")}
+                  for index, row in enumerate(rows) if index == 0 or row["date"].endswith("-01")]
+        return {"window_start": rows[0]["date"] + "T00:00:00Z",
+                "window_end": rows[-1]["date"] + "T16:30:00Z", "current_day_partial": True,
+                "status": "ok", "complete": True, "additions": sum(row["additions"] for row in rows),
+                "deletions": sum(row["deletions"] for row in rows),
+                "commit_count": sum(row["additions"] > 0 for row in rows),
+                "stats_observed": sum(row["additions"] > 0 for row in rows),
+                "excluded_merges": 0, "daily": rows, "bins": bins, "month_labels": months}
+
+    activity["overall_code_changes"] = {
+        "schema": "profile-owned-code-analytics/v1", "status": "ok", "complete": True,
+        "meaning": "Repository activity · all authors · owned public and private nonfork repositories; profile excluded",
+        "coverage": {"expected": 3, "eligible": 3, "repositories_observed": 3,
+                     "repositories_complete": 3, "branches_observed": 4,
+                     "branches_complete": 4, "reasons": []},
+        "windows": {"30d": window(30, 1), "365d": window(365, 7)},
+    }
+    return activity
+
+
+class OwnedCodeActivitySvgTests(unittest.TestCase):
+    def test_both_readme_sizes_use_shared_annual_totals_and_bins(self):
+        activity = owned_activity_presentation()
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root = ET.fromstring(render_svg({"activity_analytics": activity}, mobile=mobile))
+                section = next(node for node in root.iter() if node.get("data-section") == "code-changes")
+                paint = " ".join(section.itertext())
+                self.assertIn("+7,798", paint)
+                self.assertIn("−3,342", paint)
+                self.assertIn("all authors", paint.lower())
+                bars = [node for node in section.iter() if node.get("data-role") == "code-change-bar"]
+                self.assertEqual((7798, 3342),
+                                 (sum(int(bar.get("data-value")) for bar in bars if bar.get("data-kind") == "additions"),
+                                  sum(int(bar.get("data-value")) for bar in bars if bar.get("data-kind") == "deletions")))
+                additions = {int(bar.get("data-value")): bar for bar in bars if bar.get("data-kind") == "additions"}
+                self.assertAlmostEqual(10, float(additions[70].get("height")) / float(additions[7].get("height")), places=3)
+                self.assertAlmostEqual(10, float(additions[700].get("height")) / float(additions[70].get("height")), places=3)
+                expected = {(row["date"], row["end_date"], str(row["additions"]))
+                            for row in activity["overall_code_changes"]["windows"]["365d"]["bins"] if row["additions"]}
+                self.assertEqual(expected, {(bar.get("data-date"), bar.get("data-end-date"), bar.get("data-value"))
+                                            for bar in additions.values()})
+                sections = [node.get("data-section") for node in root.iter() if node.get("data-section")]
+                self.assertEqual("recent-pushes", sections[sections.index("code-changes") + 1])
+
+    def test_present_unknown_overall_never_becomes_branch_totals(self):
+        activity = owned_activity_presentation()
+        activity["overall_code_changes"].update(status="unavailable", complete=False)
+        for value in activity["overall_code_changes"]["windows"].values():
+            value.update(status="unavailable", complete=False, additions=None, deletions=None, daily=[], bins=[])
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root = ET.fromstring(render_svg({"activity_analytics": activity}, mobile=mobile))
+                section = next(node for node in root.iter() if node.get("data-section") == "code-changes")
+                paint = " ".join(section.itertext())
+                self.assertIn("Overall code activity unavailable", paint)
+                self.assertNotIn("+25", paint)
+                self.assertFalse(any(node.get("data-role") == "code-change-bar" for node in section.iter()))
+
+
 class DashboardSummaryTests(unittest.TestCase):
     def test_inventory_zero_is_reported_and_absence_unavailable(self):
         zero = _fact("inventory.private_owned", 0, "Private", "private-owned")

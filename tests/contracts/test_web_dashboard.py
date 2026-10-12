@@ -167,7 +167,7 @@ class CodeChangeHydrationTests(unittest.TestCase):
                     "additions": sum(row["additions"] or 0 for row in daily),
                     "deletions": sum(row["deletions"] or 0 for row in daily)}}
 
-    def hydrate(self, activity):
+    def hydrate(self, activity, period=None):
         import json
         import subprocess
         import xml.etree.ElementTree as ET
@@ -182,11 +182,11 @@ const idle = {then() {return this;}, catch() {return this;}};
 const context = {document: {documentElement: {dataset: {}}, querySelectorAll() {return [];},
   getElementById(id) {return nodes[id] ||= {innerHTML: '', textContent: '', style: {setProperty() {}}, setAttribute() {}, replaceChildren() {}};}},
   location: {hash: '', search: ''}, localStorage: {getItem() {return null;}, setItem() {}},
-  URLSearchParams, addEventListener() {}, requestAnimationFrame() {}, fetch() {return idle;}, activity: input.activity};
-vm.runInNewContext(input.script + '\nhydrateCodeChanges(activity);', context, {timeout: 5000});
+  URLSearchParams, addEventListener() {}, requestAnimationFrame() {}, fetch() {return idle;}, activity: input.activity, period: input.period};
+vm.runInNewContext(input.script + '\nhydrateCodeChanges(activity, period);', context, {timeout: 5000});
 process.stdout.write(JSON.stringify({html: nodes['activity-code'].innerHTML, activity: context.activity}));
 '''
-        result = subprocess.run(["node", "-e", harness], input=json.dumps({"script": script[0], "activity": activity}),
+        result = subprocess.run(["node", "-e", harness], input=json.dumps({"script": script[0], "activity": activity, "period": period}),
                                 text=True, capture_output=True, check=True, timeout=10)
         observed = json.loads(result.stdout)
         self.assertEqual(activity, observed["activity"])
@@ -313,7 +313,7 @@ process.stdout.write(JSON.stringify({html: nodes['activity-code'].innerHTML, act
                 activity["code_changes"].update(additions=peak, deletions=peak)
                 svg = self.hydrate(activity).find(".//svg")
                 self.assertIsNotNone(svg)
-                self.assertEqual("0 0 640 300", svg.get("viewBox"))
+                self.assertEqual("0 0 640 300", svg.get("viewbox"))
                 ticks = [node for node in svg.iter("text")
                          if node.get("data-role") == "code-y-tick"]
                 self.assertEqual(5, len(ticks))
@@ -576,6 +576,59 @@ process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, a
         self.assertIn("Recent pushes unavailable", html)
         self.assertNotIn("No recent pushes observed", html)
         self.assertNotIn("<img>", html)
+
+
+class OwnedCodeActivityWebsiteTests(unittest.TestCase):
+    """The interactive and static windows are presentations of shared facts."""
+
+    hydrate = CodeChangeHydrationTests.hydrate
+    bars = staticmethod(CodeChangeHydrationTests.bars)
+
+    def test_default_recent_and_selected_year_use_distinct_shared_totals(self):
+        from tests.contracts.test_dashboard_summary import owned_activity_presentation
+
+        activity = owned_activity_presentation()
+        recent = self.hydrate(activity)
+        yearly = self.hydrate(activity, "365d")
+        self.assertIn("+21", " ".join(recent.itertext()))
+        self.assertIn("+7,798", " ".join(yearly.itertext()))
+        self.assertIn("−3,342", " ".join(yearly.itertext()))
+        for rendered, expected in ((recent, "30d"), (yearly, "365d")):
+            controls = [node for node in rendered.iter("button") if node.get("data-code-period")]
+            self.assertEqual({"30d", "365d"}, {node.get("data-code-period") for node in controls})
+            self.assertEqual([expected], [node.get("data-code-period") for node in controls
+                                          if node.get("aria-pressed") == "true"])
+            self.assertIn("all authors", " ".join(rendered.itertext()).lower())
+
+    def test_year_bars_preserve_shared_bin_dates_and_proportions(self):
+        from tests.contracts.test_dashboard_summary import owned_activity_presentation
+
+        activity = owned_activity_presentation()
+        root = self.hydrate(activity, "365d")
+        bars = self.bars(root)
+        self.assertEqual((7798, 3342),
+                         (sum(int(bar.get("data-value")) for bar in bars if bar.get("data-kind") == "additions"),
+                          sum(int(bar.get("data-value")) for bar in bars if bar.get("data-kind") == "deletions")))
+        additions = {int(bar.get("data-value")): bar for bar in bars if bar.get("data-kind") == "additions"}
+        self.assertAlmostEqual(10, float(additions[70].get("height")) / float(additions[7].get("height")), places=5)
+        self.assertAlmostEqual(10, float(additions[700].get("height")) / float(additions[70].get("height")), places=5)
+        expected = {(row["date"], row["end_date"], str(row["additions"]))
+                    for row in activity["overall_code_changes"]["windows"]["365d"]["bins"] if row["additions"]}
+        self.assertEqual(expected, {(bar.get("data-date"), bar.get("data-end-date"), bar.get("data-value"))
+                                    for bar in additions.values()})
+
+    def test_unavailable_overall_does_not_relabel_selected_branch_values(self):
+        from tests.contracts.test_dashboard_summary import owned_activity_presentation
+
+        activity = owned_activity_presentation()
+        activity["overall_code_changes"].update(status="unavailable", complete=False)
+        for value in activity["overall_code_changes"]["windows"].values():
+            value.update(status="unavailable", complete=False, additions=None, deletions=None, daily=[], bins=[])
+        root = self.hydrate(activity, "365d")
+        paint = " ".join(root.itertext())
+        self.assertIn("Overall code activity unavailable", paint)
+        self.assertNotIn("+25", paint)
+        self.assertEqual([], self.bars(root))
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
-"""Bounded repository activity observations; no raw commit bodies or logs."""
+"""Bounded push and owned-head activity observations, without commit bodies."""
+from collections import deque
 from datetime import timedelta, timezone
 import re
 from urllib.parse import parse_qs, urlparse
@@ -275,8 +276,308 @@ def _code_history(selected, start, now, context):
     return result
 
 
+# These are collection budgets, not claims about GitHub's platform limits.
+_OWNED_QUERY_LIMIT = 400
+_OWNED_BATCH_SIZE = 8
+_OWNED_REF_PAGES = 3
+_OWNED_HISTORY_PAGES = 100
+_OWNED_HISTORY_SIZE = 10
+_OWNED_QUOTA_RESERVE = 100
+
+
+class _OwnedRequests:
+    """Count transport invocations; internal HTTP/token retries belong to transport."""
+
+    def __init__(self):
+        self.used = 0
+        self.remaining = None
+        self.reason = "observed"
+
+    def available(self):
+        if self.used >= _OWNED_QUERY_LIMIT:
+            self.reason = "request_limit"
+            return False
+        if self.remaining is not None and self.remaining < _OWNED_QUOTA_RESERVE:
+            self.reason = "rate_limited"
+            return False
+        return True
+
+    def query(self, query, variables):
+        if not self.available():
+            return None
+        self.used += 1
+        try:
+            payload = gh._graphql_query(query, variables)
+        except (requests.RequestException, ValueError):
+            payload = None
+        quota = payload.get("rateLimit") if type(payload) is dict else None
+        if type(quota) is dict:
+            remaining, limit = count(quota.get("remaining")), count(quota.get("limit"))
+            if (remaining is not None and limit is not None and limit > 0
+                    and remaining <= limit and timestamp(quota.get("resetAt")) is not None):
+                self.remaining = remaining
+        return payload if type(payload) is dict else None
+
+
+def _owned_query(jobs, kind, start, now):
+    declarations, selections, variables = [], [], {}
+    if kind == "history":
+        declarations.extend(("$since: GitTimestamp!", "$until: GitTimestamp!"))
+        variables.update(since=iso(start), until=iso(now))
+    for index, job in enumerate(jobs):
+        owner, name = job["repository"].split("/")
+        declarations.extend((f"$owner{index}: String!", f"$name{index}: String!",
+                             f"$cursor{index}: String"))
+        variables.update({f"owner{index}": owner, f"name{index}": name,
+                          f"cursor{index}": job["cursor"]})
+        if kind == "refs":
+            body = f'''refs(refPrefix: "refs/heads/", first: 100, after: $cursor{index}) {{
+                totalCount nodes {{ name prefix target {{ __typename oid }} }}
+                pageInfo {{ hasNextPage endCursor }}
+            }}'''
+        else:
+            declarations.append(f"$oid{index}: GitObjectID!")
+            variables[f"oid{index}"] = job["result"]["head_sha"]
+            body = f'''object(oid: $oid{index}) {{ ... on Commit {{
+                oid history(first: {_OWNED_HISTORY_SIZE}, after: $cursor{index}, since: $since, until: $until) {{
+                    nodes {{ oid committedDate additions deletions parents(first: 1) {{ totalCount }} }}
+                    pageInfo {{ hasNextPage endCursor }}
+                }}
+            }} }}'''
+        selections.append(f"r{index}: repository(owner: $owner{index}, name: $name{index}) {{ nameWithOwner {body} }}")
+    return ("query(" + ", ".join(declarations) + ") { " + " ".join(selections)
+            + " rateLimit { remaining limit resetAt } }", variables)
+
+
+def _owned_responses(jobs, kind, start, now, requests):
+    """Retry one failed batch as single requests, against the same call budget."""
+    query, variables = _owned_query(jobs, kind, start, now)
+    payload = requests.query(query, variables)
+    if payload is not None:
+        return [payload.get(f"r{index}") for index in range(len(jobs))]
+    if len(jobs) == 1:
+        return [None]
+    results = []
+    for job in jobs:
+        query, variables = _owned_query([job], kind, start, now)
+        payload = requests.query(query, variables)
+        results.append(payload.get("r0") if payload is not None else None)
+    return results
+
+
+def _owned_inventory(public_repos, private_repos, repo_counts, inventory_fresh):
+    excluded = {"identity": 0, "fork": 0, "profile": 0, "privacy": 0,
+                "unknown_fork": 0, "duplicate": 0}
+    candidates, conflicting, partition_counts = {}, set(), []
+    valid_inventory = True
+    for rows, private in ((public_repos, False), (private_repos, True)):
+        observed = set()
+        for raw in rows:
+            owner = (raw.get("owner") or {}).get("login") if type(raw) is dict and type(raw.get("owner")) is dict else None
+            repository = gh._branch_repository_name(owner, raw.get("name")) if type(raw) is dict else None
+            if not repository or owner.casefold() != gh.USERNAME.casefold():
+                excluded["identity"] += 1
+                valid_inventory = False
+                continue
+            if type(raw.get("fork")) is not bool:
+                excluded["unknown_fork"] += 1
+                valid_inventory = False
+                continue
+            if raw["fork"]:
+                excluded["fork"] += 1
+                continue
+            key = repository.casefold()
+            if key in observed:
+                excluded["duplicate"] += 1
+                valid_inventory = False
+            observed.add(key)
+            if type(raw.get("private")) is not bool or raw["private"] != private:
+                excluded["privacy"] += 1
+                valid_inventory = False
+                conflicting.add(key)
+                continue
+            if is_self_repo(raw["name"]):
+                excluded["profile"] += 1
+                continue
+            if key in candidates and candidates[key][1]["private"] != private:
+                conflicting.add(key)
+                valid_inventory = False
+            elif key not in candidates:
+                candidates[key] = (repository, raw)
+        partition_counts.append(len(observed))
+    for key in conflicting:
+        candidates.pop(key, None)
+    expected_parts = [count(repo_counts.get("public_owned_nonfork")),
+                      count(repo_counts.get("private_owned_nonfork"))]
+    counts_known = all(value is not None for value in expected_parts)
+    expected = sum(expected_parts) if counts_known else None
+    inventory = {"expected": expected, "eligible": len(candidates),
+                 "complete": valid_inventory and counts_known and partition_counts == expected_parts,
+                 "fresh": inventory_fresh is True, "excluded": excluded}
+    # Push metadata determines scheduling only; quiet or undated repositories
+    # remain in the annual population.
+    def order(item):
+        repository, raw = item
+        pushed = timestamp(raw.get("pushed_at"))
+        return (-(pushed.timestamp() if pushed is not None else 0), repository.casefold())
+    return sorted(candidates.values(), key=order), inventory
+
+
+def _owned_page_cursor(info, job):
+    if info.get("hasNextPage") is False:
+        return None, None
+    cursor = info.get("endCursor")
+    if (info.get("hasNextPage") is not True or type(cursor) is not str or not cursor
+            or cursor in job["seen"]):
+        return None, "invalid_cursor"
+    job["seen"].add(cursor)
+    return cursor, None
+
+
+def _owned_refs_page(job, payload):
+    result = job["result"]
+    refs = payload.get("refs") if type(payload) is dict else None
+    if (type(payload) is not dict or repository_name(payload.get("nameWithOwner")) is None
+            or payload["nameWithOwner"].casefold() != job["repository"].casefold()
+            or type(refs) is not dict or type(refs.get("nodes")) is not list
+            or len(refs["nodes"]) > 100 or type(refs.get("pageInfo")) is not dict
+            or count(refs.get("totalCount")) is None):
+        result["reason"] = "refs_unavailable"
+        return False
+    result["page_count"] += 1
+    total = refs["totalCount"]
+    if result["total_count"] is not None and result["total_count"] != total:
+        job["invalid"] = True
+    result["total_count"] = total
+    for node in refs["nodes"]:
+        target = node.get("target") if type(node) is dict else None
+        ref = "refs/heads/" + node["name"] if type(node) is dict and type(node.get("name")) is str else None
+        if (type(node) is not dict or node.get("prefix") != "refs/heads/"
+                or not gh._valid_branch_ref(ref) or type(target) is not dict
+                or target.get("__typename") != "Commit" or not gh._valid_branch_oid(target.get("oid"))):
+            job["invalid"] = True
+            continue
+        if ref in job["heads"] or ref in job["conflicts"]:
+            job["invalid"] = True
+            if job["heads"].get(ref) != target["oid"]:
+                job["conflicts"].add(ref)
+                job["heads"].pop(ref, None)
+        elif ref not in job["conflicts"]:
+            job["heads"][ref] = target["oid"]
+    result["heads"] = [{"ref": ref, "head_sha": oid} for ref, oid in job["heads"].items()]
+    cursor, error = _owned_page_cursor(refs["pageInfo"], job)
+    if error:
+        result["reason"] = error
+    elif cursor is None:
+        complete = not job["invalid"] and len(job["heads"]) == total
+        result.update(complete=complete, reason="end_of_connection" if complete else "invalid_refs")
+    elif result["page_count"] >= _OWNED_REF_PAGES:
+        result["reason"] = "ref_page_limit"
+    else:
+        job["cursor"] = cursor
+        return True
+    return False
+
+
+def _owned_history_page(job, payload, start, now):
+    result = job["result"]
+    obj = payload.get("object") if type(payload) is dict else None
+    history = obj.get("history") if type(obj) is dict else None
+    if (type(payload) is not dict or repository_name(payload.get("nameWithOwner")) is None
+            or payload["nameWithOwner"].casefold() != job["repository"].casefold()
+            or type(obj) is not dict or obj.get("oid") != result["head_sha"]
+            or type(history) is not dict or type(history.get("nodes")) is not list
+            or len(history["nodes"]) > _OWNED_HISTORY_SIZE or type(history.get("pageInfo")) is not dict):
+        result["reason"] = "history_unavailable"
+        return False
+    result["page_count"] += 1
+    for row in history["nodes"]:
+        occurred = timestamp(row.get("committedDate")) if type(row) is dict else None
+        if type(row) is not dict or not gh._valid_branch_oid(row.get("oid")):
+            job["invalid"] = True
+            continue
+        if occurred is None or occurred > now:
+            job["invalid"] = True
+        parents = row.get("parents")
+        # Keep the OID even when its date is rejected, so the aggregate can
+        # quarantine a contradictory duplicate instead of reviving another copy.
+        value = {"oid": row["oid"], "committed_at": iso(occurred) if occurred is not None else None,
+                 "additions": count(row.get("additions")), "deletions": count(row.get("deletions")),
+                 "parent_count": count(parents.get("totalCount")) if type(parents) is dict else None}
+        if any(value[key] is None for key in ("additions", "deletions", "parent_count")):
+            job["invalid"] = True
+        result["commits"].append(value)
+    cursor, error = _owned_page_cursor(history["pageInfo"], job)
+    if error:
+        result["reason"] = error
+    elif cursor is None:
+        result.update(complete=not job["invalid"], reason="invalid_rows" if job["invalid"] else "end_of_connection")
+    elif result["page_count"] >= _OWNED_HISTORY_PAGES:
+        result["reason"] = "history_page_limit"
+    else:
+        job["cursor"] = cursor
+        return True
+    return False
+
+
+def _owned_collect_queue(queue, kind, start, now, requests):
+    while queue and requests.available():
+        jobs = [queue.popleft() for _ in range(min(_OWNED_BATCH_SIZE, len(queue)))]
+        payloads = _owned_responses(jobs, kind, start, now, requests)
+        for job, payload in zip(jobs, payloads):
+            again = (_owned_refs_page(job, payload) if kind == "refs"
+                     else _owned_history_page(job, payload, start, now))
+            if again:
+                queue.append(job)
+            result = job["result"]
+            result["status"] = "ok" if result["complete"] else "partial" if result["page_count"] else "unavailable"
+            if payload is None and requests.reason != "observed":
+                result["reason"] = requests.reason
+    for job in queue:
+        result = job["result"]
+        result.update(complete=False, reason=requests.reason,
+                      status="partial" if result["page_count"] else "unavailable")
+
+
+def _collect_owned_code_activity(public_repos, private_repos, repo_counts, now, inventory_fresh):
+    start = now.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=364)
+    candidates, inventory = _owned_inventory(public_repos, private_repos, repo_counts, inventory_fresh)
+    requests, repositories, refs_queue = _OwnedRequests(), [], deque()
+    for repository, raw in candidates:
+        refs = {"status": "unavailable", "complete": False, "reason": "not_observed",
+                "total_count": None, "heads": [], "page_count": 0}
+        repositories.append({"repository": repository, "private": raw["private"], "refs": refs, "histories": []})
+        refs_queue.append({"repository": repository, "result": refs, "cursor": None,
+                           "seen": set(), "invalid": False, "heads": {}, "conflicts": set()})
+    _owned_collect_queue(refs_queue, "refs", start, now, requests)
+    by_repository = []
+    for row in repositories:
+        heads = dict.fromkeys(head["head_sha"] for head in row["refs"]["heads"])
+        jobs = deque()
+        for head in heads:
+            result = {"head_sha": head, "status": "unavailable", "complete": False,
+                      "reason": "not_observed", "commits": [], "page_count": 0}
+            row["histories"].append(result)
+            jobs.append({"repository": row["repository"], "result": result,
+                         "cursor": None, "seen": set(), "invalid": False})
+        by_repository.append(jobs)
+    # Start one head per repository before second heads; then rotate each page
+    # behind the other queued heads so a large history cannot starve the roster.
+    history_queue = deque()
+    while any(by_repository):
+        for jobs in by_repository:
+            if jobs:
+                history_queue.append(jobs.popleft())
+    _owned_collect_queue(history_queue, "history", start, now, requests)
+    return {"schema": "profile-owned-code-observations/v1", "window_start": iso(start),
+            "window_end": iso(now), "observed_at": iso(now), "inventory": inventory,
+            "repositories": repositories,
+            "requests": {"used": requests.used, "limit": _OWNED_QUERY_LIMIT,
+                         "remaining": requests.remaining, "reason": requests.reason}}
+
+
 def collect_activity_observations(public_repos, private_repos, repo_counts, *, observed_at, inventory_fresh=True):
-    """Observe at most twenty selected recently pushed owned repositories."""
+    """Observe bounded recent pushes and annual histories of owned branch heads."""
     now = observed_at.astimezone(timezone.utc)
     start = now.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=29)
     candidates, excluded = {}, {"identity": 0, "fork": 0, "profile": 0, "outside_window": 0, "invalid_hint": 0}
@@ -358,4 +659,5 @@ def collect_activity_observations(public_repos, private_repos, repo_counts, *, o
     return {"schema": "profile-activity-observations/v1", "window_start": iso(start), "window_end": iso(now), "observed_at": iso(now),
             "cohort": cohort, "repositories": rows, "code_changes": code, "selection": selection,
             "recent_pushes": recent_pushes,
+            "overall_code_changes": _collect_owned_code_activity(public_repos, private_repos, repo_counts, now, inventory_fresh),
             "requests": {"status": "partial" if context.stopped or context.failed else "ok", "rest_core": context.quota}}

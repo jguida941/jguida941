@@ -332,6 +332,135 @@ def _code_changes_desktop(c, x, y, span, data):
     return legend_y+8
 
 
+def _owned_code_changes(c, x, y, span, data):
+    """Paint the model's annual window without regrouping its shared bins."""
+    family = data.get("overall_code_changes")
+    family = family if isinstance(family, dict) else {}
+    windows = family.get("windows") or {}
+    code = windows.get("365d") or {}
+    coverage = family.get("coverage") or {}
+    integer = lambda value: type(value) is int and 0 <= value <= 2**53-1
+    unavailable = (family.get("schema") != "profile-owned-code-analytics/v1"
+                   or family.get("status") == "unavailable"
+                   or code.get("status") == "unavailable"
+                   or not integer(code.get("additions")) or not integer(code.get("deletions")))
+    complete = family.get("complete") is True and code.get("complete") is True
+    scope = "Rolling 365 days"
+    if code.get("current_day_partial"):
+        scope += " · today partial"
+    if not complete:
+        scope += " · partial data"
+    y = c.wrap(scope, x, y, span, size=c.secondary, color="muted")
+    start, end = str(code.get("window_start") or "unavailable")[:10], str(code.get("window_end") or "unavailable")[:10]
+    y = c.wrap(f"{start} – {end} UTC", x, y, span, size=c.secondary, color="muted")
+    meaning = family.get("meaning") or "Repository activity · all authors · owned public and private nonfork repositories; profile excluded"
+    y = c.wrap(meaning, x, y+5, span, size=c.secondary, color="muted")
+    quantity = lambda key: f"{coverage[key]:,}" if integer(coverage.get(key)) else "unknown"
+    y = c.wrap(f"Coverage: {quantity('repositories_complete')} of {quantity('eligible')} eligible repositories complete · "
+               f"{quantity('branches_complete')} of {quantity('branches_observed')} observed branches complete",
+               x, y+5, span, size=c.secondary, color="muted")
+    if not complete:
+        qualifier = "Observation incomplete" if unavailable else "Observed subtotal"
+        y = c.wrap(qualifier+" · missing history is not zero.", x, y+5, span, size=c.secondary, color="muted")
+    details = (f"Non-merge commits reachable from branch heads observed during collection; all authors. "
+               f"Root commits count; duplicate OIDs across branches and repositories count once. "
+               f"{code.get('stats_observed', 'unknown')} of {code.get('commit_count', 'unknown')} observed non-merge commits have line stats; "
+               f"{code.get('excluded_merges', 'unknown')} merges excluded. "
+               f"Repositories with observed history: {quantity('repositories_observed')} of {quantity('eligible')}. "
+               f"Inventory rows expected: {quantity('expected')}. "
+               f"Coverage: {family.get('status', 'unavailable')}; " + ", ".join(str(reason) for reason in coverage.get("reasons", [])))
+    c.parts.append('<desc>'+escape(details)+'</desc>')
+    if unavailable:
+        return c.wrap("Overall code activity unavailable", x, y+12, span, color="muted")
+
+    added, deleted = f"+{code['additions']:,}", f"−{code['deletions']:,}"
+    # The phone owns a compact two-line total layout; the wide SVG keeps one row.
+    if c.mobile:
+        total_size = min(26, max(18, span/(max(len(added), len(deleted))*.62)))
+        c.text(added, x, y+total_size+7, size=total_size, color=GREEN, weight=600)
+        c.text("additions", x+span, y+total_size+7, size=15, color="muted", anchor="end")
+        c.text(deleted, x, y+2*total_size+22, size=total_size, color=RED, weight=600)
+        c.text("deletions", x+span, y+2*total_size+22, size=15, color="muted", anchor="end")
+        y += 2*total_size+39
+    else:
+        c.text(added, x, y+32, size=26, color=GREEN, weight=600)
+        c.text(deleted, x+span/2, y+32, size=26, color=RED, weight=600)
+        y += 54
+
+    # Phone and desktop have distinct geometry, but consume exactly the same bins.
+    half_height, tick_size = (82, 13) if c.mobile else (116, 14)
+    bins = code.get("bins") if isinstance(code.get("bins"), list) else []
+    maximum = max([1] + [bucket[kind] for bucket in bins for kind in ("additions", "deletions")
+                        if integer(bucket.get(kind))])
+    ticks = sorted({-maximum, -(maximum//2), 0, maximum//2, maximum})
+
+    def tick_label(value):
+        absolute = abs(value)
+        for threshold, suffix in ((10**12, "T"), (10**9, "B"), (10**6, "M"), (10**3, "k")):
+            if absolute >= threshold:
+                return ("−" if value < 0 else "") + f"{absolute/threshold:.3g}" + suffix
+        return ("−" if value < 0 else "") + str(absolute)
+
+    left = x+max(48, 14+tick_size*.7*max(len(tick_label(value)) for value in ticks))
+    right, zero = x+span, y+half_height
+    chart_span = right-left
+    for value in ticks:
+        py = zero-half_height*value/maximum
+        c.line(left, py, right, py, stroke_opacity=1 if value == 0 else .4)
+        c.text(tick_label(value), left-8, py+4, size=tick_size, color="muted", anchor="end",
+               data_role="code-y-tick", data_value=value)
+    painted = False
+    for bucket in bins:
+        first, last = bucket.get("day_index"), bucket.get("end_day_index")
+        if type(first) is not int or type(last) is not int or not 0 <= first <= last < 365:
+            continue
+        slot = chart_span*(last-first+1)/365
+        center = left+chart_span*(first+last+1)/(2*365)
+        width = min(18, slot*.7)
+        dates = f"{bucket.get('date')} – {bucket.get('end_date')}"
+        if not integer(bucket.get("additions")) and not integer(bucket.get("deletions")):
+            c.rect(center-slot/2, zero-half_height, slot, half_height*2, fill="muted", fill_opacity=.045,
+                   data_role="code-unknown-bin")
+        for kind in ("additions", "deletions"):
+            value = bucket.get(kind)
+            if not integer(value) or value == 0:
+                continue
+            height = half_height*value/maximum
+            title = f"{dates}: {value:,} observed {kind}" + (" (partial)" if not bucket.get("complete") else "")
+            c.parts.append('<rect '+_attrs(dict(x=center-width/2,
+                y=zero-height if kind == "additions" else zero, width=width, height=height,
+                fill=GREEN if kind == "additions" else RED, data_role="code-change-bar",
+                data_date=bucket.get("date"), data_end_date=bucket.get("end_date"),
+                data_kind=kind, data_value=value))+'><title>'+escape(title)+'</title></rect>')
+            painted = True
+    if not painted:
+        known = any(integer(bucket.get(kind)) for bucket in bins for kind in ("additions", "deletions"))
+        c.text("No line changes observed" if known else "Line counts unavailable", (left+right)/2,
+               zero-20, size=14 if c.mobile else 16, color="muted", anchor="middle")
+
+    label_y, previous = zero+half_height+25, -math.inf
+    months = code.get("month_labels") if isinstance(code.get("month_labels"), list) else []
+    for marker in months:
+        index = marker.get("day_index")
+        if type(index) is not int or not 0 <= index < 365:
+            continue
+        px = left+chart_span*index/365
+        if c.mobile and px-previous < 50:
+            continue
+        c.text(marker.get("label"), px, label_y, size=13 if c.mobile else 14, color="muted",
+               anchor="end" if right-px < 28 else "start", data_role="code-month-label",
+               data_date=marker.get("date"), data_day_index=index)
+        previous = px
+    c.parts.append('<desc>Monthly markers: '+escape(", ".join(f"{marker.get('date')} ({marker.get('label')})" for marker in months))+'</desc>')
+    y = label_y+27
+    for label, color, offset in (("Additions", GREEN, 0), ("Deletions", RED, 135)):
+        c.rect(x+offset, y-10, 10, 10, fill=color, radius=5)
+        c.text(label, x+offset+18, y, size=14, color="muted")
+    y = c.wrap("Proportional scale · 7-day totals", x, y+25, span, size=c.secondary, color="muted")
+    y = c.wrap("Non-merge commits · observed branch heads", x, y, span, size=c.secondary, color="muted")
+    return y+4
+
+
 def _recent_pushes(c, x, y, span, data):
     """Render shared qualified push rows, with SVG-specific responsive layout."""
     payload = data.get("recent_pushes") if isinstance(data, dict) else None
@@ -649,7 +778,7 @@ def render_svg(summary, *, mobile=False, generation=None):
     y = c.panel("focus","Current Focus",y,focus)
     analytics = summary.get("activity_analytics")
     if isinstance(analytics, dict):
-        paint_code = _code_changes if mobile else _code_changes_desktop
+        paint_code = _owned_code_changes if "overall_code_changes" in analytics else (_code_changes if mobile else _code_changes_desktop)
         y = c.panel("code-changes", "Code changes", y, lambda x, yy, span: paint_code(c, x, yy, span, analytics))
     y = c.panel("recent-pushes", "Recent repository pushes", y,
                 lambda x, yy, span: _recent_pushes(c, x, yy, span, analytics or {}))

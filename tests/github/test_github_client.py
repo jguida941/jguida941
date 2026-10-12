@@ -2461,6 +2461,7 @@ class CodeChangeCollectionTests(unittest.TestCase):
     """Branch updates choose immutable history, independently of default branches."""
     def observe(self, failure=None, generation=1, count=2, inventory_fresh=True):
         import copy
+        import re
         from datetime import datetime, timezone
         from unittest.mock import patch
         from scripts.github import github_client as gh
@@ -2493,6 +2494,22 @@ class CodeChangeCollectionTests(unittest.TestCase):
             event={'id':name,'activity_type':'push','ref':'refs/heads/dev/'+name,'before':'b'*40,'after':('c' if name=='alpha' else 'd')*40,'timestamp':'bad' if name=='beta' and failure=='malformed' else stamp}
             return Response([event])
         def graphql(query, variables):
+            # Annual branch enumeration is a separate observation. Give this
+            # legacy-history fixture a valid empty branch roster without
+            # counting those calls as pages of the selected-branch history.
+            if re.search(r'\brefs\s*\(', query):
+                result = {'rateLimit': {'remaining': 900, 'limit': 1000,
+                                       'resetAt': '2026-10-10T17:00:00Z'}}
+                matches = re.findall(
+                    r'(?:(\w+)\s*:\s*)?repository\s*\(\s*owner\s*:\s*\$(\w+)\s*,\s*name\s*:\s*\$(\w+)\s*\)', query)
+                self.assertTrue(matches, 'annual fixture must observe repository selectors')
+                for alias, owner_var, name_var in matches:
+                    result[alias or 'repository'] = {
+                        'nameWithOwner': variables[owner_var] + '/' + variables[name_var],
+                        'refs': {'totalCount': 0, 'nodes': [],
+                                 'pageInfo': {'hasNextPage': False, 'endCursor': None}}}
+                return result
+            self.assertEqual('2026-09-11T00:00:00Z', variables['since'])
             queries.append(copy.deepcopy(variables));self.assertNotIn('defaultBranchRef',query)
             second=variables['cursor'] is not None
             return {'repository':{'nameWithOwner':gh.USERNAME+'/'+variables['name'],'object':{'oid':'f'*40 if failure=='history_mismatch' else variables['oid'],'history':{'nodes':[{'oid':'e'*40 if second else variables['oid'],'committedDate':'2026-10-10T11:00:00Z','additions':5 if second else 20,'deletions':2 if second else 7,'parents':{'totalCount':1}}],'pageInfo':{'hasNextPage':failure=='history_cap' or not second,'endCursor':'page'+str(len(queries))}}}}}
@@ -2609,6 +2626,168 @@ class CodeChangeHistorySizingTests(unittest.TestCase):
             result,calls=self.collect(mode)
             self.assertEqual(('unavailable',False,[]),(result['status'],result['complete'],result['commits']))
             self.assertEqual(2 if mode=='denied' else 1,len(calls))
+
+class OwnedCodeActivityCollectionTests(unittest.TestCase):
+    """Exercise annual collection through the real entry and GraphQL boundary."""
+
+    def observe(self, failure=None):
+        import copy
+        import re
+        from datetime import datetime, timezone
+        from unittest.mock import patch
+        from scripts.github import github_client as gh
+        from scripts.github.activity_observations import collect_activity_observations
+        from tests.pipeline.test_compute_metrics_accuracy import OwnedCodeActivityAggregationTests
+
+        raw = OwnedCodeActivityAggregationTests.source()["overall_code_changes"]
+        indexed = {row["repository"]: row for row in raw["repositories"]}
+        now = datetime(2026, 10, 10, 16, 30, tzinfo=timezone.utc)
+        public = [{"name": name, "owner": {"login": gh.USERNAME}, "private": False,
+                   "fork": False, "pushed_at": pushed}
+                  for name, pushed in (("alpha", "2026-10-10T12:00:00Z"),
+                                       ("quiet", "2025-01-01T12:00:00Z"))]
+        private = [{"name": "private-beta", "owner": {"login": gh.USERNAME},
+                    "private": True, "fork": False,
+                    "pushed_at": "2026-01-01T12:00:00Z"}]
+        calls = []
+
+        class Response:
+            status_code = 200
+            headers = {}
+            links = {}
+
+            def __init__(self, payload):
+                self.payload = payload
+
+            def json(self):
+                return copy.deepcopy(self.payload)
+
+        def request(url, **kwargs):
+            if "/compare/" in url:
+                return Response({})
+            self.assertTrue(url.endswith("/activity"))
+            if url.endswith("/alpha/activity"):
+                return Response([{"id": "latest", "activity_type": "push",
+                                  "ref": "refs/heads/dev/work", "before": "9" * 40,
+                                  "after": "a" * 40, "timestamp": "2026-10-10T12:00:00Z"}])
+            return Response([])
+
+        def block_at(text, start):
+            depth = 1
+            for index in range(start, len(text)):
+                depth += (text[index] == "{") - (text[index] == "}")
+                if depth == 0:
+                    return text[start:index]
+            raise AssertionError("unbalanced repository selection in test request")
+
+        def arguments(block, field, variables):
+            match = re.search(r"\b" + field + r"\s*\(([^)]*)\)", block)
+            if match is None:
+                return {}
+            result = {}
+            for key, variable, integer, literal in re.findall(
+                    r'(\w+)\s*:\s*(?:\$(\w+)|(\d+)|"([^"]*)")', match[1]):
+                result[key] = variables[variable] if variable else int(integer) if integer else literal
+            return result
+
+        def graphql(query, variables):
+            self.assertNotIn("defaultBranchRef", query)
+            self.assertNotRegex(query, r"\bhistory\([^)]*\bauthor\s*:")
+            self.assertNotRegex(query, r"\b(?:messageBody|messageHeadline|email)\b")
+            output = {"rateLimit": {"remaining": 900, "limit": 1000,
+                                    "resetAt": "2026-10-10T17:00:00Z"}}
+            matches = list(re.finditer(
+                r"(?:(\w+)\s*:\s*)?repository\s*\(\s*owner\s*:\s*\$(\w+)\s*,\s*name\s*:\s*\$(\w+)\s*\)\s*\{",
+                query))
+            self.assertTrue(matches, "test GraphQL reader must observe a repository request")
+            for match in matches:
+                alias, owner_var, name_var = match.groups()
+                alias = alias or "repository"
+                name = variables[owner_var] + "/" + variables[name_var]
+                self.assertIn(name, indexed)
+                repository = indexed[name]
+                block = block_at(query, match.end())
+                if re.search(r"\brefs\s*\(", block):
+                    args = arguments(block, "refs", variables)
+                    self.assertEqual("refs/heads/", args.get("refPrefix"))
+                    heads = repository["refs"]["heads"]
+                    page = 0 if args.get("after") is None else int(args["after"])
+                    selected = heads[page:page + 1]
+                    more = page + 1 < len(heads)
+                    calls.append({"kind": "refs", "repository": name, "cursor": args.get("after")})
+                    if failure == "private_unavailable" and name.endswith("/private-beta"):
+                        output[alias] = None
+                    else:
+                        output[alias] = {"nameWithOwner": name,
+                            "refs": {"totalCount": len(heads),
+                                "nodes": [{"name": row["ref"].removeprefix("refs/heads/"),
+                                           "prefix": "refs/heads/",
+                                           "target": {"__typename": "Commit", "oid": row["head_sha"]}}
+                                          for row in selected],
+                                "pageInfo": {"hasNextPage": more, "endCursor": str(page + 1) if more else None}}}
+                else:
+                    obj = arguments(block, "object", variables)
+                    args = arguments(block, "history", variables)
+                    self.assertIn(obj.get("oid"), [row["head_sha"] for row in repository["histories"]])
+                    selected = next(row for row in repository["histories"] if row["head_sha"] == obj["oid"])
+                    page = 0 if args.get("after") is None else int(args["after"])
+                    rows = [row for row in selected["commits"]
+                            if args["since"] <= row["committed_at"] <= args["until"]]
+                    node_rows = rows[page:page + 1]
+                    more = page + 1 < len(rows)
+                    calls.append({"kind": "history", "repository": name, "oid": obj["oid"],
+                                  "cursor": args.get("after"), "since": args["since"], "until": args["until"]})
+                    annual = args["since"] == raw["window_start"]
+                    returned_oid = "8" * 40 if annual and failure == "wrong_head" and name.endswith("/private-beta") else obj["oid"]
+                    output[alias] = {"nameWithOwner": name, "object": {"__typename": "Commit", "oid": returned_oid,
+                        "history": {"nodes": [{"oid": row["oid"], "committedDate": row["committed_at"],
+                                              "additions": row["additions"], "deletions": row["deletions"],
+                                              "parents": {"totalCount": row["parent_count"]}}
+                                             for row in node_rows],
+                                    "pageInfo": {"hasNextPage": more, "endCursor": str(page + 1) if more else None}}}}
+            return output
+
+        with patch.object(gh, "_request_with_retry", side_effect=request), \
+             patch.object(gh, "_graphql_query", side_effect=graphql):
+            source = collect_activity_observations(
+                public, private, {"public_owned_nonfork": 2, "private_owned_nonfork": 1},
+                observed_at=now, inventory_fresh=True)
+        return source, calls
+
+    def test_collection_observes_quiet_private_and_nonmain_histories_for_a_year(self):
+        from scripts.github import github_client as gh
+        from tests.pipeline.test_compute_metrics_accuracy import OwnedCodeActivityAggregationTests
+
+        source, calls = self.observe()
+        value = OwnedCodeActivityAggregationTests.window(source)
+        self.assertEqual((171, 58, 365),
+                         (value["additions"], value["deletions"], len(value["daily"])))
+        self.assertTrue(value["complete"])
+        refs = {call["repository"] for call in calls if call["kind"] == "refs"}
+        self.assertEqual({gh.USERNAME + "/" + name for name in ("alpha", "quiet", "private-beta")}, refs)
+        histories = [call for call in calls if call["kind"] == "history" and
+                     call["since"] < "2026-09-01T00:00:00Z"]
+        self.assertEqual({"a" * 40, "c" * 40, "d" * 40}, {call["oid"] for call in histories})
+        self.assertEqual(1, len({call["since"] for call in histories}))
+        self.assertEqual(1, len({call["until"] for call in histories}))
+        self.assertTrue(any(call["cursor"] is not None for call in histories))
+
+    def test_missing_private_branch_roster_preserves_observed_subtotals_only(self):
+        from tests.pipeline.test_compute_metrics_accuracy import OwnedCodeActivityAggregationTests
+
+        source, _ = self.observe("private_unavailable")
+        value = OwnedCodeActivityAggregationTests.window(source)
+        self.assertEqual((125, 49), (value["additions"], value["deletions"]))
+        self.assertFalse(value["complete"])
+
+    def test_wrong_returned_head_never_contributes_another_repositorys_history(self):
+        from tests.pipeline.test_compute_metrics_accuracy import OwnedCodeActivityAggregationTests
+
+        source, _ = self.observe("wrong_head")
+        value = OwnedCodeActivityAggregationTests.window(source)
+        self.assertEqual((125, 49), (value["additions"], value["deletions"]))
+        self.assertFalse(value["complete"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -347,6 +347,11 @@ footer a { color: var(--ink); text-decoration: none; }
 .code-legend .code-scale { margin-left: auto; }
 .code-details { margin-top: 12px; }
 .code-details ul { padding-left: 20px; }
+.code-periods { display: flex; gap: 4px; width: fit-content; margin: 16px 0 12px; padding: 4px; border: 1px solid var(--hairline); border-radius: 12px; }
+.code-periods button { min-height: 44px; padding: 8px 18px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-dim); font: inherit; cursor: pointer; }
+.code-periods button[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--ink-strong); font-weight: 600; }
+.code-population, .code-coverage { color: var(--ink-dim); font-size: var(--type-body); margin: 8px 0; }
+.code-overall-chart { margin-top: 20px; }
 
 .recent-push-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .recent-push-item { min-width: 0; border: 1px solid color-mix(in srgb, var(--hairline) 16%, transparent); border-radius: var(--radius-tile); padding: 14px; }
@@ -556,8 +561,118 @@ footer a { color: var(--ink); text-decoration: none; }
   }
 
 
-  function hydrateCodeChanges(a) {
+  let codeActivity = null, codePeriod = "30d", codePhone = false;
+  const codePhoneLayout = () => typeof matchMedia === "function" && matchMedia("(max-width: 600px)").matches;
+
+  function hydrateOwnedCodeChanges(a, period) {
+    codeActivity = a;
+    codePeriod = period === "365d" ? "365d" : "30d";
+    codePhone = codePhoneLayout();
+    const overall = a.overall_code_changes || {}, coverage = overall.coverage || {};
+    const code = (overall.windows || {})[codePeriod] || {};
+    const count = value => Number.isSafeInteger(value) && value >= 0;
+    const unavailable = overall.schema !== "profile-owned-code-analytics/v1" || overall.status === "unavailable" ||
+      code.status === "unavailable" || !count(code.additions) || !count(code.deletions);
+    const complete = overall.complete === true && code.complete === true;
+    const daily = Array.isArray(code.daily) ? code.daily : [], bins = Array.isArray(code.bins) ? code.bins : [];
+    const year = codePeriod === "365d", days = year ? 365 : 30;
+    const range = `${String(code.window_start || "unavailable").slice(0,10)} – ${String(code.window_end || "unavailable").slice(0,10)} UTC`;
+    const totals = unavailable ? "" : `<p class="code-totals"><span class="code-additions">+${code.additions.toLocaleString("en-US")}</span><span class="code-deletions">−${code.deletions.toLocaleString("en-US")}</span></p>`;
+    let html = `<div class="code-heading"><h2 class="title">Code changes</h2>${totals}</div>`;
+    html += `<div class="code-periods" role="group" aria-label="Code activity time window"><button type="button" data-code-period="30d" aria-pressed="${!year}" aria-controls="code-window-chart">30 days</button><button type="button" data-code-period="365d" aria-pressed="${year}" aria-controls="code-window-chart">1 year</button></div>`;
+    html += `<p class="section-meta">${year ? "Rolling 365 days" : "Last 30 days"}${code.current_day_partial ? " · today partial" : ""}${!complete ? " · partial data" : ""}</p>`;
+    html += `<p class="section-meta">${esc(range)}</p><p class="code-population">${esc(overall.meaning || "Repository activity · all authors · owned public and private nonfork repositories; profile excluded")}</p>`;
+    const quantity = key => count(coverage[key]) ? coverage[key].toLocaleString("en-US") : "unknown";
+    html += `<p class="code-coverage">Coverage: ${quantity("repositories_complete")} of ${quantity("eligible")} eligible repositories complete · ${quantity("branches_complete")} of ${quantity("branches_observed")} observed branches complete</p>`;
+    if (!complete) html += `<p class="code-coverage">${unavailable ? "Observation incomplete" : "Observed subtotal"} · missing history is not zero.</p>`;
+    if (unavailable) html += '<div id="code-window-chart"><p>Overall code activity unavailable</p></div>';
+    else {
+      // Bins and day positions come from the shared model. Only geometry changes by viewport.
+      const maximum = Math.max(1, ...bins.flatMap(bin => [bin.additions, bin.deletions]).filter(count));
+      const cap = year ? maximum : 10 ** Math.ceil(Math.log10(maximum));
+      const width = codePhone ? 340 : 640, right = width - 8;
+      const halfHeight = codePhone ? 94 : 116, zero = halfHeight + 16, labelY = zero + halfHeight + 30;
+      const middle = year ? Math.floor(cap / 2) : 10 ** Math.floor(Math.log10(cap) / 2);
+      const ticks = [...new Set([-cap, -middle, 0, middle, cap])];
+      const tickLabel = value => {
+        const magnitude = Math.abs(value);
+        const units = [[1e12,"T"],[1e9,"B"],[1e6,"M"],[1e3,"k"]];
+        const unit = units.find(([scale]) => magnitude >= scale);
+        return (value < 0 ? "−" : "") + (unit ? `${Number((magnitude / unit[0]).toPrecision(3))}${unit[1]}` : magnitude);
+      };
+      // A phone has its own viewBox; axis glyphs stay readable instead of shrinking a desktop chart.
+      const left = Math.max(56, 18 + 14 * Math.max(...ticks.map(value => tickLabel(value).length)));
+      const chartSpan = right - left;
+      const magnitude = value => year ? halfHeight * value / cap : halfHeight * Math.log1p(value) / Math.log1p(cap);
+      const guides = ticks.map(value => {
+        const y = zero - Math.sign(value) * magnitude(Math.abs(value));
+        return `<line x1="${left}" y1="${y}" x2="${right}" y2="${y}" stroke="currentColor" stroke-opacity="${value === 0 ? .65 : .2}"/><text data-role="code-y-tick" data-value="${value}" x="${left-8}" y="${y+5}" text-anchor="end">${tickLabel(value)}<title>${value.toLocaleString("en-US")} lines</title></text>`;
+      }).join("");
+      let bars = "", gaps = "";
+      bins.forEach(bin => {
+        const first = bin.day_index, last = bin.end_day_index;
+        if (!Number.isInteger(first) || !Number.isInteger(last) || first < 0 || last < first || last >= days) return;
+        const slot = chartSpan * (last - first + 1) / days;
+        const center = left + chartSpan * (first + last + 1) / (2 * days);
+        const barWidth = Math.min(18, slot * .7), dates = bin.date + (year ? ` – ${bin.end_date}` : "");
+        if (!count(bin.additions) && !count(bin.deletions)) {
+          gaps += `<rect data-role="code-unknown-bin" x="${center-slot/2}" y="${zero-halfHeight}" width="${slot}" height="${halfHeight*2}" fill="currentColor" fill-opacity=".045"><title>${esc(dates)}: line counts unavailable</title></rect>`;
+        }
+        for (const kind of ["additions", "deletions"]) {
+          const value = bin[kind];
+          if (!count(value) || value === 0) continue;
+          const height = magnitude(value);
+          bars += `<rect x="${center-barWidth/2}" y="${kind === "additions" ? zero-height : zero}" width="${barWidth}" height="${height}" class="${kind}" data-role="code-change-bar" data-kind="${kind}" data-date="${esc(bin.date)}" data-end-date="${esc(bin.end_date)}" data-value="${value}"><title>${esc(dates)}: ${value.toLocaleString("en-US")} observed ${kind}${bin.complete ? "" : " (partial)"}</title></rect>`;
+        }
+      });
+      if (!bars) bars = `<text x="${(left+right)/2}" y="${zero-20}" text-anchor="middle">${bins.some(bin => count(bin.additions) || count(bin.deletions)) ? "No line changes observed" : "Line counts unavailable"}</text>`;
+      let labels = "";
+      if (year) {
+        const months = Array.isArray(code.month_labels) ? code.month_labels : [];
+        let previous = -Infinity;
+        months.forEach((marker, index) => {
+          const x = left + chartSpan * marker.day_index / days;
+          if (!Number.isFinite(x) || marker.day_index < 0 || marker.day_index >= days || (codePhone && x - previous < 54)) return;
+          const anchor = right - x < 28 ? "end" : "start";
+          // Alternate desktop baselines so partial boundary months keep distinct readable labels.
+          const y = labelY + (codePhone ? 0 : index % 2 * 20);
+          labels += `<text data-role="code-month-label" data-date="${esc(marker.date)}" data-day-index="${marker.day_index}" x="${x}" y="${y}" text-anchor="${anchor}">${esc(marker.label)}</text>`;
+          previous = x;
+        });
+      } else {
+        const indices = [...new Set((codePhone ? [0, 1, 2] : [0, 1, 2, 3, 4]).map(i => Math.round((daily.length-1)*i/(codePhone ? 2 : 4))))];
+        labels = indices.filter(i => daily[i]).map(i => {
+          const day = new Date(daily[i].date + "T00:00:00Z");
+          const label = day.toLocaleDateString("en-US", {month:"short",day:"numeric",timeZone:"UTC"});
+          return `<text x="${left+chartSpan*i/Math.max(1,days-1)}" y="${labelY}" text-anchor="${i===0 ? "start" : i===daily.length-1 ? "end" : "middle"}">${esc(label)}</text>`;
+        }).join("");
+      }
+      html += `<svg id="code-window-chart" class="code-chart code-overall-chart" data-code-layout="${codePhone ? "phone" : "desktop"}" viewBox="0 0 ${width} ${labelY+20+(year && !codePhone ? 20 : 0)}" role="img" aria-label="Observed repository additions above zero and deletions below, ${year ? "proportional weekly" : "logarithmic daily"} scale">${gaps}${guides}${bars}${labels}</svg>`;
+      html += `<div class="code-legend"><span><i class="additions" aria-hidden="true"></i>Additions</span><span><i class="deletions" aria-hidden="true"></i>Deletions</span><span class="code-scale">${year ? "Proportional scale · 7-day totals" : "Log scale · daily totals"}</span></div>`;
+    }
+    const reasons = Array.isArray(coverage.reasons) ? coverage.reasons : [];
+    const markers = Array.isArray(code.month_labels) ? code.month_labels : [];
+    html += `<details class="rhythm-detail code-details"><summary>How to read this</summary><p>${esc(code.window_start || "unavailable")} – ${esc(code.window_end || "unavailable")} UTC. The current date may still be in progress.</p><p>${esc(overall.meaning || "Repository activity · all authors")}. Non-merge commits reachable from branch heads observed during collection; deduplicated across branches and repositories. Root commits count. This is not personal contributions or net tree size.</p><p>${esc(code.stats_observed ?? "unknown")} of ${esc(code.commit_count ?? "unknown")} observed non-merge commits have line stats; ${esc(code.excluded_merges ?? "unknown")} merges excluded.</p><p>Repositories with observed history: ${quantity("repositories_observed")} of ${quantity("eligible")}. Inventory rows expected: ${quantity("expected")}. Coverage: ${esc(overall.status || "unavailable")}${reasons.length ? " · " + esc(reasons.join(", ")) : ""}. Missing history is not zero.</p><p>${year ? "Weekly bins preserve the shared model's UTC dates; the final bin may have fewer than seven days. Month markers: " + esc(markers.map(marker => `${marker.date} (${marker.label})`).join(", ")) : "Daily bins preserve the shared model's UTC dates."}</p><ul>${daily.map(day => `<li>${esc(day.date)}: ${esc(day.additions ?? "unavailable")} additions; ${esc(day.deletions ?? "unavailable")} deletions${day.complete ? "" : " (partial)"}</li>`).join("")}</ul></details>`;
+    document.getElementById("activity-code").innerHTML = html;
+  }
+
+  addEventListener("click", event => {
+    const button = event.target && event.target.closest && event.target.closest("[data-code-period]");
+    if (!button || !codeActivity) return;
+    hydrateCodeChanges(codeActivity, button.dataset.codePeriod);
+    document.querySelector(`[data-code-period="${codePeriod}"]`).focus();
+  });
+  addEventListener("resize", () => {
+    if (codeActivity && codePhone !== codePhoneLayout()) hydrateCodeChanges(codeActivity, codePeriod);
+  });
+
+  function hydrateCodeChanges(a, period) {
     a=a||{};
+    if (Object.prototype.hasOwnProperty.call(a, "overall_code_changes")) {
+      hydrateOwnedCodeChanges(a, period);
+      return;
+    }
+    codeActivity = null;
     const code=a.code_changes||{}, cohort=a.cohort||{}, selection=code.selection||{}, history=code.history||{};
     const start=Date.parse((a.window_start||"").slice(0,10)+"T00:00:00Z"), end=Date.parse((a.window_end||"").slice(0,10)+"T00:00:00Z");
     const days=Math.round((end-start)/86400000)+1;

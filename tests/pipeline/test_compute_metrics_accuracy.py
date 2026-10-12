@@ -2941,5 +2941,221 @@ class CodeChangeAggregationTests(unittest.TestCase):
         result=build_activity_analytics(self.source())
         for unrelated in ('ci','repositories','system'):self.assertNotIn(unrelated,result)
 
+class OwnedCodeActivityAggregationTests(unittest.TestCase):
+    """Owned-repository history is a distinct measure from one selected branch."""
+
+    @staticmethod
+    def source():
+        from scripts.github import github_client as gh
+
+        legacy = CodeChangeAggregationTests.source()
+        end = datetime(2026, 10, 10, 16, 30, tzinfo=timezone.utc)
+        start = end.replace(hour=0, minute=0) - timedelta(days=364)
+
+        def commit(oid, day, added, deleted, parents=1):
+            return {"oid": oid * 40, "committed_at": day + "T12:00:00Z",
+                    "additions": added, "deletions": deleted,
+                    "parent_count": parents}
+
+        shared = commit("b", "2026-06-01", 100, 40, 0)
+        recent = commit("a", "2026-10-10", 20, 7)
+        merged = commit("e", "2026-10-03", 900, 800, 2)
+
+        def history(head, rows):
+            return {"head_sha": head * 40, "status": "ok", "complete": True,
+                    "reason": "end_of_connection", "commits": copy.deepcopy(rows)}
+
+        def repository(name, private, histories):
+            return {"repository": gh.USERNAME + "/" + name, "private": private,
+                    "refs": {"status": "ok", "complete": True,
+                             "reason": "end_of_connection", "total_count": len(histories),
+                             "heads": [{"ref": "refs/heads/" + branch,
+                                        "head_sha": head * 40}
+                                       for branch, head, _ in histories]},
+                    "histories": [history(head, rows) for _, head, rows in histories]}
+
+        repositories = [
+            repository("alpha", False, [
+                ("dev/work", "a", [recent, shared, merged]),
+                ("main", "c", [commit("c", "2026-09-30", 5, 2), shared]),
+            ]),
+            repository("private-beta", True, [
+                ("experiment", "d", [commit("d", "2025-11-12", 40, 8),
+                                       shared, commit("f", "2026-10-02", 6, 1)]),
+            ]),
+            repository("quiet", False, []),
+        ]
+        legacy["overall_code_changes"] = {
+            "schema": "profile-owned-code-observations/v1",
+            "window_start": _iso(start), "window_end": _iso(end), "observed_at": _iso(end),
+            "inventory": {"expected": 3, "eligible": 3, "complete": True,
+                          "fresh": True, "excluded": {"fork": 1, "profile": 1}},
+            "repositories": repositories,
+            "requests": {"used": 6, "limit": 400, "remaining": 950, "reason": "observed"},
+        }
+        return legacy
+
+    @staticmethod
+    def window(source, period="365d"):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+
+        result = build_activity_analytics(source)
+        # The existing public seam returns a selected-branch observation today.
+        # Capture that actual value so the pre-feature failure is a wrong total,
+        # not a missing-helper/import failure.
+        overall = result.get("overall_code_changes")
+        if isinstance(overall, dict) and isinstance(overall.get("windows"), dict):
+            return overall["windows"][period]
+        return result["code_changes"]
+
+    def test_year_union_includes_other_repo_old_commit_and_shared_oid_once(self):
+        value = self.window(self.source())
+        self.assertEqual((171, 58, 5, 1),
+                         (value["additions"], value["deletions"],
+                          value["commit_count"], value["excluded_merges"]))
+        self.assertTrue(value["complete"])
+        self.assertEqual(365, len(value["daily"]))
+        self.assertEqual(40, next(day for day in value["daily"]
+                                  if day["date"] == "2025-11-12")["additions"])
+
+    def test_recent_window_comes_from_same_union_without_old_commit_totals(self):
+        value = self.window(self.source(), "30d")
+        self.assertEqual((31, 10, 3),
+                         (value["additions"], value["deletions"], value["commit_count"]))
+        self.assertEqual(30, len(value["daily"]))
+        self.assertEqual("2026-09-11", value["daily"][0]["date"])
+
+    def test_legacy_selected_branch_is_preserved_as_a_separate_measure(self):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+
+        before = build_activity_analytics(CodeChangeAggregationTests.source())["code_changes"]
+        after = build_activity_analytics(self.source())["code_changes"]
+        self.assertEqual(before, after)
+        self.assertEqual((25, 9, "owner/project"),
+                         (after["additions"], after["deletions"], after["repository"]))
+        self.assertEqual(30, len(after["daily"]))
+
+    def test_complete_empty_population_has_a_known_zero_for_every_year_date(self):
+        source = self.source()
+        raw = source["overall_code_changes"]
+        raw["inventory"].update(expected=0, eligible=0)
+        raw["repositories"] = []
+        value = self.window(source)
+        self.assertEqual((0, 0, 365),
+                         (value["additions"], value["deletions"], len(value["daily"])))
+        self.assertTrue(value["complete"])
+        self.assertTrue(all(day["complete"] and day["additions"] == day["deletions"] == 0
+                            for day in value["daily"]))
+
+    def test_missing_private_inventory_does_not_turn_unknown_dates_into_zero(self):
+        source = self.source()
+        source["overall_code_changes"]["inventory"].update(expected=None, complete=False)
+        value = self.window(source)
+        self.assertEqual((171, 58), (value["additions"], value["deletions"]))
+        self.assertFalse(value["complete"])
+        quiet = next(day for day in value["daily"] if day["date"] == "2026-10-01")
+        self.assertEqual((None, None, False),
+                         (quiet["additions"], quiet["deletions"], quiet["complete"]))
+        known = next(day for day in value["daily"] if day["date"] == "2026-10-10")
+        self.assertEqual((20, 7, False),
+                         (known["additions"], known["deletions"], known["complete"]))
+
+    def test_no_accepted_stats_under_incomplete_coverage_is_unavailable(self):
+        source = self.source()
+        raw = source["overall_code_changes"]
+        raw["repositories"] = []
+        raw["inventory"].update(complete=False)
+        value = self.window(source)
+        self.assertIsNone(value["additions"])
+        self.assertIsNone(value["deletions"])
+        self.assertFalse(value["complete"])
+
+    def test_observed_zero_diff_is_zero_even_when_other_history_is_missing(self):
+        source = self.source()
+        raw = source["overall_code_changes"]
+        row = raw["repositories"][0]["histories"][0]["commits"][0]
+        row.update(additions=0, deletions=0)
+        raw["repositories"] = raw["repositories"][:1]
+        raw["repositories"][0]["histories"] = raw["repositories"][0]["histories"][:1]
+        raw["repositories"][0]["histories"][0].update(complete=False, status="partial")
+        raw["repositories"][0]["histories"][0]["commits"] = [row]
+        raw["inventory"]["complete"] = False
+        value = self.window(source)
+        self.assertEqual((0, 0, False),
+                         (value["additions"], value["deletions"], value["complete"]))
+        day = next(day for day in value["daily"] if day["date"] == "2026-10-10")
+        self.assertEqual((0, 0, False), (day["additions"], day["deletions"], day["complete"]))
+
+    def test_duplicate_conflict_stays_quarantined_after_a_third_copy(self):
+        import itertools
+
+        original = self.source()
+        raw = original["overall_code_changes"]
+        raw["repositories"][0]["histories"][1]["commits"][1]["additions"] = 999
+        # Three copies of b now disagree. No input ordering may revive b.
+        for repositories in itertools.permutations(raw["repositories"]):
+            source = copy.deepcopy(original)
+            source["overall_code_changes"]["repositories"] = list(repositories)
+            value = self.window(source)
+            self.assertEqual((71, 18), (value["additions"], value["deletions"]))
+            self.assertFalse(value["complete"])
+
+    def test_duplicate_roster_and_unknown_ref_history_cannot_claim_complete(self):
+        for arm in ("duplicate_repository", "missing_head", "ref_incomplete", "history_incomplete", "stale_inventory"):
+            with self.subTest(arm=arm):
+                source = self.source()
+                raw = source["overall_code_changes"]
+                if arm == "duplicate_repository":
+                    raw["repositories"].append(copy.deepcopy(raw["repositories"][0]))
+                elif arm == "missing_head":
+                    raw["repositories"][0]["histories"] = raw["repositories"][0]["histories"][:1]
+                elif arm == "ref_incomplete":
+                    raw["repositories"][0]["refs"].update(complete=False, status="partial")
+                elif arm == "history_incomplete":
+                    raw["repositories"][0]["histories"][0].update(complete=False, status="partial")
+                else:
+                    raw["inventory"]["fresh"] = False
+                self.assertFalse(self.window(source)["complete"])
+
+    def test_invalid_stats_and_unknown_parents_do_not_count_as_known_changes(self):
+        for field, invalid in (("additions", True), ("additions", -1),
+                               ("additions", "20"), ("deletions", None),
+                               ("parent_count", None)):
+            with self.subTest(field=field, invalid=invalid):
+                source = self.source()
+                source["overall_code_changes"]["repositories"][0]["histories"][0]["commits"][0][field] = invalid
+                value = self.window(source)
+                self.assertEqual((151, 51), (value["additions"], value["deletions"]))
+                self.assertFalse(value["complete"])
+
+    def test_weekly_bins_conserve_exact_counts_and_months_keep_calendar_positions(self):
+        value = self.window(self.source())
+        bins = value.get("bins", [])
+        self.assertEqual((171, 58),
+                         (sum(row["additions"] or 0 for row in bins),
+                          sum(row["deletions"] or 0 for row in bins)))
+        self.assertEqual(53, len(bins))
+        self.assertEqual(value["daily"][0]["date"], bins[0]["date"])
+        self.assertEqual(value["daily"][-1]["date"], bins[-1]["end_date"])
+        labels = value.get("month_labels", [])
+        self.assertGreaterEqual(len(labels), 12)
+        start = date.fromisoformat(value["daily"][0]["date"])
+        for label in labels:
+            day = date.fromisoformat(label["date"])
+            self.assertEqual((day - start).days, label["day_index"])
+            self.assertTrue(day == start or day.day == 1)
+
+    def test_new_public_family_has_no_raw_commit_or_private_roster(self):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+
+        value = build_activity_analytics(self.source()).get("overall_code_changes")
+        self.assertIsInstance(value, dict)
+        encoded = json.dumps(value)
+        for private_detail in ("private-beta", "experiment", "a" * 40, "b" * 40):
+            self.assertNotIn(private_detail, encoded)
+        self.assertIn("all authors", value["meaning"].lower())
+        self.assertIn("nonfork", value["meaning"].lower())
+
+
 if __name__ == "__main__":
     unittest.main()

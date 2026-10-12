@@ -31,6 +31,8 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_bootstrap_red_ref.py",
             "test_card_contracts.py",
             "test_data_semantics.py",
+            "test_dashboard_destinations.py",
+            "test_dashboard_summary.py",
             "test_design_button.py",
             "test_design_card.py",
             "test_design_character.py",
@@ -78,6 +80,7 @@ TEST_GROUPS: tuple[TestGroup, ...] = (
             "test_compute_metrics_accuracy.py",
             "test_compute_metrics_integration.py",
             "test_profile_pipeline_fixture.py",
+            "test_push_activity.py",
         ),
     ),
     TestGroup(
@@ -196,6 +199,8 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
         "test_page_shell.py",           # P5-CHROME: the switchable governed page-shell — the site's own chrome is a rendered instance of a language (token-only + provenance + conform)
     ),
     "cross_projection": (
+        "test_dashboard_destinations.py",
+        "test_dashboard_summary.py",
         "test_web_dashboard.py",        # Law 3: web projection generated, token-parity, a11y
         "test_public_data_privacy.py",  # the public snapshot JSON leaks no token/credentials
     ),
