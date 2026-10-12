@@ -55,7 +55,7 @@ class OwnedCodeActivitySvgTests(unittest.TestCase):
         activity = owned_activity_presentation()
         for mobile in (False, True):
             with self.subTest(mobile=mobile):
-                root = ET.fromstring(render_svg({"activity_analytics": activity}, mobile=mobile))
+                root = ET.fromstring(render_svg({"activity_analytics": activity}, mobile=mobile, code_view="owned_annual"))
                 section = next(node for node in root.iter() if node.get("data-section") == "code-changes")
                 paint = " ".join(section.itertext())
                 self.assertIn("+7,798", paint)
@@ -73,7 +73,7 @@ class OwnedCodeActivitySvgTests(unittest.TestCase):
                 self.assertEqual(expected, {(bar.get("data-date"), bar.get("data-end-date"), bar.get("data-value"))
                                             for bar in additions.values()})
                 sections = [node.get("data-section") for node in root.iter() if node.get("data-section")]
-                self.assertEqual("recent-pushes", sections[sections.index("code-changes") + 1])
+                self.assertEqual(["project-activity", "recent-pushes"], sections[sections.index("code-changes") + 1:sections.index("code-changes") + 3])
 
     def test_present_unknown_overall_never_becomes_branch_totals(self):
         activity = owned_activity_presentation()
@@ -82,7 +82,7 @@ class OwnedCodeActivitySvgTests(unittest.TestCase):
             value.update(status="unavailable", complete=False, additions=None, deletions=None, daily=[], bins=[])
         for mobile in (False, True):
             with self.subTest(mobile=mobile):
-                root = ET.fromstring(render_svg({"activity_analytics": activity}, mobile=mobile))
+                root = ET.fromstring(render_svg({"activity_analytics": activity}, mobile=mobile, code_view="owned_annual"))
                 section = next(node for node in root.iter() if node.get("data-section") == "code-changes")
                 paint = " ".join(section.itertext())
                 self.assertIn("Overall code activity unavailable", paint)
@@ -102,9 +102,87 @@ class DashboardSummaryTests(unittest.TestCase):
             root=ET.fromstring(render_svg({},mobile=mobile))
             self.assertEqual(root.get("width"),width)
             sections=[node.get("data-section") for node in root.iter() if node.get("data-section")]
-            self.assertEqual(sections,["overview","weekly","rhythm","languages","automation","working","focus","recent-pushes","projects","metrics","calendar"])
+            self.assertEqual(sections,["overview","weekly","rhythm","languages","automation","working","focus","project-activity","recent-pushes","projects","metrics","calendar"])
             self.assertIn("Contribution calendar unavailable", " ".join(root.itertext()))
             self.assertFalse(any(node.tag.endswith("filter") for node in root.iter()))
+
+
+class ProjectActivitySvgTests(unittest.TestCase):
+    @staticmethod
+    def activity(empty=False):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        from tests.pipeline.test_compute_metrics_accuracy import (
+            project_activity_envelope, project_activity_event, project_activity_source,
+        )
+        rows = [project_activity_envelope("static" + str(index), [] if empty else [
+            project_activity_event("day" + str(index), repository="static" + str(index), branch="feature/day"),
+            project_activity_event("previous" + str(index), repository="static" + str(index), when="2026-10-10T06:00:00Z"),
+        ]) for index in range(9)]
+        return build_activity_analytics(project_activity_source(rows))
+
+    def test_both_sizes_read_the_same_default_cells_and_shared_scale(self):
+        from scripts.core.config import PROJECT_ACTIVITY_COLORS
+        activity = self.activity()
+        model = activity["project_activity"]
+        expected = {(row["repository"], day["date"]): day for row in model["rows"][:8] for day in row["daily"][-14:]}
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root = ET.fromstring(render_svg({"activity_analytics": activity}, mobile=mobile))
+                sections = [node.get("data-section") for node in root.iter() if node.get("data-section")]
+                self.assertEqual(["code-changes", "project-activity", "recent-pushes"],
+                                 sections[sections.index("project-activity")-1:sections.index("project-activity")+2])
+                section = next(node for node in root.iter() if node.get("data-section") == "project-activity")
+                cells = [node for node in section.iter() if node.get("data-role") == "project-activity-cell"]
+                self.assertEqual(8 * 14, len(cells))
+                self.assertEqual([row["repository"] for row in model["rows"][:8]],
+                                 [node.get("data-repository") for node in section.iter() if node.get("data-role") == "project-activity-row"])
+                self.assertFalse(any(node.get("data-role") == "project-activity-branch" for node in section.iter()))
+                self.assertFalse(any(node.tag.endswith("script") for node in section.iter()))
+                for cell in cells:
+                    day = expected[cell.get("data-repository"), cell.get("data-date")]
+                    self.assertEqual(None if day["count"] is None else str(day["count"]), cell.get("data-count"))
+                    self.assertEqual(str(day["complete"]).lower(), cell.get("data-complete"))
+                    self.assertEqual(None if day["level"] is None else str(day["level"]), cell.get("data-level"))
+                    self.assertEqual("none" if day["level"] is None else PROJECT_ACTIVITY_COLORS[day["level"]], cell.get("fill"))
+                    self.assertEqual(cell.get("width"), cell.get("height"))
+                    self.assertGreaterEqual(float(cell.get("width")), 12)
+                    self.assertLessEqual(float(cell.get("width")), 24)
+                    self.assertIn(day["date"] + " UTC", " ".join(cell.itertext()))
+                legend = next(node for node in section.iter() if node.get("data-role") == "project-activity-legend")
+                bands = [node for node in legend.iter() if node.get("data-lower") is not None]
+                self.assertEqual([(band["lower"], band["upper"], band["level"]) for band in model["scale"]["bands"]],
+                                 [(int(node.get("data-lower")), int(node.get("data-upper")), int(node.get("data-level"))) for node in bands])
+                self.assertIn("Explore observed branches on the website", " ".join(section.itertext()))
+
+    def test_zero_unavailable_and_default_neighbor_selection(self):
+        import copy
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                empty = ET.fromstring(render_svg({"activity_analytics": self.activity(empty=True)}, mobile=mobile))
+                section = next(node for node in empty.iter() if node.get("data-section") == "project-activity")
+                self.assertIn("No push events observed in this window", " ".join(section.itertext()))
+                self.assertIn("No positive push counts to scale", " ".join(section.itertext()))
+                unknown = ET.fromstring(render_svg({}, mobile=mobile))
+                section = next(node for node in unknown.iter() if node.get("data-section") == "project-activity")
+                self.assertIn("Project activity unavailable", " ".join(section.itertext()))
+                self.assertFalse(any(node.get("data-role") == "project-activity-cell" for node in section.iter()))
+                baseline = CodeChangeDesktopPresentationTests.summary()
+                changed = copy.deepcopy(baseline)
+                changed["activity_analytics"]["overall_code_changes"] = {"schema": "profile-owned-code-analytics/v1", "status": "unavailable"}
+                changed["activity_analytics"]["project_activity"] = self.activity()["project_activity"]
+                code = lambda value: next(node for node in ET.fromstring(render_svg(value, mobile=mobile)).iter() if node.get("data-section") == "code-changes")
+                self.assertEqual(ET.tostring(code(baseline)), ET.tostring(code(changed)))
+
+    def test_readme_has_an_ordinary_project_activity_link_after_picture(self):
+        from pathlib import Path
+        from tests.contracts.test_web_dashboard import ROOT
+        template = (Path(ROOT) / "templates" / "README.md.tpl").read_text()
+        picture_end = template.index("</picture>")
+        link = template.index("[Project activity details]")
+        self.assertLess(picture_end, link)
+        self.assertLess(link, template.index("<details>"))
+        self.assertIn("#project-activity)", template[link:])
+        self.assertIn("project activity by repository and UTC day", template[:picture_end])
 
 
 class DashboardVisualTests(unittest.TestCase):
@@ -352,7 +430,8 @@ class CodeChangeSvgTests(unittest.TestCase):
             tree=ET.fromstring(render_svg(summary,mobile=mobile))
             sections=[n.get('data-section') for n in tree.iter() if n.get('data-section')]
             self.assertEqual(sections.index('focus')+1,sections.index('code-changes'))
-            self.assertEqual(sections.index('code-changes')+1,sections.index('recent-pushes'))
+            self.assertEqual(sections.index('code-changes')+1,sections.index('project-activity'))
+            self.assertEqual(sections.index('project-activity')+1,sections.index('recent-pushes'))
             self.assertEqual(sections.index('recent-pushes')+1,sections.index('projects'))
             bars=[n for n in tree.iter() if n.get('data-role')=='code-change-bar']
             self.assertEqual(4,len(bars))

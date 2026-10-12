@@ -239,3 +239,10 @@ def emit_css_root() -> str:
             continue
         blocks.append(f'[data-theme="{name}"] {{\n' + _role_vars(name) + "\n" + _ia_vars(name) + "\n}")
     return "\n\n".join(blocks) + "\n"
+
+
+def emit_project_activity_css() -> str:
+    """The activity intensity scale is scoped to its component in every theme."""
+    values = "\n".join(f"  --project-activity-{level}: {color};"
+                       for level, color in config.PROJECT_ACTIVITY_COLORS.items())
+    return ".project-activity {\n" + values + "\n}\n"

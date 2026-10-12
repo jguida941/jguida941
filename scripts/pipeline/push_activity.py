@@ -212,3 +212,164 @@ def qualify_recent_pushes(recent: Any, working: Any, generated_at: Any) -> dict:
             "reason": "repository_metadata_only_seven_day_cohort" if rows else "metadata_not_observed",
             "rows": rows,
             "meaning": "Reported repository push dates only; branch, commits and change totals unverified"}
+
+
+_PROJECT_ACTIVITY_TYPES = _PUSH_TYPES | frozenset((
+    "branch_creation", "branch_deletion", "pr_merge", "merge_queue_merge"))
+_PROJECT_REPOSITORY_LIMIT = 20
+_PROJECT_ACTIVITY_PAGE_LIMIT = 3
+_PROJECT_COMPLETION = {
+    ("end_of_connection", "no_next_link"),
+    ("window_boundary", "descending_window_boundary"),
+}
+
+
+def _project_timestamp(value: Any) -> datetime | None:
+    """Treat an unrepresentable UTC conversion as an invalid new observation."""
+    try:
+        return _timestamp(value)
+    except OverflowError:
+        return None
+
+
+def _project_event(value: Any, repository: str, cutoff: datetime) -> dict | None:
+    """Validate the normalized activity vocabulary before choosing push events.
+
+    Lifecycle observations participate in identity reconciliation even though they
+    never increment a push count. This keeps one conflicting ID from choosing its
+    own meaning through input order or the push-only filter.
+    """
+    from scripts.github import github_client as gh
+    from scripts.pipeline.profile_helpers import contains_credential_material
+
+    if type(value) is not dict:
+        return None
+    identity, event_id = value.get("repository"), value.get("id")
+    kind, ref = value.get("activity_type"), value.get("ref")
+    occurred = _project_timestamp(value.get("timestamp"))
+    if (type(identity) is not str or identity.casefold() != repository.casefold()
+            or type(event_id) is not str or not _ID.fullmatch(event_id)
+            or contains_credential_material(event_id) or type(kind) is not str or kind not in _PROJECT_ACTIVITY_TYPES
+            or occurred is None or occurred > cutoff or not gh._valid_branch_ref(ref)
+            or not gh._valid_branch_oid(value.get("before"), allow_zero=True)
+            or not gh._valid_branch_oid(value.get("after"), allow_zero=kind == "branch_deletion")):
+        return None
+    return {"id": event_id, "repository": repository.casefold(), "activity_type": kind,
+            "ref": ref, "timestamp": occurred.isoformat().replace("+00:00", "Z"),
+            "before": value["before"], "after": value["after"]}
+
+
+def qualify_project_activity(rows: Any, *, window_start: str, window_end: str,
+                             observed_at: str, owner: str, profile_name: str) -> dict:
+    """Reconcile all received branch observations without changing recent cards.
+
+    The input is the existing collector's bounded normalized repository envelope.
+    Complete daily coverage requires its terminal evidence, not a Boolean alone.
+    The returned events are intermediate facts; the public model emits aggregates.
+    """
+    from scripts.pipeline.profile_helpers import contains_credential_material
+
+    start, end, cutoff = (_timestamp(value) for value in (window_start, window_end, observed_at))
+    if (type(rows) is not list or start is None or end is None or cutoff is None
+            or not start <= end == cutoff):
+        return {"rows": [], "reasons": ["observations_unavailable"], "received": 0,
+                "valid_repositories": 0, "complete_repositories": 0}
+    grouped, reasons = {}, set()
+    for envelope in rows:
+        repository = envelope.get("repository") if type(envelope) is dict else None
+        if (type(repository) is not str or not _REPO.fullmatch(repository)
+                or repository.split("/")[1] in {".", ".."}
+                or contains_credential_material(repository)
+                or repository.split("/")[0].casefold() != owner.casefold()
+                or repository.split("/")[1].casefold() == profile_name.casefold()):
+            reasons.add("invalid_repository_identity")
+            continue
+        identity = repository.casefold()
+        group = grouped.setdefault(identity, {"spellings": set(), "envelopes": []})
+        group["spellings"].add(repository)
+        group["envelopes"].append(envelope)
+
+    qualified = []
+    for identity, group in grouped.items():
+        repository = min(group["spellings"])
+        observations, conflicts, metadata, row_reasons = {}, set(), set(), set()
+        observed = False
+        privacy = set()
+        for envelope in group["envelopes"]:
+            family = envelope.get("activity")
+            if type(family) is not dict:
+                row_reasons.add("activity_unavailable")
+                continue
+            events = family.get("rows")
+            pages = family.get("page_count")
+            observed_cutoff = _project_timestamp(family.get("observed_at"))
+            private = envelope.get("is_private")
+            if type(private) is bool:
+                privacy.add(private)
+            metadata_valid = (type(private) is bool
+                              and ("name" not in envelope or type(envelope["name"]) is str
+                                   and envelope["name"].casefold() == repository.split("/")[1].casefold()))
+            if not metadata_valid:
+                row_reasons.add("invalid_repository_metadata")
+            header_valid = (family.get("source") == "github_rest_activity"
+                            and observed_cutoff == cutoff and type(pages) is int
+                            and 1 <= pages <= _PROJECT_ACTIVITY_PAGE_LIMIT
+                            and type(events) is list)
+            observed = observed or header_valid
+            terminal = (family.get("reason"), family.get("completion_evidence"))
+            complete = (header_valid and metadata_valid and family.get("status") == "ok"
+                        and family.get("complete") is True and family.get("selection_valid") is True
+                        and all(type(part) is str for part in terminal) and terminal in _PROJECT_COMPLETION)
+            if not complete:
+                row_reasons.add("incomplete_activity_coverage")
+            # Only primitive normalized metadata can enter this comparison. A
+            # malformed header already loses completeness without being hashable.
+            metadata.add(tuple(repr(family.get(key)) for key in
+                               ("status", "complete", "reason", "source", "page_count",
+                                "selection_valid", "completion_evidence"))
+                         + (observed_cutoff, private if type(private) is bool else None))
+            if type(events) is not list:
+                continue
+            previous = None
+            if len(events) > _PROJECT_ACTIVITY_PAGE_LIMIT * 100:
+                row_reasons.add("activity_row_limit")
+            for raw in events:
+                event = _project_event(raw, repository, cutoff)
+                if event is None:
+                    row_reasons.add("invalid_activity_row")
+                    event_id = raw.get("id") if type(raw) is dict else None
+                    if type(event_id) is str and _ID.fullmatch(event_id):
+                        conflicts.add(event_id)
+                    continue
+                occurred = _timestamp(event["timestamp"])
+                if previous is not None and occurred > previous:
+                    row_reasons.add("invalid_activity_order")
+                previous = occurred
+                event_id = event["id"]
+                if event_id in observations and observations[event_id] != event:
+                    conflicts.add(event_id)
+                else:
+                    observations[event_id] = event
+        if len(metadata) > 1 or len(privacy) > 1:
+            row_reasons.add("conflicting_repository_metadata")
+        if conflicts:
+            row_reasons.add("conflicting_activity_identity")
+        events = [event for event_id, event in observations.items()
+                  if event_id not in conflicts and event["activity_type"] in _PUSH_TYPES
+                  and start <= _timestamp(event["timestamp"]) <= end]
+        events.sort(key=lambda event: (_timestamp(event["timestamp"]), event["id"], event["ref"]))
+        complete = not row_reasons
+        qualified.append({"repository": repository, "is_private": next(iter(privacy)) if len(privacy) == 1 else None,
+                          "complete": complete, "observed": observed,
+                          "status": "ok" if complete else "partial" if observed or events else "unavailable",
+                          "reasons": sorted(row_reasons), "events": events,
+                          "latest_push": events[-1]["timestamp"] if events else None})
+    qualified.sort(key=lambda row: (-_timestamp(row["latest_push"]).timestamp()
+                                   if row["latest_push"] else float("inf"), row["repository"].casefold()))
+    valid_count = len(qualified)
+    if valid_count > _PROJECT_REPOSITORY_LIMIT:
+        reasons.add("repository_limit")
+        qualified = qualified[:_PROJECT_REPOSITORY_LIMIT]
+    return {"rows": qualified, "reasons": sorted(reasons), "received": len(rows),
+            "valid_repositories": valid_count,
+            "complete_repositories": sum(row["complete"] for row in qualified)}

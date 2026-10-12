@@ -164,6 +164,13 @@
   --ease-exit: ease-in;
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
 }
+.project-activity {
+  --project-activity-0: #283248;
+  --project-activity-1: #3f678b;
+  --project-activity-2: #478f8b;
+  --project-activity-3: #7ac76e;
+  --project-activity-4: #d7e24e;
+}
 
 *,*::before,*::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -401,6 +408,63 @@ footer a { color: var(--ink); text-decoration: none; }
     background: var(--surface); }
 }
 
+.project-activity { min-width: 0; }
+.project-activity .project-activity-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.project-activity .project-activity-subtitle, .project-activity .project-activity-cutoff { color: var(--ink-dim); font-size: var(--type-caption); margin: 7px 0 0; }
+.project-activity .project-activity-periods { display: inline-flex; gap: 4px; padding: 3px; border: 1px solid color-mix(in srgb, var(--hairline) 18%, transparent); border-radius: 12px; }
+.project-activity .project-activity-periods button, .project-activity .project-activity-show-all { min-height: 44px; border: 0; padding: 8px 12px; background: transparent; border-radius: 8px; font: inherit; font-size: var(--type-caption); color: var(--ink-dim); cursor: pointer; }
+.project-activity .project-activity-periods button[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--ink-strong); font-weight: 600; }
+.project-activity .project-activity-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; margin-top: 24px; padding: 0 0 6px; }
+.project-activity .project-activity-matrix { width: 100%; min-width: 0; }
+.project-activity .project-activity-scroll[data-days="30"] .project-activity-matrix { min-width: 720px; }
+.project-activity .project-activity-lane, .project-activity .project-activity-date-row { display: grid; grid-template-columns: minmax(160px, 200px) minmax(0, 1fr); column-gap: 16px; align-items: center; }
+.project-activity .project-activity-lane { min-height: 56px; padding: 5px 0; border-bottom: 1px solid color-mix(in srgb, var(--hairline) 13%, transparent); }
+.project-activity .project-activity-date-row { padding-bottom: 6px; color: var(--ink-dim); font-size: var(--type-caption); }
+.project-activity .project-activity-grid { display: grid; grid-template-columns: repeat(var(--project-days), minmax(0, 1fr)); gap: 4px; min-width: 0; align-items: center; }
+.project-activity .project-activity-date { position: relative; min-width: 0; height: 24px; }
+.project-activity .project-activity-date > span { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+.project-activity .project-activity-date:first-child > span { left: 0; transform: none; }
+.project-activity .project-activity-date:last-child > span { left: 100%; transform: translateX(-100%); }
+.project-activity .project-activity-label { min-width: 0; max-width: 100%; text-align: left; }
+.project-activity .project-activity-toggle { display: flex; align-items: center; gap: 8px; min-height: 44px; width: 100%; min-width: 0; padding: 6px 3px; text-align: left; border: 0; background: transparent; font: inherit; color: var(--ink); cursor: pointer; border-radius: 6px; }
+.project-activity .project-activity-toggle:disabled { cursor: default; }
+.project-activity .project-activity-chevron { display: block; flex: 0 0 12px; font-size: 22px; line-height: 1; text-align: center; color: var(--ink-dim); }
+.project-activity .project-activity-toggle[aria-expanded="true"] .project-activity-chevron { transform: rotate(90deg); }
+.project-activity .project-activity-name-wrap { min-width: 0; }
+.project-activity .project-activity-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-strong); font-size: var(--type-body); font-weight: 500; }
+.project-activity .project-activity-branch-count { display: block; color: var(--ink-dim); font-size: var(--type-caption); }
+.project-activity .project-activity-branch .project-activity-label { padding: 8px 8px 8px 23px; color: var(--ink-dim); font-size: var(--type-caption); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.project-activity .project-activity-branches[hidden] { display: none; }
+.project-activity .project-activity-cell { display: block; width: min(24px, 100%); aspect-ratio: 1; justify-self: center; border: 1px solid color-mix(in srgb, var(--hairline) 35%, transparent); border-radius: 4px; background: transparent; }
+.project-activity .project-activity-cell[data-complete="false"], .project-activity .project-activity-unknown { border-style: dashed; border-color: color-mix(in srgb, var(--ink-dim) 70%, transparent); }
+.project-activity [data-level="0"] { background: var(--project-activity-0); }
+.project-activity [data-level="1"] { background: var(--project-activity-1); }
+.project-activity [data-level="2"] { background: var(--project-activity-2); }
+.project-activity [data-level="3"] { background: var(--project-activity-3); }
+.project-activity [data-level="4"] { background: var(--project-activity-4); }
+.project-activity .project-activity-legend { margin-top: 16px; color: var(--ink-dim); font-size: var(--type-caption); }
+.project-activity .project-activity-legend p { margin: 0 0 9px; }
+.project-activity .project-activity-key { display: flex; gap: 12px 20px; flex-wrap: wrap; align-items: flex-start; }
+.project-activity .project-activity-key-item { display: grid; justify-items: center; gap: 5px; min-width: 28px; }
+.project-activity .project-activity-swatch { display: block; width: 16px; height: 16px; border: 1px solid color-mix(in srgb, var(--hairline) 35%, transparent); border-radius: 3px; }
+.project-activity .project-activity-swatch.project-activity-unknown { border-style: dashed; }
+.project-activity .project-activity-qualification { color: var(--ink-dim); font-size: var(--type-caption); margin: 14px 0 0; overflow-wrap: anywhere; }
+.project-activity .project-activity-show-all { margin-top: 10px; color: var(--ink); border: 1px solid color-mix(in srgb, var(--hairline) 18%, transparent); }
+.project-activity .project-activity-details { margin-top: 10px; color: var(--ink-dim); font-size: var(--type-caption); overflow-wrap: anywhere; }
+.project-activity .project-activity-details summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+.project-activity .project-activity-details ul { padding-left: 20px; }
+@media (max-width: 600px) {
+  .project-activity .project-activity-header { display: block; }
+  .project-activity .project-activity-periods { margin-top: 14px; }
+  .project-activity .project-activity-lane, .project-activity .project-activity-date-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .project-activity .project-activity-date-row > .project-activity-label { display: none; }
+  .project-activity .project-activity-lane { padding: 5px 0 12px; }
+  .project-activity .project-activity-toggle { padding: 5px 3px; }
+  .project-activity .project-activity-cell { width: min(16px, 100%); border-radius: 3px; }
+  .project-activity .project-activity-scroll[data-days="30"] .project-activity-label { position: sticky; left: 0; width: var(--project-visible-width); max-width: var(--project-visible-width); }
+  .project-activity .project-activity-branch .project-activity-label { min-height: 36px; }
+}
+
 </style>
 </head>
 <body>
@@ -491,6 +555,7 @@ footer a { color: var(--ink); text-decoration: none; }
       <div class="lanes" id="focus"></div>
     </section>
     <section class="panel code-changes"><div id="activity-code"><h2 class="title">Code changes</h2></div></section>
+    <section class="panel project-activity" id="project-activity" tabindex="-1"><div id="activity-project"><h2 class="title">Project activity</h2></div></section>
     <section class="panel recent-pushes" id="recent-pushes" tabindex="-1"><div id="activity-pushes"><h2 class="title">Recent repository pushes</h2></div></section>
     <section class="panel" id="projects" tabindex="-1">
       <div class="section-head"><div><p class="eyebrow">Showcase</p><h2 class="title">Flagship Projects</h2></div></div>
@@ -659,16 +724,16 @@ footer a { color: var(--ink); text-decoration: none; }
   addEventListener("click", event => {
     const button = event.target && event.target.closest && event.target.closest("[data-code-period]");
     if (!button || !codeActivity) return;
-    hydrateCodeChanges(codeActivity, button.dataset.codePeriod);
+    hydrateOwnedCodeChanges(codeActivity, button.dataset.codePeriod);
     document.querySelector(`[data-code-period="${codePeriod}"]`).focus();
   });
   addEventListener("resize", () => {
-    if (codeActivity && codePhone !== codePhoneLayout()) hydrateCodeChanges(codeActivity, codePeriod);
+    if (codeActivity && codePhone !== codePhoneLayout()) hydrateOwnedCodeChanges(codeActivity, codePeriod);
   });
 
-  function hydrateCodeChanges(a, period) {
+  function hydrateCodeChanges(a, period, codeView = "latest_observed_branch") {
     a=a||{};
-    if (Object.prototype.hasOwnProperty.call(a, "overall_code_changes")) {
+    if (codeView === "owned_annual") {
       hydrateOwnedCodeChanges(a, period);
       return;
     }
@@ -740,6 +805,125 @@ footer a { color: var(--ink); text-decoration: none; }
   }
 
 
+
+  let projectActivity = null, projectDays = 14, projectShowAll = false;
+  const projectExpanded = new Set();
+  const projectCount = value => Number.isSafeInteger(value) && value >= 0;
+
+  function validProjectDates(dates) {
+    return Array.isArray(dates) && dates.length === 30 && dates.every((date, index) => {
+      if (typeof date !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+      const time = Date.parse(date + "T00:00:00Z");
+      return Number.isFinite(time) && new Date(time).toISOString().slice(0, 10) === date &&
+        (index === 0 || time - Date.parse(dates[index - 1] + "T00:00:00Z") === 86400000);
+    });
+  }
+
+  function projectCellLabel(repository, ref, day, today) {
+    const known = projectCount(day.count), complete = day.complete === true;
+    const count = !known ? "Push count unavailable" : day.count === 0 ? "0 observed pushes" :
+      `${complete ? "" : "At least "}${day.count.toLocaleString("en-US")} observed ${day.count === 1 ? "push" : "pushes"}`;
+    const coverage = complete ? "Complete observed history" : day.date === today ?
+      "Today in progress; observation incomplete" : "Observation incomplete; missing history is not zero";
+    return `${repository}${ref ? " · " + ref : ""} · ${day.date} UTC: ${count}. ${coverage}.`;
+  }
+
+  function projectCells(repository, ref, daily, dates, today, emptyDaily = null) {
+    const byDate = new Map((Array.isArray(daily) ? daily : []).filter(day => day && typeof day.date === "string").map(day => [day.date, day]));
+    const defaults = new Map((Array.isArray(emptyDaily) ? emptyDaily : []).filter(day => day &&
+      typeof day.date === "string" && ((day.count === 0 && day.complete === true && day.level === 0) ||
+        (day.count === null && day.complete === false && day.level === null))).map(day => [day.date, day]));
+    return dates.map(date => {
+      const supplied = byDate.get(date) || defaults.get(date) || {};
+      const known = projectCount(supplied.count) && (supplied.count > 0 || supplied.complete === true);
+      const day = {date, count:known ? supplied.count : null, complete:known && supplied.complete === true, level:supplied.level};
+      const level = known && Number.isInteger(day.level) && day.level >= 0 && day.level <= 4 && (day.count === 0) === (day.level === 0);
+      const label = projectCellLabel(repository, ref, day, today);
+      return `<span class="project-activity-cell" role="cell" data-role="project-activity-cell" data-repository="${esc(repository)}"${ref ? ` data-ref="${esc(ref)}"` : ""} data-date="${esc(date)}" data-complete="${day.complete === true}"${known ? ` data-count="${day.count}"` : ""}${level ? ` data-level="${day.level}"` : ""} aria-label="${esc(label)}" title="${esc(label)}"></span>`;
+    }).join("");
+  }
+
+  function projectLegend(scale) {
+    const bands = (Array.isArray(scale.bands) ? scale.bands : []).filter(band => band &&
+      projectCount(band.lower) && band.lower > 0 && projectCount(band.upper) && band.upper >= band.lower &&
+      Number.isInteger(band.level) && band.level >= 1 && band.level <= 4);
+    const swatch = (level, label, extra = "") => `<span class="project-activity-key-item"><i class="project-activity-swatch${extra}"${level == null ? "" : ` data-level="${level}"`} aria-hidden="true"></i><span>${esc(label)}</span></span>`;
+    const positive = bands.map(band => swatch(band.level, band.lower === band.upper ? String(band.lower) : `${band.lower}–${band.upper}`)).join("");
+    return `<div class="project-activity-legend" data-role="project-activity-legend"><p>${bands.length ? "Observed pushes/day · low → high" : "No positive push counts to scale"}</p><div class="project-activity-key">${swatch(0, "0 · complete")}${positive}${swatch(null, "Unknown", " project-activity-unknown")}</div><p class="project-activity-qualification">${bands.length ? "One scale across all 30 days, received repositories, and observed branches." : "Zero is shown only with complete past-day observation."}${scale.lower_bounds_included ? " Partial positive counts are observed lower bounds." : ""} Dashed outlines mark incomplete observation.</p></div>`;
+  }
+
+  function sizeProjectActivity(newest = false, scrollLeft = null) {
+    const scroller = document.querySelector("#project-activity .project-activity-scroll");
+    if (!scroller) return;
+    scroller.style.setProperty("--project-visible-width", `${scroller.clientWidth}px`);
+    if (newest) scroller.scrollLeft = scroller.scrollWidth - scroller.clientWidth;
+    else if (scrollLeft != null) scroller.scrollLeft = scrollLeft;
+  }
+
+  function renderProjectActivity({focus = null, newest = false, scrollLeft = null} = {}) {
+    const root = document.getElementById("activity-project");
+    if (!root) return;
+    const model = projectActivity || {}, scale = model.scale || {};
+    const valid = model.schema === "profile-project-activity/v1" && validProjectDates(model.dates);
+    const rows = valid && Array.isArray(model.rows) ? model.rows.filter(row => row && typeof row.repository === "string" && Array.isArray(row.daily)).slice(0,20) : [];
+    const visible = rows.slice(0, projectShowAll ? rows.length : 8), dates = valid ? model.dates.slice(-projectDays) : [];
+    const today = valid ? model.dates.at(-1) : null, cutoff = valid && typeof model.observed_at === "string" ? model.observed_at : null;
+    let html = '<div class="project-activity-header"><div><h2 class="title">Project activity</h2><p class="project-activity-subtitle">Observed branch pushes · UTC</p></div>';
+    html += `<div class="project-activity-periods" role="group" aria-label="Project activity time window"><button type="button" data-project-period="14" aria-pressed="${projectDays === 14}" aria-controls="project-activity-matrix">14 days</button><button type="button" data-project-period="30" aria-pressed="${projectDays === 30}" aria-controls="project-activity-matrix">30 days</button></div></div>`;
+    html += `<p class="project-activity-cutoff">${cutoff ? `Observed through ${esc(cutoff)} · today in progress` : "Observation cutoff unavailable"}</p>`;
+    if (valid && model.complete === true && model.observed_pushes === 0) html += '<p class="project-activity-qualification">No push events observed in this window.</p>';
+    if (valid && model.status === "unavailable" && rows.length) html += '<p class="project-activity-qualification">Project activity unavailable. Missing history is not zero.</p>';
+    if (!valid || !rows.length) {
+      html += `<div id="project-activity-matrix"><p class="project-activity-qualification">${valid && model.complete === true ? "No eligible repositories in the received cohort." : "Project activity unavailable. Missing history is not zero."}</p></div>`;
+    } else {
+      const markers = new Set([0, Math.floor((dates.length - 1) / 2), dates.length - 1]);
+      const dateLabel = date => new Date(date + "T00:00:00Z").toLocaleDateString("en-US", {month:"short", day:"numeric", timeZone:"UTC"});
+      html += `<div class="project-activity-scroll" data-days="${projectDays}" role="region" aria-label="Repository activity dates${projectDays === 30 ? "; scroll horizontally for earlier dates" : ""}"${projectDays === 30 ? ' tabindex="0"' : ""}><div class="project-activity-matrix" id="project-activity-matrix" role="table" aria-label="Observed branch pushes by repository and UTC day" style="--project-days:${projectDays}"><div class="project-activity-date-row" role="row"><span class="project-activity-label" role="columnheader">Repository</span><div class="project-activity-grid" role="presentation">${dates.map((date,index) => `<span class="project-activity-date" role="columnheader" aria-label="${esc(date)} UTC">${markers.has(index) ? `<span>${esc(dateLabel(date))}</span>` : ""}</span>`).join("")}</div></div>`;
+      visible.forEach((row, index) => {
+        const repository = row.repository, branches = (Array.isArray(row.branches) ? row.branches : []).filter(branch => branch && typeof branch.ref === "string" && Array.isArray(branch.daily));
+        const expanded = projectExpanded.has(repository), branchId = `project-activity-branches-${index}`;
+        const shortName = repository.split("/").at(-1), branchText = `${branches.length} observed ${branches.length === 1 ? "branch" : "branches"}`;
+        html += `<div role="rowgroup"><div class="project-activity-lane" role="row" data-role="project-activity-row" data-repository="${esc(repository)}"><div class="project-activity-label" role="rowheader"><button type="button" class="project-activity-toggle" data-project-branch-toggle="${index}" aria-expanded="${expanded}" aria-controls="${branchId}" aria-label="${esc(repository)} · ${branchText}"${branches.length ? "" : " disabled"}><span class="project-activity-chevron" aria-hidden="true">›</span><span class="project-activity-name-wrap"><span class="project-activity-name" title="${esc(repository)}">${esc(shortName)}</span><span class="project-activity-branch-count">${branchText}</span></span></button></div><div class="project-activity-grid" role="presentation">${projectCells(repository, null, row.daily, dates, today)}</div></div>`;
+        html += `<div class="project-activity-branches" id="${branchId}" role="presentation"${expanded ? "" : " hidden"}>${expanded ? branches.map(branch => `<div class="project-activity-lane project-activity-branch" role="row" data-role="project-activity-branch" data-repository="${esc(repository)}" data-ref="${esc(branch.ref)}"><span class="project-activity-label" role="rowheader" title="${esc(branch.ref)}">${esc(branch.ref.replace(/^refs\/heads\//, ""))}</span><div class="project-activity-grid" role="presentation">${projectCells(repository, branch.ref, branch.daily, dates, today, row.branch_empty_daily)}</div></div>`).join("") : ""}</div></div>`;
+      });
+      html += '</div></div>';
+      if (rows.length > 8) html += `<button type="button" class="project-activity-show-all" data-project-show-all aria-expanded="${projectShowAll}" aria-controls="project-activity-matrix">${projectShowAll ? "Show first 8 repositories" : `Show all ${rows.length} repositories`}</button>`;
+    }
+    html += projectLegend(valid ? scale : {});
+    html += `<p class="project-activity-qualification">${esc(model.qualification || "Received repository activity is incomplete; exact global ranking is not guaranteed.")}</p>`;
+    html += `<details class="project-activity-details"><summary>How to read this</summary><p>${esc(model.meaning || "Counts are observed branch push events, not commits, contributions, or line changes.")}</p><p>Each cell uses the push event's UTC date. Repository rows combine their observed branches. Expand a repository to inspect those branches on the same scale. Deleted branches retain their historical pushes.</p><p>Solid zero cells mean no pushes in a complete past-day observation. Unfilled cells mean unknown activity; colored cells with dashed outlines are observed lower bounds. Today remains in progress. The repository list is a bounded received cohort, ordered by its latest qualified observed push.</p>${visible.length ? `<ul>${visible.map(row => `<li>${esc(row.repository)}<ul>${dates.map(date => { const day = row.daily.find(item => item && item.date === date) || {date,count:null,complete:false}; return `<li>${esc(projectCellLabel(row.repository, null, day, today))}</li>`; }).join("")}</ul></li>`).join("")}</ul>` : ""}</details>`;
+    root.innerHTML = html;
+    root.querySelectorAll("[data-project-period]").forEach(button => button.addEventListener("click", () => {
+      const next = button.dataset.projectPeriod === "30" ? 30 : 14;
+      const changed = next !== projectDays;
+      projectDays = next;
+      renderProjectActivity({focus:`[data-project-period="${next}"]`, newest:changed && next === 30});
+    }));
+    root.querySelectorAll("[data-project-branch-toggle]").forEach(button => button.addEventListener("click", () => {
+      const index = Number(button.dataset.projectBranchToggle), row = visible[index];
+      if (!row) return;
+      if (projectExpanded.has(row.repository)) projectExpanded.delete(row.repository); else projectExpanded.add(row.repository);
+      const previous = root.querySelector(".project-activity-scroll");
+      renderProjectActivity({focus:`[data-project-branch-toggle="${index}"]`, scrollLeft:previous ? previous.scrollLeft : 0});
+    }));
+    const all = root.querySelector("[data-project-show-all]");
+    if (all) all.addEventListener("click", () => {
+      projectShowAll = !projectShowAll;
+      const previous = root.querySelector(".project-activity-scroll");
+      renderProjectActivity({focus:"[data-project-show-all]", scrollLeft:previous ? previous.scrollLeft : 0});
+    });
+    sizeProjectActivity(newest, scrollLeft);
+    if (focus) root.querySelector(focus)?.focus({preventScroll:true});
+  }
+
+  function hydrateProjectActivity(a) {
+    projectActivity = a && a.project_activity || null;
+    projectDays = 14;
+    projectShowAll = false;
+    projectExpanded.clear();
+    renderProjectActivity();
+  }
+  addEventListener("resize", () => sizeProjectActivity());
 
   function hydrateRecentPushes(a) {
     const state = a && a.recent_pushes || {};
@@ -820,6 +1004,7 @@ footer a { color: var(--ink); text-decoration: none; }
 
   function hydrate(d) {
     hydrateCodeChanges(d.activity_analytics);
+    hydrateProjectActivity(d.activity_analytics);
     hydrateRecentPushes(d.activity_analytics);
     document.querySelectorAll("[data-bind]").forEach(el => {
       let v = get(d, el.getAttribute("data-bind"));

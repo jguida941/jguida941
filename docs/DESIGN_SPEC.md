@@ -256,3 +256,28 @@ projects and remaining facts. Calendar dates and weekly points retain their asso
 Rounded outer corners stay transparent; no shadow or filter paints outside the surface.
 Main's three website themes are unchanged. The weekly destination and section anchors
 are generated separately; SVG images provide native README links and text equivalents.
+
+### Current activity layout — 2026-10-12
+
+The activity sections appear in this order: **Code changes → Project activity → Recent
+repository pushes**. Code changes retains the latest observed branch chart and its
+calculations. Recent repository pushes retains its latest three repository cards,
+verified additions/deletions, and commit details.
+
+Project activity counts unique observed push and force-push events by repository and
+UTC day, including all observed branches and actors in the received feed. These are
+push counts, not commits, contributions, or lines changed. The website starts with
+14 days and at most eight actual repositories. Its 30-day control, repository branch
+expansion, and full received-repository view preserve the same order and counts.
+Phone labels sit above their grids; the 30-day grid scrolls within the panel.
+
+Rounded square cells use one sequential palette with finite numeric legend ranges
+calibrated from positive repository/day counts across the entire received 30-day
+window. That scale is shared across repositories, branches, periods, and both README
+SVG sizes. A confirmed past-day zero has a distinct solid cell; unknown activity is
+unfilled, and incomplete positive counts have dashed outlines and lower-bound text.
+Today remains in progress. Coverage text identifies the bounded received cohort.
+
+The static README panels show the same first eight repositories and fourteen dates
+with branches collapsed. An ordinary **Project activity details** link after the
+summary picture opens the website's Project activity section.

@@ -8,11 +8,11 @@
 <a href="{{ dashboard_url }}?from_snapshot={{ cache_bust }}#overview">
 <picture>
   <source media="(max-width: 767px)" srcset="assets/dashboard_summary_mobile.svg?v={{ cache_bust }}">
-  <img src="assets/dashboard_summary.svg?v={{ cache_bust }}" width="100%" alt="GitHub profile analytics: contributions, workflow configuration, code changes, language composition, recent repositories and projects. Exact values and definitions below.">
+  <img src="assets/dashboard_summary.svg?v={{ cache_bust }}" width="100%" alt="GitHub profile analytics: contributions, workflow configuration, code changes, project activity by repository and UTC day, recent repository pushes, language composition and projects. Exact values and definitions below.">
 </picture>
 </a>
 
-[Weekly trend]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#weekly-contributions) · [Calendar]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#calendar-panel) · [Weekday totals]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#rhythm-panel) · [Languages]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#languages) · [Workflow configuration]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#automation)
+[Weekly trend]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#weekly-contributions) · [Calendar]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#calendar-panel) · [Weekday totals]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#rhythm-panel) · [Languages]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#languages) · [Workflow configuration]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#automation) · [Project activity details]({{ dashboard_url }}?from_snapshot={{ cache_bust }}#project-activity)
 
 <details>
 <summary>Read the numbers and definitions</summary>

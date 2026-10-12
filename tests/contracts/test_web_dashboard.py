@@ -112,12 +112,13 @@ class WebDashboardContract(unittest.TestCase):
 
     def test_colour_only_from_tokens_no_rainbow(self):
         """Restraint: the component CHROME paints from var(--token)/color-mix, never a
-        pile of hand hexes (the old 9-accent tell). Hex legitimately lives in exactly
-        two injected blocks — the token source (emit_css_root's :root/[data-theme])
-        and the LANG_COLORS map (Linguist identity colours, data not chrome). Scrub
-        both, then the remaining component CSS + HTML + JS must hold NO raw hex."""
-        from scripts.rendering.design_tokens import emit_css_root
+        pile of hand hexes (the old 9-accent tell). Hex lives in the shared root
+        tokens, the component-scoped project intensity palette, and the LANG_COLORS
+        map (Linguist identity colours, data not chrome). Outside those exact
+        injected blocks, component CSS + HTML + JS must hold NO raw hex."""
+        from scripts.rendering.design_tokens import emit_css_root, emit_project_activity_css
         scrubbed = self.html.replace(emit_css_root().strip(), "")
+        scrubbed = scrubbed.replace(emit_project_activity_css().strip(), "")
         scrubbed = re.sub(r"const LANG_COLORS = \{.*?\};", "", scrubbed, flags=re.S)
         stray = sorted(set(re.findall(r"#[0-9a-fA-F]{3,8}\b", scrubbed)))
         self.assertEqual([], stray, f"component chrome must paint from token vars, not raw hex: {stray}")
@@ -167,7 +168,7 @@ class CodeChangeHydrationTests(unittest.TestCase):
                     "additions": sum(row["additions"] or 0 for row in daily),
                     "deletions": sum(row["deletions"] or 0 for row in daily)}}
 
-    def hydrate(self, activity, period=None):
+    def hydrate(self, activity, period=None, code_view="latest_observed_branch"):
         import json
         import subprocess
         import xml.etree.ElementTree as ET
@@ -182,11 +183,11 @@ const idle = {then() {return this;}, catch() {return this;}};
 const context = {document: {documentElement: {dataset: {}}, querySelectorAll() {return [];},
   getElementById(id) {return nodes[id] ||= {innerHTML: '', textContent: '', style: {setProperty() {}}, setAttribute() {}, replaceChildren() {}};}},
   location: {hash: '', search: ''}, localStorage: {getItem() {return null;}, setItem() {}},
-  URLSearchParams, addEventListener() {}, requestAnimationFrame() {}, fetch() {return idle;}, activity: input.activity, period: input.period};
-vm.runInNewContext(input.script + '\nhydrateCodeChanges(activity, period);', context, {timeout: 5000});
+  URLSearchParams, addEventListener() {}, requestAnimationFrame() {}, fetch() {return idle;}, activity: input.activity, period: input.period, codeView: input.code_view};
+vm.runInNewContext(input.script + '\nhydrateCodeChanges(activity, period, codeView);', context, {timeout: 5000});
 process.stdout.write(JSON.stringify({html: nodes['activity-code'].innerHTML, activity: context.activity}));
 '''
-        result = subprocess.run(["node", "-e", harness], input=json.dumps({"script": script[0], "activity": activity, "period": period}),
+        result = subprocess.run(["node", "-e", harness], input=json.dumps({"script": script[0], "activity": activity, "period": period, "code_view": code_view}),
                                 text=True, capture_output=True, check=True, timeout=10)
         observed = json.loads(result.stdout)
         self.assertEqual(activity, observed["activity"])
@@ -578,10 +579,187 @@ process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, a
         self.assertNotIn("<img>", html)
 
 
+class ProjectActivityWebsiteTests(unittest.TestCase):
+    """The repository panel reads shared facts and owns only its own hydration."""
+
+    def hydrate(self, activity, **options):
+        import json
+        import subprocess
+        from html.parser import HTMLParser
+        from scripts.pipeline.web_render import render_dashboard
+
+        script = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)
+        self.assertEqual(1, len(script))
+        harness = r'''
+const fs = require('node:fs'), vm = require('node:vm');
+const input = JSON.parse(fs.readFileSync(0, 'utf8'));
+const nodes = {'activity-code': {innerHTML:'graph already hydrated'}, 'activity-pushes': {innerHTML:'push details already expanded'}};
+const idle = {then() {return this;}, catch() {return this;}};
+const context = {document: {documentElement:{dataset:{}}, querySelectorAll() {return [];}, querySelector() {return null;},
+  getElementById(id) {return nodes[id] ||= {innerHTML:'', querySelectorAll() {return [];}, querySelector() {return null;}};}},
+  location:{hash:'',search:''}, localStorage:{getItem() {return null;},setItem() {}}, URLSearchParams,
+  addEventListener() {}, requestAnimationFrame() {}, fetch() {return idle;}, activity:input.activity, options:input.options};
+vm.runInNewContext(input.script + '\nhydrateProjectActivity(activity); projectDays = options.days || 14; projectShowAll = options.show_all === true; (options.expanded || []).forEach(repository => projectExpanded.add(repository)); renderProjectActivity();', context, {timeout:5000});
+process.stdout.write(JSON.stringify({html:nodes['activity-project'].innerHTML, code:nodes['activity-code'].innerHTML,
+  pushes:nodes['activity-pushes'].innerHTML, activity:context.activity}));
+'''
+        result = subprocess.run(["node", "-e", harness], text=True, capture_output=True,
+                                input=json.dumps({"script": script[0], "activity": activity, "options": options}),
+                                check=True, timeout=10)
+        value = json.loads(result.stdout)
+        self.assertEqual(activity, value["activity"])
+        self.assertEqual("graph already hydrated", value["code"])
+        self.assertEqual("push details already expanded", value["pushes"])
+
+        class Fragment(HTMLParser):
+            def __init__(self):
+                super().__init__(convert_charrefs=True)
+                self.nodes, self.text = [], []
+            def handle_starttag(self, tag, attrs):
+                self.nodes.append((tag, dict(attrs)))
+            def handle_data(self, value):
+                self.text.append(value)
+
+        fragment = Fragment()
+        fragment.feed(value["html"])
+        return value["html"], fragment.nodes, " ".join(fragment.text)
+
+    @staticmethod
+    def activity(repositories=9):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        from tests.pipeline.test_compute_metrics_accuracy import (
+            project_activity_envelope, project_activity_event, project_activity_source,
+        )
+        rows = [project_activity_envelope("heat" + str(index), [
+            project_activity_event("work" + str(index), repository="heat" + str(index), branch="feature/days"),
+            project_activity_event("older" + str(index), repository="heat" + str(index), when="2026-09-20T11:00:00Z"),
+        ]) for index in range(repositories)]
+        return build_activity_analytics(project_activity_source(rows))
+
+    def test_shared_cells_periods_row_limit_and_expansion(self):
+        activity = self.activity()
+        family = activity["project_activity"]
+        first_repo = family["rows"][0]["repository"]
+        initial, nodes, paint = self.hydrate(activity)
+        cells = [attrs for _, attrs in nodes if attrs.get("data-role") == "project-activity-cell" and "data-ref" not in attrs]
+        self.assertEqual(8 * 14, len(cells))
+        self.assertFalse(any(attrs.get("data-role") == "project-activity-branch" for _, attrs in nodes))
+        self.assertEqual(family["dates"][-14:], [cell["data-date"] for cell in cells[:14]])
+        self.assertEqual(["14"], [attrs["data-project-period"] for _, attrs in nodes if attrs.get("aria-pressed") == "true"])
+        self.assertIn("Show all 9 repositories", paint)
+        today = [cell for cell in cells if cell["data-date"] == family["dates"][-1]]
+        self.assertTrue(all("data-count" not in cell and "data-level" not in cell and cell["data-complete"] == "false" for cell in today))
+        self.assertTrue(all("UTC" in cell["aria-label"] and "tabindex" not in cell for cell in cells))
+        expanded, full, _ = self.hydrate(activity, days=30, show_all=True, expanded=[first_repo])
+        full_cells = [attrs for _, attrs in full if attrs.get("data-role") == "project-activity-cell" and "data-ref" not in attrs]
+        self.assertEqual(9 * 30, len(full_cells))
+        self.assertEqual(["true"], [attrs["aria-expanded"] for _, attrs in full if attrs.get("data-project-branch-toggle") == "0"])
+        self.assertEqual(1, sum(attrs.get("class") == "project-activity-scroll" for _, attrs in full))
+        legend = lambda html: re.search(r'(<div class="project-activity-legend".*?</div><p class="project-activity-qualification">)', html, re.S).group(1)
+        self.assertEqual(legend(initial), legend(expanded))
+        expected = {(row["repository"], day["date"]): day for row in family["rows"] for day in row["daily"]}
+        for cell in full_cells:
+            source = expected[cell["data-repository"], cell["data-date"]]
+            self.assertEqual(None if source["count"] is None else str(source["count"]), cell.get("data-count"))
+            self.assertEqual(None if source["level"] is None else str(source["level"]), cell.get("data-level"))
+
+    def test_unavailable_and_escaped_metadata_keep_readonly_semantics(self):
+        for malformed in ({}, {"project_activity": {"schema": "malformed", "dates": {}}},
+                          {"project_activity": {"schema": "profile-project-activity/v1", "dates": ["2026-02-30"] * 30}}):
+            _, nodes, paint = self.hydrate(malformed)
+            self.assertIn("Project activity unavailable", paint)
+            self.assertIn("No positive push counts to scale", paint)
+            self.assertFalse(any(attrs.get("data-role") == "project-activity-cell" for _, attrs in nodes))
+            self.assertTrue(any(attrs.get("id") == "project-activity-matrix" for _, attrs in nodes))
+        activity = self.activity(1)
+        row = activity["project_activity"]["rows"][0]
+        row["repository"] = 'owner/<img src=x onerror="broken">'
+        row["branches"][0]["ref"] = 'refs/heads/<script>alert("branch")</script>'
+        _, nodes, paint = self.hydrate(activity, expanded=[row["repository"]])
+        self.assertFalse(any(tag in {"img", "script"} for tag, _ in nodes))
+        self.assertIn(row["repository"], paint)
+        self.assertTrue(any(attrs.get("role") == "table" for _, attrs in nodes))
+        self.assertTrue(any(attrs.get("data-role") == "project-activity-cell" and row["repository"] in attrs["aria-label"] for _, attrs in nodes))
+
+    def test_sparse_branch_expansion_preserves_supplied_daily_coverage(self):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        from tests.pipeline.test_compute_metrics_accuracy import (
+            project_activity_envelope, project_activity_event, project_activity_source,
+        )
+
+        for complete in (True, False):
+            with self.subTest(complete=complete):
+                source = project_activity_source([project_activity_envelope("branch-days", [
+                    project_activity_event("feature-day", repository="branch-days", branch="feature/days"),
+                    project_activity_event("main-day", repository="branch-days", when="2026-09-20T11:00:00Z"),
+                ], complete=complete)])
+                activity = build_activity_analytics(source)
+                family = activity["project_activity"]
+                row = family["rows"][0]
+                self.assertEqual(2, sum(len(branch["daily"]) for branch in row["branches"]))
+                defaults = {day["date"]: day for day in row["branch_empty_daily"]}
+                expected = {(branch["ref"], date): {**defaults, **{day["date"]: day for day in branch["daily"]}}[date]
+                            for branch in row["branches"] for date in family["dates"]}
+                _, nodes, _ = self.hydrate(activity, days=30, expanded=[row["repository"]])
+                cells = [attrs for _, attrs in nodes if attrs.get("data-role") == "project-activity-cell" and "data-ref" in attrs]
+                self.assertEqual(60, len(cells))
+                for cell in cells:
+                    day = expected[cell["data-ref"], cell["data-date"]]
+                    self.assertEqual(None if day["count"] is None else str(day["count"]), cell.get("data-count"))
+                    self.assertEqual(None if day["level"] is None else str(day["level"]), cell.get("data-level"))
+                    self.assertEqual(str(day["complete"]).lower(), cell["data-complete"])
+
+    def test_missing_or_malformed_branch_defaults_never_create_zero(self):
+        import copy
+
+        original = self.activity(1)
+        quiet_date = "2026-10-09"
+        malformed = (None, {}, [], [{"date": quiet_date, "count": 0}],
+                     [{"date": quiet_date, "count": 0, "complete": False, "level": 0}],
+                     [{"date": quiet_date, "count": 0, "complete": True, "level": 2}],
+                     [{"date": quiet_date, "count": 7, "complete": True, "level": 1}])
+        for defaults in malformed:
+            with self.subTest(defaults=defaults):
+                activity = copy.deepcopy(original)
+                row = activity["project_activity"]["rows"][0]
+                self.assertTrue(row["complete"])
+                row["branch_empty_daily"] = defaults
+                _, nodes, _ = self.hydrate(activity, days=30, expanded=[row["repository"]])
+                cells = [attrs for _, attrs in nodes if attrs.get("data-role") == "project-activity-cell" and "data-ref" in attrs]
+                quiet = [cell for cell in cells if cell["data-date"] == quiet_date]
+                self.assertEqual(2, len(quiet))
+                self.assertTrue(all("data-count" not in cell and "data-level" not in cell and cell["data-complete"] == "false" for cell in quiet))
+                positive = [cell for cell in cells if cell.get("data-count") == "1"]
+                self.assertEqual(2, len(positive), "Malformed defaults must retain positive branch overrides")
+
+    def test_component_palette_and_neighbor_default_are_independent(self):
+        import copy
+        import xml.etree.ElementTree as ET
+        from scripts.core.config import PROJECT_ACTIVITY_COLORS
+        from scripts.pipeline.web_render import render_dashboard
+        from scripts.rendering.design_tokens import emit_project_activity_css
+        css = emit_project_activity_css()
+        self.assertTrue(css.startswith(".project-activity {"))
+        self.assertNotIn(":root", css)
+        for level, color in PROJECT_ACTIVITY_COLORS.items():
+            self.assertIn(f"--project-activity-{level}: {color};", css)
+        html = render_dashboard()
+        self.assertIn(css, html)
+        self.assertLess(html.index('id="activity-code"'), html.index('id="project-activity"'))
+        self.assertLess(html.index('id="project-activity"'), html.index('id="activity-pushes"'))
+        helper = CodeChangeHydrationTests()
+        baseline = helper.activity()
+        changed = copy.deepcopy(baseline)
+        changed["overall_code_changes"] = {"schema": "profile-owned-code-analytics/v1", "status": "unavailable"}
+        changed["project_activity"] = self.activity(1)["project_activity"]
+        self.assertEqual(ET.tostring(helper.hydrate(baseline)), ET.tostring(helper.hydrate(changed)))
+
+
 class OwnedCodeActivityWebsiteTests(unittest.TestCase):
     """The interactive and static windows are presentations of shared facts."""
 
-    hydrate = CodeChangeHydrationTests.hydrate
+    def hydrate(self, activity, period=None):
+        return CodeChangeHydrationTests.hydrate(self, activity, period, code_view="owned_annual")
     bars = staticmethod(CodeChangeHydrationTests.bars)
 
     def test_default_recent_and_selected_year_use_distinct_shared_totals(self):
