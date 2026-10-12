@@ -271,12 +271,15 @@ push counts, not commits, contributions, or lines changed. The website starts wi
 expansion, and full received-repository view preserve the same order and counts.
 Phone labels sit above their grids; the 30-day grid scrolls within the panel.
 
-Rounded square cells use one sequential palette with finite numeric legend ranges
+Small circular dots use one sequential palette with finite numeric legend ranges
 calibrated from positive repository/day counts across the entire received 30-day
 window. That scale is shared across repositories, branches, periods, and both README
-SVG sizes. A confirmed past-day zero has a distinct solid cell; unknown activity is
-unfilled, and incomplete positive counts have dashed outlines and lower-bound text.
-Today remains in progress. Coverage text identifies the bounded received cohort.
+SVG sizes. A compact numeric legend underneath shows low-to-high intensity, zero,
+unknown, and the dashed partial-observation key. A confirmed past-day zero has a
+distinct solid dot; unknown activity is unfilled, and incomplete positive counts
+have dashed outlines. Short context identifies the UTC period, current partial day,
+and incomplete data. Full meaning, coverage qualification, cutoff, and lower-bound
+descriptions remain in the website's closed details and the SVG descriptions/titles.
 
 The static README panels show the same first eight repositories and fourteen dates
 with branches collapsed. An ordinary **Project activity details** link after the

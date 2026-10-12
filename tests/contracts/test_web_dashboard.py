@@ -655,13 +655,79 @@ process.stdout.write(JSON.stringify({html:nodes['activity-project'].innerHTML, c
         self.assertEqual(9 * 30, len(full_cells))
         self.assertEqual(["true"], [attrs["aria-expanded"] for _, attrs in full if attrs.get("data-project-branch-toggle") == "0"])
         self.assertEqual(1, sum(attrs.get("class") == "project-activity-scroll" for _, attrs in full))
-        legend = lambda html: re.search(r'(<div class="project-activity-legend".*?</div><p class="project-activity-qualification">)', html, re.S).group(1)
+        # Compare the shared key itself, independently of explanatory copy placement.
+        def legend(html):
+            from html.parser import HTMLParser
+            class Key(HTMLParser):
+                def __init__(self):
+                    super().__init__()
+                    self.depth = 0
+                    self.values = []
+                def handle_starttag(self, tag, attrs):
+                    attrs = dict(attrs)
+                    if self.depth or attrs.get("data-role") == "project-activity-legend":
+                        self.depth += 1
+                        if "data-level" in attrs:
+                            self.values.append(("level", attrs["data-level"]))
+                def handle_endtag(self, tag):
+                    if self.depth:
+                        self.depth -= 1
+                def handle_data(self, value):
+                    if self.depth and value.strip():
+                        self.values.append(("text", value.strip()))
+            parser = Key()
+            parser.feed(html)
+            return parser.values
         self.assertEqual(legend(initial), legend(expanded))
         expected = {(row["repository"], day["date"]): day for row in family["rows"] for day in row["daily"]}
         for cell in full_cells:
             source = expected[cell["data-repository"], cell["data-date"]]
             self.assertEqual(None if source["count"] is None else str(source["count"]), cell.get("data-count"))
             self.assertEqual(None if source["level"] is None else str(source["level"]), cell.get("data-level"))
+
+    def test_compact_activity_copy_preserves_full_detail_and_shared_legend(self):
+        """The default view stays concise while full observations remain reachable."""
+        from html.parser import HTMLParser
+        activity = self.activity()
+        family = activity["project_activity"]
+        html, _, _ = self.hydrate(activity)
+        class Copy(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.stack = []
+                self.context, self.details, self.key = [], [], []
+            def handle_starttag(self, tag, attrs):
+                self.stack.append((tag, dict(attrs)))
+            def handle_endtag(self, tag):
+                if self.stack:
+                    self.stack.pop()
+            def handle_data(self, value):
+                value = value.strip()
+                if not value:
+                    return
+                if any(tag == "details" for tag, _ in self.stack):
+                    self.details.append(value)
+                elif any(attrs.get("data-role") == "project-activity-legend" for _, attrs in self.stack):
+                    self.key.append(value)
+                elif not any(tag in ("button", "h2") or attrs.get("role") == "table" for tag, attrs in self.stack):
+                    self.context.append(value)
+        parser = Copy()
+        parser.feed(html)
+        problems = []
+        details = " ".join(parser.details)
+        for field in ("meaning", "qualification", "observed_at"):
+            if family[field] not in details:
+                problems.append("Full details are missing " + field)
+        context = " ".join(parser.context)
+        if len(parser.context) != 1 or len([word for word in context.split() if any(char.isalnum() for char in word)]) > 14:
+            problems.append("Visible context is not one short block")
+        key = " ".join(parser.key)
+        for band in family["scale"]["bands"]:
+            label = str(band["lower"]) if band["lower"] == band["upper"] else f'{band["lower"]}–{band["upper"]}'
+            self.assertIn(label, key)
+        if "Pushes/day · low → high" not in key or "Dashed: partial" not in key:
+            problems.append("Compact numeric key lacks its unit or partial cue")
+        self.assertEqual([], problems)
 
     def test_unavailable_and_escaped_metadata_keep_readonly_semantics(self):
         for malformed in ({}, {"project_activity": {"schema": "malformed", "dates": {}}},
