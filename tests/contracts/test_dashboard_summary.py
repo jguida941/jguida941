@@ -17,7 +17,7 @@ class DashboardSummaryTests(unittest.TestCase):
             root=ET.fromstring(render_svg({},mobile=mobile))
             self.assertEqual(root.get("width"),width)
             sections=[node.get("data-section") for node in root.iter() if node.get("data-section")]
-            self.assertEqual(sections,["overview","weekly","rhythm","languages","automation","working","focus","projects","metrics","calendar"])
+            self.assertEqual(sections,["overview","weekly","rhythm","languages","automation","working","focus","recent-pushes","projects","metrics","calendar"])
             self.assertIn("Contribution calendar unavailable", " ".join(root.itertext()))
             self.assertFalse(any(node.tag.endswith("filter") for node in root.iter()))
 
@@ -267,7 +267,8 @@ class CodeChangeSvgTests(unittest.TestCase):
             tree=ET.fromstring(render_svg(summary,mobile=mobile))
             sections=[n.get('data-section') for n in tree.iter() if n.get('data-section')]
             self.assertEqual(sections.index('focus')+1,sections.index('code-changes'))
-            self.assertEqual(sections.index('code-changes')+1,sections.index('projects'))
+            self.assertEqual(sections.index('code-changes')+1,sections.index('recent-pushes'))
+            self.assertEqual(sections.index('recent-pushes')+1,sections.index('projects'))
             bars=[n for n in tree.iter() if n.get('data-role')=='code-change-bar']
             self.assertEqual(4,len(bars))
             import math
@@ -404,9 +405,10 @@ class RecentPushSvgProjectionTests(unittest.TestCase):
     def _paint(*, mobile, working, recent=None):
         from scripts.rendering.generate_dashboard_summary import Canvas, _recent_pushes
         c = Canvas(mobile)
-        payload = {"recent_pushes": recent or {"status": "unavailable", "rows": []}}
-        end = _recent_pushes(c, 34, 40, 292 if mobile else 752, payload, working,
-                            "2026-10-11T21:00:00Z")
+        from scripts.pipeline.push_activity import qualify_recent_pushes
+        source = recent if recent is not None else {"status": "unavailable", "rows": []}
+        payload = {"recent_pushes": qualify_recent_pushes(source, working, "2026-10-11T21:00:00Z")}
+        end = _recent_pushes(c, 34, 40, 292 if mobile else 752, payload)
         root = ET.fromstring("<svg>" + "".join(c.parts) + "</svg>")
         return root, end
 
@@ -469,3 +471,27 @@ class RecentPushSvgProjectionTests(unittest.TestCase):
         root, _ = self._paint(mobile=True, working=rows)
         subjects = [n.get("data-repository") for n in root.iter() if n.get("data-role") == "recent-push-row"]
         self.assertEqual(["owner/valid"], subjects)
+
+
+    def test_known_empty_and_unavailable_are_distinct_in_both_svgs(self):
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                zero, _ = self._paint(
+                    mobile=mobile, working=[],
+                    recent={"status": "ok", "complete": True, "rows": []})
+                text = " ".join(zero.itertext())
+                self.assertIn("Complete observation", text)
+                self.assertIn("No recent pushes observed", text)
+                self.assertNotIn("Recent pushes unavailable", text)
+                unknown, _ = self._paint(
+                    mobile=mobile, working=[],
+                    recent={"status": "partial", "complete": False, "rows": []})
+                unknown_text = " ".join(unknown.itertext())
+                self.assertIn("Recent pushes unavailable", unknown_text)
+                self.assertNotIn("No recent pushes observed", unknown_text)
+                incomplete_ok, _ = self._paint(
+                    mobile=mobile, working=[],
+                    recent={"status": "ok", "complete": False, "rows": []})
+                incomplete_text = " ".join(incomplete_ok.itertext())
+                self.assertIn("Recent pushes unavailable", incomplete_text)
+                self.assertNotIn("No recent pushes observed", incomplete_text)

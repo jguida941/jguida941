@@ -302,6 +302,36 @@ process.stdout.write(JSON.stringify({html: nodes['activity-code'].innerHTML, act
         self.assertIn("−414", paint)
         self.assertNotIn("+11k", paint)
 
+
+    def test_signed_chart_axis_ticks_keep_theme_font_headroom(self):
+        """Mobile and desktop use the same actual SVG geometry, not a mock chart."""
+        for days, peak in ((30, 100000), (365, 100000), (30, 100000000)):
+            with self.subTest(days=days, peak=peak):
+                activity = self.activity(days)
+                last = activity["code_changes"]["daily"][-1]
+                last.update(additions=peak, deletions=peak, complete=True)
+                activity["code_changes"].update(additions=peak, deletions=peak)
+                svg = self.hydrate(activity).find(".//svg")
+                self.assertIsNotNone(svg)
+                self.assertEqual("0 0 640 300", svg.get("viewBox"))
+                ticks = [node for node in svg.iter("text")
+                         if node.get("data-role") == "code-y-tick"]
+                self.assertEqual(5, len(ticks))
+                negative = [node for node in ticks if (node.text or "").startswith("−")]
+                self.assertEqual(2, len(negative))
+                for node in negative:
+                    # 14 units/character is conservative for the existing
+                    # .code-chart text rule, including the minus sign.
+                    self.assertGreaterEqual(
+                        float(node.get("x")) - 14 * len(node.text), 12,
+                        f"signed Y-axis label clips: {node.text}",
+                    )
+                bars = self.bars(self.hydrate(activity))
+                self.assertTrue(bars)
+                self.assertTrue(all(float(b.get("x")) >= 0 and
+                                    float(b.get("x")) + float(b.get("width")) <= 632
+                                    for b in bars))
+
     def test_complete_zero_and_unavailable_remain_distinct(self):
         activity = self.activity()
         activity["current_day_partial"] = False
@@ -331,7 +361,11 @@ class P024RecentPushWebsiteTests(unittest.TestCase):
     """Ordinary public-side guards; native method evidence remains separate."""
 
     @staticmethod
-    def _hydrate(activity, working=None):
+    def _hydrate(activity, working=None, generated_at="2026-10-11T21:00:00Z"):
+        if working is not None:
+            from scripts.pipeline.push_activity import qualify_recent_pushes
+            activity = {**activity, "recent_pushes": qualify_recent_pushes(
+                activity.get("recent_pushes"), working, generated_at)}
         import json
         import subprocess
         from scripts.pipeline.web_render import render_dashboard
@@ -348,7 +382,7 @@ const context = {
   URLSearchParams, addEventListener() {}, requestAnimationFrame() {}, fetch() {return idle;},
   activity: input.activity,
 };
-vm.runInNewContext(input.script + "\nhydrateRecentPushes(activity, input.working);", context, {timeout: 5000});
+vm.runInNewContext(input.script + "\nhydrateRecentPushes(activity);", context, {timeout: 5000});
 process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, activity: context.activity}));
 '''
         result = subprocess.run(["node", "-e", harness],
@@ -365,7 +399,7 @@ process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, a
         self.assertIn('id="activity-pushes"', html)
         self.assertLess(html.index('id="activity-code"'), html.index('id="activity-pushes"'))
         self.assertLess(html.index('id="activity-pushes"'), html.index('id="projects"'))
-        self.assertIn("hydrateRecentPushes(d.activity_analytics, d.dashboard_summary?.working, d.generated_at)", html)
+        self.assertIn("hydrateRecentPushes(d.activity_analytics)", html)
         self.assertIn("Workflow configuration", html)
 
     def test_mobile_recent_push_layout_and_axis_size_are_independent(self):
@@ -470,6 +504,49 @@ process.stdout.write(JSON.stringify({html: nodes["activity-pushes"].innerHTML, a
         self.assertNotIn("<svg", html)
         self.assertNotIn("javascript:", html)
         self.assertNotIn("href=\"https://github.com/owner/<", html)
+
+    def test_cutoff_alias_and_valid_control_match_shared_model(self):
+        state = {"recent_pushes": {"status": "unavailable", "rows": []}}
+        hints = [
+            {"name": "repo", "url": "https://github.com/owner/repo", "pushed_at": "2026-10-11T18:00:00Z"},
+            {"name": "repo", "url": "https://github.com/OWNER/repo", "pushed_at": "2026-10-11T20:00:00Z"},
+            {"name": "future", "url": "https://github.com/owner/future", "pushed_at": "2099-01-01T20:00:00Z"},
+            {"name": "naive", "url": "https://github.com/owner/naive", "pushed_at": "2026-10-11T20:00:00"},
+        ]
+        good = self._hydrate(state, hints)
+        self.assertEqual(1, good.count('class="recent-push-item"'))
+        self.assertIn("OWNER/repo", good)
+        self.assertNotIn("owner/future", good)
+        self.assertNotIn("owner/naive", good)
+        for cutoff in (None, "invalid"):
+            with self.subTest(cutoff=cutoff):
+                denied = self._hydrate(state, hints, generated_at=cutoff)
+                self.assertIn("Recent pushes unavailable", denied)
+                self.assertNotIn("OWNER/repo", denied)
+
+    def test_known_empty_is_not_mislabeled_unavailable(self):
+        known = self._hydrate({"recent_pushes": {"status": "ok", "complete": True, "rows": []}},
+                              working=[])
+        self.assertIn("Complete observation", known)
+        self.assertIn("No recent pushes observed", known)
+        self.assertNotIn("Recent pushes unavailable", known)
+        partial = self._hydrate({"recent_pushes": {"status": "partial", "complete": False, "rows": []}},
+                                working=[])
+        self.assertIn("Recent pushes unavailable", partial)
+        self.assertNotIn("No recent pushes observed", partial)
+        incomplete_ok = self._hydrate(
+            {"recent_pushes": {"status": "ok", "complete": False, "rows": []}}, working=[])
+        self.assertIn("Recent pushes unavailable", incomplete_ok)
+        self.assertNotIn("No recent pushes observed", incomplete_ok)
+
+    def test_rejected_raw_row_cannot_masquerade_as_complete_zero(self):
+        raw = {"status": "ok", "complete": True, "rows": [
+            {"repository": "owner/<img>", "activity_type": "repository_metadata",
+             "metadata_only": True, "timestamp": "2026-10-11T20:00:00Z"}]}
+        html = self._hydrate({"recent_pushes": raw})
+        self.assertIn("Recent pushes unavailable", html)
+        self.assertNotIn("No recent pushes observed", html)
+        self.assertNotIn("<img>", html)
 
 
 if __name__ == "__main__":

@@ -71,9 +71,13 @@ def select_recent_pushes(rows: Any, *, observed_at: str, coverage_complete: bool
             event = _safe_event(raw, expected_repo=repository, observed_at=now)
             if event is None:
                 continue
-            key = (event["timestamp"], event["id"], event["ref"], event["after"])
-            if repository not in latest or key > latest[repository][0]:
-                latest[repository] = (key, event)
+            # GitHub repository identity is case-insensitive; choose newest
+            # event before limiting the panel to three distinct repositories.
+            identity = repository.casefold()
+            key = (event["timestamp"], event["id"], event["ref"], event["after"],
+                   event["repository"])
+            if identity not in latest or key > latest[identity][0]:
+                latest[identity] = (key, event)
     selected = sorted((item[1] for item in latest.values()),
                       key=lambda row: (row["timestamp"], row["id"], row["repository"]), reverse=True)[:3]
     return {"status": "ok" if not coverage_gap else "partial", "complete": not coverage_gap,
@@ -129,12 +133,12 @@ def present_recent_pushes(raw: Any) -> dict:
         if type(event) is not dict:
             continue
         repo = event.get("repository")
-        if type(repo) is not str or not _REPO.fullmatch(repo) or ".." in repo or repo in identities:
+        if type(repo) is not str or not _REPO.fullmatch(repo) or ".." in repo or repo.casefold() in identities:
             continue
         checked = _safe_event(event, expected_repo=repo, observed_at=now)
         if checked is None:
             continue
-        identities.add(repo)
+        identities.add(repo.casefold())
         diff = event.get("diff") if type(event.get("diff")) is dict else {}
         status = diff.get("status")
         commits = diff.get("commits")
@@ -152,6 +156,58 @@ def present_recent_pushes(raw: Any) -> dict:
         checked.pop("before")  # Not necessary for the public display; compare URL binds it.
         rows.append(checked)
     rows.sort(key=lambda row: (row["timestamp"], row["id"], row["repository"]), reverse=True)
-    complete = raw.get("complete") is True and raw.get("status") == "ok"
+    # Completeness is a claim about the published selection, not merely the
+    # caller's declared input. Rejecting/truncating a row loses that claim.
+    complete = (raw.get("complete") is True and raw.get("status") == "ok"
+                and len(rows) == len(raw["rows"]))
     return {"status": "ok" if complete else "partial", "complete": complete, "rows": rows,
             "meaning": "Latest observed push per repository; tree-diff values require verified before/after fast-forward compare"}
+
+_GITHUB_REPO_URL = re.compile(
+    r"https://github\.com/([A-Za-z0-9][A-Za-z0-9-]{0,38})/([A-Za-z0-9_.-]{1,100})\Z"
+)
+
+
+def qualify_recent_pushes(recent: Any, working: Any, generated_at: Any) -> dict:
+    """Prefer observed push events; otherwise qualify seven-day metadata hints once.
+
+    Metadata cannot prove global top-three, branch/commit identity, or line totals.
+    """
+    if type(recent) is dict and type(recent.get("rows")) is list and recent["rows"]:
+        return recent
+    as_of = _timestamp(generated_at)
+    if as_of is None:
+        return {"status": "unavailable", "complete": False,
+                "reason": "metadata_cutoff_unavailable", "rows": []}
+    chosen = {}
+    for item in working if type(working) is list else []:
+        if type(item) is not dict:
+            continue
+        name, url, pushed_at = (item.get("name"), item.get("html_url", item.get("url")),
+                                item.get("pushed_at"))
+        if type(name) is not str or type(url) is not str:
+            continue
+        match = _GITHUB_REPO_URL.fullmatch(url)
+        if match is None or match[2] != name or name in {".", ".."}:
+            continue
+        when = _timestamp(pushed_at)
+        if when is None or when > as_of:
+            continue
+        repo = match[1] + "/" + match[2]
+        identity = repo.casefold()
+        if identity not in chosen or when > chosen[identity][0]:
+            chosen[identity] = (when, repo)
+    ranked = sorted(chosen.values(), key=lambda pair: (-pair[0].timestamp(),
+                                                     pair[1].casefold(), pair[1]))[:3]
+    rows = [{"repository": repo, "timestamp": when.isoformat().replace("+00:00", "Z"),
+             "activity_type": "repository_metadata", "metadata_only": True}
+            for when, repo in ranked]
+    # A complete empty event observation without qualified metadata is known
+    # zero; the absence of an observation is not the same state.
+    if (not rows and type(recent) is dict and recent.get("status") == "ok"
+            and recent.get("complete") is True and recent.get("rows") == []):
+        return recent
+    return {"status": "partial" if rows else "unavailable", "complete": False,
+            "reason": "repository_metadata_only_seven_day_cohort" if rows else "metadata_not_observed",
+            "rows": rows,
+            "meaning": "Reported repository push dates only; branch, commits and change totals unverified"}

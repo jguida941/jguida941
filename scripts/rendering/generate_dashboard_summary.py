@@ -329,53 +329,21 @@ def _code_changes_desktop(c, x, y, span, data):
     return legend_y+8
 
 
-def _recent_pushes(c, x, y, span, data, working=None, generated_at=None):
-    """Shared qualified push facts, but independent mobile/desktop composition."""
+def _recent_pushes(c, x, y, span, data):
+    """Render shared qualified push rows, with SVG-specific responsive layout."""
     payload = data.get("recent_pushes") if isinstance(data, dict) else None
     payload = payload if isinstance(payload, dict) else {}
     rows = payload.get("rows") or []
     if not isinstance(rows, list):
         rows = []
-    # Reuse the dashboard's observed repository metadata when the separate
-    # push-event route has no rows. Do not fabricate branch, commit or line stats.
-    reported = False
-    if not rows:
-        candidates, seen = [], set()
-        try:
-            as_of = datetime.fromisoformat(str(generated_at).replace("Z", "+00:00"))
-            if as_of.tzinfo is None:
-                as_of = None
-        except (TypeError, ValueError):
-            as_of = None
-        for item in working if isinstance(working, list) else []:
-            if not isinstance(item, dict):
-                continue
-            name, url, pushed_at = (item.get(key) for key in ("name", "url", "pushed_at"))
-            if not all(isinstance(v, str) for v in (name, url, pushed_at)):
-                continue
-            if not url.startswith("https://github.com/"):
-                continue
-            fullname = url.removeprefix("https://github.com/")
-            parts = fullname.split("/")
-            if (len(parts) != 2 or parts[1] != name or name in {".", ".."}
-                    or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}", parts[0])
-                    or not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}", name)
-                    or fullname.casefold() in seen):
-                continue
-            try:
-                when = datetime.fromisoformat(pushed_at.replace("Z", "+00:00"))
-            except ValueError:
-                continue
-            if when.tzinfo is None or (as_of is not None and when > as_of):
-                continue
-            seen.add(fullname.casefold())
-            candidates.append((when, fullname, pushed_at))
-        candidates.sort(key=lambda entry: (-entry[0].timestamp(), entry[1].casefold(), entry[1]))
-        rows = [{"repository": repo, "timestamp": pushed, "metadata_only": True,
-                 "activity_type": "repository_metadata"} for _, repo, pushed in candidates[:3]]
-        reported = bool(rows)
+    reported = bool(rows) and rows[0].get("metadata_only") is True
     state = payload.get("status", "unavailable")
-    if reported:
+    known_empty = (not rows and state == "ok" and payload.get("complete") is True
+                   and payload.get("rows") == [])
+    if known_empty:
+        y = c.wrap("Complete observation · no recent push events",
+                   x, y, span, size=c.secondary, color="muted") + 6
+    elif reported:
         y = c.wrap("Reported repository push dates · branches and commits unverified",
                    x, y, span, size=c.secondary, color="muted") + 6
     elif state != "ok":
@@ -385,7 +353,8 @@ def _recent_pushes(c, x, y, span, data, working=None, generated_at=None):
         y = c.wrap("Latest observed push per repository · UTC",
                    x, y, span, size=c.secondary, color="muted") + 6
     if not rows:
-        return c.wrap("Recent pushes unavailable", x, y+10, span, color="muted")
+        caption = "No recent pushes observed" if known_empty else "Recent pushes unavailable"
+        return c.wrap(caption, x, y+10, span, color="muted")
 
     cols = 1 if c.mobile else 3
     gutter = 12
@@ -680,8 +649,7 @@ def render_svg(summary, *, mobile=False, generation=None):
         paint_code = _code_changes if mobile else _code_changes_desktop
         y = c.panel("code-changes", "Code changes", y, lambda x, yy, span: paint_code(c, x, yy, span, analytics))
     y = c.panel("recent-pushes", "Recent repository pushes", y,
-                lambda x, yy, span: _recent_pushes(c, x, yy, span, analytics or {},
-                                                   summary.get("working"), summary.get("generated_at")))
+                lambda x, yy, span: _recent_pushes(c, x, yy, span, analytics or {}))
 
     def projects(x,yy,span):
         rows = summary.get("projects") or []

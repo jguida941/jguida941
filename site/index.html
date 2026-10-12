@@ -584,12 +584,20 @@ footer a { color: var(--ink); text-decoration: none; }
         buckets.push(bucket);
       }
       const maximum=Math.max(1,...buckets.flatMap(d=>[d.additions||0,d.deletions||0]));
-      const cap=10**Math.ceil(Math.log10(maximum)), halfHeight=116, zero=132, left=64, right=632;
-      const magnitude=v=>halfHeight*Math.log1p(v)/Math.log1p(cap);
+      const cap=10**Math.ceil(Math.log10(maximum)), halfHeight=116, zero=132, right=632;
       const middle=10**Math.floor(Math.log10(cap)/2), ticks=[...new Set([-cap,-middle,0,middle,cap])];
+      const tickLabel=v=>{
+        const value=Math.abs(v);
+        return (v<0?"−":"")+(value>=1000?`${value/1000}k`:value);
+      };
+      // The 14px theme font needs room for the longest signed Y-axis tick.
+      // Reserve the same chart-scale inset on phone and desktop without dropping the minus sign.
+      const longestTick=Math.max(...ticks.map(v=>tickLabel(v).length));
+      const left=Math.min(right-160, Math.max(64, 24+14*longestTick));
+      const magnitude=v=>halfHeight*Math.log1p(v)/Math.log1p(cap);
       let guides=ticks.map(v=>{
-        const y=zero-Math.sign(v)*magnitude(Math.abs(v)), value=Math.abs(v), label=(v<0?"−":"")+(value>=1000?`${value/1000}k`:value);
-        return `<line x1="${left}" y1="${y}" x2="${right}" y2="${y}" stroke="currentColor" stroke-opacity="${v===0?.65:.2}"/><text x="${left-8}" y="${y+5}" text-anchor="end">${label}</text>`;
+        const y=zero-Math.sign(v)*magnitude(Math.abs(v)), label=tickLabel(v);
+        return `<line x1="${left}" y1="${y}" x2="${right}" y2="${y}" stroke="currentColor" stroke-opacity="${v===0?.65:.2}"/><text data-role="code-y-tick" x="${left-8}" y="${y+5}" text-anchor="end">${label}</text>`;
       }).join("");
       const step=(right-left)/Math.max(1,buckets.length), width=Math.min(18,step*.7);
       let bars=''; buckets.forEach((d,i)=>{
@@ -615,7 +623,7 @@ footer a { color: var(--ink); text-decoration: none; }
   }
 
 
-  function hydrateRecentPushes(a, working, generatedAt) {
+  function hydrateRecentPushes(a) {
     const state = a && a.recent_pushes || {};
     const rows = Array.isArray(state.rows) ? state.rows : [];
     const validRepo = value => {
@@ -627,49 +635,38 @@ footer a { color: var(--ink); text-decoration: none; }
     const validSha = value => typeof value === "string" && /^[0-9a-f]{40}$/.test(value);
     const seen = new Set();
     const items = rows.filter(row => {
-      if (!row || !validRepo(row.repository) || !validSha(row.after) || seen.has(row.repository)) return false;
-      seen.add(row.repository);
+      if (!row || !validRepo(row.repository) || seen.has(row.repository.toLowerCase())) return false;
+      if (row.metadata_only === true) {
+        if (row.activity_type !== "repository_metadata" || typeof row.timestamp !== "string") return false;
+      } else if (!validSha(row.after)) return false;
+      seen.add(row.repository.toLowerCase());
       return true;
     }).slice(0, 3);
-    const fallback = Array.isArray(working) ? working : [];
-    const asOf = typeof generatedAt === "string" ? Date.parse(generatedAt) : NaN;
-    const reported = [];
-    const reportedSeen = new Set();
-    for (const item of fallback) {
-      if (!item || typeof item.name !== "string" || typeof item.url !== "string" ||
-          typeof item.pushed_at !== "string") continue;
-      const match = /^https:\/\/github\.com\/([A-Za-z0-9][A-Za-z0-9-]{0,38})\/([A-Za-z0-9_.-]{1,100})$/.exec(item.url);
-      if (!match || match[2] !== item.name || match[2] === "." || match[2] === "..") continue;
-      const when = Date.parse(item.pushed_at);
-      if (!Number.isFinite(when) || (Number.isFinite(asOf) && when > asOf)) continue;
-      if (reportedSeen.has(item.url)) continue;
-      reportedSeen.add(item.url);
-      reported.push({url: item.url, name: match[1]+"/"+match[2], pushed_at: item.pushed_at, when});
-    }
-    reported.sort((left, right) => right.when-left.when ||
-      (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
     let html = '<div class="code-heading"><h2 class="title">Recent repository pushes</h2></div>';
-    html += items.length ? '<p class="section-meta">Latest observed push per repository · not an all-branch total</p>' :
+    const knownEmpty = Array.isArray(state.rows) && state.rows.length === 0 &&
+      state.status === "ok" && state.complete === true;
+    html += knownEmpty ? '<p class="section-meta">Complete observation · no recent push events</p>' :
+      items.length && items[0].metadata_only !== true ? '<p class="section-meta">Latest observed push per repository · not an all-branch total</p>' :
       '<p class="section-meta">Reported repository push dates · branches and commits unverified</p>';
     if (state.status !== "ok" || state.complete !== true) {
       html += '<p class="section-meta">Observation incomplete · exact global ranking not guaranteed</p>';
     }
-    if (!items.length && reported.length) {
-      html += '<div class="recent-push-list">';
-      for (const row of reported.slice(0, 3)) {
-        html += '<article class="recent-push-item" data-repository="' + esc(row.name) + '">';
-        html += '<p class="recent-push-name"><a href="' + row.url + '">' + esc(row.name) + '</a></p>';
-        html += '<p class="recent-push-meta">Repository pushed · ' + esc(row.pushed_at.slice(0,16).replace("T"," ") + " UTC") + '</p>';
-        html += '<p class="recent-push-meta">Branch and push commits not verified</p>';
-        html += '<p class="recent-push-meta">Change totals unavailable</p>';
-        html += '</article>';
-      }
-      html += '</div>';
-    } else if (!items.length) {
-      html += '<p>Recent pushes unavailable</p>';
+    if (!items.length) {
+      html += knownEmpty ? '<p>No recent pushes observed</p>' : '<p>Recent pushes unavailable</p>';
     } else {
       html += '<div class="recent-push-list">';
       for (const row of items) {
+        if (row.metadata_only === true) {
+          const name = row.repository, repoURL = "https://github.com/" + name;
+          const timestamp = row.timestamp.slice(0, 16).replace("T", " ") + " UTC";
+          html += '<article class="recent-push-item" data-repository="' + esc(name) + '">';
+          html += '<p class="recent-push-name"><a href="' + repoURL + '">' + esc(name) + '</a></p>';
+          html += '<p class="recent-push-meta">Repository pushed · ' + esc(timestamp) + '</p>';
+          html += '<p class="recent-push-meta">Branch and push commits not verified</p>';
+          html += '<p class="recent-push-meta">Change totals unavailable</p>';
+          html += '</article>';
+          continue;
+        }
         const name = row.repository, repoURL = "https://github.com/" + name;
         const ref = typeof row.ref === "string" && row.ref.startsWith("refs/heads/") ? row.ref.slice(11) : "branch unavailable";
         const timestamp = typeof row.timestamp === "string" ? row.timestamp.slice(0, 16).replace("T", " ") + " UTC" : "time unavailable";
@@ -705,7 +702,7 @@ footer a { color: var(--ink); text-decoration: none; }
 
   function hydrate(d) {
     hydrateCodeChanges(d.activity_analytics);
-    hydrateRecentPushes(d.activity_analytics, d.dashboard_summary?.working, d.generated_at);
+    hydrateRecentPushes(d.activity_analytics);
     document.querySelectorAll("[data-bind]").forEach(el => {
       let v = get(d, el.getAttribute("data-bind"));
       if (v == null) return;

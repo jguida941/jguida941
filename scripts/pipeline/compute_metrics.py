@@ -2187,6 +2187,9 @@ def compute_profile_model(
     }
     from scripts.pipeline.activity_analytics import build_activity_analytics
     activity_analytics = build_activity_analytics(collected.activity_observations)
+    from scripts.pipeline.push_activity import qualify_recent_pushes
+    activity_analytics["recent_pushes"] = qualify_recent_pushes(
+        activity_analytics.get("recent_pushes"), recent_repos, dashboard_data.get("generated_at"))
     model["activity_analytics"] = activity_analytics
     model["dashboard_data"]["activity_analytics"] = activity_analytics
     from scripts.contracts.dashboard_summary import build_dashboard_summary
