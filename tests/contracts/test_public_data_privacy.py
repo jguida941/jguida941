@@ -838,5 +838,57 @@ class PublicDataPrivacyContract(unittest.TestCase):
         self.assertEqual(payload, _public_dashboard_data(payload))
 
 
+class ProjectActivityPrivacyContract(unittest.TestCase):
+    def test_private_repository_activity_publishes_aggregates_without_raw_events(self):
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+        from tests.pipeline.test_compute_metrics_accuracy import (
+            project_activity_envelope, project_activity_event,
+            project_activity_full_model, project_activity_source,
+        )
+        events = [project_activity_event("opaque-private-observation", repository="private-activity", branch="release/docs"),
+                  project_activity_event("opaque-private-second", repository="private-activity", branch="feature/counts")]
+        for event in events:
+            event.update(actor={"login": "PRIVATE_ACTOR_SENTINEL"}, message="PRIVATE_MESSAGE_SENTINEL",
+                         body="PRIVATE_BODY_SENTINEL", response={"source": "PRIVATE_RESPONSE_SENTINEL"})
+        source = project_activity_source([project_activity_envelope("private-activity", events, private=True)])
+        model = project_activity_full_model(source)
+        family = model["activity_analytics"]["project_activity"]
+        public = _public_dashboard_data(model["dashboard_data"])
+        self.assertEqual(family, public["activity_analytics"]["project_activity"])
+        self.assertEqual(family, public["dashboard_summary"]["activity_analytics"]["project_activity"])
+        row = family["rows"][0]
+        self.assertTrue(row["is_private"])
+        self.assertTrue(row["repository"].endswith("/private-activity"))
+        self.assertEqual(2, row["observed_pushes"])
+        self.assertEqual({"refs/heads/release/docs", "refs/heads/feature/counts"}, {branch["ref"] for branch in row["branches"]})
+        encoded = json.dumps(family)
+        for marker in ("opaque-private-observation", "opaque-private-second", "a" * 40, "b" * 40,
+                       "PRIVATE_ACTOR_SENTINEL", "PRIVATE_MESSAGE_SENTINEL", "PRIVATE_BODY_SENTINEL", "PRIVATE_RESPONSE_SENTINEL"):
+            self.assertNotIn(marker, encoded)
+        def keys(value):
+            if isinstance(value, dict):
+                yield from value
+                for child in value.values():
+                    yield from keys(child)
+            elif isinstance(value, list):
+                for child in value:
+                    yield from keys(child)
+        self.assertTrue(set(keys(family)).isdisjoint({"id", "before", "after", "actor", "message", "body", "response", "source", "events"}))
+
+    def test_existing_recursive_boundary_still_cleans_every_new_family_depth(self):
+        import copy
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+        from tests.pipeline.test_compute_metrics_accuracy import project_activity_source
+        family = build_activity_analytics(project_activity_source())["project_activity"]
+        contaminated = copy.deepcopy(family)
+        contaminated["source"] = "private family body"
+        contaminated["scale"]["raw_source"] = "private scale body"
+        contaminated["rows"][0]["file_contents"] = "private repository body"
+        contaminated["rows"][0]["branches"][0]["credential"] = "private credential"
+        contaminated["rows"][0]["daily"][0]["token_mode"] = "private auth posture"
+        self.assertEqual({"project_activity": family}, _public_dashboard_data({"project_activity": contaminated}))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -11,7 +11,8 @@ import textwrap
 
 from scripts.contracts.dashboard_summary import summary_facts
 from scripts.core.config import (CONTRIB_EMPTY, CONTRIB_RAMP, DASHBOARD_SUMMARY_COLORS,
-                                 DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH, GREEN, RED)
+                                 DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH, GREEN, RED,
+                                 PROJECT_ACTIVITY_COLORS)
 from scripts.rendering.components import donut_gauge
 from scripts.rendering.icons import render as icon
 from scripts.rendering.svg_utils import lang_color, truncate
@@ -410,6 +411,158 @@ def _recent_pushes(c, x, y, span, data):
     return y + (len(rows[:3])*(row_height+10) if c.mobile else row_height) + 6
 
 
+def _project_activity_legend(c, x, y, span, scale):
+    """Paint the shared finite bands without deriving a new display scale."""
+    scale = scale if isinstance(scale, dict) else {}
+    supplied = scale.get("bands")
+    supplied = supplied if isinstance(supplied, list) else []
+    bands = [band for band in supplied if isinstance(band, dict)
+             and type(band.get("lower")) is int and type(band.get("upper")) is int
+             and 1 <= band["lower"] <= band["upper"]
+             and type(band.get("level")) is int and 1 <= band["level"] <= 4]
+    if len(bands) != len(supplied) or len(bands) > 4:
+        bands = []
+    c.group(data_role="project-activity-legend")
+    y = c.wrap("Observed pushes/day · low → high", x, y, span, size=c.secondary, color="muted") + 7
+    if bands:
+        slot = min(104, span / len(bands))
+        for index, band in enumerate(bands):
+            center = x + slot * (index + .5)
+            c.rect(center-8, y, 16, 16, radius=3, fill=PROJECT_ACTIVITY_COLORS[band["level"]],
+                   stroke=COLORS["line"], data_level=band["level"],
+                   data_lower=band["lower"], data_upper=band["upper"])
+            label = str(band["lower"]) if band["lower"] == band["upper"] else f'{band["lower"]}–{band["upper"]}'
+            c.text(label, center, y+36, size=c.secondary, color="muted", anchor="middle")
+        y += 59
+    else:
+        y = c.wrap("No positive push counts to scale", x, y, span, size=c.secondary, color="muted") + 12
+    for index, (level, label) in enumerate(((0, "0 · complete"), (None, "Unknown"))):
+        left = x + index * min(174, span/2)
+        c.rect(left, y-12, 16, 16, radius=3,
+               fill=PROJECT_ACTIVITY_COLORS[0] if level == 0 else "none",
+               stroke=COLORS["line"], stroke_dasharray=None if level == 0 else "2 2",
+               data_level=level)
+        c.text(label, left+24, y+1, size=c.secondary, color="muted")
+    y += 29
+    if scale.get("lower_bounds_included") is True:
+        y = c.wrap("Scale includes observed lower bounds", x, y, span, size=c.secondary, color="muted")
+    c.end()
+    return y
+
+
+def _project_activity(c, x, y, span, data):
+    """Static default rows and dates from the shared repository push model."""
+    project = data.get("project_activity") if isinstance(data, dict) else None
+    project = project if isinstance(project, dict) else {}
+    axis, supplied_rows = project.get("dates"), project.get("rows")
+    valid = (project.get("schema") == "profile-project-activity/v1"
+             and isinstance(axis, list) and len(axis) == 30
+             and isinstance(supplied_rows, list))
+    if valid:
+        try:
+            parsed = [date.fromisoformat(day) for day in axis]
+            valid = (all(day.isoformat() == value for day, value in zip(parsed, axis))
+                     and all(right-left == timedelta(days=1) for left, right in zip(parsed, parsed[1:])))
+        except (TypeError, ValueError):
+            valid = False
+    y = c.wrap("Observed branch pushes · UTC", x, y, span, size=c.secondary, color="muted")
+    if not valid:
+        y = c.wrap("Project activity unavailable", x, y+8, span, color="muted")
+        y = c.wrap("A qualified observation window is not available.", x, y, span,
+                   size=c.secondary, color="muted")
+        y = _project_activity_legend(c, x, y+15, span, {})
+        return c.wrap("Explore observed branches on the website", x, y+5, span,
+                      size=c.secondary, color="muted")
+
+    cutoff = str(project.get("observed_at") or project.get("window_end") or "")
+    cutoff_label = cutoff[:16].replace("T", " ")+" UTC" if cutoff else "cutoff unavailable"
+    y = c.wrap("Through "+cutoff_label, x, y, span, size=c.secondary, color="muted")
+    y = c.wrap("Last 14 days · today in progress", x, y, span, size=c.secondary, color="muted")
+    c.parts.append('<desc>'+escape(str(project.get("meaning") or "Observed unique repository push events"))+'</desc>')
+    rows = [row for row in supplied_rows if isinstance(row, dict)
+            and isinstance(row.get("repository"), str) and row["repository"]
+            and isinstance(row.get("daily"), list)]
+    visible, dates = rows[:8], axis[-14:]
+    if project.get("status") == "unavailable":
+        y = c.wrap("Project activity unavailable", x, y+8, span, color="muted")
+    elif project.get("complete") is True and project.get("observed_pushes") == 0:
+        y = c.wrap("No push events observed in this window.", x, y+8, span, color="muted")
+    if visible:
+        label_width = 184
+        grid_x = x if c.mobile else x + label_width + 20
+        grid_width = span if c.mobile else span - label_width - 20
+        step = grid_width / len(dates)
+        cell_size = min(16 if c.mobile else 24, step-4)
+        y += 18
+        if not c.mobile:
+            c.text("Repository", x, y, size=c.secondary, color="muted")
+        for index in sorted({0, (len(dates)-1)//2, len(dates)-1}):
+            px = grid_x if index == 0 else grid_x+grid_width if index == len(dates)-1 else grid_x+(index+.5)*step
+            anchor = "start" if index == 0 else "end" if index == len(dates)-1 else "middle"
+            c.text(date.fromisoformat(dates[index]).strftime("%b %-d"), px, y,
+                   size=c.secondary, color="muted", anchor=anchor,
+                   data_role="project-activity-date", data_date=dates[index])
+        y += 15
+        row_height = 65 if c.mobile else 48
+        for row in visible:
+            repository = row["repository"]
+            c.group(data_role="project-activity-row", data_repository=repository)
+            c.parts.append('<title>'+escape(repository)+'</title>')
+            name = repository.split("/", 1)[-1]
+            name_width = span if c.mobile else label_width
+            # Reserve an em per character so wide names fit at the normal caption size.
+            c.text(truncate(name, max(1, int(name_width/c.secondary))), x,
+                   y+c.secondary if c.mobile else y+29, size=c.secondary, weight=500,
+                   aria_label=repository)
+            grid_y = y+29 if c.mobile else y+(row_height-cell_size)/2
+            daily = {cell.get("date"): cell for cell in row["daily"]
+                     if isinstance(cell, dict) and isinstance(cell.get("date"), str)}
+            for index, day in enumerate(dates):
+                observed = daily.get(day, {})
+                count = observed.get("count")
+                count = count if type(count) is int and count >= 0 else None
+                complete = observed.get("complete") is True and count is not None
+                if count == 0 and not complete:
+                    count = None
+                level = observed.get("level")
+                level = level if type(level) is int and level in PROJECT_ACTIVITY_COLORS else None
+                if count is None or (count == 0) != (level == 0):
+                    level = None
+                if count is None:
+                    detail = "Push count unknown; observation incomplete or unavailable"
+                elif complete:
+                    detail = f"{count} observed pushes; complete observation"
+                else:
+                    detail = f"At least {count} observed pushes; incomplete observation"
+                if day == axis[-1]:
+                    detail += "; today in progress; as of "+cutoff_label
+                label = f"{repository} · {day} UTC: {detail}"
+                attrs = dict(x=round(grid_x+(index+.5)*step-cell_size/2, 3), y=grid_y,
+                             width=cell_size, height=cell_size, rx=3 if c.mobile else 4,
+                             fill=PROJECT_ACTIVITY_COLORS[level] if level is not None else "none",
+                             stroke=COLORS["line"], stroke_width=1,
+                             stroke_dasharray=None if complete else "2 2",
+                             data_role="project-activity-cell", data_repository=repository,
+                             data_date=day, data_count=count, data_complete=str(complete).lower(),
+                             data_level=level, aria_label=label)
+                c.parts.append('<rect '+_attrs(attrs)+'><title>'+escape(label)+'</title></rect>')
+            c.line(x, y+row_height-2, x+span, y+row_height-2, stroke_opacity=.55)
+            c.end()
+            y += row_height
+        y += 17
+    elif project.get("status") != "unavailable" and project.get("complete") is not True:
+        y = c.wrap("No qualified repository observations", x, y+8, span, color="muted")
+
+    y = _project_activity_legend(c, x, y+7, span, project.get("scale"))
+    if len(rows) > len(visible):
+        y = c.wrap(f"Showing {len(visible)} of {len(rows)} received repositories", x, y+4, span,
+                   size=c.secondary, color="muted")
+    qualification = project.get("qualification") or "Bounded received repository observations"
+    y = c.wrap(qualification, x, y+4, span, size=c.secondary, color="muted")
+    return c.wrap("Explore observed branches on the website", x, y+8, span,
+                  size=c.secondary, color="muted")
+
+
 def render_svg(summary, *, mobile=False, generation=None):
     c = Canvas(mobile)
     facts = summary_facts(summary)
@@ -651,6 +804,8 @@ def render_svg(summary, *, mobile=False, generation=None):
     if isinstance(analytics, dict):
         paint_code = _code_changes if mobile else _code_changes_desktop
         y = c.panel("code-changes", "Code changes", y, lambda x, yy, span: paint_code(c, x, yy, span, analytics))
+    y = c.panel("project-activity", "Project activity", y,
+                lambda x, yy, span: _project_activity(c, x, yy, span, analytics or {}))
     y = c.panel("recent-pushes", "Recent repository pushes", y,
                 lambda x, yy, span: _recent_pushes(c, x, yy, span, analytics or {}))
 

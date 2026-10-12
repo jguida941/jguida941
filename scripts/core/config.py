@@ -148,6 +148,10 @@ LEVEL_XP_SCALE = 1.5  # multiplier per level
 DASHBOARD_SUMMARY_COLORS = {"surface": "#111827", "panel": "#172236", "line": "#35425b", "track": "#26314a",
           "text": "#e6ebf5", "muted": "#a7b6ce", "blue": "#63b5fa", "teal": "#79cacf"}
 
+# Project activity's selected sequential palette. Zero has independent coverage
+# meaning; unknown cells remain unfilled and outlined in each projection.
+PROJECT_ACTIVITY_COLORS = {0: "#283248", 1: "#3f678b", 2: "#478f8b", 3: "#7ac76e", 4: "#d7e24e"}
+
 # Identity-owned, checked-in artwork; never fetched during rendering.
 DASHBOARD_AVATAR_OWNER = "jguida941"
 DASHBOARD_AVATAR_PATH = "assets/profile-avatar.jpg"

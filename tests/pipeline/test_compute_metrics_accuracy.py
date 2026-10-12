@@ -2941,5 +2941,537 @@ class CodeChangeAggregationTests(unittest.TestCase):
         result=build_activity_analytics(self.source())
         for unrelated in ('ci','repositories','system'):self.assertNotIn(unrelated,result)
 
+PROJECT_ACTIVITY_START = "2026-09-13T00:00:00Z"
+
+PROJECT_ACTIVITY_END = "2026-10-12T12:00:00Z"
+
+def project_activity_event(identity, repository="activity-kit", when="2026-10-11T09:00:00Z",
+                           branch="main", kind="push"):
+    """A synthetic normalized push observation, independent of commit history."""
+    from scripts.github import github_client as gh
+
+    full_name = repository if "/" in repository else f"{gh.USERNAME}/{repository}"
+    return {"id": identity, "repository": full_name, "timestamp": when,
+            "ref": branch if branch.startswith("refs/") else f"refs/heads/{branch}",
+            "activity_type": kind, "before": "a" * 40,
+            "after": "0" * 40 if kind == "branch_deletion" else "b" * 40}
+
+def project_activity_envelope(repository, events, complete=True, private=False):
+    from scripts.github import github_client as gh
+
+    full_name = repository if "/" in repository else f"{gh.USERNAME}/{repository}"
+    return {
+        "repository": full_name, "name": full_name.rsplit("/", 1)[-1],
+        "language": "Python", "is_private": private,
+        "activity": {
+            "status": "ok" if complete else "partial", "complete": complete,
+            "reason": "end_of_connection" if complete else "page_limit",
+            "observed_at": PROJECT_ACTIVITY_END, "source": "github_rest_activity",
+            "page_count": 1 if complete else 3, "selection_valid": True,
+            "completion_evidence": "no_next_link" if complete else "none",
+            "rows": sorted(copy.deepcopy(events), key=lambda event: datetime.fromisoformat(
+                event["timestamp"].replace("Z", "+00:00")), reverse=True),
+        },
+    }
+
+def project_activity_source(repositories=None):
+    """Supply a fixed 30 UTC date feed without any line-change family."""
+    if repositories is None:
+        repositories = [project_activity_envelope("activity-kit", [
+            project_activity_event("main-push"),
+            project_activity_event("branch-push", when="2026-10-10T16:00:00Z",
+                                   branch="release/docs"),
+        ])]
+    repositories = copy.deepcopy(repositories)
+    complete = sum(row["activity"]["complete"] is True for row in repositories)
+    return {
+        "schema": "profile-activity-observations/v1",
+        "window_start": PROJECT_ACTIVITY_START, "window_end": PROJECT_ACTIVITY_END,
+        "observed_at": PROJECT_ACTIVITY_END, "repositories": repositories,
+        "cohort": {
+            "inventory": len(repositories), "inventory_complete": True, "inventory_fresh": True,
+            "eligible": len(repositories), "selected": len(repositories), "queried": len(repositories),
+            "complete": complete, "partial": len(repositories) - complete, "unavailable": 0,
+            "excluded": {key: 0 for key in ("identity", "fork", "profile", "outside_window",
+                                            "invalid_hint", "selection_limit")},
+        },
+        "recent_pushes": {"status": "ok", "complete": True, "rows": []},
+    }
+
+def project_activity_full_model(source):
+    collected = CollectedProfileData(
+        repo_counts={"public_owned_total": 0, "public_owned_forks": 0, "public_owned_nonfork": 0,
+                     "private_owned": 0, "private_owned_nonfork": 0},
+        repos=[], all_repos=[], language_bytes={}, events=[], latest_push_message_by_repo={},
+        public_scope_commits=None, ci_count_probe=0, calendar=None, total_contributions=None,
+        token_mode="fixture", cache_mode={}, activity_observations=copy.deepcopy(source),
+    )
+    return compute_profile_model(collected, logger=_noop, allow_network_calls=False)
+
+class ProjectActivityAggregationTests(unittest.TestCase):
+    """Repository push counts use received identities and explicit coverage facts."""
+
+    @staticmethod
+    def project(source):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+
+        return build_activity_analytics(source)["project_activity"]
+
+    @staticmethod
+    def days(row):
+        return {cell["date"]: cell for cell in row["daily"]}
+
+    @staticmethod
+    def branch_days(row, branch):
+        cells = {cell["date"]: cell for cell in row["branch_empty_daily"]}
+        cells.update({cell["date"]: cell for cell in branch["daily"]})
+        return cells
+
+    @staticmethod
+    def bands(value):
+        return [(band["lower"], band["upper"], band["level"]) for band in value["scale"]["bands"]]
+
+    @staticmethod
+    def distribution(counts, *, old_last=False):
+        repositories = []
+        for index, count in enumerate(counts):
+            name = f"scale-{index:02d}"
+            when = "2026-09-20T09:00:00Z" if old_last and index == len(counts) - 1 else "2026-10-11T09:00:00Z"
+            repositories.append(project_activity_envelope(name, [
+                project_activity_event(f"push-{index}-{number}", repository=name, when=when,
+                                       branch="feature/one" if number == 0 else "main")
+                for number in range(count)
+            ]))
+        return project_activity_source(repositories)
+
+    def test_unique_push_ids_and_utc_dates_preserve_deleted_branch_history(self):
+        same_head = project_activity_event("same-head-a")
+        same_head["committed_at"] = "2026-09-17T00:00:00Z"
+        events = [same_head, {**same_head, "id": "same-head-b"}, copy.deepcopy(same_head),
+                  project_activity_event("force", when="2026-10-10T23:30:00-02:00",
+                                         branch="feature", kind="force_push"),
+                  project_activity_event("older", when="2026-10-09T09:00:00Z", branch="feature"),
+                  project_activity_event("case-sensitive", when="2026-10-10T09:00:00Z", branch="Feature")]
+        for kind in ("branch_creation", "branch_deletion", "pr_merge", "merge_queue_merge"):
+            events.append(project_activity_event(kind, when="2026-10-12T01:00:00Z",
+                                                 branch="feature", kind=kind))
+        value = self.project(project_activity_source([project_activity_envelope("activity-kit", events)]))
+        row = value["rows"][0]
+        self.assertEqual(5, row["observed_pushes"])
+        self.assertEqual({"2026-10-09": 1, "2026-10-10": 1, "2026-10-11": 3},
+                         {cell["date"]: cell["count"] for cell in row["daily"] if cell["count"]})
+        self.assertEqual({"refs/heads/Feature": 1, "refs/heads/feature": 2, "refs/heads/main": 2},
+                         {branch["ref"]: branch["observed_pushes"] for branch in row["branches"]})
+        branches = [self.branch_days(row, branch) for branch in row["branches"]]
+        for day in row["daily"]:
+            self.assertEqual(day["count"] or 0,
+                             sum(branch[day["date"]]["count"] or 0 for branch in branches))
+        self.assertEqual("2026-10-11T09:00:00Z", row["latest_push"])
+        self.assertTrue(row["complete"])
+
+    def test_replayed_envelopes_and_equal_utc_instants_do_not_multiply_identities(self):
+        events = [project_activity_event("shared", repository="Activity-Kit"),
+                  project_activity_event("separate", repository="Activity-Kit")]
+        first = project_activity_envelope("Activity-Kit", events + [copy.deepcopy(events[0])])
+        second = project_activity_envelope("activity-kit", [
+            project_activity_event(event["id"], when="2026-10-11T05:00:00-04:00") for event in events
+        ])
+        source = project_activity_source([first, second])
+        expected = self.project(source)
+        source["repositories"].reverse()
+        for envelope in source["repositories"]:
+            envelope["activity"]["rows"].reverse()
+        self.assertEqual(expected, self.project(source))
+        self.assertEqual(1, len(expected["rows"]))
+        self.assertEqual(2, expected["rows"][0]["observed_pushes"])
+        self.assertTrue(expected["rows"][0]["complete"])
+        self.assertTrue(expected["rows"][0]["repository"].endswith("/Activity-Kit"))
+
+    def test_event_ids_are_repository_scoped_and_only_push_dates_rank_rows(self):
+        rows = [project_activity_envelope(name, [project_activity_event("same-id", repository=name, when=when)])
+                for name, when in (("old", "2026-10-09T09:00:00Z"),
+                                   ("beta", "2026-10-11T09:00:00Z"),
+                                   ("Alpha", "2026-10-11T09:00:00Z"),
+                                   ("delta", "2026-10-08T09:00:00Z"))]
+        rows[0] = project_activity_envelope("old", rows[0]["activity"]["rows"] + [
+            project_activity_event("deleted", repository="old", when="2026-10-12T10:00:00Z",
+                                   kind="branch_deletion")])
+        rows.insert(0, project_activity_envelope("quiet", []))
+        value = self.project(project_activity_source(rows))
+        self.assertEqual(["Alpha", "beta", "old", "delta", "quiet"],
+                         [row["repository"].split("/")[1] for row in value["rows"]])
+        self.assertEqual([1, 1, 1, 1, 0], [row["observed_pushes"] for row in value["rows"]])
+        self.assertEqual(5, value["cohort"]["default_visible"])
+
+    def test_fractional_push_instants_select_latest_and_change_repository_rank(self):
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+
+        for beta_time, expected_order in ((".500Z", ["alpha", "beta"]),
+                                          (".900Z", ["beta", "alpha"])):
+            with self.subTest(beta_time=beta_time):
+                source = project_activity_source([
+                    project_activity_envelope("beta", [
+                        project_activity_event("between-or-newest", repository="beta",
+                                               when="2026-10-11T09:00:00" + beta_time),
+                    ]),
+                    project_activity_envelope("alpha", [
+                        project_activity_event("later-fraction", repository="alpha",
+                                               when="2026-10-11T09:00:00.750Z", branch="feature"),
+                        project_activity_event("earlier-whole", repository="alpha"),
+                    ]),
+                ])
+                model = project_activity_full_model(source)
+                public = _public_dashboard_data(model["dashboard_data"])
+                value = public["activity_analytics"]["project_activity"]
+                self.assertEqual(expected_order, [row["repository"].split("/")[1] for row in value["rows"]])
+                rows = {row["repository"].split("/")[1]: row for row in value["rows"]}
+                self.assertEqual("2026-10-11T09:00:00.750000Z", rows["alpha"]["latest_push"])
+                self.assertEqual("2026-10-11T09:00:00" + beta_time[:-1] + "000Z", rows["beta"]["latest_push"])
+                self.assertEqual({"alpha": 2, "beta": 1}, {name: row["observed_pushes"] for name, row in rows.items()})
+                self.assertEqual(3, value["observed_pushes"])
+                self.assertTrue(value["complete"])
+                self.assertEqual(model["activity_analytics"], public["activity_analytics"])
+                self.assertEqual(public["activity_analytics"], public["dashboard_summary"]["activity_analytics"])
+
+    def test_conflicting_identity_versions_are_quarantined_before_push_filtering(self):
+        changes = (("activity_type", "branch_creation"), ("activity_type", "force_push"),
+                   ("ref", "refs/heads/other"), ("timestamp", "2026-10-10T09:00:00Z"),
+                   ("before", "c" * 40), ("after", "c" * 40))
+        for field, replacement in changes:
+            with self.subTest(field=field, replacement=replacement):
+                disputed = project_activity_event("disputed")
+                events = [disputed, {**disputed, field: replacement},
+                          project_activity_event("survivor", branch="unambiguous")]
+                row = self.project(project_activity_source([
+                    project_activity_envelope("activity-kit", events)]))["rows"][0]
+                self.assertEqual(1, row["observed_pushes"])
+                self.assertEqual(["refs/heads/unambiguous"], [branch["ref"] for branch in row["branches"]])
+                self.assertFalse(row["complete"])
+                self.assertIn("conflicting_activity_identity", row["reasons"])
+                self.assertEqual((1, False), tuple(self.days(row)["2026-10-11"][key]
+                                                  for key in ("count", "complete")))
+                self.assertIsNone(self.days(row)["2026-10-08"]["count"])
+
+    def test_invalid_records_withhold_zero_but_preserve_unambiguous_pushes(self):
+        changes = (("id", "invalid id"), ("id", 7), ("activity_type", "PushEvent"),
+                   ("activity_type", []), ("repository", "someone-else/activity-kit"),
+                   ("ref", "refs/tags/release"), ("ref", "refs/heads/../invalid"),
+                   ("before", "not-an-oid"), ("after", "0" * 40),
+                   ("timestamp", "2026-10-11T09:00:00"),
+                   ("timestamp", "2026-10-12T12:00:01Z"), ("timestamp", "not-a-date"))
+        for field, replacement in changes:
+            with self.subTest(field=field, replacement=replacement):
+                source = project_activity_source([project_activity_envelope("activity-kit", [
+                    project_activity_event("survivor"), project_activity_event("rejected")])])
+                source["repositories"][0]["activity"]["rows"][1][field] = replacement
+                row = self.project(source)["rows"][0]
+                self.assertEqual(1, row["observed_pushes"])
+                self.assertFalse(row["complete"])
+                self.assertIsNone(self.days(row)["2026-10-08"]["count"])
+        source = project_activity_source([project_activity_envelope("activity-kit", [
+            project_activity_event("same"), project_activity_event("same"), project_activity_event("survivor")])])
+        source["repositories"][0]["activity"]["rows"][1]["ref"] = "refs/tags/release"
+        self.assertEqual(1, self.project(source)["rows"][0]["observed_pushes"])
+
+    def test_window_boundaries_are_inclusive_and_older_valid_events_do_not_count(self):
+        events = [project_activity_event("older", when="2026-09-12T23:59:59Z"),
+                  project_activity_event("start", when=PROJECT_ACTIVITY_START),
+                  project_activity_event("cutoff", when=PROJECT_ACTIVITY_END)]
+        value = self.project(project_activity_source([project_activity_envelope("activity-kit", events)]))
+        row = value["rows"][0]
+        self.assertEqual(2, row["observed_pushes"])
+        self.assertEqual((1, True), (row["daily"][0]["count"], row["daily"][0]["complete"]))
+        self.assertEqual((1, False), (row["daily"][-1]["count"], row["daily"][-1]["complete"]))
+        self.assertEqual(0, self.days(row)["2026-09-14"]["count"])
+        self.assertTrue(row["complete"])
+        self.assertEqual("partial", value["scale"]["status"])
+
+    def test_past_zeros_partial_unknowns_and_today_have_distinct_quality(self):
+        rows = [project_activity_envelope(name, [project_activity_event("observed", repository=name)], complete)
+                for name, complete in (("confirmed", True), ("partial", False))]
+        value = self.project(project_activity_source(rows))
+        by_name = {row["repository"].split("/")[1]: self.days(row) for row in value["rows"]}
+        self.assertEqual({"date": "2026-10-08", "count": 0, "complete": True, "level": 0},
+                         by_name["confirmed"]["2026-10-08"])
+        self.assertEqual({"date": "2026-10-08", "count": None, "complete": False, "level": None},
+                         by_name["partial"]["2026-10-08"])
+        for name in by_name:
+            self.assertEqual(1, by_name[name]["2026-10-11"]["count"])
+            self.assertEqual(name == "confirmed", by_name[name]["2026-10-11"]["complete"])
+            self.assertEqual({"date": "2026-10-12", "count": None, "complete": False, "level": None},
+                             by_name[name]["2026-10-12"])
+        self.assertFalse(value["cohort"]["ranking_complete"])
+
+    def test_complete_empty_cohort_and_unavailable_windows_remain_distinct(self):
+        empty = self.project(project_activity_source([]))
+        self.assertEqual(("ok", True, 0, []),
+                         (empty["status"], empty["complete"], empty["observed_pushes"], empty["rows"]))
+        self.assertEqual((30, PROJECT_ACTIVITY_START[:10], PROJECT_ACTIVITY_END[:10]),
+                         (len(empty["dates"]), empty["dates"][0], empty["dates"][-1]))
+        self.assertEqual((14, [14, 30], "UTC", True),
+                         (empty["default_days"], empty["available_days"], empty["timezone"], empty["current_day_partial"]))
+        invalid = [None, {}]
+        for key, replacement in (("schema", "unknown"), ("window_start", "2026-09-14T00:00:00Z"),
+                                 ("window_start", "2026-09-13T01:00:00Z"),
+                                 ("window_end", "2026-10-12T12:00:00"),
+                                 ("observed_at", "2026-10-12T13:00:00Z")):
+            invalid.append({**project_activity_source(), key: replacement})
+        for source in invalid:
+            with self.subTest(source=source):
+                value = self.project(source)
+                self.assertEqual(("unavailable", [], []), (value["status"], value["dates"], value["rows"]))
+        source = project_activity_source()
+        source["window_end"] = source["observed_at"] = "2026-10-12T08:00:00-04:00"
+        self.assertEqual(self.project(project_activity_source()), self.project(source))
+
+    def test_complete_past_zeros_require_matching_normalized_terminal_evidence(self):
+        for reason, evidence in (("end_of_connection", "no_next_link"),
+                                 ("window_boundary", "descending_window_boundary")):
+            source = project_activity_source()
+            source["repositories"][0]["activity"].update(reason=reason, completion_evidence=evidence, page_count=3)
+            self.assertTrue(self.project(source)["rows"][0]["complete"])
+        invalid = (("status", "partial"), ("complete", False), ("selection_valid", False),
+                   ("source", "other_feed"), ("observed_at", "2026-10-12T11:59:59Z"),
+                   ("page_count", 0), ("page_count", 4), ("page_count", True),
+                   ("page_count", 1.0), ("page_count", "1"), ("reason", "window_boundary"),
+                   ("reason", []), ("completion_evidence", "none"), ("completion_evidence", []))
+        for key, replacement in invalid:
+            with self.subTest(key=key, replacement=replacement):
+                source = project_activity_source()
+                source["repositories"][0]["activity"][key] = replacement
+                row = self.project(source)["rows"][0]
+                self.assertEqual(2, row["observed_pushes"])
+                self.assertFalse(row["complete"])
+                self.assertIsNone(self.days(row)["2026-10-08"]["count"])
+
+    def test_order_and_envelope_metadata_conflicts_withhold_coverage(self):
+        source = project_activity_source()
+        source["repositories"][0]["activity"]["rows"].reverse()
+        row = self.project(source)["rows"][0]
+        self.assertEqual(2, row["observed_pushes"])
+        self.assertFalse(row["complete"])
+        self.assertIn("invalid_activity_order", row["reasons"])
+        for key, replacement in (("is_private", None), ("is_private", "false"), ("name", "wrong-name")):
+            source = project_activity_source()
+            source["repositories"][0][key] = replacement
+            self.assertFalse(self.project(source)["rows"][0]["complete"])
+        for kind in ("privacy", "page_count"):
+            source = project_activity_source()
+            duplicate = copy.deepcopy(source["repositories"][0])
+            if kind == "privacy":
+                duplicate["is_private"] = True
+            else:
+                duplicate["activity"]["page_count"] = 2
+            source["repositories"].append(duplicate)
+            row = self.project(source)["rows"][0]
+            self.assertEqual(2, row["observed_pushes"])
+            self.assertFalse(row["complete"])
+            self.assertIn("conflicting_repository_metadata", row["reasons"])
+
+    def test_foreign_profile_and_malformed_repository_identities_are_excluded(self):
+        from scripts.github import github_client as gh
+
+        source = project_activity_source()
+        for identity in ("another-owner/external", f"{gh.USERNAME.upper()}/{gh.USERNAME.upper()}",
+                         f"{gh.USERNAME}/.", f"{gh.USERNAME}/bad name", "missing-owner"):
+            envelope = copy.deepcopy(source["repositories"][0])
+            envelope["repository"] = identity
+            source["repositories"].append(envelope)
+        value = self.project(source)
+        self.assertEqual([f"{gh.USERNAME}/activity-kit"], [row["repository"] for row in value["rows"]])
+        self.assertEqual(2, value["observed_pushes"])
+        self.assertIn("invalid_repository_identity", value["cohort"]["reasons"])
+        self.assertFalse(value["complete"])
+        self.assertTrue(value["rows"][0]["complete"])
+
+    def test_shared_scale_uses_all_thirty_dates_before_the_eight_row_cut(self):
+        value = self.project(self.distribution([2, 3, 5, 5, 7, 9, 12, 20, 40], old_last=True))
+        self.assertEqual(9, len(value["rows"]))
+        self.assertEqual(8, value["cohort"]["default_visible"])
+        self.assertTrue(value["rows"][-1]["repository"].endswith("/scale-08"))
+        self.assertEqual(103, value["observed_pushes"])
+        self.assertEqual(9, value["scale"]["sample_size"])
+        self.assertEqual([(1, 5, 1), (6, 7, 2), (8, 12, 3), (13, 40, 4)], self.bands(value))
+        self.assertEqual(4, self.days(value["rows"][-1])["2026-09-20"]["level"])
+        for row in value["rows"]:
+            one = next(branch for branch in row["branches"] if branch["ref"] == "refs/heads/feature/one")
+            self.assertEqual([1], [cell["level"] for cell in one["daily"] if cell["count"]])
+        self.assertEqual([1, 1], [self.days(value["rows"][index])["2026-10-11"]["level"] for index in (2, 3)])
+
+    def test_scale_collapses_ties_and_changes_with_the_observed_distribution(self):
+        cases = (([1, 1, 1], [(1, 1, 1)]),
+                 ([2, 2, 2, 7], [(1, 2, 1), (3, 7, 4)]),
+                 ([2, 2, 6, 9], [(1, 2, 1), (3, 6, 3), (7, 9, 4)]),
+                 ([3, 6, 11, 18], [(1, 3, 1), (4, 6, 2), (7, 11, 3), (12, 18, 4)]))
+        for counts, expected in cases:
+            with self.subTest(counts=counts):
+                value = self.project(self.distribution(counts))
+                self.assertEqual(len(counts), value["scale"]["sample_size"])
+                self.assertEqual(expected, self.bands(value))
+        for counts in ([], [0, 0]):
+            value = self.project(self.distribution(counts))
+            self.assertEqual(("unavailable", 0, []),
+                             (value["scale"]["status"], value["scale"]["sample_size"], value["scale"]["bands"]))
+            self.assertEqual("No positive push counts to scale", value["scale"]["qualification"])
+
+    def test_partial_positive_samples_keep_the_shared_scale_and_qualification(self):
+        source = self.distribution([1, 4, 7, 12])
+        complete = self.project(source)
+        source["repositories"][0]["activity"].update(status="partial", complete=False,
+                                                    reason="page_limit", completion_evidence="none")
+        partial = self.project(source)
+        self.assertEqual(complete["scale"]["bands"], partial["scale"]["bands"])
+        self.assertEqual(("partial", 4, True), (partial["scale"]["status"], partial["scale"]["sample_size"],
+                                               partial["scale"]["lower_bounds_included"]))
+        self.assertIn("lower bounds", partial["scale"]["qualification"])
+        self.assertEqual(1, self.days(partial["rows"][0])["2026-10-11"]["count"])
+        self.assertIsNone(self.days(partial["rows"][0])["2026-10-08"]["count"])
+
+    def test_real_pipeline_and_public_summary_carry_the_same_activity_facts(self):
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+
+        source = project_activity_source()
+        expected = self.project(source)
+        model = project_activity_full_model(source)
+        published = _public_dashboard_data(model["dashboard_data"])
+        for surface in (model, model["dashboard_data"], model["dashboard_summary"], published,
+                        published["dashboard_summary"]):
+            self.assertEqual(expected, surface["activity_analytics"]["project_activity"])
+        self.assertEqual(source, project_activity_source(), "Aggregation must not mutate the received feed")
+
+    def test_maximum_observed_branch_cohort_survives_full_public_projection(self):
+        from scripts.github import github_client as gh
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+
+        first = date.fromisoformat(PROJECT_ACTIVITY_START[:10])
+        dates = [(first + timedelta(days=offset)).isoformat() for offset in range(30)]
+        repositories = []
+        for index in range(20):
+            name = f"capacity-{index:02d}"
+            events = [project_activity_event(f"push-{number:03d}", repository=name,
+                                             when=dates[(index + number) % 30] + "T09:00:00Z",
+                                             branch=f"work/{number:03d}")
+                      for number in range(300)]
+            envelope = project_activity_envelope(name, events, complete=index % 2 == 0,
+                                                  private=index % 3 == 0)
+            envelope["activity"]["page_count"] = 3
+            repositories.append(envelope)
+        original = project_activity_source(repositories)
+
+        for move_first_push in (False, True):
+            with self.subTest(move_first_push=move_first_push):
+                source = copy.deepcopy(original)
+                if move_first_push:
+                    events = source["repositories"][0]["activity"]["rows"]
+                    next(event for event in events if event["id"] == "push-000")["timestamp"] = dates[-1] + "T09:00:00Z"
+                    events.sort(key=lambda event: event["timestamp"], reverse=True)
+                model = project_activity_full_model(source)
+                published = _public_dashboard_data(model["dashboard_data"])
+                value = published["activity_analytics"]["project_activity"]
+                self.assertEqual(value, model["activity_analytics"]["project_activity"])
+                self.assertEqual(value, model["dashboard_summary"]["activity_analytics"]["project_activity"])
+                self.assertEqual(value, published["dashboard_summary"]["activity_analytics"]["project_activity"])
+                self.assertEqual((20, 6000, 600),
+                                 (len(value["rows"]), value["observed_pushes"], value["scale"]["sample_size"]))
+                self.assertEqual(dates, value["dates"])
+
+                expected_branches = {}
+                for index in range(20):
+                    repository = f"{gh.USERNAME}/capacity-{index:02d}"
+                    for number in range(300):
+                        day = dates[-1] if move_first_push and index == number == 0 else dates[(index + number) % 30]
+                        expected_branches[(repository, f"refs/heads/work/{number:03d}")] = (
+                            day, 1, index % 2 == 0 and day != dates[-1], 1)
+                actual_branches = {}
+                for row in value["rows"]:
+                    index = int(row["repository"].rsplit("-", 1)[1])
+                    self.assertEqual(index % 3 == 0, row["is_private"])
+                    self.assertEqual((300, 300), (row["observed_pushes"], len(row["branches"])))
+                    expected_counts = [10] * 30
+                    if move_first_push and index == 0:
+                        expected_counts[0], expected_counts[-1] = 9, 11
+                    self.assertEqual(expected_counts, [cell["count"] for cell in row["daily"]])
+                    expected_defaults = []
+                    for day in dates:
+                        complete = index % 2 == 0 and day != dates[-1]
+                        expected_defaults.append({"date": day, "count": 0 if complete else None,
+                                                  "complete": complete, "level": 0 if complete else None})
+                    self.assertEqual(expected_defaults, row["branch_empty_daily"])
+                    partition = dict.fromkeys(dates, 0)
+                    for branch in row["branches"]:
+                        self.assertEqual((1, 1), (branch["observed_pushes"], len(branch["daily"])))
+                        self.assertNotIn("branch_empty_daily", branch)
+                        cell = branch["daily"][0]
+                        actual_branches[(row["repository"], branch["ref"])] = tuple(
+                            cell[key] for key in ("date", "count", "complete", "level"))
+                        partition[cell["date"]] += cell["count"]
+                    self.assertEqual(dict(zip(dates, expected_counts)), partition)
+                    branch = next(branch for branch in row["branches"] if branch["ref"] == "refs/heads/work/000")
+                    reconstructed = self.branch_days(row, branch)
+                    expected_days = {cell["date"]: cell for cell in expected_defaults}
+                    positive_day, count, complete, level = expected_branches[(row["repository"], branch["ref"])]
+                    expected_days[positive_day] = {"date": positive_day, "count": count,
+                                                   "complete": complete, "level": level}
+                    self.assertEqual(expected_days, reconstructed)
+                self.assertEqual(expected_branches, actual_branches)
+
+                # Both serialized activity copies share the existing publication budget.
+                containers, pending = 0, [published]
+                while pending:
+                    item = pending.pop()
+                    if type(item) is dict:
+                        containers += 1
+                        pending.extend(item.values())
+                    elif type(item) is list:
+                        containers += 1
+                        pending.extend(item)
+                self.assertLessEqual(containers, 50_000)
+
+    def test_unrepresentable_event_timestamp_keeps_the_other_push_as_a_lower_bound(self):
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+
+        source = project_activity_source()
+        control = self.project(source)["rows"][0]
+        self.assertEqual((2, True, 0),
+                         (control["observed_pushes"], control["complete"], self.days(control)["2026-10-09"]["count"]))
+        source["repositories"][0]["activity"]["rows"][1]["timestamp"] = "9999-12-31T23:59:59-14:00"
+        model = project_activity_full_model(source)
+        published = _public_dashboard_data(model["dashboard_data"])
+        value = published["activity_analytics"]["project_activity"]
+        self.assertEqual(value, published["dashboard_summary"]["activity_analytics"]["project_activity"])
+        row = value["rows"][0]
+        self.assertEqual((1, False, "partial"), (row["observed_pushes"], row["complete"], row["status"]))
+        self.assertEqual(["refs/heads/main"], [branch["ref"] for branch in row["branches"]])
+        self.assertEqual({"2026-10-11": 1}, {cell["date"]: cell["count"] for cell in row["daily"] if cell["count"]})
+        self.assertTrue(row["reasons"])
+        self.assertTrue(all(cell["complete"] is False for cell in row["daily"]))
+        self.assertTrue(all(cell["count"] is None and cell["level"] is None
+                            for cell in row["daily"] if cell["date"] != "2026-10-11"))
+        self.assertTrue(all(cell["count"] is None and cell["complete"] is False and cell["level"] is None
+                            for cell in row["branch_empty_daily"]))
+
+    def test_unrepresentable_repository_cutoff_preserves_all_qualified_positives(self):
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+
+        source = project_activity_source()
+        source["repositories"][0]["activity"]["observed_at"] = "9999-12-31T23:59:59-14:00"
+        model = project_activity_full_model(source)
+        published = _public_dashboard_data(model["dashboard_data"])
+        value = published["activity_analytics"]["project_activity"]
+        self.assertEqual(value, published["dashboard_summary"]["activity_analytics"]["project_activity"])
+        row = value["rows"][0]
+        self.assertEqual((2, False, "partial"), (row["observed_pushes"], row["complete"], row["status"]))
+        self.assertEqual({"refs/heads/main", "refs/heads/release/docs"}, {branch["ref"] for branch in row["branches"]})
+        self.assertEqual({"2026-10-10": 1, "2026-10-11": 1},
+                         {cell["date"]: cell["count"] for cell in row["daily"] if cell["count"]})
+        self.assertTrue(row["reasons"])
+        self.assertTrue(all(cell["complete"] is False for cell in row["daily"]))
+        for day in ("2026-10-09", "2026-10-12"):
+            self.assertEqual((None, False, None), tuple(self.days(row)[day][key]
+                                                      for key in ("count", "complete", "level")))
+        self.assertTrue(all(cell["count"] is None and cell["complete"] is False and cell["level"] is None
+                            for cell in row["branch_empty_daily"]))
+
+
 if __name__ == "__main__":
     unittest.main()
