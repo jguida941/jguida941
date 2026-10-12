@@ -410,7 +410,7 @@ footer a { color: var(--ink); text-decoration: none; }
 
 .project-activity { min-width: 0; }
 .project-activity .project-activity-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
-.project-activity .project-activity-subtitle, .project-activity .project-activity-cutoff { color: var(--ink-dim); font-size: var(--type-caption); margin: 7px 0 0; }
+.project-activity .project-activity-subtitle { color: var(--ink-dim); font-size: var(--type-caption); margin: 7px 0 0; }
 .project-activity .project-activity-periods { display: inline-flex; gap: 4px; padding: 3px; border: 1px solid color-mix(in srgb, var(--hairline) 18%, transparent); border-radius: 12px; }
 .project-activity .project-activity-periods button, .project-activity .project-activity-show-all { min-height: 44px; border: 0; padding: 8px 12px; background: transparent; border-radius: 8px; font: inherit; font-size: var(--type-caption); color: var(--ink-dim); cursor: pointer; }
 .project-activity .project-activity-periods button[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--ink-strong); font-weight: 600; }
@@ -418,7 +418,7 @@ footer a { color: var(--ink); text-decoration: none; }
 .project-activity .project-activity-matrix { width: 100%; min-width: 0; }
 .project-activity .project-activity-scroll[data-days="30"] .project-activity-matrix { min-width: 720px; }
 .project-activity .project-activity-lane, .project-activity .project-activity-date-row { display: grid; grid-template-columns: minmax(160px, 200px) minmax(0, 1fr); column-gap: 16px; align-items: center; }
-.project-activity .project-activity-lane { min-height: 56px; padding: 5px 0; border-bottom: 1px solid color-mix(in srgb, var(--hairline) 13%, transparent); }
+.project-activity .project-activity-lane { min-height: 48px; padding: 1px 0; border-bottom: 1px solid color-mix(in srgb, var(--hairline) 13%, transparent); }
 .project-activity .project-activity-date-row { padding-bottom: 6px; color: var(--ink-dim); font-size: var(--type-caption); }
 .project-activity .project-activity-grid { display: grid; grid-template-columns: repeat(var(--project-days), minmax(0, 1fr)); gap: 4px; min-width: 0; align-items: center; }
 .project-activity .project-activity-date { position: relative; min-width: 0; height: 24px; }
@@ -432,10 +432,9 @@ footer a { color: var(--ink); text-decoration: none; }
 .project-activity .project-activity-toggle[aria-expanded="true"] .project-activity-chevron { transform: rotate(90deg); }
 .project-activity .project-activity-name-wrap { min-width: 0; }
 .project-activity .project-activity-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-strong); font-size: var(--type-body); font-weight: 500; }
-.project-activity .project-activity-branch-count { display: block; color: var(--ink-dim); font-size: var(--type-caption); }
 .project-activity .project-activity-branch .project-activity-label { padding: 8px 8px 8px 23px; color: var(--ink-dim); font-size: var(--type-caption); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .project-activity .project-activity-branches[hidden] { display: none; }
-.project-activity .project-activity-cell { display: block; width: min(24px, 100%); aspect-ratio: 1; justify-self: center; border: 1px solid color-mix(in srgb, var(--hairline) 35%, transparent); border-radius: 4px; background: transparent; }
+.project-activity .project-activity-cell { display: block; width: 12px; height: 12px; justify-self: center; border: 1px solid color-mix(in srgb, var(--hairline) 35%, transparent); border-radius: 50%; background: transparent; }
 .project-activity .project-activity-cell[data-complete="false"], .project-activity .project-activity-unknown { border-style: dashed; border-color: color-mix(in srgb, var(--ink-dim) 70%, transparent); }
 .project-activity [data-level="0"] { background: var(--project-activity-0); }
 .project-activity [data-level="1"] { background: var(--project-activity-1); }
@@ -443,10 +442,11 @@ footer a { color: var(--ink); text-decoration: none; }
 .project-activity [data-level="3"] { background: var(--project-activity-3); }
 .project-activity [data-level="4"] { background: var(--project-activity-4); }
 .project-activity .project-activity-legend { margin-top: 16px; color: var(--ink-dim); font-size: var(--type-caption); }
-.project-activity .project-activity-legend p { margin: 0 0 9px; }
-.project-activity .project-activity-key { display: flex; gap: 12px 20px; flex-wrap: wrap; align-items: flex-start; }
+.project-activity .project-activity-legend-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 16px; flex-wrap: wrap; margin-bottom: 9px; }
+.project-activity .project-activity-legend p { margin: 0; }
+.project-activity .project-activity-key { display: flex; gap: 10px 20px; flex-wrap: wrap; align-items: flex-start; }
 .project-activity .project-activity-key-item { display: grid; justify-items: center; gap: 5px; min-width: 28px; }
-.project-activity .project-activity-swatch { display: block; width: 16px; height: 16px; border: 1px solid color-mix(in srgb, var(--hairline) 35%, transparent); border-radius: 3px; }
+.project-activity .project-activity-swatch { display: block; width: 10px; height: 10px; border: 1px solid color-mix(in srgb, var(--hairline) 35%, transparent); border-radius: 50%; }
 .project-activity .project-activity-swatch.project-activity-unknown { border-style: dashed; }
 .project-activity .project-activity-qualification { color: var(--ink-dim); font-size: var(--type-caption); margin: 14px 0 0; overflow-wrap: anywhere; }
 .project-activity .project-activity-show-all { margin-top: 10px; color: var(--ink); border: 1px solid color-mix(in srgb, var(--hairline) 18%, transparent); }
@@ -458,9 +458,9 @@ footer a { color: var(--ink); text-decoration: none; }
   .project-activity .project-activity-periods { margin-top: 14px; }
   .project-activity .project-activity-lane, .project-activity .project-activity-date-row { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .project-activity .project-activity-date-row > .project-activity-label { display: none; }
-  .project-activity .project-activity-lane { padding: 5px 0 12px; }
+  .project-activity .project-activity-lane { padding: 4px 0 8px; }
   .project-activity .project-activity-toggle { padding: 5px 3px; }
-  .project-activity .project-activity-cell { width: min(16px, 100%); border-radius: 3px; }
+  .project-activity .project-activity-cell { width: 10px; height: 10px; }
   .project-activity .project-activity-scroll[data-days="30"] .project-activity-label { position: sticky; left: 0; width: var(--project-visible-width); max-width: var(--project-visible-width); }
   .project-activity .project-activity-branch .project-activity-label { min-height: 36px; }
 }
@@ -847,9 +847,9 @@ footer a { color: var(--ink); text-decoration: none; }
     const bands = (Array.isArray(scale.bands) ? scale.bands : []).filter(band => band &&
       projectCount(band.lower) && band.lower > 0 && projectCount(band.upper) && band.upper >= band.lower &&
       Number.isInteger(band.level) && band.level >= 1 && band.level <= 4);
-    const swatch = (level, label, extra = "") => `<span class="project-activity-key-item"><i class="project-activity-swatch${extra}"${level == null ? "" : ` data-level="${level}"`} aria-hidden="true"></i><span>${esc(label)}</span></span>`;
+    const swatch = (level, label, extra = "", description = label) => `<span class="project-activity-key-item" role="img" aria-label="${esc(description)}" title="${esc(description)}"><i class="project-activity-swatch${extra}"${level == null ? "" : ` data-level="${level}"`} aria-hidden="true"></i><span>${esc(label)}</span></span>`;
     const positive = bands.map(band => swatch(band.level, band.lower === band.upper ? String(band.lower) : `${band.lower}–${band.upper}`)).join("");
-    return `<div class="project-activity-legend" data-role="project-activity-legend"><p>${bands.length ? "Observed pushes/day · low → high" : "No positive push counts to scale"}</p><div class="project-activity-key">${swatch(0, "0 · complete")}${positive}${swatch(null, "Unknown", " project-activity-unknown")}</div><p class="project-activity-qualification">${bands.length ? "One scale across all 30 days, received repositories, and observed branches." : "Zero is shown only with complete past-day observation."}${scale.lower_bounds_included ? " Partial positive counts are observed lower bounds." : ""} Dashed outlines mark incomplete observation.</p></div>`;
+    return `<div class="project-activity-legend" data-role="project-activity-legend"><div class="project-activity-legend-heading"><p>${bands.length ? "Pushes/day · low → high" : "No positive push counts to scale"}</p><span>Dashed: partial</span></div><div class="project-activity-key">${swatch(0, "0", "", "0 observed pushes; complete past-day observation")}${positive}${swatch(null, "Unknown", " project-activity-unknown", "Push count unknown; observation incomplete or unavailable")}</div></div>`;
   }
 
   function sizeProjectActivity(newest = false, scrollLeft = null) {
@@ -868,9 +868,9 @@ footer a { color: var(--ink); text-decoration: none; }
     const rows = valid && Array.isArray(model.rows) ? model.rows.filter(row => row && typeof row.repository === "string" && Array.isArray(row.daily)).slice(0,20) : [];
     const visible = rows.slice(0, projectShowAll ? rows.length : 8), dates = valid ? model.dates.slice(-projectDays) : [];
     const today = valid ? model.dates.at(-1) : null, cutoff = valid && typeof model.observed_at === "string" ? model.observed_at : null;
-    let html = '<div class="project-activity-header"><div><h2 class="title">Project activity</h2><p class="project-activity-subtitle">Observed branch pushes · UTC</p></div>';
+    const context = valid ? `Last ${projectDays} UTC days · today partial${model.complete === true ? "" : " · partial data"}` : "Observation cutoff unavailable";
+    let html = `<div class="project-activity-header"><div><h2 class="title">Project activity</h2><p class="project-activity-subtitle">${context}</p></div>`;
     html += `<div class="project-activity-periods" role="group" aria-label="Project activity time window"><button type="button" data-project-period="14" aria-pressed="${projectDays === 14}" aria-controls="project-activity-matrix">14 days</button><button type="button" data-project-period="30" aria-pressed="${projectDays === 30}" aria-controls="project-activity-matrix">30 days</button></div></div>`;
-    html += `<p class="project-activity-cutoff">${cutoff ? `Observed through ${esc(cutoff)} · today in progress` : "Observation cutoff unavailable"}</p>`;
     if (valid && model.complete === true && model.observed_pushes === 0) html += '<p class="project-activity-qualification">No push events observed in this window.</p>';
     if (valid && model.status === "unavailable" && rows.length) html += '<p class="project-activity-qualification">Project activity unavailable. Missing history is not zero.</p>';
     if (!valid || !rows.length) {
@@ -883,15 +883,14 @@ footer a { color: var(--ink); text-decoration: none; }
         const repository = row.repository, branches = (Array.isArray(row.branches) ? row.branches : []).filter(branch => branch && typeof branch.ref === "string" && Array.isArray(branch.daily));
         const expanded = projectExpanded.has(repository), branchId = `project-activity-branches-${index}`;
         const shortName = repository.split("/").at(-1), branchText = `${branches.length} observed ${branches.length === 1 ? "branch" : "branches"}`;
-        html += `<div role="rowgroup"><div class="project-activity-lane" role="row" data-role="project-activity-row" data-repository="${esc(repository)}"><div class="project-activity-label" role="rowheader"><button type="button" class="project-activity-toggle" data-project-branch-toggle="${index}" aria-expanded="${expanded}" aria-controls="${branchId}" aria-label="${esc(repository)} · ${branchText}"${branches.length ? "" : " disabled"}><span class="project-activity-chevron" aria-hidden="true">›</span><span class="project-activity-name-wrap"><span class="project-activity-name" title="${esc(repository)}">${esc(shortName)}</span><span class="project-activity-branch-count">${branchText}</span></span></button></div><div class="project-activity-grid" role="presentation">${projectCells(repository, null, row.daily, dates, today)}</div></div>`;
+        html += `<div role="rowgroup"><div class="project-activity-lane" role="row" data-role="project-activity-row" data-repository="${esc(repository)}"><div class="project-activity-label" role="rowheader"><button type="button" class="project-activity-toggle" data-project-branch-toggle="${index}" aria-expanded="${expanded}" aria-controls="${branchId}" aria-label="${esc(repository)} · ${branchText}" title="${esc(repository)} · ${branchText}"${branches.length ? "" : " disabled"}><span class="project-activity-chevron" aria-hidden="true">›</span><span class="project-activity-name-wrap"><span class="project-activity-name" title="${esc(repository)}">${esc(shortName)}</span></span></button></div><div class="project-activity-grid" role="presentation">${projectCells(repository, null, row.daily, dates, today)}</div></div>`;
         html += `<div class="project-activity-branches" id="${branchId}" role="presentation"${expanded ? "" : " hidden"}>${expanded ? branches.map(branch => `<div class="project-activity-lane project-activity-branch" role="row" data-role="project-activity-branch" data-repository="${esc(repository)}" data-ref="${esc(branch.ref)}"><span class="project-activity-label" role="rowheader" title="${esc(branch.ref)}">${esc(branch.ref.replace(/^refs\/heads\//, ""))}</span><div class="project-activity-grid" role="presentation">${projectCells(repository, branch.ref, branch.daily, dates, today, row.branch_empty_daily)}</div></div>`).join("") : ""}</div></div>`;
       });
       html += '</div></div>';
       if (rows.length > 8) html += `<button type="button" class="project-activity-show-all" data-project-show-all aria-expanded="${projectShowAll}" aria-controls="project-activity-matrix">${projectShowAll ? "Show first 8 repositories" : `Show all ${rows.length} repositories`}</button>`;
     }
     html += projectLegend(valid ? scale : {});
-    html += `<p class="project-activity-qualification">${esc(model.qualification || "Received repository activity is incomplete; exact global ranking is not guaranteed.")}</p>`;
-    html += `<details class="project-activity-details"><summary>How to read this</summary><p>${esc(model.meaning || "Counts are observed branch push events, not commits, contributions, or line changes.")}</p><p>Each cell uses the push event's UTC date. Repository rows combine their observed branches. Expand a repository to inspect those branches on the same scale. Deleted branches retain their historical pushes.</p><p>Solid zero cells mean no pushes in a complete past-day observation. Unfilled cells mean unknown activity; colored cells with dashed outlines are observed lower bounds. Today remains in progress. The repository list is a bounded received cohort, ordered by its latest qualified observed push.</p>${visible.length ? `<ul>${visible.map(row => `<li>${esc(row.repository)}<ul>${dates.map(date => { const day = row.daily.find(item => item && item.date === date) || {date,count:null,complete:false}; return `<li>${esc(projectCellLabel(row.repository, null, day, today))}</li>`; }).join("")}</ul></li>`).join("")}</ul>` : ""}</details>`;
+    html += `<details class="project-activity-details"><summary>How to read this</summary><p>${esc(model.meaning || "Counts are observed branch push events, not commits, contributions, or line changes.")}</p><p>${cutoff ? `Observed through ${esc(cutoff)} · today in progress` : "Observation cutoff unavailable"}</p><p>${esc(model.qualification || "Received repository activity is incomplete; exact global ranking is not guaranteed.")}</p><p>One scale across all 30 days, received repositories, and observed branches.${scale.lower_bounds_included ? " Partial positive counts are observed lower bounds." : ""} Each cell uses the push event's UTC date. Repository rows combine their observed branches. Expand a repository to inspect those branches on the same scale. Deleted branches retain their historical pushes.</p><p>Solid zero cells mean no pushes in a complete past-day observation. Unfilled cells mean unknown activity; colored cells with dashed outlines are observed lower bounds. Today remains in progress. The repository list is a bounded received cohort, ordered by its latest qualified observed push.</p>${visible.length ? `<ul>${visible.map(row => `<li>${esc(row.repository)}<ul>${dates.map(date => { const day = row.daily.find(item => item && item.date === date) || {date,count:null,complete:false}; return `<li>${esc(projectCellLabel(row.repository, null, day, today))}</li>`; }).join("")}</ul></li>`).join("")}</ul>` : ""}</details>`;
     root.innerHTML = html;
     root.querySelectorAll("[data-project-period]").forEach(button => button.addEventListener("click", () => {
       const next = button.dataset.projectPeriod === "30" ? 30 : 14;

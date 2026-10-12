@@ -551,30 +551,44 @@ def _project_activity_legend(c, x, y, span, scale):
              and type(band.get("level")) is int and 1 <= band["level"] <= 4]
     if len(bands) != len(supplied) or len(bands) > 4:
         bands = []
+
+    def key(center, cy, level, label, lower=None, upper=None):
+        description = ("0 observed pushes; complete past-day observation" if level == 0 else
+                       "Push count unknown; observation incomplete or unavailable" if level is None else
+                       label + " observed pushes/day")
+        c.group(data_role="project-activity-key", stroke_dasharray="2 2" if level is None else None)
+        attrs = dict(cx=round(center, 3), cy=cy, r=5,
+                     fill=PROJECT_ACTIVITY_COLORS[level] if level is not None else "none",
+                     stroke=COLORS["line"],
+                     data_level=level, data_lower=lower, data_upper=upper, aria_label=description)
+        c.parts.append('<circle '+_attrs(attrs)+'><title>'+escape(description)+'</title></circle>')
+        c.text(label, center, cy+22, size=c.secondary, color="muted", anchor="middle")
+        c.end()
+
     c.group(data_role="project-activity-legend")
-    y = c.wrap("Observed pushes/day · low → high", x, y, span, size=c.secondary, color="muted") + 7
     if bands:
-        slot = min(104, span / len(bands))
+        c.text("Pushes/day · low → high", x, y, size=c.secondary, color="muted")
+        slot = min(104, span / (len(bands) if c.mobile else len(bands)+2))
         for index, band in enumerate(bands):
-            center = x + slot * (index + .5)
-            c.rect(center-8, y, 16, 16, radius=3, fill=PROJECT_ACTIVITY_COLORS[band["level"]],
-                   stroke=COLORS["line"], data_level=band["level"],
-                   data_lower=band["lower"], data_upper=band["upper"])
+            center = x + slot * (index + (.5 if c.mobile else 1.5))
             label = str(band["lower"]) if band["lower"] == band["upper"] else f'{band["lower"]}–{band["upper"]}'
-            c.text(label, center, y+36, size=c.secondary, color="muted", anchor="middle")
-        y += 59
+            key(center, y+20, band["level"], label, band["lower"], band["upper"])
+        if c.mobile:
+            key(x+18, y+64, 0, "0")
+            key(x+94, y+64, None, "Unknown")
+            c.text("Dashed: partial", x+span, y+86, size=c.secondary, color="muted", anchor="end")
+            y += 96
+        else:
+            key(x+slot*.5, y+20, 0, "0")
+            key(x+slot*(len(bands)+1.5), y+20, None, "Unknown")
+            c.text("Dashed: partial", x+span, y, size=c.secondary, color="muted", anchor="end")
+            y += 52
     else:
         y = c.wrap("No positive push counts to scale", x, y, span, size=c.secondary, color="muted") + 12
-    for index, (level, label) in enumerate(((0, "0 · complete"), (None, "Unknown"))):
-        left = x + index * min(174, span/2)
-        c.rect(left, y-12, 16, 16, radius=3,
-               fill=PROJECT_ACTIVITY_COLORS[0] if level == 0 else "none",
-               stroke=COLORS["line"], stroke_dasharray=None if level == 0 else "2 2",
-               data_level=level)
-        c.text(label, left+24, y+1, size=c.secondary, color="muted")
-    y += 29
-    if scale.get("lower_bounds_included") is True:
-        y = c.wrap("Scale includes observed lower bounds", x, y, span, size=c.secondary, color="muted")
+        key(x+18, y, 0, "0")
+        key(x+94, y, None, "Unknown")
+        c.text("Dashed: partial", x+span, y+22, size=c.secondary, color="muted", anchor="end")
+        y += 32
     c.end()
     return y
 
@@ -594,24 +608,38 @@ def _project_activity(c, x, y, span, data):
                      and all(right-left == timedelta(days=1) for left, right in zip(parsed, parsed[1:])))
         except (TypeError, ValueError):
             valid = False
-    y = c.wrap("Observed branch pushes · UTC", x, y, span, size=c.secondary, color="muted")
     if not valid:
         y = c.wrap("Project activity unavailable", x, y+8, span, color="muted")
         y = c.wrap("A qualified observation window is not available.", x, y, span,
                    size=c.secondary, color="muted")
-        y = _project_activity_legend(c, x, y+15, span, {})
-        return c.wrap("Explore observed branches on the website", x, y+5, span,
-                      size=c.secondary, color="muted")
+        return _project_activity_legend(c, x, y+15, span, {})
 
     cutoff = str(project.get("observed_at") or project.get("window_end") or "")
     cutoff_label = cutoff[:16].replace("T", " ")+" UTC" if cutoff else "cutoff unavailable"
-    y = c.wrap("Through "+cutoff_label, x, y, span, size=c.secondary, color="muted")
-    y = c.wrap("Last 14 days · today in progress", x, y, span, size=c.secondary, color="muted")
-    c.parts.append('<desc>'+escape(str(project.get("meaning") or "Observed unique repository push events"))+'</desc>')
     rows = [row for row in supplied_rows if isinstance(row, dict)
             and isinstance(row.get("repository"), str) and row["repository"]
             and isinstance(row.get("daily"), list)]
     visible, dates = rows[:8], axis[-14:]
+    context = ["Last 14 UTC days · today partial"]
+    if project.get("complete") is not True:
+        context.append("partial data")
+    if len(rows) > len(visible):
+        context.append(f"{len(visible)}/{len(rows)} repos")
+    if c.mobile:
+        c.text(context[0], x, y, size=c.secondary, color="muted")
+        y += c.secondary * 1.4
+        if len(context) > 1:
+            y = c.wrap(" · ".join(context[1:]), x, y, span, size=c.secondary, color="muted")
+    else:
+        y = c.wrap(" · ".join(context), x, y, span, size=c.secondary, color="muted")
+    meaning = str(project.get("meaning") or "Observed unique repository push events")
+    qualification = str(project.get("qualification") or "Bounded received repository observations")
+    description = (meaning + " Observed through " + cutoff + ". " + qualification +
+                   " One scale across all 30 days, received repositories, and observed branches. "
+                   "Solid zero dots mean no pushes in a complete past-day observation. "
+                   "Unfilled dots mean unknown activity; colored dots with dashed outlines are observed lower bounds. "
+                   "Today remains in progress.")
+    c.parts.append('<desc>'+escape(description)+'</desc>')
     if project.get("status") == "unavailable":
         y = c.wrap("Project activity unavailable", x, y+8, span, color="muted")
     elif project.get("complete") is True and project.get("observed_pushes") == 0:
@@ -621,7 +649,7 @@ def _project_activity(c, x, y, span, data):
         grid_x = x if c.mobile else x + label_width + 20
         grid_width = span if c.mobile else span - label_width - 20
         step = grid_width / len(dates)
-        cell_size = min(16 if c.mobile else 24, step-4)
+        cell_radius = 5 if c.mobile else 6
         y += 18
         if not c.mobile:
             c.text("Repository", x, y, size=c.secondary, color="muted")
@@ -632,7 +660,7 @@ def _project_activity(c, x, y, span, data):
                    size=c.secondary, color="muted", anchor=anchor,
                    data_role="project-activity-date", data_date=dates[index])
         y += 15
-        row_height = 65 if c.mobile else 48
+        row_height = 48 if c.mobile else 44
         for row in visible:
             repository = row["repository"]
             c.group(data_role="project-activity-row", data_repository=repository)
@@ -641,9 +669,9 @@ def _project_activity(c, x, y, span, data):
             name_width = span if c.mobile else label_width
             # Reserve an em per character so wide names fit at the normal caption size.
             c.text(truncate(name, max(1, int(name_width/c.secondary))), x,
-                   y+c.secondary if c.mobile else y+29, size=c.secondary, weight=500,
+                   y+c.secondary if c.mobile else y+27, size=c.secondary, weight=500,
                    aria_label=repository)
-            grid_y = y+29 if c.mobile else y+(row_height-cell_size)/2
+            grid_y = y+34 if c.mobile else y+row_height/2
             daily = {cell.get("date"): cell for cell in row["daily"]
                      if isinstance(cell, dict) and isinstance(cell.get("date"), str)}
             for index, day in enumerate(dates):
@@ -666,15 +694,14 @@ def _project_activity(c, x, y, span, data):
                 if day == axis[-1]:
                     detail += "; today in progress; as of "+cutoff_label
                 label = f"{repository} · {day} UTC: {detail}"
-                attrs = dict(x=round(grid_x+(index+.5)*step-cell_size/2, 3), y=grid_y,
-                             width=cell_size, height=cell_size, rx=3 if c.mobile else 4,
+                attrs = dict(cx=round(grid_x+(index+.5)*step, 3), cy=grid_y, r=cell_radius,
                              fill=PROJECT_ACTIVITY_COLORS[level] if level is not None else "none",
                              stroke=COLORS["line"], stroke_width=1,
                              stroke_dasharray=None if complete else "2 2",
                              data_role="project-activity-cell", data_repository=repository,
                              data_date=day, data_count=count, data_complete=str(complete).lower(),
                              data_level=level, aria_label=label)
-                c.parts.append('<rect '+_attrs(attrs)+'><title>'+escape(label)+'</title></rect>')
+                c.parts.append('<circle '+_attrs(attrs)+'><title>'+escape(label)+'</title></circle>')
             c.line(x, y+row_height-2, x+span, y+row_height-2, stroke_opacity=.55)
             c.end()
             y += row_height
@@ -682,14 +709,7 @@ def _project_activity(c, x, y, span, data):
     elif project.get("status") != "unavailable" and project.get("complete") is not True:
         y = c.wrap("No qualified repository observations", x, y+8, span, color="muted")
 
-    y = _project_activity_legend(c, x, y+7, span, project.get("scale"))
-    if len(rows) > len(visible):
-        y = c.wrap(f"Showing {len(visible)} of {len(rows)} received repositories", x, y+4, span,
-                   size=c.secondary, color="muted")
-    qualification = project.get("qualification") or "Bounded received repository observations"
-    y = c.wrap(qualification, x, y+4, span, size=c.secondary, color="muted")
-    return c.wrap("Explore observed branches on the website", x, y+8, span,
-                  size=c.secondary, color="muted")
+    return _project_activity_legend(c, x, y+7, span, project.get("scale"))
 
 
 def render_svg(summary, *, mobile=False, generation=None, code_view="latest_observed_branch"):

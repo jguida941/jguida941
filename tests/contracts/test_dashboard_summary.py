@@ -144,15 +144,49 @@ class ProjectActivitySvgTests(unittest.TestCase):
                     self.assertEqual(str(day["complete"]).lower(), cell.get("data-complete"))
                     self.assertEqual(None if day["level"] is None else str(day["level"]), cell.get("data-level"))
                     self.assertEqual("none" if day["level"] is None else PROJECT_ACTIVITY_COLORS[day["level"]], cell.get("fill"))
-                    self.assertEqual(cell.get("width"), cell.get("height"))
-                    self.assertGreaterEqual(float(cell.get("width")), 12)
-                    self.assertLessEqual(float(cell.get("width")), 24)
+                    # Marker geometry follows the current circular-dot direction below;
+                    # this shared-fact test remains independent of SVG primitive choice.
                     self.assertIn(day["date"] + " UTC", " ".join(cell.itertext()))
                 legend = next(node for node in section.iter() if node.get("data-role") == "project-activity-legend")
                 bands = [node for node in legend.iter() if node.get("data-lower") is not None]
                 self.assertEqual([(band["lower"], band["upper"], band["level"]) for band in model["scale"]["bands"]],
                                  [(int(node.get("data-lower")), int(node.get("data-upper")), int(node.get("data-level"))) for node in bands])
-                self.assertIn("Explore observed branches on the website", " ".join(section.itertext()))
+                self.assertIn(model["meaning"], " ".join(section.itertext()))
+
+    def test_small_circular_activity_markers_and_compact_copy(self):
+        """The compact dot view keeps full meaning outside the visible summary copy."""
+        activity = self.activity()
+        family = activity["project_activity"]
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                tree = ET.fromstring(render_svg({"activity_analytics": activity}, mobile=mobile))
+                section = next(node for node in tree.iter() if node.get("data-section") == "project-activity")
+                cells = [node for node in section.iter() if node.get("data-role") == "project-activity-cell"]
+                legend = next(node for node in section.iter() if node.get("data-role") == "project-activity-legend")
+                keys = [node for node in legend.iter() if node.tag.rsplit("}", 1)[-1] in ("rect", "circle")]
+                descriptions = " ".join(node.text or "" for node in section.iter()
+                                        if node.tag.rsplit("}", 1)[-1] in ("desc", "title"))
+                problems = []
+                for node in cells:
+                    if node.tag.rsplit("}", 1)[-1] != "circle" or float(node.get("r", -1)) != (5 if mobile else 6):
+                        problems.append("Day marker is not the small circle")
+                for node in keys:
+                    if node.tag.rsplit("}", 1)[-1] != "circle" or float(node.get("r", -1)) != 5:
+                        problems.append("Legend marker is not the small circle")
+                for field in ("meaning", "qualification", "observed_at"):
+                    if family[field] not in descriptions:
+                        problems.append("Full description is missing " + field)
+                row_nodes = {node for row in section.iter() if row.get("data-role") == "project-activity-row" for node in row.iter()}
+                legend_nodes = set(legend.iter())
+                context = [node.text or "" for node in section.iter()
+                           if node.tag.rsplit("}", 1)[-1] == "text" and node not in row_nodes | legend_nodes
+                           and node.get("data-role") != "project-activity-date"
+                           and node.text not in ("Project activity", "Repository")]
+                if len(context) > 2 or len([word for word in " ".join(context).split() if any(char.isalnum() for char in word)]) > 14:
+                    problems.append("Visible context is not compact")
+                if "Explore observed branches on the website" in context:
+                    problems.append("Repeated website footer remains visible")
+                self.assertEqual([], problems)
 
     def test_zero_unavailable_and_default_neighbor_selection(self):
         import copy
