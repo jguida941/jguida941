@@ -3524,7 +3524,8 @@ class OwnedCodeActivityAggregationTests(unittest.TestCase):
         legacy["overall_code_changes"] = {
             "schema": "profile-owned-code-observations/v1",
             "window_start": _iso(start), "window_end": _iso(end), "observed_at": _iso(end),
-            "inventory": {"expected": 3, "eligible": 3, "complete": True,
+            # Expected nonfork inventory includes the excluded profile repository.
+            "inventory": {"expected": 4, "eligible": 3, "complete": True,
                           "fresh": True, "excluded": {"fork": 1, "profile": 1}},
             "repositories": repositories,
             "requests": {"used": 6, "limit": 400, "remaining": 950, "reason": "observed"},
@@ -3575,6 +3576,7 @@ class OwnedCodeActivityAggregationTests(unittest.TestCase):
         source = self.source()
         raw = source["overall_code_changes"]
         raw["inventory"].update(expected=0, eligible=0)
+        raw["inventory"]["excluded"]["profile"] = 0
         raw["repositories"] = []
         value = self.window(source)
         self.assertEqual((0, 0, 365),
@@ -3691,6 +3693,153 @@ class OwnedCodeActivityAggregationTests(unittest.TestCase):
             self.assertNotIn(private_detail, encoded)
         self.assertIn("all authors", value["meaning"].lower())
         self.assertIn("nonfork", value["meaning"].lower())
+
+
+class OwnedInventoryReconciliationTests(unittest.TestCase):
+    """Inventory totals must account for the profile without counting forks."""
+
+    @staticmethod
+    def source(expected=1, profile=0, eligible=1, committed_at="2026-10-09T12:00:00Z"):
+        from scripts.github import github_client as gh
+
+        source = CodeChangeAggregationTests.source()
+        end = datetime(2026, 10, 10, 16, 30, tzinfo=timezone.utc)
+        start = end.replace(hour=0, minute=0) - timedelta(days=364)
+        repositories = []
+        for index in range(eligible):
+            heads = [{"ref": "refs/heads/main", "head_sha": "c" * 40}] if index == 0 else []
+            histories = [{
+                "head_sha": "c" * 40, "status": "ok", "complete": True,
+                "reason": "end_of_connection", "commits": [{
+                    "oid": "1" * 40, "committed_at": committed_at,
+                    "additions": 10, "deletions": 2, "parent_count": 1,
+                }],
+            }] if index == 0 else []
+            repositories.append({
+                "repository": f"{gh.USERNAME}/inventory-{index}", "private": bool(index % 2),
+                "refs": {"status": "ok", "complete": True, "reason": "end_of_connection",
+                         "total_count": len(heads), "heads": heads},
+                "histories": histories,
+            })
+        source["overall_code_changes"] = {
+            "schema": "profile-owned-code-observations/v1", "window_start": _iso(start),
+            "window_end": _iso(end), "observed_at": _iso(end),
+            "inventory": {"expected": expected, "eligible": eligible, "complete": True,
+                          "fresh": True, "excluded": {"fork": 0, "profile": profile,
+                          "identity": 0, "privacy": 0, "unknown_fork": 0, "duplicate": 0}},
+            "repositories": repositories,
+            "requests": {"used": 2, "limit": 400, "remaining": 950, "reason": "observed"},
+        }
+        return source
+
+    @staticmethod
+    def model(source):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+
+        fields = {"repo_counts": {}, "repos": [], "all_repos": [], "language_bytes": {},
+                  "events": [], "latest_push_message_by_repo": {}, "public_scope_commits": None,
+                  "ci_count_probe": 0, "calendar": None, "total_contributions": None,
+                  "token_mode": "fixture", "cache_mode": {}, "activity_observations": source}
+        collected = CollectedProfileData(**json.loads(json.dumps(fields)))
+        return build_activity_analytics(collected.activity_observations)
+
+    def test_inventory_mismatch_preserves_subtotals_and_unknown_days(self):
+        for expected, profile in ((1, 1), (2, 0)):
+            for committed_at in ("2026-01-21T12:00:00Z", "2026-10-09T12:00:00Z"):
+                for period in ("30d", "365d"):
+                    with self.subTest(expected=expected, profile=profile, committed_at=committed_at, period=period):
+                        source = self.source(expected, profile, committed_at=committed_at)
+                        family = self.model(source)["overall_code_changes"]
+                        window = family["windows"][period]
+                        quiet = next(day for day in window["daily"] if day["date"] == "2026-10-08")
+                        observed = period == "365d" or committed_at.startswith("2026-10")
+                        self.assertEqual(
+                            (False, "partial", False, "partial" if observed else "unavailable",
+                             10 if observed else None, 2 if observed else None, None, None, False),
+                            (family["complete"], family["status"], window["complete"], window["status"],
+                             window["additions"], window["deletions"], quiet["additions"], quiet["deletions"],
+                             quiet["complete"]),
+                        )
+                        self.assertEqual((expected, 1, profile),
+                                         (family["coverage"]["expected"], family["coverage"]["eligible"],
+                                          family["coverage"]["excluded"]["profile"]))
+                        self.assertTrue(family["coverage"]["reasons"])
+                        self.assertTrue(all(not row["complete"] for row in window["bins"]))
+
+    def test_reconciled_inventory_and_fork_exclusion_keep_complete_values(self):
+        for expected, profile in ((1, 0), (2, 1)):
+            for forks in (0, 3):
+                with self.subTest(expected=expected, profile=profile, forks=forks):
+                    source = self.source(expected, profile)
+                    source["overall_code_changes"]["inventory"]["excluded"]["fork"] = forks
+                    family = self.model(source)["overall_code_changes"]
+                    self.assertTrue(family["complete"])
+                    self.assertEqual([], family["coverage"]["reasons"])
+                    for window in family["windows"].values():
+                        quiet = next(day for day in window["daily"] if day["date"] == "2026-10-08")
+                        self.assertEqual((10, 2, True, 0, 0, True),
+                                         (window["additions"], window["deletions"], window["complete"],
+                                          quiet["additions"], quiet["deletions"], quiet["complete"]))
+
+    def test_optional_diagnostics_do_not_account_for_an_unobserved_profile(self):
+        for expected in (1, 2):
+            for omitted in ("profile", "all_counters", "excluded"):
+                with self.subTest(expected=expected, omitted=omitted):
+                    source = self.source(expected)
+                    inventory = source["overall_code_changes"]["inventory"]
+                    if omitted == "profile":
+                        inventory["excluded"].pop("profile")
+                    elif omitted == "all_counters":
+                        inventory["excluded"] = {}
+                    else:
+                        inventory.pop("excluded")
+                    family = self.model(source)["overall_code_changes"]
+                    self.assertEqual(expected == 1, family["complete"])
+                    self.assertIsNone(family["coverage"]["excluded"]["profile"])
+                    self.assertEqual((10, 2), (family["windows"]["365d"]["additions"],
+                                               family["windows"]["365d"]["deletions"]))
+
+    def test_small_inventory_partitions_reconcile_both_directions(self):
+        for eligible in range(4):
+            for profile in (0, 1):
+                accounted = eligible + profile
+                for expected in range(max(0, accounted - 1), accounted + 2):
+                    with self.subTest(expected=expected, eligible=eligible, profile=profile):
+                        family = self.model(self.source(expected, profile, eligible))["overall_code_changes"]
+                        complete = expected == accounted
+                        self.assertEqual(complete, family["complete"])
+                        for window in family["windows"].values():
+                            totals = (10, 2) if eligible else (0, 0) if complete else (None, None)
+                            self.assertEqual((*totals, complete),
+                                             (window["additions"], window["deletions"], window["complete"]))
+
+    def test_observed_zero_and_existing_partial_inventory_keep_their_meaning(self):
+        source = self.source()
+        raw = source["overall_code_changes"]
+        raw["inventory"]["complete"] = False
+        raw["repositories"][0]["histories"][0]["commits"][0].update(additions=0, deletions=0)
+        family = self.model(source)["overall_code_changes"]
+        for window in family["windows"].values():
+            observed = next(day for day in window["daily"] if day["date"] == "2026-10-09")
+            quiet = next(day for day in window["daily"] if day["date"] == "2026-10-08")
+            self.assertEqual((0, 0, False, 0, 0, False, None, None, False),
+                             (window["additions"], window["deletions"], window["complete"],
+                              observed["additions"], observed["deletions"], observed["complete"],
+                              quiet["additions"], quiet["deletions"], quiet["complete"]))
+
+    def test_serialized_and_direct_inputs_agree_without_changing_other_families(self):
+        from scripts.pipeline.activity_analytics import build_activity_analytics
+
+        baseline = self.model(self.source())
+        for expected, profile in ((1, 0), (2, 1), (1, 1), (2, 0)):
+            with self.subTest(expected=expected, profile=profile):
+                source = self.source(expected, profile)
+                before = copy.deepcopy(source)
+                serialized = self.model(source)
+                self.assertEqual(serialized, build_activity_analytics(source))
+                self.assertEqual(before, source)
+                self.assertEqual({key: value for key, value in baseline.items() if key != "overall_code_changes"},
+                                 {key: value for key, value in serialized.items() if key != "overall_code_changes"})
 
 
 if __name__ == "__main__":

@@ -115,6 +115,10 @@ def _build_owned_code_activity(source):
         reasons.add("invalid_inventory_exclusions")
     if any(coverage["excluded"][key] for key in ("identity", "privacy", "unknown_fork", "duplicate")):
         reasons.add("uncertain_inventory_exclusions")
+    # Expected counts cover nonfork inventory before the profile is excluded.
+    if (expected is not None and eligible is not None
+            and expected != eligible + (coverage["excluded"]["profile"] or 0)):
+        reasons.add("inventory_incomplete")
     requests = source.get("requests") if type(source.get("requests")) is dict else {}
     used, limit, remaining = count(requests.get("used")), count(requests.get("limit")), count(requests.get("remaining"))
     coverage["requests"] = {"used": used, "limit": limit, "remaining": remaining}
