@@ -112,18 +112,9 @@ to a `doc_cite`. Adding theme 4 adds zero predicates; adding a component adds on
 - **Cuts (right-sized for this repo):** NO 45-lane sprawl, NO claim_intake/authority_leak/relay
   plumbing, NO Rust subprocess. One runner, one predicate library, one schema, one prove lane.
 
-## 6. The skill (repeatable RED-first driver, portable in DISCIPLINE)
+## 6. Private authoring boundary
 
-`skills/design-language-tdd/` gains lanes: `doctrine-ingest` (docs/examples/screenshots→candidate
-obligation packet: typed axes + negative_cases + refute_by + receipt_obligation), `add-design-language`
-(obligations→`docs/design/<lang>.md`→profile JSON→RED), `add-component` (DONE), `add-aspect-contract`,
-and `prove-theme` (GREEN + mutation + true-viewport receipts + codex). Org gate baked in. The portable
-half (predicate LOGIC, profile schema, roster shape, runner, LAW shapes) is portable in DISCIPLINE.
-**(codex must-fix #6: "zero repo literals" is NOT literally true today — the skill/boundaries TEXT
-names this repo's paths (`repo_layout.json`, `DESIGN_CONTRACT_GROUPS`, `bootstrap_red_ref`,
-`design_predicates.py`). On lift to scout those paths get templated / isolated into a "this-repo
-bindings" section; the governance shape lifts, the paths don't — reword, don't overclaim.)** The
-profile-specific half (`design_render_adapter`, token values, receipts) stays.
+The design-language authoring skill and its supporting lane documents are retained in authenticated private storage, not this public product checkout. Authorized agents obtain them from the private continuation. Public profile data, renderers, conformance predicates, and receipts remain governed by executable public contracts. This skill is not an imported runtime dependency, and removing it does not introduce a Rust kernel here.
 
 ## 7. Phased build order (RED-first; each: name RED → declare homes+authority → implement → prove+mutation → receipt → codex)
 
@@ -197,13 +188,13 @@ profile-specific half (`design_render_adapter`, token values, receipts) stays.
    theme selector. Reserved profiles (including `power-bi`) cannot leak into the public switcher; the RED
    contract binds `THEMES` / `THEME_META` / `MATERIALS` / `THEME_IA` + generated HTML to the active roster.
    Carbon is now a public option, but its palette/radius remain profile-owned and projected into the bridge.
-8. **P5-THEMES-4-10** — via the skill: Material 3, Fluent 2, Polaris, Atlassian, Linear, Geist, Stripe
+8. **P5-THEMES-4-10** — via access-controlled private authoring guidance: Material 3, Fluent 2, Polaris, Atlassian, Linear, Geist, Stripe
    — each a profile JSON + cited doctrine doc + usually zero new predicates + optional internal receipt
    fixture, NOT a separate public product page.
    **Pre-theme hardening now folded:** button focus uses the same mutually-exclusive signal counting
    as chip focus (ambiguous rings → None), and the anti-convergence gate is bound to RENDERED
    button/chip/card fingerprints, with declared `components.*.fingerprint` checked only for
-   consistency. The skill now begins with `doctrine-ingest.md`, so Scout emits obligations (typed axes,
+   consistency. Private authoring guidance uses an authenticated doctrine-intake stage, so Scout emits obligations (typed axes,
    negative cases, `refute_by`, visual receipt obligations), not summaries. A model can still propose
    profile data, but distinctness is decided by observed rendered facts, not JSON self-reporting.
 9. **P5-RECEIPT-GATE** ✅ (obligation layer) — every deferred/judgment row now carries structured

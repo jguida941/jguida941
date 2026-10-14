@@ -161,7 +161,7 @@ DESIGN_CONTRACT_GROUPS: dict[str, tuple[str, ...]] = {
         "test_design_distinctness.py",  # P5: themes are DISTINCT design languages (anti-convergence)
     ),
     "skill": (
-        "test_skill_structure.py",      # P5: the design-language-tdd skill structure (the repeatable engine)
+        "test_skill_structure.py",      # Public exclusion guard; private authoring files must not ship
     ),
     "data_semantics": (
         "test_data_semantics.py",       # P5-DATA: the computed metrics are honest (value+label match meaning)
