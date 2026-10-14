@@ -44,7 +44,7 @@ attack lists recorded in b-0-design.md + commit messages). Fold findings RED-fir
 4. SIBLING REPOS — yes, but TARGETED, read-only (do not wander):
    - `/Users/jguida941/semantic-tdd/docs/developer/operating-guide.md` §0.5 — the canonical
      12-step slice ritual this repo adapts (no local Rust kernel — deliberate, see
-     `skills/design-language-tdd/references/boundaries.md`).
+     the privately retained design-method boundaries (access-controlled)).
    - `/Users/jguida941/repo-surface-scout/docs/process/WRITING-GOOD-INVARIANTS.md` +
      `SLICE-PROOF-TEMPLATE.md` — RED-for-the-right-reason, gap→pending-contract, surface-to-law.
 5. Verify ground truth yourself (never trust this doc over the tree): `git log --oneline -12`,

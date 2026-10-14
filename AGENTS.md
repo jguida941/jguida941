@@ -1,5 +1,9 @@
 # AGENTS.md
 
+## Private authoring materials
+
+This public product source intentionally excludes internal design-language authoring skills and their reference documents. An authorized agent uses the access-controlled private project handoff instead. Do not reconstruct private instructions from public history or reintroduce them into public commits. Public runtime renderers, design profiles, contracts, and tests remain usable without a private repository checkout.
+
 ## Role protocol (operator-ratified, 2026-07-02)
 
 **Fable (Claude, main loop) owns the work**: reorientation, slice design (written to a scratch

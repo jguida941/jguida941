@@ -96,7 +96,7 @@ per page × language (honest kinds); receipt obligations on the judgment aspects
 Riders re-sequenced AFTER D-SHELL: E-BTN-LABELS (into D-SHELL-3), P2-RECEIPTS, switcher, themes.
 
 ## Repeatability deliverables (D-SHELL-1 slice includes)
-skills/design-language-tdd/references/add-page-aspect.md — the surface-to-law loop (observe →
+Privately retained design-method aspect guidance (authenticated continuation only) — the surface-to-law loop (observe →
 model → candidate law → doctrine/gap → RED → data/render/facts/predicate → receipt → codex).
 Repo AGENTS.md — the two-plan protocol: Fable designs/reviews/commits; codex gates (DESIGN-VERDICT/
 VERDICT/ADVERSARIAL-VERDICT lines) + codex build agents (workspace-write, never commit).

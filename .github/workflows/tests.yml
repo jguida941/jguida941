@@ -46,6 +46,7 @@ jobs:
             tests.contracts.test_data_semantics \
             tests.contracts.test_public_data_privacy \
             tests.contracts.test_design_contract \
+            tests.contracts.test_skill_structure \
             tests.contracts.test_label_legibility
 
       - name: Fixture smoke CLI run (offline path)

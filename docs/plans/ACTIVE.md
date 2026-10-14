@@ -52,12 +52,7 @@
   CSS-gated on `[data-theme="power-bi"]` so the switcher reflows it. `test_design_character` extended
   (Power BI table-forward; others bar/stat-forward — grounded in the research). 171 green. Same data,
   different chart per design language — the start of each theme being a different *website*.
-- ✅ **P5-SKILL slice 1 (the repeatable engine exists)** — `skills/design-language-tdd/` (SKILL.md +
-  references add-design-language / prove-theme / boundaries) codifies the loop (research → cited
-  doctrine → closed proper-style + character invariant set RED-first → GENERATE the themed
-  anatomy → prove: GREEN both surfaces + mutation + receipts + codex → honest receipt, never "is
-  Apple"). Org gate baked in. Guarded by `test_skill_structure` (new `skill` authority). 175 green.
-  "Add Material / Stripe / a brand guide" = run this skill = another complete distinct website.
+- ✅ **P5 private authoring process (historical)** — Its procedural files and reference lanes are maintained in authenticated private source, not the public checkout. Public theme behavior and runtime contracts remain in this repository, which has no dependency on those private method files.
 - ✅ **P5-1 slice 4 (per-theme KPI-grid density)** — `.tiles` now `auto-fit minmax(var(--tile-min),1fr)`;
   Power BI tile_min 150 packs a dense 5-6-KPI row, Apple tile_min 380 spreads to 2 large cards, Liquid
   280 (3-up). `test_design_character` extended (KPI density inverts padding, distinct). 176 green.
@@ -206,9 +201,8 @@ profiles (liquid-glass, carbon, apple-dark) — character + distinctness determi
 receipt. The loudest "genuinely different component, not a reskin" moment.
 
 - **Roadmap:** **P5-DATA semantic-TDD on the metrics (NOW)** → docs/design verification → P5-3 webkit button slice
-  → showcase scaffold → themes 4–10 via the skill → P5-4 settings/customization → P5-6 showcase polish + the
-  runtime/visual receipt gate. P5-0 org-gate completion gates the showcase-file homes. The `design-language-tdd`
-  skill dogfoods on the first 3 themes.
+  → showcase scaffold → themes 4–10 under private authoring guidance → P5-4 settings/customization → P5-6 showcase polish + the
+  runtime/visual receipt gate. P5-0 org-gate completion gates the showcase-file homes. The private authoring process was historically exercised on the first three themes.
 
 ## Context
 
@@ -282,13 +276,9 @@ into ONE portable target-shape over **every** surface, by **reusing** the proven
 Liquid Glass (origin) · Apple HIG · Power BI · Material 3 · Fluent 2 · IBM Carbon · Shopify Polaris ·
 Atlassian · Linear · Vercel/Geist · Stripe.
 
-## The SKILL — `skills/design-language-tdd/` (built here, portable to scout)
-One skill, three lanes (mirrors scout `semantic-tdd-claim-audit`): `SKILL.md` router + `references/`
-(`add-design-language`/`add-aspect-contract`/`prove-theme` + `predicate-library`/`determinism-split`/
-`distinctness-and-character`/`visual-receipts`/`doctrine-sourcing`/`boundaries`) + templates. The org gate
-is baked in (name the RED first; declare the new file's home in `repo_layout.json` same slice). Loop:
-research→cited doctrine → closed invariant set → RED-first → implement → mutation-prove → GREEN (SVG+web)
-+ visual receipts → distinctness/character → codex folds disagreements RED-first → honest receipt.
+## Access-controlled authoring guidance
+
+Internal design-language authoring methods and supporting reference documents now live outside this public product repository. Public documentation covers the product's architecture and observable outputs; authorized agents load private method instructions from the authenticated continuation.
 
 ## Architecture & contract structure → `docs/plans/DESIGN-SYSTEM.md`
 The full SELF-DEMONSTRATING design-system architecture — the one `PROFILE→render→invariant→receipt`
