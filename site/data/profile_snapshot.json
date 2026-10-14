@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-14T08:04:08.831403Z",
+  "generated_at": "2026-10-14T09:02:08.694120Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 12207,
-    "public_scope_commits": 7515,
+    "last_year_contributions": 12208,
+    "public_scope_commits": 7517,
     "total_repos": 56,
     "public_forks": 0,
     "private_owned_repos": 204,
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 12207,
-      "display_value": "12,207"
+      "value": 12208,
+      "display_value": "12,208"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 7515,
-      "display_value": "7,515"
+      "value": 7517,
+      "display_value": "7,517"
     },
     {
       "key": "total_repos",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 12207,
-      "display_value": "12,207"
+      "value": 12208,
+      "display_value": "12,208"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 7515,
-      "display_value": "7,515"
+      "value": 7517,
+      "display_value": "7,517"
     },
     {
       "key": "total_repos",
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-14T08:03:09Z",
+        "observed_at": "2026-10-14T09:00:37Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -228,8 +228,8 @@
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-10-15T04:00:00Z",
-        "window_end": "2026-10-14T08:03:15Z",
-        "observed_at": "2026-10-14T08:03:16Z",
+        "window_end": "2026-10-14T09:00:59Z",
+        "observed_at": "2026-10-14T09:01:00Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -243,8 +243,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-09-15T04:00:00Z",
-        "window_end": "2026-10-14T08:03:13Z",
-        "observed_at": "2026-10-14T08:03:15Z",
+        "window_end": "2026-10-14T09:00:53Z",
+        "observed_at": "2026-10-14T09:00:58Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -258,8 +258,8 @@
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-10-15T04:00:00Z",
-        "window_end": "2026-10-14T08:03:15Z",
-        "observed_at": "2026-10-14T08:03:15Z",
+        "window_end": "2026-10-14T09:00:58Z",
+        "observed_at": "2026-10-14T09:00:59Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-14T08:03:08Z",
+        "observed_at": "2026-10-14T09:00:34Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -289,7 +289,7 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0535714285714286,
     "ci_coverage_pct": 22.00772200772201,
-    "last_year_contributions": 12207,
+    "last_year_contributions": 12208,
     "active_days_last_year": 326,
     "automation_workflows": 170,
     "primary_lang_share_pct": 66.7,
@@ -301,8 +301,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 12207,
-      "display_value": "12,207",
+      "value": 12208,
+      "display_value": "12,208",
       "accent": "#7dcfff"
     },
     {
@@ -554,7 +554,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-14",
       "pushed_at_raw": "2026-10-14T06:50:55Z",
-      "pushed_ago": "today",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-10-11",
       "last_commit_msg": "fix(private-ci): qualify P2 through protected Mac admission, disable \u2026",
       "is_private": true,
@@ -570,7 +570,7 @@
       "ci": "no",
       "pushed_at": "2026-10-14",
       "pushed_at_raw": "2026-10-14T06:48:08Z",
-      "pushed_ago": "today",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-09-06",
       "last_commit_msg": "Remove unapproved CF2 workflow registration from main",
       "is_private": true,
@@ -586,7 +586,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-14",
       "pushed_at_raw": "2026-10-14T06:44:35Z",
-      "pushed_ago": "today",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-08-16",
       "last_commit_msg": "lease 4: seven attacks killed and restored",
       "is_private": true,
@@ -602,7 +602,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-14",
       "pushed_at_raw": "2026-10-14T06:34:30Z",
-      "pushed_ago": "today",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-08-09",
       "last_commit_msg": "chore: close raw Git path identity slice",
       "is_private": true,
@@ -618,7 +618,7 @@
       "ci": "no",
       "pushed_at": "2026-10-14",
       "pushed_at_raw": "2026-10-14T05:17:53Z",
-      "pushed_ago": "2 hours ago",
+      "pushed_ago": "3 hours ago",
       "created_at": "2026-08-15",
       "last_commit_msg": "Bootstrap private canary laboratory",
       "is_private": true,
@@ -634,7 +634,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-14",
       "pushed_at_raw": "2026-10-14T05:17:50Z",
-      "pushed_ago": "2 hours ago",
+      "pushed_ago": "3 hours ago",
       "created_at": "2026-08-05",
       "last_commit_msg": "plan: the working projections track dev (D-M5); the release moved mai\u2026",
       "is_private": true,
@@ -650,7 +650,7 @@
       "ci": "no",
       "pushed_at": "2026-10-13",
       "pushed_at_raw": "2026-10-13T14:10:29Z",
-      "pushed_ago": "17 hours ago",
+      "pushed_ago": "18 hours ago",
       "created_at": "2026-09-11",
       "last_commit_msg": "feat: retain scoped local and cloud continuation inputs",
       "is_private": true,
@@ -1044,19 +1044,19 @@
     "now": [
       {
         "title": "profile-private-continuation",
-        "detail": "Python \u00b7 pushed today",
+        "detail": "Python \u00b7 pushed 2 hours ago",
         "url": "https://github.com/jguida941/profile-private-continuation",
         "is_private": true
       },
       {
         "title": "CS405",
-        "detail": "C++ \u00b7 pushed today",
+        "detail": "C++ \u00b7 pushed 2 hours ago",
         "url": "https://github.com/jguida941/CS405",
         "is_private": true
       },
       {
         "title": "semloop",
-        "detail": "Python \u00b7 pushed today",
+        "detail": "Python \u00b7 pushed 2 hours ago",
         "url": "https://github.com/jguida941/semloop",
         "is_private": true
       }
@@ -1065,19 +1065,19 @@
     "shipped": [
       {
         "title": "chore: close raw Git path identity slice",
-        "detail": "sembridge \u00b7 today",
+        "detail": "sembridge \u00b7 2 hours ago",
         "url": "https://github.com/jguida941/sembridge",
         "is_private": true
       },
       {
         "title": "Bootstrap private canary laboratory",
-        "detail": "semvariants-canaries \u00b7 2 hours ago",
+        "detail": "semvariants-canaries \u00b7 3 hours ago",
         "url": "https://github.com/jguida941/semvariants-canaries",
         "is_private": true
       },
       {
         "title": "plan: the working projections track dev (D-M5); the rel...",
-        "detail": "semvariants \u00b7 2 hours ago",
+        "detail": "semvariants \u00b7 3 hours ago",
         "url": "https://github.com/jguida941/semvariants",
         "is_private": true
       }
@@ -1091,7 +1091,7 @@
       "repo": "jguida941/profile-private-continuation",
       "repo_url": "https://github.com/jguida941/profile-private-continuation",
       "state": "PUSH",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-10-14T06:50:55Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1103,7 +1103,7 @@
       "repo": "jguida941/CS405",
       "repo_url": "https://github.com/jguida941/CS405",
       "state": "PUSH",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-10-14T06:48:08Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1115,7 +1115,7 @@
       "repo": "jguida941/semloop",
       "repo_url": "https://github.com/jguida941/semloop",
       "state": "PUSH",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-10-14T06:44:35Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1127,7 +1127,7 @@
       "repo": "jguida941/sembridge",
       "repo_url": "https://github.com/jguida941/sembridge",
       "state": "PUSH",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-10-14T06:34:30Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1139,7 +1139,7 @@
       "repo": "jguida941/semvariants-canaries",
       "repo_url": "https://github.com/jguida941/semvariants-canaries",
       "state": "PUSH",
-      "time_ago": "2 hours ago",
+      "time_ago": "3 hours ago",
       "created_at": "2026-10-14T05:17:53Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1151,7 +1151,7 @@
       "repo": "jguida941/semvariants",
       "repo_url": "https://github.com/jguida941/semvariants",
       "state": "PUSH",
-      "time_ago": "2 hours ago",
+      "time_ago": "3 hours ago",
       "created_at": "2026-10-14T05:17:50Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1163,7 +1163,7 @@
       "repo": "jguida941/blambridge",
       "repo_url": "https://github.com/jguida941/blambridge",
       "state": "PUSH",
-      "time_ago": "17 hours ago",
+      "time_ago": "18 hours ago",
       "created_at": "2026-10-13T14:10:29Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1245,7 +1245,7 @@
       25,
       121,
       311,
-      136
+      137
     ],
     "contribution_trend": {
       "status": "available",
@@ -1362,7 +1362,7 @@
           "observed_start": "2026-10-12",
           "observed_end": "2026-10-14",
           "days_observed": 3,
-          "contributions": 136,
+          "contributions": 137,
           "partial": true
         }
       ],
@@ -1454,7 +1454,7 @@
     }
   },
   "contribution_calendar": {
-    "total": 12207,
+    "total": 12208,
     "weeks": [
       [
         {
@@ -3019,7 +3019,7 @@
         },
         {
           "date": "2026-10-14",
-          "count": 31
+          "count": 32
         }
       ]
     ]
@@ -3034,7 +3034,7 @@
     "window_start": "2025-10-15",
     "window_end": "2026-10-14",
     "days_observed": 365,
-    "total": 12207,
+    "total": 12208,
     "weekdays": [
       {
         "weekday": "Mon",
@@ -3048,7 +3048,7 @@
       },
       {
         "weekday": "Wed",
-        "contributions": 1677,
+        "contributions": 1678,
         "days_observed": 53
       },
       {
@@ -3100,9 +3100,9 @@
       },
       {
         "weekday": "Wed",
-        "contributions": 1677,
+        "contributions": 1678,
         "days_observed": 53,
-        "count_text": "1,677"
+        "count_text": "1,678"
       },
       {
         "weekday": "Thu",
@@ -3133,7 +3133,7 @@
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
     "window_start": "2026-09-15T00:00:00Z",
-    "window_end": "2026-10-14T08:03:37.898244Z",
+    "window_end": "2026-10-14T09:01:26.663306Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 260,
@@ -3422,8 +3422,8 @@
       "status": "partial",
       "complete": false,
       "window_start": "2026-09-15T00:00:00Z",
-      "window_end": "2026-10-14T08:03:37.898244Z",
-      "observed_at": "2026-10-14T08:03:37.898244Z",
+      "window_end": "2026-10-14T09:01:26.663306Z",
+      "observed_at": "2026-10-14T09:01:26.663306Z",
       "timezone": "UTC",
       "current_day_partial": true,
       "default_days": 14,
@@ -8989,12 +8989,12 @@
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-10-14T08:04:08.831403Z",
+    "generated_at": "2026-10-14T09:02:08.694120Z",
     "facts": [
       {
         "metric_id": "calendar.total",
-        "value": 12207,
-        "display_value": "12,207",
+        "value": 12208,
+        "display_value": "12,208",
         "label": "contributions",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
@@ -9063,8 +9063,8 @@
       },
       {
         "metric_id": "activity.public_commits",
-        "value": 7515,
-        "display_value": "7,515",
+        "value": 7517,
+        "display_value": "7,517",
         "label": "Public commits",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
@@ -9082,7 +9082,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "owned-repositories-visible-to-primary-pr-search",
-        "window": "2025-10-15T04:00:00Z \u2013 2026-10-14T08:03:15Z",
+        "window": "2025-10-15T04:00:00Z \u2013 2026-10-14T09:00:58Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -9096,7 +9096,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-09-15T04:00:00Z \u2013 2026-10-14T08:03:13Z",
+        "window": "2026-09-15T04:00:00Z \u2013 2026-10-14T09:00:53Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -9305,7 +9305,7 @@
             "observed_start": "2026-10-12",
             "observed_end": "2026-10-14",
             "days_observed": 3,
-            "contributions": 136,
+            "contributions": 137,
             "partial": true
           }
         ],
@@ -9326,12 +9326,12 @@
           25,
           121,
           311,
-          136
+          137
         ],
         "peak": "Peak 505 contributions/week",
         "window": "Jul 27 \u2013 Oct 14, 2026 \u00b7 12 weeks",
         "qualification": "Mon\u2013Sun \u00b7 UTC \u00b7 partial weeks included",
-        "description": "UTC contribution calendar. 2026-07-27 to 2026-08-02: 123 contributions (complete); 2026-08-03 to 2026-08-09: 147 contributions (complete); 2026-08-10 to 2026-08-16: 505 contributions (complete); 2026-08-17 to 2026-08-23: 473 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 75 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-14: 136 contributions (partial)"
+        "description": "UTC contribution calendar. 2026-07-27 to 2026-08-02: 123 contributions (complete); 2026-08-03 to 2026-08-09: 147 contributions (complete); 2026-08-10 to 2026-08-16: 505 contributions (complete); 2026-08-17 to 2026-08-23: 473 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 75 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-14: 137 contributions (partial)"
       }
     },
     "rhythm": {
@@ -9345,7 +9345,7 @@
         "window_start": "2025-10-15",
         "window_end": "2026-10-14",
         "days_observed": 365,
-        "total": 12207,
+        "total": 12208,
         "weekdays": [
           {
             "weekday": "Mon",
@@ -9359,7 +9359,7 @@
           },
           {
             "weekday": "Wed",
-            "contributions": 1677,
+            "contributions": 1678,
             "days_observed": 53
           },
           {
@@ -9410,9 +9410,9 @@
           },
           {
             "weekday": "Wed",
-            "contributions": 1677,
+            "contributions": 1678,
             "days_observed": 53,
-            "count_text": "1,677"
+            "count_text": "1,678"
           },
           {
             "weekday": "Thu",
@@ -11236,7 +11236,7 @@
         },
         {
           "date": "2026-10-14",
-          "count": 31
+          "count": 32
         }
       ],
       "window": "2025-10-15 \u2013 2026-10-14 \u00b7 UTC",
@@ -11250,7 +11250,7 @@
         "last_commit_msg": "fix(private-ci): qualify P2 through protected Mac admission, disable \u2026",
         "is_private": true,
         "url": "https://github.com/jguida941/profile-private-continuation",
-        "push_age": "pushed 1h ago"
+        "push_age": "pushed 2h ago"
       },
       {
         "name": "CS405",
@@ -11259,7 +11259,7 @@
         "last_commit_msg": "Remove unapproved CF2 workflow registration from main",
         "is_private": true,
         "url": "https://github.com/jguida941/CS405",
-        "push_age": "pushed 1h ago"
+        "push_age": "pushed 2h ago"
       },
       {
         "name": "semloop",
@@ -11268,7 +11268,7 @@
         "last_commit_msg": "lease 4: seven attacks killed and restored",
         "is_private": true,
         "url": "https://github.com/jguida941/semloop",
-        "push_age": "pushed 1h ago"
+        "push_age": "pushed 2h ago"
       },
       {
         "name": "sembridge",
@@ -11277,7 +11277,7 @@
         "last_commit_msg": "chore: close raw Git path identity slice",
         "is_private": true,
         "url": "https://github.com/jguida941/sembridge",
-        "push_age": "pushed 1h ago"
+        "push_age": "pushed 2h ago"
       },
       {
         "name": "semvariants-canaries",
@@ -11286,7 +11286,7 @@
         "last_commit_msg": "Bootstrap private canary laboratory",
         "is_private": true,
         "url": "https://github.com/jguida941/semvariants-canaries",
-        "push_age": "pushed 2h ago"
+        "push_age": "pushed 3h ago"
       },
       {
         "name": "semvariants",
@@ -11295,7 +11295,7 @@
         "last_commit_msg": "plan: the working projections track dev (D-M5); the release moved mai\u2026",
         "is_private": true,
         "url": "https://github.com/jguida941/semvariants",
-        "push_age": "pushed 2h ago"
+        "push_age": "pushed 3h ago"
       },
       {
         "name": "blambridge",
@@ -11304,7 +11304,7 @@
         "last_commit_msg": "feat: retain scoped local and cloud continuation inputs",
         "is_private": true,
         "url": "https://github.com/jguida941/blambridge",
-        "push_age": "pushed 17h ago"
+        "push_age": "pushed 18h ago"
       },
       {
         "name": "CS465",
@@ -11329,19 +11329,19 @@
       "now": [
         {
           "title": "profile-private-continuation",
-          "detail": "Python \u00b7 pushed today",
+          "detail": "Python \u00b7 pushed 2 hours ago",
           "url": "https://github.com/jguida941/profile-private-continuation",
           "is_private": true
         },
         {
           "title": "CS405",
-          "detail": "C++ \u00b7 pushed today",
+          "detail": "C++ \u00b7 pushed 2 hours ago",
           "url": "https://github.com/jguida941/CS405",
           "is_private": true
         },
         {
           "title": "semloop",
-          "detail": "Python \u00b7 pushed today",
+          "detail": "Python \u00b7 pushed 2 hours ago",
           "url": "https://github.com/jguida941/semloop",
           "is_private": true
         }
@@ -11350,19 +11350,19 @@
       "updates": [
         {
           "title": "chore: close raw Git path identity slice",
-          "detail": "sembridge \u00b7 today",
+          "detail": "sembridge \u00b7 2 hours ago",
           "url": "https://github.com/jguida941/sembridge",
           "is_private": true
         },
         {
           "title": "Bootstrap private canary laboratory",
-          "detail": "semvariants-canaries \u00b7 2 hours ago",
+          "detail": "semvariants-canaries \u00b7 3 hours ago",
           "url": "https://github.com/jguida941/semvariants-canaries",
           "is_private": true
         },
         {
           "title": "plan: the working projections track dev (D-M5); the rel...",
-          "detail": "semvariants \u00b7 2 hours ago",
+          "detail": "semvariants \u00b7 3 hours ago",
           "url": "https://github.com/jguida941/semvariants",
           "is_private": true
         }
@@ -11472,7 +11472,7 @@
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
       "window_start": "2026-09-15T00:00:00Z",
-      "window_end": "2026-10-14T08:03:37.898244Z",
+      "window_end": "2026-10-14T09:01:26.663306Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 260,
@@ -11761,8 +11761,8 @@
         "status": "partial",
         "complete": false,
         "window_start": "2026-09-15T00:00:00Z",
-        "window_end": "2026-10-14T08:03:37.898244Z",
-        "observed_at": "2026-10-14T08:03:37.898244Z",
+        "window_end": "2026-10-14T09:01:26.663306Z",
+        "observed_at": "2026-10-14T09:01:26.663306Z",
         "timezone": "UTC",
         "current_day_partial": true,
         "default_days": 14,
@@ -17328,11 +17328,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-14T08:04:08.831403Z",
-    "generator_revision": "351ebd7bd4f0f8529574008910013a5c9a87f9c7",
+    "generated_at": "2026-10-14T09:02:08.694120Z",
+    "generator_revision": "938e1bc41241702115ced51ad0f3e7fa918ed499",
     "generator_source_digest": "8674b8910f3f7ea7621fa4db7793092612b2d4c0283a0531aa718fa9895be42f",
-    "claim_input_digest": "c17609304240abe56584601f24d040cd4e65d0e63a55d7b51fbf018a8a7ff31d",
-    "render_key": "aa86a52e992dff2c73f5dbbdf5152b1dabfa3cedd985cdc37fc30f41137ac36e",
+    "claim_input_digest": "7f72eb0098e48d77969a6cac456d0b3156f474982468a4ffa6154c26d026a480",
+    "render_key": "b7595744170674bfebac4f0ef32309738191fc12cfccc748531b6c55e85e4c4a",
     "schema": "profile-artifact-generation/v1"
   }
 }
