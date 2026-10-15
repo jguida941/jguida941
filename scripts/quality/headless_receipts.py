@@ -135,6 +135,10 @@ def screenshot_page(page: str, width: int = 1280) -> Path:
         "--no-default-browser-check",
         "--hide-scrollbars",
         f"--window-size={width},{height}",
+        # The index fetches its same-directory canonical snapshot from file://
+        # during headless screenshot capture. The Chrome file access flag is
+        # necessary to photograph hydrated evidence, not a loading placeholder.
+        *(["--allow-file-access-from-files"] if page == "index" else []),
         f"--screenshot={artifact}",
         route.as_uri(),
     ]
