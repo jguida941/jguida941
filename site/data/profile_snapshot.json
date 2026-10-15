@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-15T20:34:34.023625Z",
+  "generated_at": "2026-10-15T21:01:48.108612Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,7 +18,7 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 12304,
+    "last_year_contributions": 12305,
     "public_scope_commits": 7557,
     "total_repos": 56,
     "public_forks": 0,
@@ -35,8 +35,8 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 12304,
-      "display_value": "12,304"
+      "value": 12305,
+      "display_value": "12,305"
     },
     {
       "key": "public_scope_commits",
@@ -113,8 +113,8 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 12304,
-      "display_value": "12,304"
+      "value": 12305,
+      "display_value": "12,305"
     },
     {
       "key": "public_scope_commits",
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-15T20:33:14Z",
+        "observed_at": "2026-10-15T21:00:39Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -228,8 +228,8 @@
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-10-16T04:00:00Z",
-        "window_end": "2026-10-15T20:33:23Z",
-        "observed_at": "2026-10-15T20:33:24Z",
+        "window_end": "2026-10-15T21:00:45Z",
+        "observed_at": "2026-10-15T21:00:45Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -243,8 +243,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-09-16T04:00:00Z",
-        "window_end": "2026-10-15T20:33:19Z",
-        "observed_at": "2026-10-15T20:33:22Z",
+        "window_end": "2026-10-15T21:00:42Z",
+        "observed_at": "2026-10-15T21:00:44Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -258,8 +258,8 @@
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-10-16T04:00:00Z",
-        "window_end": "2026-10-15T20:33:22Z",
-        "observed_at": "2026-10-15T20:33:23Z",
+        "window_end": "2026-10-15T21:00:44Z",
+        "observed_at": "2026-10-15T21:00:45Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-15T20:33:14Z",
+        "observed_at": "2026-10-15T21:00:38Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -289,7 +289,7 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0535714285714286,
     "ci_coverage_pct": 21.923076923076923,
-    "last_year_contributions": 12304,
+    "last_year_contributions": 12305,
     "active_days_last_year": 327,
     "automation_workflows": 170,
     "primary_lang_share_pct": 66.7,
@@ -301,8 +301,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 12304,
-      "display_value": "12,304",
+      "value": 12305,
+      "display_value": "12,305",
       "accent": "#7dcfff"
     },
     {
@@ -545,22 +545,6 @@
       "featured": true
     },
     {
-      "name": "semgration",
-      "full_name": "jguida941/semgration",
-      "url": "https://github.com/jguida941/semgration",
-      "language": "n/a",
-      "stars": 1,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-10-15",
-      "pushed_at_raw": "2026-10-15T20:31:41Z",
-      "pushed_ago": "today",
-      "created_at": "2026-10-14",
-      "last_commit_msg": "docs: establish SemGration system-integration scope as proposal",
-      "is_private": true,
-      "featured": false
-    },
-    {
       "name": "profile-private-continuation",
       "full_name": "jguida941/profile-private-continuation",
       "url": "https://github.com/jguida941/profile-private-continuation",
@@ -569,10 +553,26 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-10-15",
-      "pushed_at_raw": "2026-10-15T20:30:42Z",
+      "pushed_at_raw": "2026-10-15T20:54:52Z",
       "pushed_ago": "today",
       "created_at": "2026-10-11",
       "last_commit_msg": "fix(work): bind verified SHA-256 of goal reader after source identity\u2026",
+      "is_private": true,
+      "featured": false
+    },
+    {
+      "name": "semgration",
+      "full_name": "jguida941/semgration",
+      "url": "https://github.com/jguida941/semgration",
+      "language": "n/a",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-10-15",
+      "pushed_at_raw": "2026-10-15T20:51:40Z",
+      "pushed_ago": "today",
+      "created_at": "2026-10-14",
+      "last_commit_msg": "docs: establish SemGration system-integration scope as proposal",
       "is_private": true,
       "featured": false
     },
@@ -618,7 +618,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-15",
       "pushed_at_raw": "2026-10-15T18:39:23Z",
-      "pushed_ago": "today",
+      "pushed_ago": "2 hours ago",
       "created_at": "2026-05-23",
       "last_commit_msg": "docs: preserve CI0163 release reentry closeout",
       "is_private": true,
@@ -793,7 +793,7 @@
       "visibility": "private",
       "description": "System Integration Repository. SemGration coordinates building the ecosystem for Semloop, Sembridge, Semvariant, Semcompose constellation",
       "html_url": "https://github.com/jguida941/semgration",
-      "pushed_at": "2026-10-15T20:31:41Z",
+      "pushed_at": "2026-10-15T20:51:40Z",
       "created_at": "2026-10-14T19:37:24Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -814,7 +814,7 @@
       "visibility": "private",
       "description": "Private backup and continuation map for profile fixes and features; archived research is not an implementation queue.",
       "html_url": "https://github.com/jguida941/profile-private-continuation",
-      "pushed_at": "2026-10-15T20:30:42Z",
+      "pushed_at": "2026-10-15T20:54:52Z",
       "created_at": "2026-10-11T19:31:51Z",
       "stargazers_count": 0,
       "forks_count": 0,
@@ -1041,15 +1041,15 @@
   "focus": {
     "now": [
       {
-        "title": "semgration",
-        "detail": "code \u00b7 pushed today",
-        "url": "https://github.com/jguida941/semgration",
-        "is_private": true
-      },
-      {
         "title": "profile-private-continuation",
         "detail": "Python \u00b7 pushed today",
         "url": "https://github.com/jguida941/profile-private-continuation",
+        "is_private": true
+      },
+      {
+        "title": "semgration",
+        "detail": "code \u00b7 pushed today",
+        "url": "https://github.com/jguida941/semgration",
         "is_private": true
       },
       {
@@ -1069,7 +1069,7 @@
       },
       {
         "title": "docs: preserve CI0163 release reentry closeout",
-        "detail": "semantic-tdd \u00b7 today",
+        "detail": "semantic-tdd \u00b7 2 hours ago",
         "url": "https://github.com/jguida941/semantic-tdd",
         "is_private": true
       },
@@ -1084,25 +1084,25 @@
   "activity_feed": [
     {
       "kind": "activity",
-      "title": "docs: establish SemGration system-integration scope as proposal",
-      "url": "https://github.com/jguida941/semgration",
-      "repo": "jguida941/semgration",
-      "repo_url": "https://github.com/jguida941/semgration",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-10-15T20:31:41Z",
-      "is_private": true,
-      "observation_source": "repository push metadata"
-    },
-    {
-      "kind": "activity",
       "title": "fix(work): bind verified SHA-256 of goal reader after source identity\u2026",
       "url": "https://github.com/jguida941/profile-private-continuation",
       "repo": "jguida941/profile-private-continuation",
       "repo_url": "https://github.com/jguida941/profile-private-continuation",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-10-15T20:30:42Z",
+      "created_at": "2026-10-15T20:54:52Z",
+      "is_private": true,
+      "observation_source": "repository push metadata"
+    },
+    {
+      "kind": "activity",
+      "title": "docs: establish SemGration system-integration scope as proposal",
+      "url": "https://github.com/jguida941/semgration",
+      "repo": "jguida941/semgration",
+      "repo_url": "https://github.com/jguida941/semgration",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-10-15T20:51:40Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1137,7 +1137,7 @@
       "repo": "jguida941/semantic-tdd",
       "repo_url": "https://github.com/jguida941/semantic-tdd",
       "state": "PUSH",
-      "time_ago": "today",
+      "time_ago": "2 hours ago",
       "created_at": "2026-10-15T18:39:23Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1149,7 +1149,7 @@
       "repo": "jguida941/semgration",
       "repo_url": "https://github.com/jguida941/semgration",
       "state": "PUSH",
-      "time_ago": "23 hours ago",
+      "time_ago": "1 day ago",
       "created_at": "2026-10-14T20:35:28Z",
       "is_private": false,
       "observation_source": "event"
@@ -1315,7 +1315,7 @@
       25,
       121,
       311,
-      234
+      235
     ],
     "contribution_trend": {
       "status": "available",
@@ -1432,7 +1432,7 @@
           "observed_start": "2026-10-12",
           "observed_end": "2026-10-15",
           "days_observed": 4,
-          "contributions": 234,
+          "contributions": 235,
           "partial": true
         }
       ],
@@ -1524,7 +1524,7 @@
     }
   },
   "contribution_calendar": {
-    "total": 12304,
+    "total": 12305,
     "weeks": [
       [
         {
@@ -3089,7 +3089,7 @@
         },
         {
           "date": "2026-10-15",
-          "count": 60
+          "count": 61
         }
       ]
     ]
@@ -3104,7 +3104,7 @@
     "window_start": "2025-10-16",
     "window_end": "2026-10-15",
     "days_observed": 365,
-    "total": 12304,
+    "total": 12305,
     "weekdays": [
       {
         "weekday": "Mon",
@@ -3123,7 +3123,7 @@
       },
       {
         "weekday": "Thu",
-        "contributions": 2156,
+        "contributions": 2157,
         "days_observed": 53
       },
       {
@@ -3176,9 +3176,9 @@
       },
       {
         "weekday": "Thu",
-        "contributions": 2156,
+        "contributions": 2157,
         "days_observed": 53,
-        "count_text": "2,156"
+        "count_text": "2,157"
       },
       {
         "weekday": "Fri",
@@ -3203,7 +3203,7 @@
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
     "window_start": "2026-09-16T00:00:00Z",
-    "window_end": "2026-10-15T20:33:59.709882Z",
+    "window_end": "2026-10-15T21:01:06.330778Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 261,
@@ -3231,23 +3231,23 @@
         "status": "partial",
         "complete": false,
         "reason": "activity_incomplete",
-        "occurred_at": "2026-10-15T20:31:41Z"
+        "occurred_at": "2026-10-15T20:54:52Z"
       },
       "history": {
         "status": "ok",
         "complete": true,
         "reason": "end_of_connection"
       },
-      "repository": "jguida941/semgration",
-      "ref": "refs/heads/design/system-entry-composition",
-      "head_sha": "9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7",
-      "commit_url": "https://github.com/jguida941/semgration/commit/9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7",
-      "additions": 21075,
-      "deletions": 1026,
-      "commit_count": 156,
-      "observed_commits": 157,
-      "stats_observed": 156,
-      "excluded_merges": 1,
+      "repository": "jguida941/profile-private-continuation",
+      "ref": "refs/heads/codex/profile-ci-inventory-20261015",
+      "head_sha": "a0cd950b356dbfdfd72f14649283e957863b9910",
+      "commit_url": "https://github.com/jguida941/profile-private-continuation/commit/a0cd950b356dbfdfd72f14649283e957863b9910",
+      "additions": 3899725,
+      "deletions": 2364,
+      "commit_count": 146,
+      "observed_commits": 146,
+      "stats_observed": 146,
+      "excluded_merges": 0,
       "daily": [
         {
           "date": "2026-09-16",
@@ -3401,32 +3401,32 @@
         },
         {
           "date": "2026-10-11",
-          "additions": null,
-          "deletions": null,
+          "additions": 2681765,
+          "deletions": 78,
           "complete": false
         },
         {
           "date": "2026-10-12",
-          "additions": null,
-          "deletions": null,
+          "additions": 52145,
+          "deletions": 81,
           "complete": false
         },
         {
           "date": "2026-10-13",
-          "additions": null,
-          "deletions": null,
+          "additions": 1111747,
+          "deletions": 1577,
           "complete": false
         },
         {
           "date": "2026-10-14",
-          "additions": 1751,
-          "deletions": 231,
+          "additions": 53146,
+          "deletions": 235,
           "complete": false
         },
         {
           "date": "2026-10-15",
-          "additions": 19324,
-          "deletions": 795,
+          "additions": 922,
+          "deletions": 393,
           "complete": false
         }
       ],
@@ -3437,37 +3437,37 @@
       "complete": false,
       "rows": [
         {
-          "id": "46642054195",
-          "repository": "jguida941/semgration",
-          "timestamp": "2026-10-15T20:31:41Z",
-          "activity_type": "push",
-          "ref": "refs/heads/design/system-entry-composition",
-          "after": "9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7",
-          "diff_status": "ok",
-          "additions": 1,
-          "deletions": 1,
-          "commits": [
-            "9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7"
-          ],
-          "compare_url": "https://github.com/jguida941/semgration/compare/445aaa85fbd97e4c7afebd35417936c24860d804...9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7",
-          "head_url": "https://github.com/jguida941/semgration/commit/9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7"
-        },
-        {
-          "id": "46641964817",
+          "id": "46644114300",
           "repository": "jguida941/profile-private-continuation",
-          "timestamp": "2026-10-15T20:30:42Z",
+          "timestamp": "2026-10-15T20:54:52Z",
           "activity_type": "push",
           "ref": "refs/heads/codex/profile-ci-inventory-20261015",
-          "after": "5e0a16876bed00a98eaf0c76753a480bd27ac0c7",
+          "after": "a0cd950b356dbfdfd72f14649283e957863b9910",
           "diff_status": "ok",
-          "additions": 398,
-          "deletions": 203,
+          "additions": 59,
+          "deletions": 13,
           "commits": [
-            "44be235a90190de0f81aafd1e9c799f37b2011d6",
-            "5e0a16876bed00a98eaf0c76753a480bd27ac0c7"
+            "34bd1826641b860485fc91e4ad1094fe9644fe6d",
+            "a0cd950b356dbfdfd72f14649283e957863b9910"
           ],
-          "compare_url": "https://github.com/jguida941/profile-private-continuation/compare/48dbdf345cd58acca201912ffc7be6c6da3085a7...5e0a16876bed00a98eaf0c76753a480bd27ac0c7",
-          "head_url": "https://github.com/jguida941/profile-private-continuation/commit/5e0a16876bed00a98eaf0c76753a480bd27ac0c7"
+          "compare_url": "https://github.com/jguida941/profile-private-continuation/compare/8c4ec216972a67b3d30bcf488c153b987087fe1d...a0cd950b356dbfdfd72f14649283e957863b9910",
+          "head_url": "https://github.com/jguida941/profile-private-continuation/commit/a0cd950b356dbfdfd72f14649283e957863b9910"
+        },
+        {
+          "id": "46643835096",
+          "repository": "jguida941/semgration",
+          "timestamp": "2026-10-15T20:51:40Z",
+          "activity_type": "push",
+          "ref": "refs/heads/design/system-entry-composition",
+          "after": "da7e8d46a0e7313f5afedc50abc7c7addf21f96c",
+          "diff_status": "ok",
+          "additions": 67,
+          "deletions": 1,
+          "commits": [
+            "da7e8d46a0e7313f5afedc50abc7c7addf21f96c"
+          ],
+          "compare_url": "https://github.com/jguida941/semgration/compare/2efc33e552f80a9647edf9a8a44d04414eb3782c...da7e8d46a0e7313f5afedc50abc7c7addf21f96c",
+          "head_url": "https://github.com/jguida941/semgration/commit/da7e8d46a0e7313f5afedc50abc7c7addf21f96c"
         },
         {
           "id": "46637756595",
@@ -3494,8 +3494,8 @@
       "status": "partial",
       "complete": false,
       "window_start": "2026-09-16T00:00:00Z",
-      "window_end": "2026-10-15T20:33:59.709882Z",
-      "observed_at": "2026-10-15T20:33:59.709882Z",
+      "window_end": "2026-10-15T21:01:06.330778Z",
+      "observed_at": "2026-10-15T21:01:06.330778Z",
       "timezone": "UTC",
       "current_day_partial": true,
       "default_days": 14,
@@ -3539,6 +3539,455 @@
       ],
       "rows": [
         {
+          "repository": "jguida941/profile-private-continuation",
+          "is_private": true,
+          "status": "partial",
+          "complete": false,
+          "reasons": [
+            "incomplete_activity_coverage"
+          ],
+          "latest_push": "2026-10-15T20:54:52Z",
+          "observed_pushes": 94,
+          "daily": [
+            {
+              "date": "2026-09-16",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-17",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-18",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-19",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-20",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-21",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-22",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-23",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-24",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-25",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-26",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-27",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-28",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-29",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-30",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-01",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-02",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-03",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-04",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-05",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-06",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-07",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-08",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-09",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-10",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-11",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-12",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-13",
+              "count": 6,
+              "complete": false,
+              "level": 2
+            },
+            {
+              "date": "2026-10-14",
+              "count": 63,
+              "complete": false,
+              "level": 4
+            },
+            {
+              "date": "2026-10-15",
+              "count": 25,
+              "complete": false,
+              "level": 4
+            }
+          ],
+          "branch_empty_daily": [
+            {
+              "date": "2026-09-16",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-17",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-18",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-19",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-20",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-21",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-22",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-23",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-24",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-25",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-26",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-27",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-28",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-29",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-09-30",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-01",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-02",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-03",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-04",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-05",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-06",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-07",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-08",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-09",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-10",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-11",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-12",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-13",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-14",
+              "count": null,
+              "complete": false,
+              "level": null
+            },
+            {
+              "date": "2026-10-15",
+              "count": null,
+              "complete": false,
+              "level": null
+            }
+          ],
+          "branches": [
+            {
+              "ref": "refs/heads/codex/doc-nav-002-current-entry",
+              "daily": [
+                {
+                  "date": "2026-10-14",
+                  "count": 17,
+                  "complete": false,
+                  "level": 3
+                },
+                {
+                  "date": "2026-10-15",
+                  "count": 5,
+                  "complete": false,
+                  "level": 1
+                }
+              ],
+              "observed_pushes": 22
+            },
+            {
+              "ref": "refs/heads/codex/p13-a2-design-receiving",
+              "daily": [
+                {
+                  "date": "2026-10-15",
+                  "count": 14,
+                  "complete": false,
+                  "level": 3
+                }
+              ],
+              "observed_pushes": 14
+            },
+            {
+              "ref": "refs/heads/codex/profile-ci-inventory-20261015",
+              "daily": [
+                {
+                  "date": "2026-10-15",
+                  "count": 6,
+                  "complete": false,
+                  "level": 2
+                }
+              ],
+              "observed_pushes": 6
+            },
+            {
+              "ref": "refs/heads/evidence/a2-dependency-2026-10-13",
+              "daily": [
+                {
+                  "date": "2026-10-14",
+                  "count": 6,
+                  "complete": false,
+                  "level": 2
+                }
+              ],
+              "observed_pushes": 6
+            },
+            {
+              "ref": "refs/heads/main",
+              "daily": [
+                {
+                  "date": "2026-10-13",
+                  "count": 6,
+                  "complete": false,
+                  "level": 2
+                },
+                {
+                  "date": "2026-10-14",
+                  "count": 40,
+                  "complete": false,
+                  "level": 4
+                }
+              ],
+              "observed_pushes": 46
+            }
+          ]
+        },
+        {
           "repository": "jguida941/semgration",
           "is_private": true,
           "status": "partial",
@@ -3546,7 +3995,7 @@
           "reasons": [
             "incomplete_activity_coverage"
           ],
-          "latest_push": "2026-10-15T20:31:41Z",
+          "latest_push": "2026-10-15T20:51:40Z",
           "observed_pushes": 91,
           "daily": [
             {
@@ -3918,12 +4367,12 @@
               "daily": [
                 {
                   "date": "2026-10-15",
-                  "count": 37,
+                  "count": 36,
                   "complete": false,
                   "level": 4
                 }
               ],
-              "observed_pushes": 37
+              "observed_pushes": 36
             },
             {
               "ref": "refs/heads/docs/reports-2026-10-15",
@@ -3942,12 +4391,12 @@
               "daily": [
                 {
                   "date": "2026-10-15",
-                  "count": 21,
+                  "count": 22,
                   "complete": false,
-                  "level": 3
+                  "level": 4
                 }
               ],
-              "observed_pushes": 21
+              "observed_pushes": 22
             },
             {
               "ref": "refs/heads/slice/frontdoor-actors-1",
@@ -3972,455 +4421,6 @@
                 }
               ],
               "observed_pushes": 19
-            }
-          ]
-        },
-        {
-          "repository": "jguida941/profile-private-continuation",
-          "is_private": true,
-          "status": "partial",
-          "complete": false,
-          "reasons": [
-            "incomplete_activity_coverage"
-          ],
-          "latest_push": "2026-10-15T20:30:42Z",
-          "observed_pushes": 94,
-          "daily": [
-            {
-              "date": "2026-09-16",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-17",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-18",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-19",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-20",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-21",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-22",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-23",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-24",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-25",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-26",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-27",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-28",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-29",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-30",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-01",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-02",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-03",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-04",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-05",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-06",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-07",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-08",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-09",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-10",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-11",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-12",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-13",
-              "count": 8,
-              "complete": false,
-              "level": 2
-            },
-            {
-              "date": "2026-10-14",
-              "count": 63,
-              "complete": false,
-              "level": 4
-            },
-            {
-              "date": "2026-10-15",
-              "count": 23,
-              "complete": false,
-              "level": 4
-            }
-          ],
-          "branch_empty_daily": [
-            {
-              "date": "2026-09-16",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-17",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-18",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-19",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-20",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-21",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-22",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-23",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-24",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-25",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-26",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-27",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-28",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-29",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-09-30",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-01",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-02",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-03",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-04",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-05",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-06",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-07",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-08",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-09",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-10",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-11",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-12",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-13",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-14",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
-            {
-              "date": "2026-10-15",
-              "count": null,
-              "complete": false,
-              "level": null
-            }
-          ],
-          "branches": [
-            {
-              "ref": "refs/heads/codex/doc-nav-002-current-entry",
-              "daily": [
-                {
-                  "date": "2026-10-14",
-                  "count": 17,
-                  "complete": false,
-                  "level": 3
-                },
-                {
-                  "date": "2026-10-15",
-                  "count": 5,
-                  "complete": false,
-                  "level": 1
-                }
-              ],
-              "observed_pushes": 22
-            },
-            {
-              "ref": "refs/heads/codex/p13-a2-design-receiving",
-              "daily": [
-                {
-                  "date": "2026-10-15",
-                  "count": 14,
-                  "complete": false,
-                  "level": 3
-                }
-              ],
-              "observed_pushes": 14
-            },
-            {
-              "ref": "refs/heads/codex/profile-ci-inventory-20261015",
-              "daily": [
-                {
-                  "date": "2026-10-15",
-                  "count": 4,
-                  "complete": false,
-                  "level": 1
-                }
-              ],
-              "observed_pushes": 4
-            },
-            {
-              "ref": "refs/heads/evidence/a2-dependency-2026-10-13",
-              "daily": [
-                {
-                  "date": "2026-10-14",
-                  "count": 6,
-                  "complete": false,
-                  "level": 2
-                }
-              ],
-              "observed_pushes": 6
-            },
-            {
-              "ref": "refs/heads/main",
-              "daily": [
-                {
-                  "date": "2026-10-13",
-                  "count": 8,
-                  "complete": false,
-                  "level": 2
-                },
-                {
-                  "date": "2026-10-14",
-                  "count": 40,
-                  "complete": false,
-                  "level": 4
-                }
-              ],
-              "observed_pushes": 48
             }
           ]
         },
@@ -9923,12 +9923,12 @@
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-10-15T20:34:34.023625Z",
+    "generated_at": "2026-10-15T21:01:48.108612Z",
     "facts": [
       {
         "metric_id": "calendar.total",
-        "value": 12304,
-        "display_value": "12,304",
+        "value": 12305,
+        "display_value": "12,305",
         "label": "contributions",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
@@ -10016,7 +10016,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "owned-repositories-visible-to-primary-pr-search",
-        "window": "2025-10-16T04:00:00Z \u2013 2026-10-15T20:33:22Z",
+        "window": "2025-10-16T04:00:00Z \u2013 2026-10-15T21:00:44Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -10030,7 +10030,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-09-16T04:00:00Z \u2013 2026-10-15T20:33:19Z",
+        "window": "2026-09-16T04:00:00Z \u2013 2026-10-15T21:00:42Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -10239,7 +10239,7 @@
             "observed_start": "2026-10-12",
             "observed_end": "2026-10-15",
             "days_observed": 4,
-            "contributions": 234,
+            "contributions": 235,
             "partial": true
           }
         ],
@@ -10260,12 +10260,12 @@
           25,
           121,
           311,
-          234
+          235
         ],
         "peak": "Peak 505 contributions/week",
         "window": "Jul 27 \u2013 Oct 15, 2026 \u00b7 12 weeks",
         "qualification": "Mon\u2013Sun \u00b7 UTC \u00b7 partial weeks included",
-        "description": "UTC contribution calendar. 2026-07-27 to 2026-08-02: 123 contributions (complete); 2026-08-03 to 2026-08-09: 147 contributions (complete); 2026-08-10 to 2026-08-16: 505 contributions (complete); 2026-08-17 to 2026-08-23: 473 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 75 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-15: 234 contributions (partial)"
+        "description": "UTC contribution calendar. 2026-07-27 to 2026-08-02: 123 contributions (complete); 2026-08-03 to 2026-08-09: 147 contributions (complete); 2026-08-10 to 2026-08-16: 505 contributions (complete); 2026-08-17 to 2026-08-23: 473 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 75 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-15: 235 contributions (partial)"
       }
     },
     "rhythm": {
@@ -10279,7 +10279,7 @@
         "window_start": "2025-10-16",
         "window_end": "2026-10-15",
         "days_observed": 365,
-        "total": 12304,
+        "total": 12305,
         "weekdays": [
           {
             "weekday": "Mon",
@@ -10298,7 +10298,7 @@
           },
           {
             "weekday": "Thu",
-            "contributions": 2156,
+            "contributions": 2157,
             "days_observed": 53
           },
           {
@@ -10350,9 +10350,9 @@
           },
           {
             "weekday": "Thu",
-            "contributions": 2156,
+            "contributions": 2157,
             "days_observed": 53,
-            "count_text": "2,156"
+            "count_text": "2,157"
           },
           {
             "weekday": "Fri",
@@ -12170,7 +12170,7 @@
         },
         {
           "date": "2026-10-15",
-          "count": 60
+          "count": 61
         }
       ],
       "window": "2025-10-16 \u2013 2026-10-15 \u00b7 UTC",
@@ -12178,21 +12178,21 @@
     },
     "working": [
       {
-        "name": "semgration",
-        "language": null,
-        "pushed_at": "2026-10-15T20:31:41Z",
-        "last_commit_msg": "docs: establish SemGration system-integration scope as proposal",
-        "is_private": true,
-        "url": "https://github.com/jguida941/semgration",
-        "push_age": "pushed <1h ago"
-      },
-      {
         "name": "profile-private-continuation",
         "language": "Python",
-        "pushed_at": "2026-10-15T20:30:42Z",
+        "pushed_at": "2026-10-15T20:54:52Z",
         "last_commit_msg": "fix(work): bind verified SHA-256 of goal reader after source identity\u2026",
         "is_private": true,
         "url": "https://github.com/jguida941/profile-private-continuation",
+        "push_age": "pushed <1h ago"
+      },
+      {
+        "name": "semgration",
+        "language": null,
+        "pushed_at": "2026-10-15T20:51:40Z",
+        "last_commit_msg": "docs: establish SemGration system-integration scope as proposal",
+        "is_private": true,
+        "url": "https://github.com/jguida941/semgration",
         "push_age": "pushed <1h ago"
       },
       {
@@ -12202,7 +12202,7 @@
         "last_commit_msg": "Remove unapproved CF2 workflow registration from main",
         "is_private": true,
         "url": "https://github.com/jguida941/CS405",
-        "push_age": "pushed <1h ago"
+        "push_age": "pushed 1h ago"
       },
       {
         "name": "sembridge",
@@ -12220,7 +12220,7 @@
         "last_commit_msg": "docs: preserve CI0163 release reentry closeout",
         "is_private": true,
         "url": "https://github.com/jguida941/semantic-tdd",
-        "push_age": "pushed 1h ago"
+        "push_age": "pushed 2h ago"
       },
       {
         "name": "semvariants-canaries",
@@ -12271,15 +12271,15 @@
     "focus": {
       "now": [
         {
-          "title": "semgration",
-          "detail": "code \u00b7 pushed today",
-          "url": "https://github.com/jguida941/semgration",
-          "is_private": true
-        },
-        {
           "title": "profile-private-continuation",
           "detail": "Python \u00b7 pushed today",
           "url": "https://github.com/jguida941/profile-private-continuation",
+          "is_private": true
+        },
+        {
+          "title": "semgration",
+          "detail": "code \u00b7 pushed today",
+          "url": "https://github.com/jguida941/semgration",
           "is_private": true
         },
         {
@@ -12299,7 +12299,7 @@
         },
         {
           "title": "docs: preserve CI0163 release reentry closeout",
-          "detail": "semantic-tdd \u00b7 today",
+          "detail": "semantic-tdd \u00b7 2 hours ago",
           "url": "https://github.com/jguida941/semantic-tdd",
           "is_private": true
         },
@@ -12415,7 +12415,7 @@
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
       "window_start": "2026-09-16T00:00:00Z",
-      "window_end": "2026-10-15T20:33:59.709882Z",
+      "window_end": "2026-10-15T21:01:06.330778Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 261,
@@ -12443,23 +12443,23 @@
           "status": "partial",
           "complete": false,
           "reason": "activity_incomplete",
-          "occurred_at": "2026-10-15T20:31:41Z"
+          "occurred_at": "2026-10-15T20:54:52Z"
         },
         "history": {
           "status": "ok",
           "complete": true,
           "reason": "end_of_connection"
         },
-        "repository": "jguida941/semgration",
-        "ref": "refs/heads/design/system-entry-composition",
-        "head_sha": "9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7",
-        "commit_url": "https://github.com/jguida941/semgration/commit/9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7",
-        "additions": 21075,
-        "deletions": 1026,
-        "commit_count": 156,
-        "observed_commits": 157,
-        "stats_observed": 156,
-        "excluded_merges": 1,
+        "repository": "jguida941/profile-private-continuation",
+        "ref": "refs/heads/codex/profile-ci-inventory-20261015",
+        "head_sha": "a0cd950b356dbfdfd72f14649283e957863b9910",
+        "commit_url": "https://github.com/jguida941/profile-private-continuation/commit/a0cd950b356dbfdfd72f14649283e957863b9910",
+        "additions": 3899725,
+        "deletions": 2364,
+        "commit_count": 146,
+        "observed_commits": 146,
+        "stats_observed": 146,
+        "excluded_merges": 0,
         "daily": [
           {
             "date": "2026-09-16",
@@ -12613,32 +12613,32 @@
           },
           {
             "date": "2026-10-11",
-            "additions": null,
-            "deletions": null,
+            "additions": 2681765,
+            "deletions": 78,
             "complete": false
           },
           {
             "date": "2026-10-12",
-            "additions": null,
-            "deletions": null,
+            "additions": 52145,
+            "deletions": 81,
             "complete": false
           },
           {
             "date": "2026-10-13",
-            "additions": null,
-            "deletions": null,
+            "additions": 1111747,
+            "deletions": 1577,
             "complete": false
           },
           {
             "date": "2026-10-14",
-            "additions": 1751,
-            "deletions": 231,
+            "additions": 53146,
+            "deletions": 235,
             "complete": false
           },
           {
             "date": "2026-10-15",
-            "additions": 19324,
-            "deletions": 795,
+            "additions": 922,
+            "deletions": 393,
             "complete": false
           }
         ],
@@ -12649,37 +12649,37 @@
         "complete": false,
         "rows": [
           {
-            "id": "46642054195",
-            "repository": "jguida941/semgration",
-            "timestamp": "2026-10-15T20:31:41Z",
-            "activity_type": "push",
-            "ref": "refs/heads/design/system-entry-composition",
-            "after": "9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7",
-            "diff_status": "ok",
-            "additions": 1,
-            "deletions": 1,
-            "commits": [
-              "9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7"
-            ],
-            "compare_url": "https://github.com/jguida941/semgration/compare/445aaa85fbd97e4c7afebd35417936c24860d804...9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7",
-            "head_url": "https://github.com/jguida941/semgration/commit/9fb365f888b8a63b73eeab8f7c3c6d33bc6268d7"
-          },
-          {
-            "id": "46641964817",
+            "id": "46644114300",
             "repository": "jguida941/profile-private-continuation",
-            "timestamp": "2026-10-15T20:30:42Z",
+            "timestamp": "2026-10-15T20:54:52Z",
             "activity_type": "push",
             "ref": "refs/heads/codex/profile-ci-inventory-20261015",
-            "after": "5e0a16876bed00a98eaf0c76753a480bd27ac0c7",
+            "after": "a0cd950b356dbfdfd72f14649283e957863b9910",
             "diff_status": "ok",
-            "additions": 398,
-            "deletions": 203,
+            "additions": 59,
+            "deletions": 13,
             "commits": [
-              "44be235a90190de0f81aafd1e9c799f37b2011d6",
-              "5e0a16876bed00a98eaf0c76753a480bd27ac0c7"
+              "34bd1826641b860485fc91e4ad1094fe9644fe6d",
+              "a0cd950b356dbfdfd72f14649283e957863b9910"
             ],
-            "compare_url": "https://github.com/jguida941/profile-private-continuation/compare/48dbdf345cd58acca201912ffc7be6c6da3085a7...5e0a16876bed00a98eaf0c76753a480bd27ac0c7",
-            "head_url": "https://github.com/jguida941/profile-private-continuation/commit/5e0a16876bed00a98eaf0c76753a480bd27ac0c7"
+            "compare_url": "https://github.com/jguida941/profile-private-continuation/compare/8c4ec216972a67b3d30bcf488c153b987087fe1d...a0cd950b356dbfdfd72f14649283e957863b9910",
+            "head_url": "https://github.com/jguida941/profile-private-continuation/commit/a0cd950b356dbfdfd72f14649283e957863b9910"
+          },
+          {
+            "id": "46643835096",
+            "repository": "jguida941/semgration",
+            "timestamp": "2026-10-15T20:51:40Z",
+            "activity_type": "push",
+            "ref": "refs/heads/design/system-entry-composition",
+            "after": "da7e8d46a0e7313f5afedc50abc7c7addf21f96c",
+            "diff_status": "ok",
+            "additions": 67,
+            "deletions": 1,
+            "commits": [
+              "da7e8d46a0e7313f5afedc50abc7c7addf21f96c"
+            ],
+            "compare_url": "https://github.com/jguida941/semgration/compare/2efc33e552f80a9647edf9a8a44d04414eb3782c...da7e8d46a0e7313f5afedc50abc7c7addf21f96c",
+            "head_url": "https://github.com/jguida941/semgration/commit/da7e8d46a0e7313f5afedc50abc7c7addf21f96c"
           },
           {
             "id": "46637756595",
@@ -12706,8 +12706,8 @@
         "status": "partial",
         "complete": false,
         "window_start": "2026-09-16T00:00:00Z",
-        "window_end": "2026-10-15T20:33:59.709882Z",
-        "observed_at": "2026-10-15T20:33:59.709882Z",
+        "window_end": "2026-10-15T21:01:06.330778Z",
+        "observed_at": "2026-10-15T21:01:06.330778Z",
         "timezone": "UTC",
         "current_day_partial": true,
         "default_days": 14,
@@ -12751,6 +12751,455 @@
         ],
         "rows": [
           {
+            "repository": "jguida941/profile-private-continuation",
+            "is_private": true,
+            "status": "partial",
+            "complete": false,
+            "reasons": [
+              "incomplete_activity_coverage"
+            ],
+            "latest_push": "2026-10-15T20:54:52Z",
+            "observed_pushes": 94,
+            "daily": [
+              {
+                "date": "2026-09-16",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-17",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-18",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-19",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-20",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-21",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-22",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-23",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-24",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-25",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-26",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-27",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-28",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-29",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-30",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-01",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-02",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-03",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-04",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-05",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-06",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-07",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-08",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-09",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-10",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-11",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-12",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-13",
+                "count": 6,
+                "complete": false,
+                "level": 2
+              },
+              {
+                "date": "2026-10-14",
+                "count": 63,
+                "complete": false,
+                "level": 4
+              },
+              {
+                "date": "2026-10-15",
+                "count": 25,
+                "complete": false,
+                "level": 4
+              }
+            ],
+            "branch_empty_daily": [
+              {
+                "date": "2026-09-16",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-17",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-18",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-19",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-20",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-21",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-22",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-23",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-24",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-25",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-26",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-27",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-28",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-29",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-09-30",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-01",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-02",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-03",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-04",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-05",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-06",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-07",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-08",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-09",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-10",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-11",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-12",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-13",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-14",
+                "count": null,
+                "complete": false,
+                "level": null
+              },
+              {
+                "date": "2026-10-15",
+                "count": null,
+                "complete": false,
+                "level": null
+              }
+            ],
+            "branches": [
+              {
+                "ref": "refs/heads/codex/doc-nav-002-current-entry",
+                "daily": [
+                  {
+                    "date": "2026-10-14",
+                    "count": 17,
+                    "complete": false,
+                    "level": 3
+                  },
+                  {
+                    "date": "2026-10-15",
+                    "count": 5,
+                    "complete": false,
+                    "level": 1
+                  }
+                ],
+                "observed_pushes": 22
+              },
+              {
+                "ref": "refs/heads/codex/p13-a2-design-receiving",
+                "daily": [
+                  {
+                    "date": "2026-10-15",
+                    "count": 14,
+                    "complete": false,
+                    "level": 3
+                  }
+                ],
+                "observed_pushes": 14
+              },
+              {
+                "ref": "refs/heads/codex/profile-ci-inventory-20261015",
+                "daily": [
+                  {
+                    "date": "2026-10-15",
+                    "count": 6,
+                    "complete": false,
+                    "level": 2
+                  }
+                ],
+                "observed_pushes": 6
+              },
+              {
+                "ref": "refs/heads/evidence/a2-dependency-2026-10-13",
+                "daily": [
+                  {
+                    "date": "2026-10-14",
+                    "count": 6,
+                    "complete": false,
+                    "level": 2
+                  }
+                ],
+                "observed_pushes": 6
+              },
+              {
+                "ref": "refs/heads/main",
+                "daily": [
+                  {
+                    "date": "2026-10-13",
+                    "count": 6,
+                    "complete": false,
+                    "level": 2
+                  },
+                  {
+                    "date": "2026-10-14",
+                    "count": 40,
+                    "complete": false,
+                    "level": 4
+                  }
+                ],
+                "observed_pushes": 46
+              }
+            ]
+          },
+          {
             "repository": "jguida941/semgration",
             "is_private": true,
             "status": "partial",
@@ -12758,7 +13207,7 @@
             "reasons": [
               "incomplete_activity_coverage"
             ],
-            "latest_push": "2026-10-15T20:31:41Z",
+            "latest_push": "2026-10-15T20:51:40Z",
             "observed_pushes": 91,
             "daily": [
               {
@@ -13130,12 +13579,12 @@
                 "daily": [
                   {
                     "date": "2026-10-15",
-                    "count": 37,
+                    "count": 36,
                     "complete": false,
                     "level": 4
                   }
                 ],
-                "observed_pushes": 37
+                "observed_pushes": 36
               },
               {
                 "ref": "refs/heads/docs/reports-2026-10-15",
@@ -13154,12 +13603,12 @@
                 "daily": [
                   {
                     "date": "2026-10-15",
-                    "count": 21,
+                    "count": 22,
                     "complete": false,
-                    "level": 3
+                    "level": 4
                   }
                 ],
-                "observed_pushes": 21
+                "observed_pushes": 22
               },
               {
                 "ref": "refs/heads/slice/frontdoor-actors-1",
@@ -13184,455 +13633,6 @@
                   }
                 ],
                 "observed_pushes": 19
-              }
-            ]
-          },
-          {
-            "repository": "jguida941/profile-private-continuation",
-            "is_private": true,
-            "status": "partial",
-            "complete": false,
-            "reasons": [
-              "incomplete_activity_coverage"
-            ],
-            "latest_push": "2026-10-15T20:30:42Z",
-            "observed_pushes": 94,
-            "daily": [
-              {
-                "date": "2026-09-16",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-17",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-18",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-19",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-20",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-21",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-22",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-23",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-24",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-25",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-26",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-27",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-28",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-29",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-30",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-01",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-02",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-03",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-04",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-05",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-06",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-07",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-08",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-09",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-10",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-11",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-12",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-13",
-                "count": 8,
-                "complete": false,
-                "level": 2
-              },
-              {
-                "date": "2026-10-14",
-                "count": 63,
-                "complete": false,
-                "level": 4
-              },
-              {
-                "date": "2026-10-15",
-                "count": 23,
-                "complete": false,
-                "level": 4
-              }
-            ],
-            "branch_empty_daily": [
-              {
-                "date": "2026-09-16",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-17",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-18",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-19",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-20",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-21",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-22",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-23",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-24",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-25",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-26",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-27",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-28",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-29",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-09-30",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-01",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-02",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-03",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-04",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-05",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-06",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-07",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-08",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-09",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-10",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-11",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-12",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-13",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-14",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
-              {
-                "date": "2026-10-15",
-                "count": null,
-                "complete": false,
-                "level": null
-              }
-            ],
-            "branches": [
-              {
-                "ref": "refs/heads/codex/doc-nav-002-current-entry",
-                "daily": [
-                  {
-                    "date": "2026-10-14",
-                    "count": 17,
-                    "complete": false,
-                    "level": 3
-                  },
-                  {
-                    "date": "2026-10-15",
-                    "count": 5,
-                    "complete": false,
-                    "level": 1
-                  }
-                ],
-                "observed_pushes": 22
-              },
-              {
-                "ref": "refs/heads/codex/p13-a2-design-receiving",
-                "daily": [
-                  {
-                    "date": "2026-10-15",
-                    "count": 14,
-                    "complete": false,
-                    "level": 3
-                  }
-                ],
-                "observed_pushes": 14
-              },
-              {
-                "ref": "refs/heads/codex/profile-ci-inventory-20261015",
-                "daily": [
-                  {
-                    "date": "2026-10-15",
-                    "count": 4,
-                    "complete": false,
-                    "level": 1
-                  }
-                ],
-                "observed_pushes": 4
-              },
-              {
-                "ref": "refs/heads/evidence/a2-dependency-2026-10-13",
-                "daily": [
-                  {
-                    "date": "2026-10-14",
-                    "count": 6,
-                    "complete": false,
-                    "level": 2
-                  }
-                ],
-                "observed_pushes": 6
-              },
-              {
-                "ref": "refs/heads/main",
-                "daily": [
-                  {
-                    "date": "2026-10-13",
-                    "count": 8,
-                    "complete": false,
-                    "level": 2
-                  },
-                  {
-                    "date": "2026-10-14",
-                    "count": 40,
-                    "complete": false,
-                    "level": 4
-                  }
-                ],
-                "observed_pushes": 48
               }
             ]
           },
@@ -19135,11 +19135,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-15T20:34:34.023625Z",
-    "generator_revision": "44907ff9febfbb80abea52a215dae29bf467d0f7",
+    "generated_at": "2026-10-15T21:01:48.108612Z",
+    "generator_revision": "53b34a4f63554a598730964330a3ee5932e89549",
     "generator_source_digest": "8674b8910f3f7ea7621fa4db7793092612b2d4c0283a0531aa718fa9895be42f",
-    "claim_input_digest": "cca9ccd7968ea290361ae0b7713edbbf4384a76082e9a5283c13ff9f65306461",
-    "render_key": "3acb94b28e2f9ffcc69fa76f1474c0035d744f11e5beb6b837964c303fedd32f",
+    "claim_input_digest": "94a72ee5bd56dce54a0250b7280839da3dade0a06d1b00304e87b5c7a9dd34e0",
+    "render_key": "becafabd9c342e1e2f121ae2a36f28ce56b965c8e6d18498ec5c72bd3fefafd5",
     "schema": "profile-artifact-generation/v1"
   }
 }
