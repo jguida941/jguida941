@@ -78,6 +78,31 @@ class ZeroWidthContainmentGaming(unittest.TestCase):
         self.assertEqual(_uncontained_dom_offenders(real), [])
 
 
+    def test_calendar_scroller_requires_measured_positive_containment(self):
+        """A wide calendar may scroll inside its real wrapper, not escape the page."""
+        from copy import deepcopy
+        valid = {"offenders": [{
+            "contained_by_table_scroll": False,
+            "contained_by_calendar_scroll": True,
+            "scroll_container": {
+                "class": "cal-wrap", "overflow_x": "auto",
+                "in_viewport": True, "width": 280,
+            },
+        }]}
+        self.assertEqual([], _uncontained_dom_offenders(valid))
+        for field, bad in (
+            ("width", 0), ("overflow_x", "visible"),
+            ("in_viewport", False), ("class", "bogus-scroll")
+        ):
+            with self.subTest(mutation=field):
+                mutated = deepcopy(valid)
+                mutated["offenders"][0]["scroll_container"][field] = bad
+                self.assertEqual(1, len(_uncontained_dom_offenders(mutated)))
+        bare = deepcopy(valid)
+        bare["offenders"][0]["contained_by_calendar_scroll"] = False
+        self.assertEqual(1, len(_uncontained_dom_offenders(bare)))
+
+
 class ReceiptProvenanceContract(unittest.TestCase):
     def test_obligation_kinds_name_their_actual_producer(self):
         """No obligation may claim a capability its producer lacks: the reconstruction kind must not
