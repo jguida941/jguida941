@@ -62,8 +62,11 @@ are included.
 The browser reads this evidence only from its already-qualified snapshot and
 constructs run links from numeric IDs under the known public repository.
 Provider text is rendered as text nodes. CI/CD status reuses the site's existing
-icon-and-label convention and grouped inset rows; receipt-gated responsive
-layout and code review remain required before publication.
+icon-and-label convention and grouped inset rows. The six newest observed runs
+are visible by default; a native disclosure reveals up to six more. Real Chrome
+screenshots and a true 390px DOM probe are the visible-surface acceptance evidence.
+
+## AI Ingestion Contract
 
 `site/data/triage_report.json` is the stable handoff for AI tools.
 
