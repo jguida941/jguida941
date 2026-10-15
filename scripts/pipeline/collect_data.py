@@ -11,6 +11,7 @@ from typing import Any
 
 from scripts.github import github_client as gh
 from scripts.github.activity_observations import collect_activity_observations
+from scripts.github.actions_audit import collect_profile_ci_runs
 from scripts.core.runtime_env import cache_mode_from_env, token_mode_from_env
 
 
@@ -39,6 +40,7 @@ class CollectedProfileData:
     private_repos: list[dict[str, Any]] = field(default_factory=list)
     metric_observations: dict[str, dict[str, Any]] = field(default_factory=dict)
     activity_observations: dict[str, Any] = field(default_factory=dict)
+    ci_execution_observation: dict[str, Any] = field(default_factory=dict)
 
 
 def collect_profile_data(logger=print) -> CollectedProfileData:
@@ -183,8 +185,14 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
         observed_at=activity_observed_at, inventory_fresh=inventory_fresh,
     )
 
+    # This is a separate, bounded execution sample for this public profile repo.
+    # It is not inferred from account-wide workflow configuration counts.
+    from scripts.core.config import USERNAME
+    ci_execution_observation = collect_profile_ci_runs(f"{USERNAME}/{USERNAME}")
+
     return CollectedProfileData(
         activity_observations=activity_observations,
+        ci_execution_observation=ci_execution_observation,
         repo_counts=repo_counts,
         repos=repos,
         all_repos=all_repos,
