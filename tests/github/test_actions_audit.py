@@ -111,6 +111,15 @@ class ProfileCIExecutionTests(unittest.TestCase):
         self.assertEqual("failure", invalid["runs"][0]["outcome"])
         self.assertNotIn("url", invalid["runs"][0])
 
+    def test_unhashable_provider_fields_are_partial_not_exceptions(self):
+        from scripts.github.actions_audit import normalize_profile_ci_runs
+
+        rows = [{"databaseId": 321, "workflowName": "Workflow", "status": [],
+                 "conclusion": {"unexpected": True}, "createdAt": "2026-10-15T12:00:00Z"}]
+        sample = normalize_profile_ci_runs(rows, "jguida941/jguida941", "2026-10-15T12:01:00Z")
+        self.assertEqual("partial", sample["status"])
+        self.assertEqual("unknown", sample["runs"][0]["outcome"])
+
     def test_cli_failure_is_unavailable_not_empty(self):
         from scripts.github.actions_audit import collect_profile_ci_runs
 
