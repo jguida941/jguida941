@@ -927,7 +927,8 @@ def _script() -> str:
         when.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit", timeZone:"UTC", timeZoneName:"short"});
       meta.textContent = (run.head_branch ? run.head_branch + " · " : "") + stamp;
       left.append(title, meta);
-      const [label, type] = CI_OUTCOME[run.outcome] || CI_OUTCOME.unknown;
+      const [label, type] = Object.prototype.hasOwnProperty.call(CI_OUTCOME, run.outcome)
+        ? CI_OUTCOME[run.outcome] : CI_OUTCOME.unknown;
       const status = document.createElement("span");
       status.className = "chip ci-status " + type;
       status.innerHTML = STATUS_ICON[type] + label;
