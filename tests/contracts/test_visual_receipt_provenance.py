@@ -44,13 +44,18 @@ def _uncontained_dom_offenders(data: dict) -> list[dict]:
     out = []
     for offender in data.get("offenders", []):
         scroll = offender.get("scroll_container") or {}
-        if (
+        declared = (
             offender.get("contained_by_table_scroll") is True
             and scroll.get("class") == "table-scroll"
+        ) or (
+            offender.get("contained_by_calendar_scroll") is True
+            and scroll.get("class") == "cal-wrap"
+        )
+        if (
+            declared
             and scroll.get("overflow_x") == "auto"
             and scroll.get("in_viewport") is True
-            # the zero-width gaming vector (adversarial gate, live-probed): a width:0 wrapper
-            # "contains" any child; containment demands a meaningfully positive measured width.
+            # A zero-width wrapper cannot prove it contains a wide child.
             and isinstance(scroll.get("width"), (int, float))
             and scroll.get("width") > 1
         ):
