@@ -149,8 +149,8 @@ def normalize_profile_ci_runs(
         state = source.get("status")
         conclusion = source.get("conclusion")
         if state == "completed":
-            outcome = conclusion if conclusion in _PROFILE_CI_CONCLUSIONS else "unknown"
-        elif state in _PROFILE_CI_ACTIVE:
+            outcome = conclusion if isinstance(conclusion, str) and conclusion in _PROFILE_CI_CONCLUSIONS else "unknown"
+        elif isinstance(state, str) and state in _PROFILE_CI_ACTIVE:
             outcome = "in_progress" if state == "in_progress" else "queued"
         else:
             outcome = "unknown"
