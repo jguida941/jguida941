@@ -40,6 +40,7 @@ jobs:
         run: |
           python -m unittest \
             tests.github.test_github_client \
+            tests.github.test_actions_audit \
             tests.github.test_token_fallback \
             tests.pipeline.test_compute_metrics_accuracy \
             tests.pipeline.test_profile_pipeline_fixture \
