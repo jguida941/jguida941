@@ -4,7 +4,22 @@
 > ephemeral `~/.claude/plans/*.md` mirror can be lost; THIS file (deployed with the repo)
 > cannot. Finished history is folded into `docs/history/PLAN-LEDGER.md`.
 
+
 ## STATUS — where we are (updated each slice)
+
+### CI-EXEC-01 — bounded public Actions execution canary (2026-10-15, candidate)
+
+- Branch: `feature/profile-ci-execution-20261015`; source owner:
+  `scripts/github/actions_audit.py`, `scripts/pipeline/collect_data.py`,
+  `scripts/pipeline/compute_metrics.py`, and the existing web renderer.
+- The committed CI/CD panel is distinct from workflow-configuration adoption;
+  it displays only observed public-profile-repository runs, with explicit
+  unavailable/partial status and no inferred account-wide success rate.
+- RED-first controls cover false exactness from partial CI evidence, outcome
+  distinctions, unavailable/empty responses, and hostile provider values.
+- Publication stays **UNACCEPTED** until the candidate's full CI gates, true
+  390px browser overflow probe, 1280px screenshot receipt, and independent
+  review finish. Do not conflate a passing test with visual acceptance.
 
 - **Phases 1–4: DONE / LIVE** — see `docs/history/PLAN-LEDGER.md`. ~142 contracts green before Phase 5.
 - **Phase 5 in progress.** Current workstream: **P5-0 — the organization-as-invariant meta-gate.**
