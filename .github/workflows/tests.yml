@@ -13,10 +13,22 @@ on:
       - ".github/workflows/tests.yml"
       - ".github/workflows/analytics.yml"
       - ".github/workflows/metrics.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "site/**"
+      - "contracts/**"
+      - "assets/receipts/**"
+      - "docs/design/**"
+      - ".github/workflows/tests.yml"
+      - ".github/workflows/analytics.yml"
+      - ".github/workflows/metrics.yml"
   workflow_dispatch:
 
 concurrency:
-  group: profile-pipeline-tests
+  group: profile-pipeline-tests-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
