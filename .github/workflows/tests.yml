@@ -2,7 +2,7 @@ name: Test Profile Pipeline
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "feature/profile-ci-execution-20261015"]
     paths:
       - "scripts/**"
       - "tests/**"
@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: profile-pipeline-tests
+  group: profile-pipeline-tests-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
