@@ -128,37 +128,15 @@ class ContributionRhythmGeometryTests(unittest.TestCase):
 
 class PublishedProfileContract(unittest.TestCase):
     def _valid_nested_payload(self):
-        payload = json.loads(
+        """Use the same sealed snapshot the validator compares to its cards.
+
+        Replacing current scope/quality with invented exact observations made
+        this schema test depend on whether an unrelated GitHub API probe was
+        complete during the preceding artifact generation.
+        """
+        return json.loads(
             (ROOT / "site/data/profile_snapshot.json").read_text(encoding="utf-8")
         )
-        payload["data_scope"] = {
-            "repos_included": "public + private observed, exact",
-            "activity_metric_scope": "last twelve months",
-            "public_owned_repos_total": 2,
-            "public_owned_forks_total": 0,
-            "public_owned_nonfork_repos_total": 2,
-            "private_owned_repos_total": 1,
-            "private_owned_nonfork_repos_total": 1,
-            "metric_scopes": {
-                metric: "owned-public-private-nonfork-profile-excluded-exact"
-                for metric in _GOVERNED_AGGREGATE_METRICS
-            },
-        }
-        payload["data_quality"] = {
-            "ci_status": "exact",
-            "ci_note": "Current repository evidence.",
-            "commits_status": "exact",
-            "commits_note": "Current repository evidence.",
-            "releases_status": "exact",
-            "releases_note": "Current repository evidence.",
-            "events_status": "exact",
-            "events_note": "Current repository evidence.",
-            "private_aggregate_status": "exact",
-            "metric_statuses": {
-                metric: "exact" for metric in _GOVERNED_AGGREGATE_METRICS
-            },
-        }
-        return payload
 
     def test_nested_fixture_keeps_partial_ci_evidence(self):
         """A schema fixture cannot upgrade an observed partial CI population to exact.
