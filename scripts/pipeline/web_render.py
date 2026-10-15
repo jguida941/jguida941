@@ -122,6 +122,8 @@ body {
   min-height: 44px; display: inline-flex; align-items: center; }
 .ci-execution-panel .ci-run-list { margin-top: var(--gap-grid, 20px); }
 .ci-execution-panel .ci-run-list[hidden] { display: none; }
+.ci-execution-panel .ci-more[hidden] { display: none; }
+.ci-execution-panel .ci-more summary { cursor: pointer; display: flex; align-items: center; min-height: 44px; color: var(--ink); font-size: var(--type-body); }
 .ci-execution-panel .ci-run-list .mrow { grid-template-columns: minmax(0,1fr) auto; }
 .ci-execution-panel .ci-run-list .mt { overflow-wrap: anywhere; }
 .ci-execution-panel .ci-run-list .ms { overflow-wrap: anywhere; }
@@ -402,6 +404,10 @@ def _ci_execution() -> str:
     <p class="ms">Recent workflow runs in this public repository, across branches. Not an account-wide success rate or a workflow-configuration count.</p>
     <p class="ms" id="ci-execution-note" role="status">Run observation unavailable</p>
     <div class="mgroup ci-run-list" id="ci-execution-rows" hidden></div>
+    <details class="ci-more" id="ci-execution-more" hidden>
+      <summary id="ci-execution-more-label">More observed runs</summary>
+      <div class="mgroup ci-run-list" id="ci-execution-more-rows"></div>
+    </details>
   </section>"""
 
 
@@ -888,8 +894,14 @@ def _script() -> str:
   function hydrateCIExecution(sample) {
     const host = document.getElementById("ci-execution-rows");
     const note = document.getElementById("ci-execution-note");
+    const more = document.getElementById("ci-execution-more");
+    const extra = document.getElementById("ci-execution-more-rows");
+    const moreLabel = document.getElementById("ci-execution-more-label");
     host.replaceChildren();
+    extra.replaceChildren();
     host.hidden = true;
+    more.hidden = true;
+    more.open = false;
     if (!sample || sample.schema !== "profile-ci-execution/v1" ||
         sample.repository !== "jguida941/jguida941" ||
         !["available", "partial", "empty", "unavailable"].includes(sample.status) ||
@@ -912,7 +924,7 @@ def _script() -> str:
       note.textContent = "No verified run rows in this observation.";
       return;
     }
-    for (const run of rows) {
+    for (const [index, run] of rows.entries()) {
       const item = document.createElement("div");
       item.className = "mrow";
       const left = document.createElement("span");
@@ -934,9 +946,13 @@ def _script() -> str:
       status.className = "chip ci-status " + type;
       status.innerHTML = STATUS_ICON[type] + label;
       item.append(left, status);
-      host.append(item);
+      (index < 6 ? host : extra).append(item);
     }
     host.hidden = false;
+    if (rows.length > 6) {
+      moreLabel.textContent = (rows.length - 6) + " more observed runs";
+      more.hidden = false;
+    }
     note.textContent = rows.length + " recent observed runs · " +
       (sample.status === "partial" ? "Partial observation; some provider rows could not be verified." :
         "Observed sample, not all runs or repositories.") +
