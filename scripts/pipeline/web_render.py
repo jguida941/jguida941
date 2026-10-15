@@ -124,6 +124,7 @@ body {
 .ci-execution-panel .ci-run-list[hidden] { display: none; }
 .ci-execution-panel .ci-run-list .mrow { grid-template-columns: minmax(0,1fr) auto; }
 .ci-execution-panel .ci-run-list .mt { overflow-wrap: anywhere; }
+.ci-execution-panel .ci-run-list .ms { overflow-wrap: anywhere; }
 .ci-execution-panel .ci-run-title { color: var(--ink-strong); display: inline-flex;
   align-items: center; min-height: 44px; text-decoration: none; }
 .ci-execution-panel .ci-run-title:hover { text-decoration: underline; }
