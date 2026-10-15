@@ -138,6 +138,26 @@ process.stdout.write(JSON.stringify({count:host.children.length,url:title.href,t
         self.assertIn("<script>bad</script>", value["meta"])
         self.assertIn("Unknown", value["badge"])
 
+    def test_ci_index_receipt_is_pinned_and_no_overflow_at_true_390(self):
+        """An actual 390px browser probe must agree with the committed index."""
+        import hashlib
+        import json
+        from scripts.quality.headless_receipts import dom_probe_artifact, provenance_path
+
+        artifact = dom_probe_artifact("index")
+        self.assertTrue(artifact.is_file())
+        data = json.loads(artifact.read_text(encoding="utf-8"))
+        sidecar = json.loads(provenance_path(artifact).read_text(encoding="utf-8"))
+        self.assertEqual(390, data.get("client_width"))
+        self.assertEqual(390, data.get("viewport", {}).get("width"))
+        self.assertFalse(data.get("horizontal_overflow"), data.get("offenders"))
+        self.assertEqual(0, data.get("uncontained_offender_count"))
+        self.assertEqual(
+            hashlib.sha256(INDEX.read_bytes()).hexdigest(),
+            sidecar.get("page_sha256"),
+            "CI panel changed the page: recapture the 390px receipt",
+        )
+
     def test_status_conveyed_by_shape_not_hue_alone(self):
         """DESIGN_SPEC 3.6 / 10 (and the README status_chip): pipeline status must read
         by icon-SHAPE AND label, never hue alone — so a desaturated/colour-blind viewer
