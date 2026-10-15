@@ -94,14 +94,6 @@ jobs:
           path: ${{ runner.temp }}/profile-ci-candidate.tar.gz
           if-no-files-found: error
 
-      - name: Fixture smoke CLI run (offline path)
-        env:
-          GITHUB_TOKEN: ""
-          GH_TOKEN: ""
-          PERSONAL_GITHUB_TOKEN: ""
-        run: |
-          python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json
-
       # Branch preview only: data comes from actual GitHub Actions runs and
       # cannot modify the canonical stored snapshot or its sealed manifest.
       - name: Render current Actions sample for visual review
@@ -145,6 +137,14 @@ jobs:
           finally:
               source.write_bytes(original)
           PY
+
+      - name: Fixture smoke CLI run (offline path)
+        env:
+          GITHUB_TOKEN: ""
+          GH_TOKEN: ""
+          PERSONAL_GITHUB_TOKEN: ""
+        run: |
+          python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json
 
       - name: Upload branch browser evidence
         if: ${{ always() && github.ref == 'refs/heads/feature/profile-ci-execution-20261015' }}
