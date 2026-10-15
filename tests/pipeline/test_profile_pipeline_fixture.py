@@ -30,12 +30,15 @@ DEPLOY_JOB_CONDITION = (
 MANUAL_VALIDATION_CONDITION = "github.event_name == 'workflow_dispatch'"
 PROFILE_PRODUCT_TEST_MODULES = (
     "tests.github.test_github_client",
+    "tests.github.test_actions_audit",
     "tests.github.test_token_fallback",
     "tests.pipeline.test_compute_metrics_accuracy",
     "tests.pipeline.test_profile_pipeline_fixture",
     "tests.contracts.test_data_semantics",
     "tests.contracts.test_public_data_privacy",
     "tests.contracts.test_design_contract",
+    "tests.contracts.test_web_dashboard",
+    "tests.contracts.test_page_manifest",
     "tests.contracts.test_dashboard_summary",
     "tests.contracts.test_dashboard_destinations",
     "tests.contracts.test_readme_projection",
