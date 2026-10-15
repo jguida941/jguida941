@@ -160,6 +160,28 @@ class PublishedProfileContract(unittest.TestCase):
         }
         return payload
 
+    def test_nested_fixture_keeps_partial_ci_evidence(self):
+        """A schema fixture cannot upgrade an observed partial CI population to exact.
+
+        The old helper replaced the live artifact's scope/quality with synthetic
+        exact claims, contradicting real cards during provider degradation.
+        """
+        partial = {
+            "data_scope": {
+                "metric_scopes": {
+                    "ci_coverage_pct": "owned-public-private-nonfork-profile-excluded-partial-observation",
+                },
+            },
+            "data_quality": {
+                "ci_status": "partial",
+                "metric_statuses": {"ci_coverage_pct": "partial"},
+            },
+        }
+        with patch.object(Path, "read_text", return_value=json.dumps(partial)):
+            observed = self._valid_nested_payload()
+        self.assertEqual(partial["data_scope"], observed["data_scope"])
+        self.assertEqual(partial["data_quality"], observed["data_quality"])
+
     def test_public_snapshot_requires_every_nested_scope_and_quality_field(self):
         valid_payload = self._valid_nested_payload()
         valid_errors = _validate_snapshot_payload(valid_payload).errors
