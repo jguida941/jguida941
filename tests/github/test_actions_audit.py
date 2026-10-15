@@ -111,6 +111,33 @@ class ProfileCIExecutionTests(unittest.TestCase):
         self.assertEqual("failure", invalid["runs"][0]["outcome"])
         self.assertNotIn("url", invalid["runs"][0])
 
+    def test_execution_flows_to_public_snapshot_without_changing_adoption(self):
+        """Real run outcomes and configured workflow counts are separate meanings."""
+        from dataclasses import replace
+        from scripts.github.actions_audit import normalize_profile_ci_runs
+        from scripts.pipeline.compute_metrics import compute_profile_model
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+        from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
+
+        observed = normalize_profile_ci_runs([{
+            "databaseId": 422, "workflowName": "Generate Metrics",
+            "status": "completed", "conclusion": "failure",
+            "createdAt": "2026-10-15T12:01:00Z",
+            "event": "schedule", "headBranch": "main",
+        }], "jguida941/jguida941", "2026-10-15T12:03:00Z")
+        collected = AccuracyTests()._collected()
+        before = compute_profile_model(collected, logger=lambda *_: None,
+                                       allow_network_calls=False)
+        candidate = replace(collected, ci_execution_observation=observed)
+        after = compute_profile_model(candidate, logger=lambda *_: None,
+                                      allow_network_calls=False)
+        self.assertEqual(before["automation"], after["automation"],
+                         "adding execution evidence cannot change configuration adoption")
+        self.assertEqual(before["scorecard"]["ci_coverage_pct"],
+                         after["scorecard"]["ci_coverage_pct"])
+        self.assertEqual(observed, after["dashboard_data"]["ci_execution"])
+        self.assertEqual(observed, _public_dashboard_data(after["dashboard_data"])["ci_execution"])
+
     def test_unhashable_provider_fields_are_partial_not_exceptions(self):
         from scripts.github.actions_audit import normalize_profile_ci_runs
 
