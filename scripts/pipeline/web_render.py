@@ -117,6 +117,22 @@ body {
 .mv { font-size: var(--type-metric); font-weight: 600; color: var(--ink-strong); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .mrow svg { width: 15px; height: 15px; stroke: var(--ink-dim); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
 
+/* --- CI/CD execution: one public profile repo, not adoption across account --- */
+.ci-execution-panel .ci-link { color: var(--ink); font-size: var(--type-body);
+  min-height: 44px; display: inline-flex; align-items: center; }
+.ci-execution-panel .ci-run-list { margin-top: var(--gap-grid, 20px); }
+.ci-execution-panel .ci-run-list[hidden] { display: none; }
+.ci-execution-panel .ci-run-list .mrow { grid-template-columns: minmax(0,1fr) auto; }
+.ci-execution-panel .ci-run-list .mt { overflow-wrap: anywhere; }
+.ci-execution-panel .ci-run-title { color: var(--ink-strong); display: inline-flex;
+  align-items: center; min-height: 44px; text-decoration: none; }
+.ci-execution-panel .ci-run-title:hover { text-decoration: underline; }
+.ci-execution-panel .ci-status { justify-self: end; white-space: nowrap; }
+@media (max-width: 480px) {
+  .ci-execution-panel .ci-run-list .mrow { grid-template-columns: minmax(0,1fr); gap: 4px; }
+  .ci-execution-panel .ci-status { justify-self: start; }
+}
+
 /* --- ring (CI coverage) --- */
 .ring { --p: 0; position: relative; width: 64px; height: 64px; border-radius: 50%; flex: 0 0 auto;
   background: conic-gradient(var(--accent) calc(var(--p)*1%), color-mix(in srgb,var(--hairline) 12%, transparent) 0);
@@ -371,6 +387,20 @@ def _scorecard() -> str:
       <p class="ms">{escape(AUTOMATION_SCOPE)} {escape(AUTOMATION_MEANING)}</p>
       {_workflow_breakdown()}
     </details>
+  </section>"""
+
+
+def _ci_execution() -> str:
+    return """
+  <section class="panel ci-execution-panel" id="ci-execution" tabindex="-1">
+    <div class="section-head">
+      <div><p class="eyebrow">GitHub Actions · Profile Repository</p><h2 class="title">CI/CD Execution</h2></div>
+      <a class="ci-link" href="https://github.com/jguida941/jguida941/actions">All runs</a>
+    </div>
+    <hr class="hairline">
+    <p class="ms">Recent workflow runs in this public repository, across branches. Not an account-wide success rate or a workflow-configuration count.</p>
+    <p class="ms" id="ci-execution-note" role="status">Run observation unavailable</p>
+    <div class="mgroup ci-run-list" id="ci-execution-rows" hidden></div>
   </section>"""
 
 
@@ -835,7 +865,84 @@ def _script() -> str:
     document.getElementById("activity-pushes").innerHTML = html;
   }
 
+
+  // Only the profile repository's published, bounded Actions sample.
+  // Build links from verified positive numeric run IDs; provider strings
+  // enter the DOM as text, never as HTML or untrusted URLs.
+  const CI_OUTCOME = {
+    success: ["Passed", "ok"],
+    failure: ["Failed", "bad"],
+    cancelled: ["Cancelled", "warn"],
+    skipped: ["Skipped", "warn"],
+    timed_out: ["Timed out", "bad"],
+    startup_failure: ["Startup failed", "bad"],
+    stale: ["Stale", "warn"],
+    action_required: ["Action required", "warn"],
+    neutral: ["Neutral", "warn"],
+    in_progress: ["Running", "warn"],
+    queued: ["Queued", "warn"],
+    unknown: ["Unknown", "warn"]
+  };
+
+  function hydrateCIExecution(sample) {
+    const host = document.getElementById("ci-execution-rows");
+    const note = document.getElementById("ci-execution-note");
+    host.replaceChildren();
+    host.hidden = true;
+    if (!sample || sample.schema !== "profile-ci-execution/v1" ||
+        sample.repository !== "jguida941/jguida941" ||
+        !["available", "partial", "empty", "unavailable"].includes(sample.status) ||
+        !Array.isArray(sample.runs)) {
+      note.textContent = "Run observation unavailable. Check GitHub Actions for current results.";
+      return;
+    }
+    if (sample.status === "unavailable") {
+      note.textContent = "GitHub Actions run history unavailable for this snapshot.";
+      return;
+    }
+    if (sample.status === "empty") {
+      note.textContent = "No workflow runs returned in the observed sample.";
+      return;
+    }
+    const rows = sample.runs.filter(r =>
+      r && Number.isSafeInteger(r.run_id) && r.run_id > 0 && typeof r.workflow === "string"
+    ).slice(0, 12);
+    if (!rows.length) {
+      note.textContent = "No verified run rows in this observation.";
+      return;
+    }
+    for (const run of rows) {
+      const item = document.createElement("div");
+      item.className = "mrow";
+      const left = document.createElement("span");
+      left.className = "ml";
+      const title = document.createElement("a");
+      title.className = "mt ci-run-title";
+      title.href = "https://github.com/jguida941/jguida941/actions/runs/" + run.run_id;
+      title.textContent = run.workflow;
+      const meta = document.createElement("span");
+      meta.className = "ms";
+      const when = new Date(run.created_at || "");
+      const stamp = Number.isNaN(when.getTime()) ? "Time unavailable" :
+        when.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit", timeZone:"UTC", timeZoneName:"short"});
+      meta.textContent = (run.head_branch ? run.head_branch + " · " : "") + stamp;
+      left.append(title, meta);
+      const [label, type] = CI_OUTCOME[run.outcome] || CI_OUTCOME.unknown;
+      const status = document.createElement("span");
+      status.className = "chip ci-status " + type;
+      status.innerHTML = STATUS_ICON[type] + label;
+      item.append(left, status);
+      host.append(item);
+    }
+    host.hidden = false;
+    note.textContent = rows.length + " recent observed runs · " +
+      (sample.status === "partial" ? "Partial observation; some provider rows could not be verified." :
+        "Observed sample, not all runs or repositories.") +
+      (sample.observed_at ? " · Collected " + sample.observed_at : "");
+  }
+
   function hydrate(d) {
+    hydrateCIExecution(d.ci_execution);
     hydrateCodeChanges(d.activity_analytics);
     hydrateProjectActivity(d.activity_analytics);
     hydrateRecentPushes(d.activity_analytics);
@@ -996,7 +1103,7 @@ def render_dashboard(default_theme: str = DEFAULT_THEME) -> str:
         .replace("__LANG_COLORS__", _lang_colors_json())
         .replace("__THEME_NAMES__", json.dumps(list(THEMES)))
     )
-    body = "".join([_hero(), _scorecard(), _weekly(), _calendar(), _languages(), _rhythm(), _repos_focus(), _snapshot()])
+    body = "".join([_hero(), _scorecard(), _ci_execution(), _weekly(), _calendar(), _languages(), _rhythm(), _repos_focus(), _snapshot()])
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
