@@ -70,6 +70,31 @@ class WebDashboardContract(unittest.TestCase):
                        "Contribution Calendar", "Contribution Rhythm"):
             self.assertIn(needle, self.html, f"web dashboard missing {needle!r}")
 
+    def test_ci_execution_is_a_separate_governed_dashboard_section(self):
+        """Configuration is not execution, and the new view reuses product chrome."""
+        html = self.html
+        self.assertLess(html.index('id="automation"'), html.index('id="ci-execution"'))
+        self.assertLess(html.index('id="ci-execution"'), html.index('id="weekly-contributions"'))
+        for fragment in (
+            'class="panel ci-execution-panel"',
+            'class="mgroup ci-run-list"',
+            'id="ci-execution-note" role="status"',
+            'hydrateCIExecution(d.ci_execution)',
+            "profile-ci-execution/v1",
+            "CI_OUTCOME",
+            "STATUS_ICON[type]",
+            'title.textContent = run.workflow',
+            'title.href = "https://github.com/jguida941/jguida941/actions/runs/" + run.run_id',
+            'Number.isSafeInteger(r.run_id)',
+        ):
+            self.assertIn(fragment, html, f"CI proof surface lost {fragment!r}")
+        self.assertIn("not an account-wide", html.lower())
+        self.assertNotIn("https://api.github.com/repos/jguida941/jguida941/actions/runs", html,
+                         "live browser API access would bypass the qualified snapshot")
+        self.assertIn(".ci-execution-panel .ci-run-list[hidden] { display: none; }", html)
+        self.assertIn(".ci-execution-panel .ci-status { justify-self: end;", html)
+        self.assertIn(".ci-execution-panel .ci-status { justify-self: start;", html)
+
     def test_status_conveyed_by_shape_not_hue_alone(self):
         """DESIGN_SPEC 3.6 / 10 (and the README status_chip): pipeline status must read
         by icon-SHAPE AND label, never hue alone — so a desaturated/colour-blind viewer
