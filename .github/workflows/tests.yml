@@ -22,6 +22,9 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
 
     steps:
       - uses: actions/checkout@v4
@@ -35,6 +38,29 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      # Candidate-only Chrome evidence, taken before any fixture modifies bytes.
+      # The published page must match these receipts exactly.
+      - name: Capture index desktop and true-phone receipts
+        if: ${{ github.ref == 'refs/heads/feature/profile-ci-execution-20261015' && !startsWith(github.event.head_commit.message, 'ci(receipts):') }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import shutil
+          from scripts.quality import headless_receipts as hr
+          chrome = shutil.which("google-chrome") or shutil.which("google-chrome-stable")
+          if not chrome:
+              raise RuntimeError("Google Chrome unavailable: cannot claim visual acceptance")
+          hr.CHROME = Path(chrome)
+          screenshot = hr.screenshot_page("index")
+          probe = hr.dom_probe("index")
+          data = json.loads(probe.read_text(encoding="utf-8"))
+          if data.get("client_width") != 390 or data.get("horizontal_overflow"):
+              raise RuntimeError("CI panel mobile viewport overflow: " + str(data.get("offenders")))
+          print("verified Chrome screenshot", screenshot)
+          print("verified true-phone probe", probe)
+          PY
 
       - name: Run tests
         run: |
@@ -75,3 +101,68 @@ jobs:
           PERSONAL_GITHUB_TOKEN: ""
         run: |
           python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json
+
+      # Branch preview only: data comes from actual GitHub Actions runs and
+      # cannot modify the canonical stored snapshot or its sealed manifest.
+      - name: Render current Actions sample for visual review
+        if: ${{ github.ref == 'refs/heads/feature/profile-ci-execution-20261015' && !startsWith(github.event.head_commit.message, 'ci(receipts):') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          import shutil
+          import subprocess
+          from scripts.github.actions_audit import collect_profile_ci_runs
+          source = Path("site/data/profile_snapshot.json")
+          original = source.read_bytes()
+          try:
+              snapshot = json.loads(original)
+              sample = collect_profile_ci_runs("jguida941/jguida941")
+              if sample["status"] not in {"available", "partial"} or not sample["runs"]:
+                  raise RuntimeError("Live Actions sample unavailable: refusing filled preview")
+              snapshot["ci_execution"] = sample
+              source.write_text(json.dumps(snapshot, indent=2) + "\n", encoding="utf-8")
+              chrome = shutil.which("google-chrome") or shutil.which("google-chrome-stable")
+              if not chrome:
+                  raise RuntimeError("Google Chrome unavailable")
+              dest = Path("ci-populated-preview.png").resolve()
+              cmd = [chrome, "--headless=new", "--no-first-run",
+                     "--no-default-browser-check", "--allow-file-access-from-files",
+                     "--hide-scrollbars", "--window-size=1280,2000",
+                     f"--screenshot={dest}", Path("site/index.html").resolve().as_uri()]
+              subprocess.run(cmd, check=True, capture_output=True, timeout=120)
+              if not dest.is_file() or dest.stat().st_size == 0:
+                  raise RuntimeError("Populated preview screenshot was not created")
+              Path("ci-preview-provenance.json").write_text(
+                  json.dumps({"source":"GitHub Actions via gh run list",
+                              "snapshot_kind":"temporary visual preview, not canonical",
+                              "observed_at":sample["observed_at"],
+                              "status":sample["status"],
+                              "sample_size":len(sample["runs"]),
+                              "command":cmd}, indent=2)+"\n", encoding="utf-8")
+          finally:
+              source.write_bytes(original)
+          PY
+
+      - name: Upload branch browser evidence
+        if: ${{ always() && github.ref == 'refs/heads/feature/profile-ci-execution-20261015' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: profile-ci-visual-review
+          path: |
+            assets/receipts/pages/index/screenshot-1280.png
+            assets/receipts/pages/index/screenshot-1280.png.provenance.json
+            assets/receipts/pages/index/dom-probe-390.json
+            assets/receipts/pages/index/dom-probe-390.json.provenance.json
+            ci-populated-preview.png
+            ci-preview-provenance.json
+
+      - name: Commit branch-only index receipts
+        if: ${{ success() && github.ref == 'refs/heads/feature/profile-ci-execution-20261015' && !startsWith(github.event.head_commit.message, 'ci(receipts):') }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          branch: feature/profile-ci-execution-20261015
+          commit_message: "ci(receipts): capture index desktop and true-mobile Chrome evidence"
+          file_pattern: "assets/receipts/pages/index/screenshot-1280.png assets/receipts/pages/index/screenshot-1280.png.provenance.json assets/receipts/pages/index/dom-probe-390.json assets/receipts/pages/index/dom-probe-390.json.provenance.json"
