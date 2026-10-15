@@ -110,15 +110,16 @@ const fs=require('node:fs'), vm=require('node:vm');
 const src=JSON.parse(fs.readFileSync(0,'utf8'));
 const element=(tag)=>({tag,children:[],hidden:false,textContent:'',innerHTML:'',
   append(...children){this.children.push(...children)},replaceChildren(){this.children=[]}});
-const host=element('div'), note=element('p');
+const host=element('div'), note=element('p'), extra=element('div'), more=element('details'), moreLabel=element('summary');
 const idle={then(){return this},catch(){return this}};
 const doc={documentElement:{dataset:{}},querySelectorAll(){return []},
-  getElementById(id){return id==='ci-execution-rows'?host:note},createElement:element};
+  getElementById(id){return ({'ci-execution-rows':host,'ci-execution-note':note,'ci-execution-more':more,'ci-execution-more-rows':extra,'ci-execution-more-label':moreLabel})[id]},createElement:element};
 const ctx={document:doc,location:{hash:'',search:''},localStorage:{getItem(){return null},setItem(){}},
   URLSearchParams,addEventListener(){},requestAnimationFrame(){},fetch(){return idle},sample:src.sample};
 vm.runInNewContext(src.script+'\nhydrateCIExecution(sample);',ctx,{timeout:5000});
 const item=host.children[0], title=item.children[0].children[0], meta=item.children[0].children[1], badge=item.children[1];
-process.stdout.write(JSON.stringify({count:host.children.length,url:title.href,title:title.textContent,
+process.stdout.write(JSON.stringify({count:host.children.length,extra_count:extra.children.length,
+  more_hidden:more.hidden,more_label:moreLabel.textContent,url:title.href,title:title.textContent,
   meta:meta.textContent,badge:badge.innerHTML,notice:note.textContent}));
 '''
         fixture = {
@@ -126,13 +127,20 @@ process.stdout.write(JSON.stringify({count:host.children.length,url:title.href,t
             "status": "available", "observed_at": "2026-10-15T12:03:00Z",
             "runs": [{"run_id": 9, "workflow": '<img src=x onerror=alert(1)>',
                       "outcome": "constructor", "head_branch": "<script>bad</script>",
-                      "created_at": "2026-10-15T12:02:00Z"}],
+                      "created_at": "2026-10-15T12:02:00Z"}] + [
+                {"run_id": i, "workflow": "Test Profile Pipeline", "outcome": "success",
+                 "head_branch": "main", "created_at": "2026-10-15T12:00:00Z"}
+                for i in range(10, 21)
+            ],
         }
         result = subprocess.run(["node", "-e", harness],
                                 input=json.dumps({"script": scripts[0], "sample": fixture}),
                                 text=True, capture_output=True, timeout=10, check=True)
         value = json.loads(result.stdout)
-        self.assertEqual(1, value["count"])
+        self.assertEqual(6, value["count"])
+        self.assertEqual(6, value["extra_count"])
+        self.assertIs(value["more_hidden"], False)
+        self.assertEqual("6 more observed runs", value["more_label"])
         self.assertEqual("https://github.com/jguida941/jguida941/actions/runs/9", value["url"])
         self.assertEqual('<img src=x onerror=alert(1)>', value["title"])
         self.assertIn("<script>bad</script>", value["meta"])
