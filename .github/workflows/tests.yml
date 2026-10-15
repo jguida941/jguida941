@@ -47,6 +47,8 @@ jobs:
             tests.contracts.test_data_semantics \
             tests.contracts.test_public_data_privacy \
             tests.contracts.test_design_contract \
+            tests.contracts.test_web_dashboard \
+            tests.contracts.test_page_manifest \
             tests.contracts.test_skill_structure \
             tests.contracts.test_label_legibility
 
