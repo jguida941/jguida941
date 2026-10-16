@@ -4,7 +4,33 @@
 > ephemeral `~/.claude/plans/*.md` mirror can be lost; THIS file (deployed with the repo)
 > cannot. Finished history is folded into `docs/history/PLAN-LEDGER.md`.
 
+
 ## STATUS — where we are (updated each slice)
+
+### CI-EXEC-01 — bounded public Actions execution canary (2026-10-15, candidate)
+
+- Branch: `feature/profile-ci-execution-20261015`; source owner:
+  `scripts/github/actions_audit.py`, `scripts/pipeline/collect_data.py`,
+  `scripts/pipeline/compute_metrics.py`, and the existing web renderer.
+- The committed CI/CD panel is distinct from workflow-configuration adoption;
+  it displays only observed public-profile-repository runs, with explicit
+  unavailable/partial status and no inferred account-wide success rate.
+- RED-first controls cover false exactness from partial CI evidence, outcome
+  distinctions, unavailable/empty responses, and hostile provider values.
+- **Browser and product gates verified** on Actions run `38817391143`: a real 1280px
+  Chrome screenshot with the published snapshot and current public Actions sample,
+  the measured 390px page probe with zero page overflow, product tests, and fixture
+  validation. The exact index receipts are SHA-bound to this candidate.
+- The actual populated screenshot exposed 12 rows taking excessive space; the
+  panel now shows six and uses a native disclosure for the next six. A RED
+  discovered the pre-existing calendar scroller was excluded from the DOM
+  containment law; the repaired browser producer accepts only viewport-bound,
+  positive-width, `overflow-x:auto` calendar or table wrappers, with negative
+  vectors against fake/zero-width containment.
+- Production CI config is restored; only the new product test modules and
+  read-only Actions permission survive. **Publication remains UNACCEPTED pending
+  independent DESIGN/CODE/ADVERSARIAL review**, not another screenshot or a
+  new system-level feature.
 
 - **Phases 1–4: DONE / LIVE** — see `docs/history/PLAN-LEDGER.md`. ~142 contracts green before Phase 5.
 - **Phase 5 in progress.** Current workstream: **P5-0 — the organization-as-invariant meta-gate.**

@@ -70,6 +70,102 @@ class WebDashboardContract(unittest.TestCase):
                        "Contribution Calendar", "Contribution Rhythm"):
             self.assertIn(needle, self.html, f"web dashboard missing {needle!r}")
 
+    def test_ci_execution_is_a_separate_governed_dashboard_section(self):
+        """Configuration is not execution, and the new view reuses product chrome."""
+        html = self.html
+        self.assertLess(html.index('id="automation"'), html.index('id="ci-execution"'))
+        self.assertLess(html.index('id="ci-execution"'), html.index('id="weekly-contributions"'))
+        for fragment in (
+            'class="panel ci-execution-panel"',
+            'class="mgroup ci-run-list"',
+            'id="ci-execution-note" role="status"',
+            'hydrateCIExecution(d.ci_execution)',
+            "profile-ci-execution/v1",
+            "CI_OUTCOME",
+            "STATUS_ICON[type]",
+            'title.textContent = run.workflow',
+            'title.href = "https://github.com/jguida941/jguida941/actions/runs/" + run.run_id',
+            'Number.isSafeInteger(r.run_id)',
+        ):
+            self.assertIn(fragment, html, f"CI proof surface lost {fragment!r}")
+        self.assertIn("not an account-wide", html.lower())
+        self.assertNotIn("https://api.github.com/repos/jguida941/jguida941/actions/runs", html,
+                         "live browser API access would bypass the qualified snapshot")
+        self.assertIn(".ci-execution-panel .ci-run-list[hidden] { display: none; }", html)
+        self.assertIn(".ci-execution-panel .ci-status { justify-self: end;", html)
+        self.assertIn(".ci-execution-panel .ci-status { justify-self: start;", html)
+
+    def test_ci_run_hydration_rejects_inherited_status_and_markup(self):
+        """Execute emitted hydration, including a hostile run and branch label."""
+        import json
+        import shutil
+        import subprocess
+        if shutil.which("node") is None:
+            self.skipTest("Node required to exercise emitted CI hydration")
+        from scripts.pipeline.web_render import render_dashboard
+        scripts = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)
+        self.assertEqual(1, len(scripts))
+        harness = r'''
+const fs=require('node:fs'), vm=require('node:vm');
+const src=JSON.parse(fs.readFileSync(0,'utf8'));
+const element=(tag)=>({tag,children:[],hidden:false,textContent:'',innerHTML:'',
+  append(...children){this.children.push(...children)},replaceChildren(){this.children=[]}});
+const host=element('div'), note=element('p'), extra=element('div'), more=element('details'), moreLabel=element('summary');
+const idle={then(){return this},catch(){return this}};
+const doc={documentElement:{dataset:{}},querySelectorAll(){return []},
+  getElementById(id){return ({'ci-execution-rows':host,'ci-execution-note':note,'ci-execution-more':more,'ci-execution-more-rows':extra,'ci-execution-more-label':moreLabel})[id]},createElement:element};
+const ctx={document:doc,location:{hash:'',search:''},localStorage:{getItem(){return null},setItem(){}},
+  URLSearchParams,addEventListener(){},requestAnimationFrame(){},fetch(){return idle},sample:src.sample};
+vm.runInNewContext(src.script+'\nhydrateCIExecution(sample);',ctx,{timeout:5000});
+const item=host.children[0], title=item.children[0].children[0], meta=item.children[0].children[1], badge=item.children[1];
+process.stdout.write(JSON.stringify({count:host.children.length,extra_count:extra.children.length,
+  more_hidden:more.hidden,more_label:moreLabel.textContent,url:title.href,title:title.textContent,
+  meta:meta.textContent,badge:badge.innerHTML,notice:note.textContent}));
+'''
+        fixture = {
+            "schema": "profile-ci-execution/v1", "repository": "jguida941/jguida941",
+            "status": "available", "observed_at": "2026-10-15T12:03:00Z",
+            "runs": [{"run_id": 9, "workflow": '<img src=x onerror=alert(1)>',
+                      "outcome": "constructor", "head_branch": "<script>bad</script>",
+                      "created_at": "2026-10-15T12:02:00Z"}] + [
+                {"run_id": i, "workflow": "Test Profile Pipeline", "outcome": "success",
+                 "head_branch": "main", "created_at": "2026-10-15T12:00:00Z"}
+                for i in range(10, 21)
+            ],
+        }
+        result = subprocess.run(["node", "-e", harness],
+                                input=json.dumps({"script": scripts[0], "sample": fixture}),
+                                text=True, capture_output=True, timeout=10, check=True)
+        value = json.loads(result.stdout)
+        self.assertEqual(6, value["count"])
+        self.assertEqual(6, value["extra_count"])
+        self.assertIs(value["more_hidden"], False)
+        self.assertEqual("6 more observed runs", value["more_label"])
+        self.assertEqual("https://github.com/jguida941/jguida941/actions/runs/9", value["url"])
+        self.assertEqual('<img src=x onerror=alert(1)>', value["title"])
+        self.assertIn("<script>bad</script>", value["meta"])
+        self.assertIn("Unknown", value["badge"])
+
+    def test_ci_index_receipt_is_pinned_and_no_overflow_at_true_390(self):
+        """An actual 390px browser probe must agree with the committed index."""
+        import hashlib
+        import json
+        from scripts.quality.headless_receipts import dom_probe_artifact, provenance_path
+
+        artifact = dom_probe_artifact("index")
+        self.assertTrue(artifact.is_file())
+        data = json.loads(artifact.read_text(encoding="utf-8"))
+        sidecar = json.loads(provenance_path(artifact).read_text(encoding="utf-8"))
+        self.assertEqual(390, data.get("client_width"))
+        self.assertEqual(390, data.get("viewport", {}).get("width"))
+        self.assertFalse(data.get("horizontal_overflow"), data.get("offenders"))
+        self.assertEqual(0, data.get("uncontained_offender_count"))
+        self.assertEqual(
+            hashlib.sha256(INDEX.read_bytes()).hexdigest(),
+            sidecar.get("page_sha256"),
+            "CI panel changed the page: recapture the 390px receipt",
+        )
+
     def test_status_conveyed_by_shape_not_hue_alone(self):
         """DESIGN_SPEC 3.6 / 10 (and the README status_chip): pipeline status must read
         by icon-SHAPE AND label, never hue alone — so a desaturated/colour-blind viewer

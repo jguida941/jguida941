@@ -2,21 +2,22 @@
   "artifact": "assets/receipts/pages/index/screenshot-1280.png",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "chrome_version": "Google Chrome 149.0.7827.200",
+  "chrome_version": "Google Chrome 155.0.8059.39",
   "command": [
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/usr/bin/google-chrome",
     "--headless=new",
     "--no-first-run",
     "--no-default-browser-check",
     "--hide-scrollbars",
     "--window-size=1280,1536",
-    "--screenshot=/Users/jguida941/Dev/jguida941/assets/receipts/pages/index/screenshot-1280.png",
-    "file:///Users/jguida941/Dev/jguida941/site/index.html"
+    "--allow-file-access-from-files",
+    "--screenshot=/home/runner/work/jguida941/jguida941/assets/receipts/pages/index/screenshot-1280.png",
+    "file:///home/runner/work/jguida941/jguida941/site/index.html"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-screenshot",
   "page": "index",
-  "page_sha256": "e9b18505f187ea3e4380684645109533fda903a9cb24ea645d761eaa8f1c0c0b",
+  "page_sha256": "cad871b43638d082dc3b8daecfed3db5351babd94d2d021eb3173adb9d360790",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/index.html",
   "viewport": {

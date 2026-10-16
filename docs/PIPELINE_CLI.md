@@ -41,6 +41,31 @@ python scripts/profile_cli.py <command> [flags]
   - Audits required checks on a branch.
   - Can apply missing required checks with `gh api`.
 
+## CI/CD execution evidence (public profile repository only)
+
+The dashboard's **Workflow configuration** family counts owned public/private non-fork
+repositories with workflow files observed at default-branch HEAD. It does **not**
+describe successful executions. The independent **CI/CD Execution** section samples
+up to 12 recent GitHub Actions runs in the public `jguida941/jguida941` repository
+across branches, captured during canonical profile generation with `gh run list`.
+
+`site/data/profile_snapshot.json.ci_execution` carries
+`profile-ci-execution/v1`: `repository`, `observed_at`, `sample_limit`,
+`status`, `observed_runs`, and `runs` (positive run ID, workflow name,
+conclusion-derived outcome, created UTC timestamp, event, and branch). Valid
+statuses are `available`, `partial`, `empty`, and `unavailable`. A failed
+query is unavailable, **never zero**; rejected provider rows make the sample
+partial. Unfinished runs are never counted as successes. No workflow job logs,
+credentials, private repository contents, or account-wide success percentages
+are included.
+
+The browser reads this evidence only from its already-qualified snapshot and
+constructs run links from numeric IDs under the known public repository.
+Provider text is rendered as text nodes. CI/CD status reuses the site's existing
+icon-and-label convention and grouped inset rows. The six newest observed runs
+are visible by default; a native disclosure reveals up to six more. Real Chrome
+screenshots and a true 390px DOM probe are the visible-surface acceptance evidence.
+
 ## AI Ingestion Contract
 
 `site/data/triage_report.json` is the stable handoff for AI tools.

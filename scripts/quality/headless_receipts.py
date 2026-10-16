@@ -135,6 +135,10 @@ def screenshot_page(page: str, width: int = 1280) -> Path:
         "--no-default-browser-check",
         "--hide-scrollbars",
         f"--window-size={width},{height}",
+        # The index fetches its same-directory canonical snapshot from file://
+        # during headless screenshot capture. The Chrome file access flag is
+        # necessary to photograph hydrated evidence, not a loading placeholder.
+        *(["--allow-file-access-from-files"] if page == "index" else []),
         f"--screenshot={artifact}",
         route.as_uri(),
     ]
@@ -192,7 +196,7 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       var overLeft = Math.max(0, -rect.left);
       var overRight = Math.max(0, rect.right - clientWidth);
       if (overLeft > 1 || overRight > 1) {{
-        var scroller = el.closest ? el.closest(".table-scroll") : null;
+        var scroller = el.closest ? el.closest(".table-scroll, .cal-wrap") : null;
         var scrollInfo = null;
         var contained = false;
         if (scroller && scroller !== el) {{
@@ -209,7 +213,9 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
             "overflow_x": scrollStyle.overflowX,
             "in_viewport": inViewport
           }};
-          contained = cls(scroller).split(" ").indexOf("table-scroll") !== -1
+          var declaredClasses = cls(scroller).split(" ");
+          contained = (declaredClasses.indexOf("table-scroll") !== -1 ||
+                       declaredClasses.indexOf("cal-wrap") !== -1)
             && scrollStyle.overflowX === "auto"
             && inViewport
             && scrollRect.width > 1;
@@ -222,13 +228,14 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
           "right": Math.round(rect.right * 100) / 100,
           "width": Math.round(rect.width * 100) / 100,
           "overflow_px": Math.round(Math.max(overLeft, overRight) * 100) / 100,
-          "contained_by_table_scroll": contained,
+          "contained_by_table_scroll": contained && cls(scroller).split(" ").indexOf("table-scroll") !== -1,
+          "contained_by_calendar_scroll": contained && cls(scroller).split(" ").indexOf("cal-wrap") !== -1,
           "scroll_container": scrollInfo
         }});
       }}
     }});
     var overflowPx = Math.max(0, scrollWidth - clientWidth);
-    var uncontained = offenders.filter(function (o) {{ return o.contained_by_table_scroll !== true; }});
+    var uncontained = offenders.filter(function (o) {{ return o.contained_by_table_scroll !== true && o.contained_by_calendar_scroll !== true; }});
     var result = {{
       "contract_id": "PageHeadlessDomProbe",
       "page": "{page}",

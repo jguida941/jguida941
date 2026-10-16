@@ -2,7 +2,7 @@
   "contract_id": "PageManifest",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "purpose": "D-SHELL-2 (MF2, ratified): every generated page declares WHAT IT IS \u2014 intent, archetype (closed enum), and the regions its archetype requires. A page absent from this manifest, an archetype outside the enum, or a required region missing from the COMMITTED page bytes reddens tests/contracts/test_page_manifest.py. Aliases use the closed grammar '.class-token' | '[data-attr]' only, written from the actual renders.",
+  "purpose": "D-SHELL-2 (MF2, ratified): every generated page declares WHAT IT IS — intent, archetype (closed enum), and the regions its archetype requires. A page absent from this manifest, an archetype outside the enum, or a required region missing from the COMMITTED page bytes reddens tests/contracts/test_page_manifest.py. Aliases use the closed grammar '.class-token' | '[data-attr]' only, written from the actual renders.",
   "doc_cite": "docs/design/pageshell.md",
   "archetypes": [
     "landing",
@@ -19,11 +19,13 @@
       "archetype": "landing",
       "required_regions": [
         "content-column",
-        "site-nav"
+        "site-nav",
+        "ci-execution"
       ],
       "region_aliases": {
         "content-column": ".wrap",
-        "site-nav": ".site-nav"
+        "site-nav": ".site-nav",
+        "ci-execution": ".ci-execution-panel"
       },
       "receipt_obligations": [
         {

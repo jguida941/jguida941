@@ -44,13 +44,18 @@ def _uncontained_dom_offenders(data: dict) -> list[dict]:
     out = []
     for offender in data.get("offenders", []):
         scroll = offender.get("scroll_container") or {}
-        if (
+        declared = (
             offender.get("contained_by_table_scroll") is True
             and scroll.get("class") == "table-scroll"
+        ) or (
+            offender.get("contained_by_calendar_scroll") is True
+            and scroll.get("class") == "cal-wrap"
+        )
+        if (
+            declared
             and scroll.get("overflow_x") == "auto"
             and scroll.get("in_viewport") is True
-            # the zero-width gaming vector (adversarial gate, live-probed): a width:0 wrapper
-            # "contains" any child; containment demands a meaningfully positive measured width.
+            # A zero-width wrapper cannot prove it contains a wide child.
             and isinstance(scroll.get("width"), (int, float))
             and scroll.get("width") > 1
         ):
@@ -76,6 +81,31 @@ class ZeroWidthContainmentGaming(unittest.TestCase):
                                  "in_viewport": True, "width": 284},
         }]}
         self.assertEqual(_uncontained_dom_offenders(real), [])
+
+
+    def test_calendar_scroller_requires_measured_positive_containment(self):
+        """A wide calendar may scroll inside its real wrapper, not escape the page."""
+        from copy import deepcopy
+        valid = {"offenders": [{
+            "contained_by_table_scroll": False,
+            "contained_by_calendar_scroll": True,
+            "scroll_container": {
+                "class": "cal-wrap", "overflow_x": "auto",
+                "in_viewport": True, "width": 280,
+            },
+        }]}
+        self.assertEqual([], _uncontained_dom_offenders(valid))
+        for field, bad in (
+            ("width", 0), ("overflow_x", "visible"),
+            ("in_viewport", False), ("class", "bogus-scroll")
+        ):
+            with self.subTest(mutation=field):
+                mutated = deepcopy(valid)
+                mutated["offenders"][0]["scroll_container"][field] = bad
+                self.assertEqual(1, len(_uncontained_dom_offenders(mutated)))
+        bare = deepcopy(valid)
+        bare["offenders"][0]["contained_by_calendar_scroll"] = False
+        self.assertEqual(1, len(_uncontained_dom_offenders(bare)))
 
 
 class ReceiptProvenanceContract(unittest.TestCase):

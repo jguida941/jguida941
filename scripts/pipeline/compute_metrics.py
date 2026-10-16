@@ -2145,6 +2145,19 @@ def compute_profile_model(
     dashboard_data["engineering"] = engineering
     dashboard_data["automation"] = automation
     dashboard_data["automation_display"] = workflow_display
+    # Execution history is one separately qualified public-repo observation.
+    # Never infer run outcomes from workflow-file/adoption inventory.
+    from scripts.github.actions_audit import normalize_profile_ci_runs
+    ci_execution = getattr(collected, "ci_execution_observation", None)
+    if (not isinstance(ci_execution, dict)
+            or ci_execution.get("schema") != "profile-ci-execution/v1"
+            or ci_execution.get("repository") != f"{USERNAME}/{USERNAME}"
+            or ci_execution.get("status") not in ("available", "partial", "empty", "unavailable")):
+        ci_execution = normalize_profile_ci_runs(
+            None, f"{USERNAME}/{USERNAME}",
+            now_utc.isoformat(timespec="seconds").replace("+00:00", "Z"),
+        )
+    dashboard_data["ci_execution"] = ci_execution
     calendar_public = _public_contribution_calendar(calendar)
     if calendar_public:
         dashboard_data["contribution_calendar"] = calendar_public
