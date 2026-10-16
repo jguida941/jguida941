@@ -216,6 +216,45 @@ class PublicMultiRepositoryCITimelineTests(unittest.TestCase):
         self.assertIsNone(sample["repositories"][1]["observed_runs"])
         self.assertFalse(sample["repositories"][1]["runs"])
 
+
+    def test_out_of_window_runs_cannot_mean_zero_in_window(self):
+        """A nonempty provider history outside the chart window is not an empty-run proof."""
+        from scripts.github.actions_audit import normalize_public_ci_timeline
+        sample = normalize_public_ci_timeline([{"repository": "jguida941/jguida941",
+            "runs": [{"databaseId": 91, "workflowName": "Old workflow", "status": "completed",
+                      "conclusion": "success", "createdAt": "2026-01-01T00:00:00Z"}]}],
+            "jguida941", "2026-10-15T12:00:00Z", window_days=84)
+        row = sample["repositories"][0]
+        self.assertEqual(0, sample["observed_runs"])
+        self.assertEqual("partial", sample["status"],
+                         "hidden prior runs cannot become a complete zero-run timeline")
+        self.assertEqual("partial", row["status"])
+        self.assertTrue(row["outside_window"],
+                        "mark clipped history separately from actually empty API response")
+        self.assertEqual([], row["runs"])
+
+    def test_future_and_healthy_runs_keep_independent_timeline_meaning(self):
+        from scripts.github.actions_audit import normalize_public_ci_timeline
+        rows = [{"databaseId": 92, "workflowName": "Future", "status": "completed",
+                 "conclusion": "failure", "createdAt": "2026-10-16T12:00:00Z"},
+                {"databaseId": 93, "workflowName": "Current", "status": "completed",
+                 "conclusion": "success", "createdAt": "2026-10-14T12:00:00Z"}]
+        s = normalize_public_ci_timeline(
+            [{"repository": "jguida941/jguida941", "runs": rows}],
+            "jguida941", "2026-10-15T12:00:00Z")
+        self.assertEqual(1, s["observed_runs"])
+        self.assertEqual("partial", s["status"])
+        self.assertEqual([93], [r["run_id"] for r in s["repositories"][0]["runs"]])
+        self.assertTrue(s["repositories"][0]["outside_window"])
+
+    def test_real_empty_sample_remains_distinct_from_clipped_history(self):
+        from scripts.github.actions_audit import normalize_public_ci_timeline
+        s = normalize_public_ci_timeline(
+            [{"repository": "jguida941/jguida941", "runs": []}],
+            "jguida941", "2026-10-15T12:00:00Z")
+        self.assertEqual("empty", s["repositories"][0]["status"])
+        self.assertFalse(s["repositories"][0]["outside_window"])
+
     def test_source_cap_prevents_exact_history_claim(self):
         from scripts.github.actions_audit import normalize_public_ci_timeline
         runs = [{"databaseId": i+1, "workflowName": "CI",
