@@ -108,6 +108,41 @@ class ZeroWidthContainmentGaming(unittest.TestCase):
         self.assertEqual(1, len(_uncontained_dom_offenders(bare)))
 
 
+    def test_ci_observatory_known_scroller_is_measured(self):
+        """CI-RECEIPT-01b: actual observed 390px overflow is an internal timeline track.
+
+        Run 38855931366 produced a true 390px DOM witness with 770px ci-plot,
+        ci-axis and lane elements. A named, real in-viewport 285px scroll wrapper
+        may contain these, but arbitrary overflow wrappers MUST remain visible.
+        """
+        from copy import deepcopy
+        valid = {"offenders": [{
+            "tag": "div", "class": "ci-plot", "left": 41, "right": 811,
+            "contained_by_ci_plot_scroll": True,
+            "scroll_container": {
+                "class": "ci-plot-scroll", "overflow_x": "auto",
+                "in_viewport": True, "width": 285,
+                "observatory_parent": True,
+            },
+        }]}
+        self.assertEqual([], _uncontained_dom_offenders(valid),
+                         "real scoped timeline scrolling is not page overflow")
+        for field, wrong in (
+            ("class", "arbitrary-scroll"),
+            ("overflow_x", "visible"),
+            ("in_viewport", False),
+            ("width", 0),
+            ("observatory_parent", False),
+        ):
+            with self.subTest(wrong=field):
+                bad = deepcopy(valid)
+                bad["offenders"][0]["scroll_container"][field] = wrong
+                self.assertEqual(1, len(_uncontained_dom_offenders(bad)),
+                                 "a wrong/synthetic scroll wrapper cannot hide overflow")
+        missing_claim = deepcopy(valid)
+        missing_claim["offenders"][0]["contained_by_ci_plot_scroll"] = False
+        self.assertEqual(1, len(_uncontained_dom_offenders(missing_claim)))
+
 class ReceiptProvenanceContract(unittest.TestCase):
     def test_obligation_kinds_name_their_actual_producer(self):
         """No obligation may claim a capability its producer lacks: the reconstruction kind must not
