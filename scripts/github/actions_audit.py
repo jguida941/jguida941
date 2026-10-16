@@ -266,18 +266,24 @@ def normalize_public_ci_timeline(
         raw = observation.get("runs")
         qualified = normalize_profile_ci_runs(raw, repo, instant, limit=limit_per_repo)
         samples = []
+        outside_window = False
         for item in qualified["runs"]:
             moment = datetime.fromisoformat(item["created_at"].replace("Z", "+00:00"))
             if lower <= moment <= end:
                 samples.append(item)
+            else:
+                # A sampled older/future run is not evidence of *zero* runs inside
+                # the selected chart window. Preserve the clipped-history signal.
+                outside_window = True
         truncated = isinstance(raw, list) and len(raw) >= limit_per_repo
         completeness = qualified["status"]
-        if truncated and completeness == "available":
+        if completeness == "available" and (truncated or outside_window):
             completeness = "partial"
         if completeness in ("partial", "unavailable"):
             partial = True
         result["repositories"].append({"repository":repo, "status":completeness,
-            "truncated":truncated, "observed_runs":len(samples) if raw is not None else None,
+            "truncated":truncated, "outside_window":outside_window,
+            "observed_runs":len(samples) if raw is not None else None,
             "runs":samples})
         result["observed_runs"] += len(samples)
     if not result["repositories"]:
