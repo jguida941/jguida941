@@ -248,5 +248,38 @@ class ReceiptProvenanceContract(unittest.TestCase):
                     f"{page}: 390px DOM probe has uncontained overflowing elements: {data.get('offenders')}")
 
 
+class BrowserProducerPortabilityContract(unittest.TestCase):
+    """CI-RECEIPT-01: genuine Google Chrome on an existing non-Mac runner."""
+
+    def test_google_chrome_available_on_linux_runner_is_discoverable(self):
+        from unittest.mock import patch
+        import tempfile
+        from scripts.quality import headless_receipts as producer
+
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            installed = home / "google-chrome"
+            installed.write_bytes(b"stand-in path only; executable not invoked")
+            with patch.object(producer, "CHROME", home / "missing-Mac-Chrome"), patch(
+                "shutil.which",
+                side_effect=lambda name: str(installed) if name == "google-chrome" else None
+            ):
+                self.assertEqual(installed, producer._chrome(),
+                    "A real Chrome executable on CI must be found before capturing evidence")
+
+    def test_missing_google_chrome_refuses_no_generic_chromium_fallback(self):
+        from unittest.mock import patch
+        import tempfile
+        from scripts.quality import headless_receipts as producer
+
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            with patch.object(producer, "CHROME", home / "missing-Mac-Chrome"), patch(
+                "shutil.which", return_value=None
+            ):
+                with self.assertRaises(FileNotFoundError):
+                    producer._chrome()
+
+
 if __name__ == "__main__":
     unittest.main()
