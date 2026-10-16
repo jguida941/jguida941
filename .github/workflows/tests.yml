@@ -98,7 +98,12 @@ jobs:
           if (data.get("client_width") != 390 or
                   data.get("horizontal_overflow") or
                   data.get("uncontained_offender_count")):
-              raise RuntimeError("Actual Chrome 390px overflow proof failed")
+              raise RuntimeError(
+                  "Actual Chrome 390px overflow proof failed: " +
+                  json.dumps({"client_width": data.get("client_width"),
+                              "overflow": data.get("horizontal_overflow"),
+                              "offenders": data.get("offenders"),
+                              "uncontained": data.get("uncontained_offender_count")}, sort_keys=True))
           for artifact in (general, focused, mobile):
               if not artifact.is_file() or not provenance_path(artifact).is_file():
                   raise RuntimeError("Missing genuine browser evidence")

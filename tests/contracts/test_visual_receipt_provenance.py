@@ -40,7 +40,7 @@ def _obligations():
 
 def _uncontained_dom_offenders(data: dict) -> list[dict]:
     """Committed DOM probes are acceptance facts. An element-level offender is acceptable only
-    when the browser producer proved it is inside the measured horizontal table scroller."""
+    when the producer proved a measured, viewport-bound declared table, calendar, or CI timeline scroller."""
     out = []
     for offender in data.get("offenders", []):
         scroll = offender.get("scroll_container") or {}
@@ -50,6 +50,10 @@ def _uncontained_dom_offenders(data: dict) -> list[dict]:
         ) or (
             offender.get("contained_by_calendar_scroll") is True
             and scroll.get("class") == "cal-wrap"
+        ) or (
+            offender.get("contained_by_ci_plot_scroll") is True
+            and scroll.get("class") == "ci-plot-scroll"
+            and scroll.get("observatory_parent") is True
         )
         if (
             declared

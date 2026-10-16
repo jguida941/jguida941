@@ -155,7 +155,8 @@ def screenshot_page(page: str, width: int = 1280, *, target: str | None = None) 
         # during headless screenshot capture. The Chrome file access flag is
         # necessary to photograph hydrated evidence, not a loading placeholder.
         *(["--allow-file-access-from-files"] if page == "index" else []),
-        *(["--virtual-time-budget=3500"] if target else []),
+        # A virtual-time jump after a long SVG anchor can paint a blank viewport;
+        # capture real compositor output without a simulated-time budget.
         f"--screenshot={artifact}",
         route.as_uri() + ("#ci-observatory" if target else ""),
     ]
@@ -222,14 +223,16 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       var overLeft = Math.max(0, -rect.left);
       var overRight = Math.max(0, rect.right - clientWidth);
       if (overLeft > 1 || overRight > 1) {{
-        var scroller = el.closest ? el.closest(".table-scroll, .cal-wrap") : null;
+        var scroller = el.closest ? el.closest(".table-scroll, .cal-wrap, .ci-plot-scroll") : null;
         var scrollInfo = null;
         var contained = false;
         if (scroller && scroller !== el) {{
           var scrollStyle = frame.contentWindow.getComputedStyle(scroller);
           var scrollRect = scroller.getBoundingClientRect();
           var inViewport = scrollRect.left >= -1 && scrollRect.right <= clientWidth + 1;
+          var ciScoped = scroller.matches(".ci-observatory .ci-plot-scroll");
           scrollInfo = {{
+            "observatory_parent": ciScoped,
             "tag": scroller.tagName.toLowerCase(),
             "id": scroller.id || "",
             "class": cls(scroller),
@@ -241,7 +244,8 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
           }};
           var declaredClasses = cls(scroller).split(" ");
           contained = (declaredClasses.indexOf("table-scroll") !== -1 ||
-                       declaredClasses.indexOf("cal-wrap") !== -1)
+                       declaredClasses.indexOf("cal-wrap") !== -1 ||
+                       ciScoped)
             && scrollStyle.overflowX === "auto"
             && inViewport
             && scrollRect.width > 1;
@@ -256,12 +260,13 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
           "overflow_px": Math.round(Math.max(overLeft, overRight) * 100) / 100,
           "contained_by_table_scroll": contained && cls(scroller).split(" ").indexOf("table-scroll") !== -1,
           "contained_by_calendar_scroll": contained && cls(scroller).split(" ").indexOf("cal-wrap") !== -1,
+          "contained_by_ci_plot_scroll": contained && scrollInfo && scrollInfo.observatory_parent,
           "scroll_container": scrollInfo
         }});
       }}
     }});
     var overflowPx = Math.max(0, scrollWidth - clientWidth);
-    var uncontained = offenders.filter(function (o) {{ return o.contained_by_table_scroll !== true && o.contained_by_calendar_scroll !== true; }});
+    var uncontained = offenders.filter(function (o) {{ return o.contained_by_table_scroll !== true && o.contained_by_calendar_scroll !== true && o.contained_by_ci_plot_scroll !== true; }});
     var result = {{
       "contract_id": "PageHeadlessDomProbe",
       "page": "{page}",
@@ -275,7 +280,7 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       "overflow_px": overflowPx,
       "offender_count": offenders.length,
       "uncontained_offender_count": uncontained.length,
-      "offenders": uncontained.concat(offenders.filter(function (o) {{ return o.contained_by_table_scroll === true || o.contained_by_calendar_scroll === true; }})).slice(0, 20),
+      "offenders": uncontained.concat(offenders.filter(function (o) {{ return o.contained_by_table_scroll === true || o.contained_by_calendar_scroll === true || o.contained_by_ci_plot_scroll === true; }})).slice(0, 20),
       "authority_status": "candidate_only",
       "cannot_mark_done": true
     }};
