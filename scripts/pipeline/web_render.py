@@ -969,7 +969,7 @@ def _script() -> str:
       meta.className = "ms";
       const when = new Date(run.created_at || "");
       const stamp = Number.isNaN(when.getTime()) ? "Time unavailable" :
-        when.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit", timeZone:"UTC", timeZoneName:"short"});
+        when.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short"});
       meta.textContent = (run.head_branch ? run.head_branch + " · " : "") + stamp;
       left.append(title, meta);
       const [label, type] = Object.prototype.hasOwnProperty.call(CI_OUTCOME, run.outcome)
