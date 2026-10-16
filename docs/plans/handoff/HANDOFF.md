@@ -1,59 +1,18 @@
-# CURRENT REENTRY — jguida941 CI dashboard, 2026-10-16
+# CURRENT REENTRY — jguida941 dashboard, 2026-10-15
 
-**This current checkpoint supersedes the archived July handoff below.** The
-operator asked for the supplied reference-based multi-repository CI visualization,
-not another oversized profile-repo run list. `main` has the rejected CI-EXEC-01
-data canary; the selected unaccepted slice is **CI-REPO-TIMELINE-01** on
-`feature/profile-multi-repo-ci-timeline-20261015`. Verified starting remote HEAD `07013be1`; always
-refresh head and inspect local uncommitted/unpublished work before editing.
-Do not reset, assume a past handoff is live, or open a competing timeline branch.
+This section is the authoritative next-agent entry; older July handoff is archived below, not an alternate work selection.
 
-## Owner, files, and visual target
+**Refs:** Public `jguida941/jguida941` `development` starts at `dbec9174` (candidate CI commits and newest `main` generated assets, archive-only parents retain old `codex/p024` and preview history); `main` remained `af9731f` when assembled; `w3-correction` preserved. Re-read *live* heads before any edit, and preserve local unpublished work. Obsolete remote branches still need real deletion after verification; do not claim cleanup done or create another work branch. Do not merge unreviewed candidate to `main`.
 
-`AGENTS.md` governs the RED-first/mutation/Chrome+390/independent
-DESIGN-CODE-ADVERSARIAL review gates. Fable is the implementation owner;
-Codex independently reviews. No review has approved this slice yet.
-The data flow is `scripts/github/actions_audit.py` -> `collect_data.py` ->
-`compute_metrics.py` -> `scripts/contracts/dashboard_summary.py` ->
-`scripts/rendering/generate_dashboard_summary.py` -> the same desktop/mobile
-SVG bytes on GitHub README and Pages overview. Do not add another projection.
+**Read first:** `AGENTS.md`, `docs/plans/ACTIVE.md`, `docs/DESIGN_SPEC.md`, `docs/design/charts.md`, the latest actual source and tests, then the authenticated private [work selector and selected case](https://github.com/jguida941/profile-private-continuation/blob/codex/profile-ci-inventory-20261015/docs/development/work-slices.toml) (`JG-CI-VIS-001`, selected and unaccepted) and [existing privacy/output plan](https://github.com/jguida941/profile-private-continuation/blob/codex/profile-ci-inventory-20261015/records/privacy-output-migration-v1/PLAN.md). A2 stays paused/unaccepted. No invented new production runner or writer.
 
-Operator references: GIT//INTEL / Developer Observatory / Code Chronicle.
-Their distinguishing requirements: **real repository lanes**, a true chronological
-Actions time axis, dots encoding observed run outcomes (shape/label equivalents),
-and legible cross-repository visual hierarchy. The figures in the screenshots
-are illustrative; never hard-code their success rates or private repo histories.
+**Operator requirement (corrected):** public repository names, including private SemLoop / SemVariants / BlamBridge / SemBridge / CS405 / SemCompose, and *qualified* aggregate metrics are allowed; private **implementation**, credentials, raw logs and sensitive source are not. Private source + protected Mac generator → checked output package → minimally scoped publisher → public profile README/GitHub Pages is already the approved architecture. P2 private output diagnostics have passed; P3/P4 cutover has not.
 
-## CI-REPO-TIMELINE-01a evidence correction
+**Live CI code and gap:** Existing `scripts/github/actions_audit.py` → `collect_data.py` → `compute_metrics.py` → `scripts/contracts/dashboard_summary.py` → `scripts/rendering/generate_dashboard_summary.py` produces a shared SVG for README and website. The current 84-day/newest-20 public-only timeline is **not** the GIT//INTEL / Developer Observatory / Code Chronicle screen. It lacks mixed-visibility lanes, complete commit+CI matrices, denominator-qualified repo comparison and selected-day timeline. The rejected oversized activity list survives in collapsed detail and must not be mistaken for the product. The private candidate's six changed imported blobs conflict with immutable source custody; fix the authority separation, not its frozen evidence.
 
-Two independent negative tests were first observed FAILING: repeated repo
-observations inflated `observed_runs` (1 became 2); missing `private` metadata
-allowed an unverified repository into the public cohort. A dedup/partial guard and
-explicit-public admission rule now pass. Existing positive fixture declares
-`private: False`. Local focused test group:
-`python -m unittest tests.github.test_actions_audit
-tests.contracts.test_dashboard_summary tests.contracts.test_readme_projection
-tests.contracts.test_web_dashboard -q` -> **88 green**. General
-`unittest discover` exceeded the sandbox timeout (many tests advanced),
-so no full-green claim is made. Record exact GitHub CI qualification when run.
+**Next executable slice:** (1) re-check live public/private HEADs + original image targets and source selector; (2) freeze right-reason RED/healthy controls for provenance-bound public/private repository Actions observations and distinction among unavailable, queued, failed and successful; (3) preserve immutable private imported generator and build mutable candidate in separate admitted working source, no historical digest laundering; (4) add one visual, theme-token-governed repo/time chart section from qualified data, with measured desktop/390 browser evidence *showing the actual chart*, no inferred twelve-month metrics; (5) run existing test suite and real Chrome receipt producers plus targeted mutation, independently review DESIGN/CODE/ADVERSARIAL, and record exact evidence/remaining gaps here after the slice. Continue incrementally toward performance/sparkline/day details, then code quality and the existing private publisher cutover. Do NOT mark complete on unit tests or top-of-page screenshots alone.
 
-## Exact next action
-
-1. Refresh the live branch head, `main` drift, local worktree and
-   `docs/plans/ACTIVE.md`; do not overwrite newer work.
-2. Run focused and full CI plus RED/mutation probes. Verify provider privacy,
-   replay dedup, sample limit, stale timestamps and unavailable-vs-zero.
-3. Capture **populated, real API** multi-repo timeline at desktop and true phone
-   widths. Inspect the CI region, not only the top of the tall profile card.
-   Align repo-axis/legend/marker composition to operator references and carry
-   honest `<=20` runs/repo limitation; a full 12-month series is NOT proved.
-4. Run Chrome 1280 screenshot, 390 DOM horizontal-overflow receipt and source
-   identity/pixel review. Don't publish a synthetic/empty-state image as accepted.
-5. Get independent DESIGN/CODE/ADVERSARIAL verdicts, fold findings RED first;
-   update active plan/handoff with proof and bounded next goal in same commit.
-6. Only then consider PR/merge/publication. Next visual slice: 12-month
-   referenced timeline and repository comparative metrics, separately proving
-   complete denominators before percentages or sparklines.
+**Branch retirement status:** Only `development`, `main`, and `w3-correction` should remain eventually. The old feature, Codex, preview refs are still present; their histories are now reachable from `development` and deletion remains unperformed. Use an authenticated branch-delete capability with current-head checks; do not force-reset branches or erase their unpublished work.
 
 ## Archived handoff, 2026-07-02 (historical, not the active goal)
 

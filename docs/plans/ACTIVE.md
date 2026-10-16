@@ -7,36 +7,15 @@
 
 ## STATUS — where we are (updated each slice)
 
-### CI-REPO-TIMELINE-01 — ACTIVE / UNACCEPTED (2026-10-16)
+### CI-REPO-TIMELINE-01 — ACTIVE / UNACCEPTED (operator visual target, 2026-10-15)
 
-- **Branch:** `feature/profile-multi-repo-ci-timeline-20261015`; re-read the real remote HEAD and preserve unpublished Mac
-  work before any new write. Do not create competing timeline branches.
-- **Operator visual target:** supplied GIT//INTEL, Developer Observatory, Code Chronicle
-  references. One lane per real repository, chronological GitHub Actions dots, accessible
-  outcome legend, and compact cross-repo composition. A generic six-row run list
-  does **not** satisfy this. Illustrative reference metrics must not be published as data.
-- **Candidate implementation:** `scripts/github/actions_audit.py` samples the profile
-  plus at most five explicitly public, configured repositories, up to 20 newest runs
-  each. `compute_metrics` carries `profile-ci-timeline/v1` into
-  `dashboard_summary` and the shared README/Pages desktop and mobile SVG renderer.
-  Unknown, partial or truncated history cannot become an exact success rate.
-- **CI-REPO-TIMELINE-01a RIGHT-REASON RED→GREEN:** replayed repository observation
-  previously doubled its run counts; a missing visibility fact was treated as public.
-  Repeats now retain first qualified repo only and mark partial; cohort selection
-  requires explicit `private is False`. Both red tests reproduced the defects,
-  then passed together with focused tests (88 GREEN). Full suite still pending.
-- **Current gate:** initial browser CI run
-  [38844266492](https://github.com/jguida941/jguida941/actions/runs/38844266492)
-  succeeded, but the screenshot shows only the top of a tall page; the shipped
-  branch SVG reports timeline unavailable until real Actions observations are
-  collected. Do **not** assert visual reference parity or merge based on that.
-- **Next slice:** render actual, provenance-bound multi-repo runs at 1280 and true
-  390, including the CI timeline itself. Compare measured repo/axis/legend/dot
-  anatomy against the operator's images; challenge sample-window coverage and
-  absence-vs-zero before expanding to the reference's 12-month presentation.
-  Require independent DESIGN/CODE/ADVERSARIAL review and signed browser receipts.
-- All edits and next-agent entry instructions live with source; no source ownership
-  moves to a second bespoke web renderer.
+- **One active development line:** `development` was assembled at `dbec9174` from the live multi-repository CI candidate and current `main` generated artifacts. Historical Codex and preview commit DAGs are retained via explicit archive-only merge parents; those obsolete changes are NOT accepted source. Keep `main` stable, preserve `w3-correction`, and do not open another feature branch. Legacy branch refs still exist and require verified retirement after cleanup is possible.
+- **Operator references are acceptance requirements, not decorative inspiration:** GIT//INTEL's multi-repository Commit & CI Activity, repository-performance comparisons and workflow signals; Developer Observatory's dated success/failure/queued/cancelled CI Workflow Timeline; Code Chronicle's interactive event timeline and selected-day detail. Layout hierarchy, spacing, theme character, 1280/390 actual browser pixels and real outcomes must be compared before declaring acceptance.
+- **Current candidate is narrower, not finished:** the static shared README/Pages SVG has up to six observed **public-only** repository lanes, a bounded 84-day window and at most 20 newest workflow runs per repository. It does NOT prove a full-year timeline, commit density, account-wide action success rate, PR merge percentage, twelve-week trends or selected-day details. Empty provider history is not zero. Existing profile-repository execution list is a useful data canary but visually rejected.
+- **Privacy policy correction:** publicly display private repository **names, links, ordinary metadata, and aggregate GitHub Actions / performance metrics** when qualified. Never publish private source, credentials, raw logs or internal evidence. The already-established [private producer / public artifact plan](https://github.com/jguida941/profile-private-continuation/blob/codex/profile-ci-inventory-20261015/records/privacy-output-migration-v1/PLAN.md) is the migration owner. Real protected-Mac P2C full four-page output parity and P2D HTTP diagnostics exist; P3 publisher and P4 public-source minimization remain **OWED**, not implicitly solved by a public-site code change.
+- **Real architecture defect identified:** private `product-source/**` CI candidate changed six imported files while the immutable 179-file custody manifest still pins their original blobs. Do not rewrite historical hashes. Preserve the original evidence baseline separately from mutable private development input before claiming `make source-check`, private build or output parity.
+- **Selected private goal remains JG-CI-VIS-001, ACTIVE / UNACCEPTED** (A2 queued/paused and unaccepted); reconcile its stale single-profile canary narrative with the operator's full visual/mixed-repo request rather than starting a competing goal.
+- **Nearest bounded next slice:** prove one real, mixed-visibility repository/day/actions observation end-to-end using the existing data owners, with named REDs for absent/duplicate/malformed/out-of-window/private-name handling and healthy controls; add a theme-correct accessible visualization in the existing shared projection (not a second frontend). Capture a *populated* CI chart at desktop and true phone, compare against the three source images, run full source/product/CI + mutations, request independent DESIGN/CODE/ADVERSARIAL review, and update this plan + handoff after each admitted slice. All proof gates remain open until actual receipts.
 
 ### CI-EXEC-01 — LIVE DATA CANARY, VISUAL REJECTED
 
