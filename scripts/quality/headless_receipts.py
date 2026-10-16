@@ -249,7 +249,7 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       "overflow_px": overflowPx,
       "offender_count": offenders.length,
       "uncontained_offender_count": uncontained.length,
-      "offenders": offenders.slice(0, 20),
+      "offenders": uncontained.concat(offenders.filter(function (o) {{ return o.contained_by_table_scroll === true || o.contained_by_calendar_scroll === true; }})).slice(0, 20),
       "authority_status": "candidate_only",
       "cannot_mark_done": true
     }};
