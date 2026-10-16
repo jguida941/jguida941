@@ -61,6 +61,9 @@ jobs:
             tests.contracts.test_design_contract \
             tests.contracts.test_web_dashboard \
             tests.contracts.test_page_manifest \
+            tests.contracts.test_dashboard_summary \
+            tests.contracts.test_readme_projection \
+            tests.contracts.test_visual_receipt_provenance \
             tests.contracts.test_skill_structure \
             tests.contracts.test_label_legibility
 

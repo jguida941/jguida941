@@ -17,9 +17,55 @@ class DashboardSummaryTests(unittest.TestCase):
             root=ET.fromstring(render_svg({},mobile=mobile))
             self.assertEqual(root.get("width"),width)
             sections=[node.get("data-section") for node in root.iter() if node.get("data-section")]
-            self.assertEqual(sections,["overview","weekly","rhythm","languages","automation","working","focus","project-activity","recent-pushes","projects","metrics","calendar"])
+            self.assertEqual(sections,["overview","weekly","rhythm","languages","automation","ci-timeline","working","focus","project-activity","recent-pushes","projects","metrics","calendar"])
             self.assertIn("Contribution calendar unavailable", " ".join(root.itertext()))
             self.assertFalse(any(node.tag.endswith("filter") for node in root.iter()))
+
+
+class CITimelineSVGContract(unittest.TestCase):
+    """Real Actions evidence, not fake workflow successes, in both README sizes."""
+
+    def test_desktop_mobile_have_the_same_run_identities_and_unavailable_rows(self):
+        from scripts.github.actions_audit import normalize_public_ci_timeline
+        sample = normalize_public_ci_timeline([
+            {"repository": "jguida941/jguida941", "runs": [
+                {"databaseId": 111, "workflowName": "Tests",
+                 "status": "completed", "conclusion": "failure", "createdAt": "2026-10-14T00:00:00Z"},
+                {"databaseId": 112, "workflowName": "Build",
+                 "status": "completed", "conclusion": "success", "createdAt": "2026-10-14T08:00:00Z"}]},
+            {"repository": "jguida941/ci-cd-hub", "runs": None},
+        ], "jguida941", "2026-10-15T00:00:00Z")
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root = ET.fromstring(render_svg({"ci_timeline": sample}, mobile=mobile))
+                chart = next(n for n in root.iter() if n.get("data-role") == "ci-timeline-chart")
+                marks = [n for n in chart.iter() if n.get("data-role") == "ci-run"]
+                self.assertEqual({"111", "112"}, {n.get("data-run-id") for n in marks})
+                self.assertEqual({"failure", "success"}, {n.get("data-status") for n in marks})
+                unavailable = next(n for n in chart.iter() if n.get("data-repository") == "jguida941/ci-cd-hub")
+                self.assertEqual("unavailable", unavailable.get("data-status"))
+                self.assertFalse([n for n in unavailable.iter() if n.get("data-role") == "ci-run"])
+                self.assertIn("Up to 20 newest runs", " ".join(chart.itertext()))
+
+    def test_missing_timeline_does_not_invent_runs(self):
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({}, mobile=mobile))
+            chart = next(n for n in root.iter() if n.get("data-role") == "ci-timeline-chart")
+            self.assertFalse([n for n in chart.iter() if n.get("data-role") == "ci-run"])
+            self.assertIn("Multi-repository workflow history unavailable", " ".join(chart.itertext()))
+
+
+class ProfileLocalClockTests(unittest.TestCase):
+    def test_timestamp_near_midnight_utc_stays_on_october_15_in_eastern(self):
+        from unittest.mock import patch
+        with patch.dict("os.environ", {"PROFILE_TIMEZONE": "America/New_York"}):
+            for mobile in (False, True):
+                root = ET.fromstring(render_svg({
+                    "generated_at": "2026-10-16T02:01:27Z",
+                }, mobile=mobile))
+                labels = " ".join(root.itertext())
+                self.assertIn("Snapshot Oct 15, 2026", labels)
+                self.assertNotIn("Snapshot Oct 16, 2026", labels)
 
 
 class DashboardVisualTests(unittest.TestCase):

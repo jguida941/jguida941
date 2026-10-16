@@ -2158,6 +2158,17 @@ def compute_profile_model(
             now_utc.isoformat(timespec="seconds").replace("+00:00", "Z"),
         )
     dashboard_data["ci_execution"] = ci_execution
+    # This independent public-repository cohort supports both the static
+    # GitHub card and the website. Missing provider history never becomes zero.
+    from scripts.github.actions_audit import normalize_public_ci_timeline
+    ci_timeline = getattr(collected, "ci_timeline_observation", None)
+    if (not isinstance(ci_timeline, dict)
+            or ci_timeline.get("schema") != "profile-ci-timeline/v1"
+            or ci_timeline.get("owner") != USERNAME
+            or ci_timeline.get("status") not in ("available", "partial", "unavailable")):
+        ci_timeline = normalize_public_ci_timeline(
+            None, USERNAME, now_utc.isoformat(timespec="seconds").replace("+00:00", "Z"))
+    dashboard_data["ci_timeline"] = ci_timeline
     calendar_public = _public_contribution_calendar(calendar)
     if calendar_public:
         dashboard_data["contribution_calendar"] = calendar_public

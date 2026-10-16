@@ -157,5 +157,93 @@ class ProfileCIExecutionTests(unittest.TestCase):
         self.assertEqual([], sample["runs"])
 
 
+class PublicMultiRepositoryCITimelineTests(unittest.TestCase):
+    """Public Actions run history is a sampled cohort, not workflow adoption."""
+
+    def test_public_selection_excludes_private_forks_foreign_owner_and_missing_config(self):
+        from scripts.github.actions_audit import select_public_ci_repositories
+        def repo(name, *, private=False, fork=False, owner="jguida941", workflow=True,
+                 pushed="2026-10-10T00:00:00Z"):
+            return {"name": name, "owner": {"login": owner}, "private": private,
+                    "fork": fork, "has_ci_workflows": workflow, "pushed_at": pushed}
+        rows = [repo("ci-cd-hub"), repo("recent", pushed="2026-10-14T00:00:00Z"),
+                repo("hidden", private=True), repo("fork", fork=True),
+                repo("foreign", owner="other"), repo("no-ci", workflow=False),
+                repo("bad/name"), repo("jguida941")]
+        self.assertEqual(
+            ["jguida941/jguida941", "jguida941/recent", "jguida941/ci-cd-hub"],
+            select_public_ci_repositories(rows, "jguida941"))
+
+    def test_duplicate_repository_envelope_cannot_multiply_run_totals(self):
+        """Replayed repo observations must not mint another run or repository."""
+        from scripts.github.actions_audit import normalize_public_ci_timeline
+        one = {"repository": "jguida941/ci-cd-hub", "runs": [{
+            "databaseId": 321, "workflowName": "CI", "status": "completed",
+            "conclusion": "failure", "createdAt": "2026-10-14T12:00:00Z",
+        }]}
+        sample = normalize_public_ci_timeline(
+            [one, dict(one)], "jguida941", "2026-10-15T12:00:00Z")
+        self.assertEqual(1, sample["observed_runs"])
+        self.assertEqual(["jguida941/ci-cd-hub"],
+                         [item["repository"] for item in sample["repositories"]])
+        self.assertEqual("partial", sample["status"])
+
+    def test_unverified_visibility_is_not_public_permission(self):
+        """An absent privacy bit cannot qualify a repository as public."""
+        from scripts.github.actions_audit import select_public_ci_repositories
+        repo = {"name": "unknown-visibility", "owner": {"login": "jguida941"},
+                "fork": False, "has_ci_workflows": True,
+                "pushed_at": "2026-10-14T12:00:00Z"}
+        self.assertEqual(["jguida941/jguida941"],
+                         select_public_ci_repositories([repo], "jguida941"))
+
+    def test_dated_run_identity_is_real_and_unavailable_is_not_zero(self):
+        from scripts.github.actions_audit import normalize_public_ci_timeline
+        rows = [{"repository": "jguida941/jguida941", "runs": [
+            {"databaseId": 1, "workflowName": "CI", "status": "completed",
+             "conclusion": "failure", "createdAt": "2026-10-12T00:00:00Z"},
+            {"databaseId": 2, "workflowName": "CI", "status": "in_progress",
+             "conclusion": None, "createdAt": "2026-10-13T00:00:00Z"},
+            {"databaseId": 3, "workflowName": "old", "status": "completed",
+             "conclusion": "success", "createdAt": "2026-06-01T00:00:00Z"}]},
+            {"repository": "jguida941/ci-cd-hub", "runs": None}]
+        sample = normalize_public_ci_timeline(rows, "jguida941", "2026-10-15T00:00:00Z")
+        self.assertEqual("partial", sample["status"])
+        self.assertEqual(2, sample["observed_runs"])
+        self.assertEqual(["in_progress", "failure"],
+                         [row["outcome"] for row in sample["repositories"][0]["runs"]])
+        self.assertEqual("unavailable", sample["repositories"][1]["status"])
+        self.assertIsNone(sample["repositories"][1]["observed_runs"])
+        self.assertFalse(sample["repositories"][1]["runs"])
+
+    def test_source_cap_prevents_exact_history_claim(self):
+        from scripts.github.actions_audit import normalize_public_ci_timeline
+        runs = [{"databaseId": i+1, "workflowName": "CI",
+                 "status": "completed", "conclusion": "success",
+                 "createdAt": "2026-10-15T00:00:00Z"} for i in range(20)]
+        sample = normalize_public_ci_timeline(
+            [{"repository": "jguida941/jguida941", "runs": runs}],
+            "jguida941", "2026-10-15T12:00:00Z")
+        self.assertEqual("partial", sample["status"])
+        self.assertTrue(sample["repositories"][0]["truncated"])
+
+    def test_one_provider_failure_does_not_erase_other_real_runs(self):
+        from scripts.github.actions_audit import collect_public_ci_timeline
+        rows = [{"name": "ci-cd-hub", "owner": {"login": "jguida941"},
+                 "private": False, "fork": False,
+                 "has_ci_workflows": True, "pushed_at": "2026-10-14T00:00:00Z"}]
+        def fetch(command, **kwargs):
+            if "ci-cd-hub" in command[command.index("--repo")+1]:
+                raise RuntimeError("unavailable")
+            return [{"databaseId": 12, "workflowName": "Profile",
+                     "status": "completed", "conclusion": "failure",
+                     "createdAt": "2026-10-15T11:00:00Z"}]
+        with patch("scripts.github.actions_audit.run_json", side_effect=fetch):
+            sample = collect_public_ci_timeline(rows, "jguida941")
+        self.assertEqual("partial", sample["status"])
+        self.assertEqual("failure", sample["repositories"][0]["runs"][0]["outcome"])
+        self.assertEqual("unavailable", sample["repositories"][1]["status"])
+
+
 if __name__ == "__main__":
     unittest.main()

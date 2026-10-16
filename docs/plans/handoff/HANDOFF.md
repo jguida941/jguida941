@@ -1,3 +1,62 @@
+# CURRENT REENTRY — jguida941 CI dashboard, 2026-10-16
+
+**This current checkpoint supersedes the archived July handoff below.** The
+operator asked for the supplied reference-based multi-repository CI visualization,
+not another oversized profile-repo run list. `main` has the rejected CI-EXEC-01
+data canary; the selected unaccepted slice is **CI-REPO-TIMELINE-01** on
+`feature/profile-multi-repo-ci-timeline-20261015`. Verified starting remote HEAD `07013be1`; always
+refresh head and inspect local uncommitted/unpublished work before editing.
+Do not reset, assume a past handoff is live, or open a competing timeline branch.
+
+## Owner, files, and visual target
+
+`AGENTS.md` governs the RED-first/mutation/Chrome+390/independent
+DESIGN-CODE-ADVERSARIAL review gates. Fable is the implementation owner;
+Codex independently reviews. No review has approved this slice yet.
+The data flow is `scripts/github/actions_audit.py` -> `collect_data.py` ->
+`compute_metrics.py` -> `scripts/contracts/dashboard_summary.py` ->
+`scripts/rendering/generate_dashboard_summary.py` -> the same desktop/mobile
+SVG bytes on GitHub README and Pages overview. Do not add another projection.
+
+Operator references: GIT//INTEL / Developer Observatory / Code Chronicle.
+Their distinguishing requirements: **real repository lanes**, a true chronological
+Actions time axis, dots encoding observed run outcomes (shape/label equivalents),
+and legible cross-repository visual hierarchy. The figures in the screenshots
+are illustrative; never hard-code their success rates or private repo histories.
+
+## CI-REPO-TIMELINE-01a evidence correction
+
+Two independent negative tests were first observed FAILING: repeated repo
+observations inflated `observed_runs` (1 became 2); missing `private` metadata
+allowed an unverified repository into the public cohort. A dedup/partial guard and
+explicit-public admission rule now pass. Existing positive fixture declares
+`private: False`. Local focused test group:
+`python -m unittest tests.github.test_actions_audit
+tests.contracts.test_dashboard_summary tests.contracts.test_readme_projection
+tests.contracts.test_web_dashboard -q` -> **88 green**. General
+`unittest discover` exceeded the sandbox timeout (many tests advanced),
+so no full-green claim is made. Record exact GitHub CI qualification when run.
+
+## Exact next action
+
+1. Refresh the live branch head, `main` drift, local worktree and
+   `docs/plans/ACTIVE.md`; do not overwrite newer work.
+2. Run focused and full CI plus RED/mutation probes. Verify provider privacy,
+   replay dedup, sample limit, stale timestamps and unavailable-vs-zero.
+3. Capture **populated, real API** multi-repo timeline at desktop and true phone
+   widths. Inspect the CI region, not only the top of the tall profile card.
+   Align repo-axis/legend/marker composition to operator references and carry
+   honest `<=20` runs/repo limitation; a full 12-month series is NOT proved.
+4. Run Chrome 1280 screenshot, 390 DOM horizontal-overflow receipt and source
+   identity/pixel review. Don't publish a synthetic/empty-state image as accepted.
+5. Get independent DESIGN/CODE/ADVERSARIAL verdicts, fold findings RED first;
+   update active plan/handoff with proof and bounded next goal in same commit.
+6. Only then consider PR/merge/publication. Next visual slice: 12-month
+   referenced timeline and repository comparative metrics, separately proving
+   complete denominators before percentages or sparklines.
+
+## Archived handoff, 2026-07-02 (historical, not the active goal)
+
 # HANDOFF — full state + new-agent reorientation (2026-07-02, post B-1)
 
 ## Where things stand (all pushed; main deployed to jguida941.github.io)

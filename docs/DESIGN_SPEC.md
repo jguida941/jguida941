@@ -284,3 +284,25 @@ descriptions remain in the website's closed details and the SVG descriptions/tit
 The static README panels show the same first eight repositories and fourteen dates
 with branches collapsed. An ordinary **Project activity details** link after the
 summary picture opens the website's Project activity section.
+
+### CI-REPO-TIMELINE-01: visual-data evidence contract (candidate)
+
+The operator-supplied GIT//INTEL / Developer Observatory / Code Chronicle
+reference imagery calls for a **time-axis visual analytical chart**, not a large
+generic list. Acceptance must prove:
+
+1. One qualified **public repository identity per lane**; no repeated or
+   unverified visibility facts, private identities, or generated names.
+2. Monotonically increasing dated UTC-axis ticks; honest window and sample
+   limits; empty grid space is **not** proof of zero unsuccessful runs.
+3. One dot per independently observed Actions run identifier; status is
+   visibly distinguished **and** exposed as accessible text/title/legend.
+4. Partial, truncated and unavailable observations remain visibly qualified;
+   no account-wide success rates or implied full-year history.
+5. Compact chart composition at desktop and narrow/mobile README size, from
+   shared source data and design tokens; no independent duplicate browser model.
+6. Chrome desktop and true-phone receipts **containing populated timeline rows**,
+   checked against the visual references and independently challenged in review.
+
+Mockup percentages and timeline dots are illustrative, not measurement inputs.
+A green unit test alone cannot certify visual reference parity.

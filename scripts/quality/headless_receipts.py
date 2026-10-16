@@ -189,6 +189,15 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
     var scrollWidth = Math.max(root.scrollWidth || 0, bodyScrollWidth);
     var offenders = [];
     Array.prototype.forEach.call(doc.querySelectorAll("*"), function (el) {{
+      // CSS may still return geometries for descendants of closed <details>,
+      // despite them not being displayed. Never count those invisible
+      // descendants as viewport overflow. The visible summary and anything in
+      // an OPEN disclosure remain measurable and cannot bypass this gate.
+      var closed = el.closest ? el.closest("details:not([open])") : null;
+      if (closed) {{
+        var summary = closed.querySelector(":scope > summary");
+        if (!summary || (el !== summary && !summary.contains(el))) return;
+      }}
       var style = frame.contentWindow.getComputedStyle(el);
       if (style.display === "none" || style.visibility === "hidden") return;
       var rect = el.getBoundingClientRect();
@@ -249,7 +258,7 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       "overflow_px": overflowPx,
       "offender_count": offenders.length,
       "uncontained_offender_count": uncontained.length,
-      "offenders": offenders.slice(0, 20),
+      "offenders": uncontained.concat(offenders.filter(function (o) {{ return o.contained_by_table_scroll === true || o.contained_by_calendar_scroll === true; }})).slice(0, 20),
       "authority_status": "candidate_only",
       "cannot_mark_done": true
     }};

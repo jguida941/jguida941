@@ -7,30 +7,43 @@
 
 ## STATUS — where we are (updated each slice)
 
-### CI-EXEC-01 — bounded public Actions execution canary (2026-10-15, candidate)
+### CI-REPO-TIMELINE-01 — ACTIVE / UNACCEPTED (2026-10-16)
 
-- Branch: `feature/profile-ci-execution-20261015`; source owner:
-  `scripts/github/actions_audit.py`, `scripts/pipeline/collect_data.py`,
-  `scripts/pipeline/compute_metrics.py`, and the existing web renderer.
-- The committed CI/CD panel is distinct from workflow-configuration adoption;
-  it displays only observed public-profile-repository runs, with explicit
-  unavailable/partial status and no inferred account-wide success rate.
-- RED-first controls cover false exactness from partial CI evidence, outcome
-  distinctions, unavailable/empty responses, and hostile provider values.
-- **Browser and product gates verified** on Actions run `38817391143`: a real 1280px
-  Chrome screenshot with the published snapshot and current public Actions sample,
-  the measured 390px page probe with zero page overflow, product tests, and fixture
-  validation. The exact index receipts are SHA-bound to this candidate.
-- The actual populated screenshot exposed 12 rows taking excessive space; the
-  panel now shows six and uses a native disclosure for the next six. A RED
-  discovered the pre-existing calendar scroller was excluded from the DOM
-  containment law; the repaired browser producer accepts only viewport-bound,
-  positive-width, `overflow-x:auto` calendar or table wrappers, with negative
-  vectors against fake/zero-width containment.
-- Production CI config is restored; only the new product test modules and
-  read-only Actions permission survive. **Publication remains UNACCEPTED pending
-  independent DESIGN/CODE/ADVERSARIAL review**, not another screenshot or a
-  new system-level feature.
+- **Branch:** `feature/profile-multi-repo-ci-timeline-20261015`; re-read the real remote HEAD and preserve unpublished Mac
+  work before any new write. Do not create competing timeline branches.
+- **Operator visual target:** supplied GIT//INTEL, Developer Observatory, Code Chronicle
+  references. One lane per real repository, chronological GitHub Actions dots, accessible
+  outcome legend, and compact cross-repo composition. A generic six-row run list
+  does **not** satisfy this. Illustrative reference metrics must not be published as data.
+- **Candidate implementation:** `scripts/github/actions_audit.py` samples the profile
+  plus at most five explicitly public, configured repositories, up to 20 newest runs
+  each. `compute_metrics` carries `profile-ci-timeline/v1` into
+  `dashboard_summary` and the shared README/Pages desktop and mobile SVG renderer.
+  Unknown, partial or truncated history cannot become an exact success rate.
+- **CI-REPO-TIMELINE-01a RIGHT-REASON RED→GREEN:** replayed repository observation
+  previously doubled its run counts; a missing visibility fact was treated as public.
+  Repeats now retain first qualified repo only and mark partial; cohort selection
+  requires explicit `private is False`. Both red tests reproduced the defects,
+  then passed together with focused tests (88 GREEN). Full suite still pending.
+- **Current gate:** initial browser CI run
+  [38844266492](https://github.com/jguida941/jguida941/actions/runs/38844266492)
+  succeeded, but the screenshot shows only the top of a tall page; the shipped
+  branch SVG reports timeline unavailable until real Actions observations are
+  collected. Do **not** assert visual reference parity or merge based on that.
+- **Next slice:** render actual, provenance-bound multi-repo runs at 1280 and true
+  390, including the CI timeline itself. Compare measured repo/axis/legend/dot
+  anatomy against the operator's images; challenge sample-window coverage and
+  absence-vs-zero before expanding to the reference's 12-month presentation.
+  Require independent DESIGN/CODE/ADVERSARIAL review and signed browser receipts.
+- All edits and next-agent entry instructions live with source; no source ownership
+  moves to a second bespoke web renderer.
+
+### CI-EXEC-01 — LIVE DATA CANARY, VISUAL REJECTED
+
+- PR #8 merged (`418a2f0`) and deployed with actual profile-repo Actions
+  evidence. Operator rejected its visual presentation. Preserve the useful
+  observed-data contract; replace the generic run-list presentation in bounded
+  reviewed slices. Technical tests do not prove visual quality.
 
 - **Phases 1–4: DONE / LIVE** — see `docs/history/PLAN-LEDGER.md`. ~142 contracts green before Phase 5.
 - **Phase 5 in progress.** Current workstream: **P5-0 — the organization-as-invariant meta-gate.**
