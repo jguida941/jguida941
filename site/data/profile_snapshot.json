@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-16T01:17:03.373696Z",
+  "generated_at": "2026-10-16T01:42:23.147017Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,7 +18,7 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 12370,
+    "last_year_contributions": 12371,
     "public_scope_commits": 7563,
     "total_repos": 56,
     "public_forks": 0,
@@ -35,8 +35,8 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 12370,
-      "display_value": "12,370"
+      "value": 12371,
+      "display_value": "12,371"
     },
     {
       "key": "public_scope_commits",
@@ -113,8 +113,8 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 12370,
-      "display_value": "12,370"
+      "value": 12371,
+      "display_value": "12,371"
     },
     {
       "key": "public_scope_commits",
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-16T01:16:05Z",
+        "observed_at": "2026-10-16T01:41:23Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -228,8 +228,8 @@
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-10-16T04:00:00Z",
-        "window_end": "2026-10-16T01:16:12Z",
-        "observed_at": "2026-10-16T01:16:13Z",
+        "window_end": "2026-10-16T01:41:29Z",
+        "observed_at": "2026-10-16T01:41:30Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -243,8 +243,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-09-16T04:00:00Z",
-        "window_end": "2026-10-16T01:16:09Z",
-        "observed_at": "2026-10-16T01:16:11Z",
+        "window_end": "2026-10-16T01:41:26Z",
+        "observed_at": "2026-10-16T01:41:28Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -258,8 +258,8 @@
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-10-16T04:00:00Z",
-        "window_end": "2026-10-16T01:16:11Z",
-        "observed_at": "2026-10-16T01:16:12Z",
+        "window_end": "2026-10-16T01:41:28Z",
+        "observed_at": "2026-10-16T01:41:29Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-16T01:16:05Z",
+        "observed_at": "2026-10-16T01:41:22Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -289,7 +289,7 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0535714285714286,
     "ci_coverage_pct": 21.923076923076923,
-    "last_year_contributions": 12370,
+    "last_year_contributions": 12371,
     "active_days_last_year": 328,
     "automation_workflows": 170,
     "primary_lang_share_pct": 66.7,
@@ -301,8 +301,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 12370,
-      "display_value": "12,370",
+      "value": 12371,
+      "display_value": "12,371",
       "accent": "#7dcfff"
     },
     {
@@ -545,6 +545,22 @@
       "featured": true
     },
     {
+      "name": "semgration",
+      "full_name": "jguida941/semgration",
+      "url": "https://github.com/jguida941/semgration",
+      "language": "n/a",
+      "stars": 1,
+      "forks": 0,
+      "ci": "no",
+      "pushed_at": "2026-10-16",
+      "pushed_at_raw": "2026-10-16T01:41:10Z",
+      "pushed_ago": "today",
+      "created_at": "2026-10-14",
+      "last_commit_msg": "docs: establish SemGration system-integration scope as proposal",
+      "is_private": true,
+      "featured": false
+    },
+    {
       "name": "semantic-tdd",
       "full_name": "jguida941/semantic-tdd",
       "url": "https://github.com/jguida941/semantic-tdd",
@@ -557,22 +573,6 @@
       "pushed_ago": "today",
       "created_at": "2026-05-23",
       "last_commit_msg": "docs: preserve CI0163 release reentry closeout",
-      "is_private": true,
-      "featured": false
-    },
-    {
-      "name": "semgration",
-      "full_name": "jguida941/semgration",
-      "url": "https://github.com/jguida941/semgration",
-      "language": "n/a",
-      "stars": 1,
-      "forks": 0,
-      "ci": "no",
-      "pushed_at": "2026-10-16",
-      "pushed_at_raw": "2026-10-16T00:39:24Z",
-      "pushed_ago": "today",
-      "created_at": "2026-10-14",
-      "last_commit_msg": "docs: establish SemGration system-integration scope as proposal",
       "is_private": true,
       "featured": false
     },
@@ -602,7 +602,7 @@
       "ci": "yes",
       "pushed_at": "2026-10-15",
       "pushed_at_raw": "2026-10-15T21:23:51Z",
-      "pushed_ago": "3 hours ago",
+      "pushed_ago": "4 hours ago",
       "created_at": "2026-10-11",
       "last_commit_msg": "fix(work): bind verified SHA-256 of goal reader after source identity\u2026",
       "is_private": true,
@@ -793,7 +793,7 @@
       "visibility": "private",
       "description": "System Integration Repository. SemGration coordinates building the ecosystem for Semloop, Sembridge, Semvariant, Semcompose constellation",
       "html_url": "https://github.com/jguida941/semgration",
-      "pushed_at": "2026-10-16T00:39:24Z",
+      "pushed_at": "2026-10-16T01:41:10Z",
       "created_at": "2026-10-14T19:37:24Z",
       "stargazers_count": 1,
       "forks_count": 0,
@@ -1041,15 +1041,15 @@
   "focus": {
     "now": [
       {
-        "title": "semantic-tdd",
-        "detail": "Python \u00b7 pushed today",
-        "url": "https://github.com/jguida941/semantic-tdd",
-        "is_private": true
-      },
-      {
         "title": "semgration",
         "detail": "code \u00b7 pushed today",
         "url": "https://github.com/jguida941/semgration",
+        "is_private": true
+      },
+      {
+        "title": "semantic-tdd",
+        "detail": "Python \u00b7 pushed today",
+        "url": "https://github.com/jguida941/semantic-tdd",
         "is_private": true
       },
       {
@@ -1063,7 +1063,7 @@
     "shipped": [
       {
         "title": "fix(work): bind verified SHA-256 of goal reader after s...",
-        "detail": "profile-private-continuation \u00b7 3 hours ago",
+        "detail": "profile-private-continuation \u00b7 4 hours ago",
         "url": "https://github.com/jguida941/profile-private-continuation",
         "is_private": true
       },
@@ -1084,6 +1084,18 @@
   "activity_feed": [
     {
       "kind": "activity",
+      "title": "docs: establish SemGration system-integration scope as proposal",
+      "url": "https://github.com/jguida941/semgration",
+      "repo": "jguida941/semgration",
+      "repo_url": "https://github.com/jguida941/semgration",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-10-16T01:41:10Z",
+      "is_private": true,
+      "observation_source": "repository push metadata"
+    },
+    {
+      "kind": "activity",
       "title": "docs: preserve CI0163 release reentry closeout",
       "url": "https://github.com/jguida941/semantic-tdd",
       "repo": "jguida941/semantic-tdd",
@@ -1091,18 +1103,6 @@
       "state": "PUSH",
       "time_ago": "today",
       "created_at": "2026-10-16T00:55:42Z",
-      "is_private": true,
-      "observation_source": "repository push metadata"
-    },
-    {
-      "kind": "activity",
-      "title": "docs: establish SemGration system-integration scope as proposal",
-      "url": "https://github.com/jguida941/semgration",
-      "repo": "jguida941/semgration",
-      "repo_url": "https://github.com/jguida941/semgration",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-10-16T00:39:24Z",
       "is_private": true,
       "observation_source": "repository push metadata"
     },
@@ -1125,7 +1125,7 @@
       "repo": "jguida941/profile-private-continuation",
       "repo_url": "https://github.com/jguida941/profile-private-continuation",
       "state": "PUSH",
-      "time_ago": "3 hours ago",
+      "time_ago": "4 hours ago",
       "created_at": "2026-10-15T21:23:51Z",
       "is_private": true,
       "observation_source": "repository push metadata"
@@ -1150,7 +1150,31 @@
       "repo_url": "https://github.com/jguida941/semgration",
       "state": "PUSH",
       "time_ago": "1 day ago",
+      "created_at": "2026-10-14T20:39:21Z",
+      "is_private": false,
+      "observation_source": "event"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/semgration",
+      "repo": "jguida941/semgration",
+      "repo_url": "https://github.com/jguida941/semgration",
+      "state": "PUSH",
+      "time_ago": "1 day ago",
       "created_at": "2026-10-14T20:35:28Z",
+      "is_private": false,
+      "observation_source": "event"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/semgration",
+      "repo": "jguida941/semgration",
+      "repo_url": "https://github.com/jguida941/semgration",
+      "state": "PUSH",
+      "time_ago": "1 day ago",
+      "created_at": "2026-10-14T20:25:34Z",
       "is_private": false,
       "observation_source": "event"
     },
@@ -1198,7 +1222,7 @@
       "repo_url": "https://github.com/jguida941/semgration",
       "state": "PUSH",
       "time_ago": "1 day ago",
-      "created_at": "2026-10-14T20:23:22Z",
+      "created_at": "2026-10-14T20:23:42Z",
       "is_private": false,
       "observation_source": "event"
     },
@@ -1222,18 +1246,6 @@
       "repo_url": "https://github.com/jguida941/semgration",
       "state": "PUSH",
       "time_ago": "1 day ago",
-      "created_at": "2026-10-14T20:22:08Z",
-      "is_private": false,
-      "observation_source": "event"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/semgration",
-      "repo": "jguida941/semgration",
-      "repo_url": "https://github.com/jguida941/semgration",
-      "state": "PUSH",
-      "time_ago": "1 day ago",
       "created_at": "2026-10-14T20:16:52Z",
       "is_private": false,
       "observation_source": "event"
@@ -1246,19 +1258,7 @@
       "repo_url": "https://github.com/jguida941/semgration",
       "state": "PUSH",
       "time_ago": "1 day ago",
-      "created_at": "2026-10-14T20:15:21Z",
-      "is_private": false,
-      "observation_source": "event"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/semgration",
-      "repo": "jguida941/semgration",
-      "repo_url": "https://github.com/jguida941/semgration",
-      "state": "PUSH",
-      "time_ago": "1 day ago",
-      "created_at": "2026-10-14T20:14:47Z",
+      "created_at": "2026-10-14T20:05:46Z",
       "is_private": false,
       "observation_source": "event"
     },
@@ -1315,7 +1315,7 @@
       25,
       121,
       311,
-      300
+      301
     ],
     "contribution_trend": {
       "status": "available",
@@ -1432,7 +1432,7 @@
           "observed_start": "2026-10-12",
           "observed_end": "2026-10-16",
           "days_observed": 5,
-          "contributions": 300,
+          "contributions": 301,
           "partial": true
         }
       ],
@@ -1526,12 +1526,28 @@
   "ci_execution": {
     "schema": "profile-ci-execution/v1",
     "repository": "jguida941/jguida941",
-    "observed_at": "2026-10-16T01:17:02Z",
+    "observed_at": "2026-10-16T01:42:22Z",
     "sample_limit": 12,
     "scope": "Latest observed GitHub Actions runs in the public profile repository, across branches; not account-wide.",
     "status": "available",
     "observed_runs": 12,
     "runs": [
+      {
+        "run_id": 38836434429,
+        "workflow": "Generate Metrics",
+        "outcome": "in_progress",
+        "created_at": "2026-10-16T01:41:01Z",
+        "event": "schedule",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 38834306414,
+        "workflow": "Deploy Profile Site",
+        "outcome": "success",
+        "created_at": "2026-10-16T01:17:26Z",
+        "event": "workflow_run",
+        "head_branch": "main"
+      },
       {
         "run_id": 38834151540,
         "workflow": "Test Profile Pipeline",
@@ -1551,7 +1567,7 @@
       {
         "run_id": 38834151466,
         "workflow": "Build Analytics & README",
-        "outcome": "in_progress",
+        "outcome": "success",
         "created_at": "2026-10-16T01:15:41Z",
         "event": "push",
         "head_branch": "main"
@@ -1611,27 +1627,11 @@
         "created_at": "2026-10-15T23:02:01Z",
         "event": "workflow_run",
         "head_branch": "main"
-      },
-      {
-        "run_id": 38820814591,
-        "workflow": "Generate Metrics",
-        "outcome": "success",
-        "created_at": "2026-10-15T23:00:02Z",
-        "event": "workflow_dispatch",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 38818080164,
-        "workflow": "Test Profile Pipeline",
-        "outcome": "success",
-        "created_at": "2026-10-15T22:34:54Z",
-        "event": "pull_request",
-        "head_branch": "feature/profile-ci-execution-20261015"
       }
     ]
   },
   "contribution_calendar": {
-    "total": 12370,
+    "total": 12371,
     "weeks": [
       [
         {
@@ -3200,7 +3200,7 @@
         },
         {
           "date": "2026-10-16",
-          "count": 2
+          "count": 3
         }
       ]
     ]
@@ -3215,7 +3215,7 @@
     "window_start": "2025-10-16",
     "window_end": "2026-10-16",
     "days_observed": 366,
-    "total": 12370,
+    "total": 12371,
     "weekdays": [
       {
         "weekday": "Mon",
@@ -3239,7 +3239,7 @@
       },
       {
         "weekday": "Fri",
-        "contributions": 1679,
+        "contributions": 1680,
         "days_observed": 53
       },
       {
@@ -3293,9 +3293,9 @@
       },
       {
         "weekday": "Fri",
-        "contributions": 1679,
+        "contributions": 1680,
         "days_observed": 53,
-        "count_text": "1,679"
+        "count_text": "1,680"
       },
       {
         "weekday": "Sat",
@@ -3314,7 +3314,7 @@
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
     "window_start": "2026-09-17T00:00:00Z",
-    "window_end": "2026-10-16T01:16:33.662712Z",
+    "window_end": "2026-10-16T01:41:50.009399Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 261,
@@ -3342,23 +3342,23 @@
         "status": "partial",
         "complete": false,
         "reason": "activity_incomplete",
-        "occurred_at": "2026-10-16T00:55:42Z"
+        "occurred_at": "2026-10-16T01:41:10Z"
       },
       "history": {
         "status": "ok",
         "complete": true,
         "reason": "end_of_connection"
       },
-      "repository": "jguida941/semantic-tdd",
-      "ref": "refs/heads/ci-control/kernel-proof-sha257-1",
-      "head_sha": "5092ff2ad563815afe8053d2256e210e33f5227e",
-      "commit_url": "https://github.com/jguida941/semantic-tdd/commit/5092ff2ad563815afe8053d2256e210e33f5227e",
-      "additions": 763,
-      "deletions": 140,
-      "commit_count": 26,
-      "observed_commits": 26,
-      "stats_observed": 26,
-      "excluded_merges": 0,
+      "repository": "jguida941/semgration",
+      "ref": "refs/heads/ci-control/receipt-executor-1",
+      "head_sha": "9ab17d9011c4a5bd5095d55b13ba8ab030fe6a6a",
+      "commit_url": "https://github.com/jguida941/semgration/commit/9ab17d9011c4a5bd5095d55b13ba8ab030fe6a6a",
+      "additions": 64909,
+      "deletions": 2060,
+      "commit_count": 251,
+      "observed_commits": 254,
+      "stats_observed": 251,
+      "excluded_merges": 3,
       "daily": [
         {
           "date": "2026-09-17",
@@ -3524,20 +3524,20 @@
         },
         {
           "date": "2026-10-14",
-          "additions": null,
-          "deletions": null,
+          "additions": 1751,
+          "deletions": 231,
           "complete": false
         },
         {
           "date": "2026-10-15",
-          "additions": 762,
-          "deletions": 139,
+          "additions": 61140,
+          "deletions": 1825,
           "complete": false
         },
         {
           "date": "2026-10-16",
-          "additions": 1,
-          "deletions": 1,
+          "additions": 2018,
+          "deletions": 4,
           "complete": false
         }
       ],
@@ -3613,8 +3613,8 @@
       "status": "partial",
       "complete": false,
       "window_start": "2026-09-17T00:00:00Z",
-      "window_end": "2026-10-16T01:16:33.662712Z",
-      "observed_at": "2026-10-16T01:16:33.662712Z",
+      "window_end": "2026-10-16T01:41:50.009399Z",
+      "observed_at": "2026-10-16T01:41:50.009399Z",
       "timezone": "UTC",
       "current_day_partial": true,
       "default_days": 14,
@@ -3666,7 +3666,7 @@
             "incomplete_activity_coverage"
           ],
           "latest_push": "2026-10-16T00:39:24Z",
-          "observed_pushes": 92,
+          "observed_pushes": 91,
           "daily": [
             {
               "date": "2026-09-17",
@@ -3838,7 +3838,7 @@
             },
             {
               "date": "2026-10-15",
-              "count": 88,
+              "count": 87,
               "complete": false,
               "level": 4
             },
@@ -4067,7 +4067,7 @@
               "daily": [
                 {
                   "date": "2026-10-15",
-                  "count": 25,
+                  "count": 24,
                   "complete": false,
                   "level": 4
                 },
@@ -4078,7 +4078,7 @@
                   "level": 1
                 }
               ],
-              "observed_pushes": 26
+              "observed_pushes": 25
             },
             {
               "ref": "refs/heads/slice/frontdoor-actors-1",
@@ -9695,7 +9695,7 @@
           },
           {
             "lower": 21,
-            "upper": 88,
+            "upper": 87,
             "level": 4
           }
         ],
@@ -9716,18 +9716,18 @@
         "default_visible": 8,
         "reasons": []
       },
-      "observed_pushes": 782
+      "observed_pushes": 781
     }
   },
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-10-16T01:17:03.373696Z",
+    "generated_at": "2026-10-16T01:42:23.147017Z",
     "facts": [
       {
         "metric_id": "calendar.total",
-        "value": 12370,
-        "display_value": "12,370",
+        "value": 12371,
+        "display_value": "12,371",
         "label": "contributions",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
@@ -9815,7 +9815,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "owned-repositories-visible-to-primary-pr-search",
-        "window": "2025-10-16T04:00:00Z \u2013 2026-10-16T01:16:11Z",
+        "window": "2025-10-16T04:00:00Z \u2013 2026-10-16T01:41:28Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -9829,7 +9829,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-09-16T04:00:00Z \u2013 2026-10-16T01:16:09Z",
+        "window": "2026-09-16T04:00:00Z \u2013 2026-10-16T01:41:26Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -10038,7 +10038,7 @@
             "observed_start": "2026-10-12",
             "observed_end": "2026-10-16",
             "days_observed": 5,
-            "contributions": 300,
+            "contributions": 301,
             "partial": true
           }
         ],
@@ -10059,12 +10059,12 @@
           25,
           121,
           311,
-          300
+          301
         ],
         "peak": "Peak 505 contributions/week",
         "window": "Jul 27 \u2013 Oct 16, 2026 \u00b7 12 weeks",
         "qualification": "Mon\u2013Sun \u00b7 UTC \u00b7 partial weeks included",
-        "description": "UTC contribution calendar. 2026-07-27 to 2026-08-02: 123 contributions (complete); 2026-08-03 to 2026-08-09: 147 contributions (complete); 2026-08-10 to 2026-08-16: 505 contributions (complete); 2026-08-17 to 2026-08-23: 473 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 75 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-16: 300 contributions (partial)"
+        "description": "UTC contribution calendar. 2026-07-27 to 2026-08-02: 123 contributions (complete); 2026-08-03 to 2026-08-09: 147 contributions (complete); 2026-08-10 to 2026-08-16: 505 contributions (complete); 2026-08-17 to 2026-08-23: 473 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 75 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-16: 301 contributions (partial)"
       }
     },
     "rhythm": {
@@ -10078,7 +10078,7 @@
         "window_start": "2025-10-16",
         "window_end": "2026-10-16",
         "days_observed": 366,
-        "total": 12370,
+        "total": 12371,
         "weekdays": [
           {
             "weekday": "Mon",
@@ -10102,7 +10102,7 @@
           },
           {
             "weekday": "Fri",
-            "contributions": 1679,
+            "contributions": 1680,
             "days_observed": 53
           },
           {
@@ -10155,9 +10155,9 @@
           },
           {
             "weekday": "Fri",
-            "contributions": 1679,
+            "contributions": 1680,
             "days_observed": 53,
-            "count_text": "1,679"
+            "count_text": "1,680"
           },
           {
             "weekday": "Sat",
@@ -11973,7 +11973,7 @@
         },
         {
           "date": "2026-10-16",
-          "count": 2
+          "count": 3
         }
       ],
       "window": "2025-10-16 \u2013 2026-10-16 \u00b7 UTC",
@@ -11981,21 +11981,21 @@
     },
     "working": [
       {
+        "name": "semgration",
+        "language": null,
+        "pushed_at": "2026-10-16T01:41:10Z",
+        "last_commit_msg": "docs: establish SemGration system-integration scope as proposal",
+        "is_private": true,
+        "url": "https://github.com/jguida941/semgration",
+        "push_age": "pushed <1h ago"
+      },
+      {
         "name": "semantic-tdd",
         "language": "Python",
         "pushed_at": "2026-10-16T00:55:42Z",
         "last_commit_msg": "docs: preserve CI0163 release reentry closeout",
         "is_private": true,
         "url": "https://github.com/jguida941/semantic-tdd",
-        "push_age": "pushed <1h ago"
-      },
-      {
-        "name": "semgration",
-        "language": null,
-        "pushed_at": "2026-10-16T00:39:24Z",
-        "last_commit_msg": "docs: establish SemGration system-integration scope as proposal",
-        "is_private": true,
-        "url": "https://github.com/jguida941/semgration",
         "push_age": "pushed <1h ago"
       },
       {
@@ -12014,7 +12014,7 @@
         "last_commit_msg": "fix(work): bind verified SHA-256 of goal reader after source identity\u2026",
         "is_private": true,
         "url": "https://github.com/jguida941/profile-private-continuation",
-        "push_age": "pushed 3h ago"
+        "push_age": "pushed 4h ago"
       },
       {
         "name": "CS405",
@@ -12074,15 +12074,15 @@
     "focus": {
       "now": [
         {
-          "title": "semantic-tdd",
-          "detail": "Python \u00b7 pushed today",
-          "url": "https://github.com/jguida941/semantic-tdd",
-          "is_private": true
-        },
-        {
           "title": "semgration",
           "detail": "code \u00b7 pushed today",
           "url": "https://github.com/jguida941/semgration",
+          "is_private": true
+        },
+        {
+          "title": "semantic-tdd",
+          "detail": "Python \u00b7 pushed today",
+          "url": "https://github.com/jguida941/semantic-tdd",
           "is_private": true
         },
         {
@@ -12096,7 +12096,7 @@
       "updates": [
         {
           "title": "fix(work): bind verified SHA-256 of goal reader after s...",
-          "detail": "profile-private-continuation \u00b7 3 hours ago",
+          "detail": "profile-private-continuation \u00b7 4 hours ago",
           "url": "https://github.com/jguida941/profile-private-continuation",
           "is_private": true
         },
@@ -12218,7 +12218,7 @@
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
       "window_start": "2026-09-17T00:00:00Z",
-      "window_end": "2026-10-16T01:16:33.662712Z",
+      "window_end": "2026-10-16T01:41:50.009399Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 261,
@@ -12246,23 +12246,23 @@
           "status": "partial",
           "complete": false,
           "reason": "activity_incomplete",
-          "occurred_at": "2026-10-16T00:55:42Z"
+          "occurred_at": "2026-10-16T01:41:10Z"
         },
         "history": {
           "status": "ok",
           "complete": true,
           "reason": "end_of_connection"
         },
-        "repository": "jguida941/semantic-tdd",
-        "ref": "refs/heads/ci-control/kernel-proof-sha257-1",
-        "head_sha": "5092ff2ad563815afe8053d2256e210e33f5227e",
-        "commit_url": "https://github.com/jguida941/semantic-tdd/commit/5092ff2ad563815afe8053d2256e210e33f5227e",
-        "additions": 763,
-        "deletions": 140,
-        "commit_count": 26,
-        "observed_commits": 26,
-        "stats_observed": 26,
-        "excluded_merges": 0,
+        "repository": "jguida941/semgration",
+        "ref": "refs/heads/ci-control/receipt-executor-1",
+        "head_sha": "9ab17d9011c4a5bd5095d55b13ba8ab030fe6a6a",
+        "commit_url": "https://github.com/jguida941/semgration/commit/9ab17d9011c4a5bd5095d55b13ba8ab030fe6a6a",
+        "additions": 64909,
+        "deletions": 2060,
+        "commit_count": 251,
+        "observed_commits": 254,
+        "stats_observed": 251,
+        "excluded_merges": 3,
         "daily": [
           {
             "date": "2026-09-17",
@@ -12428,20 +12428,20 @@
           },
           {
             "date": "2026-10-14",
-            "additions": null,
-            "deletions": null,
+            "additions": 1751,
+            "deletions": 231,
             "complete": false
           },
           {
             "date": "2026-10-15",
-            "additions": 762,
-            "deletions": 139,
+            "additions": 61140,
+            "deletions": 1825,
             "complete": false
           },
           {
             "date": "2026-10-16",
-            "additions": 1,
-            "deletions": 1,
+            "additions": 2018,
+            "deletions": 4,
             "complete": false
           }
         ],
@@ -12517,8 +12517,8 @@
         "status": "partial",
         "complete": false,
         "window_start": "2026-09-17T00:00:00Z",
-        "window_end": "2026-10-16T01:16:33.662712Z",
-        "observed_at": "2026-10-16T01:16:33.662712Z",
+        "window_end": "2026-10-16T01:41:50.009399Z",
+        "observed_at": "2026-10-16T01:41:50.009399Z",
         "timezone": "UTC",
         "current_day_partial": true,
         "default_days": 14,
@@ -12570,7 +12570,7 @@
               "incomplete_activity_coverage"
             ],
             "latest_push": "2026-10-16T00:39:24Z",
-            "observed_pushes": 92,
+            "observed_pushes": 91,
             "daily": [
               {
                 "date": "2026-09-17",
@@ -12742,7 +12742,7 @@
               },
               {
                 "date": "2026-10-15",
-                "count": 88,
+                "count": 87,
                 "complete": false,
                 "level": 4
               },
@@ -12971,7 +12971,7 @@
                 "daily": [
                   {
                     "date": "2026-10-15",
-                    "count": 25,
+                    "count": 24,
                     "complete": false,
                     "level": 4
                   },
@@ -12982,7 +12982,7 @@
                     "level": 1
                   }
                 ],
-                "observed_pushes": 26
+                "observed_pushes": 25
               },
               {
                 "ref": "refs/heads/slice/frontdoor-actors-1",
@@ -18599,7 +18599,7 @@
             },
             {
               "lower": 21,
-              "upper": 88,
+              "upper": 87,
               "level": 4
             }
           ],
@@ -18620,17 +18620,17 @@
           "default_visible": 8,
           "reasons": []
         },
-        "observed_pushes": 782
+        "observed_pushes": 781
       }
     }
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-16T01:17:03.373696Z",
-    "generator_revision": "418a2f04624a96dff66c00c06d5f1d3fa170c779",
+    "generated_at": "2026-10-16T01:42:23.147017Z",
+    "generator_revision": "0337194b7452d07ba96c347f30765b3a22b54be1",
     "generator_source_digest": "fbf4d8a730c83b0093b747bab69d4dd91bfea231a90f83e5c98e6060c4d1d51e",
-    "claim_input_digest": "4029d1a4547ae3fbfeac3e21ce0410a838f53ebedb1ccd3b6ebf564eea4f0c0e",
-    "render_key": "a48e18c682329b4461df8965a5e0099e2607e71507802ac365cb4f4f9e55437c",
+    "claim_input_digest": "39c3deb9b0219055e3e45d52d36b756daf6ce2f5bbc045b878a5c20d16c936e7",
+    "render_key": "e7fa6ec1ed94198edc1e426ec3daa556ac9c279ad47c77b4d8211c43349a0994",
     "schema": "profile-artifact-generation/v1"
   }
 }
