@@ -174,6 +174,29 @@ class PublicMultiRepositoryCITimelineTests(unittest.TestCase):
             ["jguida941/jguida941", "jguida941/recent", "jguida941/ci-cd-hub"],
             select_public_ci_repositories(rows, "jguida941"))
 
+    def test_duplicate_repository_envelope_cannot_multiply_run_totals(self):
+        """Replayed repo observations must not mint another run or repository."""
+        from scripts.github.actions_audit import normalize_public_ci_timeline
+        one = {"repository": "jguida941/ci-cd-hub", "runs": [{
+            "databaseId": 321, "workflowName": "CI", "status": "completed",
+            "conclusion": "failure", "createdAt": "2026-10-14T12:00:00Z",
+        }]}
+        sample = normalize_public_ci_timeline(
+            [one, dict(one)], "jguida941", "2026-10-15T12:00:00Z")
+        self.assertEqual(1, sample["observed_runs"])
+        self.assertEqual(["jguida941/ci-cd-hub"],
+                         [item["repository"] for item in sample["repositories"]])
+        self.assertEqual("partial", sample["status"])
+
+    def test_unverified_visibility_is_not_public_permission(self):
+        """An absent privacy bit cannot qualify a repository as public."""
+        from scripts.github.actions_audit import select_public_ci_repositories
+        repo = {"name": "unknown-visibility", "owner": {"login": "jguida941"},
+                "fork": False, "has_ci_workflows": True,
+                "pushed_at": "2026-10-14T12:00:00Z"}
+        self.assertEqual(["jguida941/jguida941"],
+                         select_public_ci_repositories([repo], "jguida941"))
+
     def test_dated_run_identity_is_real_and_unavailable_is_not_zero(self):
         from scripts.github.actions_audit import normalize_public_ci_timeline
         rows = [{"repository": "jguida941/jguida941", "runs": [
@@ -207,6 +230,7 @@ class PublicMultiRepositoryCITimelineTests(unittest.TestCase):
     def test_one_provider_failure_does_not_erase_other_real_runs(self):
         from scripts.github.actions_audit import collect_public_ci_timeline
         rows = [{"name": "ci-cd-hub", "owner": {"login": "jguida941"},
+                 "private": False, "fork": False,
                  "has_ci_workflows": True, "pushed_at": "2026-10-14T00:00:00Z"}]
         def fetch(command, **kwargs):
             if "ci-cd-hub" in command[command.index("--repo")+1]:

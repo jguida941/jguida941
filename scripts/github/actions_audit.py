@@ -202,7 +202,7 @@ def select_public_ci_repositories(repositories: object, owner: str, *, limit: in
         return []
     eligible = []
     for repo in repositories if isinstance(repositories, list) else []:
-        if not isinstance(repo, dict) or repo.get("private") is True or repo.get("fork") is True:
+        if not isinstance(repo, dict) or repo.get("private") is not False or repo.get("fork") is True:
             continue
         name = repo.get("name")
         identity = repo.get("owner")
@@ -242,6 +242,7 @@ def normalize_public_ci_timeline(
     if not isinstance(observations, list) or not observations:
         return result
     partial = False
+    seen_repositories: set[str] = set()
     for observation in observations[:6]:
         if not isinstance(observation, dict):
             partial = True
@@ -255,6 +256,13 @@ def normalize_public_ci_timeline(
         if not fullmatch(r"[A-Za-z0-9_.-]{1,100}", repo.split("/", 1)[1]):
             partial = True
             continue
+        # A repeated envelope does not describe a second repository.
+        # Preserve its first qualified observation; disclose replay as partial,
+        # and do not multiply observed run totals.
+        if repo in seen_repositories:
+            partial = True
+            continue
+        seen_repositories.add(repo)
         raw = observation.get("runs")
         qualified = normalize_profile_ci_runs(raw, repo, instant, limit=limit_per_repo)
         samples = []
