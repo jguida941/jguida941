@@ -585,6 +585,49 @@ def _project_activity(c, x, y, span, data):
     return _project_activity_legend(c, x, y+7, span, project.get("scale"))
 
 
+def _ci_status_symbol(state, cx, cy, radius, color, *, role, title="", **metadata):
+    """One status-by-shape glyph for both legend and provider-observed runs.
+
+    A fill color is supplemental: shape and accessible title also convey status.
+    Unknown status uses a cross, never the same filled dot as a successful run.
+    This is a renderer primitive, not another interpretation of provider data.
+    """
+    shapes = {
+        "success": "circle",
+        "failure": "square", "timed_out": "square", "startup_failure": "square",
+        "queued": "triangle", "action_required": "triangle", "stale": "triangle",
+        "cancelled": "diamond", "skipped": "diamond", "neutral": "diamond",
+        "in_progress": "ring", "unknown": "cross",
+    }
+    shape = shapes.get(state, "cross")
+    data = dict(data_role=role, data_status=state, data_shape=shape, **metadata)
+    if shape in ("circle", "ring"):
+        tag = "circle"
+        props = dict(cx=cx, cy=cy, r=radius,
+                     fill=color if shape == "circle" else "none",
+                     stroke=color if shape == "ring" else COLORS["surface"],
+                     stroke_width=2 if shape == "ring" else 1, **data)
+    elif shape == "square":
+        tag = "rect"
+        props = dict(x=cx-radius, y=cy-radius, width=radius*2,
+                     height=radius*2, fill=color, stroke=COLORS["surface"],
+                     stroke_width=1, **data)
+    elif shape in ("triangle", "diamond"):
+        tag = "polygon"
+        if shape == "triangle":
+            points = f"{cx},{cy-radius} {cx+radius},{cy+radius} {cx-radius},{cy+radius}"
+        else:
+            points = f"{cx},{cy-radius} {cx+radius},{cy} {cx},{cy+radius} {cx-radius},{cy}"
+        props = dict(points=points, fill=color, stroke=COLORS["surface"],
+                     stroke_width=1, **data)
+    else:
+        tag = "path"
+        props = dict(d=f"M{cx-radius},{cy-radius} L{cx+radius},{cy+radius} "
+                       f"M{cx+radius},{cy-radius} L{cx-radius},{cy+radius}",
+                     stroke=color, stroke_width=2, fill="none", **data)
+    return f"<{tag} {_attrs(props)}><title>{escape(str(title))}</title></{tag}>"
+
+
 def _ci_timeline(c, x, y, span, data):
     """One static README timeline from qualified public repository observations.
 
@@ -614,8 +657,8 @@ def _ci_timeline(c, x, y, span, data):
         columns = 2 if c.mobile else 4
         xx = x + (i % columns) * (span / columns)
         yy = y + (i // columns) * 24
-        c.parts.append('<circle ' + _attrs(dict(cx=xx+5, cy=yy, r=5, fill=colors[state],
-                                                 data_role="ci-key", data_status=state)) + '/>')
+        c.parts.append(_ci_status_symbol(
+            state, xx+5, yy, 5, colors[state], role="ci-key", title=label))
         c.text(label, xx+16, yy+5, size=13, color="muted")
     y += 58 if c.mobile else 32
     try:
@@ -669,11 +712,12 @@ def _ci_timeline(c, x, y, span, data):
             outcome = str(run.get("outcome", "unknown"))
             cx = round(plot_x + ratio * plot_width, 2)
             cy = row_y + ((plotted % 3)-1) * 6
-            c.parts.append('<circle ' + _attrs(dict(cx=cx, cy=cy, r=4 if c.mobile else 5,
-                fill=colors.get(outcome, COLORS["muted"]), stroke=COLORS["surface"], stroke_width=1,
-                data_role="ci-run", data_run_id=run["run_id"], data_status=outcome,
-                data_repository=row["repository"], data_date=run["created_at"])) + '>')
-            c.parts.append('<title>' + escape(f'{row["repository"]} · {run.get("workflow", "Workflow")} · {run["created_at"]} · {outcome}') + '</title></circle>')
+            c.parts.append(_ci_status_symbol(
+                outcome, cx, cy, 4 if c.mobile else 5,
+                colors.get(outcome, COLORS["muted"]), role="ci-run",
+                data_run_id=run["run_id"], data_repository=row["repository"],
+                data_date=run["created_at"],
+                title=f'{row["repository"]} · {run.get("workflow", "Workflow")} · {run["created_at"]} · {outcome}'))
             plotted += 1
         if not runs:
             c.text("No observed runs" if status == "empty" else "Unavailable",
