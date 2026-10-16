@@ -7,6 +7,13 @@
 
 ## STATUS — where we are (updated each slice)
 
+### CI-RECEIPT-01c — focused screenshot must paint (2026-10-16 / RED observed, GREEN candidate)
+
+- **Independent authentic failure:** [Chrome run 38856476570](https://github.com/jguida941/jguida941/actions/runs/38856476570) passed genuine 390px scroll containment but produced `ci-observatory-1280.png` as 1280x1536 pixels of ONE uniform RGB value (12,14,24). The original full-page top capture contained real UI. A seemingly valid PNG and source-sha sidecar did not establish that the requested CI panel was painted.
+- **Real RED-first control:** [GitHub CI 38856880268](https://github.com/jguida941/jguida941/actions/runs/38856880268), at `d5a2b72`, failed `test_blank_focused_chrome_capture_refuses_before_provenance` for exactly this defect (`RuntimeError not raised`). A healthy image with a visible pixel region is the nearest-valid control; no arbitrary positive source label can certify a blank image.
+- **GREEN candidate / architecture choice:** RETAIN the original `screenshot_page` source and real Chrome renderer, **improve** only its fixed `index#ci-observatory` composition to a same-origin temporary iframe host that scrolls the real rendered child document to the selected CI panel (not a second renderer or fixture). For focused receipts require `png_summary()["nonblank"]` BEFORE writing a provenance sidecar. Missing, blank or inaccessible target remains a hard failure; an image that paints the wrong region remains visually unaccepted until a human pixel check.
+- **Required next step:** check exact post-change Actions CI run, retrieve raw focused PNG and inspect **CI heading, repo axis, legend and sampled/unknown signals**, not just nonblank pixels. The stored snapshot still reports no `ci_timeline`; do NOT promote it as a populated timeline. No browser proof grants private publisher cutover, SemLoop native or independent DESIGN/CODE/ADVERSARIAL approval.
+
 ### CI-RECEIPT-01b — bounded 390px CI scroller (RED observed, GREEN candidate / UNACCEPTED)
 
 - **Actual Chrome diagnosis:** [GitHub CI 38855931366](https://github.com/jguida941/jguida941/actions/runs/38855931366) captured genuine Google Chrome 155 `screenshot-1280.png`, `ci-observatory-1280.png` and a true `dom-probe-390.json` under artifact `12026913979`. The DOM measured `client_width=390`, `scroll_width=390`, but marked exactly 3 offenders (`.ci-plot`, `.ci-axis`, `#ci-timeline-rows`) at x=41..811, width=770. These are the intended contents of `.ci-observatory .ci-plot-scroll` with viewport-limited `overflow-x:auto` already present in source CSS. The old probe recognized only table/calendar scroll wrappers; this is an evidence-producer omission, NOT permission to suppress real page overflow.
