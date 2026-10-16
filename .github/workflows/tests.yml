@@ -2,7 +2,7 @@ name: Test Profile Pipeline
 
 on:
   push:
-    branches: ["main", "feature/profile-multi-repo-ci-timeline-20261015"]
+    branches: ["main"]
     paths:
       - "scripts/**"
       - "tests/**"
@@ -34,9 +34,6 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      actions: read
 
     steps:
       - uses: actions/checkout@v4
@@ -50,32 +47,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      # Temporary branch-only receipt production, not a production dependency.
-      - name: Capture exact index browser receipts
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature/profile-multi-repo-ci-timeline-20261015' && !startsWith(github.event.head_commit.message, 'ci(receipts):') }}
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          from scripts.quality import headless_receipts as receipts
-          from scripts.pipeline.web_render import render_dashboard
-          import json, shutil
-          assert Path("site/index.html").read_text(encoding="utf-8") == render_dashboard()
-          Path("site/assets").mkdir(exist_ok=True)
-          for name in ("dashboard_summary.svg","dashboard_summary_mobile.svg"):
-              shutil.copy2(Path("assets")/name, Path("site/assets")/name)
-              assert (Path("assets")/name).read_bytes() == (Path("site/assets")/name).read_bytes()
-          binary=shutil.which("google-chrome") or shutil.which("google-chrome-stable")
-          if not binary:
-              raise RuntimeError("Chrome absent: cannot certify responsive layout")
-          receipts.CHROME=Path(binary)
-          shot=receipts.screenshot_page("index")
-          probe=receipts.dom_probe("index")
-          facts=json.loads(probe.read_text())
-          if facts.get("client_width")!=390 or facts.get("horizontal_overflow"):
-              raise RuntimeError("Measured phone viewport overflow: "+str(facts.get("offenders")))
-          print("Chrome receipts",shot,probe)
-          PY
 
       - name: Run tests
         run: |
@@ -103,33 +74,3 @@ jobs:
           PERSONAL_GITHUB_TOKEN: ""
         run: |
           python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json
-
-      # Complete candidate bundle includes original README template.
-      - name: Pack complete profile candidate
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature/profile-multi-repo-ci-timeline-20261015' }}
-        run: |
-          tar -czf "${{ runner.temp }}/profile-source.tar.gz" scripts tests templates contracts site assets docs .github README.md requirements.txt pyproject.toml
-      - name: Upload candidate source bundle
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/feature/profile-multi-repo-ci-timeline-20261015' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: profile-shared-renderer-qualification
-          path: ${{ runner.temp }}/profile-source.tar.gz
-          if-no-files-found: error
-      - name: Upload browser receipts
-        if: ${{ always() && github.ref == 'refs/heads/feature/profile-multi-repo-ci-timeline-20261015' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: profile-browser-qual-receipts
-          path: |
-            assets/receipts/pages/index/screenshot-1280.png
-            assets/receipts/pages/index/screenshot-1280.png.provenance.json
-            assets/receipts/pages/index/dom-probe-390.json
-            assets/receipts/pages/index/dom-probe-390.json.provenance.json
-      - name: Commit browser receipts to candidate branch only
-        if: ${{ success() && github.event_name == 'push' && github.ref == 'refs/heads/feature/profile-multi-repo-ci-timeline-20261015' && !startsWith(github.event.head_commit.message, 'ci(receipts):') }}
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          branch: feature/profile-multi-repo-ci-timeline-20261015
-          commit_message: "ci(receipts): capture shared-card website in genuine Chrome"
-          file_pattern: "assets/receipts/pages/index/screenshot-1280.png assets/receipts/pages/index/screenshot-1280.png.provenance.json assets/receipts/pages/index/dom-probe-390.json assets/receipts/pages/index/dom-probe-390.json.provenance.json"
