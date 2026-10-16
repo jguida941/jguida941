@@ -185,3 +185,111 @@ def collect_profile_ci_runs(repository: str, limit: int = 12) -> dict:
     except (RuntimeError, ValueError):
         rows = None
     return normalize_profile_ci_runs(rows, repository, observed_at, limit=limit)
+
+
+# CI-REPO-TIMELINE-01: bounded, public-only repository execution sample.
+# The README and website share this carrier. It must never describe the
+# complete account or imply a sample is the population of successful runs.
+def select_public_ci_repositories(repositories: object, owner: str, *, limit: int = 6) -> list[str]:
+    """Pick a stable, recently pushed public workflow cohort, plus profile self.
+
+    The caller supplies the *public* repository inventory, not a combined
+    public/private list. Reject explicitly private, forked and foreign rows.
+    A configured workflow is not a successful run, just a sampling criterion.
+    """
+    import re
+    if not re.fullmatch(r"[A-Za-z0-9-]+", owner):
+        return []
+    eligible = []
+    for repo in repositories if isinstance(repositories, list) else []:
+        if not isinstance(repo, dict) or repo.get("private") is True or repo.get("fork") is True:
+            continue
+        name = repo.get("name")
+        identity = repo.get("owner")
+        if (not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}", name)
+                or not isinstance(identity, dict) or identity.get("login") != owner
+                or name == owner or repo.get("has_ci_workflows") is not True):
+            continue
+        timestamp = _utc_instant(repo.get("pushed_at")) or ""
+        eligible.append((timestamp, name))
+    eligible.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return [f"{owner}/{owner}"] + [f"{owner}/{name}" for _, name in eligible[:max(0, limit-1)]]
+
+
+def normalize_public_ci_timeline(
+    observations: object, owner: str, observed_at: str, *, window_days: int = 84,
+    limit_per_repo: int = 20,
+) -> dict:
+    """A truthful time-axis view of *sampled* public GitHub Actions executions.
+
+    One point is one valid provider run. A failed/unavailable query never adds
+    success or an observed zero. Reaching the source cap makes coverage partial.
+    """
+    from datetime import timedelta
+    instant = _utc_instant(observed_at)
+    if not instant:
+        raise ValueError("observed_at must be an offset-aware timestamp")
+    end = datetime.fromisoformat(instant.replace("Z", "+00:00"))
+    window_days = max(7, min(365, int(window_days)))
+    lower = end - timedelta(days=window_days)
+    limit_per_repo = max(1, min(60, int(limit_per_repo)))
+    start = lower.isoformat(timespec="seconds").replace("+00:00", "Z")
+    result = {"schema":"profile-ci-timeline/v1", "owner":owner,
+              "observed_at":instant, "window_start":start, "window_end":instant,
+              "window_days":window_days, "sample_limit_per_repo":limit_per_repo,
+              "scope":"Selected public, owned repositories with observed workflow configuration, plus profile; up to 20 most recent runs per repository, not complete history.",
+              "repositories":[], "observed_runs":0, "status":"unavailable"}
+    if not isinstance(observations, list) or not observations:
+        return result
+    partial = False
+    for observation in observations[:6]:
+        if not isinstance(observation, dict):
+            partial = True
+            continue
+        repo = observation.get("repository")
+        if (not isinstance(repo, str) or not repo.startswith(owner + "/")
+                or repo.count("/") != 1):
+            partial = True
+            continue
+        from re import fullmatch
+        if not fullmatch(r"[A-Za-z0-9_.-]{1,100}", repo.split("/", 1)[1]):
+            partial = True
+            continue
+        raw = observation.get("runs")
+        qualified = normalize_profile_ci_runs(raw, repo, instant, limit=limit_per_repo)
+        samples = []
+        for item in qualified["runs"]:
+            moment = datetime.fromisoformat(item["created_at"].replace("Z", "+00:00"))
+            if lower <= moment <= end:
+                samples.append(item)
+        truncated = isinstance(raw, list) and len(raw) >= limit_per_repo
+        completeness = qualified["status"]
+        if truncated and completeness == "available":
+            completeness = "partial"
+        if completeness in ("partial", "unavailable"):
+            partial = True
+        result["repositories"].append({"repository":repo, "status":completeness,
+            "truncated":truncated, "observed_runs":len(samples) if raw is not None else None,
+            "runs":samples})
+        result["observed_runs"] += len(samples)
+    if not result["repositories"]:
+        return result
+    if all(row["status"] == "unavailable" for row in result["repositories"]):
+        return result
+    result["status"] = "partial" if partial else "available"
+    return result
+
+
+def collect_public_ci_timeline(public_repositories: list[dict], owner: str) -> dict:
+    """Bounded live GitHub Actions read. No private-repository run metadata."""
+    observed = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    selected = select_public_ci_repositories(public_repositories, owner)
+    observations = []
+    for repo in selected:
+        try:
+            rows = run_json(["gh", "run", "list", "--repo", repo, "--limit", "20",
+                "--json", "databaseId,workflowName,status,conclusion,createdAt,event,headBranch"])
+        except (RuntimeError, ValueError):
+            rows = None
+        observations.append({"repository":repo,"runs":rows})
+    return normalize_public_ci_timeline(observations, owner, observed)
