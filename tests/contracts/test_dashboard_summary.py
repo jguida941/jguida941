@@ -47,6 +47,61 @@ class CITimelineSVGContract(unittest.TestCase):
                 self.assertFalse([n for n in unavailable.iter() if n.get("data-role") == "ci-run"])
                 self.assertIn("Up to 20 newest runs", " ".join(chart.itertext()))
 
+    def test_real_ci_outcomes_use_independent_shapes_on_both_ii(self):
+        """RED CI-VIS-01b: status must be visible without relying on colour.
+
+        Reference: Developer Observatory legend has distinct glyphs for passed,
+        failed, queued, and cancelled. The displayed identities MUST remain
+        provider-derived; no design preview events are admitted as real runs.
+        """
+        from scripts.github.actions_audit import normalize_public_ci_timeline
+        rows = []
+        states = (
+            (201, "success", "completed"),
+            (202, "failure", "completed"),
+            (203, None, "queued"),
+            (204, "cancelled", "completed"),
+            (205, None, "in_progress"),
+        )
+        for run_id, conclusion, status in states:
+            rows.append({"databaseId": run_id, "workflowName": "CI",
+                         "status": status, "conclusion": conclusion,
+                         "createdAt": f"2026-10-14T{run_id-200:02d}:00:00Z"})
+        observed = normalize_public_ci_timeline(
+            [{"repository": "jguida941/jguida941", "runs": rows}],
+            "jguida941", "2026-10-15T00:00:00Z",
+        )
+        expected = {
+            "success": ("circle", "circle"),
+            "failure": ("rect", "square"),
+            "queued": ("polygon", "triangle"),
+            "cancelled": ("polygon", "diamond"),
+            "in_progress": ("circle", "ring"),
+        }
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root = ET.fromstring(render_svg({"ci_timeline": observed}, mobile=mobile))
+                chart = next(n for n in root.iter() if n.get("data-role") == "ci-timeline-chart")
+                marks = [n for n in chart.iter() if n.get("data-role") == "ci-run"]
+                self.assertEqual(5, len(marks))
+                self.assertEqual({str(i) for i in range(201, 206)},
+                                 {n.get("data-run-id") for n in marks})
+                for node in marks:
+                    status = node.get("data-status")
+                    self.assertIn(status, expected)
+                    tag, shape = expected[status]
+                    self.assertEqual(tag, node.tag.rsplit("}", 1)[-1],
+                                     f"{status} must have a geometrically distinct icon")
+                    self.assertEqual(shape, node.get("data-shape"))
+                    self.assertTrue(any(c.tag.endswith("title") and status in (c.text or "")
+                                        for c in node), "accessible event label required")
+                key = {n.get("data-status"): n for n in chart.iter()
+                       if n.get("data-role") == "ci-key"}
+                for state in ("success", "failure", "queued", "cancelled"):
+                    self.assertEqual(expected[state][1], key[state].get("data-shape"))
+                    self.assertEqual(expected[state][0], key[state].tag.rsplit("}", 1)[-1])
+                self.assertNotIn("success rate", " ".join(chart.itertext()).lower())
+
     def test_missing_timeline_does_not_invent_runs(self):
         for mobile in (False, True):
             root = ET.fromstring(render_svg({}, mobile=mobile))
