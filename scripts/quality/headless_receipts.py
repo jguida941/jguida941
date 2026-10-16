@@ -189,6 +189,15 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
     var scrollWidth = Math.max(root.scrollWidth || 0, bodyScrollWidth);
     var offenders = [];
     Array.prototype.forEach.call(doc.querySelectorAll("*"), function (el) {{
+      // CSS may still return geometries for descendants of closed <details>,
+      // despite them not being displayed. Never count those invisible
+      // descendants as viewport overflow. The visible summary and anything in
+      // an OPEN disclosure remain measurable and cannot bypass this gate.
+      var closed = el.closest ? el.closest("details:not([open])") : null;
+      if (closed) {{
+        var summary = closed.querySelector(":scope > summary");
+        if (!summary || (el !== summary && !summary.contains(el))) return;
+      }}
       var style = frame.contentWindow.getComputedStyle(el);
       if (style.display === "none" || style.visibility === "hidden") return;
       var rect = el.getBoundingClientRect();
