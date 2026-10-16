@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import base64
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 from html import escape
 import math
 import re
@@ -10,6 +11,7 @@ from pathlib import Path
 import textwrap
 
 from scripts.contracts.dashboard_summary import summary_facts
+from scripts.contracts import profile_timezone_name
 from scripts.core.config import (CONTRIB_EMPTY, CONTRIB_RAMP, DASHBOARD_SUMMARY_COLORS,
                                  DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH, GREEN, RED, YELLOW,
                                  PROJECT_ACTIVITY_COLORS)
@@ -705,7 +707,11 @@ def render_svg(summary, *, mobile=False, generation=None):
     c.text(username, pad, 69, size=26, weight=600)
     try:
         observed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-        snapshot_date = observed.strftime("%b %-d, %Y")
+        if observed.tzinfo is None:
+            raise ValueError("unqualified snapshot instant")
+        # GitHub profile snapshots show the owner-configured local calendar date;
+        # workflow timeline sample instants remain provenance-bound UTC.
+        snapshot_date = observed.astimezone(ZoneInfo(profile_timezone_name())).strftime("%b %-d, %Y")
     except ValueError:
         snapshot_date = "date unavailable"
     c.text("Snapshot " + snapshot_date, pad, 96, size=14 if mobile else 16, color="muted")
