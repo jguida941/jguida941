@@ -287,6 +287,54 @@ class ReceiptProvenanceContract(unittest.TestCase):
                     f"{page}: 390px DOM probe has uncontained overflowing elements: {data.get('offenders')}")
 
 
+class FocusedCIBrowserScreenshotContract(unittest.TestCase):
+    """A source-bound PNG artifact does not prove the CI chart was painted."""
+
+    def test_blank_focused_chrome_capture_refuses_before_provenance(self):
+        """Run 38856476570 produced a full-size, ONE-COLOR focused PNG.
+
+        The existing original 1280 screenshot was healthy. The fixed CI anchor
+        must fail before an apparently successful provenance sidecar is written;
+        a nonblank nearest-valid image must continue to qualify as a candidate.
+        """
+        import subprocess
+        import tempfile
+        from unittest.mock import patch
+        from PIL import Image, ImageDraw
+        from scripts.quality import headless_receipts as producer
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "site").mkdir()
+            (root / "site" / "index.html").write_text(
+                '<!doctype html><title>CI test subject</title><section id="ci-observatory">Verified</section>'
+            )
+            has_paint = [False]
+
+            def emit_png(command):
+                filename = next(v.split("=", 1)[1] for v in command
+                                if v.startswith("--screenshot="))
+                picture = Image.new("RGB", (1280, 1536), (12, 14, 24))
+                if has_paint[0]:
+                    ImageDraw.Draw(picture).rectangle((30, 30, 350, 130), fill=(255, 255, 255))
+                picture.save(filename)
+                return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+            with patch.object(producer, "_root", return_value=root), patch.object(
+                producer, "_chrome", return_value=Path("/mock/google-chrome")
+            ), patch.object(
+                producer, "_chrome_version", return_value="Google Chrome 155.0"
+            ), patch.object(producer, "_run", side_effect=emit_png):
+                with self.assertRaisesRegex(RuntimeError, "blank"):
+                    producer.screenshot_page("index", target="ci-observatory")
+                candidate = root / "assets/receipts/pages/index/ci-observatory-1280.png"
+                self.assertFalse(producer.provenance_path(candidate).exists(),
+                                 "blank viewport cannot acquire credible provenance")
+                has_paint[0] = True
+                out = producer.screenshot_page("index", target="ci-observatory")
+                self.assertEqual(out, candidate)
+                self.assertTrue(producer.provenance_path(out).is_file())
+
+
 class BrowserProducerPortabilityContract(unittest.TestCase):
     """CI-RECEIPT-01: genuine Google Chrome on an existing non-Mac runner."""
 
