@@ -55,6 +55,19 @@ class CITimelineSVGContract(unittest.TestCase):
             self.assertIn("Multi-repository workflow history unavailable", " ".join(chart.itertext()))
 
 
+class ProfileLocalClockTests(unittest.TestCase):
+    def test_timestamp_near_midnight_utc_stays_on_october_15_in_eastern(self):
+        from unittest.mock import patch
+        with patch.dict("os.environ", {"PROFILE_TIMEZONE": "America/New_York"}):
+            for mobile in (False, True):
+                root = ET.fromstring(render_svg({
+                    "generated_at": "2026-10-16T02:01:27Z",
+                }, mobile=mobile))
+                labels = " ".join(root.itertext())
+                self.assertIn("Snapshot Oct 15, 2026", labels)
+                self.assertNotIn("Snapshot Oct 16, 2026", labels)
+
+
 class DashboardVisualTests(unittest.TestCase):
     def test_six_languages_and_other_preserve_observed_bytes(self):
         from datetime import date
