@@ -10,6 +10,7 @@ import hashlib
 import html
 import json
 import re
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -35,14 +36,22 @@ def _root() -> Path:
 
 
 def _chrome() -> Path:
-    if not CHROME.is_file():
-        raise FileNotFoundError(f"Chrome binary not found: {CHROME}")
-    return CHROME
+    """Find genuine Google Chrome without making the Mac binary a CI prerequisite."""
+    if CHROME.is_file():
+        return CHROME
+    for executable in ("google-chrome", "google-chrome-stable"):
+        found = shutil.which(executable)
+        if found and Path(found).is_file():
+            return Path(found)
+    raise FileNotFoundError("Google Chrome unavailable on this runner; no Chromium or simulated proof")
 
 
 def _chrome_version(chrome: Path) -> str:
     proc = subprocess.run([str(chrome), "--version"], check=True, capture_output=True, text=True)
-    return proc.stdout.strip()
+    version = proc.stdout.strip()
+    if not version.startswith("Google Chrome "):
+        raise RuntimeError("Google Chrome receipt refused: browser identity is not Google Chrome")
+    return version
 
 
 def _route(page: str) -> Path:
@@ -118,13 +127,20 @@ def _write_provenance(
     return out
 
 
-def screenshot_page(page: str, width: int = 1280) -> Path:
-    """Write `assets/receipts/pages/<page>/screenshot-<width>.png` via Chrome headless."""
+def screenshot_page(page: str, width: int = 1280, *, target: str | None = None) -> Path:
+    """Capture genuine Google Chrome; optional CI-region focus is separately identified.
+
+    Only one exact, registered dashboard anchor is available. Do not generalize
+    browser navigation to arbitrary client strings or substitute a fixture.
+    """
     chrome = _chrome()
     chrome_version = _chrome_version(chrome)
     route = _route(page)
     _receipt_dir(page, create=True)
-    artifact = screenshot_artifact(page, width)
+    if target not in (None, "ci-observatory") or (target is not None and page != "index"):
+        raise ValueError("unsupported screenshot target; only index#ci-observatory is registered")
+    artifact = (screenshot_artifact(page, width) if target is None else
+                _receipt_dir(page) / f"ci-observatory-{width}.png")
     height = max(900, round(width * 1.2))
     # NO --user-data-dir: a custom fresh profile dir makes --headless=new hang after writing the
     # artifact (observed); the ephemeral auto-profile exits cleanly (the session-proven invocation).
@@ -139,8 +155,9 @@ def screenshot_page(page: str, width: int = 1280) -> Path:
         # during headless screenshot capture. The Chrome file access flag is
         # necessary to photograph hydrated evidence, not a loading placeholder.
         *(["--allow-file-access-from-files"] if page == "index" else []),
+        *(["--virtual-time-budget=3500"] if target else []),
         f"--screenshot={artifact}",
-        route.as_uri(),
+        route.as_uri() + ("#ci-observatory" if target else ""),
     ]
     _run(command)
     if not artifact.is_file() or artifact.stat().st_size <= 0:

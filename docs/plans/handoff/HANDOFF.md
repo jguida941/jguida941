@@ -1,3 +1,7 @@
+## CURRENT EXECUTION NOTE — CI-RECEIPT-01 (2026-10-16)
+
+Reorient live `jguida941/jguida941:development`, private `profile-private-continuation:development`, and selected `JG-CI-VIS-001` before edits. Real [GitHub CI 38855651229](https://github.com/jguida941/jguida941/actions/runs/38855651229) observed the Mac-only Chrome discovery RED while the two preexisting index receipt-provenance checks remained red. New `headless_receipts._chrome` retains real protected-Mac Chrome and detects actual Google Chrome on the existing Linux PR test runner; `_chrome_version` validates the real browser vendor. Existing PR test workflow now captures true browser 1280 index, fixed-anchor CI-focused 1280 and true-390 probe artifacts **after tests and before fixture smoke**, uploads raw candidate evidence, and grants no write privileges. Its capture does not imply timeline population: the committed snapshot currently has NO `ci_timeline` value. Next agent MUST read run logs, raw artifact identity and actual CI-region pixels; commit genuine revised receipt bytes only after review, rerun full tests and obtain independent design/code/adversarial, then continue real multi-repo/time-axis data work. No public Pages cutover and no acceptance claimed. Showcase/Studio remains queued under `P5-DESIGN-OBSERVATORY-01`, not another selected branch.
+
 # CURRENT REENTRY — jguida941 dashboard, 2026-10-15
 
 This section is the authoritative next-agent entry; older July handoff is archived below, not an alternate work selection.

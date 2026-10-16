@@ -67,6 +67,59 @@ jobs:
             tests.contracts.test_skill_structure \
             tests.contracts.test_label_legibility
 
+      # Candidate evidence only. This uses the existing Linux test runner's
+      # genuine Google Chrome, not a new self-hosted/public publisher trust.
+      # Run AFTER static tests but BEFORE the fixture smoke CLI, so no synthetic
+      # profile snapshot can masquerade as a live observed screenshot.
+      - name: Capture real index Chrome receipts (development candidate only)
+        if: ${{ always() && github.event_name == 'pull_request' && github.head_ref == 'development' }}
+        env:
+          PROFILE_TIMEZONE: America/New_York
+        run: |
+          python - <<'PY'
+          import json
+          import shutil
+          from pathlib import Path
+          from scripts.quality.headless_receipts import (
+              screenshot_page, dom_probe, provenance_path, _chrome_version, _chrome,
+          )
+          Path("site/assets").mkdir(parents=True, exist_ok=True)
+          for name in ("dashboard_summary.svg", "dashboard_summary_mobile.svg"):
+              shutil.copyfile(Path("assets") / name, Path("site/assets") / name)
+          actual = json.loads(Path("site/data/profile_snapshot.json").read_text())
+          timeline = actual.get("ci_timeline")
+          print("Candidate snapshot CI status:",
+                timeline.get("status") if isinstance(timeline, dict) else "UNAVAILABLE")
+          print("Google Chrome:", _chrome_version(_chrome()))
+          general = screenshot_page("index")
+          focused = screenshot_page("index", target="ci-observatory")
+          mobile = dom_probe("index")
+          data = json.loads(mobile.read_text())
+          if (data.get("client_width") != 390 or
+                  data.get("horizontal_overflow") or
+                  data.get("uncontained_offender_count")):
+              raise RuntimeError("Actual Chrome 390px overflow proof failed")
+          for artifact in (general, focused, mobile):
+              if not artifact.is_file() or not provenance_path(artifact).is_file():
+                  raise RuntimeError("Missing genuine browser evidence")
+              print("Chrome produced:", artifact)
+          PY
+
+      - name: Upload raw unaccepted browser evidence
+        if: ${{ always() && github.event_name == 'pull_request' && github.head_ref == 'development' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: index-chrome-candidate-${{ github.sha }}
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            assets/receipts/pages/index/screenshot-1280.png
+            assets/receipts/pages/index/screenshot-1280.png.provenance.json
+            assets/receipts/pages/index/ci-observatory-1280.png
+            assets/receipts/pages/index/ci-observatory-1280.png.provenance.json
+            assets/receipts/pages/index/dom-probe-390.json
+            assets/receipts/pages/index/dom-probe-390.json.provenance.json
+
       - name: Fixture smoke CLI run (offline path)
         env:
           GITHUB_TOKEN: ""
