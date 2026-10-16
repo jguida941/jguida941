@@ -70,6 +70,33 @@ class WebDashboardContract(unittest.TestCase):
                        "Contribution Calendar", "Contribution Rhythm"):
             self.assertIn(needle, self.html, f"web dashboard missing {needle!r}")
 
+
+    def test_ci_observatory_is_visible_without_expanding_old_activity_feed(self):
+        """Reference RED: an actual plotted CI chart must not hide inside the old feed."""
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        self.assertIn('id="ci-observatory"', html)
+        self.assertLess(html.index('id="ci-observatory"'),
+                        html.index('id="interactive-details"'),
+                        "CI visualization must be visible without opening legacy details")
+        for region in ('id="ci-timeline-axis"', 'id="ci-timeline-rows"',
+                       'id="ci-selected-day"', 'id="ci-observatory-note"'):
+            self.assertIn(region, html)
+
+    def test_ci_observatory_uses_qualified_timeline_and_observed_day_details(self):
+        """A chart dot selects real sampled run IDs, not decorative month percentages."""
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        self.assertIn('hydrateCITimeline(d.ci_timeline)', html)
+        self.assertIn('profile-ci-timeline/v1', html)
+        self.assertIn('data-ci-run-id', html)
+        self.assertIn('data-ci-outcome', html)
+        self.assertIn('data-ci-date', html)
+        self.assertIn('aria-live="polite"', html)
+        self.assertIn('new Date(', html)
+        self.assertIn('sample_limit_per_repo', html)
+        self.assertNotIn('CI success rate: 95%', html)
+
     def test_ci_execution_is_a_separate_governed_dashboard_section(self):
         """Configuration is not execution, and the new view reuses product chrome."""
         html = self.html
