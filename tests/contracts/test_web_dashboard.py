@@ -97,6 +97,113 @@ class WebDashboardContract(unittest.TestCase):
         self.assertIn('sample_limit_per_repo', html)
         self.assertNotIn('CI success rate: 95%', html)
 
+
+    def test_ci_observatory_js_observes_private_names_and_day_selection(self):
+        """Execute the emitted view over mixed public/private names and attack wrong fixes.
+
+        The JS is a read-only projection of a qualified sample, not the decider
+        of private/public authorisation or a source of CI success denominators.
+        """
+        import json
+        import re
+        import shutil
+        import subprocess
+        from scripts.pipeline.web_render import render_dashboard
+
+        if shutil.which("node") is None:
+            self.skipTest("Node is required to execute the emitted JS")
+        scripts = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)
+        self.assertEqual(1, len(scripts))
+        emitted = scripts[0]
+        start = emitted.index("  const CI_TIMELINE_SIGNAL =")
+        end = emitted.index("  function hydrate(d) {", start)
+        ci_js = emitted[start:end]
+        harness = r"""
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
+class El {
+  constructor(tag='div') {
+    this.tagName = tag; this.children = []; this.attrs = {};
+    this.style = {}; this.handlers = {}; this.textContent = '';
+  }
+  replaceChildren(...items) { this.children = items; }
+  append(...items) { this.children.push(...items); }
+  setAttribute(k,v) { this.attrs[k] = String(v); }
+  getAttribute(k) { return Object.prototype.hasOwnProperty.call(this.attrs,k)
+    ? this.attrs[k] : null; }
+  addEventListener(k,f) { this.handlers[k] = f; }
+}
+const ids = ['ci-observatory','ci-timeline-axis','ci-timeline-rows',
+             'ci-selected-day','ci-observatory-note',
+             'ci-observatory-count','ci-observatory-scope'];
+const nodes = Object.fromEntries(ids.map(id => [id,new El()]));
+const document = {
+  getElementById: id => nodes[id] || null,
+  createElement: tag => new El(tag)
+};
+const row = (id,outcome,date,name='Workflow') => ({
+  run_id:id, outcome, created_at:date, workflow:name
+});
+const sample = {
+  schema:'profile-ci-timeline/v1', status:'partial', owner:'jguida941',
+  window_start:'2026-10-01T00:00:00Z', window_end:'2026-10-15T12:00:00Z',
+  sample_limit_per_repo:20,
+  repositories:[
+    {repository:'jguida941/jguida941', status:'partial', runs:[
+      row(31,'success','2026-10-14T12:00:00Z','Compile'),
+      row('bad-run','failure','2026-10-14T12:01:00Z'),
+      row(32,'failure','2026-10-16T00:00:00Z')
+    ]},
+    {repository:'jguida941/semloop',status:'available',runs:[
+      row(41,'failure','2026-10-14T02:00:00Z','<img onerror=alert(1)>'),
+      row(42,'queued','2026-10-14T07:00:00Z','Review')
+    ]},
+    {repository:'jguida941/jguida941', status:'available',runs:[
+      row(31,'success','2026-10-14T12:00:00Z')
+    ]}
+  ]
+};
+const source = fs.readFileSync(0,'utf8');
+vm.runInNewContext(source + '\nhydrateCITimeline(sample);',{document,sample});
+assert.equal(nodes['ci-timeline-rows'].children.length,2,'one lane per received identity');
+const dots = nodes['ci-timeline-rows'].children.flatMap(l => l.children[1].children);
+assert.equal(dots.length,3,'no string ID, future event or replay can mint runs');
+assert.deepEqual(new Set(dots.map(d => d.getAttribute('data-ci-outcome'))),
+  new Set(['success','failure','queued']));
+assert(dots.some(d=>d.getAttribute('aria-label').includes('jguida941/semloop')),
+  'private repo names are allowed in selected public presentation');
+assert(nodes['ci-observatory-note'].textContent.includes('Partial'),
+  'rejected records cannot be described as a complete observation');
+assert(nodes['ci-observatory-scope'].textContent.includes('20'),
+  'sample limit must remain visible');
+dots[0].handlers.click();
+assert.equal(nodes['ci-selected-day'].children[1].children.length,3,
+  'selected UTC day lists ONLY the observed events, across repositories');
+const links = nodes['ci-selected-day'].children[1].children.map(li=>li.children[0]);
+assert(links.every(l=>l.href.startsWith('https://github.com/jguida941/')),
+  'day drill must link only to admitted repository/run paths');
+assert(links.some(l=>l.textContent.includes('<img onerror=alert(1)>')),
+  'hostile workflow name must remain text, not interpreted markup');
+assert(!nodes['ci-observatory-count'].textContent.includes('%'),
+  'sampled outcomes cannot become invented CI success rate');
+"""
+        def run(body):
+            return subprocess.run(["node", "-e", harness], input=body, text=True,
+                                  capture_output=True, timeout=15)
+        healthy = run(ci_js)
+        self.assertEqual(0, healthy.returncode, healthy.stderr[-4000:])
+        for original, wrong in (
+            ("seenRepos.has(row.repository)", "false"),
+            ("Number.isSafeInteger(run.run_id)", "true"),
+            ("at > end.getTime()", "false"),
+        ):
+            with self.subTest(wrong_fix=original):
+                self.assertIn(original, ci_js)
+                mutant = ci_js.replace(original, wrong, 1)
+                self.assertNotEqual(0, run(mutant).returncode,
+                                    "A wrong fix must trip the actual emitted view oracle")
+
     def test_ci_execution_is_a_separate_governed_dashboard_section(self):
         """Configuration is not execution, and the new view reuses product chrome."""
         html = self.html
