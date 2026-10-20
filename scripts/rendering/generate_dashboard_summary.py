@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import base64
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 from html import escape
 import math
 import re
@@ -10,8 +11,9 @@ from pathlib import Path
 import textwrap
 
 from scripts.contracts.dashboard_summary import summary_facts
+from scripts.contracts import profile_timezone_name
 from scripts.core.config import (CONTRIB_EMPTY, CONTRIB_RAMP, DASHBOARD_SUMMARY_COLORS,
-                                 DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH, GREEN, RED,
+                                 DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH, GREEN, RED, YELLOW,
                                  PROJECT_ACTIVITY_COLORS)
 from scripts.rendering.components import donut_gauge
 from scripts.rendering.icons import render as icon
@@ -583,6 +585,157 @@ def _project_activity(c, x, y, span, data):
     return _project_activity_legend(c, x, y+7, span, project.get("scale"))
 
 
+def _ci_status_symbol(state, cx, cy, radius, color, *, role, title="", **metadata):
+    """One status-by-shape glyph for both legend and provider-observed runs.
+
+    A fill color is supplemental: shape and accessible title also convey status.
+    Unknown status uses a cross, never the same filled dot as a successful run.
+    This is a renderer primitive, not another interpretation of provider data.
+    """
+    shapes = {
+        "success": "circle",
+        "failure": "square", "timed_out": "square", "startup_failure": "square",
+        "queued": "triangle", "action_required": "triangle", "stale": "triangle",
+        "cancelled": "diamond", "skipped": "diamond", "neutral": "diamond",
+        "in_progress": "ring", "unknown": "cross",
+    }
+    shape = shapes.get(state, "cross")
+    data = dict(data_role=role, data_status=state, data_shape=shape, **metadata)
+    if shape in ("circle", "ring"):
+        tag = "circle"
+        props = dict(cx=cx, cy=cy, r=radius,
+                     fill=color if shape == "circle" else "none",
+                     stroke=color if shape == "ring" else COLORS["surface"],
+                     stroke_width=2 if shape == "ring" else 1, **data)
+    elif shape == "square":
+        tag = "rect"
+        props = dict(x=cx-radius, y=cy-radius, width=radius*2,
+                     height=radius*2, fill=color, stroke=COLORS["surface"],
+                     stroke_width=1, **data)
+    elif shape in ("triangle", "diamond"):
+        tag = "polygon"
+        if shape == "triangle":
+            points = f"{cx},{cy-radius} {cx+radius},{cy+radius} {cx-radius},{cy+radius}"
+        else:
+            points = f"{cx},{cy-radius} {cx+radius},{cy} {cx},{cy+radius} {cx-radius},{cy}"
+        props = dict(points=points, fill=color, stroke=COLORS["surface"],
+                     stroke_width=1, **data)
+    else:
+        tag = "path"
+        props = dict(d=f"M{cx-radius},{cy-radius} L{cx+radius},{cy+radius} "
+                       f"M{cx+radius},{cy-radius} L{cx-radius},{cy+radius}",
+                     stroke=color, stroke_width=2, fill="none", **data)
+    return f"<{tag} {_attrs(props)}><title>{escape(str(title))}</title></{tag}>"
+
+
+def _ci_timeline(c, x, y, span, data):
+    """One static README timeline from qualified public repository observations.
+
+    A dot is an actual provider run, not evidence inferred from workflow config.
+    An unobservable repository paints an honest unavailable row.
+    """
+    c.group(data_role="ci-timeline-chart")
+    payload = data if isinstance(data, dict) else {}
+    rows = payload.get("repositories") if payload.get("schema") == "profile-ci-timeline/v1" else None
+    rows = rows if isinstance(rows, list) else []
+    c.text("Public repository Actions runs · sampled last 12 weeks", x, y,
+           size=c.secondary, color="muted")
+    y += 24
+    if not rows:
+        c.text("Multi-repository workflow history unavailable", x, y + 20,
+               size=c.secondary, color="muted", data_role="ci-unavailable")
+        c.end()
+        return y + 40
+    colors = {"success": GREEN, "failure": RED, "timed_out": RED,
+              "startup_failure": RED, "cancelled": COLORS["muted"],
+              "queued": YELLOW, "in_progress": COLORS["teal"],
+              "skipped": COLORS["muted"], "neutral": COLORS["muted"],
+              "action_required": YELLOW, "stale": YELLOW, "unknown": COLORS["muted"]}
+    legend = (("success", "Passed"), ("failure", "Failed"),
+              ("queued", "Queued"), ("cancelled", "Cancelled"))
+    for i, (state, label) in enumerate(legend):
+        columns = 2 if c.mobile else 4
+        xx = x + (i % columns) * (span / columns)
+        yy = y + (i // columns) * 24
+        c.parts.append(_ci_status_symbol(
+            state, xx+5, yy, 5, colors[state], role="ci-key", title=label))
+        c.text(label, xx+16, yy+5, size=13, color="muted")
+    y += 58 if c.mobile else 32
+    try:
+        start = datetime.fromisoformat(str(payload["window_start"]).replace("Z", "+00:00"))
+        end = datetime.fromisoformat(str(payload["window_end"]).replace("Z", "+00:00"))
+        duration = (end-start).total_seconds()
+        if duration <= 0:
+            raise ValueError("nonpositive window")
+    except (KeyError, ValueError, TypeError):
+        c.text("Timeline dates unavailable", x, y+20, size=c.secondary, color="muted")
+        c.end()
+        return y + 45
+    label_space = 100 if c.mobile else 176
+    plot_x, plot_width = x + label_space, span - label_space - 8
+    plot_end = plot_x + plot_width
+    row_height = 43 if c.mobile else 46
+    axis_y = y + 27
+    c.group(data_role="ci-axis")
+    for tick in range(0, 13, 2 if c.mobile else 3):
+        xx = plot_x + plot_width * tick / 12
+        tick_date = start + timedelta(seconds=duration * tick / 12)
+        c.text(tick_date.strftime("%b %-d"), xx, axis_y-4, size=12,
+               color="muted", anchor="start" if tick == 0 else "end" if tick == 12 else "middle")
+        c.line(xx, axis_y+6, xx, axis_y+13+row_height*len(rows), stroke_opacity=.35)
+    c.end()
+    row_y = axis_y + 31
+    for row in rows[:6]:
+        if not isinstance(row, dict):
+            continue
+        name = str(row.get("repository", "")).split("/")[-1]
+        if not name:
+            continue
+        status = row.get("status", "unavailable")
+        c.group(data_role="ci-repository-row", data_repository=row.get("repository", ""),
+                data_status=status)
+        c.text(truncate(name, 12 if c.mobile else 20), x, row_y+5,
+               size=13 if c.mobile else 16, weight=500)
+        c.line(plot_x, row_y, plot_end, row_y, stroke_opacity=.6)
+        runs = row.get("runs") if isinstance(row.get("runs"), list) else []
+        plotted = 0
+        for run in runs:
+            if not isinstance(run, dict) or type(run.get("run_id")) is not int or run["run_id"] <= 0:
+                continue
+            try:
+                when = datetime.fromisoformat(str(run["created_at"]).replace("Z", "+00:00"))
+                ratio = (when-start).total_seconds() / duration
+            except (KeyError, ValueError, TypeError):
+                continue
+            if not 0 <= ratio <= 1:
+                continue
+            outcome = str(run.get("outcome", "unknown"))
+            cx = round(plot_x + ratio * plot_width, 2)
+            cy = row_y + ((plotted % 3)-1) * 6
+            c.parts.append(_ci_status_symbol(
+                outcome, cx, cy, 4 if c.mobile else 5,
+                colors.get(outcome, COLORS["muted"]), role="ci-run",
+                data_run_id=run["run_id"], data_repository=row["repository"],
+                data_date=run["created_at"],
+                title=f'{row["repository"]} · {run.get("workflow", "Workflow")} · {run["created_at"]} · {outcome}'))
+            plotted += 1
+        if not runs:
+            c.text("No observed runs" if status == "empty" else "Unavailable",
+                   plot_x+4, row_y-7, size=12, color="muted", data_role="ci-empty-state")
+        row_y += row_height
+        c.end()
+    y = row_y + 17
+    total = payload.get("observed_runs")
+    observation = f"{total} observed runs" if type(total) is int else "Observed run count unavailable"
+    y = c.wrap(observation + " · Up to 20 newest runs/repository; missing history is not zero.",
+               x, y, span, size=c.secondary, color="muted") + 4
+    if payload.get("status") != "available":
+        y = c.wrap("Partial or unavailable provider observations. This is not a success-rate measurement.",
+                   x, y, span, size=c.secondary, color="muted")
+    c.end()
+    return y + 12
+
+
 def render_svg(summary, *, mobile=False, generation=None):
     c = Canvas(mobile)
     facts = summary_facts(summary)
@@ -598,7 +751,11 @@ def render_svg(summary, *, mobile=False, generation=None):
     c.text(username, pad, 69, size=26, weight=600)
     try:
         observed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-        snapshot_date = observed.strftime("%b %-d, %Y")
+        if observed.tzinfo is None:
+            raise ValueError("unqualified snapshot instant")
+        # GitHub profile snapshots show the owner-configured local calendar date;
+        # workflow timeline sample instants remain provenance-bound UTC.
+        snapshot_date = observed.astimezone(ZoneInfo(profile_timezone_name())).strftime("%b %-d, %Y")
     except ValueError:
         snapshot_date = "date unavailable"
     c.text("Snapshot " + snapshot_date, pad, 96, size=14 if mobile else 16, color="muted")
@@ -745,6 +902,9 @@ def render_svg(summary, *, mobile=False, generation=None):
     c.parts[idx] = '<rect ' + _attrs(dict(x=pad,y=inner,width=content,height=y-inner+5,rx=13,fill=COLORS["panel"],stroke=COLORS["line"])) + '/>'
     c.end()
     y += 25
+
+    y = c.panel("ci-timeline", "CI Workflow Timeline", y,
+                lambda x, yy, span: _ci_timeline(c, x, yy, span, summary.get("ci_timeline")))
 
     def working(x, yy, span):
         rows = summary.get("working") or []

@@ -211,6 +211,17 @@ body {
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .section-meta { font-size: var(--type-caption); color: var(--ink-dim); }
 
+/* The website and README consume the exact same responsive profile card bytes.
+   The interactive web-only details below are deliberately a separate view. */
+.canonical-profile { margin-bottom: var(--gap-grid,20px); }
+.canonical-profile picture, .canonical-profile img { display:block; width:100%; max-width:100%; height:auto; }
+.canonical-profile img { border-radius: var(--radius-panel); }
+.canonical-profile .section-meta { margin: 12px 4px 0; }
+.detail-explorer { margin-top:var(--gap-grid,20px); }
+.detail-explorer > summary { cursor:pointer; font-size:var(--type-body); font-weight:600;
+  padding:14px 18px; min-height:44px; border:1px solid var(--hairline);
+  border-radius:var(--radius-tile); color:var(--ink); }
+.detail-explorer[open] > summary { margin-bottom:var(--gap-grid,20px); }
 /* --- hero --- */
 .hero .topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .hero h1 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 600; color: var(--ink-strong); margin: 2px 0 4px; letter-spacing: -0.01em; }
@@ -254,6 +265,41 @@ body {
 .ms { font-size: var(--type-caption); color: var(--ink-dim); }
 .mv { font-size: var(--type-metric); font-weight: 600; color: var(--ink-strong); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .mrow svg { width: 15px; height: 15px; stroke: var(--ink-dim); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+
+
+/* CI observatory: time-axis lanes from the one qualified snapshot, not a status feed. */
+.ci-observatory { min-width: 0; }
+.ci-observatory .ci-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-lg); flex-wrap: wrap; }
+.ci-observatory .ci-legend { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-lg); margin: var(--space-lg) 0; font-size: var(--type-caption); }
+.ci-observatory .ci-legend span { display: inline-flex; align-items: center; gap: var(--space-xs); }
+.ci-observatory .ci-symbol { display: inline-flex; align-items: center; justify-content: center; font-weight: 700; width: 24px; height: 24px; }
+.ci-observatory .ci-symbol.pass { color: var(--status-success); border: 2px solid var(--status-success); border-radius: 50%; }
+.ci-observatory .ci-symbol.fail { color: var(--status-danger); border: 2px solid var(--status-danger); border-radius: 4px; }
+.ci-observatory .ci-symbol.queued { color: var(--status-warning); border: 2px solid var(--status-warning); border-radius: 6px; }
+.ci-observatory .ci-symbol.neutral { color: var(--ink-dim); border: 2px dashed var(--hairline); border-radius: 50%; }
+.ci-observatory .ci-plot-scroll { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; padding-bottom: var(--space-sm); }
+.ci-observatory .ci-plot { min-width: 770px; }
+.ci-observatory .ci-axis, .ci-observatory .ci-lane { display: grid; grid-template-columns: 155px minmax(0,1fr); gap: var(--space-md); align-items: center; }
+.ci-observatory .ci-axis { padding-bottom: var(--space-sm); border-bottom: 1px solid var(--hairline); color: var(--ink-dim); font-size: var(--type-caption); }
+.ci-observatory .ci-axis-plot { position: relative; height: 25px; }
+.ci-observatory .ci-axis-plot span { position: absolute; white-space: nowrap; transform: translateX(-50%); }
+.ci-observatory .ci-axis-plot span:first-child { transform: none; }
+.ci-observatory .ci-axis-plot span:last-child { transform: translateX(-100%); }
+.ci-observatory .ci-lane { min-height: 62px; border-bottom: 1px solid color-mix(in srgb,var(--hairline) 15%, transparent); }
+.ci-observatory .ci-repo-name { display: block; font-size: var(--type-body); font-weight: 600; color: var(--ink-strong); overflow-wrap: anywhere; }
+.ci-observatory .ci-repo-name a { color: inherit; }
+.ci-observatory .ci-lane-note { display: block; color: var(--ink-dim); font-size: var(--type-caption); }
+.ci-observatory .ci-track { position: relative; min-height: 56px; background: repeating-linear-gradient(to right, transparent 0%, transparent calc(25% - 1px), color-mix(in srgb,var(--hairline) 14%, transparent) 25%); }
+.ci-observatory .ci-dot { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 28px; height: 28px; padding: 0; cursor: pointer; background: var(--surface-raised); font: inherit; font-size: var(--type-caption); transition: transform var(--motion-fast) var(--ease-standard); }
+.ci-observatory .ci-dot:hover { transform: translate(-50%,-50%) scale(1.08); }
+.ci-observatory .ci-dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; z-index: 2; }
+.ci-observatory .ci-dot[aria-pressed="true"] { outline: 2px solid var(--ink-strong); outline-offset: 2px; z-index: 1; }
+.ci-observatory .ci-inspector { margin-top: var(--space-lg); padding: var(--pad-tile); border: 1px solid color-mix(in srgb,var(--hairline) 20%, transparent); border-radius: var(--radius-tile); }
+.ci-observatory .ci-inspector h3 { color: var(--ink-strong); font-size: var(--type-body); margin: 0 0 var(--space-sm); }
+.ci-observatory .ci-inspector ul { margin: var(--space-sm) 0 0; padding-left: var(--space-xl); }
+.ci-observatory .ci-inspector li { font-size: var(--type-body); padding: var(--space-xs) 0; }
+.ci-observatory .ci-inspector a { color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .ci-observatory .ci-dot { transition: none; } }
 
 /* --- CI/CD execution: one public profile repo, not adoption across account --- */
 .ci-execution-panel .ci-link { color: var(--ink); font-size: var(--type-body);
@@ -484,7 +530,41 @@ footer a { color: var(--ink); text-decoration: none; }
 <body>
 <main class="wrap">
 
-  <header class="panel hero" id="overview" tabindex="-1">
+  <section class="canonical-profile" id="overview" tabindex="-1"
+           data-renderer="scripts.rendering.generate_dashboard_summary.render_svg">
+    <picture>
+      <source media="(max-width: 767px)" srcset="./assets/dashboard_summary_mobile.svg">
+      <img src="./assets/dashboard_summary.svg" width="100%" loading="eager"
+           alt="Responsive GitHub profile analytics generated by the same renderer as the GitHub profile card.">
+    </picture>
+    <p class="section-meta">This overview is the same rendered card on GitHub. Expand details for interactive repository analytics.</p>
+  </section>
+  <section class="panel ci-observatory" id="ci-observatory" tabindex="-1">
+    <div class="ci-heading">
+      <div><p class="eyebrow">Engineering Observatory · GitHub Actions</p>
+        <h2 class="title">CI Workflow Timeline by Repository</h2></div>
+      <p class="section-meta" id="ci-observatory-count">Awaiting qualified Actions observations</p>
+    </div>
+    <p class="section-meta" id="ci-observatory-note" role="status">Timeline history unavailable in this snapshot. No run outcomes are inferred from workflow configuration.</p>
+    <div class="ci-legend" aria-label="Workflow outcomes">
+      <span><i class="ci-symbol pass" aria-hidden="true">✓</i> Passed</span>
+      <span><i class="ci-symbol fail" aria-hidden="true">×</i> Failed</span>
+      <span><i class="ci-symbol queued" aria-hidden="true">◆</i> Queued / running</span>
+      <span><i class="ci-symbol neutral" aria-hidden="true">⊘</i> Cancelled / other</span>
+    </div>
+    <div class="ci-plot-scroll" tabindex="0" aria-label="Scroll the observed repository workflow timeline">
+      <div class="ci-plot">
+        <div class="ci-axis" id="ci-timeline-axis"></div>
+        <div id="ci-timeline-rows" aria-label="Observed repository lanes"></div>
+      </div>
+    </div>
+    <section class="ci-inspector" aria-label="Selected UTC date">
+      <h3>Selected day · observed events</h3>
+      <div id="ci-selected-day" aria-live="polite">Select a dated run marker to inspect the observed workflows for that UTC day.</div>
+    </section>
+    <p class="section-meta" id="ci-observatory-scope">Observed run sampling only; missing history is not zero.</p>
+  </section><details class="detail-explorer" id="interactive-details"><summary>Explore live analytics and repository details</summary>
+  <header class="panel hero" id="legacy-overview" tabindex="-1">
     <div class="topline">
       <div>
         <p class="eyebrow">GitHub Analytics · Live</p>
@@ -597,7 +677,7 @@ footer a { color: var(--ink); text-decoration: none; }
     <div class="mgroup" id="snap-tiles"></div>
     <p class="eyebrow" style="margin:20px 0 0">Pipeline Status</p>
     <div class="chips" id="pipeline"></div>
-  </section>
+  </section></details>
   <footer>Generated from the GitHub API · <a href="https://github.com/jguida941">@jguida941</a></footer>
 </main>
 
@@ -650,6 +730,8 @@ footer a { color: var(--ink); text-decoration: none; }
     try { id = decodeURIComponent(selectedHash.slice(1)); } catch (_) { return; }
     const target = document.getElementById(id);
     if (!target) return;
+    const details = document.getElementById("interactive-details");
+    if (details && details.contains(target)) details.open = true;
     requestAnimationFrame(() => { if (!interruptedScroll && location.hash === selectedHash) target.scrollIntoView({block:"start"}); });
   }
 
@@ -984,7 +1066,7 @@ footer a { color: var(--ink); text-decoration: none; }
       meta.className = "ms";
       const when = new Date(run.created_at || "");
       const stamp = Number.isNaN(when.getTime()) ? "Time unavailable" :
-        when.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit", timeZone:"UTC", timeZoneName:"short"});
+        when.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short"});
       meta.textContent = (run.head_branch ? run.head_branch + " · " : "") + stamp;
       left.append(title, meta);
       const [label, type] = Object.prototype.hasOwnProperty.call(CI_OUTCOME, run.outcome)
@@ -1006,8 +1088,174 @@ footer a { color: var(--ink); text-decoration: none; }
       (sample.observed_at ? " · Collected " + sample.observed_at : "");
   }
 
+
+  // Web-specific interaction over the SAME profile-ci-timeline/v1 carrier as
+  // README SVG. The client draws received run identities; it never judges CI
+  // success rates, invents missing days, or re-queries a provider.
+  const CI_TIMELINE_SIGNAL = Object.freeze({
+    success: ["Passed", "✓", "pass"], failure: ["Failed", "×", "fail"],
+    timed_out: ["Timed out", "×", "fail"], startup_failure: ["Startup failure", "×", "fail"],
+    queued: ["Queued", "◆", "queued"], in_progress: ["Running", "▶", "queued"],
+    cancelled: ["Cancelled", "⊘", "neutral"], skipped: ["Skipped", "–", "neutral"],
+    neutral: ["Neutral", "○", "neutral"], stale: ["Stale", "!", "neutral"],
+    action_required: ["Action required", "!", "queued"], unknown: ["Unknown", "?", "neutral"]
+  });
+
+  function hydrateCITimeline(sample) {
+    const root = document.getElementById("ci-observatory");
+    if (!root) return;
+    const axis = document.getElementById("ci-timeline-axis");
+    const lanes = document.getElementById("ci-timeline-rows");
+    const inspect = document.getElementById("ci-selected-day");
+    const note = document.getElementById("ci-observatory-note");
+    const count = document.getElementById("ci-observatory-count");
+    const scope = document.getElementById("ci-observatory-scope");
+    axis.replaceChildren();
+    lanes.replaceChildren();
+    inspect.textContent = "Select a dated run marker to inspect the observed workflows for that UTC day.";
+    count.textContent = "Run history unavailable";
+    scope.textContent = "Observed run sampling only; missing history is not zero.";
+    note.textContent = "Timeline history unavailable in this snapshot.";
+
+    const owner = sample && sample.owner;
+    if (!sample || sample.schema !== "profile-ci-timeline/v1" ||
+        !["available", "partial", "unavailable"].includes(sample.status) ||
+        typeof owner !== "string" || !/^[A-Za-z0-9-]+$/.test(owner) ||
+        !Array.isArray(sample.repositories)) return;
+    const start = new Date(sample.window_start);
+    const end = new Date(sample.window_end);
+    const span = end.getTime() - start.getTime();
+    if (!Number.isFinite(span) || span <= 0 || !Number.isFinite(start.getTime())) {
+      note.textContent = "Timeline window unavailable; no time-axis values inferred.";
+      return;
+    }
+    const dateText = when => when.toLocaleDateString("en-US",
+      {timeZone:"UTC", month:"short", day:"numeric"});
+    const axisTitle = document.createElement("strong");
+    axisTitle.textContent = "Repository / UTC";
+    axis.append(axisTitle);
+    const ticks = document.createElement("div");
+    ticks.className = "ci-axis-plot";
+    for (let i = 0; i <= 4; i++) {
+      const tick = document.createElement("span");
+      tick.style.left = (i * 25) + "%";
+      tick.textContent = dateText(new Date(start.getTime() + span * i / 4));
+      ticks.append(tick);
+    }
+    axis.append(ticks);
+
+    const allEvents = [], buttons = [];
+    const seenRepos = new Set();
+    let rejected = false;
+    const validName = name => typeof name === "string" && name.startsWith(owner + "/") &&
+      /^[A-Za-z0-9_.-]{1,100}$/.test(name.slice(owner.length + 1));
+    const received = sample.repositories.slice(0, 6);
+    for (const row of received) {
+      if (!row || !validName(row.repository) || seenRepos.has(row.repository)) {
+        rejected = true; continue;
+      }
+      seenRepos.add(row.repository);
+      const lane = document.createElement("div");
+      lane.className = "ci-lane";
+      lane.setAttribute("data-ci-repository", row.repository);
+      const label = document.createElement("div");
+      const repoLink = document.createElement("a");
+      repoLink.className = "ci-repo-name";
+      repoLink.href = "https://github.com/" + row.repository;
+      repoLink.textContent = row.repository.slice(owner.length + 1);
+      label.append(repoLink);
+      const details = document.createElement("span");
+      details.className = "ci-lane-note";
+      const rowState = ["available", "partial", "empty", "unavailable"].includes(row.status)
+        ? row.status : "unavailable";
+      details.textContent = rowState === "partial" ? "Partial observation" :
+        rowState === "unavailable" ? "Provider unavailable" :
+        rowState === "empty" ? "No runs returned" : "Sampled run signals";
+      label.append(details);
+      const track = document.createElement("div");
+      track.className = "ci-track";
+      track.setAttribute("aria-label", row.repository + " workflow runs");
+      lane.append(label, track);
+      lanes.append(lane);
+      const seenRuns = new Set();
+      const runs = Array.isArray(row.runs) ? row.runs.slice(0, 60) : [];
+      for (const run of runs) {
+        if (!run || !Number.isSafeInteger(run.run_id) || run.run_id <= 0 ||
+            seenRuns.has(run.run_id) || typeof run.created_at !== "string") {
+          rejected = true; continue;
+        }
+        seenRuns.add(run.run_id);
+        const when = new Date(run.created_at);
+        const at = when.getTime();
+        if (!Number.isFinite(at) || at < start.getTime() || at > end.getTime()) {
+          rejected = true; continue;
+        }
+        const outcome = Object.prototype.hasOwnProperty.call(CI_TIMELINE_SIGNAL, run.outcome)
+          ? run.outcome : "unknown";
+        const signal = CI_TIMELINE_SIGNAL[outcome];
+        const day = when.toISOString().slice(0, 10);
+        const item = {repository:row.repository, run_id:run.run_id, date:day,
+                      workflow:typeof run.workflow === "string" ? run.workflow : "Workflow",
+                      outcome:outcome, label:signal[0], created_at:when.toISOString()};
+        allEvents.push(item);
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "ci-dot ci-symbol " + signal[2];
+        dot.style.left = ((at - start.getTime()) / span * 100).toFixed(3) + "%";
+        dot.textContent = signal[1];
+        dot.setAttribute("data-ci-run-id", String(run.run_id));
+        dot.setAttribute("data-ci-outcome", outcome);
+        dot.setAttribute("data-ci-date", day);
+        dot.setAttribute("aria-pressed", "false");
+        dot.setAttribute("aria-label", row.repository + " · " + signal[0] +
+          " · " + day + " UTC · " + item.workflow);
+        dot.title = dot.getAttribute("aria-label");
+        dot.addEventListener("click", function () { showDay(day); });
+        buttons.push(dot);
+        track.append(dot);
+      }
+    }
+
+    function showDay(day) {
+      const events = allEvents.filter(x => x.date === day)
+        .sort((a, b) => a.created_at.localeCompare(b.created_at));
+      inspect.replaceChildren();
+      const intro = document.createElement("p");
+      intro.textContent = day + " UTC · " + events.length + " observed runs in this sample";
+      inspect.append(intro);
+      const list = document.createElement("ul");
+      for (const event of events) {
+        const li = document.createElement("li");
+        const link = document.createElement("a");
+        link.href = "https://github.com/" + event.repository +
+          "/actions/runs/" + event.run_id;
+        link.textContent = event.repository + " · " + event.workflow;
+        const status = document.createElement("span");
+        status.textContent = " · " + event.label;
+        li.append(link, status);
+        list.append(li);
+      }
+      inspect.append(list);
+      for (const button of buttons)
+        button.setAttribute("aria-pressed", String(button.getAttribute("data-ci-date") === day));
+    }
+
+    count.textContent = allEvents.length + " observed Actions runs · " +
+      seenRepos.size + " repository lanes";
+    const limit = Number.isSafeInteger(sample.sample_limit_per_repo) &&
+      sample.sample_limit_per_repo > 0 ? sample.sample_limit_per_repo : null;
+    scope.textContent = "Newest " + (limit == null ? "bounded" : limit) +
+      " received runs per repository, within observed dates. No full-history or success-rate claim.";
+    note.textContent = (sample.status === "partial" || rejected
+      ? "Partial evidence; missing or rejected observations are not zero. "
+      : sample.status === "unavailable"
+      ? "Provider history unavailable. " : "Sampled provider observations. ") +
+      "UTC axis " + dateText(start) + " to " + dateText(end) + ".";
+  }
+
   function hydrate(d) {
     hydrateCIExecution(d.ci_execution);
+    hydrateCITimeline(d.ci_timeline);
     hydrateCodeChanges(d.activity_analytics);
     hydrateProjectActivity(d.activity_analytics);
     hydrateRecentPushes(d.activity_analytics);

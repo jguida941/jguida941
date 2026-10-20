@@ -10,6 +10,7 @@ import hashlib
 import html
 import json
 import re
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -35,14 +36,22 @@ def _root() -> Path:
 
 
 def _chrome() -> Path:
-    if not CHROME.is_file():
-        raise FileNotFoundError(f"Chrome binary not found: {CHROME}")
-    return CHROME
+    """Find genuine Google Chrome without making the Mac binary a CI prerequisite."""
+    if CHROME.is_file():
+        return CHROME
+    for executable in ("google-chrome", "google-chrome-stable"):
+        found = shutil.which(executable)
+        if found and Path(found).is_file():
+            return Path(found)
+    raise FileNotFoundError("Google Chrome unavailable on this runner; no Chromium or simulated proof")
 
 
 def _chrome_version(chrome: Path) -> str:
     proc = subprocess.run([str(chrome), "--version"], check=True, capture_output=True, text=True)
-    return proc.stdout.strip()
+    version = proc.stdout.strip()
+    if not version.startswith("Google Chrome "):
+        raise RuntimeError("Google Chrome receipt refused: browser identity is not Google Chrome")
+    return version
 
 
 def _route(page: str) -> Path:
@@ -118,33 +127,83 @@ def _write_provenance(
     return out
 
 
-def screenshot_page(page: str, width: int = 1280) -> Path:
-    """Write `assets/receipts/pages/<page>/screenshot-<width>.png` via Chrome headless."""
+def _ci_focus_host(route: Path) -> str:
+    """Same-origin Chrome frame that scrolls only its content to the real CI panel.
+
+    Direct file://#fragment screenshots painted an empty viewport on Chrome 155.
+    This temporary host renders the actual page in an iframe and scrolls its
+    inner document without changing the page source or synthesizing CI data.
+    """
+    source = html.escape(route.as_uri(), quote=True)
+    return (
+        '<!doctype html><html><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        '</head><body style="margin:0;overflow:hidden;background:#0c0e18">'
+        f'<iframe id="subject" src="{source}" title="Actual CI observatory" '
+        'style="width:100vw;height:100vh;display:block;border:0"></iframe>'
+        '<script>(function(){'
+        'var frame=document.getElementById("subject");'
+        'var retries=0;'
+        'function focus(){'
+        'var doc=frame.contentDocument;'
+        'var node=doc&&doc.getElementById("ci-observatory");'
+        'if(!node){if(++retries<20)window.setTimeout(focus,100);return;}'
+        'var y=node.getBoundingClientRect().top+frame.contentWindow.scrollY;'
+        'frame.contentWindow.scrollTo(0,Math.max(0,y-16));'
+        'document.body.dataset.focusTarget="ci-observatory";'
+        '}'
+        'frame.addEventListener("load",focus);'
+        'window.setTimeout(focus,600);'
+        '}());</script></body></html>'
+    )
+
+
+def screenshot_page(page: str, width: int = 1280, *, target: str | None = None) -> Path:
+    """Capture genuine Google Chrome; optional CI-region focus is separately identified.
+
+    Only one exact, registered dashboard anchor is available. Do not generalize
+    browser navigation to arbitrary client strings or substitute a fixture.
+    """
     chrome = _chrome()
     chrome_version = _chrome_version(chrome)
     route = _route(page)
     _receipt_dir(page, create=True)
-    artifact = screenshot_artifact(page, width)
+    if target not in (None, "ci-observatory") or (target is not None and page != "index"):
+        raise ValueError("unsupported screenshot target; only index#ci-observatory is registered")
+    artifact = (screenshot_artifact(page, width) if target is None else
+                _receipt_dir(page) / f"ci-observatory-{width}.png")
     height = max(900, round(width * 1.2))
     # NO --user-data-dir: a custom fresh profile dir makes --headless=new hang after writing the
     # artifact (observed); the ephemeral auto-profile exits cleanly (the session-proven invocation).
-    command = [
-        str(chrome),
-        "--headless=new",
-        "--no-first-run",
-        "--no-default-browser-check",
-        "--hide-scrollbars",
-        f"--window-size={width},{height}",
-        # The index fetches its same-directory canonical snapshot from file://
-        # during headless screenshot capture. The Chrome file access flag is
-        # necessary to photograph hydrated evidence, not a loading placeholder.
-        *(["--allow-file-access-from-files"] if page == "index" else []),
-        f"--screenshot={artifact}",
-        route.as_uri(),
-    ]
-    _run(command)
+    # A fixed local host avoids Chrome's observed blank file://#fragment
+    # capture; it scrolls the REAL page's own frame to the source-owned panel.
+    with tempfile.TemporaryDirectory(prefix="ci-focus-") as scratch:
+        focus_url = route.as_uri()
+        if target:
+            host = Path(scratch) / "focus.html"
+            host.write_text(_ci_focus_host(route), encoding="utf-8")
+            focus_url = host.as_uri()
+        command = [
+            str(chrome),
+            "--headless=new",
+            "--no-first-run",
+            "--no-default-browser-check",
+            "--hide-scrollbars",
+            f"--window-size={width},{height}",
+            # Both the real index snapshot and the same-origin focused iframe
+            # are file:// reads of the original generated page.
+            *(["--allow-file-access-from-files"] if page == "index" else []),
+            *(["--virtual-time-budget=3500"] if target else []),
+            f"--screenshot={artifact}",
+            focus_url,
+        ]
+        _run(command)
     if not artifact.is_file() or artifact.stat().st_size <= 0:
         raise RuntimeError(f"{artifact}: Chrome did not produce a nonempty screenshot")
+    if target:
+        from scripts.quality.visual_receipts import png_summary
+        if not png_summary(artifact)["nonblank"]:
+            raise RuntimeError("CI-focused Chrome screenshot is blank; refusing provenance")
     _write_provenance(
         page=page,
         artifact=artifact,
@@ -189,6 +248,15 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
     var scrollWidth = Math.max(root.scrollWidth || 0, bodyScrollWidth);
     var offenders = [];
     Array.prototype.forEach.call(doc.querySelectorAll("*"), function (el) {{
+      // CSS may still return geometries for descendants of closed <details>,
+      // despite them not being displayed. Never count those invisible
+      // descendants as viewport overflow. The visible summary and anything in
+      // an OPEN disclosure remain measurable and cannot bypass this gate.
+      var closed = el.closest ? el.closest("details:not([open])") : null;
+      if (closed) {{
+        var summary = closed.querySelector(":scope > summary");
+        if (!summary || (el !== summary && !summary.contains(el))) return;
+      }}
       var style = frame.contentWindow.getComputedStyle(el);
       if (style.display === "none" || style.visibility === "hidden") return;
       var rect = el.getBoundingClientRect();
@@ -196,14 +264,16 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       var overLeft = Math.max(0, -rect.left);
       var overRight = Math.max(0, rect.right - clientWidth);
       if (overLeft > 1 || overRight > 1) {{
-        var scroller = el.closest ? el.closest(".table-scroll, .cal-wrap") : null;
+        var scroller = el.closest ? el.closest(".table-scroll, .cal-wrap, .ci-plot-scroll") : null;
         var scrollInfo = null;
         var contained = false;
         if (scroller && scroller !== el) {{
           var scrollStyle = frame.contentWindow.getComputedStyle(scroller);
           var scrollRect = scroller.getBoundingClientRect();
           var inViewport = scrollRect.left >= -1 && scrollRect.right <= clientWidth + 1;
+          var ciScoped = scroller.matches(".ci-observatory .ci-plot-scroll");
           scrollInfo = {{
+            "observatory_parent": ciScoped,
             "tag": scroller.tagName.toLowerCase(),
             "id": scroller.id || "",
             "class": cls(scroller),
@@ -215,7 +285,8 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
           }};
           var declaredClasses = cls(scroller).split(" ");
           contained = (declaredClasses.indexOf("table-scroll") !== -1 ||
-                       declaredClasses.indexOf("cal-wrap") !== -1)
+                       declaredClasses.indexOf("cal-wrap") !== -1 ||
+                       ciScoped)
             && scrollStyle.overflowX === "auto"
             && inViewport
             && scrollRect.width > 1;
@@ -230,12 +301,13 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
           "overflow_px": Math.round(Math.max(overLeft, overRight) * 100) / 100,
           "contained_by_table_scroll": contained && cls(scroller).split(" ").indexOf("table-scroll") !== -1,
           "contained_by_calendar_scroll": contained && cls(scroller).split(" ").indexOf("cal-wrap") !== -1,
+          "contained_by_ci_plot_scroll": contained && scrollInfo && scrollInfo.observatory_parent,
           "scroll_container": scrollInfo
         }});
       }}
     }});
     var overflowPx = Math.max(0, scrollWidth - clientWidth);
-    var uncontained = offenders.filter(function (o) {{ return o.contained_by_table_scroll !== true && o.contained_by_calendar_scroll !== true; }});
+    var uncontained = offenders.filter(function (o) {{ return o.contained_by_table_scroll !== true && o.contained_by_calendar_scroll !== true && o.contained_by_ci_plot_scroll !== true; }});
     var result = {{
       "contract_id": "PageHeadlessDomProbe",
       "page": "{page}",
@@ -249,7 +321,7 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       "overflow_px": overflowPx,
       "offender_count": offenders.length,
       "uncontained_offender_count": uncontained.length,
-      "offenders": offenders.slice(0, 20),
+      "offenders": uncontained.concat(offenders.filter(function (o) {{ return o.contained_by_table_scroll === true || o.contained_by_calendar_scroll === true || o.contained_by_ci_plot_scroll === true; }})).slice(0, 20),
       "authority_status": "candidate_only",
       "cannot_mark_done": true
     }};
