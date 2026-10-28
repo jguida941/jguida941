@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-27T23:15:40.586120Z",
+  "generated_at": "2026-10-28T00:01:23.889686Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,7 +18,7 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 12628,
+    "last_year_contributions": 12629,
     "public_scope_commits": 7956,
     "total_repos": 56,
     "public_forks": 1,
@@ -35,8 +35,8 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 12628,
-      "display_value": "12,628"
+      "value": 12629,
+      "display_value": "12,629"
     },
     {
       "key": "public_scope_commits",
@@ -113,8 +113,8 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 12628,
-      "display_value": "12,628"
+      "value": 12629,
+      "display_value": "12,629"
     },
     {
       "key": "public_scope_commits",
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-27T23:14:36Z",
+        "observed_at": "2026-10-28T00:00:29Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -228,8 +228,8 @@
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-10-28T04:00:00Z",
-        "window_end": "2026-10-27T23:14:43Z",
-        "observed_at": "2026-10-27T23:14:44Z",
+        "window_end": "2026-10-28T00:00:34Z",
+        "observed_at": "2026-10-28T00:00:35Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -243,8 +243,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-09-28T04:00:00Z",
-        "window_end": "2026-10-27T23:14:40Z",
-        "observed_at": "2026-10-27T23:14:42Z",
+        "window_end": "2026-10-28T00:00:32Z",
+        "observed_at": "2026-10-28T00:00:34Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -258,8 +258,8 @@
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-10-28T04:00:00Z",
-        "window_end": "2026-10-27T23:14:42Z",
-        "observed_at": "2026-10-27T23:14:43Z",
+        "window_end": "2026-10-28T00:00:34Z",
+        "observed_at": "2026-10-28T00:00:34Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-10-27T23:14:35Z",
+        "observed_at": "2026-10-28T00:00:28Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -289,7 +289,7 @@
     "avg_release_gap_days": 0.0,
     "stars_per_public_repo": 1.0535714285714286,
     "ci_coverage_pct": 20.866141732283463,
-    "last_year_contributions": 12628,
+    "last_year_contributions": 12629,
     "active_days_last_year": 330,
     "automation_workflows": 165,
     "primary_lang_share_pct": 66.4,
@@ -301,8 +301,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 12628,
-      "display_value": "12,628",
+      "value": 12629,
+      "display_value": "12,629",
       "accent": "#7dcfff"
     },
     {
@@ -1134,7 +1134,7 @@
       311,
       438,
       215,
-      55
+      56
     ],
     "contribution_trend": {
       "status": "available",
@@ -1144,7 +1144,7 @@
       "timezone": "UTC",
       "completeness": "known",
       "window_start": "2026-08-10",
-      "window_end": "2026-10-27",
+      "window_end": "2026-10-28",
       "points": [
         {
           "week_start": "2026-08-10",
@@ -1249,9 +1249,9 @@
           "week_start": "2026-10-26",
           "week_end": "2026-11-01",
           "observed_start": "2026-10-26",
-          "observed_end": "2026-10-27",
-          "days_observed": 2,
-          "contributions": 55,
+          "observed_end": "2026-10-28",
+          "days_observed": 3,
+          "contributions": 56,
           "partial": true
         }
       ],
@@ -1345,16 +1345,32 @@
   "ci_execution": {
     "schema": "profile-ci-execution/v1",
     "repository": "jguida941/jguida941",
-    "observed_at": "2026-10-27T23:15:39Z",
+    "observed_at": "2026-10-28T00:01:23Z",
     "sample_limit": 12,
     "scope": "Latest observed GitHub Actions runs in the public profile repository, across branches; not account-wide.",
     "status": "available",
     "observed_runs": 12,
     "runs": [
       {
-        "run_id": 40600712378,
+        "run_id": 40605882294,
         "workflow": "Generate Metrics",
         "outcome": "in_progress",
+        "created_at": "2026-10-28T00:00:07Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 40600937109,
+        "workflow": "Deploy Profile Site",
+        "outcome": "success",
+        "created_at": "2026-10-27T23:16:04Z",
+        "event": "workflow_run",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 40600712378,
+        "workflow": "Generate Metrics",
+        "outcome": "success",
         "created_at": "2026-10-27T23:14:13Z",
         "event": "schedule",
         "head_branch": "main"
@@ -1430,27 +1446,11 @@
         "created_at": "2026-10-27T19:04:13Z",
         "event": "workflow_run",
         "head_branch": "main"
-      },
-      {
-        "run_id": 40565410882,
-        "workflow": "Deploy Profile Site",
-        "outcome": "success",
-        "created_at": "2026-10-27T19:02:03Z",
-        "event": "workflow_run",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 40565104907,
-        "workflow": "Generate Metrics",
-        "outcome": "failure",
-        "created_at": "2026-10-27T19:00:04Z",
-        "event": "workflow_dispatch",
-        "head_branch": "main"
       }
     ]
   },
   "contribution_calendar": {
-    "total": 12628,
+    "total": 12629,
     "weeks": [
       [
         {
@@ -3015,7 +3015,11 @@
         },
         {
           "date": "2026-10-27",
-          "count": 28
+          "count": 29
+        },
+        {
+          "date": "2026-10-28",
+          "count": 0
         }
       ]
     ]
@@ -3028,9 +3032,9 @@
     "timezone": "UTC",
     "completeness": "known",
     "window_start": "2025-10-28",
-    "window_end": "2026-10-27",
-    "days_observed": 365,
-    "total": 12628,
+    "window_end": "2026-10-28",
+    "days_observed": 366,
+    "total": 12629,
     "weekdays": [
       {
         "weekday": "Mon",
@@ -3039,13 +3043,13 @@
       },
       {
         "weekday": "Tue",
-        "contributions": 1640,
+        "contributions": 1641,
         "days_observed": 53
       },
       {
         "weekday": "Wed",
         "contributions": 1745,
-        "days_observed": 52
+        "days_observed": 53
       },
       {
         "weekday": "Thu",
@@ -3077,8 +3081,8 @@
     "subtitle": "Contributions by weekday",
     "scope": "Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred.",
     "explanation": "These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.",
-    "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 53; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 52.",
-    "caption": "2025-10-28 \u2013 2026-10-27 \u00b7 UTC calendar dates",
+    "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 53; Wed: 53; Thu: 52; Fri: 52; Sat: 52; Sun: 52.",
+    "caption": "2025-10-28 \u2013 2026-10-28 \u00b7 UTC calendar dates",
     "qualification": "Last date may be in progress",
     "message": "",
     "rows": [
@@ -3090,14 +3094,14 @@
       },
       {
         "weekday": "Tue",
-        "contributions": 1640,
+        "contributions": 1641,
         "days_observed": 53,
-        "count_text": "1,640"
+        "count_text": "1,641"
       },
       {
         "weekday": "Wed",
         "contributions": 1745,
-        "days_observed": 52,
+        "days_observed": 53,
         "count_text": "1,745"
       },
       {
@@ -3128,15 +3132,15 @@
   },
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
-    "window_start": "2026-09-28T00:00:00Z",
-    "window_end": "2026-10-27T23:15:03.111734Z",
+    "window_start": "2026-09-29T00:00:00Z",
+    "window_end": "2026-10-28T00:00:52.420103Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 255,
-      "eligible": 8,
-      "selected": 8,
-      "queried": 8,
-      "complete": 4,
+      "eligible": 7,
+      "selected": 7,
+      "queried": 7,
+      "complete": 3,
       "partial": 4,
       "unavailable": 0,
       "inventory_complete": true,
@@ -3144,7 +3148,7 @@
         "identity": 0,
         "fork": 0,
         "profile": 1,
-        "outside_window": 246,
+        "outside_window": 247,
         "invalid_hint": 0,
         "selection_limit": 0
       },
@@ -3175,12 +3179,6 @@
       "stats_observed": 295,
       "excluded_merges": 2,
       "daily": [
-        {
-          "date": "2026-09-28",
-          "additions": null,
-          "deletions": null,
-          "complete": false
-        },
         {
           "date": "2026-09-29",
           "additions": null,
@@ -3354,6 +3352,12 @@
           "additions": null,
           "deletions": null,
           "complete": false
+        },
+        {
+          "date": "2026-10-28",
+          "additions": null,
+          "deletions": null,
+          "complete": false
         }
       ],
       "meaning": "Summed non-merge commit line changes reachable from the selected head; not net tree size or all branches"
@@ -3417,9 +3421,9 @@
       "schema": "profile-project-activity/v1",
       "status": "partial",
       "complete": false,
-      "window_start": "2026-09-28T00:00:00Z",
-      "window_end": "2026-10-27T23:15:03.111734Z",
-      "observed_at": "2026-10-27T23:15:03.111734Z",
+      "window_start": "2026-09-29T00:00:00Z",
+      "window_end": "2026-10-28T00:00:52.420103Z",
+      "observed_at": "2026-10-28T00:00:52.420103Z",
       "timezone": "UTC",
       "current_day_partial": true,
       "default_days": 14,
@@ -3430,7 +3434,6 @@
       "default_repositories": 8,
       "meaning": "Observed branch pushes \u00b7 UTC. Repository activity from all actors represented in the received branch feed; owned public and private nonfork repositories, profile excluded. Counts are unique observed push events, not commits, contributions, or line changes.",
       "dates": [
-        "2026-09-28",
         "2026-09-29",
         "2026-09-30",
         "2026-10-01",
@@ -3459,7 +3462,8 @@
         "2026-10-24",
         "2026-10-25",
         "2026-10-26",
-        "2026-10-27"
+        "2026-10-27",
+        "2026-10-28"
       ],
       "rows": [
         {
@@ -3473,12 +3477,6 @@
           "latest_push": "2026-10-26T04:09:23Z",
           "observed_pushes": 97,
           "daily": [
-            {
-              "date": "2026-09-28",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
             {
               "date": "2026-09-29",
               "count": null,
@@ -3652,15 +3650,15 @@
               "count": null,
               "complete": false,
               "level": null
-            }
-          ],
-          "branch_empty_daily": [
+            },
             {
-              "date": "2026-09-28",
+              "date": "2026-10-28",
               "count": null,
               "complete": false,
               "level": null
-            },
+            }
+          ],
+          "branch_empty_daily": [
             {
               "date": "2026-09-29",
               "count": null,
@@ -3834,6 +3832,12 @@
               "count": null,
               "complete": false,
               "level": null
+            },
+            {
+              "date": "2026-10-28",
+              "count": null,
+              "complete": false,
+              "level": null
             }
           ],
           "branches": [
@@ -3928,12 +3932,6 @@
           "latest_push": "2026-10-24T22:18:39Z",
           "observed_pushes": 98,
           "daily": [
-            {
-              "date": "2026-09-28",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
             {
               "date": "2026-09-29",
               "count": null,
@@ -4088,7 +4086,7 @@
               "date": "2026-10-24",
               "count": 3,
               "complete": false,
-              "level": 1
+              "level": 2
             },
             {
               "date": "2026-10-25",
@@ -4107,15 +4105,15 @@
               "count": null,
               "complete": false,
               "level": null
-            }
-          ],
-          "branch_empty_daily": [
+            },
             {
-              "date": "2026-09-28",
+              "date": "2026-10-28",
               "count": null,
               "complete": false,
               "level": null
-            },
+            }
+          ],
+          "branch_empty_daily": [
             {
               "date": "2026-09-29",
               "count": null,
@@ -4289,6 +4287,12 @@
               "count": null,
               "complete": false,
               "level": null
+            },
+            {
+              "date": "2026-10-28",
+              "count": null,
+              "complete": false,
+              "level": null
             }
           ],
           "branches": [
@@ -4323,7 +4327,7 @@
                   "date": "2026-10-24",
                   "count": 3,
                   "complete": false,
-                  "level": 1
+                  "level": 2
                 }
               ],
               "observed_pushes": 28
@@ -4369,12 +4373,6 @@
           "latest_push": "2026-10-18T18:13:07Z",
           "observed_pushes": 1,
           "daily": [
-            {
-              "date": "2026-09-28",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
             {
               "date": "2026-09-29",
               "count": 0,
@@ -4545,18 +4543,18 @@
             },
             {
               "date": "2026-10-27",
+              "count": 0,
+              "complete": true,
+              "level": 0
+            },
+            {
+              "date": "2026-10-28",
               "count": null,
               "complete": false,
               "level": null
             }
           ],
           "branch_empty_daily": [
-            {
-              "date": "2026-09-28",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
             {
               "date": "2026-09-29",
               "count": 0,
@@ -4727,6 +4725,12 @@
             },
             {
               "date": "2026-10-27",
+              "count": 0,
+              "complete": true,
+              "level": 0
+            },
+            {
+              "date": "2026-10-28",
               "count": null,
               "complete": false,
               "level": null
@@ -4756,12 +4760,6 @@
           "latest_push": "2026-10-18T17:33:41Z",
           "observed_pushes": 29,
           "daily": [
-            {
-              "date": "2026-09-28",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
             {
               "date": "2026-09-29",
               "count": 0,
@@ -4932,18 +4930,18 @@
             },
             {
               "date": "2026-10-27",
+              "count": 0,
+              "complete": true,
+              "level": 0
+            },
+            {
+              "date": "2026-10-28",
               "count": null,
               "complete": false,
               "level": null
             }
           ],
           "branch_empty_daily": [
-            {
-              "date": "2026-09-28",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
             {
               "date": "2026-09-29",
               "count": 0,
@@ -5114,6 +5112,12 @@
             },
             {
               "date": "2026-10-27",
+              "count": 0,
+              "complete": true,
+              "level": 0
+            },
+            {
+              "date": "2026-10-28",
               "count": null,
               "complete": false,
               "level": null
@@ -5193,12 +5197,6 @@
           "latest_push": "2026-10-15T22:41:32Z",
           "observed_pushes": 10,
           "daily": [
-            {
-              "date": "2026-09-28",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
             {
               "date": "2026-09-29",
               "count": null,
@@ -5372,15 +5370,15 @@
               "count": null,
               "complete": false,
               "level": null
-            }
-          ],
-          "branch_empty_daily": [
+            },
             {
-              "date": "2026-09-28",
+              "date": "2026-10-28",
               "count": null,
               "complete": false,
               "level": null
-            },
+            }
+          ],
+          "branch_empty_daily": [
             {
               "date": "2026-09-29",
               "count": null,
@@ -5554,6 +5552,12 @@
               "count": null,
               "complete": false,
               "level": null
+            },
+            {
+              "date": "2026-10-28",
+              "count": null,
+              "complete": false,
+              "level": null
             }
           ],
           "branches": [
@@ -5606,12 +5610,6 @@
           "latest_push": "2026-10-13T14:10:29Z",
           "observed_pushes": 65,
           "daily": [
-            {
-              "date": "2026-09-28",
-              "count": null,
-              "complete": false,
-              "level": null
-            },
             {
               "date": "2026-09-29",
               "count": null,
@@ -5785,15 +5783,15 @@
               "count": null,
               "complete": false,
               "level": null
-            }
-          ],
-          "branch_empty_daily": [
+            },
             {
-              "date": "2026-09-28",
+              "date": "2026-10-28",
               "count": null,
               "complete": false,
               "level": null
-            },
+            }
+          ],
+          "branch_empty_daily": [
             {
               "date": "2026-09-29",
               "count": null,
@@ -5967,6 +5965,12 @@
               "count": null,
               "complete": false,
               "level": null
+            },
+            {
+              "date": "2026-10-28",
+              "count": null,
+              "complete": false,
+              "level": null
             }
           ],
           "branches": [
@@ -6037,7 +6041,7 @@
                   "date": "2026-10-07",
                   "count": 3,
                   "complete": false,
-                  "level": 1
+                  "level": 2
                 }
               ],
               "observed_pushes": 3
@@ -6125,12 +6129,6 @@
           "latest_push": "2026-10-08T07:00:41Z",
           "observed_pushes": 4,
           "daily": [
-            {
-              "date": "2026-09-28",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
             {
               "date": "2026-09-29",
               "count": 0,
@@ -6301,18 +6299,18 @@
             },
             {
               "date": "2026-10-27",
+              "count": 0,
+              "complete": true,
+              "level": 0
+            },
+            {
+              "date": "2026-10-28",
               "count": null,
               "complete": false,
               "level": null
             }
           ],
           "branch_empty_daily": [
-            {
-              "date": "2026-09-28",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
             {
               "date": "2026-09-29",
               "count": 0,
@@ -6483,6 +6481,12 @@
             },
             {
               "date": "2026-10-27",
+              "count": 0,
+              "complete": true,
+              "level": 0
+            },
+            {
+              "date": "2026-10-28",
               "count": null,
               "complete": false,
               "level": null
@@ -6502,418 +6506,19 @@
               "observed_pushes": 4
             }
           ]
-        },
-        {
-          "repository": "jguida941/geometry-dash-mods",
-          "is_private": true,
-          "status": "ok",
-          "complete": true,
-          "reasons": [],
-          "latest_push": "2026-09-28T23:15:16Z",
-          "observed_pushes": 12,
-          "daily": [
-            {
-              "date": "2026-09-28",
-              "count": 12,
-              "complete": true,
-              "level": 3
-            },
-            {
-              "date": "2026-09-29",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-09-30",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-01",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-02",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-03",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-04",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-05",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-06",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-07",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-08",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-09",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-10",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-11",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-12",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-13",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-14",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-15",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-16",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-17",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-18",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-19",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-20",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-21",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-22",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-23",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-24",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-25",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-26",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-27",
-              "count": null,
-              "complete": false,
-              "level": null
-            }
-          ],
-          "branch_empty_daily": [
-            {
-              "date": "2026-09-28",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-09-29",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-09-30",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-01",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-02",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-03",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-04",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-05",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-06",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-07",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-08",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-09",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-10",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-11",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-12",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-13",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-14",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-15",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-16",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-17",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-18",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-19",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-20",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-21",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-22",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-23",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-24",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-25",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-26",
-              "count": 0,
-              "complete": true,
-              "level": 0
-            },
-            {
-              "date": "2026-10-27",
-              "count": null,
-              "complete": false,
-              "level": null
-            }
-          ],
-          "branches": [
-            {
-              "ref": "refs/heads/feature/live-control-deck-001",
-              "daily": [
-                {
-                  "date": "2026-09-28",
-                  "count": 2,
-                  "complete": true,
-                  "level": 1
-                }
-              ],
-              "observed_pushes": 2
-            },
-            {
-              "ref": "refs/heads/feature/windows-first-runtime-canary",
-              "daily": [
-                {
-                  "date": "2026-09-28",
-                  "count": 10,
-                  "complete": true,
-                  "level": 3
-                }
-              ],
-              "observed_pushes": 10
-            }
-          ]
         }
       ],
       "scale": {
         "status": "partial",
-        "sample_size": 29,
+        "sample_size": 28,
         "bands": [
           {
             "lower": 1,
-            "upper": 3,
+            "upper": 2,
             "level": 1
           },
           {
-            "lower": 4,
+            "lower": 3,
             "upper": 8,
             "level": 2
           },
@@ -6933,34 +6538,34 @@
         "qualification": "Scale includes observed lower bounds"
       },
       "reason": "incomplete_received_cohort",
-      "qualification": "8 received repositories \u00b7 bounded recent-push cohort. Observation incomplete; counts are lower bounds and ranking is among received repositories.",
+      "qualification": "7 received repositories \u00b7 bounded recent-push cohort. Observation incomplete; counts are lower bounds and ranking is among received repositories.",
       "cohort": {
-        "eligible": 8,
-        "selected": 8,
-        "queried": 8,
-        "repositories_received": 8,
-        "repositories_complete": 4,
+        "eligible": 7,
+        "selected": 7,
+        "queried": 7,
+        "repositories_received": 7,
+        "repositories_complete": 3,
         "received_complete": false,
         "ranking_complete": false,
-        "default_visible": 8,
+        "default_visible": 7,
         "reasons": []
       },
-      "observed_pushes": 316
+      "observed_pushes": 304
     }
   },
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-10-27T23:15:40.586120Z",
+    "generated_at": "2026-10-28T00:01:23.889686Z",
     "facts": [
       {
         "metric_id": "calendar.total",
-        "value": 12628,
-        "display_value": "12,628",
+        "value": 12629,
+        "display_value": "12,629",
         "label": "contributions",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-10-28 \u2013 2026-10-27 \u00b7 UTC",
+        "window": "2025-10-28 \u2013 2026-10-28 \u00b7 UTC",
         "quality": {
           "status": "exact",
           "reason": "calendar_observation",
@@ -7044,7 +6649,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "owned-repositories-visible-to-primary-pr-search",
-        "window": "2025-10-28T04:00:00Z \u2013 2026-10-27T23:14:42Z",
+        "window": "2025-10-28T04:00:00Z \u2013 2026-10-28T00:00:34Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -7058,7 +6663,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-09-28T04:00:00Z \u2013 2026-10-27T23:14:40Z",
+        "window": "2026-09-28T04:00:00Z \u2013 2026-10-28T00:00:32Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -7100,7 +6705,7 @@
         "label": "active days",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-10-28 \u2013 2026-10-27 \u00b7 UTC",
+        "window": "2025-10-28 \u2013 2026-10-28 \u00b7 UTC",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
@@ -7119,7 +6724,7 @@
         "label": "current observed streak",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-10-28 \u2013 2026-10-27 \u00b7 UTC",
+        "window": "2025-10-28 \u2013 2026-10-28 \u00b7 UTC",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
@@ -7138,7 +6743,7 @@
         "label": "longest observed streak",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-10-28 \u2013 2026-10-27 \u00b7 UTC",
+        "window": "2025-10-28 \u2013 2026-10-28 \u00b7 UTC",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
@@ -7160,7 +6765,7 @@
         "timezone": "UTC",
         "completeness": "known",
         "window_start": "2026-08-10",
-        "window_end": "2026-10-27",
+        "window_end": "2026-10-28",
         "points": [
           {
             "week_start": "2026-08-10",
@@ -7265,9 +6870,9 @@
             "week_start": "2026-10-26",
             "week_end": "2026-11-01",
             "observed_start": "2026-10-26",
-            "observed_end": "2026-10-27",
-            "days_observed": 2,
-            "contributions": 55,
+            "observed_end": "2026-10-28",
+            "days_observed": 3,
+            "contributions": 56,
             "partial": true
           }
         ],
@@ -7288,12 +6893,12 @@
           311,
           438,
           215,
-          55
+          56
         ],
         "peak": "Peak 503 contributions/week",
-        "window": "Aug 10 \u2013 Oct 27, 2026 \u00b7 12 weeks",
+        "window": "Aug 10 \u2013 Oct 28, 2026 \u00b7 12 weeks",
         "qualification": "Mon\u2013Sun \u00b7 UTC \u00b7 partial weeks included",
-        "description": "UTC contribution calendar. 2026-08-10 to 2026-08-16: 503 contributions (complete); 2026-08-17 to 2026-08-23: 472 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 438 contributions (complete); 2026-10-19 to 2026-10-25: 215 contributions (complete); 2026-10-26 to 2026-10-27: 55 contributions (partial)"
+        "description": "UTC contribution calendar. 2026-08-10 to 2026-08-16: 503 contributions (complete); 2026-08-17 to 2026-08-23: 472 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 438 contributions (complete); 2026-10-19 to 2026-10-25: 215 contributions (complete); 2026-10-26 to 2026-10-28: 56 contributions (partial)"
       }
     },
     "rhythm": {
@@ -7305,9 +6910,9 @@
         "timezone": "UTC",
         "completeness": "known",
         "window_start": "2025-10-28",
-        "window_end": "2026-10-27",
-        "days_observed": 365,
-        "total": 12628,
+        "window_end": "2026-10-28",
+        "days_observed": 366,
+        "total": 12629,
         "weekdays": [
           {
             "weekday": "Mon",
@@ -7316,13 +6921,13 @@
           },
           {
             "weekday": "Tue",
-            "contributions": 1640,
+            "contributions": 1641,
             "days_observed": 53
           },
           {
             "weekday": "Wed",
             "contributions": 1745,
-            "days_observed": 52
+            "days_observed": 53
           },
           {
             "weekday": "Thu",
@@ -7353,8 +6958,8 @@
         "subtitle": "Contributions by weekday",
         "scope": "Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred.",
         "explanation": "These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.",
-        "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 53; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 52.",
-        "caption": "2025-10-28 \u2013 2026-10-27 \u00b7 UTC calendar dates",
+        "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 53; Wed: 53; Thu: 52; Fri: 52; Sat: 52; Sun: 52.",
+        "caption": "2025-10-28 \u2013 2026-10-28 \u00b7 UTC calendar dates",
         "qualification": "Last date may be in progress",
         "message": "",
         "rows": [
@@ -7366,14 +6971,14 @@
           },
           {
             "weekday": "Tue",
-            "contributions": 1640,
+            "contributions": 1641,
             "days_observed": 53,
-            "count_text": "1,640"
+            "count_text": "1,641"
           },
           {
             "weekday": "Wed",
             "contributions": 1745,
-            "days_observed": 52,
+            "days_observed": 53,
             "count_text": "1,745"
           },
           {
@@ -9198,10 +8803,14 @@
         },
         {
           "date": "2026-10-27",
-          "count": 28
+          "count": 29
+        },
+        {
+          "date": "2026-10-28",
+          "count": 0
         }
       ],
-      "window": "2025-10-28 \u2013 2026-10-27 \u00b7 UTC",
+      "window": "2025-10-28 \u2013 2026-10-28 \u00b7 UTC",
       "status": "exact"
     },
     "working": [
@@ -9345,15 +8954,15 @@
     ],
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
-      "window_start": "2026-09-28T00:00:00Z",
-      "window_end": "2026-10-27T23:15:03.111734Z",
+      "window_start": "2026-09-29T00:00:00Z",
+      "window_end": "2026-10-28T00:00:52.420103Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 255,
-        "eligible": 8,
-        "selected": 8,
-        "queried": 8,
-        "complete": 4,
+        "eligible": 7,
+        "selected": 7,
+        "queried": 7,
+        "complete": 3,
         "partial": 4,
         "unavailable": 0,
         "inventory_complete": true,
@@ -9361,7 +8970,7 @@
           "identity": 0,
           "fork": 0,
           "profile": 1,
-          "outside_window": 246,
+          "outside_window": 247,
           "invalid_hint": 0,
           "selection_limit": 0
         },
@@ -9392,12 +9001,6 @@
         "stats_observed": 295,
         "excluded_merges": 2,
         "daily": [
-          {
-            "date": "2026-09-28",
-            "additions": null,
-            "deletions": null,
-            "complete": false
-          },
           {
             "date": "2026-09-29",
             "additions": null,
@@ -9571,6 +9174,12 @@
             "additions": null,
             "deletions": null,
             "complete": false
+          },
+          {
+            "date": "2026-10-28",
+            "additions": null,
+            "deletions": null,
+            "complete": false
           }
         ],
         "meaning": "Summed non-merge commit line changes reachable from the selected head; not net tree size or all branches"
@@ -9634,9 +9243,9 @@
         "schema": "profile-project-activity/v1",
         "status": "partial",
         "complete": false,
-        "window_start": "2026-09-28T00:00:00Z",
-        "window_end": "2026-10-27T23:15:03.111734Z",
-        "observed_at": "2026-10-27T23:15:03.111734Z",
+        "window_start": "2026-09-29T00:00:00Z",
+        "window_end": "2026-10-28T00:00:52.420103Z",
+        "observed_at": "2026-10-28T00:00:52.420103Z",
         "timezone": "UTC",
         "current_day_partial": true,
         "default_days": 14,
@@ -9647,7 +9256,6 @@
         "default_repositories": 8,
         "meaning": "Observed branch pushes \u00b7 UTC. Repository activity from all actors represented in the received branch feed; owned public and private nonfork repositories, profile excluded. Counts are unique observed push events, not commits, contributions, or line changes.",
         "dates": [
-          "2026-09-28",
           "2026-09-29",
           "2026-09-30",
           "2026-10-01",
@@ -9676,7 +9284,8 @@
           "2026-10-24",
           "2026-10-25",
           "2026-10-26",
-          "2026-10-27"
+          "2026-10-27",
+          "2026-10-28"
         ],
         "rows": [
           {
@@ -9690,12 +9299,6 @@
             "latest_push": "2026-10-26T04:09:23Z",
             "observed_pushes": 97,
             "daily": [
-              {
-                "date": "2026-09-28",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
               {
                 "date": "2026-09-29",
                 "count": null,
@@ -9869,15 +9472,15 @@
                 "count": null,
                 "complete": false,
                 "level": null
-              }
-            ],
-            "branch_empty_daily": [
+              },
               {
-                "date": "2026-09-28",
+                "date": "2026-10-28",
                 "count": null,
                 "complete": false,
                 "level": null
-              },
+              }
+            ],
+            "branch_empty_daily": [
               {
                 "date": "2026-09-29",
                 "count": null,
@@ -10051,6 +9654,12 @@
                 "count": null,
                 "complete": false,
                 "level": null
+              },
+              {
+                "date": "2026-10-28",
+                "count": null,
+                "complete": false,
+                "level": null
               }
             ],
             "branches": [
@@ -10145,12 +9754,6 @@
             "latest_push": "2026-10-24T22:18:39Z",
             "observed_pushes": 98,
             "daily": [
-              {
-                "date": "2026-09-28",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
               {
                 "date": "2026-09-29",
                 "count": null,
@@ -10305,7 +9908,7 @@
                 "date": "2026-10-24",
                 "count": 3,
                 "complete": false,
-                "level": 1
+                "level": 2
               },
               {
                 "date": "2026-10-25",
@@ -10324,15 +9927,15 @@
                 "count": null,
                 "complete": false,
                 "level": null
-              }
-            ],
-            "branch_empty_daily": [
+              },
               {
-                "date": "2026-09-28",
+                "date": "2026-10-28",
                 "count": null,
                 "complete": false,
                 "level": null
-              },
+              }
+            ],
+            "branch_empty_daily": [
               {
                 "date": "2026-09-29",
                 "count": null,
@@ -10506,6 +10109,12 @@
                 "count": null,
                 "complete": false,
                 "level": null
+              },
+              {
+                "date": "2026-10-28",
+                "count": null,
+                "complete": false,
+                "level": null
               }
             ],
             "branches": [
@@ -10540,7 +10149,7 @@
                     "date": "2026-10-24",
                     "count": 3,
                     "complete": false,
-                    "level": 1
+                    "level": 2
                   }
                 ],
                 "observed_pushes": 28
@@ -10586,12 +10195,6 @@
             "latest_push": "2026-10-18T18:13:07Z",
             "observed_pushes": 1,
             "daily": [
-              {
-                "date": "2026-09-28",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
               {
                 "date": "2026-09-29",
                 "count": 0,
@@ -10762,18 +10365,18 @@
               },
               {
                 "date": "2026-10-27",
+                "count": 0,
+                "complete": true,
+                "level": 0
+              },
+              {
+                "date": "2026-10-28",
                 "count": null,
                 "complete": false,
                 "level": null
               }
             ],
             "branch_empty_daily": [
-              {
-                "date": "2026-09-28",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
               {
                 "date": "2026-09-29",
                 "count": 0,
@@ -10944,6 +10547,12 @@
               },
               {
                 "date": "2026-10-27",
+                "count": 0,
+                "complete": true,
+                "level": 0
+              },
+              {
+                "date": "2026-10-28",
                 "count": null,
                 "complete": false,
                 "level": null
@@ -10973,12 +10582,6 @@
             "latest_push": "2026-10-18T17:33:41Z",
             "observed_pushes": 29,
             "daily": [
-              {
-                "date": "2026-09-28",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
               {
                 "date": "2026-09-29",
                 "count": 0,
@@ -11149,18 +10752,18 @@
               },
               {
                 "date": "2026-10-27",
+                "count": 0,
+                "complete": true,
+                "level": 0
+              },
+              {
+                "date": "2026-10-28",
                 "count": null,
                 "complete": false,
                 "level": null
               }
             ],
             "branch_empty_daily": [
-              {
-                "date": "2026-09-28",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
               {
                 "date": "2026-09-29",
                 "count": 0,
@@ -11331,6 +10934,12 @@
               },
               {
                 "date": "2026-10-27",
+                "count": 0,
+                "complete": true,
+                "level": 0
+              },
+              {
+                "date": "2026-10-28",
                 "count": null,
                 "complete": false,
                 "level": null
@@ -11410,12 +11019,6 @@
             "latest_push": "2026-10-15T22:41:32Z",
             "observed_pushes": 10,
             "daily": [
-              {
-                "date": "2026-09-28",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
               {
                 "date": "2026-09-29",
                 "count": null,
@@ -11589,15 +11192,15 @@
                 "count": null,
                 "complete": false,
                 "level": null
-              }
-            ],
-            "branch_empty_daily": [
+              },
               {
-                "date": "2026-09-28",
+                "date": "2026-10-28",
                 "count": null,
                 "complete": false,
                 "level": null
-              },
+              }
+            ],
+            "branch_empty_daily": [
               {
                 "date": "2026-09-29",
                 "count": null,
@@ -11771,6 +11374,12 @@
                 "count": null,
                 "complete": false,
                 "level": null
+              },
+              {
+                "date": "2026-10-28",
+                "count": null,
+                "complete": false,
+                "level": null
               }
             ],
             "branches": [
@@ -11823,12 +11432,6 @@
             "latest_push": "2026-10-13T14:10:29Z",
             "observed_pushes": 65,
             "daily": [
-              {
-                "date": "2026-09-28",
-                "count": null,
-                "complete": false,
-                "level": null
-              },
               {
                 "date": "2026-09-29",
                 "count": null,
@@ -12002,15 +11605,15 @@
                 "count": null,
                 "complete": false,
                 "level": null
-              }
-            ],
-            "branch_empty_daily": [
+              },
               {
-                "date": "2026-09-28",
+                "date": "2026-10-28",
                 "count": null,
                 "complete": false,
                 "level": null
-              },
+              }
+            ],
+            "branch_empty_daily": [
               {
                 "date": "2026-09-29",
                 "count": null,
@@ -12184,6 +11787,12 @@
                 "count": null,
                 "complete": false,
                 "level": null
+              },
+              {
+                "date": "2026-10-28",
+                "count": null,
+                "complete": false,
+                "level": null
               }
             ],
             "branches": [
@@ -12254,7 +11863,7 @@
                     "date": "2026-10-07",
                     "count": 3,
                     "complete": false,
-                    "level": 1
+                    "level": 2
                   }
                 ],
                 "observed_pushes": 3
@@ -12342,12 +11951,6 @@
             "latest_push": "2026-10-08T07:00:41Z",
             "observed_pushes": 4,
             "daily": [
-              {
-                "date": "2026-09-28",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
               {
                 "date": "2026-09-29",
                 "count": 0,
@@ -12518,18 +12121,18 @@
               },
               {
                 "date": "2026-10-27",
+                "count": 0,
+                "complete": true,
+                "level": 0
+              },
+              {
+                "date": "2026-10-28",
                 "count": null,
                 "complete": false,
                 "level": null
               }
             ],
             "branch_empty_daily": [
-              {
-                "date": "2026-09-28",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
               {
                 "date": "2026-09-29",
                 "count": 0,
@@ -12700,6 +12303,12 @@
               },
               {
                 "date": "2026-10-27",
+                "count": 0,
+                "complete": true,
+                "level": 0
+              },
+              {
+                "date": "2026-10-28",
                 "count": null,
                 "complete": false,
                 "level": null
@@ -12719,418 +12328,19 @@
                 "observed_pushes": 4
               }
             ]
-          },
-          {
-            "repository": "jguida941/geometry-dash-mods",
-            "is_private": true,
-            "status": "ok",
-            "complete": true,
-            "reasons": [],
-            "latest_push": "2026-09-28T23:15:16Z",
-            "observed_pushes": 12,
-            "daily": [
-              {
-                "date": "2026-09-28",
-                "count": 12,
-                "complete": true,
-                "level": 3
-              },
-              {
-                "date": "2026-09-29",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-09-30",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-01",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-02",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-03",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-04",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-05",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-06",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-07",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-08",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-09",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-10",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-11",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-12",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-13",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-14",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-15",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-16",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-17",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-18",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-19",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-20",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-21",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-22",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-23",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-24",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-25",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-26",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-27",
-                "count": null,
-                "complete": false,
-                "level": null
-              }
-            ],
-            "branch_empty_daily": [
-              {
-                "date": "2026-09-28",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-09-29",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-09-30",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-01",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-02",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-03",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-04",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-05",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-06",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-07",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-08",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-09",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-10",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-11",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-12",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-13",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-14",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-15",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-16",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-17",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-18",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-19",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-20",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-21",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-22",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-23",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-24",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-25",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-26",
-                "count": 0,
-                "complete": true,
-                "level": 0
-              },
-              {
-                "date": "2026-10-27",
-                "count": null,
-                "complete": false,
-                "level": null
-              }
-            ],
-            "branches": [
-              {
-                "ref": "refs/heads/feature/live-control-deck-001",
-                "daily": [
-                  {
-                    "date": "2026-09-28",
-                    "count": 2,
-                    "complete": true,
-                    "level": 1
-                  }
-                ],
-                "observed_pushes": 2
-              },
-              {
-                "ref": "refs/heads/feature/windows-first-runtime-canary",
-                "daily": [
-                  {
-                    "date": "2026-09-28",
-                    "count": 10,
-                    "complete": true,
-                    "level": 3
-                  }
-                ],
-                "observed_pushes": 10
-              }
-            ]
           }
         ],
         "scale": {
           "status": "partial",
-          "sample_size": 29,
+          "sample_size": 28,
           "bands": [
             {
               "lower": 1,
-              "upper": 3,
+              "upper": 2,
               "level": 1
             },
             {
-              "lower": 4,
+              "lower": 3,
               "upper": 8,
               "level": 2
             },
@@ -13150,29 +12360,29 @@
           "qualification": "Scale includes observed lower bounds"
         },
         "reason": "incomplete_received_cohort",
-        "qualification": "8 received repositories \u00b7 bounded recent-push cohort. Observation incomplete; counts are lower bounds and ranking is among received repositories.",
+        "qualification": "7 received repositories \u00b7 bounded recent-push cohort. Observation incomplete; counts are lower bounds and ranking is among received repositories.",
         "cohort": {
-          "eligible": 8,
-          "selected": 8,
-          "queried": 8,
-          "repositories_received": 8,
-          "repositories_complete": 4,
+          "eligible": 7,
+          "selected": 7,
+          "queried": 7,
+          "repositories_received": 7,
+          "repositories_complete": 3,
           "received_complete": false,
           "ranking_complete": false,
-          "default_visible": 8,
+          "default_visible": 7,
           "reasons": []
         },
-        "observed_pushes": 316
+        "observed_pushes": 304
       }
     }
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-10-27T23:15:40.586120Z",
-    "generator_revision": "11d69a975ceb554123e012fcdf288684fa91a943",
+    "generated_at": "2026-10-28T00:01:23.889686Z",
+    "generator_revision": "76aefe783ab9184ba541cbe7e987c99c97571c8f",
     "generator_source_digest": "fbf4d8a730c83b0093b747bab69d4dd91bfea231a90f83e5c98e6060c4d1d51e",
-    "claim_input_digest": "9f3846bc83b06ae4881f113d732da2c41b1dc1a95aecb8bb366df3d893b7e814",
-    "render_key": "32a99b9f19f39e3481d243504187e9978b9461286815c780a1e62ac7dc275702",
+    "claim_input_digest": "2cd0ca9fca817b7493bc222799c9e2a0eab0ff791f17b36f58d9ff3b109c71b5",
+    "render_key": "c6604ba1b841511401e40ffab46678dbf21520f9458831163cae1b49e08fabd2",
     "schema": "profile-artifact-generation/v1"
   }
 }
