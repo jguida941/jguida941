@@ -81,6 +81,16 @@ jobs:
           token: ${{ github.token }}
           enablement: false
 
+      # GitHub Pages publishes byte-identical canonical profile card SVGs,
+      # never a second web-only implementation of the overview.
+      - name: Mirror canonical profile cards into Pages
+        run: |
+          mkdir -p site/assets
+          cp assets/dashboard_summary.svg site/assets/dashboard_summary.svg
+          cp assets/dashboard_summary_mobile.svg site/assets/dashboard_summary_mobile.svg
+          cmp assets/dashboard_summary.svg site/assets/dashboard_summary.svg
+          cmp assets/dashboard_summary_mobile.svg site/assets/dashboard_summary_mobile.svg
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
