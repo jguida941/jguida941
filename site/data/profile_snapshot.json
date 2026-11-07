@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-07T04:01:43.023289Z",
+  "generated_at": "2026-11-07T05:01:45.341260Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 13089,
-    "public_scope_commits": 8247,
+    "last_year_contributions": 13090,
+    "public_scope_commits": 8248,
     "total_repos": 56,
     "public_forks": 1,
     "private_owned_repos": 199,
@@ -28,22 +28,22 @@
     "prs_merged": 68,
     "releases": 3,
     "ci_repos": 53,
-    "streak_days": 36
+    "streak_days": 37
   },
   "snapshot_rows": [
     {
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 13089,
-      "display_value": "13,089"
+      "value": 13090,
+      "display_value": "13,090"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 8247,
-      "display_value": "8,247"
+      "value": 8248,
+      "display_value": "8,248"
     },
     {
       "key": "total_repos",
@@ -105,22 +105,22 @@
       "key": "streak_days",
       "label": "Current Streak Days",
       "dashboard_label": "Current Streak Days",
-      "value": 36,
-      "display_value": "36"
+      "value": 37,
+      "display_value": "37"
     }
   ],
   "snapshot_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 13089,
-      "display_value": "13,089"
+      "value": 13090,
+      "display_value": "13,090"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 8247,
-      "display_value": "8,247"
+      "value": 8248,
+      "display_value": "8,248"
     },
     {
       "key": "total_repos",
@@ -173,8 +173,8 @@
     {
       "key": "streak_days",
       "label": "Current Streak Days",
-      "value": 36,
-      "display_value": "36"
+      "value": 37,
+      "display_value": "37"
     }
   ],
   "data_quality": {
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-11-07T04:00:30Z",
+        "observed_at": "2026-11-07T05:00:33Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -227,9 +227,9 @@
         "complete": true,
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
-        "window_start": "2025-11-07T05:00:00Z",
-        "window_end": "2026-11-07T04:00:38Z",
-        "observed_at": "2026-11-07T04:00:39Z",
+        "window_start": "2025-11-08T05:00:00Z",
+        "window_end": "2026-11-07T05:00:39Z",
+        "observed_at": "2026-11-07T05:00:40Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -242,9 +242,9 @@
         "complete": true,
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
-        "window_start": "2026-10-08T04:00:00Z",
-        "window_end": "2026-11-07T04:00:35Z",
-        "observed_at": "2026-11-07T04:00:38Z",
+        "window_start": "2026-10-09T04:00:00Z",
+        "window_end": "2026-11-07T05:00:36Z",
+        "observed_at": "2026-11-07T05:00:39Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -257,9 +257,9 @@
         "complete": true,
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
-        "window_start": "2025-11-07T05:00:00Z",
-        "window_end": "2026-11-07T04:00:38Z",
-        "observed_at": "2026-11-07T04:00:38Z",
+        "window_start": "2025-11-08T05:00:00Z",
+        "window_end": "2026-11-07T05:00:39Z",
+        "observed_at": "2026-11-07T05:00:39Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-11-07T04:00:29Z",
+        "observed_at": "2026-11-07T05:00:31Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -289,11 +289,11 @@
     "avg_release_gap_days": 0.04677083333333333,
     "stars_per_public_repo": 1.0535714285714286,
     "ci_coverage_pct": 20.866141732283463,
-    "last_year_contributions": 13089,
+    "last_year_contributions": 13090,
     "active_days_last_year": 333,
     "automation_workflows": 165,
     "primary_lang_share_pct": 67.9,
-    "median_days_since_push": 380.5,
+    "median_days_since_push": 381.0,
     "days_since_last_push": 1.0
   },
   "scorecard_cards": [
@@ -301,8 +301,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 13089,
-      "display_value": "13,089",
+      "value": 13090,
+      "display_value": "13,090",
       "accent": "#7dcfff"
     },
     {
@@ -1308,7 +1308,7 @@
       577,
       237,
       229,
-      273
+      274
     ],
     "contribution_trend": {
       "status": "available",
@@ -1425,7 +1425,7 @@
           "observed_start": "2026-11-02",
           "observed_end": "2026-11-07",
           "days_observed": 6,
-          "contributions": 273,
+          "contributions": 274,
           "partial": true
         }
       ],
@@ -1435,7 +1435,7 @@
     "automation_repos": 53,
     "primary_lang_share_pct": 67.9,
     "languages_over_5pct": 3,
-    "median_days_since_push": 380.5,
+    "median_days_since_push": 381.0,
     "days_since_last_push": 1.0,
     "public_repos_total": 57,
     "public_nonfork_repos": 56,
@@ -1519,16 +1519,32 @@
   "ci_execution": {
     "schema": "profile-ci-execution/v1",
     "repository": "jguida941/jguida941",
-    "observed_at": "2026-11-07T04:01:42Z",
+    "observed_at": "2026-11-07T05:01:44Z",
     "sample_limit": 12,
     "scope": "Latest observed GitHub Actions runs in the public profile repository, across branches; not account-wide.",
     "status": "available",
     "observed_runs": 12,
     "runs": [
       {
-        "run_id": 42336454185,
+        "run_id": 42340811182,
         "workflow": "Generate Metrics",
         "outcome": "in_progress",
+        "created_at": "2026-11-07T05:00:01Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 42336629077,
+        "workflow": "Deploy Profile Site",
+        "outcome": "success",
+        "created_at": "2026-11-07T04:02:10Z",
+        "event": "workflow_run",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 42336454185,
+        "workflow": "Generate Metrics",
+        "outcome": "success",
         "created_at": "2026-11-07T04:00:02Z",
         "event": "workflow_dispatch",
         "head_branch": "main"
@@ -1604,33 +1620,13 @@
         "created_at": "2026-11-07T00:01:59Z",
         "event": "workflow_run",
         "head_branch": "main"
-      },
-      {
-        "run_id": 42315461045,
-        "workflow": "Generate Metrics",
-        "outcome": "success",
-        "created_at": "2026-11-07T00:00:03Z",
-        "event": "workflow_dispatch",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 42312754556,
-        "workflow": "Deploy Profile Site",
-        "outcome": "success",
-        "created_at": "2026-11-06T23:33:58Z",
-        "event": "workflow_run",
-        "head_branch": "main"
       }
     ]
   },
   "contribution_calendar": {
-    "total": 13089,
+    "total": 13090,
     "weeks": [
       [
-        {
-          "date": "2025-11-07",
-          "count": 0
-        },
         {
           "date": "2025-11-08",
           "count": 17
@@ -3193,7 +3189,7 @@
         },
         {
           "date": "2026-11-07",
-          "count": 5
+          "count": 6
         }
       ]
     ]
@@ -3205,10 +3201,10 @@
     "bucket": "weekday",
     "timezone": "UTC",
     "completeness": "known",
-    "window_start": "2025-11-07",
+    "window_start": "2025-11-08",
     "window_end": "2026-11-07",
-    "days_observed": 366,
-    "total": 13089,
+    "days_observed": 365,
+    "total": 13090,
     "weekdays": [
       {
         "weekday": "Mon",
@@ -3233,11 +3229,11 @@
       {
         "weekday": "Fri",
         "contributions": 1800,
-        "days_observed": 53
+        "days_observed": 52
       },
       {
         "weekday": "Sat",
-        "contributions": 2056,
+        "contributions": 2057,
         "days_observed": 53
       },
       {
@@ -3255,8 +3251,8 @@
     "subtitle": "Contributions by weekday",
     "scope": "Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred.",
     "explanation": "These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.",
-    "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 52; Wed: 52; Thu: 52; Fri: 53; Sat: 53; Sun: 52.",
-    "caption": "2025-11-07 \u2013 2026-11-07 \u00b7 UTC calendar dates",
+    "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 53; Sun: 52.",
+    "caption": "2025-11-08 \u2013 2026-11-07 \u00b7 UTC calendar dates",
     "qualification": "Last date may be in progress",
     "message": "",
     "rows": [
@@ -3287,14 +3283,14 @@
       {
         "weekday": "Fri",
         "contributions": 1800,
-        "days_observed": 53,
+        "days_observed": 52,
         "count_text": "1,800"
       },
       {
         "weekday": "Sat",
-        "contributions": 2056,
+        "contributions": 2057,
         "days_observed": 53,
-        "count_text": "2,056"
+        "count_text": "2,057"
       },
       {
         "weekday": "Sun",
@@ -3307,7 +3303,7 @@
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
     "window_start": "2026-10-09T00:00:00Z",
-    "window_end": "2026-11-07T04:00:59.609955Z",
+    "window_end": "2026-11-07T05:01:05.792242Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 255,
@@ -3596,8 +3592,8 @@
       "status": "partial",
       "complete": false,
       "window_start": "2026-10-09T00:00:00Z",
-      "window_end": "2026-11-07T04:00:59.609955Z",
-      "observed_at": "2026-11-07T04:00:59.609955Z",
+      "window_end": "2026-11-07T05:01:05.792242Z",
+      "observed_at": "2026-11-07T05:01:05.792242Z",
       "timezone": "UTC",
       "current_day_partial": true,
       "default_days": 14,
@@ -7049,16 +7045,16 @@
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-11-07T04:01:43.023289Z",
+    "generated_at": "2026-11-07T05:01:45.341260Z",
     "facts": [
       {
         "metric_id": "calendar.total",
-        "value": 13089,
-        "display_value": "13,089",
+        "value": 13090,
+        "display_value": "13,090",
         "label": "contributions",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-07 \u2013 2026-11-07 \u00b7 UTC",
+        "window": "2025-11-08 \u2013 2026-11-07 \u00b7 UTC",
         "quality": {
           "status": "exact",
           "reason": "calendar_observation",
@@ -7123,8 +7119,8 @@
       },
       {
         "metric_id": "activity.public_commits",
-        "value": 8247,
-        "display_value": "8,247",
+        "value": 8248,
+        "display_value": "8,248",
         "label": "Public commits",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
@@ -7142,7 +7138,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "owned-repositories-visible-to-primary-pr-search",
-        "window": "2025-11-07T05:00:00Z \u2013 2026-11-07T04:00:38Z",
+        "window": "2025-11-08T05:00:00Z \u2013 2026-11-07T05:00:39Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -7156,7 +7152,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-10-08T04:00:00Z \u2013 2026-11-07T04:00:35Z",
+        "window": "2026-10-09T04:00:00Z \u2013 2026-11-07T05:00:36Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -7198,13 +7194,13 @@
         "label": "active days",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-07 \u2013 2026-11-07 \u00b7 UTC",
+        "window": "2025-11-08 \u2013 2026-11-07 \u00b7 UTC",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
           "qualification": "Last date may be in progress"
         },
-        "profile_date_cutoff": "2026-11-06",
+        "profile_date_cutoff": "2026-11-07",
         "completeness": "known",
         "last_day_in_progress": true,
         "range_start": null,
@@ -7212,22 +7208,22 @@
       },
       {
         "metric_id": "calendar.current_streak",
-        "value": 36,
-        "display_value": "36",
+        "value": 37,
+        "display_value": "37",
         "label": "current observed streak",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-07 \u2013 2026-11-07 \u00b7 UTC",
+        "window": "2025-11-08 \u2013 2026-11-07 \u00b7 UTC",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
           "qualification": "Last date may be in progress"
         },
-        "profile_date_cutoff": "2026-11-06",
+        "profile_date_cutoff": "2026-11-07",
         "completeness": "known",
         "last_day_in_progress": true,
         "range_start": "2026-10-02",
-        "range_end": "2026-11-06"
+        "range_end": "2026-11-07"
       },
       {
         "metric_id": "calendar.longest_streak",
@@ -7236,13 +7232,13 @@
         "label": "longest observed streak",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-07 \u2013 2026-11-07 \u00b7 UTC",
+        "window": "2025-11-08 \u2013 2026-11-07 \u00b7 UTC",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
           "qualification": "Last date may be in progress"
         },
-        "profile_date_cutoff": "2026-11-06",
+        "profile_date_cutoff": "2026-11-07",
         "completeness": "known",
         "last_day_in_progress": true,
         "range_start": "2026-02-12",
@@ -7365,7 +7361,7 @@
             "observed_start": "2026-11-02",
             "observed_end": "2026-11-07",
             "days_observed": 6,
-            "contributions": 273,
+            "contributions": 274,
             "partial": true
           }
         ],
@@ -7386,12 +7382,12 @@
           577,
           237,
           229,
-          273
+          274
         ],
         "peak": "Peak 577 contributions/week",
         "window": "Aug 17 \u2013 Nov 7, 2026 \u00b7 12 weeks",
         "qualification": "Mon\u2013Sun \u00b7 UTC \u00b7 partial weeks included",
-        "description": "UTC contribution calendar. 2026-08-17 to 2026-08-23: 472 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 577 contributions (complete); 2026-10-19 to 2026-10-25: 237 contributions (complete); 2026-10-26 to 2026-11-01: 229 contributions (complete); 2026-11-02 to 2026-11-07: 273 contributions (partial)"
+        "description": "UTC contribution calendar. 2026-08-17 to 2026-08-23: 472 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 577 contributions (complete); 2026-10-19 to 2026-10-25: 237 contributions (complete); 2026-10-26 to 2026-11-01: 229 contributions (complete); 2026-11-02 to 2026-11-07: 274 contributions (partial)"
       }
     },
     "rhythm": {
@@ -7402,10 +7398,10 @@
         "bucket": "weekday",
         "timezone": "UTC",
         "completeness": "known",
-        "window_start": "2025-11-07",
+        "window_start": "2025-11-08",
         "window_end": "2026-11-07",
-        "days_observed": 366,
-        "total": 13089,
+        "days_observed": 365,
+        "total": 13090,
         "weekdays": [
           {
             "weekday": "Mon",
@@ -7430,11 +7426,11 @@
           {
             "weekday": "Fri",
             "contributions": 1800,
-            "days_observed": 53
+            "days_observed": 52
           },
           {
             "weekday": "Sat",
-            "contributions": 2056,
+            "contributions": 2057,
             "days_observed": 53
           },
           {
@@ -7451,8 +7447,8 @@
         "subtitle": "Contributions by weekday",
         "scope": "Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred.",
         "explanation": "These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.",
-        "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 52; Wed: 52; Thu: 52; Fri: 53; Sat: 53; Sun: 52.",
-        "caption": "2025-11-07 \u2013 2026-11-07 \u00b7 UTC calendar dates",
+        "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 53; Sun: 52.",
+        "caption": "2025-11-08 \u2013 2026-11-07 \u00b7 UTC calendar dates",
         "qualification": "Last date may be in progress",
         "message": "",
         "rows": [
@@ -7483,14 +7479,14 @@
           {
             "weekday": "Fri",
             "contributions": 1800,
-            "days_observed": 53,
+            "days_observed": 52,
             "count_text": "1,800"
           },
           {
             "weekday": "Sat",
-            "contributions": 2056,
+            "contributions": 2057,
             "days_observed": 53,
-            "count_text": "2,056"
+            "count_text": "2,057"
           },
           {
             "weekday": "Sun",
@@ -7838,10 +7834,6 @@
     },
     "calendar": {
       "days": [
-        {
-          "date": "2025-11-07",
-          "count": 0
-        },
         {
           "date": "2025-11-08",
           "count": 17
@@ -9300,10 +9292,10 @@
         },
         {
           "date": "2026-11-07",
-          "count": 5
+          "count": 6
         }
       ],
-      "window": "2025-11-07 \u2013 2026-11-07 \u00b7 UTC",
+      "window": "2025-11-08 \u2013 2026-11-07 \u00b7 UTC",
       "status": "exact"
     },
     "working": [
@@ -9479,7 +9471,7 @@
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
       "window_start": "2026-10-09T00:00:00Z",
-      "window_end": "2026-11-07T04:00:59.609955Z",
+      "window_end": "2026-11-07T05:01:05.792242Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 255,
@@ -9768,8 +9760,8 @@
         "status": "partial",
         "complete": false,
         "window_start": "2026-10-09T00:00:00Z",
-        "window_end": "2026-11-07T04:00:59.609955Z",
-        "observed_at": "2026-11-07T04:00:59.609955Z",
+        "window_end": "2026-11-07T05:01:05.792242Z",
+        "observed_at": "2026-11-07T05:01:05.792242Z",
         "timezone": "UTC",
         "current_day_partial": true,
         "default_days": 14,
@@ -13221,11 +13213,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-11-07T04:01:43.023289Z",
-    "generator_revision": "99949171d924da7cbbca9f88694cb878a62c34da",
+    "generated_at": "2026-11-07T05:01:45.341260Z",
+    "generator_revision": "b0b642f48351fdd8082762b7a29b1c79ee648d31",
     "generator_source_digest": "fbf4d8a730c83b0093b747bab69d4dd91bfea231a90f83e5c98e6060c4d1d51e",
-    "claim_input_digest": "10b7dbb9c4a07b46f4e8cb70b63b27672ce5f29d531d7ff1941c8ebdb205aed8",
-    "render_key": "c56b187a41895d8720ff0ad63a545b3d3c004cc6dc5fd3db2459e49ea6312700",
+    "claim_input_digest": "51646cb04422405cee0846c0a4309e3a40138241d25bb9564b0bebcdb0b2868e",
+    "render_key": "a3cb6eefff1e722c335b2b73d4eb6a67e22a454059d0b2b2b67dde8f5107b385",
     "schema": "profile-artifact-generation/v1"
   }
 }
