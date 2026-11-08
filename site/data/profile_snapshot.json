@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-08T04:01:28.905725Z",
+  "generated_at": "2026-11-08T05:01:50.456151Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 13132,
-    "public_scope_commits": 8273,
+    "last_year_contributions": 13116,
+    "public_scope_commits": 8275,
     "total_repos": 56,
     "public_forks": 1,
     "private_owned_repos": 199,
@@ -28,22 +28,22 @@
     "prs_merged": 68,
     "releases": 3,
     "ci_repos": 53,
-    "streak_days": 37
+    "streak_days": 38
   },
   "snapshot_rows": [
     {
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 13132,
-      "display_value": "13,132"
+      "value": 13116,
+      "display_value": "13,116"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 8273,
-      "display_value": "8,273"
+      "value": 8275,
+      "display_value": "8,275"
     },
     {
       "key": "total_repos",
@@ -105,22 +105,22 @@
       "key": "streak_days",
       "label": "Current Streak Days",
       "dashboard_label": "Current Streak Days",
-      "value": 37,
-      "display_value": "37"
+      "value": 38,
+      "display_value": "38"
     }
   ],
   "snapshot_cards": [
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 13132,
-      "display_value": "13,132"
+      "value": 13116,
+      "display_value": "13,116"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 8273,
-      "display_value": "8,273"
+      "value": 8275,
+      "display_value": "8,275"
     },
     {
       "key": "total_repos",
@@ -173,8 +173,8 @@
     {
       "key": "streak_days",
       "label": "Current Streak Days",
-      "value": 37,
-      "display_value": "37"
+      "value": 38,
+      "display_value": "38"
     }
   ],
   "data_quality": {
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-11-08T04:00:34Z",
+        "observed_at": "2026-11-08T05:00:38Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -227,9 +227,9 @@
         "complete": true,
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
-        "window_start": "2025-11-08T05:00:00Z",
-        "window_end": "2026-11-08T04:00:39Z",
-        "observed_at": "2026-11-08T04:00:40Z",
+        "window_start": "2025-11-09T05:00:00Z",
+        "window_end": "2026-11-08T05:00:45Z",
+        "observed_at": "2026-11-08T05:00:45Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -242,9 +242,9 @@
         "complete": true,
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
-        "window_start": "2026-10-09T04:00:00Z",
-        "window_end": "2026-11-08T04:00:37Z",
-        "observed_at": "2026-11-08T04:00:38Z",
+        "window_start": "2026-10-10T04:00:00Z",
+        "window_end": "2026-11-08T05:00:42Z",
+        "observed_at": "2026-11-08T05:00:44Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -257,9 +257,9 @@
         "complete": true,
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
-        "window_start": "2025-11-08T05:00:00Z",
-        "window_end": "2026-11-08T04:00:38Z",
-        "observed_at": "2026-11-08T04:00:39Z",
+        "window_start": "2025-11-09T05:00:00Z",
+        "window_end": "2026-11-08T05:00:44Z",
+        "observed_at": "2026-11-08T05:00:45Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-11-08T04:00:33Z",
+        "observed_at": "2026-11-08T05:00:37Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -289,11 +289,11 @@
     "avg_release_gap_days": 0.04677083333333333,
     "stars_per_public_repo": 1.0535714285714286,
     "ci_coverage_pct": 20.866141732283463,
-    "last_year_contributions": 13132,
+    "last_year_contributions": 13116,
     "active_days_last_year": 333,
     "automation_workflows": 165,
     "primary_lang_share_pct": 67.9,
-    "median_days_since_push": 381.5,
+    "median_days_since_push": 382.0,
     "days_since_last_push": 2.0
   },
   "scorecard_cards": [
@@ -301,8 +301,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 13132,
-      "display_value": "13,132",
+      "value": 13116,
+      "display_value": "13,116",
       "accent": "#7dcfff"
     },
     {
@@ -1308,7 +1308,7 @@
       577,
       237,
       229,
-      316
+      317
     ],
     "contribution_trend": {
       "status": "available",
@@ -1425,7 +1425,7 @@
           "observed_start": "2026-11-02",
           "observed_end": "2026-11-08",
           "days_observed": 7,
-          "contributions": 316,
+          "contributions": 317,
           "partial": true
         }
       ],
@@ -1435,7 +1435,7 @@
     "automation_repos": 53,
     "primary_lang_share_pct": 67.9,
     "languages_over_5pct": 3,
-    "median_days_since_push": 381.5,
+    "median_days_since_push": 382.0,
     "days_since_last_push": 2.0,
     "public_repos_total": 57,
     "public_nonfork_repos": 56,
@@ -1519,16 +1519,32 @@
   "ci_execution": {
     "schema": "profile-ci-execution/v1",
     "repository": "jguida941/jguida941",
-    "observed_at": "2026-11-08T04:01:28Z",
+    "observed_at": "2026-11-08T05:01:49Z",
     "sample_limit": 12,
     "scope": "Latest observed GitHub Actions runs in the public profile repository, across branches; not account-wide.",
     "status": "available",
     "observed_runs": 12,
     "runs": [
       {
-        "run_id": 42444984034,
+        "run_id": 42449000059,
         "workflow": "Generate Metrics",
         "outcome": "in_progress",
+        "created_at": "2026-11-08T05:00:04Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 42445122981,
+        "workflow": "Deploy Profile Site",
+        "outcome": "success",
+        "created_at": "2026-11-08T04:01:55Z",
+        "event": "workflow_run",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 42444984034,
+        "workflow": "Generate Metrics",
+        "outcome": "success",
         "created_at": "2026-11-08T04:00:06Z",
         "event": "workflow_dispatch",
         "head_branch": "main"
@@ -1604,27 +1620,11 @@
         "created_at": "2026-11-08T00:00:04Z",
         "event": "workflow_dispatch",
         "head_branch": "main"
-      },
-      {
-        "run_id": 42427659251,
-        "workflow": "Generate Metrics",
-        "outcome": "success",
-        "created_at": "2026-11-07T23:59:03Z",
-        "event": "schedule",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 42423362048,
-        "workflow": "Deploy Profile Site",
-        "outcome": "success",
-        "created_at": "2026-11-07T23:02:09Z",
-        "event": "workflow_run",
-        "head_branch": "main"
       }
     ]
   },
   "contribution_calendar": {
-    "total": 13132,
+    "total": 13116,
     "weeks": [
       [
         {
@@ -3189,42 +3189,121 @@
         },
         {
           "date": "2026-11-08",
-          "count": 4
+          "count": 5
         }
       ]
     ]
   },
   "contribution_rhythm": {
-    "status": "unavailable",
-    "reason": "invalid_calendar",
+    "status": "available",
+    "reason": "dated_calendar",
     "unit": "contributions",
     "bucket": "weekday",
     "timezone": "UTC",
-    "completeness": "unknown",
-    "window_start": null,
-    "window_end": null,
-    "days_observed": null,
-    "total": null,
-    "weekdays": [],
-    "last_day_in_progress": null,
+    "completeness": "known",
+    "window_start": "2025-11-09",
+    "window_end": "2026-11-08",
+    "days_observed": 365,
+    "total": 13116,
+    "weekdays": [
+      {
+        "weekday": "Mon",
+        "contributions": 1527,
+        "days_observed": 52
+      },
+      {
+        "weekday": "Tue",
+        "contributions": 1686,
+        "days_observed": 52
+      },
+      {
+        "weekday": "Wed",
+        "contributions": 1890,
+        "days_observed": 52
+      },
+      {
+        "weekday": "Thu",
+        "contributions": 2272,
+        "days_observed": 52
+      },
+      {
+        "weekday": "Fri",
+        "contributions": 1800,
+        "days_observed": 52
+      },
+      {
+        "weekday": "Sat",
+        "contributions": 2078,
+        "days_observed": 52
+      },
+      {
+        "weekday": "Sun",
+        "contributions": 1863,
+        "days_observed": 53
+      }
+    ],
+    "last_day_in_progress": true,
     "source": "github_contribution_calendar"
   },
   "contribution_rhythm_display": {
-    "available": false,
+    "available": true,
     "title": "Contribution Rhythm",
     "subtitle": "Contributions by weekday",
     "scope": "Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred.",
     "explanation": "These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.",
-    "coverage_summary": "",
-    "caption": "",
-    "qualification": "Calendar dates or counts could not be verified",
-    "message": "Contribution rhythm unavailable",
-    "rows": []
+    "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 53.",
+    "caption": "2025-11-09 \u2013 2026-11-08 \u00b7 UTC calendar dates",
+    "qualification": "Last date may be in progress",
+    "message": "",
+    "rows": [
+      {
+        "weekday": "Mon",
+        "contributions": 1527,
+        "days_observed": 52,
+        "count_text": "1,527"
+      },
+      {
+        "weekday": "Tue",
+        "contributions": 1686,
+        "days_observed": 52,
+        "count_text": "1,686"
+      },
+      {
+        "weekday": "Wed",
+        "contributions": 1890,
+        "days_observed": 52,
+        "count_text": "1,890"
+      },
+      {
+        "weekday": "Thu",
+        "contributions": 2272,
+        "days_observed": 52,
+        "count_text": "2,272"
+      },
+      {
+        "weekday": "Fri",
+        "contributions": 1800,
+        "days_observed": 52,
+        "count_text": "1,800"
+      },
+      {
+        "weekday": "Sat",
+        "contributions": 2078,
+        "days_observed": 52,
+        "count_text": "2,078"
+      },
+      {
+        "weekday": "Sun",
+        "contributions": 1863,
+        "days_observed": 53,
+        "count_text": "1,863"
+      }
+    ]
   },
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
     "window_start": "2026-10-10T00:00:00Z",
-    "window_end": "2026-11-08T04:00:55.136941Z",
+    "window_end": "2026-11-08T05:01:06.907986Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 255,
@@ -3513,8 +3592,8 @@
       "status": "partial",
       "complete": false,
       "window_start": "2026-10-10T00:00:00Z",
-      "window_end": "2026-11-08T04:00:55.136941Z",
-      "observed_at": "2026-11-08T04:00:55.136941Z",
+      "window_end": "2026-11-08T05:01:06.907986Z",
+      "observed_at": "2026-11-08T05:01:06.907986Z",
       "timezone": "UTC",
       "current_day_partial": true,
       "default_days": 14,
@@ -6966,20 +7045,20 @@
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-11-08T04:01:28.905725Z",
+    "generated_at": "2026-11-08T05:01:50.456151Z",
     "facts": [
       {
         "metric_id": "calendar.total",
-        "value": null,
-        "display_value": "n/a",
+        "value": 13116,
+        "display_value": "13,116",
         "label": "contributions",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "Calendar unavailable",
+        "window": "2025-11-09 \u2013 2026-11-08 \u00b7 UTC",
         "quality": {
-          "status": "unavailable",
-          "reason": "value_unavailable",
-          "qualification": "Unavailable"
+          "status": "exact",
+          "reason": "calendar_observation",
+          "qualification": "Last date may be in progress"
         }
       },
       {
@@ -7040,8 +7119,8 @@
       },
       {
         "metric_id": "activity.public_commits",
-        "value": 8273,
-        "display_value": "8,273",
+        "value": 8275,
+        "display_value": "8,275",
         "label": "Public commits",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
@@ -7059,7 +7138,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "owned-repositories-visible-to-primary-pr-search",
-        "window": "2025-11-08T05:00:00Z \u2013 2026-11-08T04:00:38Z",
+        "window": "2025-11-09T05:00:00Z \u2013 2026-11-08T05:00:44Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -7073,7 +7152,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-10-09T04:00:00Z \u2013 2026-11-08T04:00:37Z",
+        "window": "2026-10-10T04:00:00Z \u2013 2026-11-08T05:00:42Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -7110,60 +7189,60 @@
       },
       {
         "metric_id": "calendar.active_days",
-        "value": null,
-        "display_value": "n/a",
+        "value": 333,
+        "display_value": "333",
         "label": "active days",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "Calendar unavailable",
+        "window": "2025-11-09 \u2013 2026-11-08 \u00b7 UTC",
         "quality": {
-          "status": "unavailable",
-          "reason": "value_unavailable",
-          "qualification": "Unavailable"
+          "status": "exact",
+          "reason": "calendar_run",
+          "qualification": "Last date may be in progress"
         },
-        "profile_date_cutoff": "2026-11-07",
-        "completeness": "unknown",
-        "last_day_in_progress": null,
+        "profile_date_cutoff": "2026-11-08",
+        "completeness": "known",
+        "last_day_in_progress": true,
         "range_start": null,
         "range_end": null
       },
       {
         "metric_id": "calendar.current_streak",
-        "value": null,
-        "display_value": "n/a",
+        "value": 38,
+        "display_value": "38",
         "label": "current observed streak",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "Calendar unavailable",
+        "window": "2025-11-09 \u2013 2026-11-08 \u00b7 UTC",
         "quality": {
-          "status": "unavailable",
-          "reason": "value_unavailable",
-          "qualification": "Unavailable"
+          "status": "exact",
+          "reason": "calendar_run",
+          "qualification": "Last date may be in progress"
         },
-        "profile_date_cutoff": "2026-11-07",
-        "completeness": "unknown",
-        "last_day_in_progress": null,
-        "range_start": null,
-        "range_end": null
+        "profile_date_cutoff": "2026-11-08",
+        "completeness": "known",
+        "last_day_in_progress": true,
+        "range_start": "2026-10-02",
+        "range_end": "2026-11-08"
       },
       {
         "metric_id": "calendar.longest_streak",
-        "value": null,
-        "display_value": "n/a",
+        "value": 132,
+        "display_value": "132",
         "label": "longest observed streak",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "Calendar unavailable",
+        "window": "2025-11-09 \u2013 2026-11-08 \u00b7 UTC",
         "quality": {
-          "status": "unavailable",
-          "reason": "value_unavailable",
-          "qualification": "Unavailable"
+          "status": "exact",
+          "reason": "calendar_run",
+          "qualification": "Last date may be in progress"
         },
-        "profile_date_cutoff": "2026-11-07",
-        "completeness": "unknown",
-        "last_day_in_progress": null,
-        "range_start": null,
-        "range_end": null
+        "profile_date_cutoff": "2026-11-08",
+        "completeness": "known",
+        "last_day_in_progress": true,
+        "range_start": "2026-02-12",
+        "range_end": "2026-06-23"
       }
     ],
     "weekly": {
@@ -7282,7 +7361,7 @@
             "observed_start": "2026-11-02",
             "observed_end": "2026-11-08",
             "days_observed": 7,
-            "contributions": 316,
+            "contributions": 317,
             "partial": true
           }
         ],
@@ -7303,40 +7382,119 @@
           577,
           237,
           229,
-          316
+          317
         ],
         "peak": "Peak 577 contributions/week",
         "window": "Aug 17 \u2013 Nov 8, 2026 \u00b7 12 weeks",
         "qualification": "Mon\u2013Sun \u00b7 UTC \u00b7 partial weeks included",
-        "description": "UTC contribution calendar. 2026-08-17 to 2026-08-23: 472 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 577 contributions (complete); 2026-10-19 to 2026-10-25: 237 contributions (complete); 2026-10-26 to 2026-11-01: 229 contributions (complete); 2026-11-02 to 2026-11-08: 316 contributions (partial)"
+        "description": "UTC contribution calendar. 2026-08-17 to 2026-08-23: 472 contributions (complete); 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 577 contributions (complete); 2026-10-19 to 2026-10-25: 237 contributions (complete); 2026-10-26 to 2026-11-01: 229 contributions (complete); 2026-11-02 to 2026-11-08: 317 contributions (partial)"
       }
     },
     "rhythm": {
       "model": {
-        "status": "unavailable",
-        "reason": "invalid_calendar",
+        "status": "available",
+        "reason": "dated_calendar",
         "unit": "contributions",
         "bucket": "weekday",
         "timezone": "UTC",
-        "completeness": "unknown",
-        "window_start": null,
-        "window_end": null,
-        "days_observed": null,
-        "total": null,
-        "weekdays": [],
-        "last_day_in_progress": null
+        "completeness": "known",
+        "window_start": "2025-11-09",
+        "window_end": "2026-11-08",
+        "days_observed": 365,
+        "total": 13116,
+        "weekdays": [
+          {
+            "weekday": "Mon",
+            "contributions": 1527,
+            "days_observed": 52
+          },
+          {
+            "weekday": "Tue",
+            "contributions": 1686,
+            "days_observed": 52
+          },
+          {
+            "weekday": "Wed",
+            "contributions": 1890,
+            "days_observed": 52
+          },
+          {
+            "weekday": "Thu",
+            "contributions": 2272,
+            "days_observed": 52
+          },
+          {
+            "weekday": "Fri",
+            "contributions": 1800,
+            "days_observed": 52
+          },
+          {
+            "weekday": "Sat",
+            "contributions": 2078,
+            "days_observed": 52
+          },
+          {
+            "weekday": "Sun",
+            "contributions": 1863,
+            "days_observed": 53
+          }
+        ],
+        "last_day_in_progress": true
       },
       "display": {
-        "available": false,
+        "available": true,
         "title": "Contribution Rhythm",
         "subtitle": "Contributions by weekday",
         "scope": "Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred.",
         "explanation": "These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.",
-        "coverage_summary": "",
-        "caption": "",
-        "qualification": "Calendar dates or counts could not be verified",
-        "message": "Contribution rhythm unavailable",
-        "rows": []
+        "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 53.",
+        "caption": "2025-11-09 \u2013 2026-11-08 \u00b7 UTC calendar dates",
+        "qualification": "Last date may be in progress",
+        "message": "",
+        "rows": [
+          {
+            "weekday": "Mon",
+            "contributions": 1527,
+            "days_observed": 52,
+            "count_text": "1,527"
+          },
+          {
+            "weekday": "Tue",
+            "contributions": 1686,
+            "days_observed": 52,
+            "count_text": "1,686"
+          },
+          {
+            "weekday": "Wed",
+            "contributions": 1890,
+            "days_observed": 52,
+            "count_text": "1,890"
+          },
+          {
+            "weekday": "Thu",
+            "contributions": 2272,
+            "days_observed": 52,
+            "count_text": "2,272"
+          },
+          {
+            "weekday": "Fri",
+            "contributions": 1800,
+            "days_observed": 52,
+            "count_text": "1,800"
+          },
+          {
+            "weekday": "Sat",
+            "contributions": 2078,
+            "days_observed": 52,
+            "count_text": "2,078"
+          },
+          {
+            "weekday": "Sun",
+            "contributions": 1863,
+            "days_observed": 53,
+            "count_text": "1,863"
+          }
+        ]
       }
     },
     "languages": {
@@ -7675,9 +7833,1470 @@
       }
     },
     "calendar": {
-      "days": [],
-      "window": "Calendar unavailable",
-      "status": "unavailable"
+      "days": [
+        {
+          "date": "2025-11-09",
+          "count": 16
+        },
+        {
+          "date": "2025-11-10",
+          "count": 28
+        },
+        {
+          "date": "2025-11-11",
+          "count": 2
+        },
+        {
+          "date": "2025-11-12",
+          "count": 8
+        },
+        {
+          "date": "2025-11-13",
+          "count": 21
+        },
+        {
+          "date": "2025-11-14",
+          "count": 5
+        },
+        {
+          "date": "2025-11-15",
+          "count": 93
+        },
+        {
+          "date": "2025-11-16",
+          "count": 16
+        },
+        {
+          "date": "2025-11-17",
+          "count": 34
+        },
+        {
+          "date": "2025-11-18",
+          "count": 98
+        },
+        {
+          "date": "2025-11-19",
+          "count": 42
+        },
+        {
+          "date": "2025-11-20",
+          "count": 125
+        },
+        {
+          "date": "2025-11-21",
+          "count": 32
+        },
+        {
+          "date": "2025-11-22",
+          "count": 8
+        },
+        {
+          "date": "2025-11-23",
+          "count": 7
+        },
+        {
+          "date": "2025-11-24",
+          "count": 24
+        },
+        {
+          "date": "2025-11-25",
+          "count": 5
+        },
+        {
+          "date": "2025-11-26",
+          "count": 0
+        },
+        {
+          "date": "2025-11-27",
+          "count": 0
+        },
+        {
+          "date": "2025-11-28",
+          "count": 0
+        },
+        {
+          "date": "2025-11-29",
+          "count": 63
+        },
+        {
+          "date": "2025-11-30",
+          "count": 5
+        },
+        {
+          "date": "2025-12-01",
+          "count": 41
+        },
+        {
+          "date": "2025-12-02",
+          "count": 83
+        },
+        {
+          "date": "2025-12-03",
+          "count": 21
+        },
+        {
+          "date": "2025-12-04",
+          "count": 0
+        },
+        {
+          "date": "2025-12-05",
+          "count": 0
+        },
+        {
+          "date": "2025-12-06",
+          "count": 15
+        },
+        {
+          "date": "2025-12-07",
+          "count": 38
+        },
+        {
+          "date": "2025-12-08",
+          "count": 0
+        },
+        {
+          "date": "2025-12-09",
+          "count": 0
+        },
+        {
+          "date": "2025-12-10",
+          "count": 47
+        },
+        {
+          "date": "2025-12-11",
+          "count": 21
+        },
+        {
+          "date": "2025-12-12",
+          "count": 2
+        },
+        {
+          "date": "2025-12-13",
+          "count": 79
+        },
+        {
+          "date": "2025-12-14",
+          "count": 26
+        },
+        {
+          "date": "2025-12-15",
+          "count": 79
+        },
+        {
+          "date": "2025-12-16",
+          "count": 0
+        },
+        {
+          "date": "2025-12-17",
+          "count": 9
+        },
+        {
+          "date": "2025-12-18",
+          "count": 80
+        },
+        {
+          "date": "2025-12-19",
+          "count": 27
+        },
+        {
+          "date": "2025-12-20",
+          "count": 0
+        },
+        {
+          "date": "2025-12-21",
+          "count": 19
+        },
+        {
+          "date": "2025-12-22",
+          "count": 13
+        },
+        {
+          "date": "2025-12-23",
+          "count": 41
+        },
+        {
+          "date": "2025-12-24",
+          "count": 46
+        },
+        {
+          "date": "2025-12-25",
+          "count": 35
+        },
+        {
+          "date": "2025-12-26",
+          "count": 76
+        },
+        {
+          "date": "2025-12-27",
+          "count": 80
+        },
+        {
+          "date": "2025-12-28",
+          "count": 0
+        },
+        {
+          "date": "2025-12-29",
+          "count": 1
+        },
+        {
+          "date": "2025-12-30",
+          "count": 22
+        },
+        {
+          "date": "2025-12-31",
+          "count": 16
+        },
+        {
+          "date": "2026-01-01",
+          "count": 7
+        },
+        {
+          "date": "2026-01-02",
+          "count": 14
+        },
+        {
+          "date": "2026-01-03",
+          "count": 46
+        },
+        {
+          "date": "2026-01-04",
+          "count": 12
+        },
+        {
+          "date": "2026-01-05",
+          "count": 1
+        },
+        {
+          "date": "2026-01-06",
+          "count": 26
+        },
+        {
+          "date": "2026-01-07",
+          "count": 57
+        },
+        {
+          "date": "2026-01-08",
+          "count": 42
+        },
+        {
+          "date": "2026-01-09",
+          "count": 27
+        },
+        {
+          "date": "2026-01-10",
+          "count": 4
+        },
+        {
+          "date": "2026-01-11",
+          "count": 28
+        },
+        {
+          "date": "2026-01-12",
+          "count": 2
+        },
+        {
+          "date": "2026-01-13",
+          "count": 9
+        },
+        {
+          "date": "2026-01-14",
+          "count": 1
+        },
+        {
+          "date": "2026-01-15",
+          "count": 71
+        },
+        {
+          "date": "2026-01-16",
+          "count": 10
+        },
+        {
+          "date": "2026-01-17",
+          "count": 30
+        },
+        {
+          "date": "2026-01-18",
+          "count": 6
+        },
+        {
+          "date": "2026-01-19",
+          "count": 40
+        },
+        {
+          "date": "2026-01-20",
+          "count": 68
+        },
+        {
+          "date": "2026-01-21",
+          "count": 57
+        },
+        {
+          "date": "2026-01-22",
+          "count": 71
+        },
+        {
+          "date": "2026-01-23",
+          "count": 3
+        },
+        {
+          "date": "2026-01-24",
+          "count": 15
+        },
+        {
+          "date": "2026-01-25",
+          "count": 86
+        },
+        {
+          "date": "2026-01-26",
+          "count": 16
+        },
+        {
+          "date": "2026-01-27",
+          "count": 0
+        },
+        {
+          "date": "2026-01-28",
+          "count": 20
+        },
+        {
+          "date": "2026-01-29",
+          "count": 35
+        },
+        {
+          "date": "2026-01-30",
+          "count": 7
+        },
+        {
+          "date": "2026-01-31",
+          "count": 24
+        },
+        {
+          "date": "2026-02-01",
+          "count": 11
+        },
+        {
+          "date": "2026-02-02",
+          "count": 121
+        },
+        {
+          "date": "2026-02-03",
+          "count": 20
+        },
+        {
+          "date": "2026-02-04",
+          "count": 0
+        },
+        {
+          "date": "2026-02-05",
+          "count": 0
+        },
+        {
+          "date": "2026-02-06",
+          "count": 38
+        },
+        {
+          "date": "2026-02-07",
+          "count": 16
+        },
+        {
+          "date": "2026-02-08",
+          "count": 0
+        },
+        {
+          "date": "2026-02-09",
+          "count": 21
+        },
+        {
+          "date": "2026-02-10",
+          "count": 0
+        },
+        {
+          "date": "2026-02-11",
+          "count": 0
+        },
+        {
+          "date": "2026-02-12",
+          "count": 8
+        },
+        {
+          "date": "2026-02-13",
+          "count": 137
+        },
+        {
+          "date": "2026-02-14",
+          "count": 74
+        },
+        {
+          "date": "2026-02-15",
+          "count": 16
+        },
+        {
+          "date": "2026-02-16",
+          "count": 49
+        },
+        {
+          "date": "2026-02-17",
+          "count": 97
+        },
+        {
+          "date": "2026-02-18",
+          "count": 8
+        },
+        {
+          "date": "2026-02-19",
+          "count": 156
+        },
+        {
+          "date": "2026-02-20",
+          "count": 95
+        },
+        {
+          "date": "2026-02-21",
+          "count": 22
+        },
+        {
+          "date": "2026-02-22",
+          "count": 20
+        },
+        {
+          "date": "2026-02-23",
+          "count": 67
+        },
+        {
+          "date": "2026-02-24",
+          "count": 38
+        },
+        {
+          "date": "2026-02-25",
+          "count": 20
+        },
+        {
+          "date": "2026-02-26",
+          "count": 4
+        },
+        {
+          "date": "2026-02-27",
+          "count": 6
+        },
+        {
+          "date": "2026-02-28",
+          "count": 4
+        },
+        {
+          "date": "2026-03-01",
+          "count": 27
+        },
+        {
+          "date": "2026-03-02",
+          "count": 10
+        },
+        {
+          "date": "2026-03-03",
+          "count": 45
+        },
+        {
+          "date": "2026-03-04",
+          "count": 27
+        },
+        {
+          "date": "2026-03-05",
+          "count": 16
+        },
+        {
+          "date": "2026-03-06",
+          "count": 82
+        },
+        {
+          "date": "2026-03-07",
+          "count": 43
+        },
+        {
+          "date": "2026-03-08",
+          "count": 21
+        },
+        {
+          "date": "2026-03-09",
+          "count": 22
+        },
+        {
+          "date": "2026-03-10",
+          "count": 20
+        },
+        {
+          "date": "2026-03-11",
+          "count": 38
+        },
+        {
+          "date": "2026-03-12",
+          "count": 24
+        },
+        {
+          "date": "2026-03-13",
+          "count": 20
+        },
+        {
+          "date": "2026-03-14",
+          "count": 43
+        },
+        {
+          "date": "2026-03-15",
+          "count": 27
+        },
+        {
+          "date": "2026-03-16",
+          "count": 16
+        },
+        {
+          "date": "2026-03-17",
+          "count": 21
+        },
+        {
+          "date": "2026-03-18",
+          "count": 15
+        },
+        {
+          "date": "2026-03-19",
+          "count": 19
+        },
+        {
+          "date": "2026-03-20",
+          "count": 23
+        },
+        {
+          "date": "2026-03-21",
+          "count": 37
+        },
+        {
+          "date": "2026-03-22",
+          "count": 42
+        },
+        {
+          "date": "2026-03-23",
+          "count": 23
+        },
+        {
+          "date": "2026-03-24",
+          "count": 25
+        },
+        {
+          "date": "2026-03-25",
+          "count": 27
+        },
+        {
+          "date": "2026-03-26",
+          "count": 24
+        },
+        {
+          "date": "2026-03-27",
+          "count": 38
+        },
+        {
+          "date": "2026-03-28",
+          "count": 30
+        },
+        {
+          "date": "2026-03-29",
+          "count": 29
+        },
+        {
+          "date": "2026-03-30",
+          "count": 17
+        },
+        {
+          "date": "2026-03-31",
+          "count": 18
+        },
+        {
+          "date": "2026-04-01",
+          "count": 22
+        },
+        {
+          "date": "2026-04-02",
+          "count": 66
+        },
+        {
+          "date": "2026-04-03",
+          "count": 79
+        },
+        {
+          "date": "2026-04-04",
+          "count": 70
+        },
+        {
+          "date": "2026-04-05",
+          "count": 78
+        },
+        {
+          "date": "2026-04-06",
+          "count": 30
+        },
+        {
+          "date": "2026-04-07",
+          "count": 47
+        },
+        {
+          "date": "2026-04-08",
+          "count": 95
+        },
+        {
+          "date": "2026-04-09",
+          "count": 66
+        },
+        {
+          "date": "2026-04-10",
+          "count": 97
+        },
+        {
+          "date": "2026-04-11",
+          "count": 68
+        },
+        {
+          "date": "2026-04-12",
+          "count": 27
+        },
+        {
+          "date": "2026-04-13",
+          "count": 29
+        },
+        {
+          "date": "2026-04-14",
+          "count": 36
+        },
+        {
+          "date": "2026-04-15",
+          "count": 38
+        },
+        {
+          "date": "2026-04-16",
+          "count": 91
+        },
+        {
+          "date": "2026-04-17",
+          "count": 24
+        },
+        {
+          "date": "2026-04-18",
+          "count": 28
+        },
+        {
+          "date": "2026-04-19",
+          "count": 72
+        },
+        {
+          "date": "2026-04-20",
+          "count": 33
+        },
+        {
+          "date": "2026-04-21",
+          "count": 37
+        },
+        {
+          "date": "2026-04-22",
+          "count": 75
+        },
+        {
+          "date": "2026-04-23",
+          "count": 49
+        },
+        {
+          "date": "2026-04-24",
+          "count": 24
+        },
+        {
+          "date": "2026-04-25",
+          "count": 116
+        },
+        {
+          "date": "2026-04-26",
+          "count": 127
+        },
+        {
+          "date": "2026-04-27",
+          "count": 86
+        },
+        {
+          "date": "2026-04-28",
+          "count": 86
+        },
+        {
+          "date": "2026-04-29",
+          "count": 44
+        },
+        {
+          "date": "2026-04-30",
+          "count": 11
+        },
+        {
+          "date": "2026-05-01",
+          "count": 30
+        },
+        {
+          "date": "2026-05-02",
+          "count": 116
+        },
+        {
+          "date": "2026-05-03",
+          "count": 152
+        },
+        {
+          "date": "2026-05-04",
+          "count": 66
+        },
+        {
+          "date": "2026-05-05",
+          "count": 41
+        },
+        {
+          "date": "2026-05-06",
+          "count": 159
+        },
+        {
+          "date": "2026-05-07",
+          "count": 78
+        },
+        {
+          "date": "2026-05-08",
+          "count": 49
+        },
+        {
+          "date": "2026-05-09",
+          "count": 68
+        },
+        {
+          "date": "2026-05-10",
+          "count": 35
+        },
+        {
+          "date": "2026-05-11",
+          "count": 103
+        },
+        {
+          "date": "2026-05-12",
+          "count": 103
+        },
+        {
+          "date": "2026-05-13",
+          "count": 159
+        },
+        {
+          "date": "2026-05-14",
+          "count": 174
+        },
+        {
+          "date": "2026-05-15",
+          "count": 200
+        },
+        {
+          "date": "2026-05-16",
+          "count": 97
+        },
+        {
+          "date": "2026-05-17",
+          "count": 41
+        },
+        {
+          "date": "2026-05-18",
+          "count": 11
+        },
+        {
+          "date": "2026-05-19",
+          "count": 7
+        },
+        {
+          "date": "2026-05-20",
+          "count": 8
+        },
+        {
+          "date": "2026-05-21",
+          "count": 8
+        },
+        {
+          "date": "2026-05-22",
+          "count": 8
+        },
+        {
+          "date": "2026-05-23",
+          "count": 16
+        },
+        {
+          "date": "2026-05-24",
+          "count": 27
+        },
+        {
+          "date": "2026-05-25",
+          "count": 16
+        },
+        {
+          "date": "2026-05-26",
+          "count": 41
+        },
+        {
+          "date": "2026-05-27",
+          "count": 25
+        },
+        {
+          "date": "2026-05-28",
+          "count": 27
+        },
+        {
+          "date": "2026-05-29",
+          "count": 13
+        },
+        {
+          "date": "2026-05-30",
+          "count": 42
+        },
+        {
+          "date": "2026-05-31",
+          "count": 21
+        },
+        {
+          "date": "2026-06-01",
+          "count": 23
+        },
+        {
+          "date": "2026-06-02",
+          "count": 16
+        },
+        {
+          "date": "2026-06-03",
+          "count": 17
+        },
+        {
+          "date": "2026-06-04",
+          "count": 18
+        },
+        {
+          "date": "2026-06-05",
+          "count": 19
+        },
+        {
+          "date": "2026-06-06",
+          "count": 6
+        },
+        {
+          "date": "2026-06-07",
+          "count": 14
+        },
+        {
+          "date": "2026-06-08",
+          "count": 14
+        },
+        {
+          "date": "2026-06-09",
+          "count": 18
+        },
+        {
+          "date": "2026-06-10",
+          "count": 17
+        },
+        {
+          "date": "2026-06-11",
+          "count": 27
+        },
+        {
+          "date": "2026-06-12",
+          "count": 18
+        },
+        {
+          "date": "2026-06-13",
+          "count": 58
+        },
+        {
+          "date": "2026-06-14",
+          "count": 64
+        },
+        {
+          "date": "2026-06-15",
+          "count": 5
+        },
+        {
+          "date": "2026-06-16",
+          "count": 6
+        },
+        {
+          "date": "2026-06-17",
+          "count": 2
+        },
+        {
+          "date": "2026-06-18",
+          "count": 6
+        },
+        {
+          "date": "2026-06-19",
+          "count": 4
+        },
+        {
+          "date": "2026-06-20",
+          "count": 11
+        },
+        {
+          "date": "2026-06-21",
+          "count": 20
+        },
+        {
+          "date": "2026-06-22",
+          "count": 32
+        },
+        {
+          "date": "2026-06-23",
+          "count": 1
+        },
+        {
+          "date": "2026-06-24",
+          "count": 0
+        },
+        {
+          "date": "2026-06-25",
+          "count": 0
+        },
+        {
+          "date": "2026-06-26",
+          "count": 0
+        },
+        {
+          "date": "2026-06-27",
+          "count": 9
+        },
+        {
+          "date": "2026-06-28",
+          "count": 76
+        },
+        {
+          "date": "2026-06-29",
+          "count": 56
+        },
+        {
+          "date": "2026-06-30",
+          "count": 55
+        },
+        {
+          "date": "2026-07-01",
+          "count": 57
+        },
+        {
+          "date": "2026-07-02",
+          "count": 100
+        },
+        {
+          "date": "2026-07-03",
+          "count": 41
+        },
+        {
+          "date": "2026-07-04",
+          "count": 43
+        },
+        {
+          "date": "2026-07-05",
+          "count": 52
+        },
+        {
+          "date": "2026-07-06",
+          "count": 36
+        },
+        {
+          "date": "2026-07-07",
+          "count": 42
+        },
+        {
+          "date": "2026-07-08",
+          "count": 21
+        },
+        {
+          "date": "2026-07-09",
+          "count": 68
+        },
+        {
+          "date": "2026-07-10",
+          "count": 115
+        },
+        {
+          "date": "2026-07-11",
+          "count": 37
+        },
+        {
+          "date": "2026-07-12",
+          "count": 46
+        },
+        {
+          "date": "2026-07-13",
+          "count": 17
+        },
+        {
+          "date": "2026-07-14",
+          "count": 57
+        },
+        {
+          "date": "2026-07-15",
+          "count": 69
+        },
+        {
+          "date": "2026-07-16",
+          "count": 26
+        },
+        {
+          "date": "2026-07-17",
+          "count": 22
+        },
+        {
+          "date": "2026-07-18",
+          "count": 42
+        },
+        {
+          "date": "2026-07-19",
+          "count": 30
+        },
+        {
+          "date": "2026-07-20",
+          "count": 13
+        },
+        {
+          "date": "2026-07-21",
+          "count": 41
+        },
+        {
+          "date": "2026-07-22",
+          "count": 17
+        },
+        {
+          "date": "2026-07-23",
+          "count": 26
+        },
+        {
+          "date": "2026-07-24",
+          "count": 20
+        },
+        {
+          "date": "2026-07-25",
+          "count": 49
+        },
+        {
+          "date": "2026-07-26",
+          "count": 29
+        },
+        {
+          "date": "2026-07-27",
+          "count": 21
+        },
+        {
+          "date": "2026-07-28",
+          "count": 15
+        },
+        {
+          "date": "2026-07-29",
+          "count": 11
+        },
+        {
+          "date": "2026-07-30",
+          "count": 10
+        },
+        {
+          "date": "2026-07-31",
+          "count": 11
+        },
+        {
+          "date": "2026-08-01",
+          "count": 14
+        },
+        {
+          "date": "2026-08-02",
+          "count": 41
+        },
+        {
+          "date": "2026-08-03",
+          "count": 9
+        },
+        {
+          "date": "2026-08-04",
+          "count": 10
+        },
+        {
+          "date": "2026-08-05",
+          "count": 10
+        },
+        {
+          "date": "2026-08-06",
+          "count": 6
+        },
+        {
+          "date": "2026-08-07",
+          "count": 28
+        },
+        {
+          "date": "2026-08-08",
+          "count": 55
+        },
+        {
+          "date": "2026-08-09",
+          "count": 27
+        },
+        {
+          "date": "2026-08-10",
+          "count": 22
+        },
+        {
+          "date": "2026-08-11",
+          "count": 29
+        },
+        {
+          "date": "2026-08-12",
+          "count": 92
+        },
+        {
+          "date": "2026-08-13",
+          "count": 136
+        },
+        {
+          "date": "2026-08-14",
+          "count": 62
+        },
+        {
+          "date": "2026-08-15",
+          "count": 51
+        },
+        {
+          "date": "2026-08-16",
+          "count": 111
+        },
+        {
+          "date": "2026-08-17",
+          "count": 47
+        },
+        {
+          "date": "2026-08-18",
+          "count": 69
+        },
+        {
+          "date": "2026-08-19",
+          "count": 116
+        },
+        {
+          "date": "2026-08-20",
+          "count": 130
+        },
+        {
+          "date": "2026-08-21",
+          "count": 56
+        },
+        {
+          "date": "2026-08-22",
+          "count": 25
+        },
+        {
+          "date": "2026-08-23",
+          "count": 29
+        },
+        {
+          "date": "2026-08-24",
+          "count": 23
+        },
+        {
+          "date": "2026-08-25",
+          "count": 49
+        },
+        {
+          "date": "2026-08-26",
+          "count": 16
+        },
+        {
+          "date": "2026-08-27",
+          "count": 7
+        },
+        {
+          "date": "2026-08-28",
+          "count": 0
+        },
+        {
+          "date": "2026-08-29",
+          "count": 0
+        },
+        {
+          "date": "2026-08-30",
+          "count": 0
+        },
+        {
+          "date": "2026-08-31",
+          "count": 0
+        },
+        {
+          "date": "2026-09-01",
+          "count": 3
+        },
+        {
+          "date": "2026-09-02",
+          "count": 5
+        },
+        {
+          "date": "2026-09-03",
+          "count": 42
+        },
+        {
+          "date": "2026-09-04",
+          "count": 2
+        },
+        {
+          "date": "2026-09-05",
+          "count": 7
+        },
+        {
+          "date": "2026-09-06",
+          "count": 15
+        },
+        {
+          "date": "2026-09-07",
+          "count": 5
+        },
+        {
+          "date": "2026-09-08",
+          "count": 11
+        },
+        {
+          "date": "2026-09-09",
+          "count": 21
+        },
+        {
+          "date": "2026-09-10",
+          "count": 19
+        },
+        {
+          "date": "2026-09-11",
+          "count": 26
+        },
+        {
+          "date": "2026-09-12",
+          "count": 21
+        },
+        {
+          "date": "2026-09-13",
+          "count": 22
+        },
+        {
+          "date": "2026-09-14",
+          "count": 28
+        },
+        {
+          "date": "2026-09-15",
+          "count": 0
+        },
+        {
+          "date": "2026-09-16",
+          "count": 2
+        },
+        {
+          "date": "2026-09-17",
+          "count": 0
+        },
+        {
+          "date": "2026-09-18",
+          "count": 5
+        },
+        {
+          "date": "2026-09-19",
+          "count": 4
+        },
+        {
+          "date": "2026-09-20",
+          "count": 2
+        },
+        {
+          "date": "2026-09-21",
+          "count": 4
+        },
+        {
+          "date": "2026-09-22",
+          "count": 21
+        },
+        {
+          "date": "2026-09-23",
+          "count": 0
+        },
+        {
+          "date": "2026-09-24",
+          "count": 0
+        },
+        {
+          "date": "2026-09-25",
+          "count": 0
+        },
+        {
+          "date": "2026-09-26",
+          "count": 0
+        },
+        {
+          "date": "2026-09-27",
+          "count": 0
+        },
+        {
+          "date": "2026-09-28",
+          "count": 1
+        },
+        {
+          "date": "2026-09-29",
+          "count": 2
+        },
+        {
+          "date": "2026-09-30",
+          "count": 0
+        },
+        {
+          "date": "2026-10-01",
+          "count": 0
+        },
+        {
+          "date": "2026-10-02",
+          "count": 26
+        },
+        {
+          "date": "2026-10-03",
+          "count": 62
+        },
+        {
+          "date": "2026-10-04",
+          "count": 30
+        },
+        {
+          "date": "2026-10-05",
+          "count": 32
+        },
+        {
+          "date": "2026-10-06",
+          "count": 41
+        },
+        {
+          "date": "2026-10-07",
+          "count": 61
+        },
+        {
+          "date": "2026-10-08",
+          "count": 51
+        },
+        {
+          "date": "2026-10-09",
+          "count": 27
+        },
+        {
+          "date": "2026-10-10",
+          "count": 28
+        },
+        {
+          "date": "2026-10-11",
+          "count": 71
+        },
+        {
+          "date": "2026-10-12",
+          "count": 48
+        },
+        {
+          "date": "2026-10-13",
+          "count": 65
+        },
+        {
+          "date": "2026-10-14",
+          "count": 95
+        },
+        {
+          "date": "2026-10-15",
+          "count": 155
+        },
+        {
+          "date": "2026-10-16",
+          "count": 64
+        },
+        {
+          "date": "2026-10-17",
+          "count": 92
+        },
+        {
+          "date": "2026-10-18",
+          "count": 58
+        },
+        {
+          "date": "2026-10-19",
+          "count": 36
+        },
+        {
+          "date": "2026-10-20",
+          "count": 31
+        },
+        {
+          "date": "2026-10-21",
+          "count": 38
+        },
+        {
+          "date": "2026-10-22",
+          "count": 28
+        },
+        {
+          "date": "2026-10-23",
+          "count": 27
+        },
+        {
+          "date": "2026-10-24",
+          "count": 41
+        },
+        {
+          "date": "2026-10-25",
+          "count": 36
+        },
+        {
+          "date": "2026-10-26",
+          "count": 27
+        },
+        {
+          "date": "2026-10-27",
+          "count": 29
+        },
+        {
+          "date": "2026-10-28",
+          "count": 30
+        },
+        {
+          "date": "2026-10-29",
+          "count": 30
+        },
+        {
+          "date": "2026-10-30",
+          "count": 28
+        },
+        {
+          "date": "2026-10-31",
+          "count": 32
+        },
+        {
+          "date": "2026-11-01",
+          "count": 53
+        },
+        {
+          "date": "2026-11-02",
+          "count": 29
+        },
+        {
+          "date": "2026-11-03",
+          "count": 39
+        },
+        {
+          "date": "2026-11-04",
+          "count": 109
+        },
+        {
+          "date": "2026-11-05",
+          "count": 58
+        },
+        {
+          "date": "2026-11-06",
+          "count": 33
+        },
+        {
+          "date": "2026-11-07",
+          "count": 44
+        },
+        {
+          "date": "2026-11-08",
+          "count": 5
+        }
+      ],
+      "window": "2025-11-09 \u2013 2026-11-08 \u00b7 UTC",
+      "status": "exact"
     },
     "working": [
       {
@@ -7852,7 +9471,7 @@
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
       "window_start": "2026-10-10T00:00:00Z",
-      "window_end": "2026-11-08T04:00:55.136941Z",
+      "window_end": "2026-11-08T05:01:06.907986Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 255,
@@ -8141,8 +9760,8 @@
         "status": "partial",
         "complete": false,
         "window_start": "2026-10-10T00:00:00Z",
-        "window_end": "2026-11-08T04:00:55.136941Z",
-        "observed_at": "2026-11-08T04:00:55.136941Z",
+        "window_end": "2026-11-08T05:01:06.907986Z",
+        "observed_at": "2026-11-08T05:01:06.907986Z",
         "timezone": "UTC",
         "current_day_partial": true,
         "default_days": 14,
@@ -11594,11 +13213,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-11-08T04:01:28.905725Z",
-    "generator_revision": "cb4d611a25754f14a61a39b2d5a27b2c2dcab632",
+    "generated_at": "2026-11-08T05:01:50.456151Z",
+    "generator_revision": "a3281f60407083a8d4459a20c205f08c5df91e27",
     "generator_source_digest": "fbf4d8a730c83b0093b747bab69d4dd91bfea231a90f83e5c98e6060c4d1d51e",
-    "claim_input_digest": "1a329c89c7b589556cd16864fb3b8f738ad0c604574a31f1d8ac1ebf13395b5d",
-    "render_key": "e0c1558a00cceebaa50ee971f0432b22dd741247d8b8fe0777181e3a39befc9c",
+    "claim_input_digest": "0dec5b5b2cda64d8f04064267b2ba394661d77f58cbf8f9b1633393487023c51",
+    "render_key": "ea8aeb2e4beb11a4fe6111200091b4b6bbfdfb6426592866f52bd9c14ac2a324",
     "schema": "profile-artifact-generation/v1"
   }
 }
