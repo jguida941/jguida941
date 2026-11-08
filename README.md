@@ -5,35 +5,35 @@
 
 </div>
 
-<a href="https://jguida941.github.io/jguida941/?from_snapshot=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7#overview">
+<a href="https://jguida941.github.io/jguida941/?from_snapshot=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01#overview">
 <picture>
-  <source media="(max-width: 767px)" srcset="assets/dashboard_summary_mobile.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7">
-  <img src="assets/dashboard_summary.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7" width="100%" alt="GitHub profile analytics: contributions, workflow configuration, code changes, project activity by repository and UTC day, recent repository pushes, language composition and projects. Exact values and definitions below.">
+  <source media="(max-width: 767px)" srcset="assets/dashboard_summary_mobile.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01">
+  <img src="assets/dashboard_summary.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01" width="100%" alt="GitHub profile analytics: contributions, workflow configuration, code changes, project activity by repository and UTC day, recent repository pushes, language composition and projects. Exact values and definitions below.">
 </picture>
 </a>
 
-[Weekly trend](https://jguida941.github.io/jguida941/?from_snapshot=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7#weekly-contributions) · [Calendar](https://jguida941.github.io/jguida941/?from_snapshot=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7#calendar-panel) · [Weekday totals](https://jguida941.github.io/jguida941/?from_snapshot=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7#rhythm-panel) · [Languages](https://jguida941.github.io/jguida941/?from_snapshot=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7#languages) · [Workflow configuration](https://jguida941.github.io/jguida941/?from_snapshot=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7#automation) · [Project activity details](https://jguida941.github.io/jguida941/?from_snapshot=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7#project-activity)
+[Weekly trend](https://jguida941.github.io/jguida941/?from_snapshot=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01#weekly-contributions) · [Calendar](https://jguida941.github.io/jguida941/?from_snapshot=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01#calendar-panel) · [Weekday totals](https://jguida941.github.io/jguida941/?from_snapshot=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01#rhythm-panel) · [Languages](https://jguida941.github.io/jguida941/?from_snapshot=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01#languages) · [Workflow configuration](https://jguida941.github.io/jguida941/?from_snapshot=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01#automation) · [Project activity details](https://jguida941.github.io/jguida941/?from_snapshot=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01#project-activity)
 
 <details>
 <summary>Read the numbers and definitions</summary>
 
-Reported inventory means its completeness and freshness are unverified. Repository push dates and reported headlines are independent observations, with no inferred branch or delivery status. Snapshot 2026-11-08T00:00:27.469910Z.
+Reported inventory means its completeness and freshness are unverified. Repository push dates and reported headlines are independent observations, with no inferred branch or delivery status. Snapshot 2026-11-08T01:01:36.493700Z.
 
 | Metric | Value | Population / period | Qualification |
 | --- | ---: | --- | --- |
-| contributions | 13,124 | github contribution calendar visible to provider; 2025-11-08 – 2026-11-07 · UTC | Last date may be in progress |
+| contributions | n/a | github contribution calendar visible to provider; Calendar unavailable | Unavailable |
 | public non-fork repos | 56 | public owned nonfork profile included; current inventory | Reported inventory · freshness/completeness unverified |
 | private owned repos | 199 | private owned including forks; current inventory | Reported inventory · freshness/completeness unverified |
 | stargazers | 59 | public owned nonfork; current inventory | Reported inventory · freshness/completeness unverified |
 | public forks | 1 | public owned forks; current inventory | Reported inventory · freshness/completeness unverified |
-| Public commits | 8,269 | owned public nonfork repositories; returned repository history |  |
-| Merged PRs | 68 | owned repositories visible to primary pr search; 2025-11-08T05:00:00Z – 2026-11-07T23:59:33Z |  |
-| Releases · 30 days | 3 | owned public nonfork repositories; 2026-10-09T04:00:00Z – 2026-11-07T23:59:32Z |  |
+| Public commits | 8,271 | owned public nonfork repositories; returned repository history |  |
+| Merged PRs | 68 | owned repositories visible to primary pr search; 2025-11-08T05:00:00Z – 2026-11-08T01:00:35Z |  |
+| Releases · 30 days | 3 | owned public nonfork repositories; 2026-10-09T04:00:00Z – 2026-11-08T01:00:33Z |  |
 | active repos | 3 | owned public private nonfork profile excluded; last 7 days |  |
 | languages | 35 | owned public private nonfork profile excluded; observed repository HEADs |  |
-| active days | 333 | github contribution calendar visible to provider; 2025-11-08 – 2026-11-07 · UTC | Last date may be in progress |
-| current observed streak | 37 | github contribution calendar visible to provider; 2025-11-08 – 2026-11-07 · UTC | Last date may be in progress; 2026-10-02 – 2026-11-07 |
-| longest observed streak | 132 | github contribution calendar visible to provider; 2025-11-08 – 2026-11-07 · UTC | Last date may be in progress; 2026-02-12 – 2026-06-23 |
+| active days | n/a | github contribution calendar visible to provider; Calendar unavailable | Unavailable |
+| current observed streak | n/a | github contribution calendar visible to provider; Calendar unavailable | Unavailable |
+| longest observed streak | n/a | github contribution calendar visible to provider; Calendar unavailable | Unavailable |
 
 
 Owned public + private nonfork repositories; profile excluded. GitHub workflow configuration at observed default-branch HEAD. Configuration does not imply successful runs.
@@ -58,20 +58,13 @@ Owned public + private nonfork repositories; profile excluded. GitHub workflow c
 | 2026-10-12 – 2026-10-18 | 577 | Complete |
 | 2026-10-19 – 2026-10-25 | 237 | Complete |
 | 2026-10-26 – 2026-11-01 | 229 | Complete |
-| 2026-11-02 – 2026-11-07 | 308 | Partial |
+| 2026-11-02 – 2026-11-08 | 309 | Partial |
 
 
 Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred. These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.
 
 | Weekday | Contributions | Observed dates |
 | --- | ---: | ---: |
-| Mon | 1,527 | 52 |
-| Tue | 1,686 | 52 |
-| Wed | 1,890 | 52 |
-| Thu | 2,272 | 52 |
-| Fri | 1,800 | 52 |
-| Sat | 2,091 | 53 |
-| Sun | 1,858 | 52 |
 
 
 | Language | Observed bytes | Share |
@@ -117,371 +110,6 @@ Counts reported by the GitHub contribution calendar. Private contributions are i
 
 | UTC date | Contributions |
 | --- | ---: |
-| 2025-11-08 | 17 |
-| 2025-11-09 | 16 |
-| 2025-11-10 | 28 |
-| 2025-11-11 | 2 |
-| 2025-11-12 | 8 |
-| 2025-11-13 | 21 |
-| 2025-11-14 | 5 |
-| 2025-11-15 | 93 |
-| 2025-11-16 | 16 |
-| 2025-11-17 | 34 |
-| 2025-11-18 | 98 |
-| 2025-11-19 | 42 |
-| 2025-11-20 | 125 |
-| 2025-11-21 | 32 |
-| 2025-11-22 | 8 |
-| 2025-11-23 | 7 |
-| 2025-11-24 | 24 |
-| 2025-11-25 | 5 |
-| 2025-11-26 | 0 |
-| 2025-11-27 | 0 |
-| 2025-11-28 | 0 |
-| 2025-11-29 | 63 |
-| 2025-11-30 | 5 |
-| 2025-12-01 | 41 |
-| 2025-12-02 | 83 |
-| 2025-12-03 | 21 |
-| 2025-12-04 | 0 |
-| 2025-12-05 | 0 |
-| 2025-12-06 | 15 |
-| 2025-12-07 | 38 |
-| 2025-12-08 | 0 |
-| 2025-12-09 | 0 |
-| 2025-12-10 | 47 |
-| 2025-12-11 | 21 |
-| 2025-12-12 | 2 |
-| 2025-12-13 | 79 |
-| 2025-12-14 | 26 |
-| 2025-12-15 | 79 |
-| 2025-12-16 | 0 |
-| 2025-12-17 | 9 |
-| 2025-12-18 | 80 |
-| 2025-12-19 | 27 |
-| 2025-12-20 | 0 |
-| 2025-12-21 | 19 |
-| 2025-12-22 | 13 |
-| 2025-12-23 | 41 |
-| 2025-12-24 | 46 |
-| 2025-12-25 | 35 |
-| 2025-12-26 | 76 |
-| 2025-12-27 | 80 |
-| 2025-12-28 | 0 |
-| 2025-12-29 | 1 |
-| 2025-12-30 | 22 |
-| 2025-12-31 | 16 |
-| 2026-01-01 | 7 |
-| 2026-01-02 | 14 |
-| 2026-01-03 | 46 |
-| 2026-01-04 | 12 |
-| 2026-01-05 | 1 |
-| 2026-01-06 | 26 |
-| 2026-01-07 | 57 |
-| 2026-01-08 | 42 |
-| 2026-01-09 | 27 |
-| 2026-01-10 | 4 |
-| 2026-01-11 | 28 |
-| 2026-01-12 | 2 |
-| 2026-01-13 | 9 |
-| 2026-01-14 | 1 |
-| 2026-01-15 | 71 |
-| 2026-01-16 | 10 |
-| 2026-01-17 | 30 |
-| 2026-01-18 | 6 |
-| 2026-01-19 | 40 |
-| 2026-01-20 | 68 |
-| 2026-01-21 | 57 |
-| 2026-01-22 | 71 |
-| 2026-01-23 | 3 |
-| 2026-01-24 | 15 |
-| 2026-01-25 | 86 |
-| 2026-01-26 | 16 |
-| 2026-01-27 | 0 |
-| 2026-01-28 | 20 |
-| 2026-01-29 | 35 |
-| 2026-01-30 | 7 |
-| 2026-01-31 | 24 |
-| 2026-02-01 | 11 |
-| 2026-02-02 | 121 |
-| 2026-02-03 | 20 |
-| 2026-02-04 | 0 |
-| 2026-02-05 | 0 |
-| 2026-02-06 | 38 |
-| 2026-02-07 | 16 |
-| 2026-02-08 | 0 |
-| 2026-02-09 | 21 |
-| 2026-02-10 | 0 |
-| 2026-02-11 | 0 |
-| 2026-02-12 | 8 |
-| 2026-02-13 | 137 |
-| 2026-02-14 | 74 |
-| 2026-02-15 | 16 |
-| 2026-02-16 | 49 |
-| 2026-02-17 | 97 |
-| 2026-02-18 | 8 |
-| 2026-02-19 | 156 |
-| 2026-02-20 | 95 |
-| 2026-02-21 | 22 |
-| 2026-02-22 | 20 |
-| 2026-02-23 | 67 |
-| 2026-02-24 | 38 |
-| 2026-02-25 | 20 |
-| 2026-02-26 | 4 |
-| 2026-02-27 | 6 |
-| 2026-02-28 | 4 |
-| 2026-03-01 | 27 |
-| 2026-03-02 | 10 |
-| 2026-03-03 | 45 |
-| 2026-03-04 | 27 |
-| 2026-03-05 | 16 |
-| 2026-03-06 | 82 |
-| 2026-03-07 | 43 |
-| 2026-03-08 | 21 |
-| 2026-03-09 | 22 |
-| 2026-03-10 | 20 |
-| 2026-03-11 | 38 |
-| 2026-03-12 | 24 |
-| 2026-03-13 | 20 |
-| 2026-03-14 | 43 |
-| 2026-03-15 | 27 |
-| 2026-03-16 | 16 |
-| 2026-03-17 | 21 |
-| 2026-03-18 | 15 |
-| 2026-03-19 | 19 |
-| 2026-03-20 | 23 |
-| 2026-03-21 | 37 |
-| 2026-03-22 | 42 |
-| 2026-03-23 | 23 |
-| 2026-03-24 | 25 |
-| 2026-03-25 | 27 |
-| 2026-03-26 | 24 |
-| 2026-03-27 | 38 |
-| 2026-03-28 | 30 |
-| 2026-03-29 | 29 |
-| 2026-03-30 | 17 |
-| 2026-03-31 | 18 |
-| 2026-04-01 | 22 |
-| 2026-04-02 | 66 |
-| 2026-04-03 | 79 |
-| 2026-04-04 | 70 |
-| 2026-04-05 | 78 |
-| 2026-04-06 | 30 |
-| 2026-04-07 | 47 |
-| 2026-04-08 | 95 |
-| 2026-04-09 | 66 |
-| 2026-04-10 | 97 |
-| 2026-04-11 | 68 |
-| 2026-04-12 | 27 |
-| 2026-04-13 | 29 |
-| 2026-04-14 | 36 |
-| 2026-04-15 | 38 |
-| 2026-04-16 | 91 |
-| 2026-04-17 | 24 |
-| 2026-04-18 | 28 |
-| 2026-04-19 | 72 |
-| 2026-04-20 | 33 |
-| 2026-04-21 | 37 |
-| 2026-04-22 | 75 |
-| 2026-04-23 | 49 |
-| 2026-04-24 | 24 |
-| 2026-04-25 | 116 |
-| 2026-04-26 | 127 |
-| 2026-04-27 | 86 |
-| 2026-04-28 | 86 |
-| 2026-04-29 | 44 |
-| 2026-04-30 | 11 |
-| 2026-05-01 | 30 |
-| 2026-05-02 | 116 |
-| 2026-05-03 | 152 |
-| 2026-05-04 | 66 |
-| 2026-05-05 | 41 |
-| 2026-05-06 | 159 |
-| 2026-05-07 | 78 |
-| 2026-05-08 | 49 |
-| 2026-05-09 | 68 |
-| 2026-05-10 | 35 |
-| 2026-05-11 | 103 |
-| 2026-05-12 | 103 |
-| 2026-05-13 | 159 |
-| 2026-05-14 | 174 |
-| 2026-05-15 | 200 |
-| 2026-05-16 | 97 |
-| 2026-05-17 | 41 |
-| 2026-05-18 | 11 |
-| 2026-05-19 | 7 |
-| 2026-05-20 | 8 |
-| 2026-05-21 | 8 |
-| 2026-05-22 | 8 |
-| 2026-05-23 | 16 |
-| 2026-05-24 | 27 |
-| 2026-05-25 | 16 |
-| 2026-05-26 | 41 |
-| 2026-05-27 | 25 |
-| 2026-05-28 | 27 |
-| 2026-05-29 | 13 |
-| 2026-05-30 | 42 |
-| 2026-05-31 | 21 |
-| 2026-06-01 | 23 |
-| 2026-06-02 | 16 |
-| 2026-06-03 | 17 |
-| 2026-06-04 | 18 |
-| 2026-06-05 | 19 |
-| 2026-06-06 | 6 |
-| 2026-06-07 | 14 |
-| 2026-06-08 | 14 |
-| 2026-06-09 | 18 |
-| 2026-06-10 | 17 |
-| 2026-06-11 | 27 |
-| 2026-06-12 | 18 |
-| 2026-06-13 | 58 |
-| 2026-06-14 | 64 |
-| 2026-06-15 | 5 |
-| 2026-06-16 | 6 |
-| 2026-06-17 | 2 |
-| 2026-06-18 | 6 |
-| 2026-06-19 | 4 |
-| 2026-06-20 | 11 |
-| 2026-06-21 | 20 |
-| 2026-06-22 | 32 |
-| 2026-06-23 | 1 |
-| 2026-06-24 | 0 |
-| 2026-06-25 | 0 |
-| 2026-06-26 | 0 |
-| 2026-06-27 | 9 |
-| 2026-06-28 | 76 |
-| 2026-06-29 | 56 |
-| 2026-06-30 | 55 |
-| 2026-07-01 | 57 |
-| 2026-07-02 | 100 |
-| 2026-07-03 | 41 |
-| 2026-07-04 | 43 |
-| 2026-07-05 | 52 |
-| 2026-07-06 | 36 |
-| 2026-07-07 | 42 |
-| 2026-07-08 | 21 |
-| 2026-07-09 | 68 |
-| 2026-07-10 | 115 |
-| 2026-07-11 | 37 |
-| 2026-07-12 | 46 |
-| 2026-07-13 | 17 |
-| 2026-07-14 | 57 |
-| 2026-07-15 | 69 |
-| 2026-07-16 | 26 |
-| 2026-07-17 | 22 |
-| 2026-07-18 | 42 |
-| 2026-07-19 | 30 |
-| 2026-07-20 | 13 |
-| 2026-07-21 | 41 |
-| 2026-07-22 | 17 |
-| 2026-07-23 | 26 |
-| 2026-07-24 | 20 |
-| 2026-07-25 | 49 |
-| 2026-07-26 | 29 |
-| 2026-07-27 | 21 |
-| 2026-07-28 | 15 |
-| 2026-07-29 | 11 |
-| 2026-07-30 | 10 |
-| 2026-07-31 | 11 |
-| 2026-08-01 | 14 |
-| 2026-08-02 | 41 |
-| 2026-08-03 | 9 |
-| 2026-08-04 | 10 |
-| 2026-08-05 | 10 |
-| 2026-08-06 | 6 |
-| 2026-08-07 | 28 |
-| 2026-08-08 | 55 |
-| 2026-08-09 | 27 |
-| 2026-08-10 | 22 |
-| 2026-08-11 | 29 |
-| 2026-08-12 | 92 |
-| 2026-08-13 | 136 |
-| 2026-08-14 | 62 |
-| 2026-08-15 | 51 |
-| 2026-08-16 | 111 |
-| 2026-08-17 | 47 |
-| 2026-08-18 | 69 |
-| 2026-08-19 | 116 |
-| 2026-08-20 | 130 |
-| 2026-08-21 | 56 |
-| 2026-08-22 | 25 |
-| 2026-08-23 | 29 |
-| 2026-08-24 | 23 |
-| 2026-08-25 | 49 |
-| 2026-08-26 | 16 |
-| 2026-08-27 | 7 |
-| 2026-08-28 | 0 |
-| 2026-08-29 | 0 |
-| 2026-08-30 | 0 |
-| 2026-08-31 | 0 |
-| 2026-09-01 | 3 |
-| 2026-09-02 | 5 |
-| 2026-09-03 | 42 |
-| 2026-09-04 | 2 |
-| 2026-09-05 | 7 |
-| 2026-09-06 | 15 |
-| 2026-09-07 | 5 |
-| 2026-09-08 | 11 |
-| 2026-09-09 | 21 |
-| 2026-09-10 | 19 |
-| 2026-09-11 | 26 |
-| 2026-09-12 | 21 |
-| 2026-09-13 | 22 |
-| 2026-09-14 | 28 |
-| 2026-09-15 | 0 |
-| 2026-09-16 | 2 |
-| 2026-09-17 | 0 |
-| 2026-09-18 | 5 |
-| 2026-09-19 | 4 |
-| 2026-09-20 | 2 |
-| 2026-09-21 | 4 |
-| 2026-09-22 | 21 |
-| 2026-09-23 | 0 |
-| 2026-09-24 | 0 |
-| 2026-09-25 | 0 |
-| 2026-09-26 | 0 |
-| 2026-09-27 | 0 |
-| 2026-09-28 | 1 |
-| 2026-09-29 | 2 |
-| 2026-09-30 | 0 |
-| 2026-10-01 | 0 |
-| 2026-10-02 | 26 |
-| 2026-10-03 | 62 |
-| 2026-10-04 | 30 |
-| 2026-10-05 | 32 |
-| 2026-10-06 | 41 |
-| 2026-10-07 | 61 |
-| 2026-10-08 | 51 |
-| 2026-10-09 | 27 |
-| 2026-10-10 | 28 |
-| 2026-10-11 | 71 |
-| 2026-10-12 | 48 |
-| 2026-10-13 | 65 |
-| 2026-10-14 | 95 |
-| 2026-10-15 | 155 |
-| 2026-10-16 | 64 |
-| 2026-10-17 | 92 |
-| 2026-10-18 | 58 |
-| 2026-10-19 | 36 |
-| 2026-10-20 | 31 |
-| 2026-10-21 | 38 |
-| 2026-10-22 | 28 |
-| 2026-10-23 | 27 |
-| 2026-10-24 | 41 |
-| 2026-10-25 | 36 |
-| 2026-10-26 | 27 |
-| 2026-10-27 | 29 |
-| 2026-10-28 | 30 |
-| 2026-10-29 | 30 |
-| 2026-10-30 | 28 |
-| 2026-10-31 | 32 |
-| 2026-11-01 | 53 |
-| 2026-11-02 | 29 |
-| 2026-11-03 | 39 |
-| 2026-11-04 | 109 |
-| 2026-11-05 | 58 |
-| 2026-11-06 | 33 |
-| 2026-11-07 | 40 |
 
 
 </details>
@@ -511,13 +139,13 @@ Next:
 Recent Updates:
 - [v1.2.9](https://github.com/jguida941/voiceterm/releases/tag/v1.2.9) — voiceterm · 2 days ago
 - [v1.2.8](https://github.com/jguida941/voiceterm/releases/tag/v1.2.8) — voiceterm · 2 days ago
-- [v1.2.7](https://github.com/jguida941/voiceterm/releases/tag/v1.2.7) — voiceterm · 2 days ago
+- [v1.2.7](https://github.com/jguida941/voiceterm/releases/tag/v1.2.7) — voiceterm · 3 days ago
 
 
 
 ### Code changes
 
-Last 30 days · 2026-10-09 – 2026-11-07 UTC; today is partial. Inspected 8 of 8 eligible recently pushed repositories.
+Last 30 days · 2026-10-10 – 2026-11-08 UTC; today is partial. Inspected 8 of 8 eligible recently pushed repositories.
 
 
 Latest observed pushed branch: jguida941/profile-private-continuation · refs/heads/main · [708482c0681933b4743845a37004337804bdbe95](https://github.com/jguida941/profile-private-continuation/commit/708482c0681933b4743845a37004337804bdbe95).
@@ -526,7 +154,6 @@ Latest observed pushed branch: jguida941/profile-private-continuation · refs/he
 
 | UTC date | Additions | Deletions |
 | --- | ---: | ---: |
-| 2026-10-09 | unavailable | unavailable |
 | 2026-10-10 | unavailable | unavailable |
 | 2026-10-11 | 2681765 | 78 |
 | 2026-10-12 | 52145 | 81 |
@@ -556,6 +183,7 @@ Latest observed pushed branch: jguida941/profile-private-continuation · refs/he
 | 2026-11-05 | 6610 | 891 |
 | 2026-11-06 | unavailable | unavailable |
 | 2026-11-07 | unavailable | unavailable |
+| 2026-11-08 | unavailable | unavailable |
 
 
 Selection: partial · activity_incomplete. History: ok. Missing history is not zero.
@@ -580,27 +208,27 @@ Recently created:
 
 These compatibility images retain their existing presentation.
 
-<img src="assets/raw_snapshot.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7" width="100%" alt="Raw Snapshot: the generated profile metric values and their qualifications.">
+<img src="assets/raw_snapshot.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01" width="100%" alt="Raw Snapshot: the generated profile metric values and their qualifications.">
 
-- [Overview](metrics.general.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Streaks](assets/streak_summary.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Badges](assets/badges.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Scorecard](assets/builder_scorecard.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Cadence](assets/engineering_cadence.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Calendar](assets/contribution_calendar.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Focus](assets/now_next_shipped.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Recent work](assets/currently_working.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Languages](assets/lang_breakdown.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Rhythm](assets/activity_heatmap.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Projects](assets/repo_spotlight.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
-- [Snapshot](assets/raw_snapshot.svg?v=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7)
+- [Overview](metrics.general.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Streaks](assets/streak_summary.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Badges](assets/badges.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Scorecard](assets/builder_scorecard.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Cadence](assets/engineering_cadence.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Calendar](assets/contribution_calendar.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Focus](assets/now_next_shipped.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Recent work](assets/currently_working.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Languages](assets/lang_breakdown.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Rhythm](assets/activity_heatmap.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Projects](assets/repo_spotlight.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
+- [Snapshot](assets/raw_snapshot.svg?v=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01)
 
 
 </details>
 
 ### Deep Dive Data
 
-- [Open the full dashboard](https://jguida941.github.io/jguida941/?from_snapshot=4c978bac059bbeb9cb696219ea59a51873cce50379c187db9772c17caf7856b7#overview)
+- [Open the full dashboard](https://jguida941.github.io/jguida941/?from_snapshot=3fa646bd528d729e3885e293224b6aab5cc0589bd2d90a5f25c749630ef18e01#overview)
 - [Open raw profile snapshot JSON](site/data/profile_snapshot.json)
 - Generated by `python scripts/profile_cli.py generate-profile --validate` from GitHub repository metadata.
 - A curated project matrix, recent delivery feed, top-language summary, and recent repository list are available in the dashboard + JSON.
