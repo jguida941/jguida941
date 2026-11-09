@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-09T21:02:12.620648Z",
+  "generated_at": "2026-11-09T22:02:39.351655Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 13153,
-    "public_scope_commits": 8315,
+    "last_year_contributions": 13154,
+    "public_scope_commits": 8316,
     "total_repos": 56,
     "public_forks": 1,
     "private_owned_repos": 199,
@@ -27,7 +27,7 @@
     "languages_count": 35,
     "prs_merged": 67,
     "releases": 3,
-    "ci_repos": 53,
+    "ci_repos": 40,
     "streak_days": 39
   },
   "snapshot_rows": [
@@ -35,15 +35,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 13153,
-      "display_value": "13,153"
+      "value": 13154,
+      "display_value": "13,154"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 8315,
-      "display_value": "8,315"
+      "value": 8316,
+      "display_value": "8,316"
     },
     {
       "key": "total_repos",
@@ -98,8 +98,8 @@
       "key": "ci_repos",
       "label": "Workflow repos",
       "dashboard_label": "Workflow repos",
-      "value": 53,
-      "display_value": "53"
+      "value": 40,
+      "display_value": "40"
     },
     {
       "key": "streak_days",
@@ -113,14 +113,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 13153,
-      "display_value": "13,153"
+      "value": 13154,
+      "display_value": "13,154"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 8315,
-      "display_value": "8,315"
+      "value": 8316,
+      "display_value": "8,316"
     },
     {
       "key": "total_repos",
@@ -167,8 +167,8 @@
     {
       "key": "ci_repos",
       "label": "Workflow repos",
-      "value": 53,
-      "display_value": "53"
+      "value": 40,
+      "display_value": "40"
     },
     {
       "key": "streak_days",
@@ -178,8 +178,8 @@
     }
   ],
   "data_quality": {
-    "ci_status": "ok",
-    "ci_note": "Workflow observation complete",
+    "ci_status": "partial",
+    "ci_note": "Workflow \u00b7 Partial \u00b7 known minimum \u00b7 unknown repositories",
     "commits_status": "ok",
     "commits_note": "Public-scope commit aggregation complete.",
     "releases_status": "ok",
@@ -194,14 +194,14 @@
     "metric_statuses": {
       "active_repos_7d": "exact",
       "days_since_last_push": "exact",
-      "automation_repos": "exact",
-      "automation_workflows": "exact",
-      "ci_coverage_pct": "exact",
-      "ci_repos": "exact",
-      "top_languages": "exact",
-      "primary_lang_share_pct": "exact",
-      "languages_over_5pct": "exact",
-      "languages_count": "exact"
+      "automation_repos": "partial",
+      "automation_workflows": "partial",
+      "ci_coverage_pct": "partial",
+      "ci_repos": "partial",
+      "top_languages": "partial",
+      "primary_lang_share_pct": "partial",
+      "languages_over_5pct": "partial",
+      "languages_count": "partial"
     },
     "metric_provenance": {
       "public_scope_commits": {
@@ -214,7 +214,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-11-09T21:00:37Z",
+        "observed_at": "2026-11-09T22:00:53Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -228,8 +228,8 @@
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-11-10T05:00:00Z",
-        "window_end": "2026-11-09T21:00:44Z",
-        "observed_at": "2026-11-09T21:00:44Z",
+        "window_end": "2026-11-09T22:01:04Z",
+        "observed_at": "2026-11-09T22:01:05Z",
         "source_id": "github_graphql_contribution_calendar",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -243,8 +243,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-10-11T04:00:00Z",
-        "window_end": "2026-11-09T21:00:41Z",
-        "observed_at": "2026-11-09T21:00:43Z",
+        "window_end": "2026-11-09T22:00:59Z",
+        "observed_at": "2026-11-09T22:01:01Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -258,8 +258,8 @@
         "population_id": "owned-repositories-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-11-10T05:00:00Z",
-        "window_end": "2026-11-09T21:00:43Z",
-        "observed_at": "2026-11-09T21:00:44Z",
+        "window_end": "2026-11-09T22:01:01Z",
+        "observed_at": "2026-11-09T22:01:02Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -274,7 +274,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-11-09T21:00:36Z",
+        "observed_at": "2026-11-09T22:00:51Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -288,11 +288,11 @@
     "active_repos_7d": 3,
     "avg_release_gap_days": 0.04677083333333333,
     "stars_per_public_repo": 1.0535714285714286,
-    "ci_coverage_pct": 20.866141732283463,
-    "last_year_contributions": 13153,
+    "ci_coverage_pct": 15.748031496062993,
+    "last_year_contributions": 13154,
     "active_days_last_year": 333,
-    "automation_workflows": 165,
-    "primary_lang_share_pct": 67.9,
+    "automation_workflows": 105,
+    "primary_lang_share_pct": 68.2,
     "median_days_since_push": 383.5,
     "days_since_last_push": 4.0
   },
@@ -301,8 +301,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 13153,
-      "display_value": "13,153",
+      "value": 13154,
+      "display_value": "13,154",
       "accent": "#7dcfff"
     },
     {
@@ -325,16 +325,16 @@
       "key": "ci_coverage_pct",
       "label": "Repo adoption",
       "detail": "owned public + private nonfork repositories",
-      "value": 20.866141732283463,
-      "display_value": "20.9%",
+      "value": 15.748031496062993,
+      "display_value": "15.7%",
       "accent": "#ff9e64"
     },
     {
       "key": "automation_workflows",
       "label": "Workflow files",
       "detail": "workflow files across repos",
-      "value": 165,
-      "display_value": "165",
+      "value": 105,
+      "display_value": "105",
       "accent": "#7aa2f7"
     },
     {
@@ -349,8 +349,8 @@
       "key": "primary_lang_share_pct",
       "label": "Primary Language",
       "detail": "share of code by bytes",
-      "value": 67.9,
-      "display_value": "67.9%",
+      "value": 68.2,
+      "display_value": "68.2%",
       "accent": "#7aa2f7"
     },
     {
@@ -373,14 +373,14 @@
     "metric_scopes": {
       "active_repos_7d": "owned-public-private-nonfork-profile-excluded-exact",
       "days_since_last_push": "owned-public-private-nonfork-profile-excluded-exact",
-      "automation_repos": "owned-public-private-nonfork-profile-excluded-exact",
-      "automation_workflows": "owned-public-private-nonfork-profile-excluded-exact",
-      "ci_coverage_pct": "owned-public-private-nonfork-profile-excluded-exact",
-      "ci_repos": "owned-public-private-nonfork-profile-excluded-exact",
-      "top_languages": "owned-public-private-nonfork-profile-excluded-exact",
-      "primary_lang_share_pct": "owned-public-private-nonfork-profile-excluded-exact",
-      "languages_over_5pct": "owned-public-private-nonfork-profile-excluded-exact",
-      "languages_count": "owned-public-private-nonfork-profile-excluded-exact"
+      "automation_repos": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "automation_workflows": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "ci_coverage_pct": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "ci_repos": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "top_languages": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "primary_lang_share_pct": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "languages_over_5pct": "owned-public-private-nonfork-profile-excluded-partial-observation",
+      "languages_count": "owned-public-private-nonfork-profile-excluded-partial-observation"
     }
   },
   "featured_repo_facts": [
@@ -391,7 +391,7 @@
       "language": "Python",
       "stars": 3,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-04-13",
       "pushed_at_raw": "2026-04-13T07:49:48Z",
       "pushed_ago": "7 months ago",
@@ -407,7 +407,7 @@
       "language": "Rust",
       "stars": 1,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-11-05",
       "pushed_at_raw": "2026-11-05T03:04:05Z",
       "pushed_ago": "4 days ago",
@@ -423,7 +423,7 @@
       "language": "Java",
       "stars": 3,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-04-06",
       "pushed_at_raw": "2026-04-06T20:57:12Z",
       "pushed_ago": "7 months ago",
@@ -436,58 +436,58 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 94074012,
-      "percent": 67.93
+      "bytes": 96018050,
+      "percent": 68.25
     },
     {
       "name": "Rust",
       "bytes": 10904193,
-      "percent": 7.87
+      "percent": 7.75
     },
     {
       "name": "C++",
       "bytes": 7919971,
-      "percent": 5.72
+      "percent": 5.63
     },
     {
       "name": "Swift",
       "bytes": 6142050,
-      "percent": 4.44
+      "percent": 4.37
     },
     {
       "name": "Makefile",
       "bytes": 5886788,
-      "percent": 4.25
+      "percent": 4.18
     },
     {
       "name": "HTML",
-      "bytes": 4794539,
-      "percent": 3.46
+      "bytes": 5058518,
+      "percent": 3.6
     },
     {
       "name": "Java",
       "bytes": 2124950,
-      "percent": 1.53
+      "percent": 1.51
     },
     {
       "name": "JavaScript",
       "bytes": 1363682,
-      "percent": 0.98
+      "percent": 0.97
     },
     {
       "name": "Shell",
       "bytes": 1255556,
-      "percent": 0.91
+      "percent": 0.89
     },
     {
       "name": "GDScript",
       "bytes": 1129648,
-      "percent": 0.82
+      "percent": 0.8
     },
     {
       "name": "Jupyter Notebook",
       "bytes": 899502,
-      "percent": 0.65
+      "percent": 0.64
     },
     {
       "name": "TypeScript",
@@ -503,7 +503,7 @@
       "language": "Python",
       "stars": 3,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-04-13",
       "pushed_at_raw": "2026-04-13T07:49:48Z",
       "pushed_ago": "7 months ago",
@@ -519,7 +519,7 @@
       "language": "Rust",
       "stars": 1,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-11-05",
       "pushed_at_raw": "2026-11-05T03:04:05Z",
       "pushed_ago": "4 days ago",
@@ -535,7 +535,7 @@
       "language": "Java",
       "stars": 3,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-04-06",
       "pushed_at_raw": "2026-04-06T20:57:12Z",
       "pushed_ago": "7 months ago",
@@ -567,7 +567,7 @@
       "language": "Ruby",
       "stars": 1,
       "forks": 0,
-      "ci": "no",
+      "ci": "n/a",
       "pushed_at": "2026-11-05",
       "pushed_at_raw": "2026-11-05T02:46:21Z",
       "pushed_ago": "4 days ago",
@@ -663,12 +663,12 @@
       "language": "Swift",
       "stars": 1,
       "forks": 0,
-      "ci": "no",
+      "ci": "n/a",
       "pushed_at": "2026-10-08",
       "pushed_at_raw": "2026-10-08T07:00:41Z",
       "pushed_ago": "1 month ago",
       "created_at": "2026-09-03",
-      "last_commit_msg": "Keep documentation focused on app behavior",
+      "last_commit_msg": "recent push detected",
       "is_private": false,
       "featured": false
     },
@@ -759,12 +759,12 @@
       "language": "Swift",
       "stars": 1,
       "forks": 0,
-      "ci": "no",
+      "ci": "n/a",
       "pushed_at": "2026-08-26",
       "pushed_at_raw": "2026-08-26T02:17:19Z",
       "pushed_ago": "2 months ago",
       "created_at": "2025-05-18",
-      "last_commit_msg": "Rebuild MemLite as native macOS preview",
+      "last_commit_msg": "recent push detected",
       "is_private": false,
       "featured": false
     },
@@ -775,12 +775,12 @@
       "language": "Python",
       "stars": 2,
       "forks": 0,
-      "ci": "yes",
+      "ci": "n/a",
       "pushed_at": "2026-08-25",
       "pushed_at_raw": "2026-08-25T19:09:01Z",
       "pushed_ago": "2 months ago",
       "created_at": "2026-08-15",
-      "last_commit_msg": "Merge pull request #4 from jguida941/privacy-contract-split-03d9",
+      "last_commit_msg": "recent push detected",
       "is_private": false,
       "featured": false
     }
@@ -965,27 +965,115 @@
       "latest_commit_message": "Record what the mod established, and the gaps that were living in a c\u2026"
     },
     {
+      "id": 1356002851,
+      "node_id": "R_kgDOUNL2Iw",
       "name": "build-sweep",
-      "fork": false,
+      "full_name": "jguida941/build-sweep",
       "private": false,
-      "visibility": "public",
-      "description": "A simple native macOS utility that reclaims space by cleaning regenerable development files.",
-      "html_url": "https://github.com/jguida941/build-sweep",
-      "pushed_at": "2026-10-08T07:00:41Z",
-      "created_at": "2026-09-03T13:21:01Z",
-      "stargazers_count": 1,
-      "forks_count": 0,
-      "language": "Swift",
       "owner": {
-        "login": "jguida941"
+        "login": "jguida941",
+        "id": 197367371,
+        "node_id": "U_kgDOC8OWSw",
+        "avatar_url": "https://avatars.githubusercontent.com/u/197367371?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/jguida941",
+        "html_url": "https://github.com/jguida941",
+        "followers_url": "https://api.github.com/users/jguida941/followers",
+        "following_url": "https://api.github.com/users/jguida941/following{/other_user}",
+        "gists_url": "https://api.github.com/users/jguida941/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/jguida941/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/jguida941/subscriptions",
+        "organizations_url": "https://api.github.com/users/jguida941/orgs",
+        "repos_url": "https://api.github.com/users/jguida941/repos",
+        "events_url": "https://api.github.com/users/jguida941/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/jguida941/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
       },
-      "has_ci_workflows": false,
-      "workflow_file_count": 0,
-      "language_bytes": {
-        "Swift": 47963
+      "html_url": "https://github.com/jguida941/build-sweep",
+      "description": "A simple native macOS utility that reclaims space by cleaning regenerable development files.",
+      "fork": false,
+      "url": "https://api.github.com/repos/jguida941/build-sweep",
+      "forks_url": "https://api.github.com/repos/jguida941/build-sweep/forks",
+      "keys_url": "https://api.github.com/repos/jguida941/build-sweep/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/jguida941/build-sweep/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/jguida941/build-sweep/teams",
+      "hooks_url": "https://api.github.com/repos/jguida941/build-sweep/hooks",
+      "issue_events_url": "https://api.github.com/repos/jguida941/build-sweep/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/jguida941/build-sweep/events",
+      "assignees_url": "https://api.github.com/repos/jguida941/build-sweep/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/jguida941/build-sweep/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/jguida941/build-sweep/tags",
+      "blobs_url": "https://api.github.com/repos/jguida941/build-sweep/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/jguida941/build-sweep/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/jguida941/build-sweep/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/jguida941/build-sweep/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/jguida941/build-sweep/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/jguida941/build-sweep/languages",
+      "stargazers_url": "https://api.github.com/repos/jguida941/build-sweep/stargazers",
+      "contributors_url": "https://api.github.com/repos/jguida941/build-sweep/contributors",
+      "subscribers_url": "https://api.github.com/repos/jguida941/build-sweep/subscribers",
+      "subscription_url": "https://api.github.com/repos/jguida941/build-sweep/subscription",
+      "commits_url": "https://api.github.com/repos/jguida941/build-sweep/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/jguida941/build-sweep/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/jguida941/build-sweep/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/jguida941/build-sweep/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/jguida941/build-sweep/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/jguida941/build-sweep/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/jguida941/build-sweep/merges",
+      "archive_url": "https://api.github.com/repos/jguida941/build-sweep/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/jguida941/build-sweep/downloads",
+      "issues_url": "https://api.github.com/repos/jguida941/build-sweep/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/jguida941/build-sweep/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/jguida941/build-sweep/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/jguida941/build-sweep/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/jguida941/build-sweep/labels{/name}",
+      "releases_url": "https://api.github.com/repos/jguida941/build-sweep/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/jguida941/build-sweep/deployments",
+      "created_at": "2026-09-03T13:21:01Z",
+      "updated_at": "2026-10-08T07:00:45Z",
+      "pushed_at": "2026-10-08T07:00:41Z",
+      "git_url": "git://github.com/jguida941/build-sweep.git",
+      "ssh_url": "git@github.com:jguida941/build-sweep.git",
+      "clone_url": "https://github.com/jguida941/build-sweep.git",
+      "svn_url": "https://github.com/jguida941/build-sweep",
+      "homepage": "",
+      "size": 1297,
+      "stargazers_count": 1,
+      "watchers_count": 1,
+      "language": "Swift",
+      "has_issues": true,
+      "has_projects": true,
+      "has_downloads": false,
+      "has_wiki": false,
+      "has_pages": false,
+      "has_discussions": false,
+      "forks_count": 0,
+      "mirror_url": null,
+      "archived": false,
+      "disabled": false,
+      "open_issues_count": 0,
+      "license": null,
+      "allow_forking": true,
+      "is_template": false,
+      "web_commit_signoff_required": false,
+      "has_pull_requests": true,
+      "pull_request_creation_policy": "all",
+      "topics": [],
+      "visibility": "public",
+      "forks": 0,
+      "open_issues": 0,
+      "watchers": 1,
+      "default_branch": "main",
+      "permissions": {
+        "admin": true,
+        "maintain": true,
+        "push": true,
+        "triage": true,
+        "pull": true
       },
-      "language_bytes_complete": true,
-      "latest_commit_message": "Keep documentation focused on app behavior"
+      "latest_commit_message": ""
     },
     {
       "name": "github-control-plane",
@@ -1260,7 +1348,7 @@
       237,
       229,
       351,
-      19
+      20
     ],
     "contribution_trend": {
       "status": "available",
@@ -1377,15 +1465,15 @@
           "observed_start": "2026-11-09",
           "observed_end": "2026-11-09",
           "days_observed": 1,
-          "contributions": 19,
+          "contributions": 20,
           "partial": true
         }
       ],
       "reason": "dated_calendar"
     },
-    "automation_workflows": 165,
-    "automation_repos": 53,
-    "primary_lang_share_pct": 67.9,
+    "automation_workflows": 105,
+    "automation_repos": 40,
+    "primary_lang_share_pct": 68.2,
     "languages_over_5pct": 3,
     "median_days_since_push": 383.5,
     "days_since_last_push": 4.0,
@@ -1400,13 +1488,13 @@
     "public": {
       "observed_eligible_repos": 55,
       "eligible_repos": 55,
-      "observed_workflow_repos": 55,
-      "unknown_workflow_repos": 0,
-      "configured_repos": 13,
-      "workflow_files": 60,
-      "adoption_pct": 23.636363636363637,
+      "observed_workflow_repos": 0,
+      "unknown_workflow_repos": 55,
+      "configured_repos": null,
+      "workflow_files": null,
+      "adoption_pct": null,
       "inventory_status": "exact",
-      "status": "exact"
+      "status": "unavailable"
     },
     "private": {
       "observed_eligible_repos": 199,
@@ -1422,28 +1510,28 @@
     "combined": {
       "observed_eligible_repos": 254,
       "eligible_repos": 254,
-      "observed_workflow_repos": 254,
-      "unknown_workflow_repos": 0,
-      "configured_repos": 53,
-      "workflow_files": 165,
-      "adoption_pct": 20.866141732283463,
+      "observed_workflow_repos": 199,
+      "unknown_workflow_repos": 55,
+      "configured_repos": 40,
+      "workflow_files": 105,
+      "adoption_pct": 15.748031496062993,
       "inventory_status": "exact",
-      "status": "exact"
+      "status": "partial"
     }
   },
   "automation_display": {
     "scope": "Owned public + private nonfork repositories; profile excluded.",
     "meaning": "GitHub workflow configuration at observed default-branch HEAD. Configuration does not imply successful runs.",
     "public": {
-      "configured_repos": "13",
+      "configured_repos": "n/a",
       "eligible_repos": "55",
-      "workflow_files": "60",
-      "unknown_workflow_repos": "0",
+      "workflow_files": "n/a",
+      "unknown_workflow_repos": "55",
       "observed_eligible_repos": "55",
-      "status": "Exact",
-      "qualification": "Workflow observation complete",
-      "adoption": "24%",
-      "gauge_detail": "13/55 repos"
+      "status": "Unavailable",
+      "qualification": "Workflow \u00b7 Unavailable \u00b7 n/a",
+      "adoption": "n/a",
+      "gauge_detail": "n/a/55 repos"
     },
     "private": {
       "configured_repos": "40",
@@ -1457,30 +1545,46 @@
       "gauge_detail": "40/199 repos"
     },
     "combined": {
-      "configured_repos": "53",
+      "configured_repos": "40",
       "eligible_repos": "254",
-      "workflow_files": "165",
-      "unknown_workflow_repos": "0",
+      "workflow_files": "105",
+      "unknown_workflow_repos": "55",
       "observed_eligible_repos": "254",
-      "status": "Exact",
-      "qualification": "Workflow observation complete",
-      "adoption": "21%",
-      "gauge_detail": "53/254 repos"
+      "status": "Partial",
+      "qualification": "Workflow \u00b7 Partial \u00b7 known minimum \u00b7 unknown repositories",
+      "adoption": "16%",
+      "gauge_detail": "40/254 repos"
     }
   },
   "ci_execution": {
     "schema": "profile-ci-execution/v1",
     "repository": "jguida941/jguida941",
-    "observed_at": "2026-11-09T21:02:11Z",
+    "observed_at": "2026-11-09T22:02:36Z",
     "sample_limit": 12,
     "scope": "Latest observed GitHub Actions runs in the public profile repository, across branches; not account-wide.",
     "status": "available",
     "observed_runs": 12,
     "runs": [
       {
-        "run_id": 42698268405,
+        "run_id": 42707751959,
         "workflow": "Generate Metrics",
         "outcome": "in_progress",
+        "created_at": "2026-11-09T22:00:06Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 42698698492,
+        "workflow": "Deploy Profile Site",
+        "outcome": "success",
+        "created_at": "2026-11-09T21:02:41Z",
+        "event": "workflow_run",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 42698268405,
+        "workflow": "Generate Metrics",
+        "outcome": "success",
         "created_at": "2026-11-09T21:00:04Z",
         "event": "workflow_dispatch",
         "head_branch": "main"
@@ -1556,27 +1660,11 @@
         "created_at": "2026-11-09T16:01:28Z",
         "event": "workflow_run",
         "head_branch": "main"
-      },
-      {
-        "run_id": 42650040650,
-        "workflow": "Generate Metrics",
-        "outcome": "success",
-        "created_at": "2026-11-09T15:58:38Z",
-        "event": "workflow_dispatch",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 42640183834,
-        "workflow": "Deploy Profile Site",
-        "outcome": "success",
-        "created_at": "2026-11-09T15:00:08Z",
-        "event": "workflow_run",
-        "head_branch": "main"
       }
     ]
   },
   "contribution_calendar": {
-    "total": 13153,
+    "total": 13154,
     "weeks": [
       [
         {
@@ -3141,7 +3229,7 @@
       [
         {
           "date": "2026-11-09",
-          "count": 19
+          "count": 20
         }
       ]
     ]
@@ -3156,11 +3244,11 @@
     "window_start": "2025-11-10",
     "window_end": "2026-11-09",
     "days_observed": 365,
-    "total": 13153,
+    "total": 13154,
     "weekdays": [
       {
         "weekday": "Mon",
-        "contributions": 1546,
+        "contributions": 1547,
         "days_observed": 53
       },
       {
@@ -3210,9 +3298,9 @@
     "rows": [
       {
         "weekday": "Mon",
-        "contributions": 1546,
+        "contributions": 1547,
         "days_observed": 53,
-        "count_text": "1,546"
+        "count_text": "1,547"
       },
       {
         "weekday": "Tue",
@@ -3255,7 +3343,7 @@
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
     "window_start": "2026-10-11T00:00:00Z",
-    "window_end": "2026-11-09T21:01:12.277388Z",
+    "window_end": "2026-11-09T22:01:37.324951Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 255,
@@ -3544,8 +3632,8 @@
       "status": "partial",
       "complete": false,
       "window_start": "2026-10-11T00:00:00Z",
-      "window_end": "2026-11-09T21:01:12.277388Z",
-      "observed_at": "2026-11-09T21:01:12.277388Z",
+      "window_end": "2026-11-09T22:01:37.324951Z",
+      "observed_at": "2026-11-09T22:01:37.324951Z",
       "timezone": "UTC",
       "current_day_partial": true,
       "default_days": 14,
@@ -6991,12 +7079,12 @@
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-11-09T21:02:12.620648Z",
+    "generated_at": "2026-11-09T22:02:39.351655Z",
     "facts": [
       {
         "metric_id": "calendar.total",
-        "value": 13153,
-        "display_value": "13,153",
+        "value": 13154,
+        "display_value": "13,154",
         "label": "contributions",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
@@ -7065,8 +7153,8 @@
       },
       {
         "metric_id": "activity.public_commits",
-        "value": 8315,
-        "display_value": "8,315",
+        "value": 8316,
+        "display_value": "8,316",
         "label": "Public commits",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
@@ -7084,7 +7172,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "owned-repositories-visible-to-primary-pr-search",
-        "window": "2025-11-10T05:00:00Z \u2013 2026-11-09T21:00:43Z",
+        "window": "2025-11-10T05:00:00Z \u2013 2026-11-09T22:01:01Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -7098,7 +7186,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-10-11T04:00:00Z \u2013 2026-11-09T21:00:41Z",
+        "window": "2026-10-11T04:00:00Z \u2013 2026-11-09T22:00:59Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -7128,9 +7216,9 @@
         "population_id": "owned-public-private-nonfork-profile-excluded",
         "window": "observed repository HEADs",
         "quality": {
-          "status": "exact",
+          "status": "partial",
           "reason": "language_byte_observation",
-          "qualification": ""
+          "qualification": "Partial"
         }
       },
       {
@@ -7307,7 +7395,7 @@
             "observed_start": "2026-11-09",
             "observed_end": "2026-11-09",
             "days_observed": 1,
-            "contributions": 19,
+            "contributions": 20,
             "partial": true
           }
         ],
@@ -7328,12 +7416,12 @@
           237,
           229,
           351,
-          19
+          20
         ],
         "peak": "Peak 577 contributions/week",
         "window": "Aug 24 \u2013 Nov 9, 2026 \u00b7 12 weeks",
         "qualification": "Mon\u2013Sun \u00b7 UTC \u00b7 partial weeks included",
-        "description": "UTC contribution calendar. 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 577 contributions (complete); 2026-10-19 to 2026-10-25: 237 contributions (complete); 2026-10-26 to 2026-11-01: 229 contributions (complete); 2026-11-02 to 2026-11-08: 351 contributions (complete); 2026-11-09 to 2026-11-09: 19 contributions (partial)"
+        "description": "UTC contribution calendar. 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 577 contributions (complete); 2026-10-19 to 2026-10-25: 237 contributions (complete); 2026-10-26 to 2026-11-01: 229 contributions (complete); 2026-11-02 to 2026-11-08: 351 contributions (complete); 2026-11-09 to 2026-11-09: 20 contributions (partial)"
       }
     },
     "rhythm": {
@@ -7347,11 +7435,11 @@
         "window_start": "2025-11-10",
         "window_end": "2026-11-09",
         "days_observed": 365,
-        "total": 13153,
+        "total": 13154,
         "weekdays": [
           {
             "weekday": "Mon",
-            "contributions": 1546,
+            "contributions": 1547,
             "days_observed": 53
           },
           {
@@ -7400,9 +7488,9 @@
         "rows": [
           {
             "weekday": "Mon",
-            "contributions": 1546,
+            "contributions": 1547,
             "days_observed": 53,
-            "count_text": "1,546"
+            "count_text": "1,547"
           },
           {
             "weekday": "Tue",
@@ -7447,261 +7535,261 @@
       "rows": [
         {
           "name": "Python",
-          "bytes": 94074012,
-          "percent": 67.93351479456928,
-          "display_value": "67.9%"
+          "bytes": 96018050,
+          "percent": 68.24914645785955,
+          "display_value": "68.2%"
         },
         {
           "name": "Rust",
           "bytes": 10904193,
-          "percent": 7.874227331649666,
-          "display_value": "7.9%"
+          "percent": 7.750645478238383,
+          "display_value": "7.8%"
         },
         {
           "name": "C++",
           "bytes": 7919971,
-          "percent": 5.719235904396845,
-          "display_value": "5.7%"
+          "percent": 5.629475507167667,
+          "display_value": "5.6%"
         },
         {
           "name": "Swift",
           "bytes": 6142050,
-          "percent": 4.435348675721242,
+          "percent": 4.365738212778704,
           "display_value": "4.4%"
         },
         {
           "name": "Makefile",
           "bytes": 5886788,
-          "percent": 4.251016738719434,
-          "display_value": "4.3%"
+          "percent": 4.184299268505976,
+          "display_value": "4.2%"
         },
         {
           "name": "HTML",
-          "bytes": 4794539,
-          "percent": 3.4622727272399034,
-          "display_value": "3.5%"
+          "bytes": 5058518,
+          "percent": 3.5955691231150686,
+          "display_value": "3.6%"
         },
         {
           "name": "Other",
           "bytes": 8757977,
-          "percent": 6.324383827703632,
-          "display_value": "6.3%"
+          "percent": 6.225125952334644,
+          "display_value": "6.2%"
         }
       ],
       "all_rows": [
         {
           "name": "Python",
-          "bytes": 94074012,
-          "percent": 67.93351479456928,
-          "display_value": "67.9%"
+          "bytes": 96018050,
+          "percent": 68.24914645785955,
+          "display_value": "68.2%"
         },
         {
           "name": "Rust",
           "bytes": 10904193,
-          "percent": 7.874227331649666,
-          "display_value": "7.9%"
+          "percent": 7.750645478238383,
+          "display_value": "7.8%"
         },
         {
           "name": "C++",
           "bytes": 7919971,
-          "percent": 5.719235904396845,
-          "display_value": "5.7%"
+          "percent": 5.629475507167667,
+          "display_value": "5.6%"
         },
         {
           "name": "Swift",
           "bytes": 6142050,
-          "percent": 4.435348675721242,
+          "percent": 4.365738212778704,
           "display_value": "4.4%"
         },
         {
           "name": "Makefile",
           "bytes": 5886788,
-          "percent": 4.251016738719434,
-          "display_value": "4.3%"
+          "percent": 4.184299268505976,
+          "display_value": "4.2%"
         },
         {
           "name": "HTML",
-          "bytes": 4794539,
-          "percent": 3.4622727272399034,
-          "display_value": "3.5%"
+          "bytes": 5058518,
+          "percent": 3.5955691231150686,
+          "display_value": "3.6%"
         },
         {
           "name": "Java",
           "bytes": 2124950,
-          "percent": 1.5344867216114901,
+          "percent": 1.5104037601849722,
           "display_value": "1.5%"
         },
         {
           "name": "JavaScript",
           "bytes": 1363682,
-          "percent": 0.984753486670557,
+          "percent": 0.9692982990171831,
           "display_value": "1.0%"
         },
         {
           "name": "Shell",
           "bytes": 1255556,
-          "percent": 0.9066726324100031,
+          "percent": 0.8924428826667935,
           "display_value": "0.9%"
         },
         {
           "name": "GDScript",
           "bytes": 1129648,
-          "percent": 0.815750891124486,
+          "percent": 0.802948110254563,
           "display_value": "0.8%"
         },
         {
           "name": "Jupyter Notebook",
           "bytes": 899502,
-          "percent": 0.6495559307574195,
+          "percent": 0.639361492314597,
           "display_value": "0.6%"
         },
         {
           "name": "TypeScript",
           "bytes": 460576,
-          "percent": 0.33259500519679697,
+          "percent": 0.3273751016498994,
           "display_value": "0.3%"
         },
         {
           "name": "C",
           "bytes": 443442,
-          "percent": 0.32022205736833453,
+          "percent": 0.31519634072516733,
           "display_value": "0.3%"
         },
         {
           "name": "CMake",
           "bytes": 392196,
-          "percent": 0.2832158659117344,
+          "percent": 0.2787709419654605,
           "display_value": "0.3%"
         },
         {
           "name": "CSS",
           "bytes": 211819,
-          "percent": 0.15296051336973773,
+          "percent": 0.1505598786223773,
           "display_value": "0.2%"
         },
         {
           "name": "GLSL",
           "bytes": 103431,
-          "percent": 0.07469046147109251,
+          "percent": 0.07351823399124302,
           "display_value": "0.1%"
         },
         {
           "name": "C#",
           "bytes": 83058,
-          "percent": 0.05997853978851604,
+          "percent": 0.05903720817593045,
           "display_value": "0.1%"
         },
         {
           "name": "Assembly",
           "bytes": 74798,
-          "percent": 0.05401375928991094,
+          "percent": 0.0531660417677195,
           "display_value": "0.1%"
         },
         {
           "name": "Rich Text Format",
           "bytes": 71946,
-          "percent": 0.051954249122595955,
+          "percent": 0.05113885452846797,
           "display_value": "0.1%"
         },
         {
           "name": "Kotlin",
           "bytes": 22961,
-          "percent": 0.01658078995502079,
+          "percent": 0.016320563183890042,
           "display_value": "0.0%"
         },
         {
           "name": "PowerShell",
           "bytes": 19687,
-          "percent": 0.014216541607268597,
+          "percent": 0.013993420469545895,
           "display_value": "0.0%"
         },
         {
           "name": "Dockerfile",
           "bytes": 19316,
-          "percent": 0.013948631974704131,
+          "percent": 0.013729715537651673,
           "display_value": "0.0%"
         },
         {
           "name": "TeX",
           "bytes": 13407,
-          "percent": 0.009681575320193534,
+          "percent": 0.009529628091390348,
           "display_value": "0.0%"
         },
         {
           "name": "Batchfile",
           "bytes": 11667,
-          "percent": 0.008425071922182288,
+          "percent": 0.008292844852856807,
           "display_value": "0.0%"
         },
         {
           "name": "SCSS",
           "bytes": 10916,
-          "percent": 0.007882753501546401,
+          "percent": 0.007759037834386294,
           "display_value": "0.0%"
         },
         {
           "name": "Go Template",
           "bytes": 9490,
-          "percent": 0.006852998417888911,
+          "percent": 0.006745444214760529,
           "display_value": "0.0%"
         },
         {
           "name": "MATLAB",
           "bytes": 8516,
-          "percent": 0.006149645366358479,
+          "percent": 0.006053129919167614,
           "display_value": "0.0%"
         },
         {
           "name": "Open Policy Agent",
           "bytes": 7012,
-          "percent": 0.005063564268307381,
+          "percent": 0.004984094292297242,
           "display_value": "0.0%"
         },
         {
           "name": "Tcl",
           "bytes": 5344,
-          "percent": 0.003859054114351775,
+          "percent": 0.0037984882912202598,
           "display_value": "0.0%"
         },
         {
           "name": "Ruby",
           "bytes": 5192,
-          "percent": 0.003749290599123206,
+          "percent": 0.0036904474565897434,
           "display_value": "0.0%"
         },
         {
           "name": "GAP",
           "bytes": 4677,
-          "percent": 0.0033773944784474645,
+          "percent": 0.003324388049782402,
           "display_value": "0.0%"
         },
         {
           "name": "Groovy",
           "bytes": 3613,
-          "percent": 0.0026090498718474853,
+          "percent": 0.002568102207368787,
           "display_value": "0.0%"
         },
         {
           "name": "Objective-C",
           "bytes": 1096,
-          "percent": 0.0007914527150691515,
+          "percent": 0.000779031281283197,
           "display_value": "0.0%"
         },
         {
           "name": "Handlebars",
           "bytes": 286,
-          "percent": 0.00020652871944322747,
+          "percent": 0.00020328735989689266,
           "display_value": "0.0%"
         },
         {
           "name": "Jinja",
           "bytes": 193,
-          "percent": 0.00013937077920469547,
+          "percent": 0.00013718342818216882,
           "display_value": "0.0%"
         }
       ],
-      "total_bytes": 138479530,
-      "quality": "exact",
+      "total_bytes": 140687547,
+      "quality": "partial",
       "scope": "Owned public + private non-fork repositories; profile excluded"
     },
     "automation": {
@@ -7709,13 +7797,13 @@
         "public": {
           "observed_eligible_repos": 55,
           "eligible_repos": 55,
-          "observed_workflow_repos": 55,
-          "unknown_workflow_repos": 0,
-          "configured_repos": 13,
-          "workflow_files": 60,
-          "adoption_pct": 23.636363636363637,
+          "observed_workflow_repos": 0,
+          "unknown_workflow_repos": 55,
+          "configured_repos": null,
+          "workflow_files": null,
+          "adoption_pct": null,
           "inventory_status": "exact",
-          "status": "exact"
+          "status": "unavailable"
         },
         "private": {
           "observed_eligible_repos": 199,
@@ -7731,28 +7819,28 @@
         "combined": {
           "observed_eligible_repos": 254,
           "eligible_repos": 254,
-          "observed_workflow_repos": 254,
-          "unknown_workflow_repos": 0,
-          "configured_repos": 53,
-          "workflow_files": 165,
-          "adoption_pct": 20.866141732283463,
+          "observed_workflow_repos": 199,
+          "unknown_workflow_repos": 55,
+          "configured_repos": 40,
+          "workflow_files": 105,
+          "adoption_pct": 15.748031496062993,
           "inventory_status": "exact",
-          "status": "exact"
+          "status": "partial"
         }
       },
       "display": {
         "scope": "Owned public + private nonfork repositories; profile excluded.",
         "meaning": "GitHub workflow configuration at observed default-branch HEAD. Configuration does not imply successful runs.",
         "public": {
-          "configured_repos": "13",
+          "configured_repos": "n/a",
           "eligible_repos": "55",
-          "workflow_files": "60",
-          "unknown_workflow_repos": "0",
+          "workflow_files": "n/a",
+          "unknown_workflow_repos": "55",
           "observed_eligible_repos": "55",
-          "status": "Exact",
-          "qualification": "Workflow observation complete",
-          "adoption": "24%",
-          "gauge_detail": "13/55 repos"
+          "status": "Unavailable",
+          "qualification": "Workflow \u00b7 Unavailable \u00b7 n/a",
+          "adoption": "n/a",
+          "gauge_detail": "n/a/55 repos"
         },
         "private": {
           "configured_repos": "40",
@@ -7766,15 +7854,15 @@
           "gauge_detail": "40/199 repos"
         },
         "combined": {
-          "configured_repos": "53",
+          "configured_repos": "40",
           "eligible_repos": "254",
-          "workflow_files": "165",
-          "unknown_workflow_repos": "0",
+          "workflow_files": "105",
+          "unknown_workflow_repos": "55",
           "observed_eligible_repos": "254",
-          "status": "Exact",
-          "qualification": "Workflow observation complete",
-          "adoption": "21%",
-          "gauge_detail": "53/254 repos"
+          "status": "Partial",
+          "qualification": "Workflow \u00b7 Partial \u00b7 known minimum \u00b7 unknown repositories",
+          "adoption": "16%",
+          "gauge_detail": "40/254 repos"
         }
       }
     },
@@ -9238,7 +9326,7 @@
         },
         {
           "date": "2026-11-09",
-          "count": 19
+          "count": 20
         }
       ],
       "window": "2025-11-10 \u2013 2026-11-09 \u00b7 UTC",
@@ -9394,6 +9482,7 @@
       },
       {
         "name": "build-sweep",
+        "url": "https://api.github.com/repos/jguida941/build-sweep",
         "html_url": "https://github.com/jguida941/build-sweep",
         "description": "A simple native macOS utility that reclaims space by cleaning regenerable development files.",
         "language": "Swift",
@@ -9417,7 +9506,7 @@
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
       "window_start": "2026-10-11T00:00:00Z",
-      "window_end": "2026-11-09T21:01:12.277388Z",
+      "window_end": "2026-11-09T22:01:37.324951Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 255,
@@ -9706,8 +9795,8 @@
         "status": "partial",
         "complete": false,
         "window_start": "2026-10-11T00:00:00Z",
-        "window_end": "2026-11-09T21:01:12.277388Z",
-        "observed_at": "2026-11-09T21:01:12.277388Z",
+        "window_end": "2026-11-09T22:01:37.324951Z",
+        "observed_at": "2026-11-09T22:01:37.324951Z",
         "timezone": "UTC",
         "current_day_partial": true,
         "default_days": 14,
@@ -13153,11 +13242,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-11-09T21:02:12.620648Z",
-    "generator_revision": "a258d7b4a5fb00f69879d4b22a7a905bcbfff355",
+    "generated_at": "2026-11-09T22:02:39.351655Z",
+    "generator_revision": "19a5fe62cb56001b2310371e746fb6f1cc9ad4dd",
     "generator_source_digest": "fbf4d8a730c83b0093b747bab69d4dd91bfea231a90f83e5c98e6060c4d1d51e",
-    "claim_input_digest": "e8f2ab09230a4ac2c2b8359400b05614e52d5295ff06fb52a49877a92c478713",
-    "render_key": "19fb5090b3293238abb1c860b197058ce35f7cfd312fb71964b8e168643d6cec",
+    "claim_input_digest": "70a35a6ac7428c50750196f23693ea79d1dbf64ba51546961a9b39d8ec072648",
+    "render_key": "697f811bf3bc57bfcae98f0fc48ef07aaf7b6dd90cc61b24e0961e9ccc2be5ef",
     "schema": "profile-artifact-generation/v1"
   }
 }
