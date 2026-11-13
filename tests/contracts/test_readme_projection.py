@@ -26,6 +26,31 @@ def assert_projection(test, text):
     test.assertNotIn('<img src="metrics.general.svg', text)
 
 
+class SharedProfileRendererContract(unittest.TestCase):
+    """GitHub profile and Pages overview consume the same canonical SVG bytes."""
+
+    def test_one_desktop_mobile_svg_pair_is_both_surfaces_overview(self):
+        from scripts.pipeline.web_render import render_dashboard
+        page = render_dashboard()
+        readme = (Path(__file__).resolve().parents[2] / "README.md").read_text()
+        for filename in ("dashboard_summary.svg", "dashboard_summary_mobile.svg"):
+            self.assertIn("assets/" + filename, readme)
+            self.assertIn("./assets/" + filename, page)
+        self.assertIn('id="overview"', page)
+        self.assertIn('src="./assets/dashboard_summary.svg"', page)
+        self.assertIn('srcset="./assets/dashboard_summary_mobile.svg"', page)
+        self.assertIn('data-renderer="scripts.rendering.generate_dashboard_summary.render_svg"', page)
+        self.assertIn('id="interactive-details"', page)
+
+    def test_pages_deploy_copies_exact_github_profile_card_bytes(self):
+        root = Path(__file__).resolve().parents[2]
+        workflow = (root / ".github/workflows/deploy-site.yml").read_text()
+        for name in ("dashboard_summary.svg", "dashboard_summary_mobile.svg"):
+            self.assertIn("cp assets/" + name + " site/assets/" + name, workflow)
+            self.assertIn("cmp assets/" + name + " site/assets/" + name, workflow)
+        self.assertLess(workflow.index("cmp assets/dashboard_summary.svg site/assets/dashboard_summary.svg"),
+                        workflow.index("uses: actions/upload-pages-artifact@v3"))
+
 class ReadmeProjectionContract(unittest.TestCase):
     def test_one_responsive_picture_and_native_equivalent(self):
         root = Path(__file__).resolve().parents[2]

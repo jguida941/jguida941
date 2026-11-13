@@ -40,7 +40,7 @@ def _obligations():
 
 def _uncontained_dom_offenders(data: dict) -> list[dict]:
     """Committed DOM probes are acceptance facts. An element-level offender is acceptable only
-    when the browser producer proved it is inside the measured horizontal table scroller."""
+    when the producer proved a measured, viewport-bound declared table, calendar, or CI timeline scroller."""
     out = []
     for offender in data.get("offenders", []):
         scroll = offender.get("scroll_container") or {}
@@ -50,6 +50,10 @@ def _uncontained_dom_offenders(data: dict) -> list[dict]:
         ) or (
             offender.get("contained_by_calendar_scroll") is True
             and scroll.get("class") == "cal-wrap"
+        ) or (
+            offender.get("contained_by_ci_plot_scroll") is True
+            and scroll.get("class") == "ci-plot-scroll"
+            and scroll.get("observatory_parent") is True
         )
         if (
             declared
@@ -107,6 +111,41 @@ class ZeroWidthContainmentGaming(unittest.TestCase):
         bare["offenders"][0]["contained_by_calendar_scroll"] = False
         self.assertEqual(1, len(_uncontained_dom_offenders(bare)))
 
+
+    def test_ci_observatory_known_scroller_is_measured(self):
+        """CI-RECEIPT-01b: actual observed 390px overflow is an internal timeline track.
+
+        Run 38855931366 produced a true 390px DOM witness with 770px ci-plot,
+        ci-axis and lane elements. A named, real in-viewport 285px scroll wrapper
+        may contain these, but arbitrary overflow wrappers MUST remain visible.
+        """
+        from copy import deepcopy
+        valid = {"offenders": [{
+            "tag": "div", "class": "ci-plot", "left": 41, "right": 811,
+            "contained_by_ci_plot_scroll": True,
+            "scroll_container": {
+                "class": "ci-plot-scroll", "overflow_x": "auto",
+                "in_viewport": True, "width": 285,
+                "observatory_parent": True,
+            },
+        }]}
+        self.assertEqual([], _uncontained_dom_offenders(valid),
+                         "real scoped timeline scrolling is not page overflow")
+        for field, wrong in (
+            ("class", "arbitrary-scroll"),
+            ("overflow_x", "visible"),
+            ("in_viewport", False),
+            ("width", 0),
+            ("observatory_parent", False),
+        ):
+            with self.subTest(wrong=field):
+                bad = deepcopy(valid)
+                bad["offenders"][0]["scroll_container"][field] = wrong
+                self.assertEqual(1, len(_uncontained_dom_offenders(bad)),
+                                 "a wrong/synthetic scroll wrapper cannot hide overflow")
+        missing_claim = deepcopy(valid)
+        missing_claim["offenders"][0]["contained_by_ci_plot_scroll"] = False
+        self.assertEqual(1, len(_uncontained_dom_offenders(missing_claim)))
 
 class ReceiptProvenanceContract(unittest.TestCase):
     def test_obligation_kinds_name_their_actual_producer(self):
@@ -246,6 +285,87 @@ class ReceiptProvenanceContract(unittest.TestCase):
                 self.assertEqual(
                     _uncontained_dom_offenders(data), [],
                     f"{page}: 390px DOM probe has uncontained overflowing elements: {data.get('offenders')}")
+
+
+class FocusedCIBrowserScreenshotContract(unittest.TestCase):
+    """A source-bound PNG artifact does not prove the CI chart was painted."""
+
+    def test_blank_focused_chrome_capture_refuses_before_provenance(self):
+        """Run 38856476570 produced a full-size, ONE-COLOR focused PNG.
+
+        The existing original 1280 screenshot was healthy. The fixed CI anchor
+        must fail before an apparently successful provenance sidecar is written;
+        a nonblank nearest-valid image must continue to qualify as a candidate.
+        """
+        import subprocess
+        import tempfile
+        from unittest.mock import patch
+        from PIL import Image, ImageDraw
+        from scripts.quality import headless_receipts as producer
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / "site").mkdir()
+            (root / "site" / "index.html").write_text(
+                '<!doctype html><title>CI test subject</title><section id="ci-observatory">Verified</section>'
+            )
+            has_paint = [False]
+
+            def emit_png(command):
+                filename = next(v.split("=", 1)[1] for v in command
+                                if v.startswith("--screenshot="))
+                picture = Image.new("RGB", (1280, 1536), (12, 14, 24))
+                if has_paint[0]:
+                    ImageDraw.Draw(picture).rectangle((30, 30, 350, 130), fill=(255, 255, 255))
+                picture.save(filename)
+                return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+            with patch.object(producer, "_root", return_value=root), patch.object(
+                producer, "_chrome", return_value=Path("/mock/google-chrome")
+            ), patch.object(
+                producer, "_chrome_version", return_value="Google Chrome 155.0"
+            ), patch.object(producer, "_run", side_effect=emit_png):
+                with self.assertRaisesRegex(RuntimeError, "blank"):
+                    producer.screenshot_page("index", target="ci-observatory")
+                candidate = root / "assets/receipts/pages/index/ci-observatory-1280.png"
+                self.assertFalse(producer.provenance_path(candidate).exists(),
+                                 "blank viewport cannot acquire credible provenance")
+                has_paint[0] = True
+                out = producer.screenshot_page("index", target="ci-observatory")
+                self.assertEqual(out, candidate)
+                self.assertTrue(producer.provenance_path(out).is_file())
+
+
+class BrowserProducerPortabilityContract(unittest.TestCase):
+    """CI-RECEIPT-01: genuine Google Chrome on an existing non-Mac runner."""
+
+    def test_google_chrome_available_on_linux_runner_is_discoverable(self):
+        from unittest.mock import patch
+        import tempfile
+        from scripts.quality import headless_receipts as producer
+
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            installed = home / "google-chrome"
+            installed.write_bytes(b"stand-in path only; executable not invoked")
+            with patch.object(producer, "CHROME", home / "missing-Mac-Chrome"), patch(
+                "shutil.which",
+                side_effect=lambda name: str(installed) if name == "google-chrome" else None
+            ):
+                self.assertEqual(installed, producer._chrome(),
+                    "A real Chrome executable on CI must be found before capturing evidence")
+
+    def test_missing_google_chrome_refuses_no_generic_chromium_fallback(self):
+        from unittest.mock import patch
+        import tempfile
+        from scripts.quality import headless_receipts as producer
+
+        with tempfile.TemporaryDirectory() as temp:
+            home = Path(temp)
+            with patch.object(producer, "CHROME", home / "missing-Mac-Chrome"), patch(
+                "shutil.which", return_value=None
+            ):
+                with self.assertRaises(FileNotFoundError):
+                    producer._chrome()
 
 
 if __name__ == "__main__":
