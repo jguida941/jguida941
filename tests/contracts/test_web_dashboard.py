@@ -146,20 +146,20 @@ const row = (id,outcome,date,name='Workflow') => ({
   run_id:id, outcome, created_at:date, workflow:name
 });
 const sample = {
-  schema:'profile-ci-timeline/v1', status:'partial', owner:'jguida941',
+  schema:'profile-ci-timeline/v1', status:'partial', owner:'example',
   window_start:'2026-10-01T00:00:00Z', window_end:'2026-10-15T12:00:00Z',
   sample_limit_per_repo:20,
   repositories:[
-    {repository:'jguida941/jguida941', status:'partial', runs:[
+    {repository:'example/example', status:'partial', runs:[
       row(31,'success','2026-10-14T12:00:00Z','Compile'),
       row('bad-run','failure','2026-10-14T12:01:00Z'),
       row(32,'failure','2026-10-16T00:00:00Z')
     ]},
-    {repository:'jguida941/semloop',status:'available',runs:[
+    {repository:'example/private-project',status:'available',runs:[
       row(41,'failure','2026-10-14T02:00:00Z','<img onerror=alert(1)>'),
       row(42,'queued','2026-10-14T07:00:00Z','Review')
     ]},
-    {repository:'jguida941/jguida941', status:'available',runs:[
+    {repository:'example/example', status:'available',runs:[
       row(31,'success','2026-10-14T12:00:00Z')
     ]}
   ]
@@ -171,7 +171,7 @@ const dots = nodes['ci-timeline-rows'].children.flatMap(l => l.children[1].child
 assert.equal(dots.length,3,'no string ID, future event or replay can mint runs');
 assert.deepEqual(new Set(dots.map(d => d.getAttribute('data-ci-outcome'))),
   new Set(['success','failure','queued']));
-assert(dots.some(d=>d.getAttribute('aria-label').includes('jguida941/semloop')),
+assert(dots.some(d=>d.getAttribute('aria-label').includes('example/private-project')),
   'private repo names are allowed in selected public presentation');
 assert(nodes['ci-observatory-note'].textContent.includes('Partial'),
   'rejected records cannot be described as a complete observation');
@@ -181,7 +181,7 @@ dots[0].handlers.click();
 assert.equal(nodes['ci-selected-day'].children[1].children.length,3,
   'selected UTC day lists ONLY the observed events, across repositories');
 const links = nodes['ci-selected-day'].children[1].children.map(li=>li.children[0]);
-assert(links.every(l=>l.href.startsWith('https://github.com/jguida941/')),
+assert(links.every(l=>l.href.startsWith('https://github.com/example/')),
   'day drill must link only to admitted repository/run paths');
 assert(links.some(l=>l.textContent.includes('<img onerror=alert(1)>')),
   'hostile workflow name must remain text, not interpreted markup');
@@ -939,6 +939,22 @@ process.stdout.write(JSON.stringify({html:nodes['activity-project'].innerHTML, c
             project_activity_event("older" + str(index), repository="heat" + str(index), when="2026-09-20T11:00:00Z"),
         ]) for index in range(repositories)]
         return build_activity_analytics(project_activity_source(rows))
+
+    def test_private_branch_details_keep_honest_counts_without_expansion(self):
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+        activity = self.activity(1)
+        source = activity["project_activity"]["rows"][0]
+        source["is_private"] = True
+        expected_count = len(source["branches"])
+        projected = _public_dashboard_data({"activity_analytics": activity})["activity_analytics"]
+        _, nodes, _ = self.hydrate(projected, expanded=[source["repository"]])
+        toggles = [attrs for tag, attrs in nodes if tag == "button" and "data-project-branch-toggle" in attrs]
+        self.assertEqual(1, len(toggles))
+        self.assertIn(f"{expected_count} observed branches · details withheld", toggles[0]["aria-label"])
+        self.assertIn("disabled", toggles[0])
+        self.assertEqual("false", toggles[0]["aria-expanded"])
+        self.assertFalse(any(attrs.get("data-role") == "project-activity-branch" for _, attrs in nodes))
+        self.assertEqual(source["daily"], projected["project_activity"]["rows"][0]["daily"])
 
     def test_shared_cells_periods_row_limit_and_expansion(self):
         activity = self.activity()

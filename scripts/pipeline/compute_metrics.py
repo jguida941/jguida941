@@ -1838,6 +1838,7 @@ def compute_profile_model(
             {
                 "name": repo["name"],
                 "description": repo.get("description", ""),
+                "is_private": repo.get("private") is True,
                 "language": repo.get("language"),
                 "stars": repo.get("stargazers_count", 0),
                 "forks": repo.get("forks_count", 0),
