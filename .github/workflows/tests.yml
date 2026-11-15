@@ -62,6 +62,7 @@ jobs:
             tests.contracts.test_web_dashboard \
             tests.contracts.test_page_manifest \
             tests.contracts.test_skill_structure \
+            tests.contracts.test_design_nav \
             tests.contracts.test_label_legibility
 
       - name: Fixture smoke CLI run (offline path)

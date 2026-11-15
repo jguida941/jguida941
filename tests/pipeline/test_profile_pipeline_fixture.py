@@ -42,6 +42,7 @@ PROFILE_PRODUCT_TEST_MODULES = (
     "tests.contracts.test_dashboard_summary",
     "tests.contracts.test_dashboard_destinations",
     "tests.contracts.test_readme_projection",
+    "tests.contracts.test_design_nav",
     "tests.contracts.test_label_legibility",
 )
 PROFILE_PRODUCT_TEST_ENV = (
