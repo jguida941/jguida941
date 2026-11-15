@@ -60,6 +60,26 @@ def profile_contribution_fact(observation, value):
     return fact
 
 
+def _inventory_fact(identity, key, value, label, population, observation):
+    """A displayed count is exact only when its fresh census value agrees."""
+    try:
+        row = observation["metrics"][key]
+        stamp = datetime.fromisoformat(observation["observed_at"].replace("Z", "+00:00"))
+        verified = (observation.get("schema") == "profile-inventory-observation/v1"
+                    and observation.get("source_id") == "github_personal_owned_repository_census"
+                    and observation.get("population_id") == "personal-owned-repositories"
+                    and observation.get("source_mode") == "live"
+                    and stamp.tzinfo is not None and stamp.utcoffset() is not None
+                    and row.get("complete") is True and _count(row.get("value")) is not None
+                    and type(value) is int and row["value"] == value)
+    except (AttributeError, KeyError, TypeError, ValueError):
+        verified = False
+    return _fact(identity, value, label, population,
+                 status="exact" if verified else "unknown",
+                 reason="fresh_personal_census" if verified else "matching_evidence_not_carried",
+                 window="Observed " + observation["observed_at"] if verified else "current inventory")
+
+
 def build_dashboard_summary(model, *, profile_date):
     """Select already-computed facts; only calendar runs and byte shares are derived.
 
@@ -110,13 +130,13 @@ def build_dashboard_summary(model, *, profile_date):
     add("calendar.total", snapshot.get("last_year_contributions") if calendar_ok else None,
         "contributions", "github-contribution-calendar-visible-to-provider", status=calendar_status,
         reason="calendar_observation", window=calendar_window, qualification=rhythm_display.get("qualification", ""))
-    for identity, value, label, population in (
-        ("inventory.public_nonfork", scope.get("public_owned_nonfork_repos_total"), "public non-fork repos", "public-owned-nonfork-profile-included"),
-        ("inventory.private_owned", snapshot.get("private_owned_repos"), "private owned repos", "private-owned-including-forks"),
-        ("inventory.stargazers", snapshot.get("total_stars"), "stargazers", "public-owned-nonfork"),
-        ("inventory.public_forks", snapshot.get("public_forks"), "public forks", "public-owned-forks"),
+    for identity, key, value, label, population in (
+        ("inventory.public_nonfork", "total_repos", scope.get("public_owned_nonfork_repos_total"), "public non-fork repos", "public-owned-nonfork-profile-included"),
+        ("inventory.private_owned", "private_owned_repos", snapshot.get("private_owned_repos"), "private owned repos", "private-owned-including-forks"),
+        ("inventory.stargazers", "total_stars", snapshot.get("total_stars"), "stargazers", "public-owned-nonfork"),
+        ("inventory.public_forks", "public_forks", snapshot.get("public_forks"), "public forks", "public-owned-forks"),
     ):
-        add(identity, value, label, population)
+        facts.append(_inventory_fact(identity, key, value, label, population, data.get("inventory_observation") or {}))
     for identity, key, label in (
         ("activity.public_commits", "public_scope_commits", "Public commits"),
         ("activity.merged_prs", "prs_merged", "Merged PRs"),

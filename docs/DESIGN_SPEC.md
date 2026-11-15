@@ -290,6 +290,10 @@ adoption keeps its existing rounding alongside numerator/denominator. Twelve ear
 SVGs remain generated compatibility details, not additional mounted headline panels.
 The shared public dashboard_summary value owns selected facts, qualification, calendar
 and project rows. Unknown inventory is labeled Reported, with its definition in text.
+A fresh, complete personal GitHub census qualifies only matching inventory values.
+Verified inventory uses the normal compact metric presentation without a warning;
+missing or mismatched evidence keeps the reported/unverified state in both SVG sizes.
+A retained private count cannot become verified from unavailable current evidence.
 Working repositories use a full-width count/row container followed by full-width Focus,
 projects and remaining facts. Calendar dates and weekly points retain their associations.
 Rounded outer corners stay transparent; no shadow or filter paints outside the surface.
