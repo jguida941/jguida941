@@ -181,6 +181,20 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
     var frame = document.getElementById("target");
     var doc = frame && frame.contentDocument;
     if (!doc || !doc.body) {{ window.setTimeout(probe, 100); return; }}
+    var hydration = null;
+    if ("{page}" === "index") {{
+      var status = doc.getElementById("calendar-status");
+      var fontsStatus = doc.fonts ? doc.fonts.status : "unavailable";
+      if (!status || status.textContent.indexOf("Loading contribution calendar") === 0 || fontsStatus === "loading") {{
+        window.setTimeout(probe, 50);
+        return;
+      }}
+      hydration = {{
+        "calendar_status": status.textContent,
+        "calendar_cell_count": doc.querySelectorAll("#cal i").length,
+        "fonts_status": fontsStatus
+      }};
+    }}
     done = true;
     var root = doc.documentElement;
     var body = doc.body;
@@ -220,6 +234,38 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
             && inViewport
             && scrollRect.width > 1;
         }}
+        // A direct, static commit link is clipped by the existing code-branch
+        // ellipsis box. Keep its geometry as evidence, but do not confuse that
+        // intentionally hidden inline tail with page overflow.
+        var clipper = el.parentElement;
+        var clipInfo = null;
+        var clipped = false;
+        if (el.tagName.toLowerCase() === "a" && clipper &&
+            clipper.tagName.toLowerCase() === "p" &&
+            clipper.matches(".code-changes .code-branch")) {{
+          var clipStyle = frame.contentWindow.getComputedStyle(clipper);
+          var clipRect = clipper.getBoundingClientRect();
+          var clipInViewport = clipRect.left >= -1 && clipRect.right <= clientWidth + 1;
+          clipInfo = {{
+            "tag": clipper.tagName.toLowerCase(),
+            "class": cls(clipper),
+            "direct_parent": true,
+            "code_changes_parent": true,
+            "left": Math.round(clipRect.left * 100) / 100,
+            "right": Math.round(clipRect.right * 100) / 100,
+            "width": Math.round(clipRect.width * 100) / 100,
+            "height": Math.round(clipRect.height * 100) / 100,
+            "overflow_x": clipStyle.overflowX,
+            "overflow_y": clipStyle.overflowY,
+            "white_space": clipStyle.whiteSpace,
+            "text_overflow": clipStyle.textOverflow,
+            "in_viewport": clipInViewport
+          }};
+          clipped = style.position === "static" && cls(clipper) === "code-branch"
+            && clipStyle.overflowX === "hidden" && clipStyle.overflowY === "hidden"
+            && clipStyle.whiteSpace === "nowrap" && clipStyle.textOverflow === "ellipsis"
+            && clipInViewport && clipRect.width > 1 && clipRect.height > 1;
+        }}
         offenders.push({{
           "tag": el.tagName.toLowerCase(),
           "id": el.id || "",
@@ -228,6 +274,9 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
           "right": Math.round(rect.right * 100) / 100,
           "width": Math.round(rect.width * 100) / 100,
           "overflow_px": Math.round(Math.max(overLeft, overRight) * 100) / 100,
+          "position": style.position,
+          "contained_by_code_branch_ellipsis": clipped,
+          "clip_container": clipInfo,
           "contained_by_table_scroll": contained && cls(scroller).split(" ").indexOf("table-scroll") !== -1,
           "contained_by_calendar_scroll": contained && cls(scroller).split(" ").indexOf("cal-wrap") !== -1,
           "scroll_container": scrollInfo
@@ -235,7 +284,7 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       }}
     }});
     var overflowPx = Math.max(0, scrollWidth - clientWidth);
-    var uncontained = offenders.filter(function (o) {{ return o.contained_by_table_scroll !== true && o.contained_by_calendar_scroll !== true; }});
+    var uncontained = offenders.filter(function (o) {{ return o.contained_by_table_scroll !== true && o.contained_by_calendar_scroll !== true && o.contained_by_code_branch_ellipsis !== true; }});
     var result = {{
       "contract_id": "PageHeadlessDomProbe",
       "page": "{page}",
@@ -249,10 +298,14 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       "overflow_px": overflowPx,
       "offender_count": offenders.length,
       "uncontained_offender_count": uncontained.length,
-      "offenders": offenders.slice(0, 20),
+      "offenders": uncontained
+        .concat(offenders.filter(function (o) {{ return o.contained_by_code_branch_ellipsis === true; }}))
+        .concat(offenders.filter(function (o) {{ return o.contained_by_code_branch_ellipsis !== true && (o.contained_by_table_scroll === true || o.contained_by_calendar_scroll === true); }}))
+        .slice(0, 20),
       "authority_status": "candidate_only",
       "cannot_mark_done": true
     }};
+    if (hydration) result.index_hydration = hydration;
     document.documentElement.innerHTML = "<head><title>probe</title></head><body><pre id=\\"headless-probe-json\\"></pre></body>";
     document.getElementById("headless-probe-json").textContent = JSON.stringify(result);
   }}

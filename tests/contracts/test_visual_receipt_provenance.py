@@ -43,6 +43,29 @@ def _uncontained_dom_offenders(data: dict) -> list[dict]:
     when the browser producer proved it is inside the measured horizontal table scroller."""
     out = []
     for offender in data.get("offenders", []):
+        clip = offender.get("clip_container") or {}
+        if (
+            offender.get("tag") == "a"
+            and offender.get("position") == "static"
+            and offender.get("contained_by_code_branch_ellipsis") is True
+            and clip.get("tag") == "p"
+            and clip.get("class") == "code-branch"
+            and clip.get("direct_parent") is True
+            and clip.get("code_changes_parent") is True
+            and clip.get("overflow_x") == "hidden"
+            and clip.get("overflow_y") == "hidden"
+            and clip.get("white_space") == "nowrap"
+            and clip.get("text_overflow") == "ellipsis"
+            and clip.get("in_viewport") is True
+            and isinstance(clip.get("width"), (int, float))
+            and isinstance(clip.get("height"), (int, float))
+            and clip["width"] > 1 and clip["height"] > 1
+            and isinstance(clip.get("left"), (int, float))
+            and isinstance(clip.get("right"), (int, float))
+            and isinstance(data.get("client_width"), (int, float))
+            and clip["left"] >= -1 and clip["right"] <= data["client_width"] + 1
+        ):
+            continue
         scroll = offender.get("scroll_container") or {}
         declared = (
             offender.get("contained_by_table_scroll") is True
@@ -107,6 +130,147 @@ class ZeroWidthContainmentGaming(unittest.TestCase):
         bare["offenders"][0]["contained_by_calendar_scroll"] = False
         self.assertEqual(1, len(_uncontained_dom_offenders(bare)))
 
+
+
+class CodeBranchEllipsisProbeContract(unittest.TestCase):
+    def test_only_observed_static_ellipsis_is_contained(self):
+        """Measure a clipped inline tail; escaping or unclipped anchors must still fail."""
+        import re
+        import shutil
+        import subprocess
+        from scripts.quality.headless_receipts import _probe_html
+        if shutil.which("node") is None:
+            self.skipTest("Node required to execute the emitted browser probe")
+        script = re.search(r"<script>(.*?)</script>",
+                           _probe_html("index", ROOT / "site/index.html", 390, 1000),
+                           re.S).group(1)
+        harness = r'''
+const fs = require("node:fs"), vm = require("node:vm");
+const script = JSON.parse(fs.readFileSync(0, "utf8"));
+function measure(change) {
+  const c = Object.assign({position:"static", tag:"A", parentTag:"P", scope:true,
+    parentClass:"code-branch", direct:true, overflowX:"hidden", overflowY:"hidden",
+    whiteSpace:"nowrap", textOverflow:"ellipsis", left:41, right:349,
+    width:308, height:23.1875}, change);
+  const parent = {tagName:c.parentTag, id:"", className:c.parentClass,
+    parentElement:null, closest() { return null; },
+    matches(selector) { return selector === ".code-changes .code-branch" && c.scope; },
+    getBoundingClientRect() { return c; },
+    style:{display:"block", visibility:"visible", position:"static",
+      overflowX:c.overflowX, overflowY:c.overflowY,
+      whiteSpace:c.whiteSpace, textOverflow:c.textOverflow}};
+  const child = {tagName:c.tag, id:"", className:"", parentElement:c.direct ? parent : null,
+    closest() { return null; },
+    getBoundingClientRect() { return {left:740.91,right:798.75,width:57.84,height:23.1875}; },
+    style:{display:"inline",visibility:"visible",position:c.position}};
+  const output = {textContent:""}, listeners = {};
+  const doc = {body:{scrollWidth:390},documentElement:{clientWidth:390,scrollWidth:390},
+    fonts:{status:"loaded"},getElementById() { return {textContent:""}; },
+    querySelectorAll(selector) { return selector === "#cal i" ? Array(365).fill({}) : [parent,child]; }};
+  const frame = {contentDocument:doc,contentWindow:{getComputedStyle(el) { return el.style; }},
+    addEventListener(name, callback) { listeners[name] = callback; }};
+  const outer = {documentElement:{innerHTML:""},
+    getElementById(id) { return id === "target" ? frame : output; }};
+  vm.runInNewContext(script, {document:outer,window:{setTimeout() {}},
+    requestAnimationFrame(callback) { callback(); }}, {timeout:1000});
+  listeners.load();
+  return JSON.parse(output.textContent);
+}
+const cases = {valid:{}, unclipped:{overflowX:"visible"}, unclippedY:{overflowY:"visible"},
+  noEllipsis:{textOverflow:"clip"}, wrapping:{whiteSpace:"normal"},
+  fixed:{position:"fixed"}, absolute:{position:"absolute"}, relative:{position:"relative"},
+  wrongTag:{tag:"SPAN"}, wrongParent:{parentTag:"DIV"}, wrongClass:{parentClass:"other"},
+  unscoped:{scope:false}, indirect:{direct:false}, zeroWidth:{width:0}, zeroHeight:{height:0},
+  outsideLeft:{left:-2,width:351}, outsideRight:{right:392,width:351}};
+process.stdout.write(JSON.stringify(Object.fromEntries(
+  Object.entries(cases).map(([name, change]) => [name, measure(change)]))));
+'''
+        process = subprocess.run(["node", "-e", harness], input=json.dumps(script),
+                                 text=True, capture_output=True, check=True, timeout=5)
+        observed = json.loads(process.stdout)
+        valid = observed.pop("valid")
+        self.assertEqual(1, valid["offender_count"])
+        self.assertEqual(0, valid["uncontained_offender_count"])
+        self.assertIs(valid["horizontal_overflow"], False)
+        self.assertIs(valid["offenders"][0]["contained_by_code_branch_ellipsis"], True)
+        self.assertEqual([], _uncontained_dom_offenders(valid))
+        for name, result in observed.items():
+            with self.subTest(case=name):
+                self.assertIs(result["horizontal_overflow"], True)
+                self.assertGreater(result["uncontained_offender_count"], 0)
+                self.assertTrue(_uncontained_dom_offenders(result))
+
+        # A claimed containment flag cannot replace its actual measured evidence.
+        from copy import deepcopy
+        mutations = {
+            "tag":"div", "class":"other", "direct_parent":False,
+            "code_changes_parent":False, "overflow_x":"visible", "overflow_y":"visible",
+            "white_space":"normal", "text_overflow":"clip", "in_viewport":False,
+            "width":0, "height":0, "left":-2, "right":392,
+        }
+        for field, value in mutations.items():
+            with self.subTest(receipt_field=field):
+                tampered = deepcopy(valid)
+                tampered["offenders"][0]["clip_container"][field] = value
+                self.assertEqual(1, len(_uncontained_dom_offenders(tampered)))
+        for field, value in (("tag", "span"), ("position", "fixed"),
+                             ("contained_by_code_branch_ellipsis", False)):
+            with self.subTest(offender_field=field):
+                tampered = deepcopy(valid)
+                tampered["offenders"][0][field] = value
+                self.assertEqual(1, len(_uncontained_dom_offenders(tampered)))
+
+
+class IndexHydrationProbeContract(unittest.TestCase):
+    def test_index_probe_waits_for_hydration_and_fonts(self):
+        """A loading document must not qualify the final hydrated calendar layout."""
+        import json
+        import re
+        import shutil
+        import subprocess
+        from scripts.quality.headless_receipts import _probe_html
+        if shutil.which("node") is None:
+            self.skipTest("Node required to execute the emitted browser probe")
+        script = re.search(r"<script>(.*?)</script>",
+                           _probe_html("index", ROOT / "site/index.html", 390, 1000),
+                           re.S).group(1)
+        harness = r'''
+const fs = require("node:fs"), vm = require("node:vm");
+const script = JSON.parse(fs.readFileSync(0, "utf8"));
+const pending = [], listeners = {}, output = {textContent: ""};
+const status = {textContent: "Loading contribution calendar…"}, fonts = {status: "loaded"};
+const doc = {body: {scrollWidth: 390}, documentElement: {clientWidth: 390, scrollWidth: 390},
+  fonts, getElementById(id) { return id === "calendar-status" ? status : null; },
+  querySelectorAll(selector) { return selector === "#cal i" ? Array(365).fill({}) : []; }};
+const frame = {contentDocument: doc, contentWindow: {getComputedStyle() { return {}; }},
+  addEventListener(name, callback) { listeners[name] = callback; }};
+const outer = {documentElement: {innerHTML: ""},
+  getElementById(id) { return id === "target" ? frame : output; }};
+vm.runInNewContext(script, {document: outer,
+  window: {setTimeout(callback) { pending.push(callback); }},
+  requestAnimationFrame(callback) { callback(); }}, {timeout: 1000});
+listeners.load();
+const whileLoading = output.textContent;
+status.textContent = "";
+fonts.status = "loading";
+if (pending.length) pending.shift()();
+const whileFontsLoad = output.textContent;
+fonts.status = "loaded";
+if (pending.length) pending.shift()();
+process.stdout.write(JSON.stringify({whileLoading, whileFontsLoad,
+  result: JSON.parse(output.textContent)}));
+'''
+        process = subprocess.run(["node", "-e", harness], input=json.dumps(script),
+                                 text=True, capture_output=True, check=True, timeout=5)
+        observed = json.loads(process.stdout)
+        self.assertEqual("", observed["whileLoading"],
+                         "loading document must not become a receipt")
+        self.assertEqual("", observed["whileFontsLoad"],
+                         "font-loading document must not become a receipt")
+        self.assertEqual({
+            "calendar_status": "", "calendar_cell_count": 365, "fonts_status": "loaded",
+        }, observed["result"]["index_hydration"])
+        self.assertEqual(390, observed["result"]["client_width"])
 
 class ReceiptProvenanceContract(unittest.TestCase):
     def test_obligation_kinds_name_their_actual_producer(self):
@@ -233,6 +397,13 @@ class ReceiptProvenanceContract(unittest.TestCase):
             self.assertEqual(data["viewport"]["width"], 390)
             self.assertEqual(data["client_width"], 390,
                              f"{page}: the probe must MEASURE 390, not merely claim it")
+            if page == "index":
+                hydration = data.get("index_hydration", {})
+                self.assertIsInstance(hydration.get("calendar_status"), str)
+                self.assertFalse(hydration["calendar_status"].startswith("Loading contribution calendar"))
+                self.assertIn(hydration.get("fonts_status"), ("loaded", "unavailable"))
+                self.assertIsInstance(hydration.get("calendar_cell_count"), int)
+                self.assertGreaterEqual(hydration["calendar_cell_count"], 0)
             probe_sidecar = json.loads(provenance_path(probe).read_text(encoding="utf-8"))
             self.assertEqual(probe_sidecar["kind"], DOM_PROBE_KIND)
             self.assertIn("--headless=new", probe_sidecar["command"])
