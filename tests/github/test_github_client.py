@@ -2742,6 +2742,11 @@ def _profile_headline_observation(value=13514):
 
 class GithubProfileHeadlineProviderTests(unittest.TestCase):
     def setUp(self):
+        from dataclasses import replace
+        configured = patch.object(gh, "_settings", replace(
+            gh._settings, token="profile-test-token", tokens=("profile-test-token",)))
+        configured.start()
+        self.addCleanup(configured.stop)
         # The mocked provider period and observation clock belong to one fixture.
         clock = patch.object(gh, "datetime", wraps=datetime)
         fixed = clock.start()
@@ -2800,6 +2805,47 @@ class GithubProfileHeadlineProviderTests(unittest.TestCase):
                 self.assertIsNone(observed["value"])
                 self.assertEqual("unavailable", observed["status"])
                 self.assertFalse(observed["complete"])
+
+
+    def test_missing_profile_credentials_return_unavailable_without_a_query(self):
+        from dataclasses import replace
+        for tokens in ((), ("",), ("   ",)):
+            with self.subTest(tokens=tokens), patch.object(
+                gh, "_settings", replace(gh._settings, token="", tokens=tokens)
+            ), patch.object(gh, "TOKEN", ""), patch.object(gh, "_graphql_query", return_value=None) as query:
+                result = gh.get_profile_contributions_observation()
+            self.assertEqual(_profile_headline_observation(None), result)
+            query.assert_not_called()
+
+    def test_fallback_only_profile_credential_still_queries(self):
+        from dataclasses import replace
+        response = {"user": {"contributionsCollection": {
+            "startedAt": "2025-11-09T05:00:00Z", "endedAt": "2026-11-16T04:59:59Z",
+            "contributionCalendar": {"totalContributions": 13514},
+        }}}
+        with patch.object(gh, "_settings", replace(
+            gh._settings, token="", tokens=("fallback-test-token",)
+        )), patch.object(gh, "TOKEN", ""), patch.object(gh, "_graphql_query", return_value=response) as query:
+            result = gh.get_profile_contributions_observation()
+        query.assert_called_once()
+        self.assertEqual(13514, result["value"])
+        self.assertTrue(gh.validate_provider_observation(result))
+
+    def test_profile_query_keeps_transport_token_fallback_after_401(self):
+        from dataclasses import replace
+        payload = {"data": {"user": {"contributionsCollection": {
+            "startedAt": "2025-11-09T05:00:00Z", "endedAt": "2026-11-16T04:59:59Z",
+            "contributionCalendar": {"totalContributions": 13514},
+        }}}}
+        with patch.object(gh, "_settings", replace(
+            gh._settings, token="expired-test-token", tokens=("expired-test-token", "fallback-test-token")
+        )), patch("scripts.github.github_graphql.requests.post", side_effect=[
+            _FakeResponse(401, {}), _FakeResponse(200, payload)
+        ]) as post:
+            result = gh.get_profile_contributions_observation()
+        self.assertEqual(13514, result["value"])
+        self.assertEqual(["Bearer expired-test-token", "Bearer fallback-test-token"],
+                         [call.kwargs["headers"]["Authorization"] for call in post.call_args_list])
 
 
 if __name__ == "__main__":

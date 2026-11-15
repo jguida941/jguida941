@@ -21,6 +21,7 @@ from scripts.core.runtime_env import token_mode_from_env
 from scripts.core.settings import Settings  # noqa: F401
 from scripts.github.github_cache import read_cache, write_cache  # noqa: F401
 from scripts.github.github_transport import (  # noqa: F401
+    candidate_tokens,
     request_with_retry,
     request_public_with_retry,
 )
@@ -2831,7 +2832,6 @@ def get_profile_contributions_observation() -> dict:
       }
     }
     """
-    data = _graphql_query(query, {"login": USERNAME})
     observation = dict(
         schema="profile-provider-observation/v1",
         metric_id="github_profile_contributions",
@@ -2842,6 +2842,9 @@ def get_profile_contributions_observation() -> dict:
         observed_at=None, source_id="github_graphql_default_contributions_collection",
         source_mode="live", completion_reason="unavailable",
     )
+    if not any(token.strip() for token in candidate_tokens(_settings)):
+        return observation
+    data = _graphql_query(query, {"login": USERNAME})
     try:
         collection = data["user"]["contributionsCollection"]
         candidate = {**observation, "value": collection["contributionCalendar"]["totalContributions"],

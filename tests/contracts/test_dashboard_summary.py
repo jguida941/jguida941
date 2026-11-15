@@ -255,7 +255,7 @@ class DashboardFlatOverviewTests(unittest.TestCase):
         ns="{http://www.w3.org/2000/svg}"
         from scripts.contracts.dashboard_summary import _fact
         summary={"facts":[_fact("activity.active_repos_7d",8,"active repos","owned",status="exact")]}
-        flat={"calendar.total","inventory.public_nonfork","inventory.private_owned","inventory.stargazers","activity.active_repos_7d"}
+        flat={"profile.contributions","inventory.public_nonfork","inventory.private_owned","inventory.stargazers","activity.active_repos_7d"}
         for mobile in (False,True):
             root=ET.fromstring(render_svg(summary,mobile=mobile))
             owners=[n for n in root.iter() if n.get("data-metric-id")]
@@ -348,7 +348,7 @@ class DashboardHeaderScaleTests(unittest.TestCase):
             for owner in (n for n in root.iter() if n.get("data-metric-id")):
                 key = owner.get("data-metric-id")
                 value = next(n for n in owner.iter(ns+"text") if n.get("data-role")=="value")
-                expected = 56 if key=="calendar.total" else 29 if key in ("inventory.public_nonfork","inventory.private_owned","inventory.stargazers") else 42 if key=="activity.active_repos_7d" else 25
+                expected = 46 if key=="profile.contributions" else 29 if key in ("inventory.public_nonfork","inventory.private_owned","inventory.stargazers") else 42 if key=="activity.active_repos_7d" else 25
                 self.assertEqual(float(value.get("font-size")), expected)
 
 
