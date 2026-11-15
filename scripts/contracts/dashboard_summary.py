@@ -58,6 +58,28 @@ def build_dashboard_summary(model, *, profile_date):
     rhythm = model.get("contribution_rhythm")
     rhythm_display = contribution_rhythm_display(rhythm)
     calendar_ok = not contribution_rhythm_errors(rhythm) and rhythm.get("status") == "available"
+    raw_calendar = data.get("contribution_calendar") or {}
+    days = []
+    if calendar_ok:
+        try:
+            days = [dict(row) for week in raw_calendar["weeks"] for row in week]
+            parsed = [date.fromisoformat(row["date"]) for row in days]
+            if (len(set(parsed)) != len(parsed)
+                    or any(day.isoformat() != row["date"] for day, row in zip(parsed, days))
+                    or any(_count(row["count"]) is None for row in days)
+                    or _count(raw_calendar.get("total")) != rhythm["total"]
+                    or _count(snapshot.get("last_year_contributions")) != rhythm["total"]
+                    or sum(row["count"] for row in days) != rhythm["total"]):
+                raise ValueError("calendar disagrees")
+            days.sort(key=lambda row: row["date"])
+            if (days[0]["date"] != rhythm["window_start"] or days[-1]["date"] != rhythm["window_end"]
+                    or len(days) != rhythm["days_observed"]
+                    or (date.fromisoformat(days[-1]["date"]) - date.fromisoformat(days[0]["date"])).days + 1 != len(days)):
+                raise ValueError("calendar window disagrees")
+        except (KeyError, TypeError, ValueError, IndexError):
+            days = []
+    # Select every calendar fact only after the same dated input reconciles.
+    calendar_ok = bool(days)
     calendar_status = "exact" if calendar_ok and rhythm.get("completeness") == "known" else "unknown" if calendar_ok else "unavailable"
     calendar_window = f'{rhythm["window_start"]} – {rhythm["window_end"]} · UTC' if calendar_ok else "Calendar unavailable"
     facts = []
@@ -107,21 +129,6 @@ def build_dashboard_summary(model, *, profile_date):
     add("language.count", len(ordered) if valid_bytes and language_status != "unavailable" else None, "languages",
         "owned-public-private-nonfork-profile-excluded", status=language_status, reason="language_byte_observation", window="observed repository HEADs")
 
-    raw_calendar = data.get("contribution_calendar") or {}
-    days = []
-    if calendar_ok:
-        try:
-            days = [dict(row) for week in raw_calendar["weeks"] for row in week]
-            parsed = [date.fromisoformat(row["date"]) for row in days]
-            if (len(set(parsed)) != len(parsed) or any(_count(row["count"]) is None for row in days)
-                    or sum(row["count"] for row in days) != rhythm["total"]):
-                raise ValueError("calendar disagrees")
-            days.sort(key=lambda row: row["date"])
-            if (days[0]["date"] != rhythm["window_start"] or days[-1]["date"] != rhythm["window_end"]
-                    or (date.fromisoformat(days[-1]["date"]) - date.fromisoformat(days[0]["date"])).days + 1 != len(days)):
-                raise ValueError("calendar window disagrees")
-        except (KeyError, TypeError, ValueError, IndexError):
-            days = []
     cutoff = profile_date.isoformat() if isinstance(profile_date, date) else str(profile_date)
     eligible = [row for row in days if row["date"] <= cutoff]
     longest, run, current = [], [], []

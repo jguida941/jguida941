@@ -302,7 +302,7 @@ def _calendar_from_observation_value(value: object) -> dict[str, Any] | None:
     return {
         "totalContributions": total,
         "weeks": [
-            {"contributionDays": weeks[key]}
+            {"contributionDays": sorted(weeks[key], key=lambda row: row["date"])}
             for key in sorted(weeks)
         ],
     }
