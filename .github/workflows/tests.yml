@@ -83,7 +83,7 @@ jobs:
               host = host.replace("offenders.slice(0, 20)", "offenders")
               host = host.replace("done = true;", "var status = doc.getElementById('calendar-status'); if ((status && status.textContent.indexOf('Loading contribution calendar') === 0) || (doc.fonts && doc.fonts.status === 'loading')) { window.setTimeout(probe, 50); return; } done = true;")
               host = host.replace('"tag": el.tagName.toLowerCase(),',
-                                  '"tag": el.tagName.toLowerCase(), "text": el.textContent.slice(0, 180), "white_space": style.whiteSpace,')
+                                  '"tag": el.tagName.toLowerCase(), "text": el.textContent.slice(0, 180), "white_space": style.whiteSpace, "ancestors": (function () { var rows = []; for (var p = el.parentElement; p; p = p.parentElement) { var ps = frame.contentWindow.getComputedStyle(p), pr = p.getBoundingClientRect(); rows.push({tag:p.tagName.toLowerCase(), id:p.id, class:cls(p), display:ps.display, visibility:ps.visibility, overflow_x:ps.overflowX, overflow_y:ps.overflowY, white_space:ps.whiteSpace, text_overflow:ps.textOverflow, left:pr.left, right:pr.right, width:pr.width, height:pr.height, open:p.open === true}); } return rows; }()),')
               host = host.replace('"client_width": clientWidth,',
                                   '"client_width": clientWidth, "calendar_cells": doc.querySelectorAll("#cal i").length, "calendar_total": doc.getElementById("cal-total").textContent,')
               diagnostic = Path(tmp) / "index.html"
