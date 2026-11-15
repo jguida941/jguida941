@@ -598,7 +598,7 @@ def render_svg(summary, *, mobile=False, generation=None):
     c.text(username, pad, 69, size=26, weight=600)
     try:
         observed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-        snapshot_date = observed.strftime("%b %-d, %Y · %H:%M UTC")
+        snapshot_date = observed.strftime("%b %-d, %Y")
     except ValueError:
         snapshot_date = "date unavailable"
     c.text("Snapshot " + snapshot_date, pad, 96, size=14 if mobile else 16, color="muted")
