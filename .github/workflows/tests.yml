@@ -74,6 +74,37 @@ jobs:
           # A failed capture must never upload the old, stale artifacts as new evidence.
           for path in outputs:
               path.unlink(missing_ok=True)
+          # Diagnostic only: measure the hydrated calendar and retain every offender.
+          # The original producer source and its acceptance predicates are unchanged.
+          with tempfile.TemporaryDirectory(prefix="index-stable-diagnostic-") as tmp:
+              host = producer._probe_html("index", page.resolve(), 390, 1000)
+              if host.count("offenders.slice(0, 20)") != 1 or host.count("done = true;") != 1:
+                  raise SystemExit("unexpected producer diagnostic shape")
+              host = host.replace("offenders.slice(0, 20)", "offenders")
+              host = host.replace("done = true;", "var status = doc.getElementById('calendar-status'); if ((status && status.textContent.indexOf('Loading contribution calendar') === 0) || (doc.fonts && doc.fonts.status === 'loading')) { window.setTimeout(probe, 50); return; } done = true;")
+              host = host.replace('"tag": el.tagName.toLowerCase(),',
+                                  '"tag": el.tagName.toLowerCase(), "text": el.textContent.slice(0, 180), "white_space": style.whiteSpace,')
+              host = host.replace('"client_width": clientWidth,',
+                                  '"client_width": clientWidth, "calendar_cells": doc.querySelectorAll("#cal i").length, "calendar_total": doc.getElementById("cal-total").textContent,')
+              diagnostic = Path(tmp) / "index.html"
+              diagnostic.write_text(host)
+              command = [str(producer.CHROME), "--headless=new", "--no-first-run",
+                         "--no-default-browser-check", "--allow-file-access-from-files",
+                         "--window-size=800,1000", "--virtual-time-budget=5000",
+                         "--dump-dom", diagnostic.as_uri()]
+              observed = producer._parse_probe_dump(producer._run(command).stdout)
+              bad = [row for row in observed["offenders"]
+                     if not row.get("contained_by_table_scroll")
+                     and not row.get("contained_by_calendar_scroll")]
+              print(json.dumps({"uncontained_diagnostic": bad,
+                                "diagnostic_total_offenders": observed["offender_count"],
+                                "diagnostic_uncontained": observed["uncontained_offender_count"],
+                                "diagnostic_calendar_cells": observed["calendar_cells"],
+                                "diagnostic_calendar_total": observed["calendar_total"]}, indent=2))
+              if not observed["calendar_cells"]:
+                  raise SystemExit("diagnostic did not observe a hydrated calendar")
+              if bad:
+                  raise SystemExit("the hydrated 390px layout has uncontained offenders")
           try:
               producer.screenshot_page("index", 1280)
               producer.dom_probe("index", 390)
@@ -91,29 +122,6 @@ jobs:
                   or measured.get("horizontal_overflow") is not False
                   or measured.get("uncontained_offender_count") != 0):
               print(json.dumps(measured, indent=2))
-              # Read the actual offending elements omitted by the producer's first-20
-              # diagnostic limit. This does not change the producer or its receipts.
-              with tempfile.TemporaryDirectory(prefix="index-diagnostic-") as tmp:
-                  host = producer._probe_html("index", page.resolve(), 390, 1000)
-                  if host.count("offenders.slice(0, 20)") != 1:
-                      raise SystemExit("unexpected producer diagnostic shape")
-                  host = host.replace("offenders.slice(0, 20)", "offenders")
-                  host = host.replace('"tag": el.tagName.toLowerCase(),',
-                                      '"tag": el.tagName.toLowerCase(), "text": el.textContent.slice(0, 180), "white_space": style.whiteSpace,')
-                  diagnostic = Path(tmp) / "index.html"
-                  diagnostic.write_text(host)
-                  command = [str(producer.CHROME), "--headless=new", "--no-first-run",
-                             "--no-default-browser-check", "--allow-file-access-from-files",
-                             "--window-size=800,1000", "--virtual-time-budget=2500",
-                             "--dump-dom", diagnostic.as_uri()]
-                  observed = producer._parse_probe_dump(producer._run(command).stdout)
-                  bad = [row for row in observed["offenders"]
-                         if not row.get("contained_by_table_scroll")
-                         and not row.get("contained_by_calendar_scroll")]
-                  print(json.dumps({"uncontained_diagnostic": bad,
-                                    "diagnostic_total_offenders": observed["offender_count"],
-                                    "diagnostic_uncontained": observed["uncontained_offender_count"]},
-                                   indent=2))
               raise SystemExit("the actual 390px layout overflowed or was not measured")
           for artifact in (screenshot, probe):
               sidecar = json.loads(producer.provenance_path(artifact).read_text())
