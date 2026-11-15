@@ -108,6 +108,17 @@ Moving controls back into the card and removing the grouped footer are the retai
 negative mutations. This bounded change does not implement the queued presentation
 architecture or settings redesign.
 
+**Single site navigation (operator correction, 2026-11-15):** Home, showcase,
+studio and settings each have one primary navigation band above their content.
+The blue row of sibling links below the introduction is redundant and is removed.
+A page title, introduction and active navigation item provide orientation; the
+page manifest therefore binds orientation to the real title, not a duplicate link
+row. The reusable shell still supports real hierarchical breadcrumbs when a
+caller supplies them, and emits no empty breadcrumb container otherwise.
+`SingleSiteNavigationTests` inspects all four rendered pages, rejects an added
+peer-link row, and retains the genuine-breadcrumb control. All four routes keep
+MF1 desktop/mobile browser receipts. This does not redesign settings behavior.
+
 ## Part 0 — Design tokens (single source of truth)
 
 Both projections MUST draw every value from these tokens (operationalizes Power BI "report theme =

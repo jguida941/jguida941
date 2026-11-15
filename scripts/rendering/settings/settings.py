@@ -121,7 +121,7 @@ def render_settings() -> str:
         HOUSE,
         title="Governed control plane",
         intro=_INTRO,
-        breadcrumbs=[("home", "index.html"), ("showcase", "showcase.html"), ("studio", "studio.html")],
+        breadcrumbs=[],
         prefix_html=nav_html,
         sections=[("The law", _LAW_HTML)],
         body_html="\n".join(base_sections),

@@ -218,7 +218,7 @@ def render_studio() -> str:
         HOUSE,
         title="Design-language studio",
         intro=_INTRO,
-        breadcrumbs=[("home", "index.html"), ("showcase", "showcase.html"), ("settings", "settings.html")],
+        breadcrumbs=[],
         prefix_html="".join(radios) + nav_html,
         body_html=body_html,
     )
