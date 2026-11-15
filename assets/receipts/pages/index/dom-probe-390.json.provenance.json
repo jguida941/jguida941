@@ -12,12 +12,12 @@
     "--window-size=800,1000",
     "--virtual-time-budget=2500",
     "--dump-dom",
-    "file:///tmp/index-probe-ca81pxnd/index.html"
+    "file:///tmp/index-probe-4xsup2ez/index.html"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-dom-probe",
   "page": "index",
-  "page_sha256": "e0fdd0c458e2bc11492ea8c5d8305808638cb7435fc77b35668e017347c2ee3f",
+  "page_sha256": "2f908132061b20d0809730f427985465570f76aacca7dbf337694a75902d5a35",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/index.html",
   "viewport": {
