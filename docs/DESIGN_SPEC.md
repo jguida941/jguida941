@@ -262,18 +262,17 @@ are generated separately; SVG images provide native README links and text equiva
 Contribution collection requests 365 inclusive UTC dates, from midnight on the first
 date through the current observation time. Profile-local dates still govern the current
 streak cutoff; pull-request and release windows retain their existing timezones. The
-shared summary records the actual UTC range. GitHub's native profile period must be
-matched before comparing totals.
+display shows its actual UTC date range rather than implying parity with GitHub's native
+profile graph, whose period must be matched before comparing totals.
 
 A complete calendar has canonical, unique, contiguous dated counts covering both
 requested boundaries, including zero-count dates, and their sum equals its reported
 total. Missing or inconsistent native evidence holds live publication and preserves the
 previous artifacts. Candidate and stored publication use the same evidence checks.
-The shared summary and README select reconciled contribution facts; rejected calendar
-rows cannot leave a numeric total in that summary. Candidate and stored publication
-also reconcile streak values and their displayed text, ranges and recorded cutoff
-through the same summary owner. The existing website renderer is unchanged in this
-hotfix; direct shared-summary selection and full date labels are a separate follow-up.
+The README and website contribution headline, active days, streaks and grid select the
+shared reconciled summary; rejected calendar rows cannot leave a numeric total behind.
+Publication also reconciles the values, displayed text, ranges and recorded streak
+cutoff through that same summary owner instead of trusting agreeing copied scalars.
 
 The streak cutoff must match the retained generation time in the effective profile
 timezone. One captured date governs both the snapshot and the shared summary.

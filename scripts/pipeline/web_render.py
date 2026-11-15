@@ -336,11 +336,11 @@ def _hero() -> str:
     </div>
     <div class="kpi">
       <div>
-        <div class="kpi-value num" data-bind="snapshot.last_year_contributions">—</div>
-        <div class="kpi-label">contributions · last 12 months</div>
+        <div class="kpi-value num" data-calendar-fact="calendar.total">n/a</div>
+        <div class="kpi-label" id="hero-contribution-window">contributions · observed UTC dates</div>
       </div>
       <div class="stats">
-        <div class="stat"><div class="v num" data-bind="scorecard.active_days_last_year">—</div><div class="l">active days</div></div>
+        <div class="stat"><div class="v num" data-calendar-fact="calendar.active_days">n/a</div><div class="l">active days</div></div>
         <div class="stat"><div class="v num" data-bind="snapshot.total_repos">—</div><div class="l">public repos</div></div>
         <div class="stat"><div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">stars</div></div>
       </div>
@@ -377,7 +377,7 @@ def _scorecard() -> str:
       <div><div class="mt">{AUTOMATION_ADOPTION_LABEL}</div><div class="ms" data-bind="automation_display.combined.gauge_detail">Workflow observation unavailable</div></div>
     </div>
     <div class="mgroup">
-      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['fire'])} active days</span><span class="ms">last 12 months</span></span><span class="mv num" data-bind="scorecard.active_days_last_year">—</span></div>
+      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['fire'])} active days</span><span class="ms" data-calendar-window>observed UTC dates</span></span><span class="mv num" data-calendar-fact="calendar.active_days">n/a</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['commit'])} active repos</span><span class="ms">last 7 days</span></span><span class="mv num" data-bind="scorecard.active_repos_7d">—</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['workflow'])} {AUTOMATION_FILES_LABEL}</span><span class="ms">observed default-branch HEAD</span></span><span class="mv num" data-bind="automation_display.combined.workflow_files">—</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['release'])} releases</span><span class="ms">last 30 days</span></span><span class="mv num" data-bind="scorecard.releases_30d">—</span></div>
@@ -426,7 +426,7 @@ def _languages() -> str:
 def _calendar() -> str:
     return """
   <section class="panel" id="calendar-panel" tabindex="-1">
-    <div class="section-head"><div><p class="eyebrow">Last 12 Months</p><h2 class="title">Contribution Calendar</h2></div><span class="section-meta" id="cal-total">—</span></div>
+    <div class="section-head"><div><p class="eyebrow">Observed UTC Dates</p><h2 class="title">Contribution Calendar</h2></div><span class="section-meta" id="cal-total">n/a</span></div>
     <hr class="hairline">
     <p id="calendar-status" role="status">Loading contribution calendar…</p>
     <div class="cal-wrap"><div class="cal" id="cal"></div></div>
@@ -1027,10 +1027,27 @@ def _script() -> str:
       const label = s === "ok" ? "OK" : esc(s[0].toUpperCase() + s.slice(1));
       return `<span class="chip ${state}">${STATUS_ICON[state] || STATUS_ICON.warn}${nm} · ${label}</span>`;
     }).join("");
-    // contribution calendar (intensity = accent opacity by level)
-    const cal = d.contribution_calendar;
-    if (cal && Array.isArray(cal.weeks) && cal.weeks.length) {
-      const days = cal.weeks.flat().filter(x => x && x.date);
+    // The README and website select the same reconciled contribution facts.
+    const selectedCalendar = d.dashboard_summary;
+    const cal = selectedCalendar?.calendar;
+    const calendarFacts = Array.isArray(selectedCalendar?.facts) ? selectedCalendar.facts : [];
+    const totalFact = calendarFacts.find(row => row.metric_id === "calendar.total");
+    const calendarAvailable = ["exact", "unknown"].includes(cal?.status) &&
+      Array.isArray(cal?.days) && cal.days.length > 0 &&
+      Number.isSafeInteger(totalFact?.value) && totalFact.value >= 0 &&
+      totalFact?.quality?.status !== "unavailable";
+    document.querySelectorAll("[data-calendar-fact]").forEach(el => {
+      const fact = calendarFacts.find(row => row.metric_id === el.getAttribute("data-calendar-fact"));
+      el.textContent = calendarAvailable && Number.isSafeInteger(fact?.value) && fact.value >= 0
+        ? fact.value.toLocaleString("en-US") : "n/a";
+    });
+    document.getElementById("hero-contribution-window").textContent = calendarAvailable
+      ? "contributions · " + cal.window : "Contribution calendar unavailable";
+    document.querySelectorAll("[data-calendar-window]").forEach(el => {
+      el.textContent = calendarAvailable ? cal.window : "Calendar unavailable";
+    });
+    if (calendarAvailable) {
+      const days = cal.days;
       const maxc = Math.max(1, ...days.map(x => x.count || 0));
       const op = [0, 38, 58, 78, 100];
       const lvl = (c) => c <= 0 ? 0 : (c/maxc <= .25 ? 1 : c/maxc <= .5 ? 2 : c/maxc <= .75 ? 3 : 4);
@@ -1040,12 +1057,15 @@ def _script() -> str:
       for (let i = 0; i < first; i++) cells += "<i></i>";
       days.forEach(dy => cells += `<i style="${fill(lvl(dy.count))}" title="${esc(dy.date)}: ${fmt(dy.count)}"></i>`);
       document.getElementById("cal").innerHTML = cells;
-      document.getElementById("cal-total").textContent = fmt(cal.total) + " contributions";
-      const mlabel = (s) => { const t = new Date(s + "T00:00:00Z"); return isNaN(t) ? esc(s) : t.toLocaleString("en-US", {month:"short", year:"numeric"}); };
-      document.getElementById("cal-months").textContent = mlabel(days[0].date) + " – " + mlabel(days[days.length-1].date);
+      document.getElementById("cal-total").textContent = totalFact.value.toLocaleString("en-US") + " contributions";
+      document.getElementById("cal-months").textContent = cal.window;
       document.getElementById("cal-scale").innerHTML = [0,1,2,3,4].map(l => `<i style="${fill(l)}"></i>`).join("");
-      document.getElementById("calendar-status").textContent = cal.total === 0 ? "No contributions in the observed dates" : "";
+      document.getElementById("calendar-status").textContent = totalFact.value === 0 ? "No contributions in the observed dates" : "";
     } else {
+      document.getElementById("cal").replaceChildren();
+      document.getElementById("cal-total").textContent = "n/a";
+      document.getElementById("cal-months").textContent = "";
+      document.getElementById("cal-scale").replaceChildren();
       document.getElementById("calendar-status").textContent = "Contribution calendar unavailable";
     }
 
