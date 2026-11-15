@@ -1679,7 +1679,7 @@ def _build_dashboard_payload(
     }
 
 
-def _build_inventory_observation(collected: CollectedProfileData) -> dict[str, Any]:
+def _build_inventory_observation(collected: CollectedProfileData, now_utc: datetime) -> dict[str, Any]:
     """Qualify aggregate personal counts from this run's fresh provider census."""
     evidence = getattr(collected, "inventory_evidence", {}) or {}
     if not isinstance(evidence, dict):
@@ -1690,8 +1690,11 @@ def _build_inventory_observation(collected: CollectedProfileData) -> dict[str, A
     observed_at = evidence.get("observed_at")
     try:
         stamp = datetime.fromisoformat(observed_at.replace("Z", "+00:00"))
-        if stamp.tzinfo is None or stamp.utcoffset() is None:
-            raise ValueError("inventory time must be timezone-aware")
+        start = datetime.fromisoformat(collected.collection_started_at.replace("Z", "+00:00"))
+        if any(value.tzinfo is None or value.utcoffset() is None for value in (start, stamp, now_utc)):
+            raise ValueError("inventory times must be timezone-aware")
+        if not start <= stamp <= now_utc:
+            raise ValueError("inventory observation is outside this collection run")
         observed_at = stamp.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
     except (AttributeError, TypeError, ValueError):
         observed_at = None
@@ -1728,7 +1731,8 @@ def _build_inventory_observation(collected: CollectedProfileData) -> dict[str, A
     }
     return {"schema": "profile-inventory-observation/v1", "source_id": "github_personal_owned_repository_census",
             "population_id": "personal-owned-repositories", "source_mode": "live" if fresh else "unavailable",
-            "observed_at": observed_at if fresh else None, "metrics": metrics}
+            "observed_at": observed_at if fresh else None, "metrics": metrics,
+            "snapshot_generated_at": now_utc.isoformat().replace("+00:00", "Z")}
 
 
 def compute_profile_model(
@@ -2033,7 +2037,7 @@ def compute_profile_model(
 
     # --- snapshot rows & cards ---
     # Inventory headline values come from a qualified fresh census when available.
-    inventory_observation = _build_inventory_observation(collected)
+    inventory_observation = _build_inventory_observation(collected, now_utc)
     inventory_scope_keys = {"total_repos": "public_owned_nonfork_repos_total",
                             "public_forks": "public_owned_forks_total",
                             "private_owned_repos": "private_owned_repos_total"}
@@ -2220,6 +2224,7 @@ def compute_profile_model(
     dashboard_data["engineering"] = engineering
     dashboard_data["profile_contributions_observation"] = profile_observation
     dashboard_data["inventory_observation"] = inventory_observation
+    dashboard_data["collection_started_at"] = collected.collection_started_at
     dashboard_data["automation"] = automation
     dashboard_data["automation_display"] = workflow_display
     # Execution history is one separately qualified public-repo observation.
