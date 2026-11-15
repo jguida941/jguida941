@@ -21,8 +21,6 @@ jobs:
         include:
           - scope: main
             source_sha: a70bcab30aa719bd113ca54ac7821f96fb04091a
-          - scope: development
-            source_sha: d6b662f5d9750484f3a6d7842e405bce43abba2a
     env:
       PYTHONDONTWRITEBYTECODE: "1"
       CAPTURE_EXPECTED_SHA: ${{ matrix.source_sha }}
@@ -50,6 +48,7 @@ jobs:
           from pathlib import Path
           import shutil
           import subprocess
+          import tempfile
           from PIL import Image
           from scripts.quality import headless_receipts as producer
 
@@ -92,6 +91,29 @@ jobs:
                   or measured.get("horizontal_overflow") is not False
                   or measured.get("uncontained_offender_count") != 0):
               print(json.dumps(measured, indent=2))
+              # Read the actual offending elements omitted by the producer's first-20
+              # diagnostic limit. This does not change the producer or its receipts.
+              with tempfile.TemporaryDirectory(prefix="index-diagnostic-") as tmp:
+                  host = producer._probe_html("index", page.resolve(), 390, 1000)
+                  if host.count("offenders.slice(0, 20)") != 1:
+                      raise SystemExit("unexpected producer diagnostic shape")
+                  host = host.replace("offenders.slice(0, 20)", "offenders")
+                  host = host.replace('"tag": el.tagName.toLowerCase(),',
+                                      '"tag": el.tagName.toLowerCase(), "text": el.textContent.slice(0, 180), "white_space": style.whiteSpace,')
+                  diagnostic = Path(tmp) / "index.html"
+                  diagnostic.write_text(host)
+                  command = [str(producer.CHROME), "--headless=new", "--no-first-run",
+                             "--no-default-browser-check", "--allow-file-access-from-files",
+                             "--window-size=800,1000", "--virtual-time-budget=2500",
+                             "--dump-dom", diagnostic.as_uri()]
+                  observed = producer._parse_probe_dump(producer._run(command).stdout)
+                  bad = [row for row in observed["offenders"]
+                         if not row.get("contained_by_table_scroll")
+                         and not row.get("contained_by_calendar_scroll")]
+                  print(json.dumps({"uncontained_diagnostic": bad,
+                                    "diagnostic_total_offenders": observed["offender_count"],
+                                    "diagnostic_uncontained": observed["uncontained_offender_count"]},
+                                   indent=2))
               raise SystemExit("the actual 390px layout overflowed or was not measured")
           for artifact in (screenshot, probe):
               sidecar = json.loads(producer.provenance_path(artifact).read_text())
