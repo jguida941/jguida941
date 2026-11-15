@@ -23,6 +23,7 @@ FONT = '-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif'
 
 # Semantic owners share the vendored Lucide system; numeric facts stay unchanged.
 SEMANTIC_ICONS = {
+    "profile.contributions": "calendar",
     "calendar.total": "calendar", "inventory.public_nonfork": "globe",
     "inventory.private_owned": "lock", "inventory.stargazers": "star",
     "inventory.public_forks": "fork", "activity.public_commits": "commit",
@@ -613,8 +614,7 @@ def render_svg(summary, *, mobile=False, generation=None):
         c.parts.append('<image '+_attrs(dict(x=avatar_x,y=avatar_y,width=avatar_size,height=avatar_size,href="data:image/jpeg;base64,"+encoded,clip_path="url(#profile-avatar-clip)",preserveAspectRatio="xMidYMid slice"))+'><title>'+escape(username+" profile artwork")+'</title></image>')
     total = fact("profile.contributions")
     y = c.fact(total,pad,146,content,size=46,fill="panel",framed=False,
-               qualify=total["quality"].get("status") not in ("exact","ok"),
-               caption="GitHub reporting period" if total.get("value") is not None else "")+12
+               qualify=total["quality"].get("status") not in ("exact","ok"))+12
     c.parts.append('<title>'+escape("Snapshot "+timestamp+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
     inventory = ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers")
     y = c.fact_grid([fact(key) for key in inventory],pad,y,content,

@@ -73,22 +73,31 @@ body {
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .section-meta { font-size: var(--type-caption); color: var(--ink-dim); }
 
-/* --- hero --- */
-.hero .topline { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.hero h1 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 600; color: var(--ink-strong); margin: 2px 0 4px; letter-spacing: -0.01em; }
-.hero .tag { font-size: var(--type-body); color: var(--ink); margin: 0; }
-.hero .kpi { display: flex; align-items: flex-end; gap: 28px; margin-top: 24px; flex-wrap: wrap; }
-.hero .kpi-value { font-size: clamp(40px, 6vw, 54px); font-weight: 600; color: var(--ink-strong); line-height: 1.05; letter-spacing: -0.02em; }
-.hero .kpi-label { font-size: var(--type-body); color: var(--ink); margin-top: 8px; }
-.hero .contribution-details { color: var(--ink-dim); font-size: 13px; margin-top: 16px; max-width: 64ch; }
-.hero .contribution-details summary { cursor: pointer; }
-.hero .contribution-details p { margin: 8px 0; line-height: 1.5; }
-.hero .stats { display: flex; gap: 26px; padding-bottom: 6px; }
-.stat .v { font-size: var(--type-metric_lg); font-weight: 600; color: var(--ink-strong); }
-.stat .l { font-size: var(--type-caption); color: var(--ink-dim); }
-.live { display: inline-flex; align-items: center; gap: 7px; font-size: var(--type-caption); color: var(--ink-dim); margin-top: 14px; }
-.live .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-success); box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-success) 60%, transparent); animation: pulse 2.4s infinite; }
-@keyframes pulse { 0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--status-success) 55%,transparent);} 70%{box-shadow:0 0 0 7px transparent;} 100%{box-shadow:0 0 0 0 transparent;} }
+/* --- activity overview: DESIGN_SPEC, operator reference 2026-11-15 --- */
+.dashboard-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: var(--gap-grid, 20px); }
+.hero { padding: 0; overflow: hidden; }
+.hero-content { padding: var(--pad-panel, 28px); }
+.hero .profile-heading { display: flex; align-items: center; gap: 20px; }
+.hero .profile-avatar { width: 64px; height: 64px; object-fit: cover; border-radius: 50%; clip-path: circle(48%); }
+.hero h1 { font-size: var(--type-metric_lg); font-weight: 600; color: var(--ink-strong); margin: 0; letter-spacing: -0.01em; }
+.hero .tag:empty { display: none; }
+.hero .tag { font-size: var(--type-body); color: var(--ink); margin: 12px 0 0; }
+.hero .kpi { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: end; gap: var(--gap-grid, 20px); margin-top: 32px; padding-bottom: 8px; }
+.hero .kpi-value { font-size: var(--type-display); font-weight: 600; color: var(--ink-strong); line-height: 1.05; letter-spacing: -0.02em; }
+.hero .kpi-label { display: flex; align-items: center; gap: 8px; font-size: var(--type-body); color: var(--ink); margin: 0 0 12px; }
+.hero svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.hero .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; border-left: 1px solid var(--hairline); padding-left: var(--pad-panel, 28px); }
+.hero .stat svg { color: var(--ink); margin-bottom: 12px; }
+.stat .v { font-size: var(--type-metric_lg); font-weight: 600; color: var(--ink-strong); line-height: 1.2; }
+.stat .l { font-size: var(--type-caption); color: var(--ink-dim); margin-top: 8px; }
+.hero-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 16px var(--pad-panel, 28px); border-top: 1px solid var(--hairline); background: color-mix(in srgb, var(--surface-raised) 35%, transparent); font-size: var(--type-caption); color: var(--ink-dim); }
+.hero-footer a { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-strong); text-decoration: none; }
+.hero-footer a:hover { text-decoration: underline; }
+.hero .live { display: inline-flex; align-items: center; gap: 8px; }
+@media (max-width: 640px) {
+  .hero .kpi { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .hero .stats { border-left: 0; border-top: 1px solid var(--hairline); padding: 20px 0 0; }
+}
 
 /* --- theme switcher --- */
 .switcher { display: inline-flex; gap: 3px; padding: 3px; border-radius: 999px;
@@ -209,7 +218,6 @@ body {
   .rhythm-row { grid-template-columns: 3ch minmax(24px, 1fr) auto; gap: 6px 10px; }
 }
 
-#snapshot-notice:empty { display:none; }
 #weekly-chart svg { display:block; width:100%; height:auto; font:16px var(--font-sans); fill:var(--ink); }
 #weekly-table table { border-collapse:collapse; width:100%; font-size:var(--type-body); }
 #weekly-table th, #weekly-table td { padding:10px 4px; text-align:left; border-bottom:1px solid var(--hairline); }
@@ -320,40 +328,45 @@ def _nav_band_html() -> str:
 
 
 def _hero() -> str:
+    from base64 import b64encode
+    from scripts.rendering.icons import LUCIDE
+    avatar = b64encode((Path(__file__).resolve().parents[2] / "assets/profile-avatar.jpg").read_bytes()).decode("ascii")
     metas = "".join(
         f'<button type="button" data-theme-set="{name}" aria-pressed="{str(name == DEFAULT_THEME).lower()}" '
         f'title="{THEME_META[name]["blurb"]}">{THEME_META[name]["label"]}</button>'
         for name in THEMES
     )
     return f"""
+  <div class="dashboard-toolbar">
+    {_nav_band_html()}
+    <div class="switcher" role="group" aria-label="Theme">{metas}</div>
+  </div>
   <header class="panel hero" id="overview" tabindex="-1">
-    <div class="topline">
-      <div>
-        <p class="eyebrow">GitHub Analytics · Live</p>
-        <h1 id="hero-name">@jguida941</h1>
-        <p id="snapshot-notice" class="section-meta" role="status"></p>
-        <p class="tag" id="hero-tag">Builder dashboard — regenerated hourly from the GitHub API.</p>
-        {_nav_band_html()}
+    <div class="hero-content">
+      <div class="profile-heading">
+        <img class="profile-avatar" src="data:image/jpeg;base64,{avatar}" width="64" height="64" alt="">
+        <div>
+          <p class="eyebrow">Activity overview</p>
+          <h1 id="hero-name">@jguida941</h1>
+        </div>
       </div>
-      <div class="switcher" role="group" aria-label="Theme">{metas}</div>
+      <p class="tag" id="hero-tag" role="status"></p>
+      <div class="kpi">
+        <div class="contribution-primary">
+          <div class="kpi-label">{_svg_icon(LUCIDE['calendar'])}<span id="hero-contribution-window">Contributions</span></div>
+          <div class="kpi-value num" id="hero-contribution-total">n/a</div>
+        </div>
+        <div class="stats">
+          <div class="stat">{_svg_icon(LUCIDE['calendar_check'])}<div class="v num" data-calendar-fact="calendar.active_days">n/a</div><div class="l">Active days</div></div>
+          <div class="stat">{_svg_icon(LUCIDE['globe'])}<div class="v num" data-bind="snapshot.total_repos">—</div><div class="l">Public repos</div></div>
+          <div class="stat">{_svg_icon(LUCIDE['star'])}<div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">Stars</div></div>
+        </div>
+      </div>
     </div>
-    <div class="kpi">
-      <div>
-        <div class="kpi-value num" id="hero-contribution-total">n/a</div>
-        <div class="kpi-label" id="hero-contribution-window">GitHub contributions</div>
-      </div>
-      <div class="stats">
-        <div class="stat"><div class="v num" data-calendar-fact="calendar.active_days">n/a</div><div class="l">active days</div></div>
-        <div class="stat"><div class="v num" data-bind="snapshot.total_repos">—</div><div class="l">public repos</div></div>
-        <div class="stat"><div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">stars</div></div>
-      </div>
+    <div class="hero-footer">
+      <div class="live">{_svg_icon(LUCIDE['clock'])}<span>Updated <span id="updated">—</span></span></div>
+      <a href="https://github.com/jguida941">View GitHub profile <span aria-hidden="true">↗</span></a>
     </div>
-    <div class="live"><span class="dot"></span><span>Live · updated <span id="updated">—</span></span></div>
-    <details class="contribution-details">
-      <summary>About this count</summary>
-      <p>GitHub's profile total uses its default reporting period. The calendar below sums the listed UTC dates and can have a different total. Both include contributions visible to the provider, including private contributions.</p>
-      <p id="profile-contribution-period">GitHub reporting period unavailable.</p>
-    </details>
   </header>"""
 
 
@@ -1056,10 +1069,7 @@ def _script() -> str:
       Number.isSafeInteger(profileFact?.value) && profileFact.value >= 0;
     document.getElementById("hero-contribution-total").textContent = profileAvailable
       ? profileFact.value.toLocaleString("en-US") : "n/a";
-    document.getElementById("hero-contribution-window").textContent = "GitHub contributions";
-    document.getElementById("profile-contribution-period").textContent = profileAvailable
-      ? "GitHub reporting period: " + profileFact.window + ". Observed " + profileFact.observed_at + "."
-      : "GitHub profile total unavailable for this observation.";
+    document.getElementById("hero-contribution-window").textContent = "Contributions";
     document.querySelectorAll("[data-calendar-window]").forEach(el => {
       el.textContent = calendarAvailable ? cal.window : "Calendar unavailable";
     });
@@ -1107,10 +1117,6 @@ def _script() -> str:
       document.getElementById("weekly-chart").replaceChildren();
       document.getElementById("weekly-table").replaceChildren();
     }
-    const requested = new URLSearchParams(location.search).get("from_snapshot");
-    const actual = d.generation?.render_key;
-    document.getElementById("snapshot-notice").textContent = requested && actual && requested !== actual
-      ? "Website shows a newer/different snapshot. Website snapshot: " + (d.generated_at || "time unavailable") + "." : "";
     realignSelectedHash();
 
     // Display the serialized calendar projection; dates are labels, never local instants.
