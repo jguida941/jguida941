@@ -546,15 +546,18 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
         )
         return model, public_repository, private_repository
 
-    def _assert_repository_metadata(self, observed, expected, *, private):
+    def _assert_repository_metadata(self, observed, expected, *, private, published=False):
         self.assertEqual(expected["name"], observed.get("name"))
         self.assertEqual(expected["html_url"], observed.get("url"))
         self.assertEqual(expected["language"], observed.get("language"))
         self.assertEqual(expected["pushed_at"], observed.get("pushed_at_raw"))
-        self.assertEqual(
-            expected["latest_commit_message"],
-            observed.get("last_commit_msg"),
-        )
+        if private and published:
+            self.assertNotIn("last_commit_msg", observed)
+        else:
+            self.assertEqual(
+                expected["latest_commit_message"],
+                observed.get("last_commit_msg"),
+            )
         if private:
             self.assertIs(
                 True,
@@ -615,6 +618,7 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
             rows[public_repository["name"]],
             public_repository,
             private=False,
+            published=True,
         )
         self.assertIn(
             private_repository["name"],
@@ -625,6 +629,7 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
             rows[private_repository["name"]],
             private_repository,
             private=True,
+            published=True,
         )
 
     def test_recent_repository_surface_keeps_its_time_window(self):
