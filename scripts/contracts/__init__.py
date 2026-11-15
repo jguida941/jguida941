@@ -23,6 +23,7 @@ from scripts.core.config import USERNAME
 
 
 class Snapshot(TypedDict):
+    github_profile_contributions: int | None
     last_year_contributions: int | None
     public_scope_commits: int | None
     total_repos: int

@@ -42,6 +42,24 @@ def _rows(rows, keys):
     return [{key: row[key] for key in keys if key in row} for row in (rows or []) if isinstance(row, dict)]
 
 
+def profile_contribution_fact(observation, value):
+    """Select the native headline only from its own retained provider observation."""
+    from scripts.github.github_client import validate_provider_observation
+    available = (validate_provider_observation(observation)
+                 and observation.get("metric_id") == "github_profile_contributions"
+                 and observation.get("status") == "ok"
+                 and _count(value) is not None and value == observation["value"])
+    period = (f'{observation["window_start"]} – {observation["window_end"]}'
+              if available else "GitHub reporting period unavailable")
+    fact = _fact("profile.contributions", value if available else None,
+                 "GitHub contributions", "github-user-contributions-visible-to-provider",
+                 status="exact" if available else "unavailable",
+                 reason="default_profile_observation", window=period)
+    for key in ("window_start", "window_end", "observed_at", "source_id"):
+        fact[key] = observation[key] if available else None
+    return fact
+
+
 def build_dashboard_summary(model, *, profile_date):
     """Select already-computed facts; only calendar runs and byte shares are derived.
 
@@ -83,6 +101,8 @@ def build_dashboard_summary(model, *, profile_date):
     calendar_status = "exact" if calendar_ok and rhythm.get("completeness") == "known" else "unknown" if calendar_ok else "unavailable"
     calendar_window = f'{rhythm["window_start"]} – {rhythm["window_end"]} · UTC' if calendar_ok else "Calendar unavailable"
     facts = []
+    facts.append(profile_contribution_fact(data.get("profile_contributions_observation"),
+                                          snapshot.get("github_profile_contributions")))
     def add(*args, **kwargs):
         row = _fact(*args, **kwargs)
         facts.append(row)

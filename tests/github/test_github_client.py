@@ -2721,5 +2721,86 @@ class CodeChangeHistorySizingTests(unittest.TestCase):
             self.assertEqual(('unavailable',False,[]),(result['status'],result['complete'],result['commits']))
             self.assertEqual(2 if mode=='denied' else 1,len(calls))
 
+def _profile_headline_observation(value=13514):
+    return {
+        "schema": "profile-provider-observation/v1",
+        "metric_id": "github_profile_contributions",
+        "source_metric_id": "github_default_profile_contribution_total",
+        "value": value,
+        "status": "ok" if value is not None else "unavailable",
+        "complete": value is not None,
+        "population_id": "github-user-contributions-visible-to-provider",
+        "population_signature": None,
+        "window_start": "2025-11-09T05:00:00Z" if value is not None else None,
+        "window_end": "2026-11-16T04:59:59Z" if value is not None else None,
+        "observed_at": "2026-11-15T15:01:46Z" if value is not None else None,
+        "source_id": "github_graphql_default_contributions_collection",
+        "source_mode": "live",
+        "completion_reason": "all_components_observed" if value is not None else "unavailable",
+    }
+
+
+class GithubProfileHeadlineProviderTests(unittest.TestCase):
+    def setUp(self):
+        # The mocked provider period and observation clock belong to one fixture.
+        clock = patch.object(gh, "datetime", wraps=datetime)
+        fixed = clock.start()
+        self.addCleanup(clock.stop)
+        fixed.now.return_value = datetime(2026, 11, 15, 15, 1, 46, tzinfo=timezone.utc)
+
+    def test_native_default_total_observation_is_admitted_with_its_own_period(self):
+        from scripts.github.github_client import validate_provider_observation
+        for value in (13514, 0):
+            self.assertTrue(validate_provider_observation(_profile_headline_observation(value)),
+                            "default profile total is its own observed metric, not the rolling-calendar sum")
+
+    def test_native_total_refuses_malformed_counts_and_periods(self):
+        from scripts.github.github_client import validate_provider_observation
+        changes = ({"value": True}, {"value": -1}, {"value": "13514"},
+                   {"window_start": "2027-01-01T00:00:00Z"},
+                   {"window_end": None}, {"window_start": "2025-11-09"},
+                   {"source_metric_id": "github_contribution_calendar_total_and_days"},
+                   {"population_id": "organization-only-contributions"})
+        for changed in changes:
+            with self.subTest(changed=changed):
+                self.assertFalse(validate_provider_observation({**_profile_headline_observation(), **changed}))
+
+    def test_provider_requests_the_unfiltered_default_collection(self):
+        from scripts.github import github_client as gh
+        response = {"user": {"contributionsCollection": {
+            "startedAt": "2025-11-09T05:00:00Z", "endedAt": "2026-11-16T04:59:59Z",
+            "contributionCalendar": {"totalContributions": 13514},
+        }}}
+        with patch.object(gh, "_graphql_query", return_value=response) as call:
+            result = gh.get_profile_contributions_observation()
+        self.assertEqual(13514, result["value"])
+        query, variables = call.call_args.args
+        self.assertRegex(query, r"contributionsCollection\s*\{")
+        self.assertNotRegex(query, r"contributionsCollection\s*\(")
+        self.assertEqual({"login": gh.USERNAME}, variables)
+        self.assertEqual(response["user"]["contributionsCollection"]["startedAt"], result["window_start"])
+        self.assertEqual(response["user"]["contributionsCollection"]["endedAt"], result["window_end"])
+
+    def test_provider_zero_is_valid_and_malformed_default_total_is_unavailable(self):
+        valid = {"startedAt": "2025-11-09T05:00:00Z", "endedAt": "2026-11-16T04:59:59Z",
+                 "contributionCalendar": {"totalContributions": 0}}
+        with patch.object(gh, "_graphql_query", return_value={"user": {"contributionsCollection": valid}}):
+            observed = gh.get_profile_contributions_observation()
+        self.assertEqual(0, observed["value"])
+        self.assertTrue(gh.validate_provider_observation(observed))
+        for changes in ({"contributionCalendar": {"totalContributions": True}},
+                        {"contributionCalendar": {"totalContributions": -1}},
+                        {"contributionCalendar": {"totalContributions": "0"}},
+                        {"contributionCalendar": {}}, {"endedAt": None},
+                        {"startedAt": "2027-01-01T00:00:00Z"}):
+            with self.subTest(changes=changes), patch.object(
+                gh, "_graphql_query", return_value={"user": {"contributionsCollection": {**valid, **changes}}}
+            ):
+                observed = gh.get_profile_contributions_observation()
+                self.assertIsNone(observed["value"])
+                self.assertEqual("unavailable", observed["status"])
+                self.assertFalse(observed["complete"])
+
+
 if __name__ == "__main__":
     unittest.main()

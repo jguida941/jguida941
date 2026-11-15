@@ -11,8 +11,37 @@
     "fonts_status": "loaded"
   },
   "kind": "chrome-headless-dom-probe",
-  "offender_count": 191,
+  "offender_count": 192,
   "offenders": [
+    {
+      "class": "",
+      "clip_container": {
+        "class": "code-branch",
+        "code_changes_parent": true,
+        "direct_parent": true,
+        "height": 23.19,
+        "in_viewport": true,
+        "left": 41,
+        "overflow_x": "hidden",
+        "overflow_y": "hidden",
+        "right": 349,
+        "tag": "p",
+        "text_overflow": "ellipsis",
+        "white_space": "nowrap",
+        "width": 308
+      },
+      "contained_by_calendar_scroll": false,
+      "contained_by_code_branch_ellipsis": true,
+      "contained_by_table_scroll": false,
+      "id": "",
+      "left": 681.08,
+      "overflow_px": 353.72,
+      "position": "static",
+      "right": 743.72,
+      "scroll_container": null,
+      "tag": "a",
+      "width": 62.64
+    },
     {
       "class": "cal",
       "clip_container": null,
@@ -360,30 +389,6 @@
       "overflow_px": 26,
       "position": "static",
       "right": 416,
-      "scroll_container": {
-        "class": "cal-wrap",
-        "id": "",
-        "in_viewport": true,
-        "left": 41,
-        "overflow_x": "auto",
-        "right": 349,
-        "tag": "div",
-        "width": 308
-      },
-      "tag": "i",
-      "width": 11
-    },
-    {
-      "class": "",
-      "clip_container": null,
-      "contained_by_calendar_scroll": true,
-      "contained_by_code_branch_ellipsis": false,
-      "contained_by_table_scroll": false,
-      "id": "",
-      "left": 419,
-      "overflow_px": 40,
-      "position": "static",
-      "right": 430,
       "scroll_container": {
         "class": "cal-wrap",
         "id": "",

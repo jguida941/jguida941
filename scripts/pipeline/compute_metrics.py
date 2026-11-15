@@ -72,6 +72,7 @@ def _validated_metric_observations(
         if metric_id in {
             "public_scope_commits",
             "last_year_contributions",
+            "github_profile_contributions",
             "releases_30d",
             "prs_merged",
             "recent_public_events",
@@ -1979,6 +1980,11 @@ def compute_profile_model(
     )
 
     # --- snapshot rows & cards ---
+    profile_observation = metric_observations.get("github_profile_contributions")
+    snapshot["github_profile_contributions"] = (
+        profile_observation["value"]
+        if profile_observation and profile_observation.get("status") == "ok" else None
+    )
     snapshot_rows: list[SnapshotRow] = []
     for definition in SNAPSHOT_METRICS:
         key = definition["key"]
@@ -2148,6 +2154,7 @@ def compute_profile_model(
         pr_list=pr_list,
     )
     dashboard_data["engineering"] = engineering
+    dashboard_data["profile_contributions_observation"] = profile_observation
     dashboard_data["automation"] = automation
     dashboard_data["automation_display"] = workflow_display
     # Execution history is one separately qualified public-repo observation.

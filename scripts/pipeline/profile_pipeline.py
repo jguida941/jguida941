@@ -169,7 +169,8 @@ def candidate_publication_subject(
         private_inventory_status=str(data_quality.get("private_aggregate_status", "unavailable")),
         contribution_currentness=(
             "current" if "NONCURRENT_CONTRIBUTIONS" not in provider_hold_reasons
-            and _current_contribution_calendar(model.get("dashboard_data")) else "noncurrent"
+            and _current_contribution_calendar(model.get("dashboard_data"))
+            and _consistent_profile_contributions(model.get("dashboard_data")) else "noncurrent"
         ),
         metric_family_statuses=tuple(sorted((str(k), str(v)) for k, v in statuses.items())),
         unqualified_partial_consumers=_unqualified_partial_metrics(statuses, scopes),
@@ -195,13 +196,37 @@ def stored_publication_subject(
         private_inventory_status=str(data_quality.get("private_aggregate_status", "unavailable")),
         contribution_currentness=(
             "current" if "NONCURRENT_CONTRIBUTIONS" not in provider_hold_reasons
-            and _current_contribution_calendar(snapshot) else "noncurrent"
+            and _current_contribution_calendar(snapshot)
+            and _consistent_profile_contributions(snapshot) else "noncurrent"
         ),
         metric_family_statuses=tuple(sorted((str(k), str(v)) for k, v in statuses.items())),
         unqualified_partial_consumers=_unqualified_partial_metrics(statuses, scopes),
         provider_hold_reasons=provider_hold_reasons,
         artifact_errors=tuple(artifact_errors),
     )
+
+
+def _consistent_profile_contributions(data: object) -> bool:
+    """Check the headline independently; missing evidence must display unavailable."""
+    from scripts.github.github_client import validate_provider_observation
+    from scripts.contracts.dashboard_summary import profile_contribution_fact
+    try:
+        observation = data.get("profile_contributions_observation")
+        value = data["snapshot"].get("github_profile_contributions")
+        facts = [row for row in data["dashboard_summary"]["facts"]
+                 if row.get("metric_id") == "profile.contributions"]
+        # Older stored artifacts may not carry this metric at all.
+        if observation is None and value is None and not facts:
+            return True
+        if observation is not None and (not validate_provider_observation(observation)
+                or observation.get("metric_id") != "github_profile_contributions"):
+            return False
+        expected_value = observation["value"] if observation and observation["status"] == "ok" else None
+        if type(value) is not type(expected_value) or value != expected_value:
+            return False
+        return facts == [profile_contribution_fact(observation, value)]
+    except (AttributeError, KeyError, TypeError, ValueError):
+        return False
 
 
 def _current_contribution_calendar(data: object) -> bool:
