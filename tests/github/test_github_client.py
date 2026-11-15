@@ -2741,6 +2741,13 @@ def _profile_headline_observation(value=13514):
 
 
 class GithubProfileHeadlineProviderTests(unittest.TestCase):
+    def setUp(self):
+        # The mocked provider period and observation clock belong to one fixture.
+        clock = patch.object(gh, "datetime", wraps=datetime)
+        fixed = clock.start()
+        self.addCleanup(clock.stop)
+        fixed.now.return_value = datetime(2026, 11, 15, 15, 1, 46, tzinfo=timezone.utc)
+
     def test_native_default_total_observation_is_admitted_with_its_own_period(self):
         from scripts.github.github_client import validate_provider_observation
         for value in (13514, 0):
