@@ -82,7 +82,7 @@ jobs:
         with:
           python-version: "3.12.15"
       - name: Install preview dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt playwright
       - name: Render and inspect contribution captions
         run: |
           cat > "$RUNNER_TEMP/capture_caption_preview.py" <<'PY_CAPTURE'
@@ -96,6 +96,7 @@ jobs:
           import shutil
           import subprocess
           import sys
+          from playwright.sync_api import sync_playwright
           
           ROOT = Path.cwd()
           sys.path.insert(0, str(ROOT))
@@ -143,17 +144,22 @@ jobs:
               page = OUT / f"{stem}.html"
               page.write_text(wrapper)
               screenshot = OUT / f"{stem}-{width}.png"
-              common = [chrome, "--headless=new", "--no-sandbox", "--disable-gpu",
-                        "--hide-scrollbars", "--allow-file-access-from-files",
-                        "--virtual-time-budget=3000", f"--window-size={width},900"]
-              capture_command = common + [f"--screenshot={screenshot}", page.as_uri()]
-              subprocess.run(capture_command, check=True, capture_output=True, text=True, timeout=60)
-              dump_command = common + ["--dump-dom", page.as_uri()]
-              proc = subprocess.run(dump_command, check=True, capture_output=True, text=True, timeout=60)
-              match = re.search(r'<pre id="probe-json">(.*?)</pre>', proc.stdout, re.S)
-              if match is None:
-                  raise AssertionError("Chrome did not execute the caption probe")
-              probe = json.loads(html.unescape(match.group(1)))
+              # Device metrics override sets the actual layout viewport below Chrome's
+              # desktop window minimum; assert innerWidth so a 500px surrogate cannot pass.
+              with sync_playwright() as playwright:
+                  browser = playwright.chromium.launch(executable_path=chrome, headless=True,
+                                                        args=["--no-sandbox", "--allow-file-access-from-files"])
+                  context = browser.new_context(viewport={"width": width, "height": 900}, device_scale_factor=1)
+                  tab = context.new_page()
+                  tab.goto(page.as_uri(), wait_until="load")
+                  tab.wait_for_function("document.getElementById('probe-json').textContent.length > 0")
+                  probe = json.loads(tab.locator("#probe-json").text_content())
+                  tab.screenshot(path=str(screenshot))
+                  browser.close()
+              capture_command = [chrome, "Playwright chromium.launch(headless=True)",
+                                 f"new_context(viewport={{width:{width},height:900}},device_scale_factor=1)",
+                                 page.as_uri(), "page.screenshot"]
+              dump_command = ["page.locator('#probe-json').text_content", "actual innerWidth asserted"]
               assert probe["width"] == width, probe
               assert probe["scrollWidth"] <= width, probe
               assert probe["textContained"], probe
