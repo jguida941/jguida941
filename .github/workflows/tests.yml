@@ -71,3 +71,121 @@ jobs:
           PERSONAL_GITHUB_TOKEN: ""
         run: |
           python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json
+
+  caption_preview:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.15"
+      - name: Install preview dependencies
+        run: pip install -r requirements.txt
+      - name: Render and inspect contribution captions
+        run: |
+          cat > "$RUNNER_TEMP/capture_caption_preview.py" <<'PY_CAPTURE'
+          """Capture the exact generated contribution headline using real Chrome."""
+          import hashlib
+          import html
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import shutil
+          import subprocess
+          import sys
+          
+          ROOT = Path.cwd()
+          sys.path.insert(0, str(ROOT))
+          from scripts.rendering.generate_dashboard_summary import render_svg
+          
+          OUT = Path(os.environ["RUNNER_TEMP"]) / "caption-preview"
+          OUT.mkdir(parents=True, exist_ok=True)
+          snapshot_bytes = (ROOT / "site/data/profile_snapshot.json").read_bytes()
+          snapshot = json.loads(snapshot_bytes)
+          summary = snapshot["dashboard_summary"]
+          window = summary["calendar"]["window"]
+          total = next(row for row in summary["facts"] if row["metric_id"] == "calendar.total")
+          chrome = shutil.which("google-chrome") or shutil.which("google-chrome-stable")
+          if chrome is None:
+              raise RuntimeError("Google Chrome is required for this preview")
+          version = subprocess.check_output([chrome, "--version"], text=True).strip()
+          source_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          records = []
+          for mobile, width in ((False, 1280), (True, 390)):
+              stem = "mobile" if mobile else "desktop"
+              svg = render_svg(summary, mobile=mobile, generation=snapshot.get("generation"))
+              (OUT / f"{stem}.svg").write_text(svg)
+              script = r'''
+              const target = document.querySelector('[data-section="overview"] [data-metric-id="calendar.total"]');
+              const svg = document.querySelector('svg');
+              const nodes = Array.from(target.querySelectorAll('text'));
+              const box = svg.getBoundingClientRect();
+              const result = {
+                width: innerWidth,
+                scrollWidth: document.documentElement.scrollWidth,
+                painted: nodes.map(n => n.textContent).join(' '),
+                value: target.querySelector('[data-role="value"]').textContent,
+                textContained: nodes.every(n => {const r=n.getBoundingClientRect();
+                  return r.left >= box.left && r.right <= box.right && r.top >= box.top;}),
+                nodeBoxes: nodes.map(n => ({text:n.textContent,x:n.getBoundingClientRect().x,
+                  y:n.getBoundingClientRect().y,width:n.getBoundingClientRect().width}))
+              };
+              document.getElementById('probe-json').textContent = JSON.stringify(result);
+              '''
+              wrapper = ('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+                         '<style>*{box-sizing:border-box}body{margin:0;padding:15px;background:white}.frame{max-width:'
+                         + ("360px" if mobile else "840px") + ';margin:auto}svg{display:block;width:100%;height:auto}pre{display:none}</style>'
+                         '<main class="frame">' + svg + '</main><pre id="probe-json"></pre><script>'
+                         'document.fonts.ready.then(()=>{' + script + '});</script>')
+              page = OUT / f"{stem}.html"
+              page.write_text(wrapper)
+              screenshot = OUT / f"{stem}-{width}.png"
+              common = [chrome, "--headless=new", "--no-sandbox", "--disable-gpu",
+                        "--hide-scrollbars", "--allow-file-access-from-files",
+                        "--virtual-time-budget=3000", f"--window-size={width},900"]
+              capture_command = common + [f"--screenshot={screenshot}", page.as_uri()]
+              subprocess.run(capture_command, check=True, capture_output=True, text=True, timeout=60)
+              dump_command = common + ["--dump-dom", page.as_uri()]
+              proc = subprocess.run(dump_command, check=True, capture_output=True, text=True, timeout=60)
+              match = re.search(r'<pre id="probe-json">(.*?)</pre>', proc.stdout, re.S)
+              if match is None:
+                  raise AssertionError("Chrome did not execute the caption probe")
+              probe = json.loads(html.unescape(match.group(1)))
+              assert probe["width"] == width, probe
+              assert probe["scrollWidth"] <= width, probe
+              assert probe["textContained"], probe
+              assert window in probe["painted"], probe
+              assert "Last 12 months" not in probe["painted"], probe
+              assert probe["value"] == total["display_value"], probe
+              from PIL import Image
+              with Image.open(screenshot) as image:
+                  assert image.size == (width, 900), image.size
+              record = {
+                  "source_sha": source_sha,
+                  "snapshot_generated_at": snapshot["generated_at"],
+                  "snapshot_sha256": hashlib.sha256(snapshot_bytes).hexdigest(),
+                  "renderer_sha256": hashlib.sha256((ROOT / "scripts/rendering/generate_dashboard_summary.py").read_bytes()).hexdigest(),
+                  "svg_sha256": hashlib.sha256(svg.encode()).hexdigest(),
+                  "html_sha256": hashlib.sha256(wrapper.encode()).hexdigest(),
+                  "screenshot_sha256": hashlib.sha256(screenshot.read_bytes()).hexdigest(),
+                  "producer": "GitHub Actions contribution caption preview",
+                  "chrome": version,
+                  "screenshot_command": capture_command,
+                  "probe_command": dump_command,
+                  "viewport": {"width": width, "height": 900},
+                  "probe": probe,
+              }
+              (OUT / f"{stem}-provenance.json").write_text(json.dumps(record, indent=2) + "\n")
+              records.append(record)
+          (OUT / "verification.json").write_text(json.dumps(records, indent=2) + "\n")
+          print(json.dumps({"source_sha": source_sha, "chrome": version, "results": [r["probe"] for r in records]}))
+          PY_CAPTURE
+          python "$RUNNER_TEMP/capture_caption_preview.py"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: contribution-caption-preview
+          path: ${{ runner.temp }}/caption-preview

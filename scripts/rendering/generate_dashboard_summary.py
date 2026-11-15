@@ -611,17 +611,10 @@ def render_svg(summary, *, mobile=False, generation=None):
         avatar_x, avatar_y = width-pad-avatar_size, 49 if mobile else 30
         c.parts.append('<defs><clipPath id="profile-avatar-clip"><circle '+_attrs(dict(cx=avatar_x+avatar_size/2,cy=avatar_y+avatar_size/2,r=avatar_size/2))+'/></clipPath></defs>')
         c.parts.append('<image '+_attrs(dict(x=avatar_x,y=avatar_y,width=avatar_size,height=avatar_size,href="data:image/jpeg;base64,"+encoded,clip_path="url(#profile-avatar-clip)",preserveAspectRatio="xMidYMid slice"))+'><title>'+escape(username+" profile artwork")+'</title></image>')
-    days = calendar.get("days") or []
-    full_year = False
-    if len(days) in (365, 366) and calendar.get("status") != "unavailable":
-        try:
-            full_year = all(date.fromisoformat(row["date"]) == date.fromisoformat(days[0]["date"])+timedelta(days=i) for i,row in enumerate(days))
-        except (KeyError, TypeError, ValueError):
-            pass
     total = fact("calendar.total")
     y = c.fact(total,pad,146,content,size=56,fill="panel",framed=False,
                qualify=total["quality"].get("status") not in ("exact","ok"),
-               caption="Last 12 months" if full_year else calendar.get("window","Calendar unavailable"))+12
+               caption=calendar.get("window","Calendar unavailable"))+12
     c.parts.append('<title>'+escape("Snapshot "+timestamp+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
     inventory = ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers")
     y = c.fact_grid([fact(key) for key in inventory],pad,y,content,
