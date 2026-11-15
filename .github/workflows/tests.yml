@@ -1,73 +1,139 @@
 name: Test Profile Pipeline
+run-name: Capture current index browser receipts
 
 on:
   push:
-    branches: ["main"]
-    paths:
-      - "scripts/**"
-      - "tests/**"
-      - "site/**"
-      - "contracts/**"
-      - "assets/receipts/**"
-      - "docs/design/**"
-      - ".github/workflows/tests.yml"
-      - ".github/workflows/analytics.yml"
-      - ".github/workflows/metrics.yml"
-  pull_request:
-    branches: ["main"]
-    paths:
-      - "scripts/**"
-      - "tests/**"
-      - "site/**"
-      - "contracts/**"
-      - "assets/receipts/**"
-      - "docs/design/**"
-      - ".github/workflows/tests.yml"
-      - ".github/workflows/analytics.yml"
-      - ".github/workflows/metrics.yml"
+    branches: ["fix/contribution-calendar-dashboard-20261115"]
+    paths: [".github/workflows/tests.yml"]
   workflow_dispatch:
 
-concurrency:
-  group: profile-pipeline-tests-${{ github.ref }}
-  cancel-in-progress: true
+permissions:
+  contents: read
 
 jobs:
-  test:
+  capture-index:
+    name: Capture index — ${{ matrix.scope }}
     runs-on: ubuntu-latest
-
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - scope: main
+            source_sha: a70bcab30aa719bd113ca54ac7821f96fb04091a
+          - scope: development
+            source_sha: d6b662f5d9750484f3a6d7842e405bce43abba2a
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      CAPTURE_EXPECTED_SHA: ${{ matrix.source_sha }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.source_sha }}
+          persist-credentials: false
+          fetch-depth: 1
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12.15"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Install source dependencies
+        run: pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Capture the exact index with the existing Chrome producer
+        shell: bash
         run: |
-          python -m unittest \
-            tests.github.test_github_client \
-            tests.github.test_actions_audit \
-            tests.github.test_token_fallback \
-            tests.pipeline.test_compute_metrics_accuracy \
-            tests.pipeline.test_profile_pipeline_fixture \
-            tests.contracts.test_data_semantics \
-            tests.contracts.test_public_data_privacy \
-            tests.contracts.test_design_contract \
+          python -B - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import shutil
+          import subprocess
+          from PIL import Image
+          from scripts.quality import headless_receipts as producer
+
+          head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          if head != os.environ["CAPTURE_EXPECTED_SHA"]:
+              raise SystemExit("checkout differs from the requested source")
+          if subprocess.check_output(["git", "status", "--porcelain"], text=True).strip():
+              raise SystemExit("capture requires a clean source checkout")
+          chrome_path = shutil.which("google-chrome") or shutil.which("google-chrome-stable")
+          if not chrome_path:
+              raise SystemExit("real Google Chrome is unavailable")
+          producer.CHROME = Path(chrome_path)
+          version = producer._chrome_version(producer.CHROME)
+          if not version.startswith("Google Chrome "):
+              raise SystemExit("the actual browser is not Google Chrome")
+
+          page = Path("site/index.html")
+          page_hash = hashlib.sha256(page.read_bytes()).hexdigest()
+          screenshot = producer.screenshot_artifact("index", 1280)
+          probe = producer.dom_probe_artifact("index", 390)
+          outputs = [screenshot, producer.provenance_path(screenshot),
+                     probe, producer.provenance_path(probe)]
+          # A failed capture must never upload the old, stale artifacts as new evidence.
+          for path in outputs:
+              path.unlink(missing_ok=True)
+          try:
+              producer.screenshot_page("index", 1280)
+              producer.dom_probe("index", 390)
+          except subprocess.CalledProcessError as error:
+              print(error.stdout or "")
+              print(error.stderr or "")
+              raise
+
+          with Image.open(screenshot) as image:
+              if image.format != "PNG" or image.size != (1280, 1536):
+                  raise SystemExit("unexpected screenshot format or viewport")
+          measured = json.loads(probe.read_text())
+          if (measured.get("client_width") != 390
+                  or measured.get("viewport", {}).get("width") != 390
+                  or measured.get("horizontal_overflow") is not False
+                  or measured.get("uncontained_offender_count") != 0):
+              print(json.dumps(measured, indent=2))
+              raise SystemExit("the actual 390px layout overflowed or was not measured")
+          for artifact in (screenshot, probe):
+              sidecar = json.loads(producer.provenance_path(artifact).read_text())
+              if sidecar.get("page_sha256") != page_hash:
+                  raise SystemExit("receipt does not bind the captured page bytes")
+              if sidecar.get("chrome_version") != version:
+                  raise SystemExit("receipt browser version differs from the actual producer")
+          if hashlib.sha256(page.read_bytes()).hexdigest() != page_hash:
+              raise SystemExit("page changed during capture")
+          allowed = {path.relative_to(Path.cwd()).as_posix() for path in outputs}
+          changed = set(subprocess.check_output(["git", "diff", "--name-only"], text=True).splitlines())
+          if not changed <= allowed:
+              raise SystemExit("capture changed an unexpected tracked path")
+          print(json.dumps({
+              "source_commit": head,
+              "page_sha256": page_hash,
+              "chrome_version": version,
+              "receipts": [{"path": path.relative_to(Path.cwd()).as_posix(),
+                            "bytes": path.stat().st_size,
+                            "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
+                           for path in outputs],
+              "client_width": measured["client_width"],
+              "horizontal_overflow": measured["horizontal_overflow"],
+              "uncontained_offender_count": measured["uncontained_offender_count"],
+          }, indent=2))
+          PY
+
+      - name: Verify the captured page with the existing contracts
+        run: |
+          python -B -m unittest \
             tests.contracts.test_web_dashboard \
-            tests.contracts.test_page_manifest \
-            tests.contracts.test_skill_structure \
-            tests.contracts.test_label_legibility
+            tests.contracts.test_visual_receipt_provenance.ReceiptProvenanceContract.test_committed_headless_page_receipts_are_real_and_provenanced
 
-      - name: Fixture smoke CLI run (offline path)
-        env:
-          GITHUB_TOKEN: ""
-          GH_TOKEN: ""
-          PERSONAL_GITHUB_TOKEN: ""
-        run: |
-          python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json
+      - name: Retain the original generated receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: profile-index-${{ matrix.scope }}-${{ matrix.source_sha }}
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            assets/receipts/pages/index/screenshot-1280.png
+            assets/receipts/pages/index/screenshot-1280.png.provenance.json
+            assets/receipts/pages/index/dom-probe-390.json
+            assets/receipts/pages/index/dom-probe-390.json.provenance.json
