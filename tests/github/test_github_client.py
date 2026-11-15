@@ -2850,3 +2850,17 @@ class GithubProfileHeadlineProviderTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class InventoryStarEvidenceTests(unittest.TestCase):
+    def test_normalized_star_evidence_preserves_observed_integer_requirement(self):
+        for value, expected in ((0, True), (7, True), (True, False), (-1, False), ("7", False)):
+            with self.subTest(value=value):
+                node = _graphql_public_repository("star-evidence")
+                node["stargazerCount"] = value
+                self.assertIs(gh._normalize_graphql_repo(node)["stargazers_count_observed"], expected)
+        node = _graphql_public_repository("missing-star-evidence")
+        del node["stargazerCount"]
+        normalized = gh._normalize_graphql_repo(node)
+        self.assertEqual(normalized["stargazers_count"], 0)
+        self.assertFalse(normalized["stargazers_count_observed"])

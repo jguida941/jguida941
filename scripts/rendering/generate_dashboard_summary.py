@@ -619,7 +619,7 @@ def render_svg(summary, *, mobile=False, generation=None):
     inventory = ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers")
     y = c.fact_grid([fact(key) for key in inventory],pad,y,content,
                     columns=2 if mobile else 3,fill="panel",framed=False,size=29)
-    if any(fact(key)["quality"].get("qualification") for key in inventory):
+    if any(fact(key)["quality"].get("status") not in ("exact", "ok") for key in inventory):
         y = c.wrap("Inventory · unverified",pad,y+c.secondary,content,size=c.secondary,color="muted")
     c.end()
     y += 12

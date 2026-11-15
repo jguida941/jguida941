@@ -1148,6 +1148,7 @@ def _normalize_graphql_repo(
         "pushed_at": node.get("pushedAt", ""),
         "created_at": node.get("createdAt", ""),
         "stargazers_count": int(node.get("stargazerCount", 0)),
+        "stargazers_count_observed": type(node.get("stargazerCount")) is int and node["stargazerCount"] >= 0,
         "forks_count": int(node.get("forkCount", 0)),
         "language": language_name,
         "owner": {"login": owner_login},

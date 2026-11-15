@@ -1679,6 +1679,62 @@ def _build_dashboard_payload(
     }
 
 
+def _build_inventory_observation(collected: CollectedProfileData, now_utc: datetime) -> dict[str, Any]:
+    """Qualify aggregate personal counts from this run's fresh provider census."""
+    evidence = getattr(collected, "inventory_evidence", {}) or {}
+    if not isinstance(evidence, dict):
+        evidence = {}
+    counts = evidence.get("counts")
+    counts = counts if isinstance(counts, dict) else {}
+    rows = evidence.get("public_repos")
+    observed_at = evidence.get("observed_at")
+    try:
+        stamp = datetime.fromisoformat(observed_at.replace("Z", "+00:00"))
+        start = datetime.fromisoformat(collected.collection_started_at.replace("Z", "+00:00"))
+        if any(value.tzinfo is None or value.utcoffset() is None for value in (start, stamp, now_utc)):
+            raise ValueError("inventory times must be timezone-aware")
+        if not start <= stamp <= now_utc:
+            raise ValueError("inventory observation is outside this collection run")
+        observed_at = stamp.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    except (AttributeError, TypeError, ValueError):
+        observed_at = None
+    fresh = evidence.get("fresh") is True and observed_at is not None
+    def count(value):
+        return type(value) is int and value >= 0
+    public = fresh and evidence.get("personal_public_complete", True) is True and isinstance(rows, list)
+    identities = set()
+    if public:
+        for row in rows:
+            owner_row = row.get("owner") if isinstance(row, dict) else None
+            owner = owner_row.get("login") if isinstance(owner_row, dict) else None
+            name = row.get("name") if isinstance(row, dict) else None
+            if (type(owner) is not str or owner.casefold() != USERNAME.casefold()
+                    or type(name) is not str or not name or row.get("private") is not False
+                    or row.get("fork") is not False or row.get("visibility") != "public"
+                    or (owner.casefold(), name.casefold()) in identities):
+                public = False
+                break
+            identities.add((owner.casefold(), name.casefold()))
+    public = bool(public and all(count(counts.get(key)) for key in
+        ("public_owned_total", "public_owned_nonfork", "public_owned_forks"))
+        and counts["public_owned_total"] == counts["public_owned_nonfork"] + counts["public_owned_forks"]
+        and len(rows) == counts["public_owned_nonfork"])
+    stars = public and all(count(row.get("stargazers_count"))
+                           and row.get("stargazers_count_observed") is not False for row in rows)
+    private = (fresh and count(counts.get("private_owned")) and count(counts.get("private_owned_nonfork"))
+               and counts["private_owned_nonfork"] <= counts["private_owned"])
+    metrics = {
+        "total_repos": {"value": counts["public_owned_nonfork"] if public else None, "complete": public},
+        "public_forks": {"value": counts["public_owned_forks"] if public else None, "complete": public},
+        "total_stars": {"value": sum(row["stargazers_count"] for row in rows) if stars else None, "complete": bool(stars)},
+        "private_owned_repos": {"value": counts["private_owned"] if private else None, "complete": bool(private)},
+    }
+    return {"schema": "profile-inventory-observation/v1", "source_id": "github_personal_owned_repository_census",
+            "population_id": "personal-owned-repositories", "source_mode": "live" if fresh else "unavailable",
+            "observed_at": observed_at if fresh else None, "metrics": metrics,
+            "snapshot_generated_at": now_utc.isoformat().replace("+00:00", "Z")}
+
+
 def compute_profile_model(
     collected: CollectedProfileData,
     logger=print,
@@ -1980,6 +2036,18 @@ def compute_profile_model(
     )
 
     # --- snapshot rows & cards ---
+    # Inventory headline values come from a qualified fresh census when available.
+    inventory_observation = _build_inventory_observation(collected, now_utc)
+    inventory_scope_keys = {"total_repos": "public_owned_nonfork_repos_total",
+                            "public_forks": "public_owned_forks_total",
+                            "private_owned_repos": "private_owned_repos_total"}
+    for key, observed in inventory_observation["metrics"].items():
+        if observed["complete"]:
+            snapshot[key] = observed["value"]
+            if key in inventory_scope_keys:
+                data_scope[inventory_scope_keys[key]] = observed["value"]
+    if all(inventory_observation["metrics"][key]["complete"] for key in ("total_repos", "public_forks")):
+        data_scope["public_owned_repos_total"] = snapshot["total_repos"] + snapshot["public_forks"]
     profile_observation = metric_observations.get("github_profile_contributions")
     snapshot["github_profile_contributions"] = (
         profile_observation["value"]
@@ -2155,6 +2223,8 @@ def compute_profile_model(
     )
     dashboard_data["engineering"] = engineering
     dashboard_data["profile_contributions_observation"] = profile_observation
+    dashboard_data["inventory_observation"] = inventory_observation
+    dashboard_data["collection_started_at"] = collected.collection_started_at
     dashboard_data["automation"] = automation
     dashboard_data["automation_display"] = workflow_display
     # Execution history is one separately qualified public-repo observation.
