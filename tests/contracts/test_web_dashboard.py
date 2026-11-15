@@ -1007,5 +1007,60 @@ process.stdout.write(JSON.stringify({html:nodes['activity-project'].innerHTML, c
         self.assertEqual(ET.tostring(helper.hydrate(baseline)), ET.tostring(helper.hydrate(changed)))
 
 
+class ContributionPeriodProjectionTests(unittest.TestCase):
+    """The README headline visibly qualifies the same dated facts as the website."""
+
+    @staticmethod
+    def headline(summary, mobile):
+        import xml.etree.ElementTree as ET
+        from scripts.rendering.generate_dashboard_summary import render_svg
+        root = ET.fromstring(render_svg(summary, mobile=mobile))
+        overview = next(node for node in root.iter() if node.get("data-section") == "overview")
+        headline = next(node for node in overview.iter() if node.get("data-metric-id") == "calendar.total")
+        # SVG titles and the calendar farther down the page cannot qualify this headline.
+        painted = " ".join("".join(node.itertext()) for node in headline.iter("{http://www.w3.org/2000/svg}text"))
+        value = next(node.text for node in headline.iter() if node.get("data-role") == "value")
+        return painted, value
+
+    def test_readme_headline_paints_the_accepted_utc_period_at_both_sizes(self):
+        import copy
+        from datetime import date, timedelta
+        from scripts.contracts.dashboard_summary import _fact
+        for start, length in ((date(2025, 11, 16), 365), (date(2023, 10, 8), 366), (date(2026, 2, 1), 7)):
+            days = [{"date": str(start + timedelta(days=i)), "count": i % 5} for i in range(length)]
+            window = f"{days[0]['date']} – {days[-1]['date']} · UTC"
+            total = sum(row["count"] for row in days)
+            summary = {
+                "facts": [_fact("calendar.total", total, "contributions", "github-contribution-calendar-visible-to-provider",
+                                status="exact", window=window)],
+                "calendar": {"status": "exact", "window": window, "days": days},
+            }
+            original = copy.deepcopy(summary)
+            for mobile in (False, True):
+                with self.subTest(days=length, mobile=mobile):
+                    painted, value = self.headline(summary, mobile)
+                    self.assertIn(window, painted)
+                    self.assertNotIn("Last 12 months", painted)
+                    self.assertEqual(f"{total:,}", value)
+                    self.assertEqual(original, summary)
+
+    def test_readme_period_keeps_observed_zero_distinct_from_unavailable(self):
+        from scripts.contracts.dashboard_summary import _fact
+        window = "2026-02-01 – 2026-02-01 · UTC"
+        zero = {
+            "facts": [_fact("calendar.total", 0, "contributions", "github-contribution-calendar-visible-to-provider",
+                            status="exact", window=window)],
+            "calendar": {"status": "exact", "window": window, "days": [{"date": "2026-02-01", "count": 0}]},
+        }
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                painted, value = self.headline(zero, mobile)
+                self.assertIn(window, painted)
+                self.assertEqual("0", value)
+                painted, value = self.headline({}, mobile)
+                self.assertIn("Calendar unavailable", painted)
+                self.assertEqual("n/a", value)
+
+
 if __name__ == "__main__":
     unittest.main()
