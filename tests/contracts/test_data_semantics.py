@@ -474,6 +474,9 @@ class GeneratedCardTruthTests(unittest.TestCase):
                     window=True,
                 ),
             }
+            observations["last_year_contributions"]["window_start"] = (
+                now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat().replace("+00:00", "Z")
+            )
             calendar = {
                 "totalContributions": 0,
                 "weeks": [{"contributionDays": [{

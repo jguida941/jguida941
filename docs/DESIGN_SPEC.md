@@ -257,6 +257,27 @@ Rounded outer corners stay transparent; no shadow or filter paints outside the s
 Main's three website themes are unchanged. The weekly destination and section anchors
 are generated separately; SVG images provide native README links and text equivalents.
 
+### Contribution observation and publication
+
+Contribution collection requests 365 inclusive UTC dates, from midnight on the first
+date through the current observation time. Profile-local dates still govern the current
+streak cutoff; pull-request and release windows retain their existing timezones. The
+shared summary records the actual UTC range. GitHub's native profile period must be
+matched before comparing totals.
+
+A complete calendar has canonical, unique, contiguous dated counts covering both
+requested boundaries, including zero-count dates, and their sum equals its reported
+total. Missing or inconsistent native evidence holds live publication and preserves the
+previous artifacts. Candidate and stored publication use the same evidence checks.
+The shared summary and README select reconciled contribution facts; rejected calendar
+rows cannot leave a numeric total in that summary. Candidate and stored publication
+also reconcile streak values and their displayed text, ranges and recorded cutoff
+through the same summary owner. The existing website renderer is unchanged in this
+hotfix; direct shared-summary selection and full date labels are a separate follow-up.
+
+The streak cutoff must match the retained generation time in the effective profile
+timezone. One captured date governs both the snapshot and the shared summary.
+
 ### Current activity layout — 2026-10-12
 
 The activity sections appear in this order: **Code changes → Project activity → Recent

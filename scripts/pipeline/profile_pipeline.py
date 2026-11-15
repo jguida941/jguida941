@@ -168,7 +168,8 @@ def candidate_publication_subject(
         source_kind=source_kind,
         private_inventory_status=str(data_quality.get("private_aggregate_status", "unavailable")),
         contribution_currentness=(
-            "noncurrent" if "NONCURRENT_CONTRIBUTIONS" in provider_hold_reasons else "current"
+            "current" if "NONCURRENT_CONTRIBUTIONS" not in provider_hold_reasons
+            and _current_contribution_calendar(model.get("dashboard_data")) else "noncurrent"
         ),
         metric_family_statuses=tuple(sorted((str(k), str(v)) for k, v in statuses.items())),
         unqualified_partial_consumers=_unqualified_partial_metrics(statuses, scopes),
@@ -193,13 +194,98 @@ def stored_publication_subject(
         source_kind=str((manifest or {}).get("source_kind", "")),
         private_inventory_status=str(data_quality.get("private_aggregate_status", "unavailable")),
         contribution_currentness=(
-            "noncurrent" if "NONCURRENT_CONTRIBUTIONS" in provider_hold_reasons else "current"
+            "current" if "NONCURRENT_CONTRIBUTIONS" not in provider_hold_reasons
+            and _current_contribution_calendar(snapshot) else "noncurrent"
         ),
         metric_family_statuses=tuple(sorted((str(k), str(v)) for k, v in statuses.items())),
         unqualified_partial_consumers=_unqualified_partial_metrics(statuses, scopes),
         provider_hold_reasons=provider_hold_reasons,
         artifact_errors=tuple(artifact_errors),
     )
+
+
+def _current_contribution_calendar(data: object) -> bool:
+    """Require the same recorded evidence for candidate and stored publication.
+
+    Rebuild the closed observation from its retained provenance and dated values.
+    Missing metadata and absent hold reasons cannot certify a contribution total.
+    Stored artifacts are checked against their own window, never today's clock.
+    """
+    from datetime import date, datetime
+    from zoneinfo import ZoneInfo
+    from scripts.contracts import profile_timezone_name
+    from scripts.github.github_client import validate_provider_observation
+    from scripts.contracts.dashboard_summary import build_dashboard_summary
+    from scripts.contracts.profile_contract import contribution_rhythm_errors
+
+    if not isinstance(data, dict):
+        return False
+    try:
+        quality = data["data_quality"]
+        if "NONCURRENT_CONTRIBUTIONS" in quality.get("publication_hold_reasons", ()):
+            return False
+        calendar = data["contribution_calendar"]
+        rows = [dict(row) for week in calendar["weeks"] for row in week]
+        observation = {
+            **quality["metric_provenance"]["last_year_contributions"],
+            "value": {"total": calendar["total"], "days": rows},
+        }
+        if (observation.get("metric_id") != "last_year_contributions"
+                or observation.get("status") != "ok"
+                or not validate_provider_observation(observation)):
+            return False
+        rows.sort(key=lambda row: row["date"])
+        total = observation["value"]["total"]
+        snapshot = data["snapshot"]
+        if type(snapshot.get("last_year_contributions")) is not int or snapshot["last_year_contributions"] != total:
+            return False
+        rhythm = data["contribution_rhythm"]
+        if (contribution_rhythm_errors(rhythm) or rhythm.get("status") != "available"
+                or rhythm.get("completeness") != "known"
+                or rhythm["total"] != total or rhythm["days_observed"] != len(rows)
+                or rhythm["window_start"] != rows[0]["date"]
+                or rhythm["window_end"] != rows[-1]["date"]):
+            return False
+        summary = data["dashboard_summary"]
+        if (summary["calendar"]["status"] != "exact"
+                or summary["calendar"]["days"] != rows):
+            return False
+        required = {"calendar.total", "calendar.active_days",
+                    "calendar.current_streak", "calendar.longest_streak"}
+        selected = [row for row in summary["facts"] if row.get("metric_id") in required]
+        if len(selected) != len(required) or {row["metric_id"] for row in selected} != required:
+            return False
+        if any(type(row.get("value")) is not int or row["value"] < 0
+               or row["quality"]["status"] != "exact" for row in selected):
+            return False
+        if type(snapshot.get("streak_days")) is not int:
+            return False
+        facts = {row["metric_id"]: row for row in selected}
+        cutoff = facts["calendar.current_streak"].get("profile_date_cutoff")
+        if type(cutoff) is not str:
+            return False
+        profile_date = date.fromisoformat(cutoff)
+        if profile_date.isoformat() != cutoff:
+            return False
+        generated_at = data["generated_at"]
+        if type(generated_at) is not str:
+            return False
+        generated = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
+        if generated.tzinfo is None or generated.utcoffset() is None:
+            return False
+        if profile_date != generated.astimezone(ZoneInfo(profile_timezone_name())).date():
+            return False
+        # Reuse the fact owner: agreeing copied scalars cannot prove a dated run.
+        expected = build_dashboard_summary({
+            "snapshot": snapshot,
+            "contribution_rhythm": rhythm,
+            "dashboard_data": {"contribution_calendar": calendar},
+        }, profile_date=profile_date)
+        expected_facts = {row["metric_id"]: row for row in expected["facts"]
+                          if row["metric_id"] in required}
+        return summary["calendar"] == expected["calendar"] and facts == expected_facts
+    except (AttributeError, KeyError, TypeError, ValueError, IndexError, OverflowError):
+        return False
 
 
 def _unqualified_partial_metrics(statuses: dict, scopes: dict) -> tuple[str, ...]:

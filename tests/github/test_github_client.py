@@ -1216,7 +1216,11 @@ class GitHubClientTests(unittest.TestCase):
                     "contributionsCollection": {
                         "contributionCalendar": {
                             "totalContributions": 4288,
-                            "weeks": [],
+                            "weeks": [{"contributionDays": [
+                                {"date": (start + timedelta(days=i)).date().isoformat(),
+                                 "contributionCount": 4288 if i == 5 else 0}
+                                for i in range(6)
+                            ]}],
                         }
                     }
                 }
@@ -1226,7 +1230,7 @@ class GitHubClientTests(unittest.TestCase):
         with patch("scripts.github.github_client._get_cached", return_value=None), patch(
             "scripts.github.github_client._set_cached",
         ), patch(
-            "scripts.github.github_client._calendar_window",
+            "scripts.github.github_client._contribution_window",
             return_value=(start, end, "2026-03-06"),
         ), patch(
             "scripts.github.github_client.requests.post",
@@ -1741,7 +1745,7 @@ class GitHubClientTests(unittest.TestCase):
             "2026-08-26",
         )
         bare_calendar = {"totalContributions": 777, "weeks": []}
-        with patch.object(gh, "_calendar_window", return_value=current_window), patch.object(
+        with patch.object(gh, "_contribution_window", return_value=current_window), patch.object(
             gh, "_get_cached", return_value=copy.deepcopy(bare_calendar)
         ), patch.object(gh, "_set_cached"), patch.object(
             gh, "_graphql_query", return_value=None
@@ -1794,7 +1798,7 @@ class GitHubClientTests(unittest.TestCase):
                 complete=True,
                 population_id="github-contribution-calendar-visible-to-provider",
                 population_signature=None,
-                window_start=window_start,
+                window_start="2026-08-26T00:00:00Z",
                 window_end=window_end,
                 observed_at=observed_at,
                 source_id="github_graphql_contribution_calendar",
@@ -2073,7 +2077,7 @@ class GitHubClientTests(unittest.TestCase):
                     complete=True,
                     population_id="github-contribution-calendar-visible-to-provider",
                     population_signature=None,
-                    window_start=window_start,
+                    window_start="2026-08-26T00:00:00Z",
                     window_end=window_end,
                     observed_at=observed_at,
                     source_id="github_graphql_contribution_calendar",
@@ -2455,6 +2459,113 @@ class GitHubClientTests(unittest.TestCase):
         self.assertEqual("same_scope_cache", replay.get("completion_reason"))
         self.assertEqual(observed_at, replay.get("observed_at"))
 
+
+
+class ContributionCalendarConsistencyTests(unittest.TestCase):
+    """Contribution dates retain one UTC window and one reconciled total."""
+
+    @staticmethod
+    def _observation(*, zero=False):
+        start = datetime(2025, 11, 16, tzinfo=timezone.utc)
+        rows = [{"date": (start + timedelta(days=i)).date().isoformat(),
+                 "count": 0 if zero else i % 5} for i in range(365)]
+        return _provider_observation(
+            metric_id="last_year_contributions",
+            source_metric_id="github_contribution_calendar_total_and_days",
+            value={"total": sum(row["count"] for row in rows), "days": rows},
+            status="ok", complete=True,
+            population_id="github-contribution-calendar-visible-to-provider",
+            population_signature=None, window_start="2025-11-16T00:00:00Z",
+            window_end="2026-11-15T00:06:29Z", observed_at="2026-11-15T00:06:30Z",
+            source_id="github_graphql_contribution_calendar", source_mode="live",
+            completion_reason="all_components_observed",
+        )
+
+    def test_requested_dates_stay_365_across_utc_local_dst_and_leap_boundaries(self):
+        instants = (
+            "2026-11-07T23:59:00+00:00", "2026-11-08T00:01:00+00:00",
+            "2026-11-08T05:01:00+00:00", "2026-11-14T23:59:00+00:00",
+            "2026-11-15T00:06:29+00:00", "2026-11-15T05:01:00+00:00",
+            "2026-03-08T07:01:00+00:00", "2026-11-01T06:01:00+00:00",
+            "2024-02-29T00:01:00+00:00",
+        )
+        for instant in instants:
+            now = datetime.fromisoformat(instant)
+            class Clock(datetime):
+                @classmethod
+                def now(cls, tz=None):
+                    return now.astimezone(tz) if tz else now.replace(tzinfo=None)
+            for zone in ("America/New_York", "Pacific/Kiritimati", "Pacific/Honolulu", "UTC"):
+                with self.subTest(instant=instant, zone=zone), patch.dict(
+                    gh.os.environ, {"PROFILE_TIMEZONE": zone}
+                ), patch.object(gh, "datetime", Clock), patch.object(
+                    gh, "_get_cached", return_value=None
+                ), patch.object(gh, "_graphql_query", return_value=None) as query:
+                    gh.get_contribution_calendar_observation(365)
+                variables = query.call_args.args[1]
+                start = datetime.fromisoformat(variables["from"].replace("Z", "+00:00"))
+                end = datetime.fromisoformat(variables["to"].replace("Z", "+00:00"))
+                self.assertEqual(now, end)
+                self.assertEqual(now.date() - timedelta(days=364), start.date())
+                self.assertEqual((0, 0, 0, 0), (start.hour, start.minute, start.second, start.microsecond))
+                self.assertEqual(365, (end.date() - start.date()).days + 1)
+
+    def test_complete_positive_and_zero_calendars_remain_valid(self):
+        for zero in (False, True):
+            with self.subTest(zero=zero):
+                self.assertTrue(gh.validate_provider_observation(self._observation(zero=zero)))
+
+    def test_inconsistent_or_incomplete_calendars_cannot_claim_complete(self):
+        for kind in ("total", "missing_zero_start", "missing_end", "gap", "duplicate",
+                     "noncanonical", "empty", "boolean", "reversed_window", "observation_before_end"):
+            observation = self._observation()
+            value = observation["value"]
+            rows = value["days"]
+            if kind == "total": value["total"] += 93
+            elif kind == "missing_zero_start": rows.pop(0)
+            elif kind == "missing_end": value["total"] -= rows.pop()["count"]
+            elif kind == "gap": value["total"] -= rows.pop(100)["count"]
+            elif kind == "duplicate": rows.insert(1, dict(rows[0]))
+            elif kind == "noncanonical": rows[0]["date"] = "2025-11-016"
+            elif kind == "empty": value.update(total=0, days=[])
+            elif kind == "boolean": rows[0]["count"] = False
+            elif kind == "reversed_window": observation["window_start"] = "2026-11-16T00:00:00Z"
+            else: observation["observed_at"] = "2026-11-14T23:59:00Z"
+            with self.subTest(kind=kind):
+                self.assertFalse(gh.validate_provider_observation(observation))
+
+    def test_provider_and_cache_reject_the_same_mismatched_total(self):
+        now = datetime(2026, 11, 15, 0, 6, 29, tzinfo=timezone.utc)
+        class Clock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return now.astimezone(tz) if tz else now.replace(tzinfo=None)
+        cached = self._observation()
+        cached["value"]["total"] += 93
+        calendar = {"totalContributions": cached["value"]["total"], "weeks": [{
+            "contributionDays": [{"date": row["date"], "contributionCount": row["count"]}
+                                 for row in cached["value"]["days"]]}]}
+        for cache in (None, cached):
+            with self.subTest(cache=cache is not None), patch.object(
+                gh, "datetime", Clock
+            ), patch.dict(gh.os.environ, {"PROFILE_TIMEZONE": "UTC"}), patch.object(
+                gh, "_get_cached", return_value=copy.deepcopy(cache)
+            ), patch.object(gh, "_set_cached") as write, patch.object(
+                gh, "_graphql_query", return_value={"user": {"contributionsCollection": {
+                    "contributionCalendar": calendar}}}
+            ) as query:
+                result = gh.get_contribution_calendar_observation()
+            query.assert_called_once()
+            write.assert_not_called()
+            self.assertEqual("unavailable", result["status"])
+            self.assertIsNone(result["value"])
+
+    def test_projection_orders_dates_before_streak_consumption(self):
+        value = self._observation()["value"]
+        value["days"].reverse()
+        calendar = gh._calendar_from_contribution_value(value)
+        labels = [row["date"] for week in calendar["weeks"] for row in week["contributionDays"]]
+        self.assertEqual(sorted(labels), labels)
 
 
 class CodeChangeCollectionTests(unittest.TestCase):
