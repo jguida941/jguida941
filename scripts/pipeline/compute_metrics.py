@@ -195,9 +195,10 @@ def _zone(name: str) -> Any:
         return timezone.utc
 
 
-def _profile_today() -> date:
-    """Today's date in the profile timezone (so streaks aren't off-by-one in UTC)."""
-    return datetime.now(_zone(profile_timezone_name())).date()
+def _profile_today(now_utc: datetime | None = None) -> date:
+    """The captured generation date in the profile timezone."""
+    instant = now_utc if now_utc is not None else datetime.now(timezone.utc)
+    return instant.astimezone(_zone(profile_timezone_name())).date()
 
 
 def _parse_calendar_day_date(value: str) -> datetime | None:
@@ -1369,7 +1370,12 @@ def _build_contribution_trend(collected: CollectedProfileData) -> dict[str, Any]
     except (TypeError, ValueError):
         return {**unavailable, "reason": "invalid_calendar"}
 
+    observations = getattr(collected, "metric_observations", {})
+    if not isinstance(observations, dict):
+        return {**unavailable, "reason": "observation_unavailable"}
     bounds = _contribution_observation_bounds(collected, days)
+    if "last_year_contributions" in observations and bounds is None:
+        return {**unavailable, "reason": "observation_unavailable"}
     if bounds and not (bounds[0].date() <= ordered[0] <= ordered[-1] <= bounds[1].date()):
         return {**unavailable, "reason": "invalid_calendar"}
     buckets: dict[date, list[date]] = {}
@@ -1741,6 +1747,7 @@ def compute_profile_model(
     )
 
     now_utc = datetime.now(timezone.utc)
+    profile_date = _profile_today(now_utc)
     total_stars = sum(repo.get("stargazers_count", 0) for repo in repos)
 
     # --- language stats ---
@@ -1798,7 +1805,7 @@ def compute_profile_model(
     )
 
     stars_per_public_repo = (total_stars / len(repos)) if repos else 0.0
-    streak_days = _compute_current_streak_days(calendar, now_utc, _profile_today())
+    streak_days = _compute_current_streak_days(calendar, now_utc, profile_date)
 
     # --- recent repos ---
     recent_repos, recent_commit_message_by_repo = _build_recent_repos(
@@ -2053,12 +2060,9 @@ def compute_profile_model(
             if contributions_status == "ok"
             else "Contribution total is retained from noncurrent evidence."
         )
-    elif exact_contributions is not None:
-        contributions_status = "ok"
-        contributions_note = "Contribution total available from the collected profile data."
     else:
         contributions_status = "unavailable"
-        contributions_note = "Contribution total unavailable for this run."
+        contributions_note = "Complete contribution observation unavailable for this run."
 
     metric_provenance = {
         metric_id: _observation_provenance(observation)
@@ -2071,8 +2075,8 @@ def compute_profile_model(
             non_exact_metrics[metric_id] = carrier
     publication_hold_reasons = (
         ("NONCURRENT_CONTRIBUTIONS",)
-        if contribution_observation is not None
-        and contribution_observation.get("status") != "ok"
+        if contribution_observation is None
+        or contribution_observation.get("status") != "ok"
         else ()
     )
     data_quality: DataQuality = {
@@ -2217,7 +2221,7 @@ def compute_profile_model(
     model["activity_analytics"] = activity_analytics
     model["dashboard_data"]["activity_analytics"] = activity_analytics
     from scripts.contracts.dashboard_summary import build_dashboard_summary
-    summary = build_dashboard_summary(model, profile_date=_profile_today())
+    summary = build_dashboard_summary(model, profile_date=profile_date)
     model["dashboard_summary"] = summary
     model["dashboard_data"]["dashboard_summary"] = summary
     return model

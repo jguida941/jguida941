@@ -156,7 +156,13 @@ class ContributionRhythmTests(unittest.TestCase):
                          (result["status"], result["completeness"], result["last_day_in_progress"]))
         obs = value.metric_observations["last_year_contributions"]
         obs["window_end"] = obs["observed_at"] = "2026-10-08T00:00:00Z"
-        self.assertFalse(self._rhythm(value)["last_day_in_progress"])
+        self.assertEqual("unavailable", self._rhythm(value)["status"])
+        value.calendar["weeks"][0]["contributionDays"].append(
+            {"date": "2026-10-08", "contributionCount": 0})
+        obs["value"]["days"] += ({"date": "2026-10-08", "count": 0},)
+        result = self._rhythm(value)
+        self.assertEqual(("available", "known", True),
+                         (result["status"], result["completeness"], result["last_day_in_progress"]))
         obs["value"]["days"][0]["date"] = "2026-9-21"
         self.assertEqual("unavailable", self._rhythm(value)["status"])
 
@@ -2458,12 +2464,14 @@ class AccuracyTests(unittest.TestCase):
         )
 
     def test_exact_zero_contributions_remain_current(self):
+        zero_days = tuple({"date": (date(2025, 8, 27) + timedelta(days=i)).isoformat(), "count": 0}
+                          for i in range(365))
         observation = _provider_observation(
             metric_id="last_year_contributions",
             source_metric_id="github_contribution_calendar_total_and_days",
             value={
                 "total": 0,
-                "days": ({"date": "2026-08-26", "count": 0},),
+                "days": zero_days,
             },
             status="ok",
             complete=True,
@@ -2483,7 +2491,8 @@ class AccuracyTests(unittest.TestCase):
                 "weeks": [
                     {
                         "contributionDays": [
-                            {"date": "2026-08-26", "contributionCount": 0}
+                            {"date": row["date"], "contributionCount": row["count"]}
+                            for row in zero_days
                         ]
                     }
                 ],
@@ -2822,8 +2831,8 @@ class ContributionTrendTests(unittest.TestCase):
                       "days": tuple({"date": row["date"], "count": row["contributionCount"]} for row in rows)},
             "status": "ok", "complete": True,
             "population_id": "github-contribution-calendar-visible-to-provider", "population_signature": None,
-            "window_start": "2026-09-21T00:00:00Z", "window_end": "2026-10-07T18:00:00Z",
-            "observed_at": "2026-10-07T18:00:00Z", "source_id": "github_graphql_contribution_calendar",
+            "window_start": "2026-09-21T00:00:00Z", "window_end": rows[-1]["date"] + "T18:00:00Z",
+            "observed_at": rows[-1]["date"] + "T18:00:00Z", "source_id": "github_graphql_contribution_calendar",
             "source_mode": "live", "completion_reason": "all_components_observed",
         }
         return SimpleNamespace(calendar=calendar, metric_observations={"last_year_contributions": observation})
@@ -2855,9 +2864,13 @@ class ContributionTrendTests(unittest.TestCase):
         observation["window_end"] = observation["observed_at"] = "2026-09-27T23:59:59Z"
         self.assertTrue(self._trend(value)["points"][0]["partial"])
         observation["window_end"] = observation["observed_at"] = "2026-09-28T00:00:00Z"
+        self.assertEqual("unavailable", self._trend(value)["status"])
+        value.calendar["weeks"][0]["contributionDays"].append(
+            {"date": "2026-09-28", "contributionCount": 0})
+        observation["value"]["days"] += ({"date": "2026-09-28", "count": 0},)
         self.assertFalse(self._trend(value)["points"][0]["partial"])
         observation["window_start"] = "2026-09-21T12:00:00Z"
-        self.assertTrue(self._trend(value)["points"][0]["partial"])
+        self.assertEqual("unavailable", self._trend(value)["status"])
 
     def test_unmatched_and_naive_observations_cannot_certify_coverage(self):
         for change in ("different", "naive", "order", "observed_before_window"):
@@ -2871,7 +2884,23 @@ class ContributionTrendTests(unittest.TestCase):
                 observation["window_end"] = "2026-01-01T00:00:00Z"
             else:
                 observation["observed_at"] = "2026-01-01T00:00:00Z"
-            self.assertEqual("unknown", self._trend(value)["completeness"])
+            result = self._trend(value)
+            self.assertEqual(("unavailable", "unknown", []),
+                             (result["status"], result["completeness"], result["points"]))
+
+    def test_supplied_invalid_observation_is_distinct_from_absence(self):
+        for carrier in (None, [], {"last_year_contributions": None},
+                        {"last_year_contributions": {}},
+                        {"last_year_contributions": {"status": "ok", "complete": True}}):
+            with self.subTest(carrier=carrier):
+                value = self._input()
+                value.metric_observations = carrier
+                self.assertEqual("unavailable", self._trend(value)["status"])
+        for zero in (False, True):
+            value = self._input(zero=zero)
+            value.metric_observations = {}
+            result = self._trend(value)
+            self.assertEqual(("available", "unknown"), (result["status"], result["completeness"]))
 
     def test_invalid_dates_counts_duplicates_and_gaps_are_unavailable(self):
         for invalid in (True, -1, 1.5, "2", None):
