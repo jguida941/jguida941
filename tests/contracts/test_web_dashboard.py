@@ -55,9 +55,9 @@ class WebDashboardContract(unittest.TestCase):
     def test_binds_shared_snapshot_metric_keys(self):
         """The web reads the SAME shared-snapshot keys the README SVG cards do."""
         required = (
-            "last_year_contributions",  # the hero KPI (shared with the SVG hero)
+            "calendar.total",  # the accepted hero fact shared with the SVG hero
             "total_repos", "total_stars", "public_scope_commits",
-            "ci_coverage_pct", "primary_lang_share_pct", "active_days_last_year",
+            "ci_coverage_pct", "primary_lang_share_pct", "calendar.active_days",
         )
         missing = [k for k in required if k not in self.html]
         self.assertEqual([], missing, f"web projection must bind shared metric keys; missing: {missing}")
@@ -66,7 +66,7 @@ class WebDashboardContract(unittest.TestCase):
         """The web projection covers the same surfaces as the README, including the
         contribution calendar and the always-visible, qualified weekday rhythm."""
         for needle in ('id="calendar-panel"', 'id="rhythm-panel"',
-                       "contribution_calendar", "contribution_rhythm",
+                       "selectedCalendar?.calendar", "contribution_rhythm",
                        "Contribution Calendar", "Contribution Rhythm"):
             self.assertIn(needle, self.html, f"web dashboard missing {needle!r}")
 
@@ -165,6 +165,80 @@ process.stdout.write(JSON.stringify({count:host.children.length,extra_count:extr
             sidecar.get("page_sha256"),
             "CI panel changed the page: recapture the 390px receipt",
         )
+
+    def test_contribution_hydration_uses_only_the_shared_accepted_summary(self):
+        """Execute the emitted page with deliberately disagreeing legacy values."""
+        import json
+        import shutil
+        import subprocess
+        from html.parser import HTMLParser
+        from scripts.pipeline.web_render import render_dashboard
+        if shutil.which("node") is None:
+            self.skipTest("Node required to exercise emitted contribution hydration")
+        class Elements(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.rows = []
+            def handle_starttag(self, tag, attributes):
+                row = dict(attributes)
+                if row.get("id") or row.get("data-bind") or row.get("data-calendar-fact"):
+                    self.rows.append(row)
+        html = render_dashboard()
+        parser = Elements()
+        parser.feed(html)
+        script = re.findall(r"<script>(.*?)</script>", html, re.S)[0]
+        harness = r'''
+const fs=require('node:fs'), vm=require('node:vm');
+const input=JSON.parse(fs.readFileSync(0,'utf8'));
+const element=(attrs={})=>({attrs,children:[],hidden:false,textContent:'',innerHTML:'',dataset:{},
+  style:{setProperty(){}},classList:{add(){},remove(){},toggle(){}},
+  append(...xs){this.children.push(...xs)},replaceChildren(){this.children=[];this.innerHTML=''},
+  getAttribute(k){return Object.hasOwn(this.attrs,k)?this.attrs[k]:null},
+  setAttribute(k,v){this.attrs[k]=v},addEventListener(){},querySelector(){return null},
+  querySelectorAll(){return []}});
+const elements=input.elements.map(element), byId=new Map(elements.filter(e=>e.attrs.id).map(e=>[e.attrs.id,e]));
+const doc={documentElement:element(),createElement(){return element()},
+  getElementById(id){if(!byId.has(id))byId.set(id,element({id}));return byId.get(id)},
+  querySelector(){return null},querySelectorAll(selector){
+    const m=/^\[([^\]]+)\]$/.exec(selector);return m?elements.filter(e=>Object.hasOwn(e.attrs,m[1])):[]}};
+const idle={then(){return this},catch(){return this}};
+const ctx={document:doc,location:{hash:'',search:''},localStorage:{getItem(){return null},setItem(){}},
+  URLSearchParams,addEventListener(){},requestAnimationFrame(){},fetch(){return idle},sample:input.sample};
+vm.runInNewContext(input.script+'\nhydrate(sample);',ctx,{timeout:5000});
+const hero=elements.find(e=>(e.attrs.class||'').split(' ').includes('kpi-value'));
+const active=elements.filter(e=>e.attrs['data-bind']==='scorecard.active_days_last_year'||e.attrs['data-calendar-fact']==='calendar.active_days');
+process.stdout.write(JSON.stringify({hero:hero.textContent,active:active.map(e=>e.textContent),
+  total:doc.getElementById('cal-total').textContent,cells:doc.getElementById('cal').innerHTML,
+  status:doc.getElementById('calendar-status').textContent}));
+'''
+        for available in (True, False):
+            sample = {
+                "snapshot": {"last_year_contributions": 999},
+                "scorecard": {"active_days_last_year": 999},
+                "contribution_calendar": {"total": 999, "weeks": [[{"date": "2026-11-15", "count": 999}]]},
+            }
+            if available:
+                sample["dashboard_summary"] = {
+                    "facts": [{"metric_id": key, "value": value, "display_value": str(value),
+                               "window": "2026-11-15 – 2026-11-15 · UTC", "quality": {"status": "exact"}}
+                              for key, value in (("calendar.total", 7), ("calendar.active_days", 1))],
+                    "calendar": {"status": "exact", "window": "2026-11-15 – 2026-11-15 · UTC",
+                                 "days": [{"date": "2026-11-15", "count": 7}]},
+                }
+            result = subprocess.run(["node", "-e", harness],
+                                    input=json.dumps({"script": script, "elements": parser.rows, "sample": sample}),
+                                    text=True, capture_output=True, timeout=10, check=True)
+            shown = json.loads(result.stdout)
+            with self.subTest(available=available):
+                self.assertEqual("7" if available else "n/a", shown["hero"])
+                self.assertEqual(["1", "1"] if available else ["n/a", "n/a"], shown["active"])
+                self.assertNotIn("999", json.dumps(shown))
+                if available:
+                    self.assertEqual("7 contributions", shown["total"])
+                    self.assertIn("2026-11-15: 7", shown["cells"])
+                else:
+                    self.assertEqual("", shown["cells"])
+                    self.assertEqual("Contribution calendar unavailable", shown["status"])
 
     def test_status_conveyed_by_shape_not_hue_alone(self):
         """DESIGN_SPEC 3.6 / 10 (and the README status_chip): pipeline status must read
