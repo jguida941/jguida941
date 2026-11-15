@@ -1034,6 +1034,215 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
         self.assertLess(upload_index, deploy_index)
 
 
+class ContributionPublicationConsistencyTests(unittest.TestCase):
+    @staticmethod
+    def _collected(*, zero=False):
+        from dataclasses import replace
+        from scripts.github import github_client as gh
+        from tests.github.test_github_client import ContributionCalendarConsistencyTests
+        from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
+        observation = ContributionCalendarConsistencyTests._observation(zero=zero)
+        return replace(
+            AccuracyTests()._collected(),
+            calendar=gh._calendar_from_contribution_value(observation["value"]),
+            total_contributions=observation["value"]["total"],
+            metric_observations={"last_year_contributions": observation},
+        )
+
+    @staticmethod
+    def _model(collected):
+        from datetime import datetime, timezone
+        from scripts.pipeline import compute_metrics
+        now = datetime(2026, 11, 15, 1, tzinfo=timezone.utc)
+        class Clock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return now.astimezone(tz) if tz else now.replace(tzinfo=None)
+        with patch.object(compute_metrics, "datetime", Clock):
+            return compute_metrics.compute_profile_model(collected, logger=lambda *_: None,
+                                                         allow_network_calls=False)
+
+    def _decisions(self, model):
+        from scripts.pipeline import profile_pipeline as pipeline
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+        candidate = pipeline.candidate_publication_subject(model, source_kind="github-api")
+        stored = pipeline.stored_publication_subject(
+            {"source_kind": "github-api"}, _public_dashboard_data(model["dashboard_data"]))
+        return [pipeline.evaluate_profile_publication(subject) for subject in (candidate, stored)]
+
+    def test_complete_positive_and_zero_calendar_remain_publishable(self):
+        for zero in (False, True):
+            with self.subTest(zero=zero):
+                for decision in self._decisions(self._model(self._collected(zero=zero))):
+                    self.assertEqual("READY", decision.state)
+
+    def test_accepted_cache_row_order_preserves_streak_and_publication(self):
+        from dataclasses import replace
+        from datetime import datetime
+        from scripts.github import github_client as gh
+        from scripts.pipeline.collect_data import _calendar_from_observation_value
+        for zero in (False, True):
+            for reverse in (False, True):
+                with self.subTest(zero=zero, reverse=reverse):
+                    collected = self._collected(zero=zero)
+                    observation = copy.deepcopy(collected.metric_observations["last_year_contributions"])
+                    for row in observation["value"]["days"]:
+                        row["count"] = int(not zero and "2026-11-10" <= row["date"] <= "2026-11-14")
+                    observation["value"]["total"] = sum(row["count"] for row in observation["value"]["days"])
+                    if reverse:
+                        observation["value"]["days"] = tuple(reversed(observation["value"]["days"]))
+                    self.assertTrue(gh.validate_provider_observation(observation))
+                    start, end = (datetime.fromisoformat(observation[key].replace("Z", "+00:00"))
+                                  for key in ("window_start", "window_end"))
+                    with patch.object(gh, "_get_cached", return_value=observation), patch.object(
+                        gh, "_contribution_window", return_value=(start, end, end.date().isoformat())
+                    ), patch.object(gh, "_graphql_query") as provider:
+                        cached = gh.get_contribution_calendar_observation()
+                    provider.assert_not_called()
+                    self.assertEqual("cache", cached["source_mode"])
+                    model = self._model(replace(
+                        collected, calendar=_calendar_from_observation_value(cached["value"]),
+                        total_contributions=cached["value"]["total"],
+                        metric_observations={"last_year_contributions": cached}))
+                    fact = next(row for row in model["dashboard_data"]["dashboard_summary"]["facts"]
+                                if row["metric_id"] == "calendar.current_streak")
+                    expected_streak = 0 if zero else 5
+                    self.assertEqual(
+                        (expected_streak, expected_streak, "exact", ["READY", "READY"]),
+                        (model["snapshot"]["streak_days"], fact["value"], fact["quality"]["status"],
+                         [decision.state for decision in self._decisions(model)]))
+
+    def test_missing_or_malformed_observation_holds_candidate_and_stored(self):
+        from dataclasses import replace
+        for observations in ({}, {"last_year_contributions": None},
+                             {"last_year_contributions": {"status": "ok", "complete": True}}):
+            with self.subTest(observations=observations):
+                model = self._model(replace(self._collected(), metric_observations=observations))
+                for decision in self._decisions(model):
+                    self.assertFalse(decision.allows_canonical_publication)
+                    self.assertIn("NONCURRENT_CONTRIBUTIONS", decision.reasons)
+
+    def test_contradictory_published_copies_cannot_be_ready(self):
+        for kind in ("raw_total", "snapshot_total", "summary_total", "summary_days",
+                     "summary_unavailable", "rhythm", "missing_provenance", "duplicate_fact",
+                     "longest_streak", "current_streak", "display_only", "streak_range",
+                     "missing_cutoff", "noncanonical_cutoff", "different_cutoff"):
+            model = self._model(self._collected())
+            data = model["dashboard_data"]
+            summary = data["dashboard_summary"]
+            total_fact = next(row for row in summary["facts"] if row["metric_id"] == "calendar.total")
+            current_fact = next(row for row in summary["facts"] if row["metric_id"] == "calendar.current_streak")
+            longest_fact = next(row for row in summary["facts"] if row["metric_id"] == "calendar.longest_streak")
+            if kind == "raw_total": data["contribution_calendar"]["total"] += 93
+            elif kind == "snapshot_total": data["snapshot"]["last_year_contributions"] += 93
+            elif kind == "summary_total": total_fact["value"] += 93
+            elif kind == "summary_days": summary["calendar"]["days"].pop(0)
+            elif kind == "summary_unavailable": summary["calendar"]["status"] = "unavailable"
+            elif kind == "rhythm": data["contribution_rhythm"]["total"] += 93
+            elif kind == "missing_provenance": data["data_quality"]["metric_provenance"].pop("last_year_contributions")
+            elif kind == "longest_streak": longest_fact.update(value=999, display_value="999")
+            elif kind == "current_streak":
+                current_fact.update(value=999, display_value="999")
+                data["snapshot"]["streak_days"] = 999
+            elif kind == "display_only": total_fact["display_value"] = "999,999"
+            elif kind == "streak_range": longest_fact["range_start"] = "2000-01-01"
+            elif kind == "missing_cutoff": current_fact.pop("profile_date_cutoff")
+            elif kind == "noncanonical_cutoff": current_fact["profile_date_cutoff"] = "20261114"
+            elif kind == "different_cutoff": longest_fact["profile_date_cutoff"] = "2026-11-13"
+            else: summary["facts"].append(copy.deepcopy(total_fact))
+            with self.subTest(kind=kind):
+                for decision in self._decisions(model):
+                    self.assertFalse(decision.allows_canonical_publication)
+                    self.assertIn("NONCURRENT_CONTRIBUTIONS", decision.reasons)
+
+    def test_coordinated_wrong_cutoff_cannot_authorize_publication(self):
+        from datetime import date, datetime, timezone
+        from scripts.contracts.dashboard_summary import build_dashboard_summary
+        from scripts.pipeline.compute_metrics import _compute_current_streak_days
+        for cutoff in (date(2026, 11, 12), date(2000, 1, 1)):
+            collected = self._collected()
+            model = self._model(collected)
+            model["snapshot"]["streak_days"] = _compute_current_streak_days(
+                collected.calendar, datetime(2026, 11, 15, 1, tzinfo=timezone.utc), cutoff)
+            summary = build_dashboard_summary(model, profile_date=cutoff)
+            model["dashboard_summary"] = summary
+            model["dashboard_data"]["dashboard_summary"] = summary
+            with self.subTest(cutoff=cutoff):
+                for decision in self._decisions(model):
+                    self.assertFalse(decision.allows_canonical_publication)
+                    self.assertIn("NONCURRENT_CONTRIBUTIONS", decision.reasons)
+
+    def test_recorded_generation_time_requires_aware_value(self):
+        for stamp in (None, "", "2026-11-15T01:00:00", "not-a-date", "0001-01-01T00:00:00Z"):
+            model = self._model(self._collected(zero=True))
+            model["dashboard_data"]["generated_at"] = stamp
+            with self.subTest(stamp=stamp):
+                for decision in self._decisions(model):
+                    self.assertFalse(decision.allows_canonical_publication)
+                    self.assertIn("NONCURRENT_CONTRIBUTIONS", decision.reasons)
+
+    def test_profile_generation_reuses_one_captured_cutoff(self):
+        from datetime import date, datetime, timezone
+        from scripts.pipeline import compute_metrics
+        now = datetime(2026, 11, 15, 1, tzinfo=timezone.utc)
+        class Clock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return now.astimezone(tz) if tz else now.replace(tzinfo=None)
+        with patch.object(compute_metrics, "datetime", Clock), patch.object(
+            compute_metrics, "_profile_today", side_effect=[date(2026, 11, 14), date(2026, 11, 15)]
+        ) as cutoff:
+            model = compute_metrics.compute_profile_model(
+                self._collected(), logger=lambda *_: None, allow_network_calls=False)
+        cutoff.assert_called_once_with(now)
+        fact = next(row for row in model["dashboard_summary"]["facts"]
+                    if row["metric_id"] == "calendar.current_streak")
+        self.assertEqual("2026-11-14", fact["profile_date_cutoff"])
+        self.assertEqual(model["snapshot"]["streak_days"], fact["value"])
+
+    def test_summary_reconciles_all_calendar_values_before_selecting_facts(self):
+        from datetime import date
+        from scripts.contracts.dashboard_summary import build_dashboard_summary
+        for kind in ("raw_total", "snapshot_total", "raw_days"):
+            model = self._model(self._collected())
+            if kind == "raw_total": model["dashboard_data"]["contribution_calendar"]["total"] += 93
+            elif kind == "snapshot_total": model["snapshot"]["last_year_contributions"] += 93
+            else: model["dashboard_data"]["contribution_calendar"]["weeks"][0].pop(0)
+            result = build_dashboard_summary(model, profile_date=date(2026, 11, 14))
+            with self.subTest(kind=kind):
+                self.assertEqual([], result["calendar"]["days"])
+                self.assertEqual("unavailable", result["calendar"]["status"])
+                calendar_facts = [row for row in result["facts"] if row["metric_id"].startswith("calendar.")]
+                self.assertTrue(all(row["value"] is None for row in calendar_facts))
+
+    def test_live_invalid_calendar_retains_existing_artifact_bytes(self):
+        from dataclasses import replace
+        from scripts.pipeline import profile_pipeline as pipeline
+        collected = replace(self._collected(), metric_observations={})
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output = Path(tmpdir)
+            prior = b"previous accepted contribution artifacts\n"
+            (output / "README.md").write_bytes(prior)
+            cwd = Path.cwd()
+            try:
+                os.chdir(output)
+                with patch.object(pipeline, "refuse_dirty_generator_source"), patch.object(
+                    pipeline, "generate_assets"
+                ) as assets, patch.object(pipeline, "write_dashboard_json") as data, patch.object(
+                    pipeline, "render_readme"
+                ) as readme:
+                    result = pipeline.run_profile_pipeline_with_collected(
+                        collected, logger=lambda *_: None, allow_network_calls=False,
+                        source_kind="github-api")
+                self.assertFalse(result["publication_decision"].allows_canonical_publication)
+                assets.assert_not_called()
+                data.assert_not_called()
+                readme.assert_not_called()
+                self.assertEqual(prior, (output / "README.md").read_bytes())
+            finally:
+                os.chdir(cwd)
+
+
 class ProfilePublicationAcceptanceTests(unittest.TestCase):
     def _generate_fixture(self, output_root):
         fixture_path = ROOT / "tests/fixtures/sample_collected_data.json"
@@ -1402,7 +1611,7 @@ class ProfilePublicationAcceptanceTests(unittest.TestCase):
         from scripts.pipeline import profile_pipeline
         from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
 
-        collected = AccuracyTests()._collected()
+        collected = ContributionPublicationConsistencyTests._collected()
         public_repositories = copy.deepcopy(collected.repos)
         next(
             repository
@@ -1465,7 +1674,7 @@ class ProfilePublicationAcceptanceTests(unittest.TestCase):
         from scripts.contracts import profile_contract
         from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
 
-        collected = AccuracyTests()._collected()
+        collected = ContributionPublicationConsistencyTests._collected()
         public_repositories = copy.deepcopy(collected.repos)
         next(
             repository
@@ -1530,7 +1739,7 @@ class ProfilePublicationAcceptanceTests(unittest.TestCase):
             output_root = Path(directory)
             result = self._generate_collected(
                 output_root,
-                AccuracyTests()._collected(),
+                ContributionPublicationConsistencyTests._collected(),
                 source_kind="github-api",
             )
             validation = self._validate_output(output_root)
@@ -1780,7 +1989,7 @@ class ProfilePublicationAcceptanceTests(unittest.TestCase):
         from scripts.pipeline import profile_pipeline
         from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
 
-        collected = AccuracyTests()._collected()
+        collected = ContributionPublicationConsistencyTests._collected()
         exact_empty = replace(
             collected,
             repo_counts={

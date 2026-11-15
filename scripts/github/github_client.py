@@ -104,6 +104,19 @@ def _calendar_window(days: int) -> tuple[datetime, datetime, str]:
     )
 
 
+def _contribution_window(days: int) -> tuple[datetime, datetime, str]:
+    """Request inclusive UTC dates, matching GitHub's dated calendar rows.
+
+    A profile-local midnight can include an extra UTC date before local midnight.
+    Release/PR windows and the profile-local streak cutoff keep their own clocks.
+    """
+    now = datetime.now(timezone.utc)
+    start = (now - timedelta(days=max(1, int(days)) - 1)).replace(
+        hour=0, minute=0, second=0, microsecond=0,
+    )
+    return start, now, now.date().isoformat()
+
+
 def _parse_iso_datetime(value: str) -> datetime | None:
     if not value:
         return None
@@ -266,18 +279,43 @@ def _valid_contribution_value(value) -> bool:
     if not _is_nonnegative_int(value.get("total")):
         return False
     days = value.get("days")
-    if type(days) not in {list, tuple}:
+    if type(days) not in {list, tuple} or not days:
         return False
+    dates = set()
+    total = 0
     for day in days:
         if type(day) is not dict or set(day) != {"date", "count"}:
             return False
         try:
-            datetime.strptime(day.get("date", ""), "%Y-%m-%d")
+            parsed = datetime.strptime(day.get("date", ""), "%Y-%m-%d").date()
         except (TypeError, ValueError):
             return False
-        if not _is_nonnegative_int(day.get("count")):
+        if (parsed.isoformat() != day["date"] or parsed in dates
+                or not _is_nonnegative_int(day.get("count"))):
             return False
-    return True
+        dates.add(parsed)
+        total += day["count"]
+    return (total == value["total"]
+            and (max(dates) - min(dates)).days + 1 == len(dates))
+
+
+def _contribution_value_covers_window(value, window_start, window_end, observed_at) -> bool:
+    """Equal sums alone cannot establish that zero-count boundary dates exist."""
+    if not _valid_contribution_value(value):
+        return False
+    try:
+        bounds = [datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+                  for stamp in (window_start, window_end, observed_at)]
+    except (AttributeError, TypeError, ValueError):
+        return False
+    if any(stamp.tzinfo is None or stamp.utcoffset() is None for stamp in bounds):
+        return False
+    start, end, observed = [stamp.astimezone(timezone.utc) for stamp in bounds]
+    dates = sorted(row["date"] for row in value["days"])
+    return (start <= end <= observed
+            and start == start.replace(hour=0, minute=0, second=0, microsecond=0)
+            and dates[0] == start.date().isoformat()
+            and dates[-1] == end.date().isoformat())
 
 
 def validate_provider_observation(observation: dict) -> bool:
@@ -428,7 +466,9 @@ def validate_provider_observation(observation: dict) -> bool:
         if source_metric_id == "github_contribution_calendar_total_and_days":
             return (
                 status == "ok"
-                and _valid_contribution_value(value)
+                and _contribution_value_covers_window(
+                    value, window_start, window_end, observation.get("observed_at")
+                )
                 and population_id == "github-contribution-calendar-visible-to-provider"
                 and signature is None
                 and window_start is not None
@@ -2719,17 +2759,18 @@ def _contribution_value_from_calendar(calendar: object) -> dict | None:
             if type(day) is not dict:
                 return None
             day_value = {"date": day.get("date"), "count": day.get("contributionCount")}
-            if not _valid_contribution_value({"total": total, "days": (day_value,)}):
-                return None
             days.append(day_value)
-    return {"total": total, "days": tuple(days)}
+    value = {"total": total, "days": tuple(days)}
+    if not _valid_contribution_value(value):
+        return None
+    return {"total": total, "days": tuple(sorted(days, key=lambda row: row["date"]))}
 
 
 def _calendar_from_contribution_value(value: object) -> dict | None:
     if not _valid_contribution_value(value):
         return None
     grouped: dict[tuple[int, int], list[dict]] = {}
-    for day in value["days"]:
+    for day in sorted(value["days"], key=lambda row: row["date"]):
         parsed = datetime.strptime(day["date"], "%Y-%m-%d")
         iso_year, iso_week, _weekday = parsed.isocalendar()
         grouped.setdefault((iso_year, iso_week), []).append(
@@ -2750,11 +2791,10 @@ def _calendar_from_contribution_value(value: object) -> dict | None:
 
 def get_contribution_calendar_observation(days: int = 365) -> dict:
     """Observe the current contribution calendar with its exact source window."""
-    start, end, window_day = _calendar_window(days)
-    tz_name = os.environ.get("PROFILE_TIMEZONE", "America/New_York").strip() or "America/New_York"
+    start, end, window_day = _contribution_window(days)
     window_start = _iso_utc(start)
     window_end = _iso_utc(end)
-    cache_key = f"contribution_calendar_observation_v1_{days}_{tz_name}_{window_day}"
+    cache_key = f"contribution_calendar_observation_v2_{days}_UTC_{window_day}"
     cached = _get_cached(cache_key)
     if (
         validate_provider_observation(cached)
@@ -2817,7 +2857,8 @@ def get_contribution_calendar_observation(days: int = 365) -> dict:
         value = _contribution_value_from_calendar(cal)
     except (KeyError, TypeError):
         value = None
-    if value is None:
+    observed_at = _iso_utc(datetime.now(timezone.utc))
+    if not _contribution_value_covers_window(value, window_start, window_end, observed_at):
         return _validated_observation(
             metric_id="last_year_contributions",
             source_metric_id="github_contribution_calendar_total_and_days",
@@ -2843,7 +2884,7 @@ def get_contribution_calendar_observation(days: int = 365) -> dict:
         population_signature=None,
         window_start=window_start,
         window_end=window_end,
-        observed_at=_iso_utc(datetime.now(timezone.utc)),
+        observed_at=observed_at,
         source_id="github_graphql_contribution_calendar",
         source_mode="live",
         completion_reason="all_components_observed",
