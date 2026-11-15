@@ -1,6 +1,6 @@
 {
-  "artifact_set_digest": "61e2d606977831e872193f16d7b77b422a2e3ded96391206e4f889a890aae83c",
-  "claim_input_digest": "13ee399eaa6e10adce5f196a19513c258f24f1997324f56588f6f1eaf691e8bd",
+  "artifact_set_digest": "27ac25a0a0445665a955430404e34ddf1d88217c3c39564f98c4b7d0faf1438a",
+  "claim_input_digest": "7cf0937c1af245f1cf1ee784ccb88a89e6eab321abd41740e942c572b18f0b89",
   "execution_identity": {
     "packages": {
       "jinja2": "3.1.6",
@@ -12,14 +12,14 @@
   },
   "files": [
     {
-      "byte_length": 13703,
+      "byte_length": 21264,
       "path": "README.md",
-      "sha256": "c3a2b3d019034f423f9aca8cb44e3b762c1ca87b5ebce6737265c1959109e347"
+      "sha256": "efad0997dc4b5d4b734df397338c00c7650e114b7f70afec568f875c5e1bd417"
     },
     {
-      "byte_length": 3925,
+      "byte_length": 7613,
       "path": "assets/activity_heatmap.svg",
-      "sha256": "a3fd6d86ad27159a7a27ac4c0bb7e81e6e2467f8f8e1d7069c12efe94bca8bdf"
+      "sha256": "52d173719759abce773b1e5042699dfcab49778448d628bd9aeb33e5adbd8e06"
     },
     {
       "byte_length": 7754,
@@ -29,7 +29,7 @@
     {
       "byte_length": 10725,
       "path": "assets/builder_scorecard.svg",
-      "sha256": "3520cd7624f1bb53aae203f5cce8ad0fb44c156d413da699ccccfc3ef8cafea6"
+      "sha256": "4fec46d80258f9d083063bd59e7789c74300243615a58bcf4b48849d8928c2ae"
     },
     {
       "byte_length": 77379,
@@ -42,19 +42,19 @@
       "sha256": "d2b42efd2c709e8876a3f307e7096b8b2c50913e62cf692eb4712580efeaccbb"
     },
     {
-      "byte_length": 137483,
+      "byte_length": 217591,
       "path": "assets/dashboard_summary.svg",
-      "sha256": "405d7b4acc530370ccabb6db8c4d78d0e6a41f14138251858842b8051e6fdaea"
+      "sha256": "fac31a4188b58d557e1e2747e327592742a6b3be5079e16d66ce4d35e43c2883"
     },
     {
-      "byte_length": 136135,
+      "byte_length": 217329,
       "path": "assets/dashboard_summary_mobile.svg",
-      "sha256": "2ea3aadd1de14930da1092424696502aabd7288908cfa273b362a27ea8d652a1"
+      "sha256": "2dd286caee12e744a47f5d5535ebf52e5df3a4d24f9aa2da1f03855f1e0ff247"
     },
     {
       "byte_length": 14432,
       "path": "assets/engineering_cadence.svg",
-      "sha256": "be72869babfd63c9361a9d56e09549c108fdb7859bbbf67ad88a0c3087a8f93c"
+      "sha256": "d9bf5af3f153253ad8c42d71397797dbf9984c0432055fc85d9ec99e2540f834"
     },
     {
       "byte_length": 7574,
@@ -69,7 +69,7 @@
     {
       "byte_length": 13288,
       "path": "assets/raw_snapshot.svg",
-      "sha256": "38b1468be8826d3323df1495f6623822f8c5cd9482643728727b5f77cc3f8348"
+      "sha256": "7644a2da8862a0d54e009c1a1435ac3246cbc4bdb9b456021620a6f93bd0397d"
     },
     {
       "byte_length": 10081,
@@ -84,24 +84,24 @@
     {
       "byte_length": 10991,
       "path": "metrics.general.svg",
-      "sha256": "d3b480bf09d4c7a4baf3136de190e51b0b60cc63594a5d61cdec76578fa34a3a"
+      "sha256": "a06cf4638402307ebf473d88235561dd017c199d36965e83e2216a8fca5cf1d5"
     },
     {
-      "byte_length": 370459,
+      "byte_length": 401729,
       "path": "site/data/profile_snapshot.json",
-      "sha256": "786d39f6e364e8279f341becdeac5e0f9bd608653c40c6b51fc6b484cbaff0bd"
+      "sha256": "aa8bdbb751e99bef983f30d9aa0deaf67529c1d2ade14bbb4a023f3af69e85ec"
     }
   ],
-  "generated_at": "2026-11-15T04:01:29.257371Z",
-  "generator_revision": "d37d668ce3e229ba929680d8ffe55fb919a6a53f",
-  "generator_source_digest": "fbf4d8a730c83b0093b747bab69d4dd91bfea231a90f83e5c98e6060c4d1d51e",
+  "generated_at": "2026-11-15T04:05:19.914435Z",
+  "generator_revision": "07d7f12ec1ff35f0d8e84dfc219deb34ff3736ff",
+  "generator_source_digest": "4bc74592fa130f767c2e1b86995cd2598880b479c58380c9c291a93f3de5ddd2",
   "render_config": {
     "activity_timezone": "America/New_York",
     "profile_timezone": "America/New_York",
     "source_kind": "github-api",
     "username": "jguida941"
   },
-  "render_key": "fd8d80f5ff7be46694956cc8ccb5bf6e5d3a6fc97851ebcbd9adbebd42b733b6",
+  "render_key": "9d4331ae2f5ba0d9594d51a79f4fcdb3ea2cc98e446901c7bc8a2f6414947126",
   "schema": "profile-artifact-manifest/v1",
   "source_kind": "github-api"
 }
