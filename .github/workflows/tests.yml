@@ -20,10 +20,13 @@ jobs:
       matrix:
         include:
           - scope: main
-            source_sha: a70bcab30aa719bd113ca54ac7821f96fb04091a
+            source_sha: ba8b8e7b9a42b06cc9acd2fb95e994cf001018a7
+          - scope: development
+            source_sha: b7903a712b75289d6157b7f7a7b50b801be61ff2
     env:
       PYTHONDONTWRITEBYTECODE: "1"
       CAPTURE_EXPECTED_SHA: ${{ matrix.source_sha }}
+      CAPTURE_SCOPE: ${{ matrix.scope }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,7 +51,6 @@ jobs:
           from pathlib import Path
           import shutil
           import subprocess
-          import tempfile
           from PIL import Image
           from scripts.quality import headless_receipts as producer
 
@@ -74,37 +76,6 @@ jobs:
           # A failed capture must never upload the old, stale artifacts as new evidence.
           for path in outputs:
               path.unlink(missing_ok=True)
-          # Diagnostic only: measure the hydrated calendar and retain every offender.
-          # The original producer source and its acceptance predicates are unchanged.
-          with tempfile.TemporaryDirectory(prefix="index-stable-diagnostic-") as tmp:
-              host = producer._probe_html("index", page.resolve(), 390, 1000)
-              if host.count("offenders.slice(0, 20)") != 1 or host.count("done = true;") != 1:
-                  raise SystemExit("unexpected producer diagnostic shape")
-              host = host.replace("offenders.slice(0, 20)", "offenders")
-              host = host.replace("done = true;", "var status = doc.getElementById('calendar-status'); if ((status && status.textContent.indexOf('Loading contribution calendar') === 0) || (doc.fonts && doc.fonts.status === 'loading')) { window.setTimeout(probe, 50); return; } done = true;")
-              host = host.replace('"tag": el.tagName.toLowerCase(),',
-                                  '"tag": el.tagName.toLowerCase(), "text": el.textContent.slice(0, 180), "white_space": style.whiteSpace, "ancestors": (function () { var rows = []; for (var p = el.parentElement; p; p = p.parentElement) { var ps = frame.contentWindow.getComputedStyle(p), pr = p.getBoundingClientRect(); rows.push({tag:p.tagName.toLowerCase(), id:p.id, class:cls(p), display:ps.display, visibility:ps.visibility, overflow_x:ps.overflowX, overflow_y:ps.overflowY, white_space:ps.whiteSpace, text_overflow:ps.textOverflow, left:pr.left, right:pr.right, width:pr.width, height:pr.height, open:p.open === true}); } return rows; }()),')
-              host = host.replace('"client_width": clientWidth,',
-                                  '"client_width": clientWidth, "calendar_cells": doc.querySelectorAll("#cal i").length, "calendar_total": doc.getElementById("cal-total").textContent,')
-              diagnostic = Path(tmp) / "index.html"
-              diagnostic.write_text(host)
-              command = [str(producer.CHROME), "--headless=new", "--no-first-run",
-                         "--no-default-browser-check", "--allow-file-access-from-files",
-                         "--window-size=800,1000", "--virtual-time-budget=5000",
-                         "--dump-dom", diagnostic.as_uri()]
-              observed = producer._parse_probe_dump(producer._run(command).stdout)
-              bad = [row for row in observed["offenders"]
-                     if not row.get("contained_by_table_scroll")
-                     and not row.get("contained_by_calendar_scroll")]
-              print(json.dumps({"uncontained_diagnostic": bad,
-                                "diagnostic_total_offenders": observed["offender_count"],
-                                "diagnostic_uncontained": observed["uncontained_offender_count"],
-                                "diagnostic_calendar_cells": observed["calendar_cells"],
-                                "diagnostic_calendar_total": observed["calendar_total"]}, indent=2))
-              if not observed["calendar_cells"]:
-                  raise SystemExit("diagnostic did not observe a hydrated calendar")
-              if bad:
-                  raise SystemExit("the hydrated 390px layout has uncontained offenders")
           try:
               producer.screenshot_page("index", 1280)
               producer.dom_probe("index", 390)
@@ -117,6 +88,13 @@ jobs:
               if image.format != "PNG" or image.size != (1280, 1536):
                   raise SystemExit("unexpected screenshot format or viewport")
           measured = json.loads(probe.read_text())
+          hydration = measured.get("index_hydration", {})
+          if hydration.get("fonts_status") != "loaded" or not isinstance(hydration.get("calendar_status"), str):
+              raise SystemExit("capture did not observe a resolved index and loaded fonts")
+          if hydration["calendar_status"].startswith("Loading contribution calendar"):
+              raise SystemExit("capture observed the loading placeholder")
+          if os.environ["CAPTURE_SCOPE"] == "main" and hydration.get("calendar_cell_count") != 365:
+              raise SystemExit("main capture did not observe the complete contribution calendar")
           if (measured.get("client_width") != 390
                   or measured.get("viewport", {}).get("width") != 390
                   or measured.get("horizontal_overflow") is not False
@@ -143,6 +121,7 @@ jobs:
                             "bytes": path.stat().st_size,
                             "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
                            for path in outputs],
+              "index_hydration": hydration,
               "client_width": measured["client_width"],
               "horizontal_overflow": measured["horizontal_overflow"],
               "uncontained_offender_count": measured["uncontained_offender_count"],
@@ -153,6 +132,8 @@ jobs:
         run: |
           python -B -m unittest \
             tests.contracts.test_web_dashboard \
+            tests.contracts.test_visual_receipt_provenance.IndexHydrationProbeContract \
+            tests.contracts.test_visual_receipt_provenance.CodeBranchEllipsisProbeContract \
             tests.contracts.test_visual_receipt_provenance.ReceiptProvenanceContract.test_committed_headless_page_receipts_are_real_and_provenanced
 
       - name: Retain the original generated receipts
