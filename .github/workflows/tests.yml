@@ -26,7 +26,6 @@ jobs:
     env:
       PYTHONDONTWRITEBYTECODE: "1"
       CAPTURE_EXPECTED_SHA: ${{ matrix.source_sha }}
-      CAPTURE_PAGE_DIGESTS: ${{ runner.temp }}/page-digests.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,7 +45,7 @@ jobs:
           if subprocess.check_output(["git", "status", "--porcelain"], text=True).strip():
               raise SystemExit("source checkout must be clean")
           hashes = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in PAGE_ROUTES.values()}
-          Path(os.environ["CAPTURE_PAGE_DIGESTS"]).write_text(json.dumps(hashes))
+          (Path(os.environ["RUNNER_TEMP"]) / "page-digests.json").write_text(json.dumps(hashes))
           PY
 
       - name: Set up Python
@@ -118,6 +117,9 @@ jobs:
           if not chrome:
               raise SystemExit("real Chrome is unavailable")
           producer.CHROME = Path(chrome)
+          for artifact in (producer.screenshot_artifact("index", 1280), producer.dom_probe_artifact("index", 390)):
+              artifact.unlink(missing_ok=True)
+              producer.provenance_path(artifact).unlink(missing_ok=True)
           screenshot = producer.screenshot_page("index", 1280)
           probe = producer.dom_probe("index", 390)
           with Image.open(screenshot) as image:
@@ -171,7 +173,7 @@ jobs:
           import hashlib, json, os, subprocess
           from pathlib import Path
           from scripts.pipeline.render_outputs import _public_dashboard_data
-          expected = json.loads(Path(os.environ["CAPTURE_PAGE_DIGESTS"]).read_text())
+          expected = json.loads((Path(os.environ["RUNNER_TEMP"]) / "page-digests.json").read_text())
           for path, digest in expected.items():
               if path != "site/index.html" and hashlib.sha256(Path(path).read_bytes()).hexdigest() != digest:
                   raise SystemExit("page source changed; existing browser receipts no longer qualify")
@@ -191,9 +193,11 @@ jobs:
       # Diagnostics carry no canonical README/SVG/JSON bytes, so a held run may
       # still publish them for inspection.
       - name: Upload diagnostics artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: profile-diagnostics-${{ matrix.scope }}
+          if-no-files-found: warn
           path: |
             site/data/triage_report.json
             site/data/doctor_report.json
@@ -228,3 +232,4 @@ jobs:
             assets/receipts/pages/index/screenshot-1280.png.provenance.json
             assets/receipts/pages/index/dom-probe-390.json
             assets/receipts/pages/index/dom-probe-390.json.provenance.json
+
