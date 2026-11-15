@@ -52,7 +52,7 @@ def profile_contribution_fact(observation, value):
     period = (f'{observation["window_start"]} – {observation["window_end"]}'
               if available else "GitHub reporting period unavailable")
     fact = _fact("profile.contributions", value if available else None,
-                 "GitHub contributions", "github-user-contributions-visible-to-provider",
+                 "Contributions", "github-user-contributions-visible-to-provider",
                  status="exact" if available else "unavailable",
                  reason="default_profile_observation", window=period)
     for key in ("window_start", "window_end", "observed_at", "source_id"):

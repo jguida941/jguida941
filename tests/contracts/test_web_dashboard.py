@@ -1126,9 +1126,25 @@ class GithubProfileHeadlineTests(unittest.TestCase):
                 values = [n.text for n in overview.iter() if n.get("data-role") == "value"]
                 self.assertEqual("13,514", values[0], "primary visible value must use GitHub's default total")
                 text = " ".join(n.text or "" for n in overview.iter("{http://www.w3.org/2000/svg}text"))
-                self.assertIn("GitHub contributions", text)
+                self.assertIn("Contributions", text)
+                headline = next(n for n in overview.iter() if n.get("data-metric-id") == "profile.contributions")
+                ns = "{http://www.w3.org/2000/svg}"
+                label = next(n for n in headline.iter(ns+"text") if n.text == "Contributions")
+                value = next(n for n in headline.iter(ns+"text") if n.get("data-role") == "value")
+                self.assertLess(float(label.get("y")), float(value.get("y")))
+                self.assertTrue(list(headline.iter(ns+"path")), "headline keeps its calendar icon")
+                self.assertEqual(["Contributions", "13,514"],
+                                 [n.text for n in headline.iter(ns+"text")],
+                                 "no duplicate label or reporting-period caption below the count")
                 self.assertNotIn("2025-11-16 – 2026-11-15", text,
                                  "the separate calendar's full ISO range must not label the native headline")
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        hero = html.split('<header class="panel hero"', 1)[1].split('</header>', 1)[0]
+        self.assertRegex(hero, r'<div class="kpi-label"><svg[^>]*>.*?</svg><span id="hero-contribution-window">Contributions</span></div>')
+        self.assertLess(hero.index('kpi-label'), hero.index('hero-contribution-total'))
+        for unwanted in ("snapshot-notice", "Website shows", "Builder dashboard", "About this count", "profile-contribution-period"):
+            self.assertNotIn(unwanted, html)
         website = _hydrate_profile_headline(summary)
         self.assertEqual("13,514", website["value"])
         self.assertNotIn("2025-11-16 – 2026-11-15", website["window"])
@@ -1194,3 +1210,44 @@ class GithubProfileHeadlineTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class ActivityOverviewLayoutTests(unittest.TestCase):
+    """DESIGN_SPEC: the reference layout is structure, not a color substitution."""
+    def test_overview_separates_controls_profile_metrics_and_update_footer(self):
+        from html.parser import HTMLParser
+        from scripts.pipeline.web_render import render_dashboard
+        class Structure(HTMLParser):
+            def __init__(self):
+                super().__init__(); self.stack=[]; self.rows=[]
+            def handle_starttag(self, tag, attrs):
+                item=dict(attrs); self.rows.append((tag,item,tuple(self.stack)))
+                if tag not in ("img","meta","link","input","br","hr"):
+                    self.stack.append((tag,item))
+            def handle_endtag(self, tag):
+                for i in range(len(self.stack)-1,-1,-1):
+                    if self.stack[i][0]==tag:
+                        self.stack=self.stack[:i];break
+        parser=Structure();parser.feed(render_dashboard())
+        def rows(cls):
+            return [row for row in parser.rows if cls in row[1].get("class","").split()]
+        def inside(row, cls):
+            return any(cls in attrs.get("class","").split() for _,attrs in row[2])
+        toolbar=rows("dashboard-toolbar"); self.assertEqual(1,len(toolbar))
+        for cls in ("site-nav","switcher"):
+            self.assertEqual(1,len(rows(cls)))
+            self.assertTrue(inside(rows(cls)[0],"dashboard-toolbar"))
+            self.assertFalse(inside(rows(cls)[0],"hero"))
+        self.assertLess(parser.rows.index(toolbar[0]), parser.rows.index(rows("hero")[0]))
+        self.assertEqual(1,len(rows("profile-heading")))
+        avatar=rows("profile-avatar");self.assertEqual(1,len(avatar))
+        self.assertTrue(avatar[0][1].get("src","").startswith("data:image/jpeg;base64,"))
+        self.assertTrue(inside(avatar[0],"profile-heading"))
+        self.assertEqual(1,len(rows("kpi")))
+        stats=rows("stat");self.assertEqual(3,len(stats))
+        for stat in stats:self.assertTrue(inside(stat,"stats"))
+        footer=rows("hero-footer");self.assertEqual(1,len(footer))
+        updated=next(row for row in parser.rows if row[1].get("id")=="updated")
+        self.assertTrue(inside(updated,"hero-footer"))
+        links=[row for row in parser.rows if row[0]=="a" and inside(row,"hero-footer")]
+        self.assertEqual(["https://github.com/jguida941"],[row[1].get("href") for row in links])
+        self.assertFalse(rows("contribution-details"))

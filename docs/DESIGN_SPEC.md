@@ -80,6 +80,34 @@ contracts in `tests/contracts/` (design/IA/A11y/SVG/projection/cross-projection)
 
 ---
 
+## Activity overview card — operator reference, 2026-11-15
+
+The supplied activity-overview reference governs the website's header structure.
+Retain the existing analytics and theme owners; this is a layout correction, not a
+new theme or a new metric. The README and website headline both read the accepted
+`profile.contributions` fact and label it **Contributions** beside the calendar icon.
+The independently dated calendar and active-day facts keep their own meanings.
+
+| Law | Rendered obligation | Negative example / verification |
+| --- | --- | --- |
+| Controls outside the card | One navigation band and the theme switcher share a toolbar above the overview. The theme control stays to the right when space permits. | Controls nested in the metric card fail the structural test. |
+| Grouped overview | Avatar and username form the profile heading. The focal contribution value sits beside one group of three secondary facts on desktop. | Missing heading/avatar or ungrouped metrics fail the structural test. |
+| Quiet labels | The contribution icon and label are above the value, with no duplicate lower label, ISO date-range caption, snapshot mismatch banner, or explanatory header paragraph. | Existing cross-projection headline guard rejects these substitutions. |
+| Compact footer | One update time and a GitHub profile link share the card footer. Error text appears only when loading fails. | An update time outside the footer or a missing/wrong profile link fails the structural test. |
+| Responsive and themed | The two metric groups stack at narrow widths; navigation and theme controls may wrap. Text uses existing ink/type roles, card material and spacing use the active theme. | Chrome at 1280 and 390 pixels in every active theme must show legible labels, intact icons and no horizontal overflow. This is a browser receipt, not proof of taste. |
+
+The structure follows the operator's reference and the existing Power BI hierarchy,
+Apple fit and projection laws above. Layout measures are **derived** from that reference:
+64px circular avatar (the existing compact SVG size; a 48% clip removes the source image’s white edge), a two-column metric group above 640px,
+and a one-column stack below it. Padding, gaps, radii, surfaces and type use the existing
+profile tokens; no new palette or theme-specific override is introduced.
+`contracts/page_manifest.json` declares the regions. `ActivityOverviewLayoutTests` and
+`GithubProfileHeadlineTests` inspect the emitted structure and labels. MF1 Chrome
+receipts and the all-theme desktop/mobile captures verify actual fit and appearance.
+Moving controls back into the card and removing the grouped footer are the retained
+negative mutations. This bounded change does not implement the queued presentation
+architecture or settings redesign.
+
 ## Part 0 — Design tokens (single source of truth)
 
 Both projections MUST draw every value from these tokens (operationalizes Power BI "report theme =
