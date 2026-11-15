@@ -806,6 +806,22 @@ process.stdout.write(JSON.stringify({html:nodes['activity-project'].innerHTML, c
         ]) for index in range(repositories)]
         return build_activity_analytics(project_activity_source(rows))
 
+    def test_private_branch_details_keep_honest_counts_without_expansion(self):
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+        activity = self.activity(1)
+        source = activity["project_activity"]["rows"][0]
+        source["is_private"] = True
+        expected_count = len(source["branches"])
+        projected = _public_dashboard_data({"activity_analytics": activity})["activity_analytics"]
+        _, nodes, _ = self.hydrate(projected, expanded=[source["repository"]])
+        toggles = [attrs for tag, attrs in nodes if tag == "button" and "data-project-branch-toggle" in attrs]
+        self.assertEqual(1, len(toggles))
+        self.assertIn(f"{expected_count} observed branches · details withheld", toggles[0]["aria-label"])
+        self.assertIn("disabled", toggles[0])
+        self.assertEqual("false", toggles[0]["aria-expanded"])
+        self.assertFalse(any(attrs.get("data-role") == "project-activity-branch" for _, attrs in nodes))
+        self.assertEqual(source["daily"], projected["project_activity"]["rows"][0]["daily"])
+
     def test_shared_cells_periods_row_limit_and_expansion(self):
         activity = self.activity()
         family = activity["project_activity"]

@@ -197,12 +197,13 @@ def qualify_recent_pushes(recent: Any, working: Any, generated_at: Any) -> dict:
         repo = match[1] + "/" + match[2]
         identity = repo.casefold()
         if identity not in chosen or when > chosen[identity][0]:
-            chosen[identity] = (when, repo)
+            chosen[identity] = (when, repo, item.get("is_private") is True)
     ranked = sorted(chosen.values(), key=lambda pair: (-pair[0].timestamp(),
                                                      pair[1].casefold(), pair[1]))[:3]
     rows = [{"repository": repo, "timestamp": when.isoformat().replace("+00:00", "Z"),
-             "activity_type": "repository_metadata", "metadata_only": True}
-            for when, repo in ranked]
+             "activity_type": "repository_metadata", "metadata_only": True,
+             "is_private": private}
+            for when, repo, private in ranked]
     # A complete empty event observation without qualified metadata is known
     # zero; the absence of an observation is not the same state.
     if (not rows and type(recent) is dict and recent.get("status") == "ok"

@@ -199,5 +199,18 @@ def build_activity_analytics(source):
     result = {"schema": "profile-activity-analytics/v1", "window_start": iso(start) if valid else None, "window_end": iso(end) if valid else None,
             "current_day_partial": True, "cohort": cohort, "code_changes": code,
             "recent_pushes": present_recent_pushes(source.get("recent_pushes") if valid else None)}
+    # Detail rows inherit their provider envelope's visibility. Missing or
+    # contradictory visibility is not evidence that private details are public.
+    privacy = {}
+    for envelope in source.get("repositories", []) if type(source.get("repositories")) is list else []:
+        if type(envelope) is not dict:
+            continue
+        identity = repository_name(envelope.get("repository"))
+        if identity:
+            identity = identity.casefold()
+            privacy[identity] = privacy.get(identity, False) or envelope.get("is_private") is not False
+    code["is_private"] = privacy.get(repository.casefold(), True) if repository else False
+    for row in result["recent_pushes"]["rows"]:
+        row["is_private"] = privacy.get(row["repository"].casefold(), True)
     result["project_activity"] = _build_project_activity(source)
     return result

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import re
+from urllib.parse import urlsplit
 
 import jinja2
 
@@ -162,6 +163,8 @@ def generate_assets(
     *,
     generation: dict | None = None,
 ) -> None:
+    public_rows = _public_dashboard_data({key: model[key]
+                                          for key in ("recent_repos", "spotlight_data", "focus")})
     logger("\n[8/8] Generating SVGs...")
     primary_language = _primary_language(model)
     ci_claim = _ci_coverage_claim(model)
@@ -186,7 +189,7 @@ def generate_assets(
     )
     logger("  -> assets/lang_breakdown.svg")
 
-    gen_working(model["recent_repos"])
+    gen_working(public_rows["recent_repos"])
     logger("  -> assets/currently_working.svg")
 
     gen_heatmap(model.get("contribution_rhythm"))
@@ -195,7 +198,7 @@ def generate_assets(
     gen_contribution_panel(collected.calendar)
     logger("  -> assets/contribution_calendar.svg")
 
-    gen_spotlight(model["spotlight_data"])
+    gen_spotlight(public_rows["spotlight_data"])
     logger("  -> assets/repo_spotlight.svg")
 
     gen_scorecard(
@@ -218,7 +221,7 @@ def generate_assets(
     )
     logger("  -> assets/engineering_cadence.svg")
 
-    gen_focus_board(model["focus"])
+    gen_focus_board(public_rows["focus"])
     logger("  -> assets/now_next_shipped.svg")
 
     gen_streak_summary(
@@ -251,12 +254,46 @@ def generate_assets(
     logger("  -> assets/dashboard_summary.svg + assets/dashboard_summary_mobile.svg")
 
 
-def _public_dashboard_data(dashboard_data: dict) -> dict:
-    """Return the publishable projection without erasing repository metadata.
+def _private_repository_row(value: dict) -> bool:
+    return (value.get("private") is True
+            or ("is_private" in value and value["is_private"] is not False)
+            or str(value.get("visibility", "")).casefold() == "private")
 
-    Private/public classification is useful profile data, so private-marked rows stay
-    in place. Credential fields, source/file bodies, internal authentication posture,
-    and concrete credential-shaped string values are removed at any depth.
+
+def _repository_identities(value: dict) -> set[str]:
+    """Exact provider identities let older unmarked display copies retain privacy."""
+    identities = set()
+    for key in ("repository", "repo", "full_name", "nameWithOwner"):
+        name = value.get(key)
+        if isinstance(name, str) and re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", name):
+            identities.add(name.casefold())
+    owner = value.get("owner")
+    login = owner.get("login") if isinstance(owner, dict) else None
+    if isinstance(login, str) and isinstance(value.get("name"), str):
+        name = login + "/" + value["name"]
+        if re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", name):
+            identities.add(name.casefold())
+    for key in ("url", "html_url", "repo_url", "commit_url", "head_url"):
+        url = value.get(key)
+        if not isinstance(url, str):
+            continue
+        try:
+            parsed = urlsplit(url)
+        except ValueError:
+            continue
+        parts = parsed.path.strip("/").split("/")
+        if (parsed.hostname == "github.com" and len(parts) >= 2
+                and re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", "/".join(parts[:2]))):
+            identities.add("/".join(parts[:2]).casefold())
+    return identities
+
+
+def _public_dashboard_data(dashboard_data: dict) -> dict:
+    """Keep basic repository metadata and aggregates; withhold private work details.
+
+    Private names, languages, dates and counts remain publishable. Free-text work
+    descriptions, commit headlines and branch/commit detail do not. Credentials,
+    source bodies and internal authentication posture are excluded at every depth.
     """
     if type(dashboard_data) is not dict:
         raise TypeError("public dashboard data must be a mapping")
@@ -264,33 +301,110 @@ def _public_dashboard_data(dashboard_data: dict) -> dict:
     max_depth = 32
     max_containers = 50_000
     containers_seen = 0
+    private_identities: set[str] = set()
     drop = object()
+    private_text_fields = {
+        "description", "notes", "topics", "last_commit_msg", "latest_commit_message",
+        "commit_message", "message", "message_headline", "headline",
+        "_push_identity_headline",
+    }
+    private_detail_fields = {
+        "ref", "branch", "branches", "default_branch", "sha", "head_sha", "oid",
+        "head_url", "commit_url", "compare_url", "commits", "before", "after",
+    }
 
-    def project(value: object, depth: int = 0) -> object:
+    def account(value: object, depth: int) -> None:
         nonlocal containers_seen
         if depth > max_depth:
             raise ValueError("public dashboard data exceeds the projection depth limit")
-        if type(value) is dict:
+        if type(value) in (dict, list):
             containers_seen += 1
             if containers_seen > max_containers:
                 raise ValueError("public dashboard data exceeds the projection size limit")
+
+    def discover(value: object, depth: int = 0) -> None:
+        account(value, depth)
+        if type(value) is dict:
+            if _private_repository_row(value):
+                private_identities.update(_repository_identities(value))
+            for item in value.values():
+                discover(item, depth + 1)
+        elif type(value) is list:
+            for item in value:
+                discover(item, depth + 1)
+
+    discover(dashboard_data)
+    containers_seen = 0
+
+    def is_private(value: object) -> bool:
+        return type(value) is dict and (
+            _private_repository_row(value)
+            or bool(_repository_identities(value) & private_identities)
+        )
+
+    def project(value: object, depth: int = 0, *, private: bool = False,
+                path: tuple[str, ...] = ()) -> object:
+        account(value, depth)
+        if type(value) is dict:
+            private = private or is_private(value)
+            if private and path and path[-1] == "code_changes":
+                return drop
+            if private and path[-2:] == ("recent_pushes", "rows"):
+                # The existing metadata-only variant cannot expose branch names,
+                # commit identifiers or compare links from a private repository.
+                return project({
+                    "repository": value.get("repository"),
+                    "timestamp": value.get("timestamp"),
+                    "activity_type": "repository_metadata",
+                    "metadata_only": True,
+                    "is_private": True,
+                }, depth + 1, private=True, path=(*path, "metadata"))
             projected_mapping = {}
             for key, item in value.items():
                 if type(key) is not str:
                     raise ValueError("public dashboard data contains a non-string mapping key")
                 if _is_prohibited_public_key(key):
                     continue
-                projected_item = project(item, depth + 1)
+                if private and key in private_text_fields | private_detail_fields:
+                    continue
+                if private and key in {"url", "html_url", "repo_url"} and isinstance(item, str):
+                    try:
+                        parsed = urlsplit(item)
+                        parts = parsed.path.strip("/").split("/")
+                        if (parsed.hostname == "github.com" and len(parts) >= 2
+                                and _repository_identities({key: item})):
+                            item = "https://github.com/" + "/".join(parts[:2])
+                    except ValueError:
+                        pass
+                if private and key == "title":
+                    identities = _repository_identities(value)
+                    names = {name.rsplit("/", 1)[-1] for name in identities} | identities
+                    if isinstance(value.get("name"), str):
+                        names.add(value["name"].casefold())
+                    if not isinstance(item, str) or item.casefold() not in names:
+                        item = "Repository updated"
+                projected_item = project(item, depth + 1, private=private,
+                                         path=(*path, key))
                 if projected_item is not drop:
                     projected_mapping[key] = projected_item
+            if private and type(value.get("branches")) is list:
+                projected_mapping["observed_branch_count"] = len(value["branches"])
+                projected_mapping["branch_details_withheld"] = True
+            if path and path[-1] == "recent_pushes" and any(
+                is_private(row) for row in (
+                    value["rows"] if type(value.get("rows")) is list else []
+                )
+            ):
+                projected_mapping.update(
+                    status="partial", complete=False,
+                    reason="private_repository_metadata_only",
+                    meaning="Observed pushes; private repositories show metadata only.",
+                )
             return projected_mapping
         if type(value) is list:
-            containers_seen += 1
-            if containers_seen > max_containers:
-                raise ValueError("public dashboard data exceeds the projection size limit")
             projected_list = []
             for item in value:
-                projected_item = project(item, depth + 1)
+                projected_item = project(item, depth + 1, private=private, path=path)
                 if projected_item is not drop:
                     projected_list.append(projected_item)
             return projected_list
@@ -301,14 +415,12 @@ def _public_dashboard_data(dashboard_data: dict) -> dict:
     projected = project(dashboard_data)
     if type(projected) is not dict:
         raise ValueError("public dashboard projection did not produce a mapping")
-    # The one closed source identifier is public metric provenance, not a file
-    # body. Keep the recursive content/credential filter unchanged elsewhere.
+    # This closed identifier is metric provenance, not repository source content.
     from scripts.contracts.profile_contract import contribution_rhythm_errors
     rhythm = dashboard_data.get("contribution_rhythm")
     if not contribution_rhythm_errors(rhythm):
         projected["contribution_rhythm"]["source"] = "github_contribution_calendar"
     return projected
-
 
 def write_dashboard_json(model: dict, logger=print, *, generation: dict | None = None) -> None:
     output_path = Path("site/data/profile_snapshot.json")
@@ -350,6 +462,9 @@ _GENERATION_PROVENANCE = {
 
 
 def render_readme(model: dict, logger=print, *, generation: dict | None = None) -> None:
+    row_keys = ("recent_created", "focus", "repo_overview_rows", "activity_feed",
+                "recent_releases", "recent_pull_requests")
+    model = {**model, **_public_dashboard_data({key: model[key] for key in row_keys})}
     logger("\nRendering README.md...")
 
     env = jinja2.Environment(

@@ -182,7 +182,7 @@ def build_dashboard_summary(model, *, profile_date):
                     "automation": {"model": model.get("automation"), "display": automation_display(model.get("automation"))},
                     "calendar": {"days": days, "window": calendar_window, "status": calendar_status if days else "unavailable"},
                     "working": working, "focus": focus, "projects": projects,
-                    "recent_created": _rows(model.get("recent_created"), ("name", "url", "html_url", "description", "language", "created_at"))}
+                    "recent_created": _rows(model.get("recent_created"), ("name", "url", "html_url", "description", "language", "created_at", "private", "is_private", "visibility"))}
     if "activity_analytics" in model:
         presentation["activity_analytics"] = model["activity_analytics"]
     return _public_dashboard_data(presentation)
