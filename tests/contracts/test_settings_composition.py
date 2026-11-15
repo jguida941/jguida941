@@ -118,12 +118,12 @@ class SettingsChromeContract(unittest.TestCase):
         for tok in ("var(--status-success)", "var(--status-danger)"):
             self.assertIn(tok, html, f"the verdict pills must derive from {tok}")
 
-    def test_settings_breadcrumb_orients_across_the_surfaces(self):
-        """Explainability/IA: the shell breadcrumb links the sibling surfaces so a viewer can navigate —
-        settings previously carried NO nav at all, so this is the orientation fix."""
+    def test_settings_primary_navigation_orients_across_the_surfaces(self):
+        """One primary navigation band links sibling pages without a duplicate lower row."""
         from scripts.rendering.settings.settings import render_settings
         html = render_settings()
-        self.assertRegex(html, r'class="ps-crumbs"')
+        self.assertRegex(html, r'<nav class="site-nav(?: [^"]+)?"')
+        self.assertNotIn('class="ps-crumbs"', html)
         for href in ("index.html", "showcase.html", "studio.html"):
             self.assertIn(href, html, f"the settings page must link {href}")
 

@@ -25,6 +25,7 @@ FONT = '-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif'
 
 # Semantic owners share the vendored Lucide system; numeric facts stay unchanged.
 SEMANTIC_ICONS = {
+    "profile.contributions": "calendar",
     "calendar.total": "calendar", "inventory.public_nonfork": "globe",
     "inventory.private_owned": "lock", "inventory.stargazers": "star",
     "inventory.public_forks": "fork", "activity.public_commits": "commit",
@@ -768,15 +769,14 @@ def render_svg(summary, *, mobile=False, generation=None):
         avatar_x, avatar_y = width-pad-avatar_size, 49 if mobile else 30
         c.parts.append('<defs><clipPath id="profile-avatar-clip"><circle '+_attrs(dict(cx=avatar_x+avatar_size/2,cy=avatar_y+avatar_size/2,r=avatar_size/2))+'/></clipPath></defs>')
         c.parts.append('<image '+_attrs(dict(x=avatar_x,y=avatar_y,width=avatar_size,height=avatar_size,href="data:image/jpeg;base64,"+encoded,clip_path="url(#profile-avatar-clip)",preserveAspectRatio="xMidYMid slice"))+'><title>'+escape(username+" profile artwork")+'</title></image>')
-    total = fact("calendar.total")
-    y = c.fact(total,pad,146,content,size=56,fill="panel",framed=False,
-               qualify=total["quality"].get("status") not in ("exact","ok"),
-               caption=calendar.get("window","Calendar unavailable"))+12
+    total = fact("profile.contributions")
+    y = c.fact(total,pad,146,content,size=46,fill="panel",framed=False,
+               qualify=total["quality"].get("status") not in ("exact","ok"))+12
     c.parts.append('<title>'+escape("Snapshot "+timestamp+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
     inventory = ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers")
     y = c.fact_grid([fact(key) for key in inventory],pad,y,content,
                     columns=2 if mobile else 3,fill="panel",framed=False,size=29)
-    if any(fact(key)["quality"].get("qualification") for key in inventory):
+    if any(fact(key)["quality"].get("status") not in ("exact", "ok") for key in inventory):
         y = c.wrap("Inventory · unverified",pad,y+c.secondary,content,size=c.secondary,color="muted")
     c.end()
     y += 12

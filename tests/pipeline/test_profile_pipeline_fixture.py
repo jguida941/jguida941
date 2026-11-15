@@ -42,6 +42,7 @@ PROFILE_PRODUCT_TEST_MODULES = (
     "tests.contracts.test_dashboard_summary",
     "tests.contracts.test_dashboard_destinations",
     "tests.contracts.test_readme_projection",
+    "tests.contracts.test_design_nav",
     "tests.contracts.test_label_legibility",
 )
 PROFILE_PRODUCT_TEST_ENV = (
@@ -551,13 +552,10 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
         self.assertEqual(expected["html_url"], observed.get("url"))
         self.assertEqual(expected["language"], observed.get("language"))
         self.assertEqual(expected["pushed_at"], observed.get("pushed_at_raw"))
-        if private and published:
-            self.assertNotIn("last_commit_msg", observed)
-        else:
-            self.assertEqual(
-                expected["latest_commit_message"],
-                observed.get("last_commit_msg"),
-            )
+        self.assertEqual(
+            expected["latest_commit_message"],
+            observed.get("last_commit_msg"),
+        )
         if private:
             self.assertIs(
                 True,

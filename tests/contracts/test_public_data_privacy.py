@@ -4,9 +4,8 @@ site/data/profile_snapshot.json is served on GitHub Pages and fetched by the web
 dashboard, so it IS the public profile — one curl away. The static index.html being
 clean is NOT enough (the sensitive data arrives client-side from this JSON). The owner
 rule: the internal token mode (whether the bot ran authenticated) and any credential
-must never appear on the public profile. Private repository basic identity and
-aggregate counts are allowed; private work descriptions, headlines and branch/commit
-details, source contents and tokens are not.
+must never appear on the public profile; private-repo COUNTS/metadata are allowed,
+contents and tokens are not.
 
 These tests cover both the committed public JSON and the projection used for each
 pipeline run.
@@ -29,81 +28,6 @@ def _repo_root() -> Path:
 
 ROOT = _repo_root()
 PUBLIC_JSON = ROOT / "site" / "data" / "profile_snapshot.json"
-
-
-class PrivateWorkDetailBoundary(unittest.TestCase):
-    def test_private_work_details_are_withheld_without_changing_basic_metadata_or_totals(self):
-        from copy import deepcopy
-        from scripts.pipeline.render_outputs import _public_dashboard_data
-
-        private_name = "internal-tools"
-        private_repo = "example/" + private_name
-        private_url = "https://github.com/" + private_repo
-        details = ("PRIVATE_WORK_DESCRIPTION", "PRIVATE_WORK_HEADLINE", "PRIVATE_WORK_BRANCH")
-        basic = {"name": private_name, "html_url": private_url, "language": "Rust",
-                 "pushed_at": "2026-10-15T12:00:00Z", "private": True}
-        public_row = {"name": private_name, "html_url": "https://github.com/public-owner/" + private_name,
-                      "description": "Public work description", "last_commit_msg": "Public work headline",
-                      "private": False}
-        payload = {
-            "snapshot": {"private_owned_repos": 7, "last_year_contributions": 120, "streak_days": 4},
-            "contribution_calendar": {"total": 120, "weeks": [[{"date": "2026-10-15", "count": 120}]]},
-            "automation": {"private": {"configured_repos": 3, "workflow_files": 8}},
-            "recent_repos": [{**basic, "description": details[0], "last_commit_msg": details[1]}, public_row],
-            "focus": {
-                "now": [{"title": private_name, "url": private_url, "detail": "Rust · pushed today", "is_private": True}],
-                "shipped": [{"title": details[1], "url": private_url, "is_private": True}],
-            },
-            "activity_feed": [{"title": details[1], "repo": private_repo, "is_private": True,
-                               "url": private_url + "/commit/" + "a" * 40}],
-            "unknown_visibility": {"name": "unclassified-tools", "is_private": None,
-                                   "description": details[0], "branches": [{"ref": details[2]}]},
-            # Older serialized copies may lack the marker: exact provider identity
-            # must still carry privacy, without matching another owner's same name.
-            "dashboard_summary": {"recent_created": [{"name": private_name, "html_url": private_url,
-                                                       "description": details[0]}]},
-            "activity_analytics": {
-                "code_changes": {"repository": private_repo, "ref": "refs/heads/" + details[2],
-                                 "head_sha": "a" * 40, "additions": 25, "status": "available"},
-                "recent_pushes": {"status": "ok", "complete": True, "rows": [
-                    {"repository": private_repo, "timestamp": "2026-10-15T12:00:00Z",
-                     "ref": "refs/heads/" + details[2], "after": "a" * 40,
-                     "head_url": private_url + "/commit/" + "a" * 40},
-                ]},
-                "project_activity": {"rows": [{"repository": private_repo, "is_private": True,
-                                               "observed_pushes": 2, "daily": [{"date": "2026-10-15", "count": 2}],
-                                               "branches": [{"ref": "refs/heads/" + details[2]}]}]},
-            },
-        }
-        original = deepcopy(payload)
-        published = _public_dashboard_data(payload)
-        text = json.dumps(published, sort_keys=True)
-        for marker in (*details, "a" * 40):
-            self.assertNotIn(marker, text)
-        self.assertEqual(original, payload, "publication must not mutate retained source evidence")
-        self.assertEqual(published, _public_dashboard_data(published), "projection must be idempotent")
-        for key in ("snapshot", "contribution_calendar", "automation"):
-            self.assertEqual(payload[key], published[key], key)
-        self.assertEqual(basic, published["recent_repos"][0])
-        self.assertEqual(public_row, published["recent_repos"][1])
-        self.assertEqual(payload["focus"]["now"], published["focus"]["now"])
-        self.assertEqual("Repository updated", published["focus"]["shipped"][0]["title"])
-        self.assertEqual(private_url, published["activity_feed"][0]["url"])
-        self.assertNotIn("description", published["unknown_visibility"])
-        self.assertNotIn("branches", published["unknown_visibility"])
-        self.assertNotIn("code_changes", published["activity_analytics"])
-        recent = published["activity_analytics"]["recent_pushes"]
-        self.assertFalse(recent["complete"])
-        self.assertEqual("partial", recent["status"])
-        self.assertEqual([{"repository": private_repo, "timestamp": "2026-10-15T12:00:00Z",
-                           "activity_type": "repository_metadata", "metadata_only": True,
-                           "is_private": True}], recent["rows"])
-        project = published["activity_analytics"]["project_activity"]["rows"][0]
-        self.assertEqual(2, project["observed_pushes"])
-        self.assertEqual(payload["activity_analytics"]["project_activity"]["rows"][0]["daily"], project["daily"])
-        self.assertNotIn("branches", project)
-        self.assertEqual(1, project["observed_branch_count"])
-        self.assertTrue(project["branch_details_withheld"])
 
 
 class PublicDataPrivacyContract(unittest.TestCase):
@@ -176,7 +100,7 @@ class PublicDataPrivacyContract(unittest.TestCase):
         self.assertEqual("ok", out["data_quality"]["ci_status"], "public source health must be preserved")
         self.assertEqual("u", out["username"], "non-sensitive fields must pass through")
 
-    def test_public_projection_keeps_private_basic_metadata_and_aggregate_counts(self):
+    def test_public_projection_keeps_private_repository_metadata_and_aggregate_counts(self):
         from scripts.pipeline.render_outputs import _public_dashboard_data
 
         payload = {
@@ -207,11 +131,8 @@ class PublicDataPrivacyContract(unittest.TestCase):
         }
 
         published = _public_dashboard_data(payload)
-        from copy import deepcopy
-        expected = deepcopy(payload)
-        expected["focus"]["now"][1].pop("last_commit_msg")
-        expected["recent_pull_requests"][1]["title"] = "Repository updated"
-        self.assertEqual(expected, published)
+
+        self.assertEqual(payload, published)
 
     def test_public_projection_keeps_public_marked_mapping_values(self):
         from scripts.pipeline.render_outputs import _public_dashboard_data
@@ -315,6 +236,7 @@ class PublicDataPrivacyContract(unittest.TestCase):
         self.assertEqual(
             {
                 "name": "secret-api",
+                "last_commit_msg": "Improve cache invalidation",
                 "language": "Rust",
                 "pushed_at": "2026-08-26T12:00:00Z",
                 "is_private": True,
@@ -400,7 +322,10 @@ class PublicDataPrivacyContract(unittest.TestCase):
             "private-observability-service",
             published["repository"]["name"],
         )
-        self.assertNotIn("last_commit_msg", published["repository"])
+        self.assertEqual(
+            "Improve deployment observability",
+            published["repository"]["last_commit_msg"],
+        )
         self.assertEqual([], published["samples"])
 
     def test_nested_credential_alias_fields_are_removed_without_hiding_repo_metadata(self):
@@ -427,8 +352,7 @@ class PublicDataPrivacyContract(unittest.TestCase):
 
         published = _public_dashboard_data(payload)
 
-        self.assertEqual({key: value for key, value in payload["repository"].items()
-                          if key != "last_commit_msg"}, published["repository"])
+        self.assertEqual(payload["repository"], published["repository"])
         credential_aliases = (
             ("accessTokenValue", published.get("transport", {})),
             (
@@ -573,11 +497,8 @@ class PublicDataPrivacyContract(unittest.TestCase):
             name = f"{visibility}-bearer-docs"
             with self.subTest(visibility=visibility, arm="harmless Bearer control"):
                 self.assertEqual(harmless_bearer, model_rows[name]["last_commit_msg"])
-                if visibility == "private":
-                    self.assertNotIn("last_commit_msg", published_rows[name])
-                else:
-                    self.assertEqual(harmless_bearer, published_rows[name]["last_commit_msg"])
-        self.assertEqual(1, svg.count(harmless_bearer))
+                self.assertEqual(harmless_bearer, published_rows[name]["last_commit_msg"])
+        self.assertEqual(2, svg.count(harmless_bearer))
 
         self.assertTrue(contains_credential_material(basic_credential))
         self.assertEqual("", safe_commit_headline(basic_credential))
@@ -585,7 +506,7 @@ class PublicDataPrivacyContract(unittest.TestCase):
             name = f"{visibility}-basic-credential-boundary"
             with self.subTest(visibility=visibility, arm="Basic credential boundary"):
                 self.assertNotEqual(basic_credential, model_rows[name]["last_commit_msg"])
-                self.assertNotEqual(basic_credential, published_rows[name].get("last_commit_msg"))
+                self.assertNotEqual(basic_credential, published_rows[name]["last_commit_msg"])
         self.assertNotIn(basic_credential, json.dumps(published, sort_keys=True))
         self.assertNotIn(basic_credential, svg)
 
@@ -595,7 +516,7 @@ class PublicDataPrivacyContract(unittest.TestCase):
             "public_model": model_rows["public-basic-docs"]["last_commit_msg"],
             "private_model": model_rows["private-basic-docs"]["last_commit_msg"],
             "public_projection": published_rows["public-basic-docs"]["last_commit_msg"],
-            "private_projection": published_rows["private-basic-docs"].get("last_commit_msg"),
+            "private_projection": published_rows["private-basic-docs"]["last_commit_msg"],
             "svg_occurrences": svg.count(harmless_basic),
         }
         self.assertEqual(
@@ -605,8 +526,8 @@ class PublicDataPrivacyContract(unittest.TestCase):
                 "public_model": harmless_basic,
                 "private_model": harmless_basic,
                 "public_projection": harmless_basic,
-                "private_projection": None,
-                "svg_occurrences": 1,
+                "private_projection": harmless_basic,
+                "svg_occurrences": 2,
             },
             observed_basic,
         )
@@ -675,10 +596,7 @@ class PublicDataPrivacyContract(unittest.TestCase):
             "repositories": repositories,
             "ordinary_repository": ordinary_repository,
         }
-        from copy import deepcopy
-        expected = deepcopy(payload)
-        expected["repositories"][1].pop("last_commit_msg")
-        self.assertEqual(expected, _public_dashboard_data(payload))
+        self.assertEqual(payload, _public_dashboard_data(payload))
 
     def test_explicit_aws_credentials_are_removed_without_dropping_repository_identity(self):
         from scripts.pipeline.profile_helpers import (
@@ -747,6 +665,8 @@ class PublicDataPrivacyContract(unittest.TestCase):
         self.assertEqual(
             {
                 "name": "private-password-documentation",
+                "last_commit_msg": ordinary_phrase,
+                "notes": ordinary_phrase,
                 "language": "Python",
                 "pushed_at": "2026-08-26T16:00:00Z",
                 "is_private": True,
@@ -846,6 +766,7 @@ class PublicDataPrivacyContract(unittest.TestCase):
             {
                 "name": repository_name,
                 "url": repository_url,
+                "last_commit_msg": "",
                 "language": "Rust",
                 "pushed_at": "2026-08-26T17:00:00Z",
                 "is_private": True,
@@ -914,9 +835,7 @@ class PublicDataPrivacyContract(unittest.TestCase):
 
         self.assertFalse(contains_credential_material(repository_name))
         self.assertEqual(repository_name, safe_commit_headline(repository_name))
-        expected = {"repository": {key: value for key, value in payload["repository"].items()
-                                   if key != "last_commit_msg"}}
-        self.assertEqual(expected, _public_dashboard_data(payload))
+        self.assertEqual(payload, _public_dashboard_data(payload))
 
 
 class ProjectActivityPrivacyContract(unittest.TestCase):
@@ -935,14 +854,8 @@ class ProjectActivityPrivacyContract(unittest.TestCase):
         model = project_activity_full_model(source)
         family = model["activity_analytics"]["project_activity"]
         public = _public_dashboard_data(model["dashboard_data"])
-        from copy import deepcopy
-        expected = deepcopy(family)
-        for projected_row in expected["rows"]:
-            branches = projected_row.pop("branches", [])
-            projected_row["observed_branch_count"] = len(branches)
-            projected_row["branch_details_withheld"] = True
-        self.assertEqual(expected, public["activity_analytics"]["project_activity"])
-        self.assertEqual(expected, public["dashboard_summary"]["activity_analytics"]["project_activity"])
+        self.assertEqual(family, public["activity_analytics"]["project_activity"])
+        self.assertEqual(family, public["dashboard_summary"]["activity_analytics"]["project_activity"])
         row = family["rows"][0]
         self.assertTrue(row["is_private"])
         self.assertTrue(row["repository"].endswith("/private-activity"))
@@ -975,6 +888,161 @@ class ProjectActivityPrivacyContract(unittest.TestCase):
         contaminated["rows"][0]["branches"][0]["credential"] = "private credential"
         contaminated["rows"][0]["daily"][0]["token_mode"] = "private auth posture"
         self.assertEqual({"project_activity": family}, _public_dashboard_data({"project_activity": contaminated}))
+
+
+
+
+from copy import deepcopy
+import json
+from pathlib import Path
+import re
+import subprocess
+import unittest
+import xml.etree.ElementTree as ET
+
+from scripts.pipeline.activity_analytics import build_activity_analytics
+from scripts.pipeline.render_outputs import _public_dashboard_data
+from scripts.pipeline.web_render import render_dashboard
+from scripts.rendering.generate_dashboard_summary import Canvas, _code_changes, _code_changes_desktop
+
+
+def observation(*, private=True, state="partial"):
+    source = {
+        "schema": "profile-activity-observations/v1",
+        "window_start": "2026-10-17T00:00:00Z",
+        "window_end": "2026-11-15T12:00:00Z",
+        "observed_at": "2026-11-15T12:00:00Z",
+        "cohort": {"eligible": 1, "queried": 1},
+        "repositories": [{"repository": "example/project", "is_private": private}],
+        "selection": {"status": "ok", "complete": True, "reason": "observed"},
+        "code_changes": {
+            "status": "ok", "complete": True, "reason": "end_of_connection",
+            "repository": "example/project", "ref": "refs/heads/PRIVATE_WORK_BRANCH",
+            "head_sha": "a" * 40,
+            "commits": [
+                {"oid": "a" * 40, "committed_at": "2026-11-14T12:00:00Z",
+                 "additions": 12003, "deletions": 407, "parent_count": 1},
+                {"oid": "b" * 40, "committed_at": "2026-11-15T11:00:00Z",
+                 "additions": None, "deletions": None, "parent_count": 1},
+            ],
+        },
+    }
+    if state == "zero":
+        source["code_changes"]["commits"] = []
+    elif state == "unavailable":
+        source["code_changes"].update(status="unavailable", complete=False, commits=[])
+    return build_activity_analytics(source)
+
+
+def web_fragment(activity):
+    script, = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)
+    harness = r'''
+const fs = require('node:fs'), vm = require('node:vm');
+const input = JSON.parse(fs.readFileSync(0, 'utf8')), nodes = {};
+const idle = {then() {return this;}, catch() {return this;}};
+const context = {document: {documentElement: {dataset: {}}, querySelectorAll() {return [];},
+  getElementById(id) {return nodes[id] ||= {innerHTML: '', textContent: '', style: {setProperty() {}}, setAttribute() {}, replaceChildren() {}};}},
+  location: {hash: '', search: ''}, localStorage: {getItem() {return null;}, setItem() {}},
+  URLSearchParams, addEventListener() {}, requestAnimationFrame() {}, fetch() {return idle;}, activity: input.activity};
+vm.runInNewContext(input.script + '\nhydrateCodeChanges(activity);', context, {timeout: 5000});
+process.stdout.write(nodes['activity-code'].innerHTML);
+'''
+    return subprocess.run(["node", "-e", harness],
+                          input=json.dumps({"script": script, "activity": activity}),
+                          text=True, capture_output=True, check=True, timeout=10).stdout
+
+
+class CodeChangeProjectionTests(unittest.TestCase):
+    def test_private_observed_aggregates_survive_projection(self):
+        activity = observation()
+        self.assertEqual((12003, 407, "partial"), tuple(activity["code_changes"][k] for k in ("additions", "deletions", "status")))
+        payload = {"activity_analytics": activity,
+                   "dashboard_summary": {"activity_analytics": deepcopy(activity)}}
+        before = deepcopy(payload)
+        published = _public_dashboard_data(payload)
+        for projected in (published["activity_analytics"], published["dashboard_summary"]["activity_analytics"]):
+            code = projected.get("code_changes", {})
+            for key in ("additions", "deletions", "daily", "status", "complete", "selection", "history", "stats_observed", "commit_count", "excluded_merges"):
+                self.assertEqual(activity["code_changes"][key], code.get(key), "Allowed observed aggregates must survive public projection: " + key)
+            for key in ("repository", "ref", "head_sha", "commit_url"):
+                self.assertEqual(activity["code_changes"][key], code.get(key))
+        self.assertEqual(before, payload)
+        self.assertEqual(published, _public_dashboard_data(published))
+
+    def test_activity_metadata_survives_for_private_and_public(self):
+        for private in (False, True):
+            with self.subTest(private=private):
+                payload = {"repo": "example/project", "is_private": private,
+                           "name": "project", "title": "Improve data processing",
+                           "description": "Personal project", "ref": "refs/heads/improve",
+                           "head_sha": "a" * 40, "url": "https://github.com/example/project/commit/" + "a" * 40,
+                           "commits": [{"oid": "b" * 40, "message": "Add useful validation"}],
+                           "branches": [{"ref": "refs/heads/improve"}]}
+                self.assertEqual(payload, _public_dashboard_data(payload))
+
+    def test_credentials_and_source_bodies_stay_excluded(self):
+        for private in (False, True):
+            with self.subTest(private=private):
+                payload = {"repo": "example/project", "is_private": private,
+                           "commits": [{"oid": "b" * 40, "message": "Add useful validation",
+                                        "file_contents": "SOURCE_BODY_SENTINEL", "access_token": "TOKEN_SENTINEL"}],
+                           "token_mode": "AUTH_MODE_SENTINEL", "raw_source": "SOURCE_BODY_SENTINEL"}
+                clean = _public_dashboard_data(payload)
+                encoded = json.dumps(clean)
+                for excluded in ("SOURCE_BODY_SENTINEL", "TOKEN_SENTINEL", "AUTH_MODE_SENTINEL"):
+                    self.assertNotIn(excluded, encoded)
+
+    def test_private_aggregates_reach_svg_and_website(self):
+        activity = _public_dashboard_data({"activity_analytics": observation()})["activity_analytics"]
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                canvas = Canvas(mobile)
+                (_code_changes if mobile else _code_changes_desktop)(canvas, 0, 50, 324 if mobile else 780, activity)
+                tree = ET.fromstring("<svg>" + "".join(canvas.parts) + "</svg>")
+                paint = " ".join(node.text or "" for node in tree.iter("text"))
+                self.assertIn("+12,003", paint)
+                self.assertIn("−407", paint)
+                self.assertNotIn("Code changes unavailable", paint)
+                bars = [node for node in tree.iter() if node.get("data-role") == "code-change-bar"]
+                for kind, expected in (("additions", 12003), ("deletions", 407)):
+                    self.assertEqual(expected, sum(int(node.get("data-value")) for node in bars if node.get("data-kind") == kind))
+        html = web_fragment(activity)
+        self.assertIn("+12,003", html)
+        self.assertIn("−407", html)
+        self.assertIn("partial data", html)
+        self.assertNotIn("Code changes unavailable", html)
+        self.assertIn("PRIVATE_WORK_BRANCH", html)
+        self.assertIn("https://github.com/example/project/commit/" + "a" * 40, html)
+
+    def test_private_code_changes_reach_readme_text(self):
+        from jinja2 import Environment
+        from scripts.pipeline.compute_metrics import compute_profile_model
+        from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
+        import scripts.pipeline.render_outputs as renderer
+        model = compute_profile_model(AccuracyTests()._collected(), logger=lambda *_: None, allow_network_calls=False)
+        model["dashboard_summary"]["activity_analytics"] = observation()
+        summary = _public_dashboard_data(model["dashboard_summary"])
+        template = Path(renderer.__file__).resolve().parents[2] / "templates/README.md.tpl"
+        text = Environment().from_string(template.read_text()).render(dashboard_summary=summary, legacy_visuals=[])
+        section = text.split("### Code changes", 1)[1].split("Recently created:", 1)[0]
+        self.assertIn("12003 additions", section)
+        self.assertIn("407 deletions", section)
+        self.assertIn("refs/heads/PRIVATE_WORK_BRANCH", section)
+        self.assertIn("observed / partial", section)
+        self.assertIn("| 2026-11-14 | 12003 | 407 |", section)
+        self.assertNotIn("Code changes unavailable", section)
+
+    def test_public_observation_is_unchanged(self):
+        activity = observation(private=False)
+        self.assertEqual(activity, _public_dashboard_data({"activity_analytics": activity})["activity_analytics"])
+
+    def test_observed_zero_and_unavailable_remain_distinct(self):
+        for private in (False, True):
+            with self.subTest(private=private):
+                zero = observation(private=private, state="zero")
+                missing = observation(private=private, state="unavailable")
+                self.assertEqual(0, _public_dashboard_data({"activity_analytics": zero})["activity_analytics"].get("code_changes", {}).get("additions"))
+                self.assertIsNone(_public_dashboard_data({"activity_analytics": missing})["activity_analytics"].get("code_changes", {}).get("additions"))
 
 
 if __name__ == "__main__":

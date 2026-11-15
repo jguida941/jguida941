@@ -42,6 +42,48 @@ def _rows(rows, keys):
     return [{key: row[key] for key in keys if key in row} for row in (rows or []) if isinstance(row, dict)]
 
 
+def profile_contribution_fact(observation, value):
+    """Select the native headline only from its own retained provider observation."""
+    from scripts.github.github_client import validate_provider_observation
+    available = (validate_provider_observation(observation)
+                 and observation.get("metric_id") == "github_profile_contributions"
+                 and observation.get("status") == "ok"
+                 and _count(value) is not None and value == observation["value"])
+    period = (f'{observation["window_start"]} – {observation["window_end"]}'
+              if available else "GitHub reporting period unavailable")
+    fact = _fact("profile.contributions", value if available else None,
+                 "Contributions", "github-user-contributions-visible-to-provider",
+                 status="exact" if available else "unavailable",
+                 reason="default_profile_observation", window=period)
+    for key in ("window_start", "window_end", "observed_at", "source_id"):
+        fact[key] = observation[key] if available else None
+    return fact
+
+
+def _inventory_fact(identity, key, value, label, population, observation, *, collection_started_at, generated_at):
+    """A displayed count is exact only when its fresh census value agrees."""
+    try:
+        row = observation["metrics"][key]
+        stamp = datetime.fromisoformat(observation["observed_at"].replace("Z", "+00:00"))
+        start = datetime.fromisoformat(collection_started_at.replace("Z", "+00:00"))
+        end = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
+        verified = (observation.get("schema") == "profile-inventory-observation/v1"
+                    and observation.get("source_id") == "github_personal_owned_repository_census"
+                    and observation.get("population_id") == "personal-owned-repositories"
+                    and observation.get("source_mode") == "live"
+                    and all(value.tzinfo is not None and value.utcoffset() is not None for value in (start, stamp, end))
+                    and observation.get("snapshot_generated_at") == generated_at
+                    and start <= stamp <= end
+                    and row.get("complete") is True and _count(row.get("value")) is not None
+                    and type(value) is int and row["value"] == value)
+    except (AttributeError, KeyError, TypeError, ValueError):
+        verified = False
+    return _fact(identity, value, label, population,
+                 status="exact" if verified else "unknown",
+                 reason="fresh_personal_census" if verified else "matching_evidence_not_carried",
+                 window="Observed " + observation["observed_at"] if verified else "current inventory")
+
+
 def build_dashboard_summary(model, *, profile_date):
     """Select already-computed facts; only calendar runs and byte shares are derived.
 
@@ -83,6 +125,8 @@ def build_dashboard_summary(model, *, profile_date):
     calendar_status = "exact" if calendar_ok and rhythm.get("completeness") == "known" else "unknown" if calendar_ok else "unavailable"
     calendar_window = f'{rhythm["window_start"]} – {rhythm["window_end"]} · UTC' if calendar_ok else "Calendar unavailable"
     facts = []
+    facts.append(profile_contribution_fact(data.get("profile_contributions_observation"),
+                                          snapshot.get("github_profile_contributions")))
     def add(*args, **kwargs):
         row = _fact(*args, **kwargs)
         facts.append(row)
@@ -90,13 +134,14 @@ def build_dashboard_summary(model, *, profile_date):
     add("calendar.total", snapshot.get("last_year_contributions") if calendar_ok else None,
         "contributions", "github-contribution-calendar-visible-to-provider", status=calendar_status,
         reason="calendar_observation", window=calendar_window, qualification=rhythm_display.get("qualification", ""))
-    for identity, value, label, population in (
-        ("inventory.public_nonfork", scope.get("public_owned_nonfork_repos_total"), "public non-fork repos", "public-owned-nonfork-profile-included"),
-        ("inventory.private_owned", snapshot.get("private_owned_repos"), "private owned repos", "private-owned-including-forks"),
-        ("inventory.stargazers", snapshot.get("total_stars"), "stargazers", "public-owned-nonfork"),
-        ("inventory.public_forks", snapshot.get("public_forks"), "public forks", "public-owned-forks"),
+    for identity, key, value, label, population in (
+        ("inventory.public_nonfork", "total_repos", scope.get("public_owned_nonfork_repos_total"), "public non-fork repos", "public-owned-nonfork-profile-included"),
+        ("inventory.private_owned", "private_owned_repos", snapshot.get("private_owned_repos"), "private owned repos", "private-owned-including-forks"),
+        ("inventory.stargazers", "total_stars", snapshot.get("total_stars"), "stargazers", "public-owned-nonfork"),
+        ("inventory.public_forks", "public_forks", snapshot.get("public_forks"), "public forks", "public-owned-forks"),
     ):
-        add(identity, value, label, population)
+        facts.append(_inventory_fact(identity, key, value, label, population, data.get("inventory_observation") or {},
+                                     collection_started_at=data.get("collection_started_at"), generated_at=data.get("generated_at")))
     for identity, key, label in (
         ("activity.public_commits", "public_scope_commits", "Public commits"),
         ("activity.merged_prs", "prs_merged", "Merged PRs"),

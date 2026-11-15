@@ -40,11 +40,14 @@ class CollectedProfileData:
     private_repos: list[dict[str, Any]] = field(default_factory=list)
     metric_observations: dict[str, dict[str, Any]] = field(default_factory=dict)
     activity_observations: dict[str, Any] = field(default_factory=dict)
+    inventory_evidence: dict[str, Any] = field(default_factory=dict)
+    collection_started_at: str | None = None
     ci_execution_observation: dict[str, Any] = field(default_factory=dict)
     ci_timeline_observation: dict[str, Any] = field(default_factory=dict)
 
 
 def collect_profile_data(logger=print) -> CollectedProfileData:
+    collection_started_at = datetime.now(timezone.utc).isoformat()
     logger("\n[1/7] Fetching repo scope counts...")
     repo_counts = gh.get_owned_repo_scope_counts()
     # Older cache entries predate the non-fork private scope. Its absence is
@@ -146,6 +149,7 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
 
     logger("[7/7] Fetching contribution calendar...")
     contribution_observation = gh.get_contribution_calendar_observation()
+    profile_contributions_observation = gh.get_profile_contributions_observation()
     contribution_value = contribution_observation.get("value")
     calendar = _calendar_from_observation_value(contribution_value)
     total_contributions = (
@@ -181,6 +185,11 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
     except (RuntimeError, ValueError):
         activity_repos, activity_private, activity_counts = repos, private_repos, repo_counts
         inventory_fresh = False
+    inventory_evidence = {
+        "fresh": inventory_fresh, "observed_at": datetime.now(timezone.utc).isoformat(),
+        "counts": dict(activity_counts), "public_repos": activity_repos,
+        "personal_public_complete": True,
+    }
     activity_observations = collect_activity_observations(
         activity_repos, activity_private, activity_counts,
         observed_at=activity_observed_at, inventory_fresh=inventory_fresh,
@@ -194,6 +203,8 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
     ci_timeline_observation = collect_public_ci_timeline(repos, USERNAME)
 
     return CollectedProfileData(
+        inventory_evidence=inventory_evidence,
+        collection_started_at=collection_started_at,
         activity_observations=activity_observations,
         ci_execution_observation=ci_execution_observation,
         ci_timeline_observation=ci_timeline_observation,
@@ -213,6 +224,7 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
         metric_observations={
             "public_scope_commits": commits_observation,
             "last_year_contributions": contribution_observation,
+            "github_profile_contributions": profile_contributions_observation,
             "releases_30d": releases_observation,
             "prs_merged": prs_observation,
             "recent_public_events": events_observation,

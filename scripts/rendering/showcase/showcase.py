@@ -233,7 +233,7 @@ def render_showcase(receipts: dict) -> str:
         intro="Every active design language, rendered from its own cited doctrine, with the conformance "
               "receipt for each invariant. The page's own frame is the apple-dark design language — the "
               "proof surface follows the very process it displays.",
-        breadcrumbs=[("home", "index.html"), ("studio", "studio.html"), ("settings", "settings.html")],
+        breadcrumbs=[],
         prefix_html=nav_html,
         sections=[("How to read this", legend)],
         body_html="\n".join(sections),

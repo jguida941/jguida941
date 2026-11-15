@@ -238,12 +238,12 @@ class StudioChromeContract(unittest.TestCase):
         for tok in ("var(--accent)", "var(--surface)", "var(--status-danger)"):
             self.assertIn(tok, html, f"the studio chrome must derive from {tok}")
 
-    def test_studio_breadcrumb_orients_across_the_surfaces(self):
-        """Explainability/IA: the shell breadcrumb links the sibling surfaces so a viewer can navigate —
-        the studio previously carried no link home + no showcase/settings orientation via the shell row."""
+    def test_studio_primary_navigation_orients_across_the_surfaces(self):
+        """One primary navigation band links sibling pages without a duplicate lower row."""
         from scripts.rendering.studio.studio import render_studio
         html = render_studio()
-        self.assertRegex(html, r'class="ps-crumbs"')
+        self.assertRegex(html, r'<nav class="site-nav(?: [^"]+)?"')
+        self.assertNotIn('class="ps-crumbs"', html)
         for href in ("index.html", "showcase.html", "settings.html"):
             self.assertIn(href, html, f"the studio page must link {href}")
 

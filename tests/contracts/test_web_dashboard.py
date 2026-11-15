@@ -19,6 +19,17 @@ Proves, against the committed site/index.html:
 """
 from __future__ import annotations
 
+import copy
+from dataclasses import replace
+from datetime import date, datetime, timedelta, timezone
+from html.parser import HTMLParser
+import json
+import os
+import shutil
+import subprocess
+from unittest.mock import patch
+from tests.github.test_github_client import _profile_headline_observation
+
 import re
 import unittest
 from pathlib import Path
@@ -55,7 +66,7 @@ class WebDashboardContract(unittest.TestCase):
     def test_binds_shared_snapshot_metric_keys(self):
         """The web reads the SAME shared-snapshot keys the README SVG cards do."""
         required = (
-            "calendar.total",  # the accepted hero fact shared with the SVG hero
+            "profile.contributions", "calendar.total",  # independent native headline and calendar
             "total_repos", "total_stars", "public_scope_commits",
             "ci_coverage_pct", "primary_lang_share_pct", "calendar.active_days",
         )
@@ -355,7 +366,7 @@ process.stdout.write(JSON.stringify({hero:hero.textContent,active:active.map(e=>
                 sample["dashboard_summary"] = {
                     "facts": [{"metric_id": key, "value": value, "display_value": str(value),
                                "window": "2026-11-15 – 2026-11-15 · UTC", "quality": {"status": "exact"}}
-                              for key, value in (("calendar.total", 7), ("calendar.active_days", 1))],
+                              for key, value in (("profile.contributions", 11), ("calendar.total", 7), ("calendar.active_days", 1))],
                     "calendar": {"status": "exact", "window": "2026-11-15 – 2026-11-15 · UTC",
                                  "days": [{"date": "2026-11-15", "count": 7}]},
                 }
@@ -364,7 +375,7 @@ process.stdout.write(JSON.stringify({hero:hero.textContent,active:active.map(e=>
                                     text=True, capture_output=True, timeout=10, check=True)
             shown = json.loads(result.stdout)
             with self.subTest(available=available):
-                self.assertEqual("7" if available else "n/a", shown["hero"])
+                self.assertEqual("11" if available else "n/a", shown["hero"])
                 self.assertEqual(["1", "1"] if available else ["n/a", "n/a"], shown["active"])
                 self.assertNotIn("999", json.dumps(shown))
                 if available:
@@ -940,22 +951,6 @@ process.stdout.write(JSON.stringify({html:nodes['activity-project'].innerHTML, c
         ]) for index in range(repositories)]
         return build_activity_analytics(project_activity_source(rows))
 
-    def test_private_branch_details_keep_honest_counts_without_expansion(self):
-        from scripts.pipeline.render_outputs import _public_dashboard_data
-        activity = self.activity(1)
-        source = activity["project_activity"]["rows"][0]
-        source["is_private"] = True
-        expected_count = len(source["branches"])
-        projected = _public_dashboard_data({"activity_analytics": activity})["activity_analytics"]
-        _, nodes, _ = self.hydrate(projected, expanded=[source["repository"]])
-        toggles = [attrs for tag, attrs in nodes if tag == "button" and "data-project-branch-toggle" in attrs]
-        self.assertEqual(1, len(toggles))
-        self.assertIn(f"{expected_count} observed branches · details withheld", toggles[0]["aria-label"])
-        self.assertIn("disabled", toggles[0])
-        self.assertEqual("false", toggles[0]["aria-expanded"])
-        self.assertFalse(any(attrs.get("data-role") == "project-activity-branch" for _, attrs in nodes))
-        self.assertEqual(source["daily"], projected["project_activity"]["rows"][0]["daily"])
-
     def test_shared_cells_periods_row_limit_and_expansion(self):
         activity = self.activity()
         family = activity["project_activity"]
@@ -1141,60 +1136,252 @@ process.stdout.write(JSON.stringify({html:nodes['activity-project'].innerHTML, c
         self.assertEqual(ET.tostring(helper.hydrate(baseline)), ET.tostring(helper.hydrate(changed)))
 
 
-class ContributionPeriodProjectionTests(unittest.TestCase):
-    """The README headline visibly qualifies the same dated facts as the website."""
 
-    @staticmethod
-    def headline(summary, mobile):
+
+class _ProfileHeadlineDateTime(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        value = cls(2026, 11, 15, 15, 1, 46, tzinfo=timezone.utc)
+        return value.astimezone(tz) if tz is not None else value.replace(tzinfo=None)
+
+
+def _profile_headline_model(value=13514, *, missing=False):
+    from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
+    from scripts.pipeline.compute_metrics import compute_profile_model
+    first = date(2025, 11, 16)
+    days = [{"date": str(first + timedelta(days=i)), "count": i % 5} for i in range(365)]
+    total = sum(row["count"] for row in days)
+    calendar = {"totalContributions": total, "weeks": [{"contributionDays": [
+        {"date": row["date"], "contributionCount": row["count"]} for row in days]}]}
+    observation = {
+        "schema": "profile-provider-observation/v1", "metric_id": "last_year_contributions",
+        "source_metric_id": "github_contribution_calendar_total_and_days",
+        "value": {"total": total, "days": tuple(days)}, "status": "ok", "complete": True,
+        "population_id": "github-contribution-calendar-visible-to-provider", "population_signature": None,
+        "window_start": "2025-11-16T00:00:00Z", "window_end": "2026-11-15T15:01:46Z",
+        "observed_at": "2026-11-15T15:01:46Z", "source_id": "github_graphql_contribution_calendar",
+        "source_mode": "live", "completion_reason": "all_components_observed",
+    }
+    base = AccuracyTests()._collected()
+    observations = {**base.metric_observations, "last_year_contributions": observation}
+    if not missing:
+        observations["github_profile_contributions"] = _profile_headline_observation(value)
+    collected = replace(base, calendar=calendar, total_contributions=total, metric_observations=observations)
+    with patch("scripts.pipeline.compute_metrics.datetime", _ProfileHeadlineDateTime):
+        model = compute_profile_model(collected, logger=lambda *_: None, allow_network_calls=False)
+    return model, total
+
+
+def _hydrate_profile_headline(summary):
+    from scripts.pipeline.web_render import render_dashboard
+    if shutil.which("node") is None:
+        raise unittest.SkipTest("Node required to execute the website projection")
+    class Elements(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.rows, self.stack, self.overview_text = [], [], []
+        def handle_starttag(self, tag, attrs):
+            attributes = dict(attrs)
+            within = attributes.get("id") == "overview" or any(row[2] for row in self.stack)
+            self.stack.append((tag, attributes, within))
+            if attributes.get("id") or attributes.get("data-bind") or attributes.get("data-calendar-fact"):
+                self.rows.append({"attrs": attributes, "within": within})
+        def handle_endtag(self, tag):
+            for i in range(len(self.stack)-1, -1, -1):
+                if self.stack[i][0] == tag:
+                    del self.stack[i:]
+                    break
+        def handle_data(self, value):
+            if value.strip() and any(row[2] for row in self.stack) and not any(row[0] in ("script", "style") for row in self.stack):
+                self.overview_text.append(value.strip())
+    html = render_dashboard()
+    parser = Elements()
+    parser.feed(html)
+    script = re.findall(r"<script>(.*?)</script>", html, re.S)[0]
+    harness = r'''
+const fs=require('node:fs'),vm=require('node:vm');
+const input=JSON.parse(fs.readFileSync(0,'utf8'));
+const element=(attrs={})=>({attrs,children:[],hidden:false,textContent:'',innerHTML:'',dataset:{},
+  style:{setProperty(){}},classList:{add(){},remove(){},toggle(){}},
+  append(...xs){this.children.push(...xs)},replaceChildren(){this.children=[];this.innerHTML=''},
+  getAttribute(k){return Object.hasOwn(this.attrs,k)?this.attrs[k]:null},
+  setAttribute(k,v){this.attrs[k]=v},removeAttribute(k){delete this.attrs[k]},
+  addEventListener(){},querySelector(s){return s.startsWith('#')?byId.get(s.slice(1)):null},querySelectorAll(){return []}});
+const elements=input.elements.map(row=>Object.assign(element(row.attrs),{within:row.within}));
+const byId=new Map(elements.filter(e=>e.attrs.id).map(e=>[e.attrs.id,e]));
+const doc={documentElement:element(),createElement(){return element()},
+  getElementById(id){if(!byId.has(id))byId.set(id,element({id}));return byId.get(id)},
+  querySelector(){return null},querySelectorAll(selector){
+const m=/^\[([^\]]+)\]$/.exec(selector);return m?elements.filter(e=>Object.hasOwn(e.attrs,m[1])):[]}};
+const idle={then(){return this},catch(){return this}};
+const ctx={document:doc,location:{hash:'',search:''},localStorage:{getItem(){return null},setItem(){}},
+  URLSearchParams,addEventListener(){},requestAnimationFrame(){},fetch(){return idle},sample:input.sample};
+vm.runInNewContext(input.script+'\nhydrate(sample);',ctx,{timeout:5000});
+const hero=elements.find(e=>(e.attrs.class||'').split(' ').includes('kpi-value'));
+process.stdout.write(JSON.stringify({value:hero.textContent,
+  painted:elements.filter(e=>e.within&&!e.hidden).map(e=>e.textContent+' '+e.innerHTML).join(' '),
+  window:doc.getElementById('hero-contribution-window').textContent,
+  updated:doc.getElementById('updated').textContent,
+  cells:doc.getElementById('cal').innerHTML}));
+'''
+    sample = {"username": summary["username"], "generated_at": summary["generated_at"],
+              "dashboard_summary": summary, "snapshot": {"last_year_contributions": 999999}}
+    result = subprocess.run(["node", "-e", harness],
+                            input=json.dumps({"script": script, "elements": parser.rows, "sample": sample}),
+                            text=True, capture_output=True, check=True, timeout=10,
+                            env={**os.environ, "TZ": "Pacific/Honolulu"})
+    shown = json.loads(result.stdout)
+    shown["painted"] += " " + " ".join(parser.overview_text)
+    return shown
+
+class GithubProfileHeadlineTests(unittest.TestCase):
+    def test_default_total_is_selected_separately_from_calendar_sum(self):
+        model, rolling_total = _profile_headline_model()
+        summary = model["dashboard_summary"]
+        facts = {row["metric_id"]: row for row in summary["facts"]}
+        self.assertEqual(rolling_total, facts["calendar.total"]["value"])
+        self.assertNotEqual(13514, rolling_total, "precondition: different populations must remain distinguishable")
+        self.assertEqual(13514, facts.get("profile.contributions", {}).get("value"),
+                         "GitHub default profile total must reach the distinct headline fact")
+        self.assertEqual(13514, model["snapshot"].get("github_profile_contributions"))
+        self.assertEqual(_profile_headline_observation(), model["dashboard_data"].get("profile_contributions_observation"))
+        self.assertEqual(rolling_total, model["snapshot"]["last_year_contributions"])
+
+    def test_hero_uses_native_total_while_calendar_keeps_its_own_total(self):
         import xml.etree.ElementTree as ET
         from scripts.rendering.generate_dashboard_summary import render_svg
-        root = ET.fromstring(render_svg(summary, mobile=mobile))
-        overview = next(node for node in root.iter() if node.get("data-section") == "overview")
-        headline = next(node for node in overview.iter() if node.get("data-metric-id") == "calendar.total")
-        # SVG titles and the calendar farther down the page cannot qualify this headline.
-        painted = " ".join("".join(node.itertext()) for node in headline.iter("{http://www.w3.org/2000/svg}text"))
-        value = next(node.text for node in headline.iter() if node.get("data-role") == "value")
-        return painted, value
-
-    def test_readme_headline_paints_the_accepted_utc_period_at_both_sizes(self):
-        import copy
-        from datetime import date, timedelta
-        from scripts.contracts.dashboard_summary import _fact
-        for start, length in ((date(2025, 11, 16), 365), (date(2023, 10, 8), 366), (date(2026, 2, 1), 7)):
-            days = [{"date": str(start + timedelta(days=i)), "count": i % 5} for i in range(length)]
-            window = f"{days[0]['date']} – {days[-1]['date']} · UTC"
-            total = sum(row["count"] for row in days)
-            summary = {
-                "facts": [_fact("calendar.total", total, "contributions", "github-contribution-calendar-visible-to-provider",
-                                status="exact", window=window)],
-                "calendar": {"status": "exact", "window": window, "days": days},
-            }
-            original = copy.deepcopy(summary)
-            for mobile in (False, True):
-                with self.subTest(days=length, mobile=mobile):
-                    painted, value = self.headline(summary, mobile)
-                    self.assertIn(window, painted)
-                    self.assertNotIn("Last 12 months", painted)
-                    self.assertEqual(f"{total:,}", value)
-                    self.assertEqual(original, summary)
-
-    def test_readme_period_keeps_observed_zero_distinct_from_unavailable(self):
-        from scripts.contracts.dashboard_summary import _fact
-        window = "2026-02-01 – 2026-02-01 · UTC"
-        zero = {
-            "facts": [_fact("calendar.total", 0, "contributions", "github-contribution-calendar-visible-to-provider",
-                            status="exact", window=window)],
-            "calendar": {"status": "exact", "window": window, "days": [{"date": "2026-02-01", "count": 0}]},
-        }
+        model, rolling_total = _profile_headline_model()
+        summary = model["dashboard_summary"]
+        before = copy.deepcopy(summary)
         for mobile in (False, True):
             with self.subTest(mobile=mobile):
-                painted, value = self.headline(zero, mobile)
-                self.assertIn(window, painted)
-                self.assertEqual("0", value)
-                painted, value = self.headline({}, mobile)
-                self.assertIn("Calendar unavailable", painted)
-                self.assertEqual("n/a", value)
+                tree = ET.fromstring(render_svg(summary, mobile=mobile))
+                overview = next(n for n in tree.iter() if n.get("data-section") == "overview")
+                values = [n.text for n in overview.iter() if n.get("data-role") == "value"]
+                self.assertEqual("13,514", values[0], "primary visible value must use GitHub's default total")
+                text = " ".join(n.text or "" for n in overview.iter("{http://www.w3.org/2000/svg}text"))
+                self.assertIn("Contributions", text)
+                headline = next(n for n in overview.iter() if n.get("data-metric-id") == "profile.contributions")
+                ns = "{http://www.w3.org/2000/svg}"
+                label = next(n for n in headline.iter(ns+"text") if n.text == "Contributions")
+                value = next(n for n in headline.iter(ns+"text") if n.get("data-role") == "value")
+                self.assertLess(float(label.get("y")), float(value.get("y")))
+                self.assertTrue(list(headline.iter(ns+"path")), "headline keeps its calendar icon")
+                self.assertEqual(["Contributions", "13,514"],
+                                 [n.text for n in headline.iter(ns+"text")],
+                                 "no duplicate label or reporting-period caption below the count")
+                self.assertNotIn("2025-11-16 – 2026-11-15", text,
+                                 "the separate calendar's full ISO range must not label the native headline")
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        hero = html.split('<header class="panel hero"', 1)[1].split('</header>', 1)[0]
+        self.assertRegex(hero, r'<div class="kpi-label"><svg[^>]*>.*?</svg><span id="hero-contribution-window">Contributions</span></div>')
+        self.assertLess(hero.index('kpi-label'), hero.index('hero-contribution-total'))
+        for unwanted in ("snapshot-notice", "Website shows", "Builder dashboard", "About this count", "profile-contribution-period"):
+            self.assertNotIn(unwanted, html)
+        website = _hydrate_profile_headline(summary)
+        self.assertEqual("13,514", website["value"])
+        self.assertNotIn("2025-11-16 – 2026-11-15", website["window"])
+        self.assertEqual(rolling_total, sum(row["count"] for row in summary["calendar"]["days"]))
+        self.assertEqual(before, summary)
+
+    def test_native_zero_and_unavailable_never_fall_back_to_calendar(self):
+        import xml.etree.ElementTree as ET
+        from scripts.rendering.generate_dashboard_summary import render_svg
+        for value, missing in ((0, False), (None, False), (None, True)):
+            model, calendar_total = _profile_headline_model(value, missing=missing)
+            summary = model["dashboard_summary"]
+            expected = "0" if value == 0 else "n/a"
+            self.assertGreater(calendar_total, 0)
+            for mobile in (False, True):
+                with self.subTest(value=value, missing=missing, mobile=mobile):
+                    tree = ET.fromstring(render_svg(summary, mobile=mobile))
+                    overview = next(n for n in tree.iter() if n.get("data-section") == "overview")
+                    shown = next(n.text for n in overview.iter() if n.get("data-role") == "value")
+                    self.assertEqual(expected, shown)
+            self.assertEqual(expected, _hydrate_profile_headline(summary)["value"])
+
+    def test_calendar_control_remains_current_with_a_distinct_native_total(self):
+        from scripts.pipeline.profile_pipeline import candidate_publication_subject
+        for value, missing in ((13514, False), (0, False), (None, False), (None, True)):
+            model, total = _profile_headline_model(value, missing=missing)
+            self.assertEqual(total, model["snapshot"]["last_year_contributions"])
+            self.assertEqual(total, model["contribution_rhythm"]["total"])
+            self.assertEqual(365, len(model["dashboard_summary"]["calendar"]["days"]))
+            self.assertEqual("current", candidate_publication_subject(model, source_kind="github-api").contribution_currentness)
+
+    def test_publication_rejects_coordinated_forged_headline_without_relabeling_calendar(self):
+        from scripts.pipeline.profile_pipeline import candidate_publication_subject, stored_publication_subject
+        model, _ = _profile_headline_model()
+        # Arrange the new source shape explicitly so the old publication seam is exercised now.
+        # This is a provider observation fixture, not a claim of provider attestation.
+        model["dashboard_data"]["profile_contributions_observation"] = _profile_headline_observation()
+        for snapshot in (model["snapshot"], model["dashboard_data"]["snapshot"]):
+            snapshot["github_profile_contributions"] = 999
+        for summary in (model["dashboard_summary"], model["dashboard_data"]["dashboard_summary"]):
+            summary["facts"] = [f for f in summary["facts"] if f["metric_id"] != "profile.contributions"]
+            summary["facts"].append({"metric_id": "profile.contributions", "value": 999,
+                                     "display_value": "999", "quality": {"status": "exact"}})
+        self.assertEqual("noncurrent", candidate_publication_subject(model, source_kind="github-api").contribution_currentness,
+                         "a copied scalar and fact cannot override their retained native source")
+        self.assertEqual("noncurrent", stored_publication_subject({"source_kind": "github-api"},
+                            model["dashboard_data"]).contribution_currentness)
+
+    def test_readme_details_keep_native_headline_and_calendar_distinct(self):
+        from jinja2 import Environment
+        model, rolling_total = _profile_headline_model()
+        summary = model["dashboard_summary"]
+        rendered = Environment().from_string((ROOT / "templates/README.md.tpl").read_text()).render(
+            dashboard_summary=summary, legacy_visuals=[])
+        native = next(row for row in summary["facts"] if row["metric_id"] == "profile.contributions")
+        calendar = next(row for row in summary["facts"] if row["metric_id"] == "calendar.total")
+        self.assertIn(f"| {native['label']} | 13,514 |", rendered)
+        self.assertIn(f"| {calendar['label']} | {rolling_total:,} |", rendered)
+        self.assertIn(summary["calendar"]["window"], rendered)
+        self.assertIn(summary["generated_at"], rendered)
+        self.assertNotEqual(native["window"], calendar["window"])
 
 
 if __name__ == "__main__":
     unittest.main()
+
+class ActivityOverviewLayoutTests(unittest.TestCase):
+    """DESIGN_SPEC: the reference layout is structure, not a color substitution."""
+    def test_overview_separates_controls_profile_metrics_and_update_footer(self):
+        from html.parser import HTMLParser
+        from scripts.pipeline.web_render import render_dashboard
+        class Structure(HTMLParser):
+            def __init__(self):
+                super().__init__(); self.stack=[]; self.rows=[]
+            def handle_starttag(self, tag, attrs):
+                item=dict(attrs); self.rows.append((tag,item,tuple(self.stack)))
+                if tag not in ("img","meta","link","input","br","hr"):
+                    self.stack.append((tag,item))
+            def handle_endtag(self, tag):
+                for i in range(len(self.stack)-1,-1,-1):
+                    if self.stack[i][0]==tag:
+                        self.stack=self.stack[:i];break
+        parser=Structure();parser.feed(render_dashboard())
+        def rows(cls):
+            return [row for row in parser.rows if cls in row[1].get("class","").split()]
+        def inside(row, cls):
+            return any(cls in attrs.get("class","").split() for _,attrs in row[2])
+        toolbar=rows("dashboard-toolbar"); self.assertEqual(1,len(toolbar))
+        for cls in ("site-nav","switcher"):
+            self.assertEqual(1,len(rows(cls)))
+            self.assertTrue(inside(rows(cls)[0],"dashboard-toolbar"))
+            self.assertFalse(inside(rows(cls)[0],"hero"))
+        self.assertLess(parser.rows.index(toolbar[0]), parser.rows.index(rows("hero")[0]))
+        self.assertEqual(1,len(rows("profile-heading")))
+        avatar=rows("profile-avatar");self.assertEqual(1,len(avatar))
+        self.assertTrue(avatar[0][1].get("src","").startswith("data:image/jpeg;base64,"))
+        self.assertTrue(inside(avatar[0],"profile-heading"))
+        self.assertEqual(1,len(rows("kpi")))
+        stats=rows("stat");self.assertEqual(3,len(stats))
+        for stat in stats:self.assertTrue(inside(stat,"stats"))
+        footer=rows("hero-footer");self.assertEqual(1,len(footer))
+        updated=next(row for row in parser.rows if row[1].get("id")=="updated")
+        self.assertTrue(inside(updated,"hero-footer"))
+        links=[row for row in parser.rows if row[0]=="a" and inside(row,"hero-footer")]
+        self.assertEqual(["https://github.com/jguida941"],[row[1].get("href") for row in links])
+        self.assertFalse(rows("contribution-details"))

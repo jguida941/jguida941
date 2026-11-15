@@ -135,6 +135,7 @@ def render_page_shell(
                 "(codex A3 #2: an injected ps-title could spoof the page-shell facts)")
     crumbs = " · ".join(f'<a href="{_html.escape(href)}">{_html.escape(label)}</a>'
                         for label, href in breadcrumbs)
+    crumbs_html = f'<p class="ps-crumbs">{crumbs}</p>' if breadcrumbs else ""
     panels = "".join(
         f'<section class="ps-panel"><h2 class="ps-panel-h">{_html.escape(heading)}</h2>{body}</section>'
         for heading, body in (sections or []))
@@ -144,7 +145,7 @@ def render_page_shell(
         f'{prefix_html}'
         f'<h1 class="ps-title">{_html.escape(title)}</h1>'
         f'<p class="ps-intro">{_html.escape(intro)}</p>'
-        f'<p class="ps-crumbs">{crumbs}</p>'
+        f'{crumbs_html}'
         f'{panels}'
         f'{body_html}'
         f'</div>'

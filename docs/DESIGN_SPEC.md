@@ -80,6 +80,45 @@ contracts in `tests/contracts/` (design/IA/A11y/SVG/projection/cross-projection)
 
 ---
 
+## Activity overview card — operator reference, 2026-11-15
+
+The supplied activity-overview reference governs the website's header structure.
+Retain the existing analytics and theme owners; this is a layout correction, not a
+new theme or a new metric. The README and website headline both read the accepted
+`profile.contributions` fact and label it **Contributions** beside the calendar icon.
+The independently dated calendar and active-day facts keep their own meanings.
+
+| Law | Rendered obligation | Negative example / verification |
+| --- | --- | --- |
+| Controls outside the card | One navigation band and the theme switcher share a toolbar above the overview. The theme control stays to the right when space permits. | Controls nested in the metric card fail the structural test. |
+| Grouped overview | Avatar and username form the profile heading. The focal contribution value sits beside one group of three secondary facts on desktop. | Missing heading/avatar or ungrouped metrics fail the structural test. |
+| Quiet labels | The contribution icon and label are above the value, with no duplicate lower label, ISO date-range caption, snapshot mismatch banner, or explanatory header paragraph. | Existing cross-projection headline guard rejects these substitutions. |
+| Compact footer | One update time and a GitHub profile link share the card footer. Error text appears only when loading fails. | An update time outside the footer or a missing/wrong profile link fails the structural test. |
+| Responsive and themed | The two metric groups stack at narrow widths; navigation and theme controls may wrap. Text uses existing ink/type roles, card material and spacing use the active theme. | Chrome at 1280 and 390 pixels in every active theme must show legible labels, intact icons and no horizontal overflow. This is a browser receipt, not proof of taste. |
+
+The structure follows the operator's reference and the existing Power BI hierarchy,
+Apple fit and projection laws above. Layout measures are **derived** from that reference:
+64px circular avatar (the existing compact SVG size; a 48% clip removes the source image’s white edge), a two-column metric group above 640px,
+and a one-column stack below it. Padding, gaps, radii, surfaces and type use the existing
+profile tokens; no new palette or theme-specific override is introduced.
+`contracts/page_manifest.json` declares the regions. `ActivityOverviewLayoutTests` and
+`GithubProfileHeadlineTests` inspect the emitted structure and labels. MF1 Chrome
+receipts and the all-theme desktop/mobile captures verify actual fit and appearance.
+Moving controls back into the card and removing the grouped footer are the retained
+negative mutations. This bounded change does not implement the queued presentation
+architecture or settings redesign.
+
+**Single site navigation (operator correction, 2026-11-15):** Home, showcase,
+studio and settings each have one primary navigation band above their content.
+The blue row of sibling links below the introduction is redundant and is removed.
+A page title, introduction and active navigation item provide orientation; the
+page manifest therefore binds orientation to the real title, not a duplicate link
+row. The reusable shell still supports real hierarchical breadcrumbs when a
+caller supplies them, and emits no empty breadcrumb container otherwise.
+`SingleSiteNavigationTests` inspects all four rendered pages, rejects an added
+peer-link row, and retains the genuine-breadcrumb control. All four routes keep
+MF1 desktop/mobile browser receipts. This does not redesign settings behavior.
+
 ## Part 0 — Design tokens (single source of truth)
 
 Both projections MUST draw every value from these tokens (operationalizes Power BI "report theme =
@@ -251,6 +290,10 @@ adoption keeps its existing rounding alongside numerator/denominator. Twelve ear
 SVGs remain generated compatibility details, not additional mounted headline panels.
 The shared public dashboard_summary value owns selected facts, qualification, calendar
 and project rows. Unknown inventory is labeled Reported, with its definition in text.
+A fresh, complete personal GitHub census qualifies only matching inventory values.
+Verified inventory uses the normal compact metric presentation without a warning;
+missing or mismatched evidence keeps the reported/unverified state in both SVG sizes.
+A retained private count cannot become verified from unavailable current evidence.
 Working repositories use a full-width count/row container followed by full-width Focus,
 projects and remaining facts. Calendar dates and weekly points retain their associations.
 Rounded outer corners stay transparent; no shadow or filter paints outside the surface.
@@ -259,22 +302,27 @@ are generated separately; SVG images provide native README links and text equiva
 
 ### Contribution observation and publication
 
-Contribution collection requests 365 inclusive UTC dates, from midnight on the first
-date through the current observation time. Profile-local dates still govern the current
-streak cutoff; pull-request and release windows retain their existing timezones. The
-display shows its actual UTC date range rather than implying parity with GitHub's native
-profile graph, whose period must be matched before comparing totals.
-Both README sizes paint that exact range directly below the contribution total;
-a tooltip or a generic annual caption does not qualify the visible headline.
+The headline selects GitHub's default `contributionsCollection` total without a custom
+date or organization filter. Retain its actual `startedAt`, `endedAt` and observation
+time independently from the calendar. Website and README use the same
+`profile.contributions` fact, labeled “GitHub contributions”; reporting details belong
+in the website disclosure and README definitions. A missing native observation shows
+`n/a`, never a substitute calendar sum or a fixed adjustment.
+
+The calendar requests 365 inclusive UTC dates, from midnight on the first date through
+the current observation time, and labels its own visible date range. Its sum can differ
+from GitHub's default profile total. Profile-local dates still govern the current streak
+cutoff; pull-request and release windows retain their existing timezones.
 
 A complete calendar has canonical, unique, contiguous dated counts covering both
 requested boundaries, including zero-count dates, and their sum equals its reported
 total. Missing or inconsistent native evidence holds live publication and preserves the
 previous artifacts. Candidate and stored publication use the same evidence checks.
-The README and website contribution headline, active days, streaks and grid select the
-shared reconciled summary; rejected calendar rows cannot leave a numeric total behind.
+The README and website calendar total, active days, streaks and grid select the shared
+reconciled summary; rejected calendar rows cannot leave a numeric calendar total behind.
 Publication also reconciles the values, displayed text, ranges and recorded streak
 cutoff through that same summary owner instead of trusting agreeing copied scalars.
+The native headline is separately reconciled against its retained provider observation.
 
 The streak cutoff must match the retained generation time in the effective profile
 timezone. One captured date governs both the snapshot and the shared summary.

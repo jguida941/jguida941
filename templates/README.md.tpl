@@ -19,6 +19,8 @@
 
 Reported inventory means its completeness and freshness are unverified. Repository push dates and reported headlines are independent observations, with no inferred branch or delivery status. Snapshot {{ dashboard_summary.generated_at | e }}.
 
+The headline uses GitHub's default profile total and reporting period. The calendar below sums its own listed UTC dates, so its total can differ. Both include contributions visible to the provider, including private contributions. Updates reflect the observation time, rather than changes made afterward.
+
 | Metric | Value | Population / period | Qualification |
 | --- | ---: | --- | --- |
 {% for fact in dashboard_summary.facts %}| {{ fact.label | e }} | {{ fact.display_value | e }} | {{ fact.population_id | replace('-', ' ') | e }}; {{ fact.window | e }} | {{ fact.quality.qualification | e }}{% if fact.range_start is defined and fact.range_start %}; {{ fact.range_start }} – {{ fact.range_end }}{% endif %} |
