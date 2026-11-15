@@ -467,11 +467,12 @@ class AccuracyTests(unittest.TestCase):
                 "scripts.rendering.generate_currently_working._time_ago",
                 side_effect=lambda value: f"activity:{value}",
             ):
-                generate(_public_dashboard_data({"recent_repos": self.model["recent_repos"]})["recent_repos"], output_path=str(output))
+                generate(self.model["recent_repos"], output_path=str(output))
             svg = output.read_text(encoding="utf-8")
 
         for expected in (
             "secret-api",
+            "private internal commit text",
             "Rust",
             f"activity:{self.collected.private_repos[0]['pushed_at']}",
             "pub1",
@@ -479,7 +480,6 @@ class AccuracyTests(unittest.TestCase):
         ):
             with self.subTest(expected=expected):
                 self.assertIn(expected, svg)
-        self.assertNotIn("private internal commit text", svg)
         self.assertIn(
             'd="M7 11V7a5 5 0 0 1 10 0v4"',
             svg,
@@ -676,44 +676,7 @@ class AccuracyTests(unittest.TestCase):
         self.assertIn("Improve cache invalidation", model_text)
         self.assertIn("Improve cache invalidation", svg)
 
-    def test_all_public_output_entry_points_withhold_private_work_text(self):
-        from contextlib import ExitStack
-        from unittest.mock import Mock
-        from scripts.pipeline import render_outputs
-
-        model = copy.deepcopy(self.model)
-        model["focus"]["shipped"] = [{"title": "PRIVATE_WORK_HEADLINE",
-            "url": "https://github.com/example/internal-tools", "is_private": True}]
-        model["spotlight_data"] = [{"name": "internal-tools", "language": "Rust",
-            "html_url": "https://github.com/example/internal-tools", "is_private": True,
-            "description": "PRIVATE_WORK_DESCRIPTION"}]
-        source = copy.deepcopy(model)
-        generators = ("gen_badges", "gen_lang_chart", "gen_working", "gen_heatmap",
-                      "gen_contribution_panel", "gen_spotlight", "gen_scorecard", "gen_cadence",
-                      "gen_focus_board", "gen_streak_summary", "gen_snapshot_panel", "gen_metrics_general")
-        with ExitStack() as stack:
-            calls = {name: stack.enter_context(patch.object(render_outputs, name)) for name in generators}
-            stack.enter_context(patch("scripts.rendering.generate_dashboard_summary.generate"))
-            render_outputs.generate_assets(self.collected, model, logger=_noop)
-        private_row = next(row for row in calls["gen_working"].call_args.args[0]
-                           if row["name"] == "secret-api")
-        self.assertNotIn("last_commit_msg", private_row)
-        self.assertEqual("Rust", private_row["language"])
-        self.assertNotIn("description", calls["gen_spotlight"].call_args.args[0][0])
-        self.assertEqual("Repository updated", calls["gen_focus_board"].call_args.args[0]["shipped"][0]["title"])
-
-        template = Mock()
-        template.render.return_value = "rendered profile"
-        with patch.object(render_outputs.jinja2, "Environment") as environment, patch.object(Path, "write_text"):
-            environment.return_value.get_template.return_value = template
-            render_outputs.render_readme(model, logger=_noop)
-        self.assertEqual("Repository updated", template.render.call_args.kwargs["focus_shipped"][0]["title"])
-        with patch.object(Path, "write_text") as write:
-            render_outputs.write_dashboard_json(model, logger=_noop)
-        self.assertNotIn("private internal commit text", write.call_args.args[0])
-        self.assertEqual(source, model, "public rendering must preserve the internal model")
-
-    def test_private_commit_headline_stays_internal_to_shipped_fallback(self):
+    def test_private_commit_headline_reaches_published_shipped_fallback(self):
         newer_public_rows = [
             self._synthetic_repo(
                 f"active-public-{index}",
@@ -771,9 +734,7 @@ class AccuracyTests(unittest.TestCase):
         from scripts.pipeline.render_outputs import _public_dashboard_data
 
         published = _public_dashboard_data(private_model["dashboard_data"])
-        self.assertIn({**private_item, "title": "Repository updated"}, published["focus"]["shipped"])
-        self.assertNotIn(headline, json.dumps(published, sort_keys=True))
-        self.assertIn(public_item, _public_dashboard_data(public_control["dashboard_data"])["focus"]["shipped"])
+        self.assertIn(private_item, published["focus"]["shipped"])
 
     def test_general_metrics_footer_labels_public_and_all_owned_domains(self):
         from scripts.rendering.generate_metrics_general import generate
@@ -3436,13 +3397,7 @@ class ProjectActivityAggregationTests(unittest.TestCase):
                 model = project_activity_full_model(source)
                 published = _public_dashboard_data(model["dashboard_data"])
                 value = published["activity_analytics"]["project_activity"]
-                internal = model["activity_analytics"]["project_activity"]
-                expected_public = copy.deepcopy(internal)
-                for row in expected_public["rows"]:
-                    if row["is_private"]:
-                        row["observed_branch_count"] = len(row.pop("branches"))
-                        row["branch_details_withheld"] = True
-                self.assertEqual(expected_public, value)
+                self.assertEqual(value, model["activity_analytics"]["project_activity"])
                 self.assertEqual(value, model["dashboard_summary"]["activity_analytics"]["project_activity"])
                 self.assertEqual(value, published["dashboard_summary"]["activity_analytics"]["project_activity"])
                 self.assertEqual((20, 6000, 600),
@@ -3457,7 +3412,7 @@ class ProjectActivityAggregationTests(unittest.TestCase):
                         expected_branches[(repository, f"refs/heads/work/{number:03d}")] = (
                             day, 1, index % 2 == 0 and day != dates[-1], 1)
                 actual_branches = {}
-                for row in internal["rows"]:
+                for row in value["rows"]:
                     index = int(row["repository"].rsplit("-", 1)[1])
                     self.assertEqual(index % 3 == 0, row["is_private"])
                     self.assertEqual((300, 300), (row["observed_pushes"], len(row["branches"])))

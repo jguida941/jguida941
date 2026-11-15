@@ -227,8 +227,11 @@ body {
 .hero h1 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 600; color: var(--ink-strong); margin: 2px 0 4px; letter-spacing: -0.01em; }
 .hero .tag { font-size: var(--type-body); color: var(--ink); margin: 0; }
 .hero .kpi { display: flex; align-items: flex-end; gap: 28px; margin-top: 24px; flex-wrap: wrap; }
-.hero .kpi-value { font-size: clamp(46px, 8vw, 72px); font-weight: 600; color: var(--ink-strong); line-height: .96; letter-spacing: -0.02em; }
+.hero .kpi-value { font-size: clamp(40px, 6vw, 54px); font-weight: 600; color: var(--ink-strong); line-height: 1.05; letter-spacing: -0.02em; }
 .hero .kpi-label { font-size: var(--type-body); color: var(--ink); margin-top: 8px; }
+.hero .contribution-details { color: var(--ink-dim); font-size: 13px; margin-top: 16px; max-width: 64ch; }
+.hero .contribution-details summary { cursor: pointer; }
+.hero .contribution-details p { margin: 8px 0; line-height: 1.5; }
 .hero .stats { display: flex; gap: 26px; padding-bottom: 6px; }
 .stat .v { font-size: var(--type-metric_lg); font-weight: 600; color: var(--ink-strong); }
 .stat .l { font-size: var(--type-caption); color: var(--ink-dim); }
@@ -577,8 +580,8 @@ footer a { color: var(--ink); text-decoration: none; }
     </div>
     <div class="kpi">
       <div>
-        <div class="kpi-value num" data-calendar-fact="calendar.total">n/a</div>
-        <div class="kpi-label" id="hero-contribution-window">contributions · observed UTC dates</div>
+        <div class="kpi-value num" id="hero-contribution-total">n/a</div>
+        <div class="kpi-label" id="hero-contribution-window">GitHub contributions</div>
       </div>
       <div class="stats">
         <div class="stat"><div class="v num" data-calendar-fact="calendar.active_days">n/a</div><div class="l">active days</div></div>
@@ -587,6 +590,11 @@ footer a { color: var(--ink); text-decoration: none; }
       </div>
     </div>
     <div class="live"><span class="dot"></span><span>Live · updated <span id="updated">—</span></span></div>
+    <details class="contribution-details">
+      <summary>About this count</summary>
+      <p>GitHub's profile total uses its default reporting period. The calendar below sums the listed UTC dates and can have a different total. Both include contributions visible to the provider, including private contributions.</p>
+      <p id="profile-contribution-period">GitHub reporting period unavailable.</p>
+    </details>
   </header>
   <section class="panel" id="automation" tabindex="-1">
     <div class="section-head"><div><p class="eyebrow">GitHub Signals · 12 Months</p><h2 class="title">Builder Scorecard</h2></div></div>
@@ -1338,8 +1346,15 @@ footer a { color: var(--ink); text-decoration: none; }
       el.textContent = calendarAvailable && Number.isSafeInteger(fact?.value) && fact.value >= 0
         ? fact.value.toLocaleString("en-US") : "n/a";
     });
-    document.getElementById("hero-contribution-window").textContent = calendarAvailable
-      ? "contributions · " + cal.window : "Contribution calendar unavailable";
+    const profileFact = calendarFacts.find(row => row.metric_id === "profile.contributions");
+    const profileAvailable = profileFact?.quality?.status === "exact" &&
+      Number.isSafeInteger(profileFact?.value) && profileFact.value >= 0;
+    document.getElementById("hero-contribution-total").textContent = profileAvailable
+      ? profileFact.value.toLocaleString("en-US") : "n/a";
+    document.getElementById("hero-contribution-window").textContent = "GitHub contributions";
+    document.getElementById("profile-contribution-period").textContent = profileAvailable
+      ? "GitHub reporting period: " + profileFact.window + ". Observed " + profileFact.observed_at + "."
+      : "GitHub profile total unavailable for this observation.";
     document.querySelectorAll("[data-calendar-window]").forEach(el => {
       el.textContent = calendarAvailable ? cal.window : "Calendar unavailable";
     });

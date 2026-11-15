@@ -146,6 +146,7 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
 
     logger("[7/7] Fetching contribution calendar...")
     contribution_observation = gh.get_contribution_calendar_observation()
+    profile_contributions_observation = gh.get_profile_contributions_observation()
     contribution_value = contribution_observation.get("value")
     calendar = _calendar_from_observation_value(contribution_value)
     total_contributions = (
@@ -213,6 +214,7 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
         metric_observations={
             "public_scope_commits": commits_observation,
             "last_year_contributions": contribution_observation,
+            "github_profile_contributions": profile_contributions_observation,
             "releases_30d": releases_observation,
             "prs_merged": prs_observation,
             "recent_public_events": events_observation,
