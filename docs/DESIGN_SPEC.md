@@ -264,6 +264,8 @@ date through the current observation time. Profile-local dates still govern the 
 streak cutoff; pull-request and release windows retain their existing timezones. The
 display shows its actual UTC date range rather than implying parity with GitHub's native
 profile graph, whose period must be matched before comparing totals.
+Both README sizes paint that exact range directly below the contribution total;
+a tooltip or a generic annual caption does not qualify the visible headline.
 
 A complete calendar has canonical, unique, contiguous dated counts covering both
 requested boundaries, including zero-count dates, and their sum equals its reported
