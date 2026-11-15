@@ -370,6 +370,13 @@ def validate_provider_observation(observation: dict) -> bool:
         if reason not in {"unavailable", "component_unavailable"}:
             return False
         unavailable_specs = {
+            "github_profile_contributions": (
+                "github_default_profile_contribution_total",
+                "github-user-contributions-visible-to-provider",
+                "github_graphql_default_contributions_collection",
+                False,
+                False,
+            ),
             "public_scope_commits": (
                 "owned_public_nonfork_authored_commits",
                 "owned-public-nonfork-repositories",
@@ -429,6 +436,24 @@ def validate_provider_observation(observation: dict) -> bool:
     population_id = observation.get("population_id")
     source_id = observation.get("source_id")
     value = observation.get("value")
+
+    if metric_id == "github_profile_contributions":
+        try:
+            timestamps = [datetime.fromisoformat(observation[key].replace("Z", "+00:00"))
+                          for key in ("window_start", "observed_at", "window_end")]
+            valid_period = (all(stamp.tzinfo is not None and stamp.utcoffset() is not None
+                                for stamp in timestamps)
+                            and timestamps[0] <= timestamps[1] <= timestamps[2])
+        except (AttributeError, TypeError, ValueError):
+            valid_period = False
+        return (
+            status == "ok" and complete is True and source_mode == "live"
+            and reason == "all_components_observed" and _is_nonnegative_int(value)
+            and source_metric_id == "github_default_profile_contribution_total"
+            and population_id == "github-user-contributions-visible-to-provider"
+            and source_id == "github_graphql_default_contributions_collection"
+            and signature is None and valid_period
+        )
 
     if metric_id == "public_scope_commits":
         exact = source_metric_id == "owned_public_nonfork_authored_commits"
@@ -2787,6 +2812,46 @@ def _calendar_from_contribution_value(value: object) -> dict | None:
             for key in sorted(grouped)
         ],
     }
+
+
+def get_profile_contributions_observation() -> dict:
+    """Observe GitHub's default profile total and its provider-defined period.
+
+    The default collection can report a different total/period from an explicitly
+    bounded 365-day calendar. Do not reconstruct it by summing those calendar cells.
+    """
+    query = """
+    query($login: String!) {
+      user(login: $login) {
+        contributionsCollection {
+          startedAt
+          endedAt
+          contributionCalendar { totalContributions }
+        }
+      }
+    }
+    """
+    data = _graphql_query(query, {"login": USERNAME})
+    observation = dict(
+        schema="profile-provider-observation/v1",
+        metric_id="github_profile_contributions",
+        source_metric_id="github_default_profile_contribution_total",
+        value=None, status="unavailable", complete=False,
+        population_id="github-user-contributions-visible-to-provider",
+        population_signature=None, window_start=None, window_end=None,
+        observed_at=None, source_id="github_graphql_default_contributions_collection",
+        source_mode="live", completion_reason="unavailable",
+    )
+    try:
+        collection = data["user"]["contributionsCollection"]
+        candidate = {**observation, "value": collection["contributionCalendar"]["totalContributions"],
+                     "status": "ok", "complete": True,
+                     "window_start": collection["startedAt"], "window_end": collection["endedAt"],
+                     "observed_at": _iso_utc(datetime.now(timezone.utc)),
+                     "completion_reason": "all_components_observed"}
+    except (KeyError, TypeError):
+        return observation
+    return candidate if validate_provider_observation(candidate) else observation
 
 
 def get_contribution_calendar_observation(days: int = 365) -> dict:

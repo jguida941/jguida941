@@ -598,7 +598,7 @@ def render_svg(summary, *, mobile=False, generation=None):
     c.text(username, pad, 69, size=26, weight=600)
     try:
         observed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-        snapshot_date = observed.strftime("%b %-d, %Y")
+        snapshot_date = observed.strftime("%b %-d, %Y · %H:%M UTC")
     except ValueError:
         snapshot_date = "date unavailable"
     c.text("Snapshot " + snapshot_date, pad, 96, size=14 if mobile else 16, color="muted")
@@ -611,10 +611,10 @@ def render_svg(summary, *, mobile=False, generation=None):
         avatar_x, avatar_y = width-pad-avatar_size, 49 if mobile else 30
         c.parts.append('<defs><clipPath id="profile-avatar-clip"><circle '+_attrs(dict(cx=avatar_x+avatar_size/2,cy=avatar_y+avatar_size/2,r=avatar_size/2))+'/></clipPath></defs>')
         c.parts.append('<image '+_attrs(dict(x=avatar_x,y=avatar_y,width=avatar_size,height=avatar_size,href="data:image/jpeg;base64,"+encoded,clip_path="url(#profile-avatar-clip)",preserveAspectRatio="xMidYMid slice"))+'><title>'+escape(username+" profile artwork")+'</title></image>')
-    total = fact("calendar.total")
-    y = c.fact(total,pad,146,content,size=56,fill="panel",framed=False,
+    total = fact("profile.contributions")
+    y = c.fact(total,pad,146,content,size=46,fill="panel",framed=False,
                qualify=total["quality"].get("status") not in ("exact","ok"),
-               caption=calendar.get("window","Calendar unavailable"))+12
+               caption="GitHub reporting period" if total.get("value") is not None else "")+12
     c.parts.append('<title>'+escape("Snapshot "+timestamp+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
     inventory = ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers")
     y = c.fact_grid([fact(key) for key in inventory],pad,y,content,
