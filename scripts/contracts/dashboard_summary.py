@@ -60,16 +60,20 @@ def profile_contribution_fact(observation, value):
     return fact
 
 
-def _inventory_fact(identity, key, value, label, population, observation):
+def _inventory_fact(identity, key, value, label, population, observation, *, collection_started_at, generated_at):
     """A displayed count is exact only when its fresh census value agrees."""
     try:
         row = observation["metrics"][key]
         stamp = datetime.fromisoformat(observation["observed_at"].replace("Z", "+00:00"))
+        start = datetime.fromisoformat(collection_started_at.replace("Z", "+00:00"))
+        end = datetime.fromisoformat(generated_at.replace("Z", "+00:00"))
         verified = (observation.get("schema") == "profile-inventory-observation/v1"
                     and observation.get("source_id") == "github_personal_owned_repository_census"
                     and observation.get("population_id") == "personal-owned-repositories"
                     and observation.get("source_mode") == "live"
-                    and stamp.tzinfo is not None and stamp.utcoffset() is not None
+                    and all(value.tzinfo is not None and value.utcoffset() is not None for value in (start, stamp, end))
+                    and observation.get("snapshot_generated_at") == generated_at
+                    and start <= stamp <= end
                     and row.get("complete") is True and _count(row.get("value")) is not None
                     and type(value) is int and row["value"] == value)
     except (AttributeError, KeyError, TypeError, ValueError):
@@ -136,7 +140,8 @@ def build_dashboard_summary(model, *, profile_date):
         ("inventory.stargazers", "total_stars", snapshot.get("total_stars"), "stargazers", "public-owned-nonfork"),
         ("inventory.public_forks", "public_forks", snapshot.get("public_forks"), "public forks", "public-owned-forks"),
     ):
-        facts.append(_inventory_fact(identity, key, value, label, population, data.get("inventory_observation") or {}))
+        facts.append(_inventory_fact(identity, key, value, label, population, data.get("inventory_observation") or {},
+                                     collection_started_at=data.get("collection_started_at"), generated_at=data.get("generated_at")))
     for identity, key, label in (
         ("activity.public_commits", "public_scope_commits", "Public commits"),
         ("activity.merged_prs", "prs_merged", "Merged PRs"),

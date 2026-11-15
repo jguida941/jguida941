@@ -41,10 +41,12 @@ class CollectedProfileData:
     metric_observations: dict[str, dict[str, Any]] = field(default_factory=dict)
     activity_observations: dict[str, Any] = field(default_factory=dict)
     inventory_evidence: dict[str, Any] = field(default_factory=dict)
+    collection_started_at: str | None = None
     ci_execution_observation: dict[str, Any] = field(default_factory=dict)
 
 
 def collect_profile_data(logger=print) -> CollectedProfileData:
+    collection_started_at = datetime.now(timezone.utc).isoformat()
     logger("\n[1/7] Fetching repo scope counts...")
     repo_counts = gh.get_owned_repo_scope_counts()
     # Older cache entries predate the non-fork private scope. Its absence is
@@ -199,6 +201,7 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
 
     return CollectedProfileData(
         inventory_evidence=inventory_evidence,
+        collection_started_at=collection_started_at,
         activity_observations=activity_observations,
         ci_execution_observation=ci_execution_observation,
         repo_counts=repo_counts,

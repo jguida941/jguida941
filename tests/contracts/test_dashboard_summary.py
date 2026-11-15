@@ -812,3 +812,69 @@ class InventoryVerificationTests(unittest.TestCase):
             summary = build_dashboard_summary(model, profile_date=date.today())
             self.assertTrue(all(row["quality"]["status"] != "exact" for row in summary["facts"]
                                 if row["metric_id"].startswith("inventory.")))
+
+
+class InventoryCurrentnessTests(unittest.TestCase):
+    def _facts(self, model):
+        from scripts.contracts.dashboard_summary import build_dashboard_summary
+        summary = build_dashboard_summary(model, profile_date=datetime.now(timezone.utc).date())
+        return {row["metric_id"]: row for row in summary["facts"] if row["metric_id"].startswith("inventory.")}
+
+    def test_inventory_time_outside_current_collection_stays_unverified(self):
+        for stamp in ("2000-01-01T00:00:00Z", "2100-01-01T00:00:00Z"):
+            with self.subTest(stamp=stamp):
+                model = inventory_fixture_model()
+                model["dashboard_data"]["inventory_observation"]["observed_at"] = stamp
+                self.assertEqual(["unknown"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+
+    def test_compute_does_not_refresh_from_old_or_future_evidence(self):
+        from scripts.pipeline import compute_metrics
+        real_compute = compute_metrics.compute_profile_model
+        for stamp in ("2000-01-01T00:00:00Z", "2100-01-01T00:00:00Z"):
+            with self.subTest(stamp=stamp):
+                def substituted(collected, *args, **kwargs):
+                    collected.inventory_evidence["observed_at"] = stamp
+                    return real_compute(collected, *args, **kwargs)
+                with patch.object(compute_metrics, "compute_profile_model", side_effect=substituted):
+                    model = inventory_fixture_model("fresh-change")
+                self.assertEqual(["unknown"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+                self.assertTrue(all(row["complete"] is False for row in model["dashboard_data"]["inventory_observation"]["metrics"].values()))
+
+    def test_complete_previous_run_census_cannot_certify_new_snapshot(self):
+        model = inventory_fixture_model()
+        data = model["dashboard_data"]
+        previous = copy.deepcopy(data["inventory_observation"])
+        previous.update(observed_at="2000-01-01T00:00:01Z", snapshot_generated_at="2000-01-01T00:00:02Z")
+        data["inventory_observation"] = previous
+        data["collection_started_at"] = "2000-01-01T00:00:00Z"
+        self.assertEqual(["unknown"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+
+    def test_missing_or_naive_run_bounds_cannot_certify_inventory(self):
+        for key in ("collection_started_at", "generated_at"):
+            for value in (None, "2026-11-15T00:00:00"):
+                with self.subTest(key=key, value=value):
+                    model = inventory_fixture_model()
+                    model["dashboard_data"][key] = value
+                    self.assertEqual(["unknown"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+
+    def test_same_observation_in_another_zone_remains_exact(self):
+        from datetime import timedelta
+        model = inventory_fixture_model()
+        observation = model["dashboard_data"]["inventory_observation"]
+        instant = datetime.fromisoformat(observation["observed_at"].replace("Z", "+00:00"))
+        observation["observed_at"] = instant.astimezone(timezone(timedelta(hours=5))).isoformat()
+        self.assertEqual(["exact"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+
+    def test_collection_crossing_midnight_remains_exact(self):
+        from scripts.pipeline import collect_data, compute_metrics
+        class CollectClock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return datetime(2026, 11, 14, 23, 59, 59, tzinfo=timezone.utc).astimezone(tz)
+        class GenerateClock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return datetime(2026, 11, 15, 0, 0, 1, tzinfo=timezone.utc).astimezone(tz)
+        with patch.object(collect_data, "datetime", CollectClock), patch.object(compute_metrics, "datetime", GenerateClock):
+            model = inventory_fixture_model()
+        self.assertEqual(["exact"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
