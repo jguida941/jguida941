@@ -105,6 +105,7 @@ jobs:
             tests.contracts.test_dashboard_summary \
             tests.contracts.test_dashboard_destinations \
             tests.contracts.test_readme_projection \
+            tests.contracts.test_design_nav \
             tests.contracts.test_label_legibility
 
       # One typed product decision governs every canonical publish effect below.

@@ -72,5 +72,45 @@ class NavContract(unittest.TestCase):
                     self.assertIn(href, band, f"{page}: must link {href}")
 
 
+class SingleSiteNavigationTests(unittest.TestCase):
+    def assert_single_navigation(self, html, page):
+        from html.parser import HTMLParser
+        class Links(HTMLParser):
+            def __init__(self):
+                super().__init__();self.stack=[];self.links=[];self.bands=0
+            def handle_starttag(self, tag, attrs):
+                attrs=dict(attrs)
+                band=tag=="nav" and "site-nav" in attrs.get("class","").split()
+                if band:self.bands+=1
+                if tag=="a" and attrs.get("href") in dict(_LINKS).values():
+                    self.links.append((attrs,any(x[1] for x in self.stack)))
+                if tag not in ("img","meta","link","input","br","hr"):
+                    self.stack.append((tag,band))
+            def handle_endtag(self, tag):
+                for i in range(len(self.stack)-1,-1,-1):
+                    if self.stack[i][0]==tag:self.stack=self.stack[:i];break
+        seen=Links();seen.feed(html)
+        self.assertEqual(1,seen.bands,page+": one primary navigation band")
+        self.assertEqual(4,len(seen.links),page+": remove duplicate peer-navigation links")
+        self.assertTrue(all(inside for _,inside in seen.links),page+": all peer links belong to the top band")
+        self.assertEqual([page+".html"],[attrs["href"] for attrs,_ in seen.links if attrs.get("aria-current")=="page"])
+
+    def test_all_four_rendered_pages_have_one_navigation_owner(self):
+        from scripts.pipeline.web_render import render_dashboard
+        from scripts.rendering.showcase.showcase import render_showcase
+        from scripts.contracts.page_manifest import committed_receipts
+        from scripts.rendering.studio.studio import render_studio
+        from scripts.rendering.settings.settings import render_settings
+        for page,render in (("index",render_dashboard),("showcase",lambda: render_showcase(committed_receipts(ROOT))),("studio",render_studio),("settings",render_settings)):
+            with self.subTest(page=page):self.assert_single_navigation(render(),page)
+
+    def test_duplicate_peer_row_is_rejected_and_real_breadcrumbs_remain_supported(self):
+        from scripts.pipeline.web_render import render_dashboard
+        from scripts.rendering.pageshell.pageshell import render_page_shell
+        with self.assertRaises(AssertionError):
+            self.assert_single_navigation(render_dashboard()+'<p><a href="settings.html">settings</a></p>',"index")
+        html,_=render_page_shell("apple-dark",title="Nested detail",intro="",breadcrumbs=[("Parent","parent.html")])
+        self.assertIn('<a href="parent.html">Parent</a>',html)
+
 if __name__ == "__main__":
     unittest.main()

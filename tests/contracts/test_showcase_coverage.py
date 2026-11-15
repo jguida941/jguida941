@@ -146,11 +146,12 @@ class ShowcaseChromeContract(unittest.TestCase):
         for tok in ("var(--status-success)", "var(--status-danger)", "var(--status-warning)"):
             self.assertIn(tok, html, f"the verdict palette must derive from {tok}")
 
-    def test_showcase_breadcrumb_orients_across_the_surfaces(self):
-        """Explainability/IA: the shell breadcrumb links the sibling surfaces so a viewer can navigate."""
+    def test_showcase_primary_navigation_orients_across_the_surfaces(self):
+        """One primary navigation band links sibling pages without a duplicate lower row."""
         from scripts.rendering.showcase.showcase import render_showcase
         html = render_showcase(_committed_receipts())
-        self.assertRegex(html, r'class="ps-crumbs"')
+        self.assertRegex(html, r'<nav class="site-nav(?: [^"]+)?"')
+        self.assertNotIn('class="ps-crumbs"', html)
         for href in ("index.html", "studio.html", "settings.html"):
             self.assertIn(href, html, f"the showcase must link {href}")
 

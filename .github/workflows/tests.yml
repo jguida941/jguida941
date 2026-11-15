@@ -65,6 +65,7 @@ jobs:
             tests.contracts.test_readme_projection \
             tests.contracts.test_visual_receipt_provenance \
             tests.contracts.test_skill_structure \
+            tests.contracts.test_design_nav \
             tests.contracts.test_label_legibility
 
       # Candidate evidence only. This uses the existing Linux test runner's
