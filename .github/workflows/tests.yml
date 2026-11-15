@@ -1,147 +1,54 @@
 name: Test Profile Pipeline
-run-name: Verify public metadata projection
 
 on:
   push:
-    branches: ["fix/contribution-calendar-dashboard-20261115"]
-    paths: [".github/workflows/tests.yml"]
+    branches: ["main"]
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "site/**"
+      - "contracts/**"
+      - "assets/receipts/**"
+      - "docs/design/**"
+      - ".github/workflows/tests.yml"
+      - ".github/workflows/analytics.yml"
+      - ".github/workflows/metrics.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "site/**"
+      - "contracts/**"
+      - "assets/receipts/**"
+      - "docs/design/**"
+      - ".github/workflows/tests.yml"
+      - ".github/workflows/analytics.yml"
+      - ".github/workflows/metrics.yml"
   workflow_dispatch:
 
+concurrency:
+  group: profile-pipeline-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
-    name: Generate accepted public artifacts — ${{ matrix.scope }}
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      actions: read
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - scope: main
-            source_sha: f77f7b1fcb25675775f618b6bb93bd3b7dca9bf5
-          - scope: development
-            source_sha: fb61b61eebf0032c09f80273158ea6733eb88e46
-    env:
-      PYTHONDONTWRITEBYTECODE: "1"
-      CAPTURE_EXPECTED_SHA: ${{ matrix.source_sha }}
+
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ matrix.source_sha }}
-          fetch-depth: 1
-          persist-credentials: false
-
-      - name: Bind source and page bytes
-        run: |
-          python -B - <<'PY'
-          import hashlib, json, os, subprocess
-          from pathlib import Path
-          from scripts.quality.headless_receipts import PAGE_ROUTES
-          head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-          if head != os.environ["CAPTURE_EXPECTED_SHA"]:
-              raise SystemExit("unexpected source checkout")
-          if subprocess.check_output(["git", "status", "--porcelain"], text=True).strip():
-              raise SystemExit("source checkout must be clean")
-          hashes = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in PAGE_ROUTES.values()}
-          (Path(os.environ["RUNNER_TEMP"]) / "page-digests.json").write_text(json.dumps(hashes))
-          PY
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12.15"
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
       - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Resolve GitHub token
-        env:
-          CANDIDATE_PAT: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          DEFAULT_TOKEN: ${{ github.token }}
         run: |
-          use_default() {
-            {
-              echo "PERSONAL_GITHUB_TOKEN="
-              echo "GITHUB_TOKEN=${DEFAULT_TOKEN}"
-              echo "GH_TOKEN=${DEFAULT_TOKEN}"
-              echo "PROFILE_TOKEN_MODE=github_token"
-            } >> "$GITHUB_ENV"
-          }
-          if [ -z "${CANDIDATE_PAT}" ]; then use_default; exit 0; fi
-          code=$(curl -sS -o /dev/null -w '%{http_code}' \
-            -H "Authorization: Bearer ${CANDIDATE_PAT}" https://api.github.com/user || echo 000)
-          if [ "${code}" = "200" ]; then
-            echo "::notice::PERSONAL_GITHUB_TOKEN healthy."
-            {
-              echo "PERSONAL_GITHUB_TOKEN=${CANDIDATE_PAT}"
-              echo "GITHUB_TOKEN=${DEFAULT_TOKEN}"
-              echo "GH_TOKEN=${CANDIDATE_PAT}"
-              echo "PROFILE_TOKEN_MODE=personal_github_token"
-            } >> "$GITHUB_ENV"
-          else
-            echo "::warning::PERSONAL_GITHUB_TOKEN returned HTTP ${code}; using github.token."
-            use_default
-          fi
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Generate and validate profile artifacts
-        env:
-          GITHUB_USERNAME: jguida941
-          PROFILE_TIMEZONE: America/New_York
-        run: |
-          echo "Token mode: ${PROFILE_TOKEN_MODE}"
-          python scripts/profile_cli.py doctor --fail-on critical
-          python scripts/profile_cli.py generate-profile
-          python scripts/profile_cli.py triage --workflow "Generate Metrics" --limit 20 --fail-on critical
-
-      - name: Validate generated profile artifacts
-        env:
-          GITHUB_USERNAME: jguida941
-          PROFILE_TIMEZONE: America/New_York
-        run: python scripts/profile_cli.py validate
-
-      - name: Capture the generated index with real Chrome
-        run: |
-          python -B - <<'PY'
-          import json, shutil
-          from pathlib import Path
-          from PIL import Image
-          from scripts.quality import headless_receipts as producer
-          chrome = shutil.which("google-chrome") or shutil.which("google-chrome-stable")
-          if not chrome:
-              raise SystemExit("real Chrome is unavailable")
-          producer.CHROME = Path(chrome)
-          for artifact in (producer.screenshot_artifact("index", 1280), producer.dom_probe_artifact("index", 390)):
-              artifact.unlink(missing_ok=True)
-              producer.provenance_path(artifact).unlink(missing_ok=True)
-          screenshot = producer.screenshot_page("index", 1280)
-          probe = producer.dom_probe("index", 390)
-          with Image.open(screenshot) as image:
-              if image.format != "PNG" or image.size != (1280, 1536):
-                  raise SystemExit("unexpected screenshot")
-          observed = json.loads(probe.read_text())
-          hydration = observed.get("index_hydration", {})
-          if hydration.get("calendar_cell_count") != 365 or hydration.get("fonts_status") != "loaded" or hydration.get("calendar_status") != "":
-              raise SystemExit("generated calendar did not hydrate completely")
-          if observed.get("client_width") != 390 or observed.get("horizontal_overflow") is not False or observed.get("uncontained_offender_count") != 0:
-              raise SystemExit("generated page is not contained at true 390 pixels")
-          print(json.dumps({"source_page": "site/index.html", "hydration": hydration, "client_width": 390, "uncontained_offenders": 0}))
-          PY
-      # Bounded to the product surfaces published by this checkpoint.
-      - name: Run profile product tests
-        env:
-          PERSONAL_GITHUB_TOKEN: ""
-          GITHUB_TOKEN: ""
-          GH_TOKEN: ""
-          PROFILE_TOKEN_MODE: none
-          CACHE_DIR: ${{ runner.temp }}/profile-product-tests
-          BYPASS_GITHUB_CACHE: "true"
+      - name: Run tests
         run: |
           python -m unittest \
             tests.github.test_github_client \
@@ -154,82 +61,13 @@ jobs:
             tests.contracts.test_design_contract \
             tests.contracts.test_web_dashboard \
             tests.contracts.test_page_manifest \
-            tests.contracts.test_dashboard_summary \
-            tests.contracts.test_dashboard_destinations \
-            tests.contracts.test_readme_projection \
+            tests.contracts.test_skill_structure \
             tests.contracts.test_label_legibility
 
-      # The same typed product decision this repository uses everywhere else.
-      - name: Decide whether to publish
-        id: gate
+      - name: Fixture smoke CLI run (offline path)
         env:
-          GITHUB_USERNAME: jguida941
-          PROFILE_TIMEZONE: America/New_York
-        run: python scripts/profile_cli.py publication-status --github-output "$GITHUB_OUTPUT"
-
-      - name: Verify public output and unchanged page sources
+          GITHUB_TOKEN: ""
+          GH_TOKEN: ""
+          PERSONAL_GITHUB_TOKEN: ""
         run: |
-          python -B - <<'PY'
-          import hashlib, json, os, subprocess
-          from pathlib import Path
-          from scripts.pipeline.render_outputs import _public_dashboard_data
-          expected = json.loads((Path(os.environ["RUNNER_TEMP"]) / "page-digests.json").read_text())
-          for path, digest in expected.items():
-              if path != "site/index.html" and hashlib.sha256(Path(path).read_bytes()).hexdigest() != digest:
-                  raise SystemExit("page source changed; existing browser receipts no longer qualify")
-          if subprocess.check_output(["git", "diff", "--name-only", "--", "scripts", "tests"], text=True).strip():
-              raise SystemExit("generation changed source files")
-          snapshot = json.loads(Path("site/data/profile_snapshot.json").read_text())
-          if snapshot != _public_dashboard_data(snapshot):
-              raise SystemExit("stored snapshot is not its public projection")
-          calendar = snapshot["contribution_calendar"]
-          days = [day for week in calendar["weeks"] for day in week]
-          if len(days) != 365 or sum(day["count"] for day in days) != calendar["total"]:
-              raise SystemExit("contribution calendar does not reconcile")
-          print(json.dumps({"source_commit": os.environ["CAPTURE_EXPECTED_SHA"], "generated_at": snapshot["generated_at"], "contributions": calendar["total"], "dates": len(days), "other_page_sources_unchanged": True}))
-          PY
-          python -B -m unittest tests.contracts.test_visual_receipt_provenance.ReceiptProvenanceContract.test_committed_headless_page_receipts_are_real_and_provenanced
-
-      # Diagnostics carry no canonical README/SVG/JSON bytes, so a held run may
-      # still publish them for inspection.
-      - name: Upload diagnostics artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: profile-diagnostics-${{ matrix.scope }}
-          if-no-files-found: warn
-          path: |
-            site/data/triage_report.json
-            site/data/doctor_report.json
-            site/data/run_diagnostics.json
-            site/data/run_diagnostics_history.jsonl
-
-      - name: Upload canonical profile artifacts
-        if: ${{ success() && steps.gate.outputs.publish == 'true' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: profile-rendered-${{ matrix.scope }}-${{ matrix.source_sha }}
-          path: |
-            README.md
-            assets/activity_heatmap.svg
-            assets/dashboard_summary.svg
-            assets/dashboard_summary_mobile.svg
-            assets/badges.svg
-            assets/builder_scorecard.svg
-            assets/contribution_calendar.svg
-            assets/currently_working.svg
-            assets/engineering_cadence.svg
-            assets/lang_breakdown.svg
-            assets/now_next_shipped.svg
-            assets/raw_snapshot.svg
-            assets/repo_spotlight.svg
-            assets/streak_summary.svg
-            metrics.general.svg
-            site/data/profile_snapshot.json
-            site/data/profile_artifact_manifest.json
-            site/index.html
-            assets/receipts/pages/index/screenshot-1280.png
-            assets/receipts/pages/index/screenshot-1280.png.provenance.json
-            assets/receipts/pages/index/dom-probe-390.json
-            assets/receipts/pages/index/dom-probe-390.json.provenance.json
-
+          python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json
