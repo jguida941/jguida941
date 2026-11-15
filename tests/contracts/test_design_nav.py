@@ -98,10 +98,13 @@ class SingleSiteNavigationTests(unittest.TestCase):
     def test_all_four_rendered_pages_have_one_navigation_owner(self):
         from scripts.pipeline.web_render import render_dashboard
         from scripts.rendering.showcase.showcase import render_showcase
-        from scripts.contracts.page_manifest import committed_receipts
+        from scripts.quality.design_invariants import conform
         from scripts.rendering.studio.studio import render_studio
         from scripts.rendering.settings.settings import render_settings
-        for page,render in (("index",render_dashboard),("showcase",lambda: render_showcase(committed_receipts(ROOT))),("studio",render_studio),("settings",render_settings)):
+        # Source-only composition has no generated receipt files. Exercise the
+        # same renderer with current conformance results from their existing owner.
+        receipts = {name: {"profile": name, "results": conform(name)} for name in _active()}
+        for page,render in (("index",render_dashboard),("showcase",lambda: render_showcase(receipts)),("studio",render_studio),("settings",render_settings)):
             with self.subTest(page=page):self.assert_single_navigation(render(),page)
 
     def test_duplicate_peer_row_is_rejected_and_real_breadcrumbs_remain_supported(self):
