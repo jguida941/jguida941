@@ -121,7 +121,7 @@ def generate(
     ).casefold()
     display = automation_display(automation)
     workflow_display = display["combined"]
-    quality_lines = ["Workflow: owned public + private nonfork; profile excluded",
+    quality_lines = ["Workflow: owned public + private nonfork; profile included",
                      workflow_display["qualification"]]
     # The active-repository tile keeps its known value, so this card owes the
     # reader that field's own partial basis rather than a bare number.

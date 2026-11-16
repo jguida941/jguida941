@@ -84,15 +84,171 @@ _PRIVATE_AGGREGATE_METRICS = (
 )
 
 
-def _scope_names_profile_exclusion(scope):
+def _scope_names_profile_inclusion(scope):
     normalized = str(scope or "").casefold()
     compact = normalized.replace("-", "").replace("_", "").replace(" ", "")
     return (
         "owned" in compact
         and "nonfork" in compact
-        and "exclud" in compact
+        and "includ" in compact
         and ("profile" in compact or "self" in compact)
     )
+
+
+class ProfileRecentWorkTests(unittest.TestCase):
+    """The profile's publishing commits do not outrank actual development."""
+
+    def scenario(self, *, change="source", producer="update canonical profile artifacts",
+                 defect=None, profile_owner="jguida941", source_days=0, refresh=True):
+        from scripts.github import github_client as gh
+        from scripts.github.activity_observations import collect_activity_observations
+        now = datetime.now(timezone.utc).replace(microsecond=0)
+        raw_time = _iso(now - timedelta(minutes=1))
+        work_time = _iso(now - timedelta(days=source_days, hours=8))
+        other_time = _iso(now - timedelta(hours=1))
+        base = AccuracyTests()._collected()
+        profile = dict(base.repos[0], owner={"login": profile_owner},
+                       html_url=f"https://github.com/{profile_owner}/jguida941",
+                       pushed_at=raw_time, latest_commit_message=producer)
+        other = dict(base.repos[1], pushed_at=other_time)
+        rows = [profile, other]
+        events = []
+        details = {}
+        if refresh:
+            events.append({"id": 10, "activity_type": "push", "ref": "refs/heads/main",
+                           "before": "b" * 40, "after": "a" * 40, "timestamp": raw_time})
+            details["a" * 40] = {
+                "sha": "a" * 40, "committer": {"login": "github-actions[bot]"},
+                "commit": {"message": producer}, "parents": [{"sha": "b" * 40}],
+                "files": [{"filename": "site/data/profile_snapshot.json", "status": "modified"}],
+            }
+        if change:
+            stamp = raw_time if not refresh else work_time
+            headline = producer if change in {"same_headline", "manual_artifacts"} else "Repair source aggregation"
+            if change == "credential":
+                headline = "Authorization: Bearer ghp_" + "A" * 36
+            committer = "github-actions[bot]" if change == "same_headline" else "jguida941"
+            files = ["site/data/profile_snapshot.json"] if change == "manual_artifacts" else ["scripts/pipeline/compute_metrics.py"]
+            events.append({"id": 9, "activity_type": "pr_merge" if change == "source" else "push",
+                           "ref": "refs/heads/development", "before": "d" * 40,
+                           "after": "c" * 40, "timestamp": stamp})
+            details["c" * 40] = {
+                "sha": "c" * 40, "committer": {"login": committer},
+                "commit": {"message": headline},
+                "parents": [{"sha": "d" * 40}],
+                "files": [{"filename": path, "status": "modified"} for path in files],
+            }
+        if defect and refresh:
+            damaged = details["a" * 40]
+            if defect == "missing_files":
+                damaged.pop("files")
+            elif defect == "empty_files":
+                damaged["files"] = []
+            elif defect == "wrong_sha":
+                damaged["sha"] = "e" * 40
+            elif defect == "multiple_commit_update":
+                damaged["parents"] = [{"sha": "e" * 40}]
+            elif defect == "rename_from_source":
+                damaged["files"][0].update(status="renamed", previous_filename="scripts/important.py")
+            elif defect == "nonexact_bot":
+                damaged["committer"]["login"] = "github-actions-copy"
+            elif defect == "nonexact_headline":
+                damaged["commit"]["message"] = "fix: " + producer
+        calls = []
+        class Response:
+            headers = {}
+            def __init__(self, payload, status=200, links=None):
+                self.payload, self.status_code, self.links = payload, status, links or {}
+            def json(self):
+                return copy.deepcopy(self.payload)
+        def request(url, **kwargs):
+            calls.append(url)
+            if "/commits/" in url:
+                oid = url.rsplit("/", 1)[1]
+                if defect == "request_failed" and oid == "a" * 40:
+                    return Response({}, 403)
+                links = {"next": {"url": url + "?page=2"}} if defect == "truncated_files" and oid == "a" * 40 else {}
+                return Response(details[oid], links=links)
+            if "/compare/" in url:
+                return Response({}, 404)
+            if url.endswith("/activity"):
+                return Response(events if url.endswith("/jguida941/jguida941/activity") else [])
+            raise AssertionError(f"Unexpected provider URL: {url}")
+        counts = {"public_owned_total": 2, "public_owned_forks": 0,
+                  "public_owned_nonfork": 2, "private_owned": 0, "private_owned_nonfork": 0}
+        with patch.object(gh, "_request_with_retry", side_effect=request), patch.object(gh, "_graphql_query", return_value=None):
+            observed = collect_activity_observations(rows, [], counts, observed_at=now)
+        collected = replace(base, repos=rows, all_repos=rows, private_repos=[],
+                            repo_counts=counts, events=[], latest_push_message_by_repo={},
+                            activity_observations=observed)
+        model = compute_profile_model(collected, logger=_noop, allow_network_calls=False)
+        return model, profile, observed, calls, (raw_time, work_time, other_time)
+
+    def test_profile_development_survives_refresh_and_uses_actual_update_order(self):
+        model, profile, _, _, stamps = self.scenario()
+        rows = model["dashboard_summary"]["working"]
+        self.assertEqual(["pub1", "jguida941"], [row["name"] for row in rows])
+        self.assertEqual(stamps[1], rows[1]["pushed_at"])
+        self.assertEqual("Repair source aggregation", rows[1]["last_commit_msg"])
+        self.assertEqual(stamps[0], profile["pushed_at"], "The aggregate repository timestamp must remain unchanged")
+
+    def test_ordinary_repository_control(self):
+        model, _, _, _, stamps = self.scenario()
+        ordinary = next(row for row in model["dashboard_summary"]["working"] if row["name"] == "pub1")
+        self.assertEqual(stamps[2], ordinary["pushed_at"])
+        self.assertEqual("Add real feature X", ordinary["last_commit_msg"])
+
+    def test_refresh_only_control(self):
+        for producer in ("update canonical profile artifacts", "update analytics & readme"):
+            with self.subTest(producer=producer):
+                model, _, _, _, _ = self.scenario(change=None, producer=producer)
+                self.assertEqual(["pub1"], [row["name"] for row in model["dashboard_summary"]["working"]])
+
+    def test_same_headline_source_work_and_manual_artifacts_remain_visible(self):
+        for change in ("same_headline", "manual_artifacts"):
+            with self.subTest(change=change):
+                model, _, _, _, _ = self.scenario(change=change, refresh=False)
+                row = next((row for row in model["dashboard_summary"]["working"] if row["name"] == "jguida941"), None)
+                self.assertIsNotNone(row)
+                self.assertEqual("update canonical profile artifacts", row["last_commit_msg"])
+
+    def test_other_owner_same_short_name_is_not_the_profile(self):
+        model, _, _, calls, stamps = self.scenario(profile_owner="example-org")
+        row = next((row for row in model["dashboard_summary"]["working"] if row["name"] == "jguida941"), None)
+        self.assertIsNotNone(row)
+        self.assertEqual(stamps[0], row["pushed_at"])
+        self.assertFalse(any("/repos/example-org/jguida941/commits/" in call for call in calls))
+
+    def test_unproven_refresh_does_not_hide_the_latest_update(self):
+        defects = ("missing_files", "empty_files", "wrong_sha", "multiple_commit_update",
+                   "rename_from_source", "nonexact_bot", "nonexact_headline",
+                   "request_failed", "truncated_files")
+        for defect in defects:
+            with self.subTest(defect=defect):
+                model, _, _, _, stamps = self.scenario(defect=defect)
+                row = next((row for row in model["dashboard_summary"]["working"] if row["name"] == "jguida941"), None)
+                self.assertIsNotNone(row)
+                self.assertEqual(stamps[0], row["pushed_at"])
+
+    def test_old_work_does_not_reenter_from_recent_automatic_refresh(self):
+        model, _, _, _, _ = self.scenario(source_days=8)
+        self.assertEqual(["pub1"], [row["name"] for row in model["dashboard_summary"]["working"]])
+
+    def test_credential_protection_remains(self):
+        model, _, _, _, _ = self.scenario(change="credential", refresh=False)
+        row = next((row for row in model["dashboard_summary"]["working"] if row["name"] == "jguida941"), None)
+        self.assertIsNotNone(row)
+        self.assertNotIn("ghp_", row["last_commit_msg"])
+
+    def test_summary_count_describes_the_same_filtered_work_rows(self):
+        from scripts.contracts.dashboard_summary import summary_facts
+        model, _, _, _, _ = self.scenario()
+        summary = model["dashboard_summary"]
+        self.assertEqual(["pub1", "jguida941"], [row["name"] for row in summary["working"]])
+        fact = summary_facts(summary).get("activity.working_repos_7d")
+        self.assertIsNotNone(fact)
+        self.assertEqual(len(model["dashboard_summary"]["working"]), fact["value"])
+        self.assertEqual(summary, model["dashboard_data"]["dashboard_summary"])
 
 
 class ContributionRhythmTests(unittest.TestCase):
@@ -387,13 +543,10 @@ class AccuracyTests(unittest.TestCase):
         )
         self.blob = json.dumps(self.model, default=str)
 
-    def test_self_repo_excluded_everywhere(self):
-        names = [r["name"] for r in self.model["recent_repos"]]
-        self.assertNotIn("jguida941", names)
-        matrix = [r["name"] for r in self.model["repo_overview_rows"]]
-        self.assertNotIn("jguida941", matrix)
-        created = [r["name"] for r in self.model["recent_created"]]
-        self.assertNotIn("jguida941", created)
+    def test_profile_repository_remains_in_personal_aggregate_population(self):
+        self.assertEqual(4, self.model["automation"]["combined"]["eligible_repos"])
+        self.assertEqual(9, self.model["automation"]["combined"]["workflow_files"])
+        self.assertEqual(2000, self._language_totals(self.model)["Python"])
 
     def test_no_bot_commit_text_anywhere(self):
         self.assertNotIn("update canonical profile artifacts", self.blob)
@@ -815,10 +968,10 @@ class AccuracyTests(unittest.TestCase):
             "the all-owned language scope must read back as one complete line",
         )
         self.assertTrue(
-            _scope_names_profile_exclusion(
+            _scope_names_profile_inclusion(
                 self.model["data_scope"]["metric_scopes"]["languages_count"]
             ),
-            "the language scope must name exclusion of the profile repository",
+            "the language scope must name inclusion of the profile repository",
         )
         self.assertEqual(
             [],
@@ -835,7 +988,6 @@ class AccuracyTests(unittest.TestCase):
         now_titles = [i["title"] for i in self.model["focus"]["now"]]
         self.assertIn("pub1", now_titles)
         self.assertIn("secret-api", now_titles)
-        self.assertNotIn("jguida941", now_titles)
 
     def test_engineering_block_present(self):
         eng = self.model["engineering"]
@@ -896,8 +1048,8 @@ class AccuracyTests(unittest.TestCase):
 
         self.assertEqual(expected, observed)
         self.assertTrue(
-            _scope_names_profile_exclusion(all_owned_scope),
-            "shared aggregate scope must name exclusion of the profile repository",
+            _scope_names_profile_inclusion(all_owned_scope),
+            "shared aggregate scope must name inclusion of the profile repository",
         )
 
     def test_complete_private_evidence_marks_all_owned_aggregates_exact(self):
@@ -923,8 +1075,8 @@ class AccuracyTests(unittest.TestCase):
         self.assertEqual(expected, observed)
         self.assertEqual(1, len(exact_scopes))
         self.assertTrue(
-            _scope_names_profile_exclusion(next(iter(exact_scopes))),
-            "exact scopes must name the self-excluded population",
+            _scope_names_profile_inclusion(next(iter(exact_scopes))),
+            "exact scopes must name the profile-included population",
         )
 
     def test_truncated_private_evidence_is_partial_and_never_exactly_all_owned(self):
@@ -993,8 +1145,8 @@ class AccuracyTests(unittest.TestCase):
         expected = {
             "complete_private_rust_bytes": 1000,
             "public_only_rust_bytes": None,
-            "complete_public_language_bytes": {"Python": 1000, "Java": 1000},
-            "public_only_language_bytes": {"Python": 1000, "Java": 1000},
+            "complete_public_language_bytes": {"Python": 2000, "Java": 1000},
+            "public_only_language_bytes": {"Python": 2000, "Java": 1000},
         }
 
         self.assertEqual(expected, observed)
@@ -1037,10 +1189,10 @@ class AccuracyTests(unittest.TestCase):
             model["data_quality"]["metric_statuses"]["top_languages"],
         )
         self.assertTrue(
-            _scope_names_profile_exclusion(
+            _scope_names_profile_inclusion(
                 model["data_scope"]["metric_scopes"]["top_languages"]
             ),
-            "the exact language scope must name exclusion of the profile repository",
+            "the exact language scope must name inclusion of the profile repository",
         )
 
     def test_activity_feed_combines_public_events_with_known_private_pushes(self):
@@ -1280,13 +1432,13 @@ class AccuracyTests(unittest.TestCase):
 
         with self.subTest(arm="shared descending order"):
             self.assertEqual(
-                ["private-newest", "public-newer", "private-middle", "public-older"],
+                ["jguida941", "private-newest", "public-newer", "private-middle", "public-older"],
                 names,
             )
         with self.subTest(arm="public ordering"):
             self.assertEqual(["public-newer", "public-older"], public_names)
-        with self.subTest(arm="profile repository exclusion"):
-            self.assertNotIn("jguida941", names)
+        with self.subTest(arm="profile repository inclusion"):
+            self.assertIn("jguida941", names)
             self.assertLessEqual(len(rows), 10)
         private_rows = [row for row in rows if row.get("name") == "private-newest"]
         with self.subTest(arm="private visibility marker"):
@@ -1588,7 +1740,7 @@ class AccuracyTests(unittest.TestCase):
             with self.subTest(case=name, assertion="metric scope"):
                 scope = model["data_scope"]["metric_scopes"]["top_languages"]
                 if expected_status == "exact":
-                    self.assertTrue(_scope_names_profile_exclusion(scope))
+                    self.assertTrue(_scope_names_profile_inclusion(scope))
                 else:
                     self.assertIn(expected_status, scope.casefold())
 
@@ -1658,7 +1810,7 @@ class AccuracyTests(unittest.TestCase):
                         model["data_quality"]["metric_statuses"][metric],
                     )
 
-    def test_profile_repository_is_excluded_from_all_shared_metric_families(self):
+    def test_profile_repository_is_included_in_shared_metric_aggregates(self):
         profile_repository = self._synthetic_repo(
             "jguida941",
             "Refresh profile artifacts",
@@ -1697,21 +1849,12 @@ class AccuracyTests(unittest.TestCase):
 
         with self.subTest(arm="language population"):
             self.assertEqual(
-                {"Haskell": 1000, "Python": 1000, "Rust": 1000},
+                {"Haskell": 10000, "Python": 1000, "Rust": 1000},
                 self._language_totals(model),
             )
-        with self.subTest(arm="row and activity populations"):
-            published_names = {
-                row.get("name") for row in model["repo_overview_rows"]
-            } | {
-                row.get("name") for row in model["recent_repos"]
-            } | {
-                str(item.get("repo", "")).split("/")[-1]
-                for item in model["activity_feed"]
-            }
-            self.assertNotIn("jguida941", published_names)
-            self.assertEqual(3, model["scorecard"]["active_repos_7d"])
-            self.assertEqual(3, model["engineering"]["automation_repos"])
+        with self.subTest(arm="push and workflow aggregate populations"):
+            self.assertEqual(4, model["scorecard"]["active_repos_7d"])
+            self.assertEqual(4, model["engineering"]["automation_repos"])
 
         scope_ids = {
             model["data_scope"]["metric_scopes"][metric]
@@ -1724,8 +1867,8 @@ class AccuracyTests(unittest.TestCase):
         with self.subTest(arm="one named population"):
             self.assertEqual(1, len(scope_ids))
             self.assertTrue(
-                _scope_names_profile_exclusion(next(iter(scope_ids))),
-                "the shared scope must name profile-repository exclusion",
+                _scope_names_profile_inclusion(next(iter(scope_ids))),
+                "the shared scope must name profile-repository inclusion",
             )
 
         nonself_model = compute_profile_model(
@@ -1769,7 +1912,7 @@ class AccuracyTests(unittest.TestCase):
         overview_by_name = {
             row["name"]: row for row in self.model["repo_overview_rows"]
         }
-        self.assertEqual({"pub1", "pub2", "secret-api"}, set(overview_by_name))
+        self.assertEqual({"jguida941", "pub1", "pub2", "secret-api"}, set(overview_by_name))
         self.assertEqual(
             {
                 "name": "secret-api",
@@ -2025,7 +2168,7 @@ class AccuracyTests(unittest.TestCase):
                 value=23,
                 status="fallback",
                 complete=True,
-                population_id="owned-public-repositories-visible-to-public-pr-search",
+                population_id="authored-public-pull-requests-visible-to-public-pr-search",
                 population_signature=None,
                 window_start=window_start,
                 window_end=window_end,
@@ -2142,7 +2285,7 @@ class AccuracyTests(unittest.TestCase):
                 value=42,
                 status="ok",
                 complete=True,
-                population_id="owned-repositories-visible-to-primary-pr-search",
+                population_id="authored-pull-requests-visible-to-primary-pr-search",
                 population_signature=None,
                 window_start=window_start,
                 window_end=window_end,
@@ -2212,7 +2355,7 @@ class AccuracyTests(unittest.TestCase):
             value=0,
             status="ok",
             complete=True,
-            population_id="owned-repositories-visible-to-primary-pr-search",
+            population_id="authored-pull-requests-visible-to-primary-pr-search",
             population_signature=None,
             window_start="2025-08-27T00:00:00Z",
             window_end=observed_at,
@@ -2246,7 +2389,7 @@ class AccuracyTests(unittest.TestCase):
                 value=23,
                 status="fallback",
                 complete=True,
-                population_id="owned-public-repositories-visible-to-public-pr-search",
+                population_id="authored-public-pull-requests-visible-to-public-pr-search",
                 population_signature=None,
                 window_start="2025-08-27T00:00:00Z",
                 window_end=observed_at,
@@ -2318,7 +2461,7 @@ class AccuracyTests(unittest.TestCase):
                 value=0,
                 status="ok",
                 complete=True,
-                population_id="owned-repositories-visible-to-primary-pr-search",
+                population_id="authored-pull-requests-visible-to-primary-pr-search",
                 population_signature=None,
                 window_start="2025-08-27T00:00:00Z",
                 window_end=observed_at,
@@ -2413,7 +2556,7 @@ class AccuracyTests(unittest.TestCase):
             value=23,
             status="fallback",
             complete=True,
-            population_id="owned-public-repositories-visible-to-public-pr-search",
+            population_id="authored-public-pull-requests-visible-to-public-pr-search",
             population_signature=None,
             window_start="2025-08-27T00:00:00Z",
             window_end="2026-08-26T15:00:00Z",
@@ -2769,10 +2912,10 @@ class AccuracyTests(unittest.TestCase):
         model = compute_profile_model(replace(collected, private_repos=[invalid]),
                                       logger=_noop, allow_network_calls=False)
         public, private, combined = (model["automation"][key] for key in ("public", "private", "combined"))
-        self.assertEqual((1, 2, 2), (public["configured_repos"], public["eligible_repos"], public["workflow_files"]))
+        self.assertEqual((2, 3, 4), (public["configured_repos"], public["eligible_repos"], public["workflow_files"]))
         self.assertEqual((None, None, 1), (private["configured_repos"], private["workflow_files"], private["unknown_workflow_repos"]))
-        self.assertEqual((1, 2, 3, "partial"), (combined["configured_repos"], combined["workflow_files"], combined["eligible_repos"], combined["status"]))
-        self.assertAlmostEqual(100 / 3, combined["adoption_pct"])
+        self.assertEqual((2, 4, 4, "partial"), (combined["configured_repos"], combined["workflow_files"], combined["eligible_repos"], combined["status"]))
+        self.assertAlmostEqual(50, combined["adoption_pct"])
         self.assertEqual(combined["workflow_files"], model["scorecard"]["automation_workflows"])
         self.assertEqual(combined["configured_repos"], model["snapshot"]["ci_repos"])
 
@@ -2782,7 +2925,7 @@ class AccuracyTests(unittest.TestCase):
         model = compute_profile_model(replace(collected, repo_counts=counts, private_repos=[]),
                                       logger=_noop, allow_network_calls=False)
         self.assertEqual("exact", model["automation"]["public"]["status"])
-        self.assertEqual(1, model["automation"]["combined"]["configured_repos"])
+        self.assertEqual(2, model["automation"]["combined"]["configured_repos"])
         self.assertIsNone(model["automation"]["combined"]["eligible_repos"])
         self.assertIsNone(model["scorecard"]["ci_coverage_pct"])
 
@@ -3297,12 +3440,12 @@ class ProjectActivityAggregationTests(unittest.TestCase):
             self.assertFalse(row["complete"])
             self.assertIn("conflicting_repository_metadata", row["reasons"])
 
-    def test_foreign_profile_and_malformed_repository_identities_are_excluded(self):
+    def test_foreign_and_malformed_repository_identities_are_excluded(self):
         from scripts.github import github_client as gh
 
         source = project_activity_source()
-        for identity in ("another-owner/external", f"{gh.USERNAME.upper()}/{gh.USERNAME.upper()}",
-                         f"{gh.USERNAME}/.", f"{gh.USERNAME}/bad name", "missing-owner"):
+        for identity in ("another-owner/external", f"{gh.USERNAME}/.",
+                         f"{gh.USERNAME}/bad name", "missing-owner"):
             envelope = copy.deepcopy(source["repositories"][0])
             envelope["repository"] = identity
             source["repositories"].append(envelope)
@@ -3500,6 +3643,73 @@ class ProjectActivityAggregationTests(unittest.TestCase):
                                                       for key in ("count", "complete", "level")))
         self.assertTrue(all(cell["count"] is None and cell["complete"] is False and cell["level"] is None
                             for cell in row["branch_empty_daily"]))
+
+
+class ProfileRepositoryDetailTests(unittest.TestCase):
+    @staticmethod
+    def row(owner="jguida941", name="jguida941", workflows=1):
+        return {"name": name, "owner": {"login": owner}, "private": False, "fork": False,
+                "html_url": f"https://github.com/{owner}/{name}", "language": "Python",
+                "pushed_at": "2026-10-11T12:00:00Z", "created_at": "2026-10-01T12:00:00Z",
+                "has_ci_workflows": workflows > 0, "workflow_file_count": workflows,
+                "latest_commit_message": "Improve repository details"}
+
+    @staticmethod
+    def event(kind, owner="jguida941", actor="jguida941"):
+        return {"type": kind, "actor": {"login": actor}, "repo": {"name": f"{owner}/jguida941"},
+                "created_at": "2026-10-11T12:00:00Z", "payload": {
+                    "commits": [{"message": "Improve repository details"}],
+                    "release": {"tag_name": "v1"},
+                    "pull_request": {"number": 2, "title": "Improve details", "state": "open"}}}
+
+    def test_profile_and_same_named_repository_keep_distinct_ci_and_catalog_rows(self):
+        from scripts.pipeline.compute_metrics import _build_ci_quality, _build_repo_overview_rows
+
+        rows = [self.row(), self.row("another-owner"), self.row(name="ordinary", workflows=0)]
+        unknown = self.row(name="unknown")
+        unknown.pop("has_ci_workflows")
+        unknown.pop("workflow_file_count")
+        rows.append(unknown)
+        quality = _build_ci_quality(rows, allow_network_calls=False)
+        self.assertEqual({("jguida941", "jguida941"): True, ("another-owner", "jguida941"): True,
+                          ("jguida941", "ordinary"): False, ("jguida941", "unknown"): None}, quality)
+        overview, _ = _build_repo_overview_rows(rows, {}, {}, quality)
+        self.assertEqual({"jguida941/jguida941", "another-owner/jguida941", "jguida941/ordinary",
+                          "jguida941/unknown"}, {row["full_name"] for row in overview})
+        rows[0]["latest_commit_message"] = "Bearer ghp_NOT_A_REAL_TOKEN"
+        overview, _ = _build_repo_overview_rows(rows, {}, {}, quality)
+        self.assertNotIn("ghp_NOT_A_REAL_TOKEN", str(overview))
+
+    def test_profile_events_are_kept_with_existing_owner_and_actor_boundaries(self):
+        from scripts.pipeline.compute_metrics import _build_recent_activity
+
+        events = [self.event(kind, owner) for owner in ("jguida941", "another-owner")
+                  for kind in ("PushEvent", "ReleaseEvent", "PullRequestEvent")]
+        contributions, releases, prs, *_ = _build_recent_activity(events, [], [], "jguida941")
+        self.assertEqual({"jguida941/jguida941"}, {row["repo"] for row in contributions})
+        for rows in (releases, prs):
+            self.assertEqual({"jguida941/jguida941", "another-owner/jguida941"},
+                             {row["repo"] for row in rows})
+        bot = self.event("PushEvent", actor="github-actions[bot]")
+        self.assertEqual([], _build_recent_activity([bot], [], [], "jguida941")[0])
+
+    def test_profile_project_activity_preserves_coverage_and_public_summary_parity(self):
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+
+        for complete in (True, False):
+            with self.subTest(complete=complete):
+                source = project_activity_source([project_activity_envelope(
+                    "jguida941", [project_activity_event("profile-push", "jguida941")], complete=complete)])
+                model = project_activity_full_model(source)
+                published = _public_dashboard_data(model["dashboard_data"])
+                value = published["activity_analytics"]["project_activity"]
+                self.assertEqual(value, published["dashboard_summary"]["activity_analytics"]["project_activity"])
+                self.assertEqual(complete, value["complete"])
+                self.assertEqual(1, value["observed_pushes"])
+                self.assertEqual([("jguida941/jguida941", 1, complete)],
+                                 [(row["repository"], row["observed_pushes"], row["complete"])
+                                  for row in value["rows"]])
+                self.assertNotIn("profile excluded", value["meaning"])
 
 
 if __name__ == "__main__":

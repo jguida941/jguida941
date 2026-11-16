@@ -401,7 +401,7 @@ def validate_provider_observation(observation: dict) -> bool:
             ),
             "prs_merged": (
                 "merged_prs_primary_visible_population",
-                "owned-repositories-visible-to-primary-pr-search",
+                "authored-pull-requests-visible-to-primary-pr-search",
                 "github_rest_merged_pr_search_primary",
                 True,
                 False,
@@ -541,14 +541,14 @@ def validate_provider_observation(observation: dict) -> bool:
         if source_metric_id == "merged_prs_primary_visible_population":
             return (
                 status == "ok"
-                and population_id == "owned-repositories-visible-to-primary-pr-search"
+                and population_id == "authored-pull-requests-visible-to-primary-pr-search"
                 and source_id == "github_rest_merged_pr_search_primary"
                 and reason in {"all_components_observed", "same_scope_cache"}
             )
         return (
             source_metric_id == "merged_prs_public_visible_population"
             and status == "fallback"
-            and population_id == "owned-public-repositories-visible-to-public-pr-search"
+            and population_id == "authored-public-pull-requests-visible-to-public-pr-search"
             and source_id == "github_rest_merged_pr_search_public"
             and source_mode in {"fallback", "cache"}
             and reason == "public_retry"
@@ -2627,13 +2627,12 @@ def _get_recent_release_cache(days: int, exclude_signature: str) -> int | None:
 
 
 def get_merged_prs_last_n_days_observation(days: int = 365) -> dict:
-    """Observe merged pull requests without collapsing public retry scope."""
+    """Observe this author's merged PRs across owners, retaining retry scope."""
     window_days = max(1, int(days))
     start, end, window_day = _calendar_window(window_days)
-    since = start.date().isoformat()
     window_start = _iso_utc(start)
     window_end = _iso_utc(end)
-    cache_key = f"merged_prs_observation_v1_{window_days}_{window_day}"
+    cache_key = f"merged_prs_observation_v2_{USERNAME.casefold()}_{window_days}_{window_day}"
     cached = _get_cached(cache_key)
     if (
         validate_provider_observation(cached)
@@ -2648,7 +2647,7 @@ def get_merged_prs_last_n_days_observation(days: int = 365) -> dict:
             replay["completion_reason"] = "same_scope_cache"
         return replay
 
-    query = f"author:{USERNAME} user:{USERNAME} is:pr is:merged merged:>={since}"
+    query = f"author:{USERNAME} is:pr is:merged merged:{window_start}..{window_end}"
     params = {"q": query, "per_page": 1}
     url = f"{API}/search/issues"
 
@@ -2670,12 +2669,10 @@ def get_merged_prs_last_n_days_observation(days: int = 365) -> dict:
             payload = resp.json()
         except ValueError:
             return None
-        if not isinstance(payload, dict):
+        if not isinstance(payload, dict) or payload.get("incomplete_results") is not False:
             return None
-        try:
-            return int(payload.get("total_count", 0))
-        except (TypeError, ValueError):
-            return None
+        total_count = payload.get("total_count")
+        return total_count if _is_nonnegative_int(total_count) else None
 
     total = _fetch_total(use_public=False)
     if total is not None:
@@ -2685,7 +2682,7 @@ def get_merged_prs_last_n_days_observation(days: int = 365) -> dict:
             value=total,
             status="ok",
             complete=True,
-            population_id="owned-repositories-visible-to-primary-pr-search",
+            population_id="authored-pull-requests-visible-to-primary-pr-search",
             population_signature=None,
             window_start=window_start,
             window_end=window_end,
@@ -2705,7 +2702,7 @@ def get_merged_prs_last_n_days_observation(days: int = 365) -> dict:
             value=public_total,
             status="fallback",
             complete=True,
-            population_id="owned-public-repositories-visible-to-public-pr-search",
+            population_id="authored-public-pull-requests-visible-to-public-pr-search",
             population_signature=None,
             window_start=window_start,
             window_end=window_end,
@@ -2723,7 +2720,7 @@ def get_merged_prs_last_n_days_observation(days: int = 365) -> dict:
         value=None,
         status="unavailable",
         complete=False,
-        population_id="owned-repositories-visible-to-primary-pr-search",
+        population_id="authored-pull-requests-visible-to-primary-pr-search",
         population_signature=None,
         window_start=window_start,
         window_end=window_end,

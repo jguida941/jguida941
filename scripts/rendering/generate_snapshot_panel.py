@@ -57,9 +57,9 @@ _SECONDARY_KEYS = (
 # glance, not an audit row, so it gets a concise noun — never a clipped one).
 _TILE_LABEL = {
     "public_scope_commits": "Commits",
-    "total_repos": "Public Repos",
+    "total_repos": "Nonfork Repos",
     "private_owned_repos": "Private",
-    "total_stars": "Stars",
+    "total_stars": "Stargazers",
     "languages_count": "Languages",
     "prs_merged": "PRs Merged",
     "public_forks": "Forks",
@@ -120,7 +120,7 @@ def _provider_evidence_label(
         carrier.get("source_metric_id")
         == "merged_prs_public_visible_population"
         or carrier.get("population_id")
-        == "owned-public-repositories-visible-to-public-pr-search"
+        == "authored-public-pull-requests-visible-to-public-pr-search"
     ):
         parts.append("Public Scope")
     elif name == "Contributions" and (
@@ -211,7 +211,7 @@ def generate(
     scope = data_scope if isinstance(data_scope, dict) else {}
     population = str(scope.get("repos_included") or "repository scope unavailable")
     evidence_notes = [
-        "Workflow: owned public + private nonfork; profile excluded",
+        "Workflow: owned public + private nonfork; profile included",
         automation_display(automation)["combined"]["qualification"],
     ]
     language_status = str(metric_statuses.get("top_languages", "")).casefold()

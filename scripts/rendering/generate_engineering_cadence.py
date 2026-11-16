@@ -135,7 +135,7 @@ def generate(
     ).casefold()
     display = automation_display(automation)
     workflow_display = display["combined"]
-    quality_lines = ["Workflow: owned public + private nonfork; profile excluded",
+    quality_lines = ["Workflow: owned public + private nonfork; profile included",
                      workflow_display["qualification"]]
     if automation is None and ci_status == "partial":
         quality_lines[-1] = "Workflow · Partial · known minimum · unknown repositories"

@@ -50,13 +50,13 @@ from scripts.pipeline.profile_helpers import (
 
 
 _ALL_OWNED_NONFORK_AGGREGATE_SCOPE = (
-    "owned-public-private-nonfork-profile-excluded-exact"
+    "owned-public-private-nonfork-profile-included-exact"
 )
 _INCOMPLETE_OWNED_NONFORK_SCOPE = (
-    "owned-public-private-nonfork-profile-excluded-partial-observation"
+    "owned-public-private-nonfork-profile-included-partial-observation"
 )
 _UNAVAILABLE_OWNED_NONFORK_SCOPE = (
-    "owned-public-private-nonfork-profile-excluded-unavailable"
+    "owned-public-private-nonfork-profile-included-unavailable"
 )
 
 
@@ -327,6 +327,7 @@ def _build_recent_repos(
     latest_push_message_by_repo: dict[str, str],
     allow_network_calls: bool,
     private_repos: list[dict] | None = None,
+    activity_observations: dict | None = None,
 ) -> tuple[list[dict], dict[tuple[str, str], str]]:
     recent_repos = []
     recent_commit_message_by_repo: dict[tuple[str, str], str] = {}
@@ -334,25 +335,37 @@ def _build_recent_repos(
     candidates = list(repos) + list(private_repos or [])
     for repo in sorted(candidates, key=lambda item: item.get("pushed_at", ""), reverse=True):
         name = repo.get("name", "")
-        # Never surface the profile repo itself (the hourly bot commit).
-        if not name or is_self_repo(name):
+        if not name:
             continue
         pushed = repo.get("pushed_at", "")
+        selected_work = None
+        repository = f"{_owner_login(repo)}/{name}"
+        if repository.casefold() == f"{USERNAME}/{USERNAME}".casefold():
+            from scripts.github.activity_observations import profile_recent_work_projection
+            selected_work = profile_recent_work_projection(
+                (activity_observations or {}).get("profile_recent_work"),
+                repository=repository, now=seven_days_ago + timedelta(days=7),
+                repository_pushed_at=pushed)
+            if selected_work and selected_work["omit"]:
+                continue
+            if selected_work:
+                pushed = selected_work["pushed_at"]
         if not pushed:
             continue
         try:
             pushed_dt = datetime.fromisoformat(pushed.replace("Z", "+00:00"))
         except (AttributeError, ValueError):
             continue
-        if pushed_dt < seven_days_ago:
-            break
+        if pushed_dt.tzinfo is None or pushed_dt < seven_days_ago:
+            continue
         identity = _row_identity(repo)
         if identity in seen:
             continue
         seen.add(identity)
 
-        last_msg = safe_commit_headline(repo.get("latest_commit_message"))
-        if not last_msg and allow_network_calls:
+        last_msg = (selected_work["last_commit_msg"] if selected_work else
+                    safe_commit_headline(repo.get("latest_commit_message")))
+        if not last_msg and not selected_work and allow_network_calls:
             try:
                 commits_data = gh.paginated_get(
                     f"repos/{_owner_login(repo)}/{name}/commits",
@@ -365,10 +378,11 @@ def _build_recent_repos(
                     )
             except Exception:
                 pass
-        if not last_msg:
+        if not last_msg and not selected_work:
             full_name = f"{_owner_login(repo)}/{name}"
             last_msg = safe_commit_headline(
                 latest_push_message_by_repo.get(full_name)
+                or latest_push_message_by_repo.get(full_name.casefold())
             )
         if not last_msg:
             last_msg = "recent push detected"
@@ -383,8 +397,10 @@ def _build_recent_repos(
                 "pushed_at": pushed,
                 "last_commit_msg": last_msg,
                 "is_private": repo.get("private") is True,
+                **({"activity_type": selected_work["activity_type"]} if selected_work else {}),
             }
         )
+    recent_repos.sort(key=lambda row: row["pushed_at"], reverse=True)
     return recent_repos, recent_commit_message_by_repo
 
 
@@ -396,7 +412,7 @@ def _build_ci_quality(
     repo_ci_lookup: dict[tuple[str, str], bool | None] = {}
     for repo in repos:
         name = repo.get("name", "")
-        if not name or is_self_repo(name):
+        if not name:
             continue
         repo_ci_lookup[_row_identity(repo)] = has_ci_workflow(
             repo, allow_network_calls=allow_network_calls
@@ -461,8 +477,6 @@ def _build_repo_overview_rows(
                 ordered_identities.append(identity)
     for repo in sorted_repos_by_push:
         repo_name = repo.get("name", "")
-        if is_self_repo(repo_name):
-            continue
         identity = _row_identity(repo)
         if repo_name and identity not in ordered_identities:
             ordered_identities.append(identity)
@@ -505,9 +519,7 @@ def _build_recent_activity(
         repo_name = _event_repo_name(event)
         if not repo_name.casefold().startswith(owned_repo_prefix):
             continue
-        # Drop the profile repo itself and automation-actor events.
-        if is_self_repo(None, repo_name):
-            continue
+        # Preserve the event feed's existing automation-actor boundary.
         if is_bot_actor(_event_actor_login(event)):
             continue
         created_at = _event_created_at(event)
@@ -568,8 +580,6 @@ def _build_recent_activity(
         payload = _event_payload(event)
         release = payload.get("release", {})
         repo_name = _event_repo_name(event)
-        if is_self_repo(None, repo_name):
-            continue
         release_tag = (release.get("tag_name") or "").strip() or "unknown"
         release_url = (release.get("html_url") or "").strip()
         if not release_url and repo_name and release_tag != "unknown":
@@ -593,8 +603,6 @@ def _build_recent_activity(
             continue
         pr = _event_payload(event).get("pull_request", {})
         repo_name = _event_repo_name(event)
-        if is_self_repo(None, repo_name):
-            continue
         state = pr.get("state", "open").upper()
         if pr.get("merged"):
             state = "MERGED"
@@ -625,7 +633,7 @@ def _build_recent_activity(
         row["full_name"]: row for row in repo_overview_rows if row.get("full_name")
     }
 
-    # "Now" = actual most-recent pushes (public + private, self-repo excluded),
+    # "Now" = actual most-recent pushes (public + private),
     # never the featured-ordered overview — this is what's genuinely in flight.
     focus_now = []
     for repo in recent_repos[:3]:
@@ -981,7 +989,7 @@ def _build_automation_summary(
     def partition(repositories, expected):
         nonfork = [repo for repo in repositories if repo.get("fork") is not True]
         inventory = _inventory_quality(expected, nonfork)
-        eligible = [repo for repo in nonfork if not is_self_repo(repo.get("name"))]
+        eligible = nonfork
         valid = [repo for repo in eligible if _has_valid_automation_fact(repo)]
         return finish(
             len(eligible), len(eligible) if inventory == "exact" else None,
@@ -1043,11 +1051,7 @@ def _metric_family_statuses(
         public_inventory_status == "exact"
         and private_inventory_status == "exact"
     )
-    repositories = [
-        repository
-        for repository in [*public_repos, *private_repos]
-        if not is_self_repo(repository.get("name"))
-    ]
+    repositories = [*public_repos, *private_repos]
     language_markers_present = any(
         "language_bytes_complete" in repository for repository in repositories
     )
@@ -1080,17 +1084,9 @@ def _aggregate_language_bytes(
     *,
     fallback_public_language_bytes: dict[str, int],
 ) -> dict[str, int]:
-    """Aggregate every valid observed fact in the self-excluded population."""
-    public_population = [
-        repository
-        for repository in public_repos
-        if not is_self_repo(repository.get("name"))
-    ]
-    private_population = [
-        repository
-        for repository in private_repos
-        if not is_self_repo(repository.get("name"))
-    ]
+    """Aggregate valid facts from every personal nonfork repository, including the profile."""
+    public_population = list(public_repos)
+    private_population = list(private_repos)
     repositories = [*public_population, *private_population]
     language_markers_present = any(
         "language_bytes_complete" in repository for repository in repositories
@@ -1437,8 +1433,6 @@ def _build_engineering_metrics(
 
     gaps: list[int] = []
     for r in push_repos:
-        if is_self_repo(r.get("name")):
-            continue
         pushed = r.get("pushed_at", "")
         if not pushed:
             continue
@@ -1503,6 +1497,7 @@ def _build_snapshot_dict(
         "last_year_contributions": last_year_contributions,
         "public_scope_commits": public_scope_commits,
         "total_repos": repo_counts["public_owned_nonfork"],
+        "public_repos_total": repo_counts["public_owned_total"],
         "public_forks": repo_counts["public_owned_forks"],
         "private_owned_repos": repo_counts["private_owned"],
         "total_stars": total_stars,
@@ -1719,11 +1714,39 @@ def _build_inventory_observation(collected: CollectedProfileData, now_utc: datet
         ("public_owned_total", "public_owned_nonfork", "public_owned_forks"))
         and counts["public_owned_total"] == counts["public_owned_nonfork"] + counts["public_owned_forks"]
         and len(rows) == counts["public_owned_nonfork"])
+    # The GitHub public repository total includes forks. It needs its own fresh
+    # complete row census; nonfork rows plus retained counters are not that census.
+    all_rows = evidence.get("all_public_repos")
+    all_public = public and isinstance(all_rows, list)
+    all_identities = set()
+    nonfork_identities = set()
+    fork_count = 0
+    if all_public:
+        for row in all_rows:
+            owner_row = row.get("owner") if isinstance(row, dict) else None
+            owner = owner_row.get("login") if isinstance(owner_row, dict) else None
+            name = row.get("name") if isinstance(row, dict) else None
+            if (type(owner) is not str or owner.casefold() != USERNAME.casefold()
+                    or type(name) is not str or not name or row.get("private") is not False
+                    or type(row.get("fork")) is not bool or row.get("visibility") != "public"
+                    or (owner.casefold(), name.casefold()) in all_identities):
+                all_public = False
+                break
+            identity = (owner.casefold(), name.casefold())
+            all_identities.add(identity)
+            if row["fork"]:
+                fork_count += 1
+            else:
+                nonfork_identities.add(identity)
+    all_public = bool(all_public and len(all_rows) == counts["public_owned_total"]
+                      and fork_count == counts["public_owned_forks"]
+                      and nonfork_identities == identities)
     stars = public and all(count(row.get("stargazers_count"))
                            and row.get("stargazers_count_observed") is not False for row in rows)
     private = (fresh and count(counts.get("private_owned")) and count(counts.get("private_owned_nonfork"))
                and counts["private_owned_nonfork"] <= counts["private_owned"])
     metrics = {
+        "public_repos_total": {"value": len(all_rows) if all_public else None, "complete": all_public},
         "total_repos": {"value": counts["public_owned_nonfork"] if public else None, "complete": public},
         "public_forks": {"value": counts["public_owned_forks"] if public else None, "complete": public},
         "total_stars": {"value": sum(row["stargazers_count"] for row in rows) if stars else None, "complete": bool(stars)},
@@ -1786,11 +1809,7 @@ def compute_profile_model(
         public_nonfork_repos,
         private_nonfork_repos,
     )
-    push_repos = [
-        repository
-        for repository in [*public_nonfork_repos, *private_nonfork_repos]
-        if not is_self_repo(repository.get("name"))
-    ]
+    push_repos = [*public_nonfork_repos, *private_nonfork_repos]
     automation = _build_automation_summary(
         repo_counts, public_nonfork_repos, private_nonfork_repos
     )
@@ -1830,8 +1849,6 @@ def compute_profile_model(
     seven_days_ago = now_utc - timedelta(days=7)
     active_repos_7d = 0
     for repo in push_repos:
-        if is_self_repo(repo.get("name")):
-            continue
         pushed = repo.get("pushed_at", "")
         if not pushed:
             continue
@@ -1872,6 +1889,23 @@ def compute_profile_model(
         allow_network_calls,
         private_repos=collected.private_repos,
     )
+    # Only the working panel substitutes the last non-publishing branch update.
+    # Reuse already-read headlines; this second projection performs no requests.
+    working_repos, _ = _build_recent_repos(
+        repos,
+        seven_days_ago,
+        {f"{owner}/{name}": message for (owner, name), message
+         in recent_commit_message_by_repo.items()},
+        False,
+        private_repos=collected.private_repos,
+        activity_observations=collected.activity_observations,
+    )
+    working_coverage = {"status": family_statuses["push"], "reason": "observed_recent_work_rows"}
+    profile_work = (collected.activity_observations or {}).get("profile_recent_work")
+    if (isinstance(profile_work, dict) and profile_work.get("status") in {"partial", "unavailable"}
+            and profile_work.get("reason") != "profile_not_observed"
+            and working_coverage["status"] != "unavailable"):
+        working_coverage = {"status": "partial", "reason": "profile_activity_coverage_incomplete"}
 
     # --- spotlight ---
     spotlight_data = []
@@ -1956,14 +1990,8 @@ def compute_profile_model(
     public_inventory_status = _inventory_quality(
         repo_counts.get("public_owned_nonfork"), public_nonfork_repos
     )
-    observed_public = any(
-        not is_self_repo(repository.get("name"))
-        for repository in public_nonfork_repos
-    )
-    observed_private = any(
-        not is_self_repo(repository.get("name"))
-        for repository in private_nonfork_repos
-    )
+    observed_public = bool(public_nonfork_repos)
+    observed_private = bool(private_nonfork_repos)
     if not observed_public and not observed_private:
         if public_inventory_status == "exact" and private_aggregate_status == "exact":
             repos_included = "public + private observed, exact empty"
@@ -2038,7 +2066,8 @@ def compute_profile_model(
     # --- snapshot rows & cards ---
     # Inventory headline values come from a qualified fresh census when available.
     inventory_observation = _build_inventory_observation(collected, now_utc)
-    inventory_scope_keys = {"total_repos": "public_owned_nonfork_repos_total",
+    inventory_scope_keys = {"public_repos_total": "public_owned_repos_total",
+                            "total_repos": "public_owned_nonfork_repos_total",
                             "public_forks": "public_owned_forks_total",
                             "private_owned_repos": "private_owned_repos_total"}
     for key, observed in inventory_observation["metrics"].items():
@@ -2046,8 +2075,6 @@ def compute_profile_model(
             snapshot[key] = observed["value"]
             if key in inventory_scope_keys:
                 data_scope[inventory_scope_keys[key]] = observed["value"]
-    if all(inventory_observation["metrics"][key]["complete"] for key in ("total_repos", "public_forks")):
-        data_scope["public_owned_repos_total"] = snapshot["total_repos"] + snapshot["public_forks"]
     profile_observation = metric_observations.get("github_profile_contributions")
     snapshot["github_profile_contributions"] = (
         profile_observation["value"]
@@ -2079,11 +2106,7 @@ def compute_profile_model(
     # --- recent activity & focus ---
     recent_created = []
     for r in sorted(
-        [
-            r
-            for r in [*public_nonfork_repos, *private_nonfork_repos]
-            if not is_self_repo(r.get("name"))
-        ],
+        [*public_nonfork_repos, *private_nonfork_repos],
         key=lambda item: item.get("created_at", ""),
         reverse=True,
     )[:10]:
@@ -2285,6 +2308,8 @@ def compute_profile_model(
         "recent_pull_requests": pr_list,
         "dashboard_data": dashboard_data,
         "recent_repos": recent_repos,
+        "working_repos": working_repos,
+        "working_coverage": working_coverage,
         "spotlight_data": spotlight_data,
         "engineering": engineering,
         "token_mode": collected.token_mode,

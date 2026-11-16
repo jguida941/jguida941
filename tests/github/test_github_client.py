@@ -1,4 +1,7 @@
 import copy
+import re
+import shlex
+from contextlib import ExitStack
 import unittest
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
@@ -187,7 +190,7 @@ def _merged_pr_observation(*, days: int) -> dict:
         "value": value,
         "status": "ok" if value is not None else "unavailable",
         "complete": value is not None,
-        "population_id": "owned-repositories-visible-to-primary-pr-search",
+        "population_id": "authored-pull-requests-visible-to-primary-pr-search",
         "population_signature": None,
         "window_start": None,
         "window_end": None,
@@ -1201,7 +1204,7 @@ class GitHubClientTests(unittest.TestCase):
             ),
         ), patch(
             "scripts.github.github_client._request_with_retry",
-            return_value=_FakeResponse(200, {"total_count": 42}),
+            return_value=_FakeResponse(200, {"total_count": 42, "incomplete_results": False}),
         ):
             total = gh.get_merged_prs_last_n_days(days=365)
 
@@ -1709,7 +1712,7 @@ class GitHubClientTests(unittest.TestCase):
         ), patch.object(
             gh, "_request_with_retry", return_value=_FakeResponse(403, {})
         ), patch.object(
-            gh, "_request_public_with_retry", return_value=_FakeResponse(200, {"total_count": 23})
+            gh, "_request_public_with_retry", return_value=_FakeResponse(200, {"total_count": 23, "incomplete_results": False})
         ):
             observation = _merged_pr_observation(days=365)
 
@@ -1721,7 +1724,7 @@ class GitHubClientTests(unittest.TestCase):
                 observation.get("source_metric_id"),
             )
             self.assertEqual(
-                "owned-public-repositories-visible-to-public-pr-search",
+                "authored-public-pull-requests-visible-to-public-pr-search",
                 observation.get("population_id"),
             )
             self.assertEqual("public_retry", observation.get("completion_reason"))
@@ -1826,7 +1829,7 @@ class GitHubClientTests(unittest.TestCase):
                 value=4,
                 status="ok",
                 complete=True,
-                population_id="owned-repositories-visible-to-primary-pr-search",
+                population_id="authored-pull-requests-visible-to-primary-pr-search",
                 population_signature=None,
                 window_start=window_start,
                 window_end=window_end,
@@ -1903,7 +1906,7 @@ class GitHubClientTests(unittest.TestCase):
                 value=23,
                 status="fallback",
                 complete=True,
-                population_id="owned-public-repositories-visible-to-public-pr-search",
+                population_id="authored-public-pull-requests-visible-to-public-pr-search",
                 population_signature=None,
                 window_start=window_start,
                 window_end=window_end,
@@ -2111,7 +2114,7 @@ class GitHubClientTests(unittest.TestCase):
                     value=0,
                     status="ok",
                     complete=True,
-                    population_id="owned-repositories-visible-to-primary-pr-search",
+                    population_id="authored-pull-requests-visible-to-primary-pr-search",
                     population_signature=None,
                     window_start=window_start,
                     window_end=window_end,
@@ -2244,7 +2247,7 @@ class GitHubClientTests(unittest.TestCase):
                     status="fallback",
                     complete=True,
                     population_id=(
-                        "owned-public-repositories-visible-to-public-pr-search"
+                        "authored-public-pull-requests-visible-to-public-pr-search"
                     ),
                     population_signature=None,
                     window_start=window_start,
@@ -2568,6 +2571,30 @@ class ContributionCalendarConsistencyTests(unittest.TestCase):
         self.assertEqual(sorted(labels), labels)
 
 
+class ProfileActivityCohortTests(unittest.TestCase):
+    def test_profile_branch_updates_remain_in_unfiltered_activity_observations(self):
+        from tests.pipeline.test_compute_metrics_accuracy import ProfileRecentWorkTests
+        for refresh in (True, False):
+            with self.subTest(refresh=refresh):
+                _, _, observed, _, stamps = ProfileRecentWorkTests().scenario(refresh=refresh)
+                profile = next((row for row in observed["repositories"]
+                                if row["repository"] == "jguida941/jguida941"), None)
+                self.assertIsNotNone(profile)
+                self.assertIn("pr_merge", [row["activity_type"] for row in profile["activity"]["rows"]])
+                if refresh:
+                    pushed = next(row for row in observed["recent_pushes"]["rows"]
+                                  if row["repository"] == "jguida941/jguida941")
+                    self.assertEqual(stamps[0], pushed["timestamp"])
+                    self.assertEqual("a" * 40, pushed["after"])
+                    self.assertEqual("push", pushed["activity_type"])
+
+    def test_other_repository_activity_control(self):
+        observed, code, _ = CodeChangeCollectionTests().observe()
+        self.assertEqual({"jguida941/alpha", "jguida941/beta"},
+                         {row["repository"] for row in observed["repositories"]})
+        self.assertEqual("ok", code["status"])
+
+
 class CodeChangeCollectionTests(unittest.TestCase):
     """Branch updates choose immutable history, independently of default branches."""
     def observe(self, failure=None, generation=1, count=2, inventory_fresh=True):
@@ -2864,3 +2891,191 @@ class InventoryStarEvidenceTests(unittest.TestCase):
         normalized = gh._normalize_graphql_repo(node)
         self.assertEqual(normalized["stargazers_count"], 0)
         self.assertFalse(normalized["stargazers_count_observed"])
+
+
+_PR_WINDOW_START = datetime(2025, 11, 16, 5, 0, 0, tzinfo=timezone.utc)
+_PR_WINDOW_END = datetime(2026, 11, 16, 1, 0, 44, tzinfo=timezone.utc)
+_PR_WINDOW = (_PR_WINDOW_START, _PR_WINDOW_END, "2026-11-15")
+_PR_ACTOR = "jguida941"
+
+
+def _pr_instant(text):
+    parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed
+
+
+def _pr_row(owner=_PR_ACTOR, author=_PR_ACTOR, merged="2026-05-01T12:00:00Z", kind="pr"):
+    return {"owner": owner, "author": author, "merged": merged, "kind": kind}
+
+
+def _pr_requested_rows(query, rows):
+    """Small independent interpretation of the documented search qualifiers."""
+    selected = list(rows)
+    for token in shlex.split(query):
+        key, separator, value = token.partition(":")
+        if not separator:
+            raise AssertionError(f"Unexpected fixture query token: {token}")
+        if key == "author":
+            selected = [r for r in selected if r["author"].casefold() == value.casefold()]
+        elif key in {"user", "org"}:
+            selected = [r for r in selected if r["owner"].casefold() == value.casefold()]
+        elif key == "is" and value == "pr":
+            selected = [r for r in selected if r["kind"] == "pr"]
+        elif key == "is" and value == "merged":
+            selected = [r for r in selected if r["merged"] is not None]
+        elif key == "merged":
+            if ".." in value:
+                lower, upper = value.split("..", 1)
+                selected = [r for r in selected if r["merged"] is not None
+                            and _pr_instant(lower) <= _pr_instant(r["merged"]) <= _pr_instant(upper)]
+            else:
+                match = re.fullmatch(r"(>=|<=|>|<)?(.+)", value)
+                operation, boundary = match.groups()
+                limit = _pr_instant(boundary)
+                operators = {">=": lambda x: x >= limit, "<=": lambda x: x <= limit,
+                             ">": lambda x: x > limit, "<": lambda x: x < limit,
+                             None: lambda x: x == limit}
+                selected = [r for r in selected if r["merged"] is not None
+                            and operators[operation](_pr_instant(r["merged"]))]
+        else:
+            raise AssertionError(f"Unsupported fixture qualifier: {token}")
+    return selected
+
+
+class _PrSearchResponse:
+    def __init__(self, payload, status=200):
+        self.status_code = status
+        self.payload = payload
+
+    def json(self):
+        return copy.deepcopy(self.payload)
+
+
+class _PrSearchProvider:
+    def __init__(self, rows):
+        self.rows = rows
+        self.queries = []
+
+    def __call__(self, url, **kwargs):
+        if url != "https://api.github.com/search/issues":
+            raise AssertionError(f"Wrong provider URL: {url}")
+        query = kwargs["params"]["q"]
+        self.queries.append(query)
+        return _PrSearchResponse({"total_count": len(_pr_requested_rows(query, self.rows)),
+                         "incomplete_results": False})
+
+
+def _observe_pr_search(*, rows=None, payload=None, public=False, cached=None, actor=_PR_ACTOR):
+    provider = _PrSearchProvider(rows or []) if payload is None else lambda *args, **kw: _PrSearchResponse(payload)
+    writes = []
+    with ExitStack() as stack:
+        stack.enter_context(patch.object(gh, "USERNAME", actor))
+        stack.enter_context(patch.object(gh, "TOKEN", "configured" if public else ""))
+        stack.enter_context(patch.object(gh, "_calendar_window", return_value=_PR_WINDOW))
+        stack.enter_context(patch.object(gh, "_get_cached", return_value=copy.deepcopy(cached)))
+        stack.enter_context(patch.object(gh, "_set_cached", side_effect=lambda key, value:
+                                        writes.append((key, copy.deepcopy(value)))))
+        stack.enter_context(patch.object(gh, "_request_with_retry", side_effect=
+                                        (lambda *args, **kw: _PrSearchResponse({}, 403)) if public else provider))
+        stack.enter_context(patch.object(gh, "_request_public_with_retry", side_effect=provider))
+        result = gh.get_merged_prs_last_n_days_observation(365)
+    return result, writes, provider
+
+
+class AuthoredPRSearchTests(unittest.TestCase):
+    def test_authored_prs_cross_owner_boundaries(self):
+        rows = [_pr_row(), _pr_row(owner="semverity-labs"), _pr_row(owner="upstream-maintainer"),
+                _pr_row(owner="semverity-labs", author="another-person"), _pr_row(merged=None),
+                _pr_row(merged="2025-10-01T12:00:00Z"), _pr_row(kind="issue")]
+        results = [_observe_pr_search(rows=rows, public=public)[0] for public in (False, True)]
+        self.assertEqual([3, 3], [r["value"] for r in results],
+                         "owner filtering removed authored PRs")
+        self.assertEqual(["authored-pull-requests-visible-to-primary-pr-search",
+                          "authored-public-pull-requests-visible-to-public-pr-search"],
+                         [r["population_id"] for r in results],
+                         "emitted scope does not name authored PRs")
+
+    def test_partial_and_malformed_search_do_not_claim_exact_count(self):
+        bad = [{"total_count": 96, "incomplete_results": True},
+               {"total_count": 96}, {"incomplete_results": False},
+               {"total_count": True, "incomplete_results": False},
+               {"total_count": "96", "incomplete_results": False},
+               {"total_count": 96.75, "incomplete_results": False},
+               {"total_count": -1, "incomplete_results": False},
+               {"total_count": 96, "incomplete_results": 0}]
+        for payload in bad:
+            with self.subTest(payload=payload):
+                try:
+                    result = _observe_pr_search(payload=payload)[0]
+                    outcome = result["status"]
+                except ValueError as exc:
+                    outcome = f"raised ValueError: {exc}"
+                self.assertEqual("unavailable", outcome,
+                                 "invalid response was not qualified as unavailable")
+
+    def test_search_and_evidence_share_timestamp_boundaries(self):
+        rows = [_pr_row(merged="2025-11-16T04:59:59Z"), _pr_row(merged="2025-11-16T05:00:00Z"),
+                _pr_row(merged="2025-11-16T05:00:01Z"), _pr_row(),
+                _pr_row(merged="2026-11-16T01:00:43Z"), _pr_row(merged="2026-11-16T01:00:44Z"),
+                _pr_row(merged="2026-11-16T01:00:45Z")]
+        result = _observe_pr_search(rows=rows)[0]
+        self.assertEqual(("2025-11-16T05:00:00Z", "2026-11-16T01:00:44Z", 5),
+                         (result["window_start"], result["window_end"], result["value"]),
+                         "query count exceeds the emitted timestamp window")
+
+    def test_owned_population_cache_cannot_answer_overall_request(self):
+        cached = {"schema": "profile-provider-observation/v1", "metric_id": "prs_merged",
+                  "source_metric_id": "merged_prs_primary_visible_population", "value": 96,
+                  "status": "ok", "complete": True,
+                  "population_id": "owned-repositories-visible-to-primary-pr-search",
+                  "population_signature": None, "window_start": "2025-11-16T05:00:00Z",
+                  "window_end": "2026-11-16T01:00:44Z", "observed_at": "2026-11-16T01:00:44Z",
+                  "source_id": "github_rest_merged_pr_search_primary", "source_mode": "live",
+                  "completion_reason": "all_components_observed"}
+        result, _, provider = _observe_pr_search(rows=[_pr_row()], cached=cached)
+        self.assertEqual((1, 1), (result["value"], len(provider.queries)),
+                         "owned-only cache answered the overall request")
+
+    def test_author_changes_do_not_reuse_other_authors_cached_count(self):
+        rows = [_pr_row(owner="alice", author="alice"), _pr_row(owner="bob", author="bob"),
+                _pr_row(owner="bob", author="bob")]
+        provider = _PrSearchProvider(rows)
+        cache = {}
+        with patch.object(gh, "TOKEN", ""), patch.object(gh, "_calendar_window", return_value=_PR_WINDOW), \
+                patch.object(gh, "_get_cached", side_effect=lambda key: copy.deepcopy(cache.get(key))), \
+                patch.object(gh, "_set_cached", side_effect=lambda key, value: cache.__setitem__(key, copy.deepcopy(value))), \
+                patch.object(gh, "_request_with_retry", side_effect=provider):
+            with patch.object(gh, "USERNAME", "alice"):
+                alice = gh.get_merged_prs_last_n_days_observation(365)
+            with patch.object(gh, "USERNAME", "bob"):
+                bob = gh.get_merged_prs_last_n_days_observation(365)
+        self.assertEqual([1, 2], [alice["value"], bob["value"]],
+                         "another author's count crossed the cache boundary")
+
+    def test_control_complete_owned_and_zero(self):
+        results = [_observe_pr_search(rows=[_pr_row(), _pr_row(author="another-person")])[0],
+                   _observe_pr_search(rows=[])[0]]
+        self.assertEqual([1, 0], [r["value"] for r in results])
+        self.assertEqual(["ok", "ok"], [r["status"] for r in results])
+        self.assertTrue(all(r["complete"] for r in results))
+
+    def test_control_public_fallback_is_not_primary_exact(self):
+        result = _observe_pr_search(rows=[_pr_row()], public=True)[0]
+        self.assertEqual("fallback", result["status"])
+        self.assertEqual(1, result["value"])
+        self.assertEqual("merged_prs_public_visible_population", result["source_metric_id"])
+        with patch.object(gh, "get_merged_prs_last_n_days_observation", return_value=result):
+            self.assertIsNone(gh.get_merged_prs_last_n_days(365))
+
+    def test_control_unavailable_is_not_zero(self):
+        result = _observe_pr_search(payload=[])[0]
+        self.assertEqual("unavailable", result["status"])
+        self.assertIsNone(result["value"])
+        self.assertFalse(result["complete"])
+
+    def test_control_same_author_cache_replays(self):
+        cached = _observe_pr_search(rows=[_pr_row()])[0]
+        result, _, provider = _observe_pr_search(rows=[], cached=cached)
+        self.assertEqual(1, result["value"])
+        self.assertEqual("cache", result["source_mode"])
+        self.assertEqual([], provider.queries)

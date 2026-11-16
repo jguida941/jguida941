@@ -192,7 +192,7 @@ class DashboardFinalFitTests(unittest.TestCase):
         rows = [{"name": "one", "status": "active"}, {"name": "two", "status": "maintained"}, {"name": "three"}]
         summary = build_dashboard_summary({"spotlight_data": rows}, profile_date=date(2026, 10, 8))
         self.assertEqual([r.get("status") for r in summary["projects"]], ["active", "maintained", None])
-        for identity, glyph in (("inventory.private_owned", "lock"), ("inventory.public_nonfork", "globe"), ("activity.public_commits", "commit"), ("calendar.current_streak", "fire")):
+        for identity, glyph in (("inventory.private_owned", "lock"), ("inventory.public_total", "globe"), ("activity.public_commits", "commit"), ("calendar.current_streak", "fire")):
             self.assertEqual(SEMANTIC_ICONS[identity], glyph)
 
     def test_common_focus_metadata_and_short_window_truth(self):
@@ -236,7 +236,7 @@ class DashboardMetricCellTests(unittest.TestCase):
         from scripts.rendering.generate_dashboard_summary import Canvas
         from scripts.contracts.dashboard_summary import _fact
         ns="{http://www.w3.org/2000/svg}"
-        facts=[_fact("inventory."+str(i),i,label,"public") for i,label in enumerate(("public non-fork repos","private owned repos","stargazers"))]
+        facts=[_fact("inventory."+str(i),i,label,"public") for i,label in enumerate(("public repos","private owned repos","stargazers"))]
         canvas=Canvas(True)
         canvas.fact_grid(facts,34,20,292,columns=2)
         root=ET.fromstring('<svg xmlns="http://www.w3.org/2000/svg">'+''.join(canvas.parts)+'</svg>')
@@ -250,12 +250,78 @@ class DashboardMetricCellTests(unittest.TestCase):
 
 
 
+class WorkingProjectionIsolationTests(unittest.TestCase):
+    def test_raw_recent_updates_and_metadata_fallback_keep_latest_push(self):
+        from tests.pipeline.test_compute_metrics_accuracy import ProfileRecentWorkTests
+        model, profile, _, _, stamps = ProfileRecentWorkTests().scenario()
+        raw = next(row for row in model["recent_repos"] if row["name"] == "jguida941")
+        self.assertEqual(stamps[0], raw["pushed_at"])
+        self.assertEqual(stamps[0], profile["pushed_at"])
+        hint = next(row for row in model["activity_analytics"]["recent_pushes"]["rows"]
+                    if row["repository"] == "jguida941/jguida941")
+        self.assertEqual(stamps[0], hint["timestamp"])
+        work = next(row for row in model["dashboard_summary"]["working"] if row["name"] == "jguida941")
+        self.assertEqual(stamps[1], work["pushed_at"])
+        self.assertNotEqual(raw["pushed_at"], work["pushed_at"])
+
+    def test_standalone_working_card_uses_the_same_filtered_rows(self):
+        from unittest.mock import patch
+        from tests.pipeline.test_compute_metrics_accuracy import ProfileRecentWorkTests, AccuracyTests
+        from scripts.pipeline import render_outputs
+        model, _, _, _, stamps = ProfileRecentWorkTests().scenario()
+        captured = []
+        class CapturedWorking(Exception):
+            pass
+        def capture(rows):
+            captured.extend(rows)
+            raise CapturedWorking()
+        with patch.object(render_outputs, "gen_badges"), patch.object(render_outputs, "gen_lang_chart"), \
+                patch.object(render_outputs, "gen_working", side_effect=capture):
+            with self.assertRaises(CapturedWorking):
+                render_outputs.generate_assets(AccuracyTests()._collected(), model, logger=lambda *args: None)
+        self.assertEqual(["pub1", "jguida941"], [row["name"] for row in captured])
+        self.assertEqual(stamps[1], captured[1]["pushed_at"])
+        self.assertEqual([(row["name"], row["pushed_at"]) for row in model["dashboard_summary"]["working"]],
+                         [(row["name"], row["pushed_at"]) for row in captured])
+
+
+class ProfileRecentWorkFreshnessTests(unittest.TestCase):
+    def test_newer_push_invalidates_an_older_refresh_selection(self):
+        import copy
+        from datetime import datetime, timedelta
+        from tests.pipeline.test_compute_metrics_accuracy import ProfileRecentWorkTests
+        from scripts.pipeline.compute_metrics import _build_recent_repos
+        _, profile, observed, _, _ = ProfileRecentWorkTests().scenario(change=None)
+        old = copy.deepcopy(observed)
+        proof = old["profile_recent_work"]
+        now = datetime.fromisoformat(proof["observed_at"].replace("Z", "+00:00"))
+        for field in ("observed_at", "window_start", "window_end"):
+            stamp = datetime.fromisoformat(proof[field].replace("Z", "+00:00"))
+            proof[field] = (stamp - timedelta(hours=2)).isoformat().replace("+00:00", "Z")
+        profile["latest_commit_message"] = "Implement the next source change"
+        rows, _ = _build_recent_repos([profile], now - timedelta(days=7), {}, False,
+                                     activity_observations=old)
+        self.assertEqual(["jguida941"], [row["name"] for row in rows])
+        self.assertEqual(profile["pushed_at"], rows[0]["pushed_at"])
+        self.assertEqual(profile["latest_commit_message"], rows[0]["last_commit_msg"])
+
+    def test_current_refresh_evidence_control(self):
+        from datetime import datetime, timedelta
+        from tests.pipeline.test_compute_metrics_accuracy import ProfileRecentWorkTests
+        from scripts.pipeline.compute_metrics import _build_recent_repos
+        _, profile, observed, _, _ = ProfileRecentWorkTests().scenario(change=None)
+        now = datetime.fromisoformat(observed["observed_at"].replace("Z", "+00:00"))
+        rows, _ = _build_recent_repos([profile], now - timedelta(days=7), {}, False,
+                                     activity_observations=observed)
+        self.assertEqual([], rows)
+
+
 class DashboardFlatOverviewTests(unittest.TestCase):
     def test_only_selected_five_owners_are_flat_and_active_label_is_one_line(self):
         ns="{http://www.w3.org/2000/svg}"
         from scripts.contracts.dashboard_summary import _fact
-        summary={"facts":[_fact("activity.active_repos_7d",8,"active repos","owned",status="exact")]}
-        flat={"profile.contributions","inventory.public_nonfork","inventory.private_owned","inventory.stargazers","activity.active_repos_7d"}
+        summary={"facts":[_fact("activity.working_repos_7d",8,"active repos","owned",status="exact")]}
+        flat={"profile.contributions","inventory.public_total","inventory.private_owned","inventory.stargazers","activity.working_repos_7d"}
         for mobile in (False,True):
             root=ET.fromstring(render_svg(summary,mobile=mobile))
             owners=[n for n in root.iter() if n.get("data-metric-id")]
@@ -263,7 +329,7 @@ class DashboardFlatOverviewTests(unittest.TestCase):
             for owner in owners:
                 cells=[n for n in owner.iter(ns+"rect") if n.get("data-role")=="metric-cell"]
                 self.assertEqual(len(cells),0 if owner.get("data-metric-id") in flat else 1)
-            active=next(n for n in owners if n.get("data-metric-id")=="activity.active_repos_7d")
+            active=next(n for n in owners if n.get("data-metric-id")=="activity.working_repos_7d")
             label=next(n for n in active.iter(ns+"text") if n.text=="active repos")
             value=next(n for n in active.iter(ns+"text") if n.get("data-role")=="value")
             self.assertEqual(label.get("font-size"),"14")
@@ -319,7 +385,7 @@ class DashboardShortInventoryLabelsTests(unittest.TestCase):
     def test_short_labels_preserve_values_scopes_and_input(self):
         import copy
         ns = "{http://www.w3.org/2000/svg}"
-        facts = [_fact("inventory.public_nonfork", 56, "public non-fork repos", "public-owned-nonfork-profile-included"),
+        facts = [_fact("inventory.public_total", 56, "public repos", "public-owned-including-forks"),
                  _fact("inventory.private_owned", 203, "private owned repos", "private-owned-including-forks")]
         summary = {"facts": facts}
         original = copy.deepcopy(summary)
@@ -348,7 +414,7 @@ class DashboardHeaderScaleTests(unittest.TestCase):
             for owner in (n for n in root.iter() if n.get("data-metric-id")):
                 key = owner.get("data-metric-id")
                 value = next(n for n in owner.iter(ns+"text") if n.get("data-role")=="value")
-                expected = 46 if key=="profile.contributions" else 29 if key in ("inventory.public_nonfork","inventory.private_owned","inventory.stargazers") else 42 if key=="activity.active_repos_7d" else 25
+                expected = 46 if key=="profile.contributions" else 29 if key in ("inventory.public_total","inventory.private_owned","inventory.stargazers") else 42 if key=="activity.working_repos_7d" else 25
                 self.assertEqual(float(value.get("font-size")), expected)
 
 
@@ -764,6 +830,8 @@ def inventory_fixture_model(mode="complete", *, zero=False):
                 "full_name": f"{gh.USERNAME}/fork-example", "html_url": f"https://github.com/{gh.USERNAME}/fork-example",
                 "stargazers_count": 999}
         all_public.append(fork)
+    if mode == "fork-only":
+        public, private, all_public = [], [], [fork]
     counts = {"public_owned_total": len(all_public), "public_owned_nonfork": len(public),
               "public_owned_forks": len(all_public) - len(public), "private_owned": len(private),
               "private_owned_nonfork": len(private)}
@@ -831,6 +899,21 @@ def inventory_fixture_model(mode="complete", *, zero=False):
             stack.enter_context(patch.object(collector, "collect_public_ci_timeline", return_value={}))
         stack.enter_context(patch("requests.sessions.Session.request", side_effect=AssertionError("Unexpected live network")))
         collected = collector.collect_profile_data(logger=lambda *_: None)
+        # These controls target the shared census admission boundary. The private
+        # collector also validates canonical identities earlier; corrupting its
+        # input would exercise that distinct boundary instead of this one.
+        if mode in ("missing-fork", "duplicate-full-census", "foreign-owner"):
+            from dataclasses import replace
+            evidence = copy.deepcopy(collected.inventory_evidence)
+            rows = copy.deepcopy(evidence["all_public_repos"])
+            evidence["all_public_repos"] = rows
+            if mode == "missing-fork":
+                evidence["all_public_repos"] = [row for row in rows if not row["fork"]]
+            elif mode == "duplicate-full-census":
+                rows[-1] = copy.deepcopy(rows[0])
+            else:
+                rows[-1]["owner"] = {"login": "semverity-labs"}
+            collected = replace(collected, inventory_evidence=evidence)
         return compute_profile_model(collected, logger=lambda *_: None, allow_network_calls=False)
 
 
@@ -840,12 +923,12 @@ class InventoryVerificationTests(unittest.TestCase):
         return {row["metric_id"]: row for row in model["dashboard_summary"]["facts"]
                 if row["metric_id"].startswith("inventory.")}
 
-    def test_fresh_matching_personal_census_qualifies_all_four_counts(self):
+    def test_fresh_matching_personal_census_qualifies_total_and_distinct_nonfork_counts(self):
         for zero in (False, True):
             model = inventory_fixture_model(zero=zero)
             facts = self.facts(model)
-            self.assertEqual(["exact"] * 4, [row["quality"]["status"] for row in facts.values()])
-            self.assertEqual([0, 0, 0, 0] if zero else [3, 1, 3, 1], [row["value"] for row in facts.values()])
+            self.assertEqual(["exact"] * 5, [row["quality"]["status"] for row in facts.values()])
+            self.assertEqual([0, 0, 0, 0, 0] if zero else [4, 3, 1, 3, 1], [row["value"] for row in facts.values()])
             self.assertIn("inventory_observation", model["dashboard_data"])
 
     def test_unavailable_fresh_census_does_not_certify_retained_counts(self):
@@ -869,10 +952,34 @@ class InventoryVerificationTests(unittest.TestCase):
         model = inventory_fixture_model("fresh-change")
         facts = self.facts(model)
         self.assertEqual(4, model["snapshot"]["total_repos"])
+        self.assertEqual(5, model["snapshot"]["public_repos_total"])
         self.assertEqual(4, model["data_scope"]["public_owned_nonfork_repos_total"])
         self.assertEqual(10, model["snapshot"]["total_stars"])
         self.assertEqual(4, facts["inventory.public_nonfork"]["value"])
         self.assertTrue(all(row["quality"]["status"] == "exact" for row in facts.values()))
+
+    def test_public_headline_counts_forks_without_changing_nonfork_or_received_stars(self):
+        model = inventory_fixture_model()
+        facts = self.facts(model)
+        self.assertEqual(4, facts["inventory.public_total"]["value"])
+        self.assertEqual(3, facts["inventory.public_nonfork"]["value"])
+        self.assertEqual(3, facts["inventory.stargazers"]["value"])
+        self.assertEqual(3, model["snapshot"]["total_repos"])
+        self.assertEqual(4, model["snapshot"]["public_repos_total"])
+
+    def test_all_public_headline_needs_its_own_complete_current_row_census(self):
+        for mode in ("missing-fork", "duplicate-full-census", "foreign-owner"):
+            with self.subTest(mode=mode):
+                facts = self.facts(inventory_fixture_model(mode))
+                self.assertNotEqual("exact", facts["inventory.public_total"]["quality"]["status"])
+                self.assertEqual("exact", facts["inventory.public_nonfork"]["quality"]["status"])
+
+    def test_fork_only_account_has_public_headline_and_zero_nonfork_inventory(self):
+        facts = self.facts(inventory_fixture_model("fork-only"))
+        self.assertEqual(1, facts["inventory.public_total"]["value"])
+        self.assertEqual(0, facts["inventory.public_nonfork"]["value"])
+        self.assertEqual(0, facts["inventory.stargazers"]["value"])
+        self.assertEqual("exact", facts["inventory.public_total"]["quality"]["status"])
 
     def test_missing_star_evidence_does_not_taint_observed_repository_count(self):
         facts = self.facts(inventory_fixture_model("unobserved-stars"))
@@ -884,7 +991,7 @@ class InventoryVerificationTests(unittest.TestCase):
         from scripts.contracts.dashboard_summary import _fact
         for status, phrase in (("exact", "Verified from GitHub"), ("unknown", "Reported inventory")):
             facts = [_fact(identity, 1, identity, "fixture", status=status, qualification=phrase)
-                     for identity in ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers", "inventory.public_forks")]
+                     for identity in ("inventory.public_total", "inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers", "inventory.public_forks")]
             for mobile in (False, True):
                 root = ET.fromstring(render_svg({"facts": facts}, mobile=mobile))
                 overview = next(node for node in root.iter() if node.get("data-section") == "overview")
@@ -926,7 +1033,7 @@ class InventoryCurrentnessTests(unittest.TestCase):
             with self.subTest(stamp=stamp):
                 model = inventory_fixture_model()
                 model["dashboard_data"]["inventory_observation"]["observed_at"] = stamp
-                self.assertEqual(["unknown"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+                self.assertEqual(["unknown"] * 5, [row["quality"]["status"] for row in self._facts(model).values()])
 
     def test_compute_does_not_refresh_from_old_or_future_evidence(self):
         from scripts.pipeline import compute_metrics
@@ -938,7 +1045,7 @@ class InventoryCurrentnessTests(unittest.TestCase):
                     return real_compute(collected, *args, **kwargs)
                 with patch.object(compute_metrics, "compute_profile_model", side_effect=substituted):
                     model = inventory_fixture_model("fresh-change")
-                self.assertEqual(["unknown"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+                self.assertEqual(["unknown"] * 5, [row["quality"]["status"] for row in self._facts(model).values()])
                 self.assertTrue(all(row["complete"] is False for row in model["dashboard_data"]["inventory_observation"]["metrics"].values()))
 
     def test_complete_previous_run_census_cannot_certify_new_snapshot(self):
@@ -948,7 +1055,7 @@ class InventoryCurrentnessTests(unittest.TestCase):
         previous.update(observed_at="2000-01-01T00:00:01Z", snapshot_generated_at="2000-01-01T00:00:02Z")
         data["inventory_observation"] = previous
         data["collection_started_at"] = "2000-01-01T00:00:00Z"
-        self.assertEqual(["unknown"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+        self.assertEqual(["unknown"] * 5, [row["quality"]["status"] for row in self._facts(model).values()])
 
     def test_missing_or_naive_run_bounds_cannot_certify_inventory(self):
         for key in ("collection_started_at", "generated_at"):
@@ -956,7 +1063,7 @@ class InventoryCurrentnessTests(unittest.TestCase):
                 with self.subTest(key=key, value=value):
                     model = inventory_fixture_model()
                     model["dashboard_data"][key] = value
-                    self.assertEqual(["unknown"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+                    self.assertEqual(["unknown"] * 5, [row["quality"]["status"] for row in self._facts(model).values()])
 
     def test_same_observation_in_another_zone_remains_exact(self):
         from datetime import timedelta
@@ -964,7 +1071,7 @@ class InventoryCurrentnessTests(unittest.TestCase):
         observation = model["dashboard_data"]["inventory_observation"]
         instant = datetime.fromisoformat(observation["observed_at"].replace("Z", "+00:00"))
         observation["observed_at"] = instant.astimezone(timezone(timedelta(hours=5))).isoformat()
-        self.assertEqual(["exact"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+        self.assertEqual(["exact"] * 5, [row["quality"]["status"] for row in self._facts(model).values()])
 
     def test_collection_crossing_midnight_remains_exact(self):
         from scripts.pipeline import collect_data, compute_metrics
@@ -978,4 +1085,4 @@ class InventoryCurrentnessTests(unittest.TestCase):
                 return datetime(2026, 11, 15, 0, 0, 1, tzinfo=timezone.utc).astimezone(tz)
         with patch.object(collect_data, "datetime", CollectClock), patch.object(compute_metrics, "datetime", GenerateClock):
             model = inventory_fixture_model()
-        self.assertEqual(["exact"] * 4, [row["quality"]["status"] for row in self._facts(model).values()])
+        self.assertEqual(["exact"] * 5, [row["quality"]["status"] for row in self._facts(model).values()])
