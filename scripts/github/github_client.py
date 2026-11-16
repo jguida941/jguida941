@@ -319,6 +319,41 @@ def _contribution_value_covers_window(value, window_start, window_end, observed_
             and dates[-1] == end.date().isoformat())
 
 
+_NATIVE_CALENDAR_SOURCE = "github_default_profile_contribution_total_and_days"
+
+
+def _valid_native_contribution_value(value) -> bool:
+    """Validate returned cells independently of GitHub's nonadditive aggregate."""
+    if type(value) is not dict or set(value) != {"total", "days", "calendar_start", "calendar_end"}:
+        return False
+    if not _is_nonnegative_int(value.get("total")):
+        return False
+    rows = value.get("days")
+    if type(rows) not in {list, tuple} or not rows:
+        return False
+    # Reuse strict dated-cell validation with the independently derived subtotal.
+    if any(type(row) is not dict or not _is_nonnegative_int(row.get("count")) for row in rows):
+        return False
+    dated = {"total": sum(row["count"] for row in rows), "days": rows}
+    if not _valid_contribution_value(dated):
+        return False
+    labels = sorted(row["date"] for row in rows)
+    return value["calendar_start"] == labels[0] and value["calendar_end"] == labels[-1]
+
+
+def _native_contribution_period(value, start, end, observed) -> bool:
+    if not _valid_native_contribution_value(value):
+        return False
+    try:
+        stamps = [datetime.fromisoformat(stamp.replace("Z", "+00:00")) for stamp in (start, observed, end)]
+        return (all(stamp.tzinfo is not None and stamp.utcoffset() is not None for stamp in stamps)
+                and stamps[0] <= stamps[1] <= stamps[2]
+                and stamps[0].date().isoformat() <= value["calendar_start"]
+                <= value["calendar_end"] <= stamps[2].date().isoformat())
+    except (AttributeError, TypeError, ValueError):
+        return False
+
+
 def validate_provider_observation(observation: dict) -> bool:
     """Validate the closed provider observation union.
 
@@ -414,6 +449,10 @@ def validate_provider_observation(observation: dict) -> bool:
                 True,
             ),
         }
+        if metric_id == "last_year_contributions" and source_metric_id == _NATIVE_CALENDAR_SOURCE:
+            unavailable_specs[metric_id] = (_NATIVE_CALENDAR_SOURCE,
+                "github-contribution-calendar-visible-to-provider",
+                "github_graphql_default_contributions_collection", False, False)
         spec = unavailable_specs.get(metric_id)
         if spec is None:
             return False
@@ -489,6 +528,12 @@ def validate_provider_observation(observation: dict) -> bool:
         )
 
     if metric_id == "last_year_contributions":
+        if source_metric_id == _NATIVE_CALENDAR_SOURCE:
+            return (status == "ok" and source_mode == "live" and complete is True
+                    and reason == "all_components_observed" and signature is None
+                    and population_id == "github-contribution-calendar-visible-to-provider"
+                    and source_id == "github_graphql_default_contributions_collection"
+                    and _native_contribution_period(value, window_start, window_end, observation.get("observed_at")))
         if source_metric_id == "github_contribution_calendar_total_and_days":
             return (
                 status == "ok"
@@ -2853,6 +2898,69 @@ def get_profile_contributions_observation() -> dict:
     except (KeyError, TypeError):
         return observation
     return candidate if validate_provider_observation(candidate) else observation
+
+
+def get_default_contribution_calendar_observation() -> dict:
+    """One uncached default response owns the account aggregate and calendar cells."""
+    unavailable = dict(schema="profile-provider-observation/v1", metric_id="last_year_contributions",
+        source_metric_id=_NATIVE_CALENDAR_SOURCE, value=None, status="unavailable", complete=False,
+        population_id="github-contribution-calendar-visible-to-provider", population_signature=None,
+        window_start=None, window_end=None, observed_at=None,
+        source_id="github_graphql_default_contributions_collection", source_mode="live",
+        completion_reason="unavailable")
+    if not any(token.strip() for token in candidate_tokens(_settings)):
+        return unavailable
+    query = """
+    query($login: String!) {
+      user(login: $login) {
+        contributionsCollection {
+          startedAt
+          endedAt
+          contributionCalendar {
+            totalContributions
+            weeks { contributionDays { date contributionCount } }
+          }
+        }
+      }
+    }
+    """
+    data = _graphql_query(query, {"login": USERNAME})
+    try:
+        collection = data["user"]["contributionsCollection"]
+        calendar = collection["contributionCalendar"]
+        if type(calendar["weeks"]) is not list or any(
+            type(week) is not dict or type(week.get("contributionDays")) is not list
+            for week in calendar["weeks"]):
+            return unavailable
+        rows = [{"date": row["date"], "count": row["contributionCount"]}
+                for week in calendar["weeks"] for row in week["contributionDays"]]
+        rows.sort(key=lambda row: row["date"])
+        candidate = {**unavailable, "status": "ok", "complete": True,
+            "value": {"total": calendar["totalContributions"], "days": rows,
+                      "calendar_start": rows[0]["date"], "calendar_end": rows[-1]["date"]},
+            "window_start": collection["startedAt"], "window_end": collection["endedAt"],
+            "observed_at": _iso_utc(datetime.now(timezone.utc)),
+            "completion_reason": "all_components_observed"}
+    except (AttributeError, KeyError, TypeError, ValueError, IndexError):
+        return unavailable
+    return candidate if validate_provider_observation(candidate) else unavailable
+
+
+def profile_contributions_from_calendar(observation) -> dict:
+    """Project the scalar without another request or a derived calendar sum."""
+    available = (validate_provider_observation(observation)
+                 and observation.get("source_metric_id") == _NATIVE_CALENDAR_SOURCE
+                 and observation.get("status") == "ok")
+    return dict(schema="profile-provider-observation/v1", metric_id="github_profile_contributions",
+        source_metric_id="github_default_profile_contribution_total",
+        value=observation["value"]["total"] if available else None,
+        status="ok" if available else "unavailable", complete=available,
+        population_id="github-user-contributions-visible-to-provider", population_signature=None,
+        window_start=observation["window_start"] if available else None,
+        window_end=observation["window_end"] if available else None,
+        observed_at=observation["observed_at"] if available else None,
+        source_id="github_graphql_default_contributions_collection", source_mode="live",
+        completion_reason="all_components_observed" if available else "unavailable")
 
 
 def get_contribution_calendar_observation(days: int = 365) -> dict:

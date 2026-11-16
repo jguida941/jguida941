@@ -3079,3 +3079,82 @@ class AuthoredPRSearchTests(unittest.TestCase):
         self.assertEqual(1, result["value"])
         self.assertEqual("cache", result["source_mode"])
         self.assertEqual([], provider.queries)
+
+
+class NativeCalendarProviderTests(unittest.TestCase):
+    setUp = GithubProfileHeadlineProviderTests.setUp
+
+    @staticmethod
+    def response():
+        return {"user": {"contributionsCollection": {
+            "startedAt": "2025-11-09T05:00:00Z", "endedAt": "2026-11-16T04:59:59Z",
+            "contributionCalendar": {"totalContributions": 17, "weeks": [{"contributionDays": [
+                {"date": "2026-11-14", "contributionCount": 0},
+                {"date": "2026-11-15", "contributionCount": 3}]}]}}}}
+
+    def native(self, response=None):
+        with patch.object(gh, "_graphql_query", return_value=response or self.response()):
+            return gh.get_default_contribution_calendar_observation()
+
+    def test_native_closed_value_refuses_malformed_rows_periods_and_replay(self):
+        valid = self.native()
+        self.assertTrue(gh.validate_provider_observation(valid))
+        self.assertEqual(17, valid["value"]["total"])
+        self.assertEqual(3, sum(row["count"] for row in valid["value"]["days"]))
+        for kind in ("boolean-total", "negative-total", "boolean-day", "duplicate", "gap", "missing-zero-edge",
+                     "false-start", "extra", "replay", "wrong-source", "naive-period", "reversed-period"):
+            broken = copy.deepcopy(valid)
+            value = broken["value"]
+            if kind == "boolean-total": value["total"] = True
+            elif kind == "negative-total": value["total"] = -1
+            elif kind == "boolean-day": value["days"][0]["count"] = True
+            elif kind == "duplicate": value["days"].append(copy.deepcopy(value["days"][0]))
+            elif kind == "gap": value["days"][0]["date"] = "2026-11-13"; value["calendar_start"] = "2026-11-13"
+            elif kind == "missing-zero-edge": value["days"].pop(0)
+            elif kind == "false-start": value["calendar_start"] = "2026-11-13"
+            elif kind == "extra": value["unexpected"] = 1
+            elif kind == "replay": broken.update(source_mode="cache", completion_reason="same_scope_cache")
+            elif kind == "wrong-source": broken["source_id"] = "github_graphql_contribution_calendar"
+            elif kind == "naive-period": broken["window_start"] = "2025-11-09T05:00:00"
+            else: broken["window_start"] = "2027-11-09T05:00:00Z"
+            with self.subTest(kind=kind):
+                self.assertFalse(gh.validate_provider_observation(broken))
+                self.assertIsNone(gh.profile_contributions_from_calendar(broken)["value"])
+
+    def test_native_query_ignores_old_cache_and_organization_settings(self):
+        for organization in ("", "semverity-labs"):
+            with patch.dict(gh.os.environ, {"GITHUB_ORG": organization}), patch.object(
+                gh, "_get_cached", return_value=ContributionCalendarConsistencyTests._observation()
+            ) as cache, patch.object(gh, "_graphql_query", return_value=self.response()) as query:
+                native = gh.get_default_contribution_calendar_observation()
+            self.assertEqual(17, native["value"]["total"])
+            cache.assert_not_called()
+            self.assertEqual({"login": gh.USERNAME}, query.call_args.args[1])
+            self.assertNotRegex(query.call_args.args[0], r"contributionsCollection\s*\(")
+            scalar = gh.profile_contributions_from_calendar(native)
+            self.assertEqual(17, scalar["value"])
+            self.assertEqual([native[key] for key in ("window_start", "window_end", "observed_at")],
+                             [scalar[key] for key in ("window_start", "window_end", "observed_at")])
+
+    def test_missing_credentials_or_malformed_native_payload_do_not_gain_values(self):
+        from dataclasses import replace
+        with patch.object(gh, "_settings", replace(gh._settings, token="", tokens=())), \
+             patch.object(gh, "_graphql_query") as query:
+            missing = gh.get_default_contribution_calendar_observation()
+        query.assert_not_called()
+        self.assertTrue(gh.validate_provider_observation(missing))
+        self.assertEqual("unavailable", missing["status"])
+        for kind in ("empty", "not-list", "string-count", "boolean-total", "bad-date", "missing-period"):
+            response = self.response()
+            collection = response["user"]["contributionsCollection"]
+            calendar = collection["contributionCalendar"]
+            if kind == "empty": calendar["weeks"] = []
+            elif kind == "not-list": calendar["weeks"] = {}
+            elif kind == "string-count": calendar["weeks"][0]["contributionDays"][0]["contributionCount"] = "0"
+            elif kind == "boolean-total": calendar["totalContributions"] = False
+            elif kind == "bad-date": calendar["weeks"][0]["contributionDays"][0]["date"] = "2026-11-014"
+            else: del collection["endedAt"]
+            with self.subTest(kind=kind):
+                result = self.native(response)
+                self.assertTrue(gh.validate_provider_observation(result))
+                self.assertEqual("unavailable", result["status"])

@@ -101,6 +101,9 @@ def build_dashboard_summary(model, *, profile_date):
     rhythm_display = contribution_rhythm_display(rhythm)
     calendar_ok = not contribution_rhythm_errors(rhythm) and rhythm.get("status") == "available"
     raw_calendar = data.get("contribution_calendar") or {}
+    from scripts.github import github_client as gh
+    calendar_provenance = provenance.get("last_year_contributions") or {}
+    native_calendar = calendar_provenance.get("source_metric_id") == gh._NATIVE_CALENDAR_SOURCE
     days = []
     if calendar_ok:
         try:
@@ -109,11 +112,31 @@ def build_dashboard_summary(model, *, profile_date):
             if (len(set(parsed)) != len(parsed)
                     or any(day.isoformat() != row["date"] for day, row in zip(parsed, days))
                     or any(_count(row["count"]) is None for row in days)
-                    or _count(raw_calendar.get("total")) != rhythm["total"]
-                    or _count(snapshot.get("last_year_contributions")) != rhythm["total"]
+                    or _count(raw_calendar.get("total")) != _count(snapshot.get("last_year_contributions"))
+                    or (not native_calendar and _count(raw_calendar.get("total")) != rhythm["total"])
                     or sum(row["count"] for row in days) != rhythm["total"]):
                 raise ValueError("calendar disagrees")
             days.sort(key=lambda row: row["date"])
+            if native_calendar:
+                observation = {**calendar_provenance, "value": {
+                    "total": raw_calendar["total"], "days": days,
+                    "calendar_start": raw_calendar.get("calendar_start"),
+                    "calendar_end": raw_calendar.get("calendar_end")}}
+                scalar = data.get("profile_contributions_observation")
+                if (not gh.validate_provider_observation(observation)
+                        or scalar != gh.profile_contributions_from_calendar(observation)
+                        or snapshot.get("github_profile_contributions") != raw_calendar["total"]
+                        or rhythm["timezone"] != "GitHub"
+                        or rhythm["last_day_in_progress"] != (
+                            datetime.fromisoformat(observation["observed_at"].replace("Z", "+00:00"))
+                            < datetime.fromisoformat(observation["window_end"].replace("Z", "+00:00")))):
+                    raise ValueError("native calendar evidence disagrees")
+            elif any(key in raw_calendar for key in ("calendar_start", "calendar_end")) or rhythm["timezone"] != "UTC":
+                raise ValueError("native calendar evidence missing")
+            for index, bucket in enumerate(rhythm["weekdays"]):
+                if bucket["contributions"] != sum(row["count"] for row in days
+                                                  if date.fromisoformat(row["date"]).weekday() == index):
+                    raise ValueError("weekday distribution disagrees")
             if (days[0]["date"] != rhythm["window_start"] or days[-1]["date"] != rhythm["window_end"]
                     or len(days) != rhythm["days_observed"]
                     or (date.fromisoformat(days[-1]["date"]) - date.fromisoformat(days[0]["date"])).days + 1 != len(days)):
@@ -123,7 +146,7 @@ def build_dashboard_summary(model, *, profile_date):
     # Select every calendar fact only after the same dated input reconciles.
     calendar_ok = bool(days)
     calendar_status = "exact" if calendar_ok and rhythm.get("completeness") == "known" else "unknown" if calendar_ok else "unavailable"
-    calendar_window = f'{rhythm["window_start"]} – {rhythm["window_end"]} · UTC' if calendar_ok else "Calendar unavailable"
+    calendar_window = f'{rhythm["window_start"]} – {rhythm["window_end"]} · {rhythm["timezone"]}' if calendar_ok else "Calendar unavailable"
     facts = []
     facts.append(profile_contribution_fact(data.get("profile_contributions_observation"),
                                           snapshot.get("github_profile_contributions")))

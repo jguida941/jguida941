@@ -2257,3 +2257,35 @@ class ProfilePublicationAcceptanceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class NativeCalendarPublicationTests(unittest.TestCase):
+    def test_native_artifact_reconsumption_preserves_values_and_rejects_mixed_evidence(self):
+        import copy
+        from tests.contracts.test_dashboard_summary import NativeCalendarParityTests
+        from scripts.pipeline.render_outputs import _public_dashboard_data
+        from scripts.pipeline.profile_pipeline import _current_contribution_calendar, _consistent_profile_contributions
+        model, _, _ = NativeCalendarParityTests.scenario()
+        data = _public_dashboard_data(model["dashboard_data"])
+        self.assertTrue(_current_contribution_calendar(data))
+        self.assertTrue(_consistent_profile_contributions(data))
+        for kind in ("aggregate", "cell", "zero-edge", "endpoint", "scalar", "scalar-period", "episode", "weekday", "complete-day", "weekly"):
+            broken = copy.deepcopy(data)
+            calendar = broken["contribution_calendar"]
+            if kind == "aggregate": calendar["total"] += 1
+            elif kind == "cell":
+                rows = [row for week in calendar["weeks"] for row in week]
+                rows[0]["count"] += 1; rows[1]["count"] -= 1
+            elif kind == "zero-edge":
+                calendar["weeks"][0].pop(0)
+            elif kind == "endpoint": calendar["calendar_start"] = "2025-11-17"
+            elif kind == "scalar": broken["snapshot"]["github_profile_contributions"] += 1
+            elif kind == "scalar-period": broken["profile_contributions_observation"]["window_start"] = "2025-11-08T05:00:00Z"
+            elif kind == "episode": broken["profile_contributions_observation"]["observed_at"] = "2026-11-16T03:41:00Z"
+            elif kind == "weekday":
+                buckets = broken["contribution_rhythm"]["weekdays"]
+                buckets[0]["contributions"] += 1; buckets[1]["contributions"] -= 1
+            elif kind == "complete-day": broken["contribution_rhythm"]["last_day_in_progress"] = False
+            else: broken["engineering"]["contribution_trend"]["points"][-1]["contributions"] += 1
+            with self.subTest(kind=kind):
+                self.assertFalse(_current_contribution_calendar(broken))
