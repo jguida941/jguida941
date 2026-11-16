@@ -11,6 +11,7 @@ import re
 import tempfile
 import types
 import unittest
+
 import xml.etree.ElementTree as ET
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
@@ -19,6 +20,44 @@ from unittest.mock import patch
 
 from scripts.pipeline.collect_data import CollectedProfileData
 from scripts.pipeline.compute_metrics import compute_profile_model
+
+
+class WorkingCoverageTests(unittest.TestCase):
+    def partial_scenario(self, defect=None):
+        from unittest.mock import patch
+        from scripts.github import activity_observations as activity
+        from tests.pipeline.test_compute_metrics_accuracy import ProfileRecentWorkTests
+        original = activity._rest_history
+        def limited(repository, *args, **kwargs):
+            result = original(repository, *args, **kwargs)
+            if repository == "jguida941/jguida941":
+                result.update(status="partial", complete=False, reason="page_limit",
+                              completion_evidence="none")
+            return result
+        with patch.object(activity, "_rest_history", side_effect=limited):
+            return ProfileRecentWorkTests().scenario(change=None, defect=defect)
+
+    def test_partial_history_does_not_redisplay_proven_refreshes(self):
+        from scripts.contracts.dashboard_summary import summary_facts
+        model, profile, observed, _, stamps = self.partial_scenario()
+        self.assertNotIn("jguida941", [row["name"] for row in model["dashboard_summary"]["working"]])
+        proof = observed["profile_recent_work"]
+        self.assertEqual("partial", proof["status"])
+        self.assertFalse(proof["complete"])
+        self.assertGreater(proof["skipped_refreshes"], 0)
+        fact = summary_facts(model["dashboard_summary"])["activity.working_repos_7d"]
+        self.assertEqual(1, fact["value"])
+        self.assertEqual("partial", fact["quality"]["status"])
+        self.assertEqual(stamps[0], next(row for row in model["recent_repos"]
+                                        if row["name"] == "jguida941")["pushed_at"])
+        self.assertEqual(stamps[0], profile["pushed_at"])
+
+    def test_partial_history_unknown_latest_update_remains_visible(self):
+        model, _, _, _, stamps = self.partial_scenario(defect="missing_files")
+        row = next((row for row in model["dashboard_summary"]["working"]
+                    if row["name"] == "jguida941"), None)
+        self.assertIsNotNone(row)
+        self.assertEqual(stamps[0], row["pushed_at"])
 
 
 class ContributionRhythmRenderingTests(unittest.TestCase):
@@ -209,7 +248,7 @@ class GeneratedCardTruthTests(unittest.TestCase):
         }
         metric_scopes = {
             metric: (
-                "owned-public-private-nonfork-profile-excluded-"
+                "owned-public-private-nonfork-profile-included-"
                 f"{scope_suffix[status]}"
             )
             for metric, status in metric_statuses.items()
@@ -453,7 +492,7 @@ class GeneratedCardTruthTests(unittest.TestCase):
                     "merged_prs_primary_visible_population",
                     0,
                     "ok",
-                    "owned-repositories-visible-to-primary-pr-search",
+                    "authored-pull-requests-visible-to-primary-pr-search",
                     "github_rest_merged_pr_search_primary",
                     "live",
                     "all_components_observed",
@@ -502,7 +541,7 @@ class GeneratedCardTruthTests(unittest.TestCase):
                     "merged_prs_public_visible_population",
                     23,
                     "fallback",
-                    "owned-public-repositories-visible-to-public-pr-search",
+                    "authored-public-pull-requests-visible-to-public-pr-search",
                     "github_rest_merged_pr_search_public",
                     "fallback",
                     "public_retry",

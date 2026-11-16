@@ -79,7 +79,7 @@ def generate(
 
     display = automation_display(automation)
     quality_lines = [
-        "Workflow: owned public + private nonfork; profile excluded",
+        "Workflow: owned public + private nonfork; profile included",
         display["combined"]["qualification"],
     ]
     if language_status == "partial":
@@ -160,7 +160,7 @@ def generate(
     grid_bottom = content_top + 2 * tile_h + row_gap
     footer_lines = (
         f"{fmt_int(total_repos)} Repositories · {fmt_int(total_stars)} Stargazers · "
-        f"{fmt_int(releases)} Releases · last 12 months",
+        f"{fmt_int(releases)} Releases · last 30 days",
         "Repositories/Stargazers/Releases: public-owned-nonfork",
         f"Languages: {language_scope}",
     )

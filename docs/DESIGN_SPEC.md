@@ -302,30 +302,63 @@ are generated separately; SVG images provide native README links and text equiva
 
 ### Contribution observation and publication
 
-The headline selects GitHub's default `contributionsCollection` total without a custom
-date or organization filter. Retain its actual `startedAt`, `endedAt` and observation
-time independently from the calendar. Website and README use the same
-`profile.contributions` fact, labeled “GitHub contributions”; reporting details belong
-in the website disclosure and README definitions. A missing native observation shows
-`n/a`, never a substitute calendar sum or a fixed adjustment.
+The headline and calendar use one default `contributionsCollection` response without a
+custom date or organization filter. Retain its actual `startedAt`, `endedAt`, observation
+time and returned day labels. Website and README select the same reported total,
+labeled “Contributions” beside its icon. Reporting details belong in the website
+disclosure and README definitions. Missing native evidence shows `n/a`, never a
+substitute day sum or a fixed adjustment.
 
-The calendar requests 365 inclusive UTC dates, from midnight on the first date through
-the current observation time, and labels its own visible date range. Its sum can differ
-from GitHub's default profile total. Profile-local dates still govern the current streak
-cutoff; pull-request and release windows retain their existing timezones.
+Native day labels define the visible calendar range; do not relabel them as requested
+UTC dates or shift them to a locally calculated year. Preserve GitHub's reported total
+even when it differs from the sum of its returned days. Active days, weekly and weekday
+charts, and streaks derive from those returned dated cells; they must not redistribute
+the difference. Profile-local dates govern the streak cutoff. Pull-request and release
+windows retain their existing definitions.
 
-A complete calendar has canonical, unique, contiguous dated counts covering both
-requested boundaries, including zero-count dates, and their sum equals its reported
-total. Missing or inconsistent native evidence holds live publication and preserves the
-previous artifacts. Candidate and stored publication use the same evidence checks.
-The README and website calendar total, active days, streaks and grid select the shared
-reconciled summary; rejected calendar rows cannot leave a numeric calendar total behind.
-Publication also reconciles the values, displayed text, ranges and recorded streak
-cutoff through that same summary owner instead of trusting agreeing copied scalars.
-The native headline is separately reconciled against its retained provider observation.
+A complete native calendar has canonical, unique, contiguous dated counts covering its
+returned endpoints, including zero-count dates. The producer retains a content digest
+of the total, dates and endpoints before projection. Both candidate and stored
+publication reconcile calendar contents and the headline against that same observation.
+Mixing day cells from another response is refused even when totals and endpoints agree.
+This is an accidental-mixing guard, not an authenticity signature against replacement
+of every trusted input. The legacy explicit UTC query retains its separate strict
+requested-boundary and sum-equality checks; it cannot substitute for native evidence.
+Missing or inconsistent evidence holds live publication and preserves previous outputs.
 
 The streak cutoff must match the retained generation time in the effective profile
 timezone. One captured date governs both the snapshot and the shared summary.
+
+### Account and organization metric scopes
+
+The main view follows GitHub account definitions. Native Contributions includes
+eligible activity across repository owners through GitHub's unfiltered collection;
+never add an organization subtotal to it. Merged PRs counts this account's authored
+PRs across all repository owners, within the stated past-year interval. Accept only
+complete search results, using the same timestamps for the query and its evidence.
+Old owned-only or other-author cache entries cannot answer that request.
+
+The public repository headline includes personally owned forks, as GitHub's public
+repository count does. Keep the separate nonfork fact for metrics that require it.
+Stargazers means received stars, not repositories the account has starred. Custom
+language, workflow and push aggregates retain their declared personal repository
+scope, including the profile repository; they do not claim a native GitHub total.
+The current CI panel remains a bounded sample of public-profile workflow runs.
+
+Only Currently Working On suppresses proven automatic profile artifact updates.
+Require the exact supported producer message, Actions bot committer, complete
+artifact-only file evidence and event/commit identity; a manual edit, source change
+or unproven update remains eligible. Rank genuine updates by observed repository
+activity time, including PR merges. This filter never changes Contributions or raw
+repository aggregate observations. Card and website share the filtered rows/count.
+If observed updates are all proven refreshes but older history is incomplete, omit
+the known refreshes while retaining partial working coverage; do not imply an exact
+zero or complete weekly inactivity. A newer repository push invalidates older proof.
+
+A later SemVerity Labs section uses separately qualified organization observations.
+It cannot redefine or be added to the main account facts. Private visibility and
+incomplete evidence remain explicit in data qualifications. Scope details belong in
+existing disclosures and definitions, not new paragraphs around the visualization.
 
 ### Current activity layout — 2026-10-12
 

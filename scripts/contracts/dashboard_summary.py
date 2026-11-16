@@ -57,6 +57,8 @@ def profile_contribution_fact(observation, value):
                  reason="default_profile_observation", window=period)
     for key in ("window_start", "window_end", "observed_at", "source_id"):
         fact[key] = observation[key] if available else None
+    if available and "source_content_digest" in observation:
+        fact["source_content_digest"] = observation["source_content_digest"]
     return fact
 
 
@@ -101,6 +103,9 @@ def build_dashboard_summary(model, *, profile_date):
     rhythm_display = contribution_rhythm_display(rhythm)
     calendar_ok = not contribution_rhythm_errors(rhythm) and rhythm.get("status") == "available"
     raw_calendar = data.get("contribution_calendar") or {}
+    from scripts.github import github_client as gh
+    calendar_provenance = provenance.get("last_year_contributions") or {}
+    native_calendar = calendar_provenance.get("source_metric_id") == gh._NATIVE_CALENDAR_SOURCE
     days = []
     if calendar_ok:
         try:
@@ -109,11 +114,31 @@ def build_dashboard_summary(model, *, profile_date):
             if (len(set(parsed)) != len(parsed)
                     or any(day.isoformat() != row["date"] for day, row in zip(parsed, days))
                     or any(_count(row["count"]) is None for row in days)
-                    or _count(raw_calendar.get("total")) != rhythm["total"]
-                    or _count(snapshot.get("last_year_contributions")) != rhythm["total"]
+                    or _count(raw_calendar.get("total")) != _count(snapshot.get("last_year_contributions"))
+                    or (not native_calendar and _count(raw_calendar.get("total")) != rhythm["total"])
                     or sum(row["count"] for row in days) != rhythm["total"]):
                 raise ValueError("calendar disagrees")
             days.sort(key=lambda row: row["date"])
+            if native_calendar:
+                observation = {**calendar_provenance, "value": {
+                    "total": raw_calendar["total"], "days": days,
+                    "calendar_start": raw_calendar.get("calendar_start"),
+                    "calendar_end": raw_calendar.get("calendar_end")}}
+                scalar = data.get("profile_contributions_observation")
+                if (not gh.validate_provider_observation(observation)
+                        or scalar != gh.profile_contributions_from_calendar(observation)
+                        or snapshot.get("github_profile_contributions") != raw_calendar["total"]
+                        or rhythm["timezone"] != "GitHub"
+                        or rhythm["last_day_in_progress"] != (
+                            datetime.fromisoformat(observation["observed_at"].replace("Z", "+00:00"))
+                            < datetime.fromisoformat(observation["window_end"].replace("Z", "+00:00")))):
+                    raise ValueError("native calendar evidence disagrees")
+            elif any(key in raw_calendar for key in ("calendar_start", "calendar_end")) or rhythm["timezone"] != "UTC":
+                raise ValueError("native calendar evidence missing")
+            for index, bucket in enumerate(rhythm["weekdays"]):
+                if bucket["contributions"] != sum(row["count"] for row in days
+                                                  if date.fromisoformat(row["date"]).weekday() == index):
+                    raise ValueError("weekday distribution disagrees")
             if (days[0]["date"] != rhythm["window_start"] or days[-1]["date"] != rhythm["window_end"]
                     or len(days) != rhythm["days_observed"]
                     or (date.fromisoformat(days[-1]["date"]) - date.fromisoformat(days[0]["date"])).days + 1 != len(days)):
@@ -123,7 +148,7 @@ def build_dashboard_summary(model, *, profile_date):
     # Select every calendar fact only after the same dated input reconciles.
     calendar_ok = bool(days)
     calendar_status = "exact" if calendar_ok and rhythm.get("completeness") == "known" else "unknown" if calendar_ok else "unavailable"
-    calendar_window = f'{rhythm["window_start"]} – {rhythm["window_end"]} · UTC' if calendar_ok else "Calendar unavailable"
+    calendar_window = f'{rhythm["window_start"]} – {rhythm["window_end"]} · {rhythm["timezone"]}' if calendar_ok else "Calendar unavailable"
     facts = []
     facts.append(profile_contribution_fact(data.get("profile_contributions_observation"),
                                           snapshot.get("github_profile_contributions")))
@@ -135,6 +160,7 @@ def build_dashboard_summary(model, *, profile_date):
         "contributions", "github-contribution-calendar-visible-to-provider", status=calendar_status,
         reason="calendar_observation", window=calendar_window, qualification=rhythm_display.get("qualification", ""))
     for identity, key, value, label, population in (
+        ("inventory.public_total", "public_repos_total", scope.get("public_owned_repos_total"), "public repos", "public-owned-including-forks"),
         ("inventory.public_nonfork", "total_repos", scope.get("public_owned_nonfork_repos_total"), "public non-fork repos", "public-owned-nonfork-profile-included"),
         ("inventory.private_owned", "private_owned_repos", snapshot.get("private_owned_repos"), "private owned repos", "private-owned-including-forks"),
         ("inventory.stargazers", "total_stars", snapshot.get("total_stars"), "stargazers", "public-owned-nonfork"),
@@ -158,7 +184,13 @@ def build_dashboard_summary(model, *, profile_date):
             window=(f'{observation.get("window_start")} – {observation.get("window_end")}' if observation.get("window_start") else "returned repository history"))
     activity_status = statuses.get("active_repos_7d", "unknown")
     add("activity.active_repos_7d", (model.get("scorecard") or {}).get("active_repos_7d"), "active repos",
-        "owned-public-private-nonfork-profile-excluded", status=activity_status, reason="repository_observation", window="last 7 days")
+        "owned-public-private-nonfork-profile-included", status=activity_status, reason="repository_observation", window="last 7 days")
+    working_coverage = model.get("working_coverage") or {}
+    working_status = working_coverage.get("status", activity_status)
+    working_count = len(model.get("working_repos", model.get("recent_repos")) or [])
+    add("activity.working_repos_7d", None if working_status == "unavailable" else working_count, "active repos",
+        "observed-recent-repositories-with-verified-profile-refreshes-removed", status=working_status,
+        reason=working_coverage.get("reason", "recent_work_projection"), window="last 7 days")
     language_bytes = model.get("language_bytes") or {}
     valid_bytes = isinstance(language_bytes, dict) and all(type(k) is str and _count(v) is not None for k, v in language_bytes.items())
     language_status = statuses.get("top_languages", "unknown")
@@ -172,7 +204,7 @@ def build_dashboard_summary(model, *, profile_date):
         visible_languages = visible_languages + [{"name": "Other", "bytes": other, "percent": other / total_bytes * 100 if total_bytes else 0,
                                                   "display_value": f"{other / total_bytes * 100:.1f}%" if total_bytes else "0.0%"}]
     add("language.count", len(ordered) if valid_bytes and language_status != "unavailable" else None, "languages",
-        "owned-public-private-nonfork-profile-excluded", status=language_status, reason="language_byte_observation", window="observed repository HEADs")
+        "owned-public-private-nonfork-profile-included", status=language_status, reason="language_byte_observation", window="observed repository HEADs")
 
     cutoff = profile_date.isoformat() if isinstance(profile_date, date) else str(profile_date)
     eligible = [row for row in days if row["date"] <= cutoff]
@@ -199,7 +231,7 @@ def build_dashboard_summary(model, *, profile_date):
             fact["quality"]["reason"] = "streak_reconciliation_required"
             fact["quality"]["qualification"] = "Streak unavailable · source counts differ"
 
-    working = _rows(model.get("recent_repos"), ("name", "html_url", "language", "pushed_at", "last_commit_msg", "is_private"))
+    working = _rows(model.get("working_repos", model.get("recent_repos")), ("name", "html_url", "language", "pushed_at", "last_commit_msg", "is_private", "activity_type"))
     generated_at = str(data.get("generated_at", ""))
     for row in working:
         row["url"] = _url(row.pop("html_url", ""))
@@ -207,7 +239,8 @@ def build_dashboard_summary(model, *, profile_date):
         try:
             elapsed = (datetime.fromisoformat(generated_at.replace("Z", "+00:00")) - datetime.fromisoformat(str(row.get("pushed_at", "")).replace("Z", "+00:00"))).total_seconds()
             if elapsed >= 0:
-                row["push_age"] = "pushed <1h ago" if elapsed < 3600 else f"pushed {int(elapsed / 3600)}h ago" if elapsed < 86400 else f"pushed {int(elapsed / 86400)}d ago"
+                action = "updated" if row.get("activity_type") in {"pr_merge", "merge_queue_merge", "branch_creation"} else "pushed"
+                row["push_age"] = f"{action} <1h ago" if elapsed < 3600 else f"{action} {int(elapsed / 3600)}h ago" if elapsed < 86400 else f"{action} {int(elapsed / 86400)}d ago"
         except (TypeError, ValueError):
             pass
     projects = _rows(model.get("spotlight_data"), ("name", "description", "language", "stars", "forks", "url", "html_url", "is_private", "status"))
@@ -223,7 +256,7 @@ def build_dashboard_summary(model, *, profile_date):
                     "facts": facts, "weekly": {"model": trend, "display": contribution_trend_display(trend)},
                     "rhythm": {"model": rhythm, "display": rhythm_display},
                     "languages": {"rows": visible_languages, "all_rows": language_rows, "total_bytes": total_bytes,
-                                  "quality": language_status, "scope": "Owned public + private non-fork repositories; profile excluded"},
+                                  "quality": language_status, "scope": "Owned public + private non-fork repositories; profile included"},
                     "automation": {"model": model.get("automation"), "display": automation_display(model.get("automation"))},
                     "calendar": {"days": days, "window": calendar_window, "status": calendar_status if days else "unavailable"},
                     "working": working, "focus": focus, "projects": projects,

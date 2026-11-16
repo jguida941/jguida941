@@ -27,6 +27,7 @@ class Snapshot(TypedDict):
     last_year_contributions: int | None
     public_scope_commits: int | None
     total_repos: int
+    public_repos_total: int | None
     public_forks: int
     private_owned_repos: int | None
     total_stars: int
@@ -434,7 +435,7 @@ def _automation_contract_errors(payload: dict[str, Any]) -> list[str]:
             errors.append(section + "." + key + " disagrees with automation.combined." + field)
     statuses = (payload.get("data_quality") or {}).get("metric_statuses") or {}
     scopes = (payload.get("data_scope") or {}).get("metric_scopes") or {}
-    expected_scope = "owned-public-private-nonfork-profile-excluded-" + {
+    expected_scope = "owned-public-private-nonfork-profile-included-" + {
         "exact": "exact", "partial": "partial-observation", "unavailable": "unavailable",
     }[combined["status"]]
     for key in ("ci_repos", "automation_repos", "automation_workflows", "ci_coverage_pct"):

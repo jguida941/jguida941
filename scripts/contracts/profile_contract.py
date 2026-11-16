@@ -13,7 +13,7 @@ from scripts.rendering.svg_utils import xml_escape
 AUTOMATION_REPOS_LABEL = "Workflow repos"
 AUTOMATION_FILES_LABEL = "Workflow files"
 AUTOMATION_ADOPTION_LABEL = "Repo adoption"
-AUTOMATION_SCOPE = "Owned public + private nonfork repositories; profile excluded."
+AUTOMATION_SCOPE = "Owned public + private nonfork repositories; profile included."
 AUTOMATION_MEANING = (
     "GitHub workflow configuration at observed default-branch HEAD. "
     "Configuration does not imply successful runs."
@@ -88,8 +88,8 @@ def contribution_rhythm_errors(rhythm: object) -> list[str]:
         return ["contribution rhythm missing"]
     if any(rhythm.get(key) != value for key, value in (
         ("source", "github_contribution_calendar"), ("unit", "contributions"),
-        ("bucket", "weekday"), ("timezone", "UTC"),
-    )) or rhythm.get("completeness") not in ("known", "unknown"):
+        ("bucket", "weekday"),
+    )) or rhythm.get("timezone") not in ("UTC", "GitHub") or rhythm.get("completeness") not in ("known", "unknown"):
         return ["invalid contribution rhythm meaning"]
     if rhythm.get("status") == "unavailable":
         expected = contribution_rhythm_unavailable()
@@ -146,7 +146,7 @@ def contribution_rhythm_display(rhythm: object) -> dict[str, Any]:
                      "Last date may be in progress" if rhythm["last_day_in_progress"] else "")
     return {
         **display,
-        "caption": f'{rhythm["window_start"]} – {rhythm["window_end"]} · UTC calendar dates',
+        "caption": f'{rhythm["window_start"]} – {rhythm["window_end"]} · {rhythm["timezone"]} calendar dates',
         "qualification": qualification,
         "message": "No contributions in the observed dates" if rhythm["total"] == 0 else "",
         "coverage_summary": "Observed dates — " + "; ".join(
@@ -161,8 +161,8 @@ def contribution_trend_errors(trend: object) -> list[str]:
         return ["dated contribution trend missing"]
     if any(trend.get(key) != value for key, value in (
         ("unit", "contributions"), ("bucket", "iso_week"),
-        ("week_start_day", "Monday"), ("timezone", "UTC"),
-    )) or trend.get("completeness") not in {"known", "unknown"}:
+        ("week_start_day", "Monday"),
+    )) or trend.get("timezone") not in ("UTC", "GitHub") or trend.get("completeness") not in {"known", "unknown"}:
         return ["invalid contribution trend meaning"]
     points = trend.get("points")
     if trend.get("status") == "unavailable":
@@ -218,8 +218,8 @@ def contribution_trend_display(trend: object) -> dict[str, Any]:
     return {"available": True, "title": "Weekly contributions", "values": values,
             "peak": f"Peak {max(values):,} contributions/week",
             "window": f"{first} – {last} · {len(points)} {'week' if len(points) == 1 else 'weeks'}",
-            "qualification": "Mon–Sun · UTC · " + completeness,
-            "description": "UTC contribution calendar. " + description}
+            "qualification": "Mon–Sun · " + trend["timezone"] + " · " + completeness,
+            "description": trend["timezone"] + " contribution calendar. " + description}
 
 
 # Curated backend-developer scorecard (8 tiles -> clean 4x2 grid). Each value is
@@ -309,6 +309,12 @@ SNAPSHOT_METRICS = [
         "key": "public_scope_commits",
         "label": "Public Repo Commits (Owned Non-Fork)",
         "dashboard_label": "Public Scope Commits",
+        "format": "int_or_na",
+    },
+    {
+        "key": "public_repos_total",
+        "label": "Public Repos (Including Forks)",
+        "dashboard_label": "Public Repos",
         "format": "int_or_na",
     },
     {

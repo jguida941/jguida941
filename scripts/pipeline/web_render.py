@@ -423,8 +423,8 @@ def _hero() -> str:
         </div>
         <div class="stats">
           <div class="stat">{_svg_icon(LUCIDE['calendar_check'])}<div class="v num" data-calendar-fact="calendar.active_days">n/a</div><div class="l">Active days</div></div>
-          <div class="stat">{_svg_icon(LUCIDE['globe'])}<div class="v num" data-bind="snapshot.total_repos">—</div><div class="l">Public repos</div></div>
-          <div class="stat">{_svg_icon(LUCIDE['star'])}<div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">Stars</div></div>
+          <div class="stat">{_svg_icon(LUCIDE['globe'])}<div class="v num" data-inventory-fact="inventory.public_total">—</div><div class="l">Public repos</div></div>
+          <div class="stat">{_svg_icon(LUCIDE['star'])}<div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">Stargazers</div></div>
         </div>
       </div>
     </div>
@@ -456,14 +456,14 @@ def _workflow_breakdown() -> str:
 def _scorecard() -> str:
     return f"""
   <section class="panel" id="automation" tabindex="-1">
-    <div class="section-head"><div><p class="eyebrow">GitHub Signals · 12 Months</p><h2 class="title">Builder Scorecard</h2></div></div>
+    <div class="section-head"><div><p class="eyebrow">GitHub Signals</p><h2 class="title">Builder Scorecard</h2></div></div>
     <hr class="hairline">
     <div class="ring-row" style="margin-bottom:14px">
       <div class="ring" id="ci-ring"><span class="num" data-bind="automation_display.combined.adoption">—</span></div>
       <div><div class="mt">{AUTOMATION_ADOPTION_LABEL}</div><div class="ms" data-bind="automation_display.combined.gauge_detail">Workflow observation unavailable</div></div>
     </div>
     <div class="mgroup">
-      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['fire'])} active days</span><span class="ms" data-calendar-window>observed UTC dates</span></span><span class="mv num" data-calendar-fact="calendar.active_days">n/a</span></div>
+      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['fire'])} active days</span><span class="ms" data-calendar-window>GitHub calendar dates</span></span><span class="mv num" data-calendar-fact="calendar.active_days">n/a</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['commit'])} active repos</span><span class="ms">last 7 days</span></span><span class="mv num" data-bind="scorecard.active_repos_7d">—</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['workflow'])} {AUTOMATION_FILES_LABEL}</span><span class="ms">observed default-branch HEAD</span></span><span class="mv num" data-bind="automation_display.combined.workflow_files">—</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['release'])} releases</span><span class="ms">last 30 days</span></span><span class="mv num" data-bind="scorecard.releases_30d">—</span></div>
@@ -546,7 +546,7 @@ def _languages() -> str:
 def _calendar() -> str:
     return """
   <section class="panel" id="calendar-panel" tabindex="-1">
-    <div class="section-head"><div><p class="eyebrow">Observed UTC Dates</p><h2 class="title">Contribution Calendar</h2></div><span class="section-meta" id="cal-total">n/a</span></div>
+    <div class="section-head"><div><p class="eyebrow">GitHub Activity</p><h2 class="title">Contribution Calendar</h2></div><span class="section-meta" id="cal-total">n/a</span></div>
     <hr class="hairline">
     <p id="calendar-status" role="status">Loading contribution calendar…</p>
     <div class="cal-wrap"><div class="cal" id="cal"></div></div>
@@ -1302,8 +1302,8 @@ def _script() -> str:
       return `<div class="lane"><h4>${label}</h4>${body}</div>`;
     }).join("");
     // snapshot tiles (deduped: contributions is the hero, not repeated here)
-    const TILE = {public_scope_commits:"Commits", total_repos:"Public Repos", private_owned_repos:"Private",
-      total_stars:"Stars", prs_merged:"PRs Merged", ci_repos:"Workflow repos"};
+    const TILE = {public_scope_commits:"Commits", public_repos_total:"Public Repos", private_owned_repos:"Private",
+      total_stars:"Stargazers", prs_merged:"PRs Merged", ci_repos:"Workflow repos"};
     const rows = (d.snapshot_rows || []).filter(r => TILE[r.key]);
     document.getElementById("snap-tiles").innerHTML = rows.slice(0, 6).map(r =>
       `<div class="mrow"><span class="ml"><span class="mt">${esc(TILE[r.key])}</span>${r.key==="ci_repos"?`<span class="ms">${esc(get(d,"automation_display.combined.qualification")||"Workflow observation unavailable")}</span>`:""}</span><span class="mv num">${esc(r.display_value)}</span></div>`).join("");
@@ -1321,6 +1321,11 @@ def _script() -> str:
     const selectedCalendar = d.dashboard_summary;
     const cal = selectedCalendar?.calendar;
     const calendarFacts = Array.isArray(selectedCalendar?.facts) ? selectedCalendar.facts : [];
+    document.querySelectorAll("[data-inventory-fact]").forEach(el => {
+      const fact = calendarFacts.find(row => row.metric_id === el.getAttribute("data-inventory-fact"));
+      el.textContent = Number.isSafeInteger(fact?.value) && fact.value >= 0 && fact?.quality?.status !== "unavailable"
+        ? fact.value.toLocaleString("en-US") : "n/a";
+    });
     const totalFact = calendarFacts.find(row => row.metric_id === "calendar.total");
     const calendarAvailable = ["exact", "unknown"].includes(cal?.status) &&
       Array.isArray(cal?.days) && cal.days.length > 0 &&
@@ -1379,7 +1384,7 @@ def _script() -> str:
       drawing += points.map((p,i)=>`<circle cx="${xy[i][0]}" cy="${xy[i][1]}" r="4" fill="var(--accent)"><title>${esc(p.observed_start)} to ${esc(p.observed_end)}: ${esc(p.contributions)} contributions${p.partial?" (partial)":""}</title></circle>`).join("");
       drawing += [...new Set([0,Math.floor(points.length/2),points.length-1])].map(i=>`<text x="${xy[i][0]}" y="224" text-anchor="${i===0?"start":i===points.length-1?"end":"middle"}">${esc(points[i].observed_start.slice(5))}</text>`).join("");
       document.getElementById("weekly-chart").innerHTML = `<svg viewBox="0 0 800 240" role="img" aria-label="Weekly contributions; exact values in the table below">${drawing}</svg>`;
-      document.getElementById("weekly-table").innerHTML = `<table><thead><tr><th>Observed UTC dates</th><th>Contributions</th><th>Week</th></tr></thead><tbody>${points.map(p=>`<tr><td>${esc(p.observed_start)} – ${esc(p.observed_end)}</td><td>${p.contributions.toLocaleString("en-US")}</td><td>${p.partial?"Partial":"Complete"}</td></tr>`).join("")}</tbody></table>`;
+      document.getElementById("weekly-table").innerHTML = `<table><thead><tr><th>GitHub calendar dates</th><th>Contributions</th><th>Week</th></tr></thead><tbody>${points.map(p=>`<tr><td>${esc(p.observed_start)} – ${esc(p.observed_end)}</td><td>${p.contributions.toLocaleString("en-US")}</td><td>${p.partial?"Partial":"Complete"}</td></tr>`).join("")}</tbody></table>`;
     } else {
       document.getElementById("weekly-chart").replaceChildren();
       document.getElementById("weekly-table").replaceChildren();
