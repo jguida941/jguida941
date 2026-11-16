@@ -57,6 +57,8 @@ def profile_contribution_fact(observation, value):
                  reason="default_profile_observation", window=period)
     for key in ("window_start", "window_end", "observed_at", "source_id"):
         fact[key] = observation[key] if available else None
+    if available and "source_content_digest" in observation:
+        fact["source_content_digest"] = observation["source_content_digest"]
     return fact
 
 

@@ -2289,3 +2289,85 @@ class NativeCalendarPublicationTests(unittest.TestCase):
             else: broken["engineering"]["contribution_trend"]["points"][-1]["contributions"] += 1
             with self.subTest(kind=kind):
                 self.assertFalse(_current_contribution_calendar(broken))
+
+
+class NativeCalendarSourceBindingTests(unittest.TestCase):
+    """Retained provider content must survive calendar reconsumption."""
+
+    @staticmethod
+    def scenario(*, changed=False):
+        import copy
+        from dataclasses import replace
+        from datetime import datetime, timedelta, timezone
+        from unittest.mock import patch
+        from scripts.github import github_client as gh
+        from tests.contracts.test_dashboard_summary import inventory_fixture_model
+        first = datetime(2025, 11, 16, tzinfo=timezone.utc)
+        rows = [{"date": (first + timedelta(days=i)).date().isoformat(), "contributionCount": 1}
+                for i in range(365)]
+        if changed:
+            rows[1]["contributionCount"] = 2
+            rows[2]["contributionCount"] = 0
+        response = {"user": {"contributionsCollection": {
+            "startedAt": "2025-11-09T05:00:00Z", "endedAt": "2026-11-16T04:59:59Z",
+            "contributionCalendar": {"totalContributions": 400, "weeks": [{"contributionDays": rows}]}}}}
+        with patch.object(gh, "_settings", replace(gh._settings, token="test", tokens=("test",))), \
+             patch.object(gh, "datetime", wraps=datetime) as clock:
+            clock.now.return_value = datetime(2026, 11, 16, 3, 41 if changed else 40, tzinfo=timezone.utc)
+            return inventory_fixture_model(calendar_query=lambda *_: copy.deepcopy(response))
+
+    @staticmethod
+    def decisions(model):
+        from scripts.pipeline.profile_pipeline import (
+            candidate_publication_subject, stored_publication_subject, evaluate_profile_publication)
+        return [evaluate_profile_publication(subject).state for subject in (
+            candidate_publication_subject(model, source_kind="github-api"),
+            stored_publication_subject({"source_kind": "github-api"}, model["dashboard_data"]))]
+
+    def test_coherent_calendar_from_another_response_is_not_current(self):
+        import copy
+        a, mixed = self.scenario(), self.scenario(changed=True)
+        for data in (mixed, mixed["dashboard_data"]):
+            data["data_quality"]["metric_provenance"]["last_year_contributions"] = copy.deepcopy(
+                a["data_quality"]["metric_provenance"]["last_year_contributions"])
+        mixed["dashboard_data"]["profile_contributions_observation"] = copy.deepcopy(
+            a["dashboard_data"]["profile_contributions_observation"])
+        fact = next(row for row in a["dashboard_summary"]["facts"] if row["metric_id"] == "profile.contributions")
+        for summary in (mixed["dashboard_summary"], mixed["dashboard_data"]["dashboard_summary"]):
+            summary["facts"] = [copy.deepcopy(fact) if row["metric_id"] == "profile.contributions" else row
+                                for row in summary["facts"]]
+        self.assertEqual(["HOLD_NONCURRENT_CONTRIBUTIONS"] * 2, self.decisions(mixed),
+                         "[NATIVE-CALENDAR-CONTENT] identical totals and endpoints cannot bind another response's dates")
+
+    def test_each_independently_observed_calendar_remains_publishable(self):
+        for changed in (False, True):
+            with self.subTest(changed=changed):
+                model = self.scenario(changed=changed)
+                self.assertEqual(["READY", "READY"], self.decisions(model))
+                self.assertEqual(400, model["snapshot"]["last_year_contributions"])
+                self.assertEqual(365, model["contribution_rhythm"]["total"])
+
+    def test_missing_or_changed_source_content_binding_refuses(self):
+        import copy
+        model = self.scenario()
+        for kind in ("missing", "changed"):
+            broken = copy.deepcopy(model)
+            for data in (broken, broken["dashboard_data"]):
+                provenance = data["data_quality"]["metric_provenance"]["last_year_contributions"]
+                if kind == "missing": provenance.pop("source_content_digest", None)
+                else: provenance["source_content_digest"] = "sha256:" + "0" * 64
+            self.assertEqual(["HOLD_NONCURRENT_CONTRIBUTIONS"] * 2, self.decisions(broken))
+
+    def test_native_content_binding_accepts_row_order_without_changing_identity(self):
+        from scripts.github import github_client as gh
+        model = self.scenario()
+        data = model["dashboard_data"]
+        calendar = data["contribution_calendar"]
+        native = {**data["data_quality"]["metric_provenance"]["last_year_contributions"], "value": {
+            "total": calendar["total"], "calendar_start": calendar["calendar_start"],
+            "calendar_end": calendar["calendar_end"],
+            "days": list(reversed([dict(row) for week in calendar["weeks"] for row in week]))}}
+        self.assertTrue(gh.validate_provider_observation(native))
+        self.assertRegex(native.get("source_content_digest", ""), r"^sha256:[0-9a-f]{64}$")
+        self.assertEqual(native["source_content_digest"],
+                         data["profile_contributions_observation"]["source_content_digest"])
