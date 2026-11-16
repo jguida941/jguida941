@@ -814,7 +814,7 @@ from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 
-def inventory_fixture_model(mode="complete", *, zero=False):
+def inventory_fixture_model(mode="complete", *, zero=False, calendar_query=None):
     from tests.pipeline.test_compute_metrics_accuracy import AccuracyTests
     from scripts.pipeline import collect_data as collector
     from scripts.pipeline.compute_metrics import compute_profile_model
@@ -890,7 +890,14 @@ def inventory_fixture_model(mode="complete", *, zero=False):
             ("_request_with_retry", current_repository),
             ("paginated_get", lambda *_a, **_k: []),
         ):
-            stack.enter_context(patch.object(gh, name, side_effect=effect))
+            if calendar_query is None or name not in {"get_contribution_calendar_observation", "get_profile_contributions_observation"}:
+                stack.enter_context(patch.object(gh, name, side_effect=effect))
+        if calendar_query is None:
+            stack.enter_context(patch.object(gh, "get_default_contribution_calendar_observation", return_value=copy.deepcopy(missing), create=True))
+        else:
+            stack.enter_context(patch.object(gh, "_graphql_query", side_effect=calendar_query))
+            stack.enter_context(patch.object(gh, "_get_cached", return_value=None))
+            stack.enter_context(patch.object(gh, "_set_cached"))
         for name, value in (("_read_previous_snapshot", {"snapshot": {"private_owned_repos": 200}}),
                             ("collect_activity_observations", {}), ("collect_profile_ci_runs", {}),
                             ("detect_token_mode", "none"), ("detect_cache_mode", {})):
@@ -1086,3 +1093,71 @@ class InventoryCurrentnessTests(unittest.TestCase):
         with patch.object(collect_data, "datetime", CollectClock), patch.object(compute_metrics, "datetime", GenerateClock):
             model = inventory_fixture_model()
         self.assertEqual(["exact"] * 5, [row["quality"]["status"] for row in self._facts(model).values()])
+
+
+class NativeCalendarParityTests(unittest.TestCase):
+    """The calendar and headline share GitHub's aggregate without rewriting cells."""
+
+    @staticmethod
+    def scenario(*, total=400, count=1):
+        from datetime import timedelta
+        from dataclasses import replace
+        from scripts.github import github_client as gh
+        first = datetime(2025, 11, 16, tzinfo=timezone.utc)
+        native_days = [{"date": (first + timedelta(days=i)).date().isoformat(),
+                        "contributionCount": count, "weekday": (i % 7)} for i in range(365)]
+        calls = []
+        def query(text, variables):
+            calls.append((text, variables))
+            rows = copy.deepcopy(native_days)
+            aggregate = total
+            if "from" in variables:
+                start = datetime.fromisoformat(variables["from"].replace("Z", "+00:00"))
+                rows = [{**row, "date": (start + timedelta(days=i)).date().isoformat()}
+                        for i, row in enumerate(rows)]
+                aggregate = sum(row["contributionCount"] for row in rows)
+            return {"user": {"contributionsCollection": {
+                "startedAt": "2025-11-09T05:00:00Z", "endedAt": "2026-11-16T04:59:59Z",
+                "contributionCalendar": {"totalContributions": aggregate,
+                                         "weeks": [{"contributionDays": rows}]}}}}
+        with patch.object(gh, "_settings", replace(gh._settings, token="test", tokens=("test",))), \
+             patch.object(gh, "datetime", wraps=datetime) as clock:
+            clock.now.return_value = datetime(2026, 11, 16, 3, 40, tzinfo=timezone.utc)
+            model = inventory_fixture_model(calendar_query=query)
+        return model, calls, [{"date": row["date"], "count": row["contributionCount"]} for row in native_days]
+
+    def test_default_calendar_and_headline_share_one_response_and_preserve_native_cells(self):
+        from scripts.pipeline.profile_pipeline import _current_contribution_calendar
+        model, calls, days = self.scenario()
+        summary = model["dashboard_summary"]
+        facts = {row["metric_id"]: row for row in summary["facts"]}
+        self.assertEqual(400, facts["calendar.total"]["value"],
+                         "[NATIVE-CALENDAR-PARITY] calendar must use the native aggregate, independent of day sum")
+        self.assertEqual(facts["profile.contributions"]["value"], facts["calendar.total"]["value"])
+        self.assertEqual(days, summary["calendar"]["days"], "[NATIVE-CALENDAR-PARITY] returned cells must not be rewritten")
+        self.assertEqual(1, len(calls), "[NATIVE-CALENDAR-PARITY] one response must supply calendar and headline")
+        self.assertEqual({"login"}, set(calls[0][1]))
+        self.assertRegex(calls[0][0], r"contributionsCollection\s*\{")
+        self.assertNotRegex(calls[0][0], r"contributionsCollection\s*\(")
+        self.assertEqual(365, model["contribution_rhythm"]["total"])
+        self.assertEqual(365, sum(row["contributions"] for row in model["contribution_rhythm"]["weekdays"]))
+        self.assertEqual("known", model["contribution_rhythm"]["completeness"])
+        self.assertTrue(model["contribution_rhythm"]["last_day_in_progress"])
+        self.assertNotIn("UTC", summary["calendar"]["window"])
+        self.assertIn("GitHub", summary["calendar"]["window"])
+        self.assertTrue(_current_contribution_calendar(model["dashboard_data"]))
+        for mobile in (False, True):
+            svg = ET.fromstring(render_svg(summary, mobile=mobile))
+            cells = [row for row in svg.iter() if row.get("data-role") == "calendar-cell"]
+            self.assertEqual([(row["date"], str(row["count"])) for row in days],
+                             [(row.get("data-date"), row.get("data-count")) for row in cells])
+
+    def test_zero_and_additive_native_calendars_still_publish(self):
+        from scripts.pipeline.profile_pipeline import _current_contribution_calendar
+        for total, count in ((0, 0), (365, 1)):
+            with self.subTest(total=total):
+                model, _, days = self.scenario(total=total, count=count)
+                facts = {row["metric_id"]: row for row in model["dashboard_summary"]["facts"]}
+                self.assertEqual(total, facts["calendar.total"]["value"])
+                self.assertEqual(days, model["dashboard_summary"]["calendar"]["days"])
+                self.assertTrue(_current_contribution_calendar(model["dashboard_data"]))

@@ -463,7 +463,7 @@ def _scorecard() -> str:
       <div><div class="mt">{AUTOMATION_ADOPTION_LABEL}</div><div class="ms" data-bind="automation_display.combined.gauge_detail">Workflow observation unavailable</div></div>
     </div>
     <div class="mgroup">
-      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['fire'])} active days</span><span class="ms" data-calendar-window>observed UTC dates</span></span><span class="mv num" data-calendar-fact="calendar.active_days">n/a</span></div>
+      <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['fire'])} active days</span><span class="ms" data-calendar-window>GitHub calendar dates</span></span><span class="mv num" data-calendar-fact="calendar.active_days">n/a</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['commit'])} active repos</span><span class="ms">last 7 days</span></span><span class="mv num" data-bind="scorecard.active_repos_7d">—</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['workflow'])} {AUTOMATION_FILES_LABEL}</span><span class="ms">observed default-branch HEAD</span></span><span class="mv num" data-bind="automation_display.combined.workflow_files">—</span></div>
       <div class="mrow"><span class="ml"><span class="mt">{_svg_icon(_ICONS['release'])} releases</span><span class="ms">last 30 days</span></span><span class="mv num" data-bind="scorecard.releases_30d">—</span></div>
