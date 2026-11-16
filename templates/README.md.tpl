@@ -19,7 +19,7 @@
 
 Reported inventory means its completeness and freshness are unverified. Repository push dates and reported headlines are independent observations, with no inferred branch or delivery status. Snapshot {{ dashboard_summary.generated_at | e }}.
 
-The headline uses GitHub's default profile total and reporting period. The calendar below sums its own listed UTC dates, so its total can differ. Both include contributions visible to the provider, including private contributions. Updates reflect the observation time, rather than changes made afterward.
+Contributions and calendar use one unfiltered GitHub profile response, including eligible private and organization activity. The total is GitHub's reported total; weekly and weekday charts sum the returned day counts. Values reflect the update time.
 
 | Metric | Value | Population / period | Qualification |
 | --- | ---: | --- | --- |
@@ -33,7 +33,7 @@ The headline uses GitHub's default profile total and reporting period. The calen
 {% for key in ['public','private','combined'] %}{% set row = dashboard_summary.automation.display[key] %}| {{ key | title }} | {{ row.configured_repos }} | {{ row.eligible_repos }} | {{ row.workflow_files }} | {{ row.qualification | e }} |
 {% endfor %}
 
-| Observed UTC dates | Weekly contributions | Week |
+| GitHub calendar dates | Weekly contributions | Week |
 | --- | ---: | --- |
 {% if dashboard_summary.weekly.display.available %}{% for row in dashboard_summary.weekly.model.points %}| {{ row.observed_start }} – {{ row.observed_end }} | {{ '{:,}'.format(row.contributions) }} | {{ 'Partial' if row.partial else 'Complete' }} |
 {% endfor %}{% else %}Contribution trend unavailable.
@@ -53,7 +53,7 @@ The headline uses GitHub's default profile total and reporting period. The calen
 
 <details><summary>Daily calendar values</summary>
 
-| UTC date | Contributions |
+| GitHub date | Contributions |
 | --- | ---: |
 {% for row in dashboard_summary.calendar.days %}| {{ row.date }} | {{ '{:,}'.format(row.count) }} |
 {% endfor %}

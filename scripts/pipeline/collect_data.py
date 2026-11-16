@@ -147,8 +147,8 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
     logger(f"  Probe found {ci_count_probe} repos with CI/CD")
 
     logger("[7/7] Fetching contribution calendar...")
-    contribution_observation = gh.get_contribution_calendar_observation()
-    profile_contributions_observation = gh.get_profile_contributions_observation()
+    contribution_observation = gh.get_default_contribution_calendar_observation()
+    profile_contributions_observation = gh.profile_contributions_from_calendar(contribution_observation)
     contribution_value = contribution_observation.get("value")
     calendar = _calendar_from_observation_value(contribution_value)
     total_contributions = (
@@ -164,9 +164,9 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
             total_contributions = previous_contribution["value"]
             logger(f"  retained previous contribution observation: {total_contributions}")
         else:
-            logger("  n/a contributions in the last 12 months (calendar unavailable for this run)")
+            logger("  n/a GitHub contributions (calendar unavailable for this run)")
     else:
-        logger(f"  {total_contributions} contributions in the last 12 months")
+        logger(f"  {total_contributions} GitHub contributions")
 
     # Collect private-owned non-fork repository metadata for the same profile
     # surfaces and aggregate families as public repository metadata.
@@ -316,6 +316,7 @@ def _calendar_from_observation_value(value: object) -> dict[str, Any] | None:
         return None
     return {
         "totalContributions": total,
+        **{key: value[key] for key in ("calendar_start", "calendar_end") if key in value},
         "weeks": [
             {"contributionDays": sorted(weeks[key], key=lambda row: row["date"])}
             for key in sorted(weeks)

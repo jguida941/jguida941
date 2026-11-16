@@ -208,7 +208,7 @@ def stored_publication_subject(
 
 def _consistent_profile_contributions(data: object) -> bool:
     """Check the headline independently; missing evidence must display unavailable."""
-    from scripts.github.github_client import validate_provider_observation
+    from scripts.github.github_client import validate_provider_observation, profile_contributions_from_calendar, _NATIVE_CALENDAR_SOURCE
     from scripts.contracts.dashboard_summary import profile_contribution_fact
     try:
         observation = data.get("profile_contributions_observation")
@@ -221,6 +221,14 @@ def _consistent_profile_contributions(data: object) -> bool:
         if observation is not None and (not validate_provider_observation(observation)
                 or observation.get("metric_id") != "github_profile_contributions"):
             return False
+        provenance = data.get("data_quality", {}).get("metric_provenance", {}).get("last_year_contributions", {})
+        if provenance.get("source_metric_id") == _NATIVE_CALENDAR_SOURCE and provenance.get("status") == "ok":
+            calendar = data["contribution_calendar"]
+            native = {**provenance, "value": {"total": calendar["total"],
+                "days": [dict(row) for week in calendar["weeks"] for row in week],
+                "calendar_start": calendar.get("calendar_start"), "calendar_end": calendar.get("calendar_end")}}
+            if observation != profile_contributions_from_calendar(native):
+                return False
         expected_value = observation["value"] if observation and observation["status"] == "ok" else None
         if type(value) is not type(expected_value) or value != expected_value:
             return False
@@ -239,7 +247,7 @@ def _current_contribution_calendar(data: object) -> bool:
     from datetime import date, datetime
     from zoneinfo import ZoneInfo
     from scripts.contracts import profile_timezone_name
-    from scripts.github.github_client import validate_provider_observation
+    from scripts.github.github_client import validate_provider_observation, profile_contributions_from_calendar, _NATIVE_CALENDAR_SOURCE
     from scripts.contracts.dashboard_summary import build_dashboard_summary
     from scripts.contracts.profile_contract import contribution_rhythm_errors
 
@@ -253,7 +261,8 @@ def _current_contribution_calendar(data: object) -> bool:
         rows = [dict(row) for week in calendar["weeks"] for row in week]
         observation = {
             **quality["metric_provenance"]["last_year_contributions"],
-            "value": {"total": calendar["total"], "days": rows},
+            "value": {"total": calendar["total"], "days": rows,
+                      **{key: calendar[key] for key in ("calendar_start", "calendar_end") if key in calendar}},
         }
         if (observation.get("metric_id") != "last_year_contributions"
                 or observation.get("status") != "ok"
@@ -264,10 +273,25 @@ def _current_contribution_calendar(data: object) -> bool:
         snapshot = data["snapshot"]
         if type(snapshot.get("last_year_contributions")) is not int or snapshot["last_year_contributions"] != total:
             return False
+        native_calendar = observation.get("source_metric_id") == _NATIVE_CALENDAR_SOURCE
+        if native_calendar and (data.get("profile_contributions_observation") != profile_contributions_from_calendar(observation)
+                or snapshot.get("github_profile_contributions") != total):
+            return False
+        if native_calendar:
+            from types import SimpleNamespace
+            from scripts.pipeline.collect_data import _calendar_from_observation_value
+            from scripts.pipeline.compute_metrics import _build_contribution_trend
+            derived = _build_contribution_trend(SimpleNamespace(
+                calendar=_calendar_from_observation_value(observation["value"]),
+                metric_observations={"last_year_contributions": observation}))
+            if (data["engineering"]["contribution_trend"] != derived
+                    or data["dashboard_summary"]["weekly"]["model"] != derived):
+                return False
         rhythm = data["contribution_rhythm"]
         if (contribution_rhythm_errors(rhythm) or rhythm.get("status") != "available"
                 or rhythm.get("completeness") != "known"
-                or rhythm["total"] != total or rhythm["days_observed"] != len(rows)
+                or rhythm["total"] != (sum(row["count"] for row in rows) if native_calendar else total)
+                or rhythm["days_observed"] != len(rows)
                 or rhythm["window_start"] != rows[0]["date"]
                 or rhythm["window_end"] != rows[-1]["date"]):
             return False
@@ -304,7 +328,9 @@ def _current_contribution_calendar(data: object) -> bool:
         expected = build_dashboard_summary({
             "snapshot": snapshot,
             "contribution_rhythm": rhythm,
-            "dashboard_data": {"contribution_calendar": calendar},
+            "data_quality": quality,
+            "dashboard_data": {"contribution_calendar": calendar,
+                               "profile_contributions_observation": data.get("profile_contributions_observation")},
         }, profile_date=profile_date)
         expected_facts = {row["metric_id"]: row for row in expected["facts"]
                           if row["metric_id"] in required}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-16T03:35:38.691045Z",
+  "generated_at": "2026-11-16T04:11:14.878733Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,8 +18,8 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 13412,
-    "public_scope_commits": 8523,
+    "last_year_contributions": 13595,
+    "public_scope_commits": 8521,
     "total_repos": 56,
     "public_repos_total": 57,
     "public_forks": 1,
@@ -37,15 +37,15 @@
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 13412,
-      "display_value": "13,412"
+      "value": 13595,
+      "display_value": "13,595"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Repo Commits (Owned Non-Fork)",
       "dashboard_label": "Public Scope Commits",
-      "value": 8523,
-      "display_value": "8,523"
+      "value": 8521,
+      "display_value": "8,521"
     },
     {
       "key": "public_repos_total",
@@ -122,14 +122,14 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 13412,
-      "display_value": "13,412"
+      "value": 13595,
+      "display_value": "13,595"
     },
     {
       "key": "public_scope_commits",
       "label": "Public Scope Commits",
-      "value": 8523,
-      "display_value": "8,523"
+      "value": 8521,
+      "display_value": "8,521"
     },
     {
       "key": "public_repos_total",
@@ -229,23 +229,24 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-11-16T03:34:36Z",
+        "observed_at": "2026-11-16T02:53:09Z",
         "source_id": "github_rest_repo_commits",
-        "source_mode": "live",
-        "completion_reason": "all_components_observed"
+        "source_mode": "cache",
+        "completion_reason": "same_scope_cache"
       },
       "last_year_contributions": {
         "schema": "profile-provider-observation/v1",
         "metric_id": "last_year_contributions",
-        "source_metric_id": "github_contribution_calendar_total_and_days",
+        "source_metric_id": "github_default_profile_contribution_total_and_days",
         "status": "ok",
         "complete": true,
+        "source_content_digest": "sha256:deeaa5d57afb70cbb57d093316e5b6e39c780731357d512413e52c54942e13ae",
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
-        "window_start": "2025-11-17T00:00:00Z",
-        "window_end": "2026-11-16T03:34:41Z",
-        "observed_at": "2026-11-16T03:34:42Z",
-        "source_id": "github_graphql_contribution_calendar",
+        "window_start": "2025-11-09T05:00:00Z",
+        "window_end": "2026-11-16T04:59:59Z",
+        "observed_at": "2026-11-16T04:10:26Z",
+        "source_id": "github_graphql_default_contributions_collection",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
       },
@@ -253,13 +254,14 @@
         "schema": "profile-provider-observation/v1",
         "metric_id": "github_profile_contributions",
         "source_metric_id": "github_default_profile_contribution_total",
+        "source_content_digest": "sha256:deeaa5d57afb70cbb57d093316e5b6e39c780731357d512413e52c54942e13ae",
         "status": "ok",
         "complete": true,
         "population_id": "github-user-contributions-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-11-09T05:00:00Z",
         "window_end": "2026-11-16T04:59:59Z",
-        "observed_at": "2026-11-16T03:34:43Z",
+        "observed_at": "2026-11-16T04:10:26Z",
         "source_id": "github_graphql_default_contributions_collection",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -273,8 +275,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-10-17T04:00:00Z",
-        "window_end": "2026-11-16T03:34:39Z",
-        "observed_at": "2026-11-16T03:34:41Z",
+        "window_end": "2026-11-16T04:10:24Z",
+        "observed_at": "2026-11-16T04:10:24Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -288,8 +290,8 @@
         "population_id": "authored-pull-requests-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-11-16T05:00:00Z",
-        "window_end": "2026-11-16T03:34:41Z",
-        "observed_at": "2026-11-16T03:34:41Z",
+        "window_end": "2026-11-16T04:10:24Z",
+        "observed_at": "2026-11-16T04:10:25Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -304,10 +306,10 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-11-16T03:34:35Z",
+        "observed_at": "2026-11-16T02:53:07Z",
         "source_id": "github_rest_public_events",
-        "source_mode": "live",
-        "completion_reason": "terminal_page"
+        "source_mode": "cache",
+        "completion_reason": "same_scope_cache"
       }
     },
     "non_exact_metrics": {},
@@ -319,7 +321,7 @@
     "avg_release_gap_days": 0.04677083333333333,
     "stars_per_public_repo": 1.0535714285714286,
     "ci_coverage_pct": 21.875,
-    "last_year_contributions": 13412,
+    "last_year_contributions": 13595,
     "active_days_last_year": 333,
     "automation_workflows": 172,
     "primary_lang_share_pct": 68.3,
@@ -331,8 +333,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 13412,
-      "display_value": "13,412",
+      "value": 13595,
+      "display_value": "13,595",
       "accent": "#7dcfff"
     },
     {
@@ -394,7 +396,7 @@
   ],
   "data_scope": {
     "repos_included": "public + private observed, exact",
-    "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
+    "activity_metric_scope": "GitHub contributionCalendar.totalContributions (default reporting period)",
     "public_owned_repos_total": 57,
     "public_owned_forks_total": 1,
     "public_owned_nonfork_repos_total": 56,
@@ -466,18 +468,18 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 97033955,
-      "percent": 68.3
+      "bytes": 97084794,
+      "percent": 68.31
     },
     {
       "name": "Rust",
       "bytes": 10904193,
-      "percent": 7.68
+      "percent": 7.67
     },
     {
       "name": "C++",
       "bytes": 7922855,
-      "percent": 5.58
+      "percent": 5.57
     },
     {
       "name": "Swift",
@@ -491,8 +493,8 @@
     },
     {
       "name": "HTML",
-      "bytes": 5349050,
-      "percent": 3.77
+      "bytes": 5349422,
+      "percent": 3.76
     },
     {
       "name": "Java",
@@ -512,7 +514,7 @@
     {
       "name": "GDScript",
       "bytes": 1129648,
-      "percent": 0.8
+      "percent": 0.79
     },
     {
       "name": "Jupyter Notebook",
@@ -575,6 +577,22 @@
       "featured": true
     },
     {
+      "name": "jguida941",
+      "full_name": "jguida941/jguida941",
+      "url": "https://github.com/jguida941/jguida941",
+      "language": "Python",
+      "stars": 2,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-11-16",
+      "pushed_at_raw": "2026-11-16T03:36:01Z",
+      "pushed_ago": "today",
+      "created_at": "2026-02-20",
+      "last_commit_msg": "recent push detected",
+      "is_private": false,
+      "featured": false
+    },
+    {
       "name": "profile-private-continuation",
       "full_name": "jguida941/profile-private-continuation",
       "url": "https://github.com/jguida941/profile-private-continuation",
@@ -588,22 +606,6 @@
       "created_at": "2026-10-11",
       "last_commit_msg": "Record contribution repair and restore accepted continuation",
       "is_private": true,
-      "featured": false
-    },
-    {
-      "name": "jguida941",
-      "full_name": "jguida941/jguida941",
-      "url": "https://github.com/jguida941/jguida941",
-      "language": "Python",
-      "stars": 2,
-      "forks": 0,
-      "ci": "yes",
-      "pushed_at": "2026-11-16",
-      "pushed_at_raw": "2026-11-16T03:33:55Z",
-      "pushed_ago": "today",
-      "created_at": "2026-02-20",
-      "last_commit_msg": "Merge pull request #23 from jguida941/fix/overall-metric-scopes-20261115",
-      "is_private": false,
       "featured": false
     },
     {
@@ -1088,16 +1090,16 @@
   "focus": {
     "now": [
       {
-        "title": "profile-private-continuation",
-        "detail": "Python \u00b7 pushed today",
-        "url": "https://github.com/jguida941/profile-private-continuation",
-        "is_private": true
-      },
-      {
         "title": "jguida941",
         "detail": "Python \u00b7 pushed today",
         "url": "https://github.com/jguida941/jguida941",
         "is_private": false
+      },
+      {
+        "title": "profile-private-continuation",
+        "detail": "Python \u00b7 pushed today",
+        "url": "https://github.com/jguida941/profile-private-continuation",
+        "is_private": true
       },
       {
         "title": "cs499-review",
@@ -1128,6 +1130,18 @@
   "activity_feed": [
     {
       "kind": "activity",
+      "title": "recent push detected",
+      "url": "https://github.com/jguida941/jguida941",
+      "repo": "jguida941/jguida941",
+      "repo_url": "https://github.com/jguida941/jguida941",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-11-16T03:36:01Z",
+      "is_private": false,
+      "observation_source": "repository push metadata"
+    },
+    {
+      "kind": "activity",
       "title": "Record contribution repair and restore accepted continuation",
       "url": "https://github.com/jguida941/profile-private-continuation",
       "repo": "jguida941/profile-private-continuation",
@@ -1140,25 +1154,13 @@
     },
     {
       "kind": "activity",
-      "title": "Merge pull request #23 from jguida941/fix/overall-metric-scopes-20261115",
+      "title": "issue",
       "url": "https://github.com/jguida941/jguida941",
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
-      "state": "PUSH",
+      "state": "ISSUE",
       "time_ago": "today",
-      "created_at": "2026-11-16T03:33:55Z",
-      "is_private": false,
-      "observation_source": "repository push metadata"
-    },
-    {
-      "kind": "activity",
-      "title": "pr review",
-      "url": "https://github.com/jguida941/jguida941",
-      "repo": "jguida941/jguida941",
-      "repo_url": "https://github.com/jguida941/jguida941",
-      "state": "PR REVIEW",
-      "time_ago": "today",
-      "created_at": "2026-11-16T03:33:52Z",
+      "created_at": "2026-11-16T02:18:13Z",
       "is_private": false,
       "observation_source": "event"
     },
@@ -1181,7 +1183,7 @@
       "repo": "jguida941/advising-assistance-cpp",
       "repo_url": "https://github.com/jguida941/advising-assistance-cpp",
       "state": "ISSUE",
-      "time_ago": "6 hours ago",
+      "time_ago": "7 hours ago",
       "created_at": "2026-11-15T21:03:33Z",
       "is_private": false,
       "observation_source": "event"
@@ -1217,7 +1219,7 @@
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
       "state": "PUSH",
-      "time_ago": "9 hours ago",
+      "time_ago": "10 hours ago",
       "created_at": "2026-11-15T17:46:33Z",
       "is_private": false,
       "observation_source": "event"
@@ -1253,7 +1255,19 @@
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
       "state": "PUSH",
-      "time_ago": "21 hours ago",
+      "time_ago": "22 hours ago",
+      "created_at": "2026-11-15T06:06:31Z",
+      "is_private": false,
+      "observation_source": "event"
+    },
+    {
+      "kind": "activity",
+      "title": "push",
+      "url": "https://github.com/jguida941/jguida941",
+      "repo": "jguida941/jguida941",
+      "repo_url": "https://github.com/jguida941/jguida941",
+      "state": "PUSH",
+      "time_ago": "22 hours ago",
       "created_at": "2026-11-15T05:59:52Z",
       "is_private": false,
       "observation_source": "event"
@@ -1293,18 +1307,6 @@
       "created_at": "2026-11-13T18:38:32Z",
       "is_private": false,
       "observation_source": "repository push metadata"
-    },
-    {
-      "kind": "activity",
-      "title": "push",
-      "url": "https://github.com/jguida941/advising-assistance-cpp",
-      "repo": "jguida941/advising-assistance-cpp",
-      "repo_url": "https://github.com/jguida941/advising-assistance-cpp",
-      "state": "PUSH",
-      "time_ago": "2 days ago",
-      "created_at": "2026-11-13T18:25:49Z",
-      "is_private": false,
-      "observation_source": "event"
     },
     {
       "kind": "created",
@@ -1371,6 +1373,7 @@
   "engineering": {
     "active_days_last_year": 333,
     "weekly_cadence": [
+      95,
       74,
       125,
       41,
@@ -1381,19 +1384,27 @@
       237,
       229,
       351,
-      446,
-      5
+      446
     ],
     "contribution_trend": {
       "status": "available",
       "unit": "contributions",
       "bucket": "iso_week",
       "week_start_day": "Monday",
-      "timezone": "UTC",
+      "timezone": "GitHub",
       "completeness": "known",
-      "window_start": "2026-08-31",
-      "window_end": "2026-11-16",
+      "window_start": "2026-08-24",
+      "window_end": "2026-11-15",
       "points": [
+        {
+          "week_start": "2026-08-24",
+          "week_end": "2026-08-30",
+          "observed_start": "2026-08-24",
+          "observed_end": "2026-08-30",
+          "days_observed": 7,
+          "contributions": 95,
+          "partial": false
+        },
         {
           "week_start": "2026-08-31",
           "week_end": "2026-09-06",
@@ -1491,15 +1502,6 @@
           "observed_end": "2026-11-15",
           "days_observed": 7,
           "contributions": 446,
-          "partial": false
-        },
-        {
-          "week_start": "2026-11-16",
-          "week_end": "2026-11-22",
-          "observed_start": "2026-11-16",
-          "observed_end": "2026-11-16",
-          "days_observed": 1,
-          "contributions": 5,
           "partial": true
         }
       ],
@@ -1522,6 +1524,7 @@
     "schema": "profile-provider-observation/v1",
     "metric_id": "github_profile_contributions",
     "source_metric_id": "github_default_profile_contribution_total",
+    "source_content_digest": "sha256:deeaa5d57afb70cbb57d093316e5b6e39c780731357d512413e52c54942e13ae",
     "value": 13595,
     "status": "ok",
     "complete": true,
@@ -1529,7 +1532,7 @@
     "population_signature": null,
     "window_start": "2025-11-09T05:00:00Z",
     "window_end": "2026-11-16T04:59:59Z",
-    "observed_at": "2026-11-16T03:34:43Z",
+    "observed_at": "2026-11-16T04:10:26Z",
     "source_id": "github_graphql_default_contributions_collection",
     "source_mode": "live",
     "completion_reason": "all_components_observed"
@@ -1539,7 +1542,7 @@
     "source_id": "github_personal_owned_repository_census",
     "population_id": "personal-owned-repositories",
     "source_mode": "live",
-    "observed_at": "2026-11-16T03:35:26.926671Z",
+    "observed_at": "2026-11-16T04:10:51.752943Z",
     "metrics": {
       "public_repos_total": {
         "value": 57,
@@ -1562,9 +1565,9 @@
         "complete": true
       }
     },
-    "snapshot_generated_at": "2026-11-16T03:35:38.691045Z"
+    "snapshot_generated_at": "2026-11-16T04:11:14.878733Z"
   },
-  "collection_started_at": "2026-11-16T03:34:25.526080+00:00",
+  "collection_started_at": "2026-11-16T04:10:24.975938+00:00",
   "automation": {
     "public": {
       "observed_eligible_repos": 56,
@@ -1640,16 +1643,40 @@
   "ci_execution": {
     "schema": "profile-ci-execution/v1",
     "repository": "jguida941/jguida941",
-    "observed_at": "2026-11-16T03:35:36Z",
+    "observed_at": "2026-11-16T04:11:14Z",
     "sample_limit": 12,
     "scope": "Latest observed GitHub Actions runs in the public profile repository, across branches; not account-wide.",
     "status": "available",
     "observed_runs": 12,
     "runs": [
       {
+        "run_id": 43801395497,
+        "workflow": "Generate Metrics",
+        "outcome": "in_progress",
+        "created_at": "2026-11-16T04:00:03Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 43799643045,
+        "workflow": "Deploy Profile Site",
+        "outcome": "skipped",
+        "created_at": "2026-11-16T03:41:06Z",
+        "event": "workflow_run",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 43799163853,
+        "workflow": "Deploy Profile Site",
+        "outcome": "success",
+        "created_at": "2026-11-16T03:36:10Z",
+        "event": "workflow_run",
+        "head_branch": "main"
+      },
+      {
         "run_id": 43798935247,
         "workflow": "Build Analytics & README",
-        "outcome": "in_progress",
+        "outcome": "success",
         "created_at": "2026-11-16T03:33:58Z",
         "event": "push",
         "head_branch": "main"
@@ -1689,7 +1716,7 @@
       {
         "run_id": 43796625095,
         "workflow": "Generate Metrics",
-        "outcome": "success",
+        "outcome": "failure",
         "created_at": "2026-11-16T03:11:11Z",
         "event": "schedule",
         "head_branch": "main"
@@ -1717,36 +1744,18 @@
         "created_at": "2026-11-16T02:02:09Z",
         "event": "workflow_run",
         "head_branch": "main"
-      },
-      {
-        "run_id": 43789489312,
-        "workflow": "Generate Metrics",
-        "outcome": "success",
-        "created_at": "2026-11-16T02:00:06Z",
-        "event": "workflow_dispatch",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 43783866499,
-        "workflow": "Deploy Profile Site",
-        "outcome": "success",
-        "created_at": "2026-11-16T01:02:18Z",
-        "event": "workflow_run",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 43783639159,
-        "workflow": "Generate Metrics",
-        "outcome": "success",
-        "created_at": "2026-11-16T01:00:04Z",
-        "event": "workflow_dispatch",
-        "head_branch": "main"
       }
     ]
   },
   "contribution_calendar": {
-    "total": 13412,
+    "total": 13595,
     "weeks": [
+      [
+        {
+          "date": "2025-11-16",
+          "count": 16
+        }
+      ],
       [
         {
           "date": "2025-11-17",
@@ -3306,31 +3315,27 @@
           "date": "2026-11-15",
           "count": 115
         }
-      ],
-      [
-        {
-          "date": "2026-11-16",
-          "count": 5
-        }
       ]
-    ]
+    ],
+    "calendar_start": "2025-11-16",
+    "calendar_end": "2026-11-15"
   },
   "contribution_rhythm": {
     "status": "available",
     "reason": "dated_calendar",
     "unit": "contributions",
     "bucket": "weekday",
-    "timezone": "UTC",
+    "timezone": "GitHub",
     "completeness": "known",
-    "window_start": "2025-11-17",
-    "window_end": "2026-11-16",
+    "window_start": "2025-11-16",
+    "window_end": "2026-11-15",
     "days_observed": 365,
-    "total": 13412,
+    "total": 13423,
     "weekdays": [
       {
         "weekday": "Mon",
-        "contributions": 1532,
-        "days_observed": 53
+        "contributions": 1527,
+        "days_observed": 52
       },
       {
         "weekday": "Tue",
@@ -3359,8 +3364,8 @@
       },
       {
         "weekday": "Sun",
-        "contributions": 1980,
-        "days_observed": 52
+        "contributions": 1996,
+        "days_observed": 53
       }
     ],
     "last_day_in_progress": true,
@@ -3372,16 +3377,16 @@
     "subtitle": "Contributions by weekday",
     "scope": "Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred.",
     "explanation": "These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.",
-    "coverage_summary": "Observed dates \u2014 Mon: 53; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 52.",
-    "caption": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC calendar dates",
+    "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 53.",
+    "caption": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub calendar dates",
     "qualification": "Last date may be in progress",
     "message": "",
     "rows": [
       {
         "weekday": "Mon",
-        "contributions": 1532,
-        "days_observed": 53,
-        "count_text": "1,532"
+        "contributions": 1527,
+        "days_observed": 52,
+        "count_text": "1,527"
       },
       {
         "weekday": "Tue",
@@ -3415,16 +3420,16 @@
       },
       {
         "weekday": "Sun",
-        "contributions": 1980,
-        "days_observed": 52,
-        "count_text": "1,980"
+        "contributions": 1996,
+        "days_observed": 53,
+        "count_text": "1,996"
       }
     ]
   },
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
     "window_start": "2026-10-18T00:00:00Z",
-    "window_end": "2026-11-16T03:34:59.465368Z",
+    "window_end": "2026-11-16T04:10:26.610928Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 256,
@@ -3452,230 +3457,227 @@
         "status": "partial",
         "complete": false,
         "reason": "activity_incomplete",
-        "occurred_at": "2026-11-16T03:34:25Z"
+        "occurred_at": "2026-11-16T03:36:01Z"
       },
       "history": {
         "status": "ok",
         "complete": true,
         "reason": "end_of_connection"
       },
-      "repository": "jguida941/profile-private-continuation",
-      "ref": "refs/heads/development",
-      "head_sha": "c9f55a6c6873f298b7fbb4c466789105a00b0cdf",
-      "commit_url": "https://github.com/jguida941/profile-private-continuation/commit/c9f55a6c6873f298b7fbb4c466789105a00b0cdf",
-      "additions": 656008,
-      "deletions": 7237,
-      "commit_count": 135,
-      "observed_commits": 145,
-      "stats_observed": 135,
-      "excluded_merges": 10,
+      "repository": "jguida941/jguida941",
+      "ref": "refs/heads/main",
+      "head_sha": "af25f35322c084fe70b68c3baea158afdb2eef56",
+      "commit_url": "https://github.com/jguida941/jguida941/commit/af25f35322c084fe70b68c3baea158afdb2eef56",
+      "additions": 228728,
+      "deletions": 222393,
+      "commit_count": 836,
+      "observed_commits": 847,
+      "stats_observed": 836,
+      "excluded_merges": 11,
       "daily": [
         {
           "date": "2026-10-18",
-          "additions": 74743,
-          "deletions": 566,
+          "additions": 14982,
+          "deletions": 14161,
           "complete": false
         },
         {
           "date": "2026-10-19",
-          "additions": 8152,
-          "deletions": 257,
+          "additions": 4968,
+          "deletions": 4968,
           "complete": false
         },
         {
           "date": "2026-10-20",
-          "additions": null,
-          "deletions": null,
+          "additions": 4348,
+          "deletions": 4395,
           "complete": false
         },
         {
           "date": "2026-10-21",
-          "additions": null,
-          "deletions": null,
+          "additions": 4047,
+          "deletions": 4059,
           "complete": false
         },
         {
           "date": "2026-10-22",
-          "additions": null,
-          "deletions": null,
+          "additions": 7520,
+          "deletions": 8294,
           "complete": false
         },
         {
           "date": "2026-10-23",
-          "additions": null,
-          "deletions": null,
+          "additions": 3632,
+          "deletions": 3644,
           "complete": false
         },
         {
           "date": "2026-10-24",
-          "additions": 116408,
-          "deletions": 258,
+          "additions": 5463,
+          "deletions": 5474,
           "complete": false
         },
         {
           "date": "2026-10-25",
-          "additions": 111751,
-          "deletions": 549,
+          "additions": 7588,
+          "deletions": 7683,
           "complete": false
         },
         {
           "date": "2026-10-26",
-          "additions": null,
-          "deletions": null,
+          "additions": 14331,
+          "deletions": 14307,
           "complete": false
         },
         {
           "date": "2026-10-27",
-          "additions": null,
-          "deletions": null,
+          "additions": 13767,
+          "deletions": 13767,
           "complete": false
         },
         {
           "date": "2026-10-28",
-          "additions": null,
-          "deletions": null,
+          "additions": 7234,
+          "deletions": 7996,
           "complete": false
         },
         {
           "date": "2026-10-29",
-          "additions": null,
-          "deletions": null,
+          "additions": 12981,
+          "deletions": 12969,
           "complete": false
         },
         {
           "date": "2026-10-30",
-          "additions": null,
-          "deletions": null,
+          "additions": 3628,
+          "deletions": 3628,
           "complete": false
         },
         {
           "date": "2026-10-31",
-          "additions": null,
-          "deletions": null,
+          "additions": 3622,
+          "deletions": 3622,
           "complete": false
         },
         {
           "date": "2026-11-01",
-          "additions": 43969,
-          "deletions": 623,
+          "additions": 6345,
+          "deletions": 6392,
           "complete": false
         },
         {
           "date": "2026-11-02",
-          "additions": 9125,
-          "deletions": 127,
+          "additions": 5030,
+          "deletions": 5018,
           "complete": false
         },
         {
           "date": "2026-11-03",
-          "additions": 137788,
-          "deletions": 160,
+          "additions": 13370,
+          "deletions": 13358,
           "complete": false
         },
         {
           "date": "2026-11-04",
-          "additions": 45561,
-          "deletions": 2177,
+          "additions": 4386,
+          "deletions": 4386,
           "complete": false
         },
         {
           "date": "2026-11-05",
-          "additions": 6610,
-          "deletions": 891,
+          "additions": 10452,
+          "deletions": 8652,
           "complete": false
         },
         {
           "date": "2026-11-06",
-          "additions": null,
-          "deletions": null,
+          "additions": 3956,
+          "deletions": 4160,
           "complete": false
         },
         {
           "date": "2026-11-07",
-          "additions": null,
-          "deletions": null,
+          "additions": 7351,
+          "deletions": 8125,
           "complete": false
         },
         {
           "date": "2026-11-08",
-          "additions": null,
-          "deletions": null,
+          "additions": 5554,
+          "deletions": 5566,
           "complete": false
         },
         {
           "date": "2026-11-09",
-          "additions": null,
-          "deletions": null,
+          "additions": 13157,
+          "deletions": 13205,
           "complete": false
         },
         {
           "date": "2026-11-10",
-          "additions": null,
-          "deletions": null,
+          "additions": 3369,
+          "deletions": 3453,
           "complete": false
         },
         {
           "date": "2026-11-11",
-          "additions": null,
-          "deletions": null,
+          "additions": 3781,
+          "deletions": 3829,
           "complete": false
         },
         {
           "date": "2026-11-12",
-          "additions": null,
-          "deletions": null,
+          "additions": 6944,
+          "deletions": 7807,
           "complete": false
         },
         {
           "date": "2026-11-13",
-          "additions": null,
-          "deletions": null,
+          "additions": 9585,
+          "deletions": 6199,
           "complete": false
         },
         {
           "date": "2026-11-14",
-          "additions": null,
-          "deletions": null,
+          "additions": 5062,
+          "deletions": 5097,
           "complete": false
         },
         {
           "date": "2026-11-15",
-          "additions": 80677,
-          "deletions": 1280,
+          "additions": 16162,
+          "deletions": 13277,
           "complete": false
         },
         {
           "date": "2026-11-16",
-          "additions": 21224,
-          "deletions": 349,
+          "additions": 6113,
+          "deletions": 4902,
           "complete": false
         }
       ],
       "meaning": "Summed non-merge commit line changes reachable from the selected head; not net tree size or all branches",
-      "is_private": true
+      "is_private": false
     },
     "recent_pushes": {
       "status": "partial",
       "complete": false,
       "rows": [
         {
-          "id": "50466884495",
+          "id": "50467168737",
           "repository": "jguida941/jguida941",
-          "timestamp": "2026-11-16T03:32:26Z",
+          "timestamp": "2026-11-16T03:36:01Z",
           "activity_type": "push",
-          "ref": "refs/heads/fix/overall-metric-scopes-20261115",
-          "after": "f762ede4b36deb8751f61d5175345a4c7a02108c",
+          "ref": "refs/heads/main",
+          "after": "af25f35322c084fe70b68c3baea158afdb2eef56",
           "diff_status": "ok",
-          "additions": 1,
-          "deletions": 1,
+          "additions": 516,
+          "deletions": 486,
           "commits": [
-            "468d2a3bf0b88074349d34f1f504dff614ea79c4",
-            "4f69bd497c3ce1492983c7055e9974364a4912ac",
-            "2f5734b03f5d84c29044034d1f7a299b4947c1e9",
-            "f762ede4b36deb8751f61d5175345a4c7a02108c"
+            "af25f35322c084fe70b68c3baea158afdb2eef56"
           ],
-          "compare_url": "https://github.com/jguida941/jguida941/compare/bc887f917d48b3e2ec0f51fd408ee7d5d20178f6...f762ede4b36deb8751f61d5175345a4c7a02108c",
-          "head_url": "https://github.com/jguida941/jguida941/commit/f762ede4b36deb8751f61d5175345a4c7a02108c",
+          "compare_url": "https://github.com/jguida941/jguida941/compare/cf7af6d4ce6c132c2088284874d864ba9dd9fdd3...af25f35322c084fe70b68c3baea158afdb2eef56",
+          "head_url": "https://github.com/jguida941/jguida941/commit/af25f35322c084fe70b68c3baea158afdb2eef56",
           "is_private": false
         },
         {
@@ -3727,8 +3729,8 @@
       "status": "partial",
       "complete": false,
       "window_start": "2026-10-18T00:00:00Z",
-      "window_end": "2026-11-16T03:34:59.465368Z",
-      "observed_at": "2026-11-16T03:34:59.465368Z",
+      "window_end": "2026-11-16T04:10:26.610928Z",
+      "observed_at": "2026-11-16T04:10:26.610928Z",
       "timezone": "UTC",
       "current_day_partial": true,
       "default_days": 14,
@@ -3779,7 +3781,7 @@
           "reasons": [
             "incomplete_activity_coverage"
           ],
-          "latest_push": "2026-11-16T03:32:26Z",
+          "latest_push": "2026-11-16T03:36:01Z",
           "observed_pushes": 80,
           "daily": [
             {
@@ -3946,9 +3948,9 @@
             },
             {
               "date": "2026-11-14",
-              "count": 7,
+              "count": 6,
               "complete": false,
-              "level": 3
+              "level": 2
             },
             {
               "date": "2026-11-15",
@@ -3958,9 +3960,9 @@
             },
             {
               "date": "2026-11-16",
-              "count": 6,
+              "count": 7,
               "complete": false,
-              "level": 2
+              "level": 3
             }
           ],
           "branch_empty_daily": [
@@ -4235,9 +4237,9 @@
               "daily": [
                 {
                   "date": "2026-11-14",
-                  "count": 7,
+                  "count": 6,
                   "complete": false,
-                  "level": 3
+                  "level": 2
                 },
                 {
                   "date": "2026-11-15",
@@ -4247,7 +4249,7 @@
                 },
                 {
                   "date": "2026-11-16",
-                  "count": 5,
+                  "count": 6,
                   "complete": false,
                   "level": 2
                 }
@@ -8459,7 +8461,7 @@
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-11-16T03:35:38.691045Z",
+    "generated_at": "2026-11-16T04:11:14.878733Z",
     "facts": [
       {
         "metric_id": "profile.contributions",
@@ -8476,17 +8478,18 @@
         },
         "window_start": "2025-11-09T05:00:00Z",
         "window_end": "2026-11-16T04:59:59Z",
-        "observed_at": "2026-11-16T03:34:43Z",
-        "source_id": "github_graphql_default_contributions_collection"
+        "observed_at": "2026-11-16T04:10:26Z",
+        "source_id": "github_graphql_default_contributions_collection",
+        "source_content_digest": "sha256:deeaa5d57afb70cbb57d093316e5b6e39c780731357d512413e52c54942e13ae"
       },
       {
         "metric_id": "calendar.total",
-        "value": 13412,
-        "display_value": "13,412",
+        "value": 13595,
+        "display_value": "13,595",
         "label": "contributions",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC",
+        "window": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub",
         "quality": {
           "status": "exact",
           "reason": "calendar_observation",
@@ -8500,7 +8503,7 @@
         "label": "public repos",
         "unit": "count",
         "population_id": "public-owned-including-forks",
-        "window": "Observed 2026-11-16T03:35:26.926671Z",
+        "window": "Observed 2026-11-16T04:10:51.752943Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8514,7 +8517,7 @@
         "label": "public non-fork repos",
         "unit": "count",
         "population_id": "public-owned-nonfork-profile-included",
-        "window": "Observed 2026-11-16T03:35:26.926671Z",
+        "window": "Observed 2026-11-16T04:10:51.752943Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8528,7 +8531,7 @@
         "label": "private owned repos",
         "unit": "count",
         "population_id": "private-owned-including-forks",
-        "window": "Observed 2026-11-16T03:35:26.926671Z",
+        "window": "Observed 2026-11-16T04:10:51.752943Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8542,7 +8545,7 @@
         "label": "stargazers",
         "unit": "count",
         "population_id": "public-owned-nonfork",
-        "window": "Observed 2026-11-16T03:35:26.926671Z",
+        "window": "Observed 2026-11-16T04:10:51.752943Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8556,7 +8559,7 @@
         "label": "public forks",
         "unit": "count",
         "population_id": "public-owned-forks",
-        "window": "Observed 2026-11-16T03:35:26.926671Z",
+        "window": "Observed 2026-11-16T04:10:51.752943Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8565,8 +8568,8 @@
       },
       {
         "metric_id": "activity.public_commits",
-        "value": 8523,
-        "display_value": "8,523",
+        "value": 8521,
+        "display_value": "8,521",
         "label": "Public commits",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
@@ -8584,7 +8587,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "authored-pull-requests-visible-to-primary-pr-search",
-        "window": "2025-11-16T05:00:00Z \u2013 2026-11-16T03:34:41Z",
+        "window": "2025-11-16T05:00:00Z \u2013 2026-11-16T04:10:24Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -8598,7 +8601,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-10-17T04:00:00Z \u2013 2026-11-16T03:34:39Z",
+        "window": "2026-10-17T04:00:00Z \u2013 2026-11-16T04:10:24Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -8654,7 +8657,7 @@
         "label": "active days",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC",
+        "window": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
@@ -8673,7 +8676,7 @@
         "label": "current observed streak",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC",
+        "window": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
@@ -8692,7 +8695,7 @@
         "label": "longest observed streak",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC",
+        "window": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
@@ -8711,11 +8714,20 @@
         "unit": "contributions",
         "bucket": "iso_week",
         "week_start_day": "Monday",
-        "timezone": "UTC",
+        "timezone": "GitHub",
         "completeness": "known",
-        "window_start": "2026-08-31",
-        "window_end": "2026-11-16",
+        "window_start": "2026-08-24",
+        "window_end": "2026-11-15",
         "points": [
+          {
+            "week_start": "2026-08-24",
+            "week_end": "2026-08-30",
+            "observed_start": "2026-08-24",
+            "observed_end": "2026-08-30",
+            "days_observed": 7,
+            "contributions": 95,
+            "partial": false
+          },
           {
             "week_start": "2026-08-31",
             "week_end": "2026-09-06",
@@ -8813,15 +8825,6 @@
             "observed_end": "2026-11-15",
             "days_observed": 7,
             "contributions": 446,
-            "partial": false
-          },
-          {
-            "week_start": "2026-11-16",
-            "week_end": "2026-11-22",
-            "observed_start": "2026-11-16",
-            "observed_end": "2026-11-16",
-            "days_observed": 1,
-            "contributions": 5,
             "partial": true
           }
         ],
@@ -8831,6 +8834,7 @@
         "available": true,
         "title": "Weekly contributions",
         "values": [
+          95,
           74,
           125,
           41,
@@ -8841,13 +8845,12 @@
           237,
           229,
           351,
-          446,
-          5
+          446
         ],
         "peak": "Peak 577 contributions/week",
-        "window": "Aug 31 \u2013 Nov 16, 2026 \u00b7 12 weeks",
-        "qualification": "Mon\u2013Sun \u00b7 UTC \u00b7 partial weeks included",
-        "description": "UTC contribution calendar. 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 577 contributions (complete); 2026-10-19 to 2026-10-25: 237 contributions (complete); 2026-10-26 to 2026-11-01: 229 contributions (complete); 2026-11-02 to 2026-11-08: 351 contributions (complete); 2026-11-09 to 2026-11-15: 446 contributions (complete); 2026-11-16 to 2026-11-16: 5 contributions (partial)"
+        "window": "Aug 24 \u2013 Nov 15, 2026 \u00b7 12 weeks",
+        "qualification": "Mon\u2013Sun \u00b7 GitHub \u00b7 partial weeks included",
+        "description": "GitHub contribution calendar. 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 577 contributions (complete); 2026-10-19 to 2026-10-25: 237 contributions (complete); 2026-10-26 to 2026-11-01: 229 contributions (complete); 2026-11-02 to 2026-11-08: 351 contributions (complete); 2026-11-09 to 2026-11-15: 446 contributions (partial)"
       }
     },
     "rhythm": {
@@ -8856,17 +8859,17 @@
         "reason": "dated_calendar",
         "unit": "contributions",
         "bucket": "weekday",
-        "timezone": "UTC",
+        "timezone": "GitHub",
         "completeness": "known",
-        "window_start": "2025-11-17",
-        "window_end": "2026-11-16",
+        "window_start": "2025-11-16",
+        "window_end": "2026-11-15",
         "days_observed": 365,
-        "total": 13412,
+        "total": 13423,
         "weekdays": [
           {
             "weekday": "Mon",
-            "contributions": 1532,
-            "days_observed": 53
+            "contributions": 1527,
+            "days_observed": 52
           },
           {
             "weekday": "Tue",
@@ -8895,8 +8898,8 @@
           },
           {
             "weekday": "Sun",
-            "contributions": 1980,
-            "days_observed": 52
+            "contributions": 1996,
+            "days_observed": 53
           }
         ],
         "last_day_in_progress": true
@@ -8907,16 +8910,16 @@
         "subtitle": "Contributions by weekday",
         "scope": "Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred.",
         "explanation": "These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.",
-        "coverage_summary": "Observed dates \u2014 Mon: 53; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 52.",
-        "caption": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC calendar dates",
+        "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 53.",
+        "caption": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub calendar dates",
         "qualification": "Last date may be in progress",
         "message": "",
         "rows": [
           {
             "weekday": "Mon",
-            "contributions": 1532,
-            "days_observed": 53,
-            "count_text": "1,532"
+            "contributions": 1527,
+            "days_observed": 52,
+            "count_text": "1,527"
           },
           {
             "weekday": "Tue",
@@ -8950,9 +8953,9 @@
           },
           {
             "weekday": "Sun",
-            "contributions": 1980,
-            "days_observed": 52,
-            "count_text": "1,980"
+            "contributions": 1996,
+            "days_observed": 53,
+            "count_text": "1,996"
           }
         ]
       }
@@ -8961,260 +8964,260 @@
       "rows": [
         {
           "name": "Python",
-          "bytes": 97033955,
-          "percent": 68.30215252115508,
+          "bytes": 97084794,
+          "percent": 68.31331289654929,
           "display_value": "68.3%"
         },
         {
           "name": "Rust",
           "bytes": 10904193,
-          "percent": 7.675456013372964,
+          "percent": 7.672690208245821,
           "display_value": "7.7%"
         },
         {
           "name": "C++",
           "bytes": 7922855,
-          "percent": 5.576893682350638,
+          "percent": 5.574884081733645,
           "display_value": "5.6%"
         },
         {
           "name": "Swift",
           "bytes": 6142050,
-          "percent": 4.323385931167709,
+          "percent": 4.321828024646688,
           "display_value": "4.3%"
         },
         {
           "name": "Makefile",
           "bytes": 5888079,
-          "percent": 4.144615870955794,
+          "percent": 4.1431223831674515,
           "display_value": "4.1%"
         },
         {
           "name": "HTML",
-          "bytes": 5349050,
-          "percent": 3.7651936267390584,
+          "bytes": 5349422,
+          "percent": 3.764098617767933,
           "display_value": "3.8%"
         },
         {
           "name": "Other",
           "bytes": 8825553,
-          "percent": 6.212302354258752,
+          "percent": 6.210063787889165,
           "display_value": "6.2%"
         }
       ],
       "all_rows": [
         {
           "name": "Python",
-          "bytes": 97033955,
-          "percent": 68.30215252115508,
+          "bytes": 97084794,
+          "percent": 68.31331289654929,
           "display_value": "68.3%"
         },
         {
           "name": "Rust",
           "bytes": 10904193,
-          "percent": 7.675456013372964,
+          "percent": 7.672690208245821,
           "display_value": "7.7%"
         },
         {
           "name": "C++",
           "bytes": 7922855,
-          "percent": 5.576893682350638,
+          "percent": 5.574884081733645,
           "display_value": "5.6%"
         },
         {
           "name": "Swift",
           "bytes": 6142050,
-          "percent": 4.323385931167709,
+          "percent": 4.321828024646688,
           "display_value": "4.3%"
         },
         {
           "name": "Makefile",
           "bytes": 5888079,
-          "percent": 4.144615870955794,
+          "percent": 4.1431223831674515,
           "display_value": "4.1%"
         },
         {
           "name": "HTML",
-          "bytes": 5349050,
-          "percent": 3.7651936267390584,
+          "bytes": 5349422,
+          "percent": 3.764098617767933,
           "display_value": "3.8%"
         },
         {
           "name": "Java",
           "bytes": 2135378,
-          "percent": 1.5030915090116557,
+          "percent": 1.5025498788863645,
           "display_value": "1.5%"
         },
         {
           "name": "JavaScript",
           "bytes": 1390601,
-          "percent": 0.9788433502279772,
+          "percent": 0.9784906298225688,
           "display_value": "1.0%"
         },
         {
           "name": "Shell",
           "bytes": 1255556,
-          "percent": 0.8837852420923313,
+          "percent": 0.8834667753133395,
           "display_value": "0.9%"
         },
         {
           "name": "GDScript",
           "bytes": 1129648,
-          "percent": 0.7951586636988855,
+          "percent": 0.7948721329826494,
           "display_value": "0.8%"
         },
         {
           "name": "Jupyter Notebook",
           "bytes": 899502,
-          "percent": 0.6331590091023709,
+          "percent": 0.6329308540024495,
           "display_value": "0.6%"
         },
         {
           "name": "TypeScript",
           "bytes": 460576,
-          "percent": 0.32419921665136214,
+          "percent": 0.3240823933832634,
           "display_value": "0.3%"
         },
         {
           "name": "C",
           "bytes": 443442,
-          "percent": 0.3121386025982972,
+          "percent": 0.31202612530106016,
           "display_value": "0.3%"
         },
         {
           "name": "CMake",
           "bytes": 392196,
-          "percent": 0.27606656876128505,
+          "percent": 0.27596708980785445,
           "display_value": "0.3%"
         },
         {
           "name": "CSS",
           "bytes": 242048,
-          "percent": 0.17037746645945273,
+          "percent": 0.17031607194823903,
           "display_value": "0.2%"
         },
         {
           "name": "GLSL",
           "bytes": 103431,
-          "percent": 0.07280502930562391,
+          "percent": 0.07277879444440075,
           "display_value": "0.1%"
         },
         {
           "name": "C#",
           "bytes": 83058,
-          "percent": 0.058464484768265906,
+          "percent": 0.058443417437354726,
           "display_value": "0.1%"
         },
         {
           "name": "Assembly",
           "bytes": 74798,
-          "percent": 0.052650274888592946,
+          "percent": 0.052631302673785296,
           "display_value": "0.1%"
         },
         {
           "name": "Rich Text Format",
           "bytes": 71946,
-          "percent": 0.05064275351125308,
+          "percent": 0.05062450469488698,
           "display_value": "0.1%"
         },
         {
           "name": "Kotlin",
           "bytes": 22961,
-          "percent": 0.01616223644638871,
+          "percent": 0.01615641248018375,
           "display_value": "0.0%"
         },
         {
           "name": "PowerShell",
           "bytes": 19687,
-          "percent": 0.013857669479554658,
+          "percent": 0.013852675950410585,
           "display_value": "0.0%"
         },
         {
           "name": "Dockerfile",
           "bytes": 19316,
-          "percent": 0.013596522764620195,
+          "percent": 0.013591623338148569,
           "display_value": "0.0%"
         },
         {
           "name": "TeX",
           "bytes": 13407,
-          "percent": 0.009437180612200401,
+          "percent": 0.009433779980045447,
           "display_value": "0.0%"
         },
         {
           "name": "Batchfile",
           "bytes": 11667,
-          "percent": 0.008212395480162758,
+          "percent": 0.008209436192078036,
           "display_value": "0.0%"
         },
         {
           "name": "SCSS",
           "bytes": 10916,
-          "percent": 0.0076837669547832905,
+          "percent": 0.007680998154857619,
           "display_value": "0.0%"
         },
         {
           "name": "Go Template",
           "bytes": 9490,
-          "percent": 0.006680006266113359,
+          "percent": 0.006677599165408467,
           "display_value": "0.0%"
         },
         {
           "name": "MATLAB",
           "bytes": 8516,
-          "percent": 0.0059944081519727474,
+          "percent": 0.0059922481024887765,
           "display_value": "0.0%"
         },
         {
           "name": "Open Policy Agent",
           "bytes": 7012,
-          "percent": 0.004935743302211473,
+          "percent": 0.004933964736337636,
           "display_value": "0.0%"
         },
         {
           "name": "Tcl",
           "bytes": 5344,
-          "percent": 0.0037616389342581442,
+          "percent": 0.00376028344994129,
           "display_value": "0.0%"
         },
         {
           "name": "Ruby",
           "bytes": 5192,
-          "percent": 0.0036546462100801435,
+          "percent": 0.00365332927995793,
           "display_value": "0.0%"
         },
         {
           "name": "GAP",
           "bytes": 4677,
-          "percent": 0.0032921379669770476,
+          "percent": 0.0032909516645537825,
           "display_value": "0.0%"
         },
         {
           "name": "Groovy",
           "bytes": 3613,
-          "percent": 0.0025431888977310397,
+          "percent": 0.0025422724746702622,
           "display_value": "0.0%"
         },
         {
           "name": "Objective-C",
           "bytes": 1096,
-          "percent": 0.0007714738532834818,
+          "percent": 0.0007711958572484382,
           "display_value": "0.0%"
         },
         {
           "name": "Handlebars",
           "bytes": 286,
-          "percent": 0.00020131525733492315,
+          "percent": 0.00020124271457395377,
           "display_value": "0.0%"
         },
         {
           "name": "Jinja",
           "bytes": 193,
-          "percent": 0.00013585260372601457,
+          "percent": 0.0001358036500446611,
           "display_value": "0.0%"
         }
       ],
-      "total_bytes": 142065735,
+      "total_bytes": 142116946,
       "quality": "exact",
       "scope": "Owned public + private non-fork repositories; profile included"
     },
@@ -9294,6 +9297,10 @@
     },
     "calendar": {
       "days": [
+        {
+          "date": "2025-11-16",
+          "count": 16
+        },
         {
           "date": "2025-11-17",
           "count": 34
@@ -10749,13 +10756,9 @@
         {
           "date": "2026-11-15",
           "count": 115
-        },
-        {
-          "date": "2026-11-16",
-          "count": 5
         }
       ],
-      "window": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC",
+      "window": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub",
       "status": "exact"
     },
     "working": [
@@ -10818,16 +10821,16 @@
     "focus": {
       "now": [
         {
-          "title": "profile-private-continuation",
-          "detail": "Python \u00b7 pushed today",
-          "url": "https://github.com/jguida941/profile-private-continuation",
-          "is_private": true
-        },
-        {
           "title": "jguida941",
           "detail": "Python \u00b7 pushed today",
           "url": "https://github.com/jguida941/jguida941",
           "is_private": false
+        },
+        {
+          "title": "profile-private-continuation",
+          "detail": "Python \u00b7 pushed today",
+          "url": "https://github.com/jguida941/profile-private-continuation",
+          "is_private": true
         },
         {
           "title": "cs499-review",
@@ -10982,7 +10985,7 @@
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
       "window_start": "2026-10-18T00:00:00Z",
-      "window_end": "2026-11-16T03:34:59.465368Z",
+      "window_end": "2026-11-16T04:10:26.610928Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 256,
@@ -11010,230 +11013,227 @@
           "status": "partial",
           "complete": false,
           "reason": "activity_incomplete",
-          "occurred_at": "2026-11-16T03:34:25Z"
+          "occurred_at": "2026-11-16T03:36:01Z"
         },
         "history": {
           "status": "ok",
           "complete": true,
           "reason": "end_of_connection"
         },
-        "repository": "jguida941/profile-private-continuation",
-        "ref": "refs/heads/development",
-        "head_sha": "c9f55a6c6873f298b7fbb4c466789105a00b0cdf",
-        "commit_url": "https://github.com/jguida941/profile-private-continuation/commit/c9f55a6c6873f298b7fbb4c466789105a00b0cdf",
-        "additions": 656008,
-        "deletions": 7237,
-        "commit_count": 135,
-        "observed_commits": 145,
-        "stats_observed": 135,
-        "excluded_merges": 10,
+        "repository": "jguida941/jguida941",
+        "ref": "refs/heads/main",
+        "head_sha": "af25f35322c084fe70b68c3baea158afdb2eef56",
+        "commit_url": "https://github.com/jguida941/jguida941/commit/af25f35322c084fe70b68c3baea158afdb2eef56",
+        "additions": 228728,
+        "deletions": 222393,
+        "commit_count": 836,
+        "observed_commits": 847,
+        "stats_observed": 836,
+        "excluded_merges": 11,
         "daily": [
           {
             "date": "2026-10-18",
-            "additions": 74743,
-            "deletions": 566,
+            "additions": 14982,
+            "deletions": 14161,
             "complete": false
           },
           {
             "date": "2026-10-19",
-            "additions": 8152,
-            "deletions": 257,
+            "additions": 4968,
+            "deletions": 4968,
             "complete": false
           },
           {
             "date": "2026-10-20",
-            "additions": null,
-            "deletions": null,
+            "additions": 4348,
+            "deletions": 4395,
             "complete": false
           },
           {
             "date": "2026-10-21",
-            "additions": null,
-            "deletions": null,
+            "additions": 4047,
+            "deletions": 4059,
             "complete": false
           },
           {
             "date": "2026-10-22",
-            "additions": null,
-            "deletions": null,
+            "additions": 7520,
+            "deletions": 8294,
             "complete": false
           },
           {
             "date": "2026-10-23",
-            "additions": null,
-            "deletions": null,
+            "additions": 3632,
+            "deletions": 3644,
             "complete": false
           },
           {
             "date": "2026-10-24",
-            "additions": 116408,
-            "deletions": 258,
+            "additions": 5463,
+            "deletions": 5474,
             "complete": false
           },
           {
             "date": "2026-10-25",
-            "additions": 111751,
-            "deletions": 549,
+            "additions": 7588,
+            "deletions": 7683,
             "complete": false
           },
           {
             "date": "2026-10-26",
-            "additions": null,
-            "deletions": null,
+            "additions": 14331,
+            "deletions": 14307,
             "complete": false
           },
           {
             "date": "2026-10-27",
-            "additions": null,
-            "deletions": null,
+            "additions": 13767,
+            "deletions": 13767,
             "complete": false
           },
           {
             "date": "2026-10-28",
-            "additions": null,
-            "deletions": null,
+            "additions": 7234,
+            "deletions": 7996,
             "complete": false
           },
           {
             "date": "2026-10-29",
-            "additions": null,
-            "deletions": null,
+            "additions": 12981,
+            "deletions": 12969,
             "complete": false
           },
           {
             "date": "2026-10-30",
-            "additions": null,
-            "deletions": null,
+            "additions": 3628,
+            "deletions": 3628,
             "complete": false
           },
           {
             "date": "2026-10-31",
-            "additions": null,
-            "deletions": null,
+            "additions": 3622,
+            "deletions": 3622,
             "complete": false
           },
           {
             "date": "2026-11-01",
-            "additions": 43969,
-            "deletions": 623,
+            "additions": 6345,
+            "deletions": 6392,
             "complete": false
           },
           {
             "date": "2026-11-02",
-            "additions": 9125,
-            "deletions": 127,
+            "additions": 5030,
+            "deletions": 5018,
             "complete": false
           },
           {
             "date": "2026-11-03",
-            "additions": 137788,
-            "deletions": 160,
+            "additions": 13370,
+            "deletions": 13358,
             "complete": false
           },
           {
             "date": "2026-11-04",
-            "additions": 45561,
-            "deletions": 2177,
+            "additions": 4386,
+            "deletions": 4386,
             "complete": false
           },
           {
             "date": "2026-11-05",
-            "additions": 6610,
-            "deletions": 891,
+            "additions": 10452,
+            "deletions": 8652,
             "complete": false
           },
           {
             "date": "2026-11-06",
-            "additions": null,
-            "deletions": null,
+            "additions": 3956,
+            "deletions": 4160,
             "complete": false
           },
           {
             "date": "2026-11-07",
-            "additions": null,
-            "deletions": null,
+            "additions": 7351,
+            "deletions": 8125,
             "complete": false
           },
           {
             "date": "2026-11-08",
-            "additions": null,
-            "deletions": null,
+            "additions": 5554,
+            "deletions": 5566,
             "complete": false
           },
           {
             "date": "2026-11-09",
-            "additions": null,
-            "deletions": null,
+            "additions": 13157,
+            "deletions": 13205,
             "complete": false
           },
           {
             "date": "2026-11-10",
-            "additions": null,
-            "deletions": null,
+            "additions": 3369,
+            "deletions": 3453,
             "complete": false
           },
           {
             "date": "2026-11-11",
-            "additions": null,
-            "deletions": null,
+            "additions": 3781,
+            "deletions": 3829,
             "complete": false
           },
           {
             "date": "2026-11-12",
-            "additions": null,
-            "deletions": null,
+            "additions": 6944,
+            "deletions": 7807,
             "complete": false
           },
           {
             "date": "2026-11-13",
-            "additions": null,
-            "deletions": null,
+            "additions": 9585,
+            "deletions": 6199,
             "complete": false
           },
           {
             "date": "2026-11-14",
-            "additions": null,
-            "deletions": null,
+            "additions": 5062,
+            "deletions": 5097,
             "complete": false
           },
           {
             "date": "2026-11-15",
-            "additions": 80677,
-            "deletions": 1280,
+            "additions": 16162,
+            "deletions": 13277,
             "complete": false
           },
           {
             "date": "2026-11-16",
-            "additions": 21224,
-            "deletions": 349,
+            "additions": 6113,
+            "deletions": 4902,
             "complete": false
           }
         ],
         "meaning": "Summed non-merge commit line changes reachable from the selected head; not net tree size or all branches",
-        "is_private": true
+        "is_private": false
       },
       "recent_pushes": {
         "status": "partial",
         "complete": false,
         "rows": [
           {
-            "id": "50466884495",
+            "id": "50467168737",
             "repository": "jguida941/jguida941",
-            "timestamp": "2026-11-16T03:32:26Z",
+            "timestamp": "2026-11-16T03:36:01Z",
             "activity_type": "push",
-            "ref": "refs/heads/fix/overall-metric-scopes-20261115",
-            "after": "f762ede4b36deb8751f61d5175345a4c7a02108c",
+            "ref": "refs/heads/main",
+            "after": "af25f35322c084fe70b68c3baea158afdb2eef56",
             "diff_status": "ok",
-            "additions": 1,
-            "deletions": 1,
+            "additions": 516,
+            "deletions": 486,
             "commits": [
-              "468d2a3bf0b88074349d34f1f504dff614ea79c4",
-              "4f69bd497c3ce1492983c7055e9974364a4912ac",
-              "2f5734b03f5d84c29044034d1f7a299b4947c1e9",
-              "f762ede4b36deb8751f61d5175345a4c7a02108c"
+              "af25f35322c084fe70b68c3baea158afdb2eef56"
             ],
-            "compare_url": "https://github.com/jguida941/jguida941/compare/bc887f917d48b3e2ec0f51fd408ee7d5d20178f6...f762ede4b36deb8751f61d5175345a4c7a02108c",
-            "head_url": "https://github.com/jguida941/jguida941/commit/f762ede4b36deb8751f61d5175345a4c7a02108c",
+            "compare_url": "https://github.com/jguida941/jguida941/compare/cf7af6d4ce6c132c2088284874d864ba9dd9fdd3...af25f35322c084fe70b68c3baea158afdb2eef56",
+            "head_url": "https://github.com/jguida941/jguida941/commit/af25f35322c084fe70b68c3baea158afdb2eef56",
             "is_private": false
           },
           {
@@ -11285,8 +11285,8 @@
         "status": "partial",
         "complete": false,
         "window_start": "2026-10-18T00:00:00Z",
-        "window_end": "2026-11-16T03:34:59.465368Z",
-        "observed_at": "2026-11-16T03:34:59.465368Z",
+        "window_end": "2026-11-16T04:10:26.610928Z",
+        "observed_at": "2026-11-16T04:10:26.610928Z",
         "timezone": "UTC",
         "current_day_partial": true,
         "default_days": 14,
@@ -11337,7 +11337,7 @@
             "reasons": [
               "incomplete_activity_coverage"
             ],
-            "latest_push": "2026-11-16T03:32:26Z",
+            "latest_push": "2026-11-16T03:36:01Z",
             "observed_pushes": 80,
             "daily": [
               {
@@ -11504,9 +11504,9 @@
               },
               {
                 "date": "2026-11-14",
-                "count": 7,
+                "count": 6,
                 "complete": false,
-                "level": 3
+                "level": 2
               },
               {
                 "date": "2026-11-15",
@@ -11516,9 +11516,9 @@
               },
               {
                 "date": "2026-11-16",
-                "count": 6,
+                "count": 7,
                 "complete": false,
-                "level": 2
+                "level": 3
               }
             ],
             "branch_empty_daily": [
@@ -11793,9 +11793,9 @@
                 "daily": [
                   {
                     "date": "2026-11-14",
-                    "count": 7,
+                    "count": 6,
                     "complete": false,
-                    "level": 3
+                    "level": 2
                   },
                   {
                     "date": "2026-11-15",
@@ -11805,7 +11805,7 @@
                   },
                   {
                     "date": "2026-11-16",
-                    "count": 5,
+                    "count": 6,
                     "complete": false,
                     "level": 2
                   }
@@ -16017,11 +16017,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-11-16T03:35:38.691045Z",
-    "generator_revision": "cf7af6d4ce6c132c2088284874d864ba9dd9fdd3",
-    "generator_source_digest": "0577a9a12d200f0ddeec6804db847dc5667832914cf1a18a158e0ba170158588",
-    "claim_input_digest": "c1636427e385991a2e48ae83aeef3d5fca486d05575e1c318f950548f8b0f6f1",
-    "render_key": "cf9be521954213659b610a88ef4f83d2a31f673ff9255f9ac8b59bff6c345052",
+    "generated_at": "2026-11-16T04:11:14.878733Z",
+    "generator_revision": "126e28f69c8ed4686ea6c597e5627b220d25b457",
+    "generator_source_digest": "0d7bb721d0f6d5d6b66359d4c8348d398057933cbac67540daa4f16209e9b031",
+    "claim_input_digest": "cc6652bd527b30162388f132adffed77535ad2f87c6482d27579cdb151a9795e",
+    "render_key": "10ee345b6920e0db9b7d9d61b2cb690c247fde7e316ec6611d52d65e1e09dc30",
     "schema": "profile-artifact-generation/v1"
   }
 }

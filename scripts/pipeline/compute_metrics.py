@@ -1242,7 +1242,8 @@ def _contribution_observation_bounds(
     observation = _validated_metric_observations(collected).get("last_year_contributions")
     if not observation or observation.get("status") != "ok" or observation.get("complete") is not True:
         return None
-    if (observation.get("source_metric_id") != "github_contribution_calendar_total_and_days"
+    native_calendar = observation.get("source_metric_id") == gh._NATIVE_CALENDAR_SOURCE
+    if not native_calendar and (observation.get("source_metric_id") != "github_contribution_calendar_total_and_days"
             or observation.get("source_id") != "github_graphql_contribution_calendar"):
         return None
     rows = observation["value"]["days"]
@@ -1257,6 +1258,14 @@ def _contribution_observation_bounds(
     if any(value.tzinfo is None or value.utcoffset() is None for value in bounds):
         return None
     start, end, observed = [value.astimezone(timezone.utc) for value in bounds]
+    if native_calendar:
+        # Date-axis surrogates for ISO-week arithmetic, not UTC collection bounds.
+        first, last = min(days), max(days)
+        start = datetime.combine(first, datetime.min.time(), tzinfo=timezone.utc)
+        cutoff = datetime.combine(last, datetime.min.time(), tzinfo=timezone.utc)
+        if observed >= end:
+            cutoff += timedelta(days=1)
+        return start, cutoff
     cutoff = min(end, observed)
     return (start, cutoff) if start <= cutoff else None
 
@@ -1288,7 +1297,10 @@ def _build_contribution_rhythm(collected: CollectedProfileData) -> dict[str, Any
             return contribution_rhythm_unavailable("no_dated_days")
         ordered = sorted(days)
         total = calendar.get("totalContributions")
-        if (type(total) is not int or total < 0 or total != sum(days.values())
+        observation = _validated_metric_observations(collected).get("last_year_contributions", {})
+        native_calendar = observation.get("source_metric_id") == gh._NATIVE_CALENDAR_SOURCE
+        if (type(total) is not int or total < 0
+                or (not native_calendar and total != sum(days.values()))
                 or (ordered[-1] - ordered[0]).days + 1 != len(ordered)):
             raise ValueError("inconsistent calendar")
     except (TypeError, ValueError):
@@ -1311,7 +1323,7 @@ def _build_contribution_rhythm(collected: CollectedProfileData) -> dict[str, Any
             return contribution_rhythm_unavailable("observation_unavailable")
         end = datetime.fromisoformat(observation["window_end"].replace("Z", "+00:00")).astimezone(timezone.utc)
         observed = datetime.fromisoformat(observation["observed_at"].replace("Z", "+00:00")).astimezone(timezone.utc)
-        if observed < end:
+        if observed < end and not native_calendar:
             return contribution_rhythm_unavailable("observation_unavailable")
     buckets = [{"weekday": name, "contributions": 0, "days_observed": 0}
                for name in CONTRIBUTION_WEEKDAYS]
@@ -1322,13 +1334,14 @@ def _build_contribution_rhythm(collected: CollectedProfileData) -> dict[str, Any
         **unavailable, "status": "available", "reason": "dated_calendar",
         "completeness": "known" if bounds else "unknown",
         "window_start": ordered[0].isoformat(), "window_end": ordered[-1].isoformat(),
-        "days_observed": len(days), "total": total, "weekdays": buckets,
-        "last_day_in_progress": bounds[1].date() <= ordered[-1] if bounds else None,
+        "days_observed": len(days), "total": sum(days.values()), "weekdays": buckets,
+        "timezone": "GitHub" if native_calendar else "UTC",
+        "last_day_in_progress": (observed < end if native_calendar else bounds[1].date() <= ordered[-1]) if bounds else None,
     }
 
 
 def _build_contribution_trend(collected: CollectedProfileData) -> dict[str, Any]:
-    """Preserve GitHub's UTC date labels; never rebucket them by viewer timezone.
+    """Preserve provider date labels; never rebucket them by viewer timezone.
 
     Raw dated values can outlive their observation metadata. They remain useful,
     but generation time cannot establish that their weeks are complete.
@@ -1394,6 +1407,7 @@ def _build_contribution_trend(collected: CollectedProfileData) -> dict[str, Any]
     return {
         **unavailable, "status": "available", "reason": "dated_calendar",
         "completeness": "known" if bounds else "unknown", "points": points,
+        "timezone": "GitHub" if _validated_metric_observations(collected).get("last_year_contributions", {}).get("source_metric_id") == gh._NATIVE_CALENDAR_SOURCE else "UTC",
         "window_start": points[0]["observed_start"], "window_end": points[-1]["observed_end"],
     }
 
@@ -1592,7 +1606,8 @@ def _public_contribution_calendar(calendar: Any) -> dict | None:
         total = int(calendar.get("totalContributions", 0) or 0)
     except (TypeError, ValueError):
         total = 0
-    return {"total": total, "weeks": weeks_out}
+    return {"total": total, "weeks": weeks_out,
+            **{key: calendar[key] for key in ("calendar_start", "calendar_end") if key in calendar}}
 
 
 def _activity_rhythm(events: list) -> dict | None:
@@ -2019,7 +2034,9 @@ def compute_profile_model(
 
     data_scope: DataScope = {
         "repos_included": repos_included,
-        "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
+        "activity_metric_scope": ("GitHub contributionCalendar.totalContributions (default reporting period)"
+                                  if contribution_observation and contribution_observation.get("source_metric_id") == gh._NATIVE_CALENDAR_SOURCE
+                                  else "GitHub contributionCalendar.totalContributions (last 12 months)"),
         "public_owned_repos_total": repo_counts["public_owned_total"],
         "public_owned_forks_total": repo_counts["public_owned_forks"],
         "public_owned_nonfork_repos_total": repo_counts["public_owned_nonfork"],
