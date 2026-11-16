@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-16T03:28:12.528011Z",
+  "generated_at": "2026-11-16T04:11:32.312438Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -18,7 +18,7 @@
     "accent_blue": "#7aa2f7"
   },
   "snapshot": {
-    "last_year_contributions": 13401,
+    "last_year_contributions": 13595,
     "public_scope_commits": 8521,
     "total_repos": 56,
     "public_repos_total": 57,
@@ -26,19 +26,19 @@
     "private_owned_repos": 200,
     "total_stars": 59,
     "languages_count": 35,
-    "prs_merged": 163,
+    "prs_merged": 165,
     "releases": 3,
     "ci_repos": 56,
     "streak_days": 45,
-    "github_profile_contributions": 13584
+    "github_profile_contributions": 13595
   },
   "snapshot_rows": [
     {
       "key": "last_year_contributions",
       "label": "Last 12 Months Contributions",
       "dashboard_label": "12mo Contributions",
-      "value": 13401,
-      "display_value": "13,401"
+      "value": 13595,
+      "display_value": "13,595"
     },
     {
       "key": "public_scope_commits",
@@ -93,8 +93,8 @@
       "key": "prs_merged",
       "label": "PRs Merged (Last 12 Months)",
       "dashboard_label": "PRs Merged (12mo)",
-      "value": 163,
-      "display_value": "163"
+      "value": 165,
+      "display_value": "165"
     },
     {
       "key": "releases",
@@ -122,8 +122,8 @@
     {
       "key": "last_year_contributions",
       "label": "12mo Contributions",
-      "value": 13401,
-      "display_value": "13,401"
+      "value": 13595,
+      "display_value": "13,595"
     },
     {
       "key": "public_scope_commits",
@@ -170,8 +170,8 @@
     {
       "key": "prs_merged",
       "label": "PRs Merged (12mo)",
-      "value": 163,
-      "display_value": "163"
+      "value": 165,
+      "display_value": "165"
     },
     {
       "key": "releases",
@@ -237,15 +237,16 @@
       "last_year_contributions": {
         "schema": "profile-provider-observation/v1",
         "metric_id": "last_year_contributions",
-        "source_metric_id": "github_contribution_calendar_total_and_days",
+        "source_metric_id": "github_default_profile_contribution_total_and_days",
         "status": "ok",
         "complete": true,
+        "source_content_digest": "sha256:deeaa5d57afb70cbb57d093316e5b6e39c780731357d512413e52c54942e13ae",
         "population_id": "github-contribution-calendar-visible-to-provider",
         "population_signature": null,
-        "window_start": "2025-11-17T00:00:00Z",
-        "window_end": "2026-11-16T03:27:03Z",
-        "observed_at": "2026-11-16T03:27:04Z",
-        "source_id": "github_graphql_contribution_calendar",
+        "window_start": "2025-11-09T05:00:00Z",
+        "window_end": "2026-11-16T04:59:59Z",
+        "observed_at": "2026-11-16T04:10:41Z",
+        "source_id": "github_graphql_default_contributions_collection",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
       },
@@ -253,13 +254,14 @@
         "schema": "profile-provider-observation/v1",
         "metric_id": "github_profile_contributions",
         "source_metric_id": "github_default_profile_contribution_total",
+        "source_content_digest": "sha256:deeaa5d57afb70cbb57d093316e5b6e39c780731357d512413e52c54942e13ae",
         "status": "ok",
         "complete": true,
         "population_id": "github-user-contributions-visible-to-provider",
         "population_signature": null,
         "window_start": "2025-11-09T05:00:00Z",
         "window_end": "2026-11-16T04:59:59Z",
-        "observed_at": "2026-11-16T03:27:05Z",
+        "observed_at": "2026-11-16T04:10:41Z",
         "source_id": "github_graphql_default_contributions_collection",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -273,8 +275,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-10-17T04:00:00Z",
-        "window_end": "2026-11-16T03:27:03Z",
-        "observed_at": "2026-11-16T03:27:03Z",
+        "window_end": "2026-11-16T04:10:40Z",
+        "observed_at": "2026-11-16T04:10:40Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -288,8 +290,8 @@
         "population_id": "authored-pull-requests-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-11-16T05:00:00Z",
-        "window_end": "2026-11-16T03:27:03Z",
-        "observed_at": "2026-11-16T03:27:03Z",
+        "window_end": "2026-11-16T04:10:40Z",
+        "observed_at": "2026-11-16T04:10:41Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -319,7 +321,7 @@
     "avg_release_gap_days": 0.04677083333333333,
     "stars_per_public_repo": 1.0535714285714286,
     "ci_coverage_pct": 21.875,
-    "last_year_contributions": 13401,
+    "last_year_contributions": 13595,
     "active_days_last_year": 333,
     "automation_workflows": 172,
     "primary_lang_share_pct": 68.3,
@@ -331,8 +333,8 @@
       "key": "last_year_contributions",
       "label": "12mo Contributions",
       "detail": "contribution calendar",
-      "value": 13401,
-      "display_value": "13,401",
+      "value": 13595,
+      "display_value": "13,595",
       "accent": "#7dcfff"
     },
     {
@@ -394,7 +396,7 @@
   ],
   "data_scope": {
     "repos_included": "public + private observed, exact",
-    "activity_metric_scope": "GitHub contributionCalendar.totalContributions (last 12 months)",
+    "activity_metric_scope": "GitHub contributionCalendar.totalContributions (default reporting period)",
     "public_owned_repos_total": 57,
     "public_owned_forks_total": 1,
     "public_owned_nonfork_repos_total": 56,
@@ -466,18 +468,18 @@
   "top_languages": [
     {
       "name": "Python",
-      "bytes": 97033955,
-      "percent": 68.3
+      "bytes": 97084794,
+      "percent": 68.31
     },
     {
       "name": "Rust",
       "bytes": 10904193,
-      "percent": 7.68
+      "percent": 7.67
     },
     {
       "name": "C++",
       "bytes": 7922855,
-      "percent": 5.58
+      "percent": 5.57
     },
     {
       "name": "Swift",
@@ -491,8 +493,8 @@
     },
     {
       "name": "HTML",
-      "bytes": 5349050,
-      "percent": 3.77
+      "bytes": 5349422,
+      "percent": 3.76
     },
     {
       "name": "Java",
@@ -512,7 +514,7 @@
     {
       "name": "GDScript",
       "bytes": 1129648,
-      "percent": 0.8
+      "percent": 0.79
     },
     {
       "name": "Jupyter Notebook",
@@ -583,11 +585,27 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-11-16",
-      "pushed_at_raw": "2026-11-16T02:02:02Z",
+      "pushed_at_raw": "2026-11-16T03:36:01Z",
       "pushed_ago": "today",
       "created_at": "2026-02-20",
       "last_commit_msg": "recent push detected",
       "is_private": false,
+      "featured": false
+    },
+    {
+      "name": "profile-private-continuation",
+      "full_name": "jguida941/profile-private-continuation",
+      "url": "https://github.com/jguida941/profile-private-continuation",
+      "language": "Python",
+      "stars": 0,
+      "forks": 0,
+      "ci": "yes",
+      "pushed_at": "2026-11-16",
+      "pushed_at_raw": "2026-11-16T03:34:25Z",
+      "pushed_ago": "today",
+      "created_at": "2026-10-11",
+      "last_commit_msg": "Record contribution repair and restore accepted continuation",
+      "is_private": true,
       "featured": false
     },
     {
@@ -603,22 +621,6 @@
       "pushed_ago": "3 hours ago",
       "created_at": "2026-11-13",
       "last_commit_msg": "Merge PR #19: record received dashboard baseline and next work",
-      "is_private": true,
-      "featured": false
-    },
-    {
-      "name": "profile-private-continuation",
-      "full_name": "jguida941/profile-private-continuation",
-      "url": "https://github.com/jguida941/profile-private-continuation",
-      "language": "Python",
-      "stars": 0,
-      "forks": 0,
-      "ci": "yes",
-      "pushed_at": "2026-11-15",
-      "pushed_at_raw": "2026-11-15T18:30:57Z",
-      "pushed_ago": "8 hours ago",
-      "created_at": "2026-10-11",
-      "last_commit_msg": "Record contribution repair and restore accepted continuation",
       "is_private": true,
       "featured": false
     },
@@ -875,7 +877,7 @@
       "visibility": "private",
       "description": "Private backup and continuation map for profile fixes and features; archived research is not an implementation queue.",
       "html_url": "https://github.com/jguida941/profile-private-continuation",
-      "pushed_at": "2026-11-15T18:30:57Z",
+      "pushed_at": "2026-11-16T03:34:25Z",
       "created_at": "2026-10-11T19:31:51Z",
       "stargazers_count": 0,
       "stargazers_count_observed": true,
@@ -1094,15 +1096,15 @@
         "is_private": false
       },
       {
-        "title": "cs499-review",
-        "detail": "Python \u00b7 pushed 3 hours ago",
-        "url": "https://github.com/jguida941/cs499-review",
+        "title": "profile-private-continuation",
+        "detail": "Python \u00b7 pushed today",
+        "url": "https://github.com/jguida941/profile-private-continuation",
         "is_private": true
       },
       {
-        "title": "profile-private-continuation",
-        "detail": "Python \u00b7 pushed 8 hours ago",
-        "url": "https://github.com/jguida941/profile-private-continuation",
+        "title": "cs499-review",
+        "detail": "Python \u00b7 pushed 3 hours ago",
+        "url": "https://github.com/jguida941/cs499-review",
         "is_private": true
       }
     ],
@@ -1128,6 +1130,30 @@
   "activity_feed": [
     {
       "kind": "activity",
+      "title": "recent push detected",
+      "url": "https://github.com/jguida941/jguida941",
+      "repo": "jguida941/jguida941",
+      "repo_url": "https://github.com/jguida941/jguida941",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-11-16T03:36:01Z",
+      "is_private": false,
+      "observation_source": "repository push metadata"
+    },
+    {
+      "kind": "activity",
+      "title": "Record contribution repair and restore accepted continuation",
+      "url": "https://github.com/jguida941/profile-private-continuation",
+      "repo": "jguida941/profile-private-continuation",
+      "repo_url": "https://github.com/jguida941/profile-private-continuation",
+      "state": "PUSH",
+      "time_ago": "today",
+      "created_at": "2026-11-16T03:34:25Z",
+      "is_private": true,
+      "observation_source": "repository push metadata"
+    },
+    {
+      "kind": "activity",
       "title": "issue",
       "url": "https://github.com/jguida941/jguida941",
       "repo": "jguida941/jguida941",
@@ -1137,18 +1163,6 @@
       "created_at": "2026-11-16T02:18:13Z",
       "is_private": false,
       "observation_source": "event"
-    },
-    {
-      "kind": "activity",
-      "title": "recent push detected",
-      "url": "https://github.com/jguida941/jguida941",
-      "repo": "jguida941/jguida941",
-      "repo_url": "https://github.com/jguida941/jguida941",
-      "state": "PUSH",
-      "time_ago": "today",
-      "created_at": "2026-11-16T02:02:02Z",
-      "is_private": false,
-      "observation_source": "repository push metadata"
     },
     {
       "kind": "activity",
@@ -1169,22 +1183,10 @@
       "repo": "jguida941/advising-assistance-cpp",
       "repo_url": "https://github.com/jguida941/advising-assistance-cpp",
       "state": "ISSUE",
-      "time_ago": "6 hours ago",
+      "time_ago": "7 hours ago",
       "created_at": "2026-11-15T21:03:33Z",
       "is_private": false,
       "observation_source": "event"
-    },
-    {
-      "kind": "activity",
-      "title": "Record contribution repair and restore accepted continuation",
-      "url": "https://github.com/jguida941/profile-private-continuation",
-      "repo": "jguida941/profile-private-continuation",
-      "repo_url": "https://github.com/jguida941/profile-private-continuation",
-      "state": "PUSH",
-      "time_ago": "8 hours ago",
-      "created_at": "2026-11-15T18:30:57Z",
-      "is_private": true,
-      "observation_source": "repository push metadata"
     },
     {
       "kind": "activity",
@@ -1217,7 +1219,7 @@
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
       "state": "PUSH",
-      "time_ago": "9 hours ago",
+      "time_ago": "10 hours ago",
       "created_at": "2026-11-15T17:46:33Z",
       "is_private": false,
       "observation_source": "event"
@@ -1253,7 +1255,7 @@
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
       "state": "PUSH",
-      "time_ago": "21 hours ago",
+      "time_ago": "22 hours ago",
       "created_at": "2026-11-15T06:06:31Z",
       "is_private": false,
       "observation_source": "event"
@@ -1265,7 +1267,7 @@
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
       "state": "PUSH",
-      "time_ago": "21 hours ago",
+      "time_ago": "22 hours ago",
       "created_at": "2026-11-15T05:59:52Z",
       "is_private": false,
       "observation_source": "event"
@@ -1371,6 +1373,7 @@
   "engineering": {
     "active_days_last_year": 333,
     "weekly_cadence": [
+      95,
       74,
       125,
       41,
@@ -1381,19 +1384,27 @@
       237,
       229,
       351,
-      435,
-      5
+      446
     ],
     "contribution_trend": {
       "status": "available",
       "unit": "contributions",
       "bucket": "iso_week",
       "week_start_day": "Monday",
-      "timezone": "UTC",
+      "timezone": "GitHub",
       "completeness": "known",
-      "window_start": "2026-08-31",
-      "window_end": "2026-11-16",
+      "window_start": "2026-08-24",
+      "window_end": "2026-11-15",
       "points": [
+        {
+          "week_start": "2026-08-24",
+          "week_end": "2026-08-30",
+          "observed_start": "2026-08-24",
+          "observed_end": "2026-08-30",
+          "days_observed": 7,
+          "contributions": 95,
+          "partial": false
+        },
         {
           "week_start": "2026-08-31",
           "week_end": "2026-09-06",
@@ -1490,16 +1501,7 @@
           "observed_start": "2026-11-09",
           "observed_end": "2026-11-15",
           "days_observed": 7,
-          "contributions": 435,
-          "partial": false
-        },
-        {
-          "week_start": "2026-11-16",
-          "week_end": "2026-11-22",
-          "observed_start": "2026-11-16",
-          "observed_end": "2026-11-16",
-          "days_observed": 1,
-          "contributions": 5,
+          "contributions": 446,
           "partial": true
         }
       ],
@@ -1522,14 +1524,15 @@
     "schema": "profile-provider-observation/v1",
     "metric_id": "github_profile_contributions",
     "source_metric_id": "github_default_profile_contribution_total",
-    "value": 13584,
+    "source_content_digest": "sha256:deeaa5d57afb70cbb57d093316e5b6e39c780731357d512413e52c54942e13ae",
+    "value": 13595,
     "status": "ok",
     "complete": true,
     "population_id": "github-user-contributions-visible-to-provider",
     "population_signature": null,
     "window_start": "2025-11-09T05:00:00Z",
     "window_end": "2026-11-16T04:59:59Z",
-    "observed_at": "2026-11-16T03:27:05Z",
+    "observed_at": "2026-11-16T04:10:41Z",
     "source_id": "github_graphql_default_contributions_collection",
     "source_mode": "live",
     "completion_reason": "all_components_observed"
@@ -1539,7 +1542,7 @@
     "source_id": "github_personal_owned_repository_census",
     "population_id": "personal-owned-repositories",
     "source_mode": "live",
-    "observed_at": "2026-11-16T03:27:33.985201Z",
+    "observed_at": "2026-11-16T04:11:08.641365Z",
     "metrics": {
       "public_repos_total": {
         "value": 57,
@@ -1562,9 +1565,9 @@
         "complete": true
       }
     },
-    "snapshot_generated_at": "2026-11-16T03:28:12.528011Z"
+    "snapshot_generated_at": "2026-11-16T04:11:32.312438Z"
   },
-  "collection_started_at": "2026-11-16T03:27:03.187262+00:00",
+  "collection_started_at": "2026-11-16T04:10:40.647464+00:00",
   "automation": {
     "public": {
       "observed_eligible_repos": 56,
@@ -1640,12 +1643,68 @@
   "ci_execution": {
     "schema": "profile-ci-execution/v1",
     "repository": "jguida941/jguida941",
-    "observed_at": "2026-11-16T03:28:11Z",
+    "observed_at": "2026-11-16T04:11:25Z",
     "sample_limit": 12,
     "scope": "Latest observed GitHub Actions runs in the public profile repository, across branches; not account-wide.",
     "status": "available",
     "observed_runs": 12,
     "runs": [
+      {
+        "run_id": 43801395497,
+        "workflow": "Generate Metrics",
+        "outcome": "in_progress",
+        "created_at": "2026-11-16T04:00:03Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 43799643045,
+        "workflow": "Deploy Profile Site",
+        "outcome": "skipped",
+        "created_at": "2026-11-16T03:41:06Z",
+        "event": "workflow_run",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 43799163853,
+        "workflow": "Deploy Profile Site",
+        "outcome": "success",
+        "created_at": "2026-11-16T03:36:10Z",
+        "event": "workflow_run",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 43798935247,
+        "workflow": "Build Analytics & README",
+        "outcome": "success",
+        "created_at": "2026-11-16T03:33:58Z",
+        "event": "push",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 43798935118,
+        "workflow": "Deploy Profile Site",
+        "outcome": "failure",
+        "created_at": "2026-11-16T03:33:58Z",
+        "event": "push",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 43798935112,
+        "workflow": "Test Profile Pipeline",
+        "outcome": "success",
+        "created_at": "2026-11-16T03:33:58Z",
+        "event": "push",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 43798793471,
+        "workflow": "Test Profile Pipeline",
+        "outcome": "success",
+        "created_at": "2026-11-16T03:32:30Z",
+        "event": "pull_request",
+        "head_branch": "fix/overall-metric-scopes-20261115"
+      },
       {
         "run_id": 43796841190,
         "workflow": "Deploy Profile Site",
@@ -1657,7 +1716,7 @@
       {
         "run_id": 43796625095,
         "workflow": "Generate Metrics",
-        "outcome": "success",
+        "outcome": "failure",
         "created_at": "2026-11-16T03:11:11Z",
         "event": "schedule",
         "head_branch": "main"
@@ -1685,68 +1744,563 @@
         "created_at": "2026-11-16T02:02:09Z",
         "event": "workflow_run",
         "head_branch": "main"
-      },
-      {
-        "run_id": 43789489312,
-        "workflow": "Generate Metrics",
-        "outcome": "success",
-        "created_at": "2026-11-16T02:00:06Z",
-        "event": "workflow_dispatch",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 43783866499,
-        "workflow": "Deploy Profile Site",
-        "outcome": "success",
-        "created_at": "2026-11-16T01:02:18Z",
-        "event": "workflow_run",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 43783639159,
-        "workflow": "Generate Metrics",
-        "outcome": "success",
-        "created_at": "2026-11-16T01:00:04Z",
-        "event": "workflow_dispatch",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 43777978835,
-        "workflow": "Deploy Profile Site",
-        "outcome": "success",
-        "created_at": "2026-11-16T00:02:00Z",
-        "event": "workflow_run",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 43777786925,
-        "workflow": "Generate Metrics",
-        "outcome": "success",
-        "created_at": "2026-11-16T00:00:03Z",
-        "event": "workflow_dispatch",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 43773599279,
-        "workflow": "Deploy Profile Site",
-        "outcome": "success",
-        "created_at": "2026-11-15T23:13:07Z",
-        "event": "workflow_run",
-        "head_branch": "main"
-      },
-      {
-        "run_id": 43773421004,
-        "workflow": "Generate Metrics",
-        "outcome": "success",
-        "created_at": "2026-11-15T23:11:14Z",
-        "event": "schedule",
-        "head_branch": "main"
       }
     ]
   },
+  "ci_timeline": {
+    "schema": "profile-ci-timeline/v1",
+    "owner": "jguida941",
+    "observed_at": "2026-11-16T04:11:26Z",
+    "window_start": "2026-08-24T04:11:26Z",
+    "window_end": "2026-11-16T04:11:26Z",
+    "window_days": 84,
+    "sample_limit_per_repo": 20,
+    "scope": "Selected public, owned repositories with observed workflow configuration, plus profile; up to 20 most recent runs per repository, not complete history.",
+    "repositories": [
+      {
+        "repository": "jguida941/jguida941",
+        "status": "partial",
+        "truncated": true,
+        "outside_window": false,
+        "observed_runs": 20,
+        "runs": [
+          {
+            "run_id": 43801395497,
+            "workflow": "Generate Metrics",
+            "outcome": "in_progress",
+            "created_at": "2026-11-16T04:00:03Z",
+            "event": "workflow_dispatch",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43799643045,
+            "workflow": "Deploy Profile Site",
+            "outcome": "skipped",
+            "created_at": "2026-11-16T03:41:06Z",
+            "event": "workflow_run",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43799163853,
+            "workflow": "Deploy Profile Site",
+            "outcome": "success",
+            "created_at": "2026-11-16T03:36:10Z",
+            "event": "workflow_run",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43798935247,
+            "workflow": "Build Analytics & README",
+            "outcome": "success",
+            "created_at": "2026-11-16T03:33:58Z",
+            "event": "push",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43798935118,
+            "workflow": "Deploy Profile Site",
+            "outcome": "failure",
+            "created_at": "2026-11-16T03:33:58Z",
+            "event": "push",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43798935112,
+            "workflow": "Test Profile Pipeline",
+            "outcome": "success",
+            "created_at": "2026-11-16T03:33:58Z",
+            "event": "push",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43798793471,
+            "workflow": "Test Profile Pipeline",
+            "outcome": "success",
+            "created_at": "2026-11-16T03:32:30Z",
+            "event": "pull_request",
+            "head_branch": "fix/overall-metric-scopes-20261115"
+          },
+          {
+            "run_id": 43796841190,
+            "workflow": "Deploy Profile Site",
+            "outcome": "success",
+            "created_at": "2026-11-16T03:13:16Z",
+            "event": "workflow_run",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43796625095,
+            "workflow": "Generate Metrics",
+            "outcome": "failure",
+            "created_at": "2026-11-16T03:11:11Z",
+            "event": "schedule",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43795671434,
+            "workflow": "Deploy Profile Site",
+            "outcome": "success",
+            "created_at": "2026-11-16T03:01:59Z",
+            "event": "workflow_run",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43795468964,
+            "workflow": "Generate Metrics",
+            "outcome": "success",
+            "created_at": "2026-11-16T03:00:03Z",
+            "event": "workflow_dispatch",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43789705438,
+            "workflow": "Deploy Profile Site",
+            "outcome": "success",
+            "created_at": "2026-11-16T02:02:09Z",
+            "event": "workflow_run",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43789489312,
+            "workflow": "Generate Metrics",
+            "outcome": "success",
+            "created_at": "2026-11-16T02:00:06Z",
+            "event": "workflow_dispatch",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43783866499,
+            "workflow": "Deploy Profile Site",
+            "outcome": "success",
+            "created_at": "2026-11-16T01:02:18Z",
+            "event": "workflow_run",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43783639159,
+            "workflow": "Generate Metrics",
+            "outcome": "success",
+            "created_at": "2026-11-16T01:00:04Z",
+            "event": "workflow_dispatch",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43777978835,
+            "workflow": "Deploy Profile Site",
+            "outcome": "success",
+            "created_at": "2026-11-16T00:02:00Z",
+            "event": "workflow_run",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43777786925,
+            "workflow": "Generate Metrics",
+            "outcome": "success",
+            "created_at": "2026-11-16T00:00:03Z",
+            "event": "workflow_dispatch",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43773599279,
+            "workflow": "Deploy Profile Site",
+            "outcome": "success",
+            "created_at": "2026-11-15T23:13:07Z",
+            "event": "workflow_run",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43773421004,
+            "workflow": "Generate Metrics",
+            "outcome": "success",
+            "created_at": "2026-11-15T23:11:14Z",
+            "event": "schedule",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 43772582897,
+            "workflow": "Deploy Profile Site",
+            "outcome": "success",
+            "created_at": "2026-11-15T23:02:21Z",
+            "event": "workflow_run",
+            "head_branch": "main"
+          }
+        ]
+      },
+      {
+        "repository": "jguida941/voiceterm",
+        "status": "partial",
+        "truncated": true,
+        "outside_window": false,
+        "observed_runs": 20,
+        "runs": [
+          {
+            "run_id": 43715539809,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-15T12:46:25Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 43593783960,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-14T12:13:59Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 43431287090,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-13T13:09:56Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 43230874763,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-12T13:48:46Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 43023014779,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-11T12:44:56Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 42825067623,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-10T13:30:05Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 42666315971,
+            "workflow": "Security",
+            "outcome": "failure",
+            "created_at": "2026-11-09T17:36:44Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 42652970695,
+            "workflow": "scorecard",
+            "outcome": "success",
+            "created_at": "2026-11-09T16:15:49Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 42629957308,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-09T13:56:55Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 42478004967,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-08T11:57:36Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 42369513452,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-07T11:45:28Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 42221807980,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-06T12:58:55Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 42034126256,
+            "workflow": "Parser Fuzz Guard",
+            "outcome": "success",
+            "created_at": "2026-11-05T13:15:13Z",
+            "event": "schedule",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 41959226190,
+            "workflow": "Documentation",
+            "outcome": "success",
+            "created_at": "2026-11-05T03:04:07Z",
+            "event": "push",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 41959226188,
+            "workflow": "scorecard",
+            "outcome": "success",
+            "created_at": "2026-11-05T03:04:07Z",
+            "event": "push",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 41957876767,
+            "workflow": "Documentation",
+            "outcome": "success",
+            "created_at": "2026-11-05T02:51:23Z",
+            "event": "push",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 41957876725,
+            "workflow": "scorecard",
+            "outcome": "success",
+            "created_at": "2026-11-05T02:51:23Z",
+            "event": "push",
+            "head_branch": "master"
+          },
+          {
+            "run_id": 41957251898,
+            "workflow": "Publish Homebrew",
+            "outcome": "success",
+            "created_at": "2026-11-05T02:45:24Z",
+            "event": "release",
+            "head_branch": "v1.2.9"
+          },
+          {
+            "run_id": 41957251824,
+            "workflow": "Release provenance",
+            "outcome": "success",
+            "created_at": "2026-11-05T02:45:24Z",
+            "event": "release",
+            "head_branch": "v1.2.9"
+          },
+          {
+            "run_id": 41957251820,
+            "workflow": "Publish PyPI",
+            "outcome": "success",
+            "created_at": "2026-11-05T02:45:24Z",
+            "event": "release",
+            "head_branch": "v1.2.9"
+          }
+        ]
+      },
+      {
+        "repository": "jguida941/simple-scratchpad",
+        "status": "partial",
+        "truncated": true,
+        "outside_window": false,
+        "observed_runs": 20,
+        "runs": [
+          {
+            "run_id": 32887699570,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T19:06:41Z",
+            "event": "push",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 32883155885,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T18:20:15Z",
+            "event": "pull_request",
+            "head_branch": "privacy-contract-split-03d9"
+          },
+          {
+            "run_id": 32883129269,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T18:19:58Z",
+            "event": "push",
+            "head_branch": "privacy-contract-split-03d9"
+          },
+          {
+            "run_id": 32882641993,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T18:14:56Z",
+            "event": "push",
+            "head_branch": "privacy-contract-split-03d9"
+          },
+          {
+            "run_id": 32881993482,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T18:08:17Z",
+            "event": "push",
+            "head_branch": "privacy-withdrawal-060b"
+          },
+          {
+            "run_id": 32877448968,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T17:21:57Z",
+            "event": "push",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 32876201490,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T17:09:18Z",
+            "event": "pull_request",
+            "head_branch": "web-bootstrap-preservation-48ab"
+          },
+          {
+            "run_id": 32876196695,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T17:09:15Z",
+            "event": "push",
+            "head_branch": "web-bootstrap-preservation-48ab"
+          },
+          {
+            "run_id": 32874796734,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T16:55:05Z",
+            "event": "pull_request",
+            "head_branch": "web-bootstrap-preservation-48ab"
+          },
+          {
+            "run_id": 32874791830,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T16:55:02Z",
+            "event": "push",
+            "head_branch": "web-bootstrap-preservation-48ab"
+          },
+          {
+            "run_id": 32874062131,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T16:47:33Z",
+            "event": "pull_request",
+            "head_branch": "web-bootstrap-preservation-48ab"
+          },
+          {
+            "run_id": 32874056005,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T16:47:29Z",
+            "event": "push",
+            "head_branch": "web-bootstrap-preservation-48ab"
+          },
+          {
+            "run_id": 32872656508,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T16:33:19Z",
+            "event": "pull_request",
+            "head_branch": "web-bootstrap-preservation-48ab"
+          },
+          {
+            "run_id": 32872653155,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T16:33:17Z",
+            "event": "push",
+            "head_branch": "web-bootstrap-preservation-48ab"
+          },
+          {
+            "run_id": 32872325132,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T16:30:03Z",
+            "event": "pull_request",
+            "head_branch": "web-bootstrap-preservation-48ab"
+          },
+          {
+            "run_id": 32872271694,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T16:29:31Z",
+            "event": "push",
+            "head_branch": "web-bootstrap-preservation-48ab"
+          },
+          {
+            "run_id": 32865520331,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T15:23:48Z",
+            "event": "push",
+            "head_branch": "main"
+          },
+          {
+            "run_id": 32863523979,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T15:04:40Z",
+            "event": "pull_request",
+            "head_branch": "canary-receipt-integrity"
+          },
+          {
+            "run_id": 32863520563,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T15:04:38Z",
+            "event": "push",
+            "head_branch": "canary-receipt-integrity"
+          },
+          {
+            "run_id": 32852763143,
+            "workflow": "CI",
+            "outcome": "success",
+            "created_at": "2026-08-25T13:20:42Z",
+            "event": "pull_request",
+            "head_branch": "canary-receipt-integrity"
+          }
+        ]
+      },
+      {
+        "repository": "jguida941/dijkstra-dashboard",
+        "status": "partial",
+        "truncated": false,
+        "outside_window": true,
+        "observed_runs": 0,
+        "runs": []
+      },
+      {
+        "repository": "jguida941/gitui",
+        "status": "partial",
+        "truncated": true,
+        "outside_window": true,
+        "observed_runs": 0,
+        "runs": []
+      },
+      {
+        "repository": "jguida941/ci-cd-hub",
+        "status": "partial",
+        "truncated": true,
+        "outside_window": true,
+        "observed_runs": 0,
+        "runs": []
+      }
+    ],
+    "observed_runs": 60,
+    "status": "partial"
+  },
   "contribution_calendar": {
-    "total": 13401,
+    "total": 13595,
     "weeks": [
+      [
+        {
+          "date": "2025-11-16",
+          "count": 16
+        }
+      ],
       [
         {
           "date": "2025-11-17",
@@ -3304,33 +3858,29 @@
         },
         {
           "date": "2026-11-15",
-          "count": 104
-        }
-      ],
-      [
-        {
-          "date": "2026-11-16",
-          "count": 5
+          "count": 115
         }
       ]
-    ]
+    ],
+    "calendar_start": "2025-11-16",
+    "calendar_end": "2026-11-15"
   },
   "contribution_rhythm": {
     "status": "available",
     "reason": "dated_calendar",
     "unit": "contributions",
     "bucket": "weekday",
-    "timezone": "UTC",
+    "timezone": "GitHub",
     "completeness": "known",
-    "window_start": "2025-11-17",
-    "window_end": "2026-11-16",
+    "window_start": "2025-11-16",
+    "window_end": "2026-11-15",
     "days_observed": 365,
-    "total": 13401,
+    "total": 13423,
     "weekdays": [
       {
         "weekday": "Mon",
-        "contributions": 1532,
-        "days_observed": 53
+        "contributions": 1527,
+        "days_observed": 52
       },
       {
         "weekday": "Tue",
@@ -3359,8 +3909,8 @@
       },
       {
         "weekday": "Sun",
-        "contributions": 1969,
-        "days_observed": 52
+        "contributions": 1996,
+        "days_observed": 53
       }
     ],
     "last_day_in_progress": true,
@@ -3372,16 +3922,16 @@
     "subtitle": "Contributions by weekday",
     "scope": "Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred.",
     "explanation": "These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.",
-    "coverage_summary": "Observed dates \u2014 Mon: 53; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 52.",
-    "caption": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC calendar dates",
+    "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 53.",
+    "caption": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub calendar dates",
     "qualification": "Last date may be in progress",
     "message": "",
     "rows": [
       {
         "weekday": "Mon",
-        "contributions": 1532,
-        "days_observed": 53,
-        "count_text": "1,532"
+        "contributions": 1527,
+        "days_observed": 52,
+        "count_text": "1,527"
       },
       {
         "weekday": "Tue",
@@ -3415,16 +3965,16 @@
       },
       {
         "weekday": "Sun",
-        "contributions": 1969,
-        "days_observed": 52,
-        "count_text": "1,969"
+        "contributions": 1996,
+        "days_observed": 53,
+        "count_text": "1,996"
       }
     ]
   },
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
     "window_start": "2026-10-18T00:00:00Z",
-    "window_end": "2026-11-16T03:27:05.697061Z",
+    "window_end": "2026-11-16T04:10:41.764452Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 256,
@@ -3452,7 +4002,7 @@
         "status": "partial",
         "complete": false,
         "reason": "activity_incomplete",
-        "occurred_at": "2026-11-16T03:13:09Z"
+        "occurred_at": "2026-11-16T03:36:01Z"
       },
       "history": {
         "status": "ok",
@@ -3461,14 +4011,14 @@
       },
       "repository": "jguida941/jguida941",
       "ref": "refs/heads/main",
-      "head_sha": "4f69bd497c3ce1492983c7055e9974364a4912ac",
-      "commit_url": "https://github.com/jguida941/jguida941/commit/4f69bd497c3ce1492983c7055e9974364a4912ac",
-      "additions": 223916,
-      "deletions": 219520,
-      "commit_count": 830,
-      "observed_commits": 839,
-      "stats_observed": 830,
-      "excluded_merges": 9,
+      "head_sha": "af25f35322c084fe70b68c3baea158afdb2eef56",
+      "commit_url": "https://github.com/jguida941/jguida941/commit/af25f35322c084fe70b68c3baea158afdb2eef56",
+      "additions": 228728,
+      "deletions": 222393,
+      "commit_count": 836,
+      "observed_commits": 847,
+      "stats_observed": 836,
+      "excluded_merges": 11,
       "daily": [
         {
           "date": "2026-10-18",
@@ -3646,8 +4196,8 @@
         },
         {
           "date": "2026-11-16",
-          "additions": 1301,
-          "deletions": 2029,
+          "additions": 6113,
+          "deletions": 4902,
           "complete": false
         }
       ],
@@ -3659,20 +4209,20 @@
       "complete": false,
       "rows": [
         {
-          "id": "50465331651",
+          "id": "50467168737",
           "repository": "jguida941/jguida941",
-          "timestamp": "2026-11-16T03:13:09Z",
+          "timestamp": "2026-11-16T03:36:01Z",
           "activity_type": "push",
           "ref": "refs/heads/main",
-          "after": "4f69bd497c3ce1492983c7055e9974364a4912ac",
+          "after": "af25f35322c084fe70b68c3baea158afdb2eef56",
           "diff_status": "ok",
-          "additions": 148,
-          "deletions": 136,
+          "additions": 516,
+          "deletions": 486,
           "commits": [
-            "4f69bd497c3ce1492983c7055e9974364a4912ac"
+            "af25f35322c084fe70b68c3baea158afdb2eef56"
           ],
-          "compare_url": "https://github.com/jguida941/jguida941/compare/468d2a3bf0b88074349d34f1f504dff614ea79c4...4f69bd497c3ce1492983c7055e9974364a4912ac",
-          "head_url": "https://github.com/jguida941/jguida941/commit/4f69bd497c3ce1492983c7055e9974364a4912ac",
+          "compare_url": "https://github.com/jguida941/jguida941/compare/cf7af6d4ce6c132c2088284874d864ba9dd9fdd3...af25f35322c084fe70b68c3baea158afdb2eef56",
+          "head_url": "https://github.com/jguida941/jguida941/commit/af25f35322c084fe70b68c3baea158afdb2eef56",
           "is_private": false
         },
         {
@@ -3724,8 +4274,8 @@
       "status": "partial",
       "complete": false,
       "window_start": "2026-10-18T00:00:00Z",
-      "window_end": "2026-11-16T03:27:05.697061Z",
-      "observed_at": "2026-11-16T03:27:05.697061Z",
+      "window_end": "2026-11-16T04:10:41.764452Z",
+      "observed_at": "2026-11-16T04:10:41.764452Z",
       "timezone": "UTC",
       "current_day_partial": true,
       "default_days": 14,
@@ -3776,8 +4326,8 @@
           "reasons": [
             "incomplete_activity_coverage"
           ],
-          "latest_push": "2026-11-16T03:13:09Z",
-          "observed_pushes": 82,
+          "latest_push": "2026-11-16T03:36:01Z",
+          "observed_pushes": 80,
           "daily": [
             {
               "date": "2026-10-18",
@@ -3943,9 +4493,9 @@
             },
             {
               "date": "2026-11-14",
-              "count": 10,
+              "count": 6,
               "complete": false,
-              "level": 4
+              "level": 2
             },
             {
               "date": "2026-11-15",
@@ -3955,9 +4505,9 @@
             },
             {
               "date": "2026-11-16",
-              "count": 5,
+              "count": 7,
               "complete": false,
-              "level": 2
+              "level": 3
             }
           ],
           "branch_empty_daily": [
@@ -4198,7 +4748,7 @@
                   "date": "2026-11-15",
                   "count": 9,
                   "complete": false,
-                  "level": 3
+                  "level": 4
                 }
               ],
               "observed_pushes": 9
@@ -4216,13 +4766,25 @@
               "observed_pushes": 10
             },
             {
+              "ref": "refs/heads/fix/overall-metric-scopes-20261115",
+              "daily": [
+                {
+                  "date": "2026-11-16",
+                  "count": 1,
+                  "complete": false,
+                  "level": 1
+                }
+              ],
+              "observed_pushes": 1
+            },
+            {
               "ref": "refs/heads/main",
               "daily": [
                 {
                   "date": "2026-11-14",
-                  "count": 10,
+                  "count": 6,
                   "complete": false,
-                  "level": 4
+                  "level": 2
                 },
                 {
                   "date": "2026-11-15",
@@ -4232,12 +4794,12 @@
                 },
                 {
                   "date": "2026-11-16",
-                  "count": 5,
+                  "count": 6,
                   "complete": false,
                   "level": 2
                 }
               ],
-              "observed_pushes": 44
+              "observed_pushes": 41
             }
           ]
         },
@@ -4410,7 +4972,7 @@
               "date": "2026-11-13",
               "count": 9,
               "complete": true,
-              "level": 3
+              "level": 4
             },
             {
               "date": "2026-11-14",
@@ -4715,7 +5277,7 @@
             "incomplete_activity_coverage"
           ],
           "latest_push": "2026-11-15T18:29:22Z",
-          "observed_pushes": 70,
+          "observed_pushes": 68,
           "daily": [
             {
               "date": "2026-10-18",
@@ -4761,7 +5323,7 @@
             },
             {
               "date": "2026-10-25",
-              "count": 6,
+              "count": 4,
               "complete": false,
               "level": 2
             },
@@ -5122,7 +5684,7 @@
               "daily": [
                 {
                   "date": "2026-10-25",
-                  "count": 6,
+                  "count": 4,
                   "complete": false,
                   "level": 2
                 },
@@ -5163,7 +5725,7 @@
                   "level": 2
                 }
               ],
-              "observed_pushes": 49
+              "observed_pushes": 47
             },
             {
               "ref": "refs/heads/fix/contribution-calendar-20261115",
@@ -8412,11 +8974,11 @@
           },
           {
             "lower": 7,
-            "upper": 9,
+            "upper": 8,
             "level": 3
           },
           {
-            "lower": 10,
+            "lower": 9,
             "upper": 67,
             "level": 4
           }
@@ -8438,18 +9000,18 @@
         "default_visible": 8,
         "reasons": []
       },
-      "observed_pushes": 220
+      "observed_pushes": 216
     }
   },
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-11-16T03:28:12.528011Z",
+    "generated_at": "2026-11-16T04:11:32.312438Z",
     "facts": [
       {
         "metric_id": "profile.contributions",
-        "value": 13584,
-        "display_value": "13,584",
+        "value": 13595,
+        "display_value": "13,595",
         "label": "Contributions",
         "unit": "count",
         "population_id": "github-user-contributions-visible-to-provider",
@@ -8461,17 +9023,18 @@
         },
         "window_start": "2025-11-09T05:00:00Z",
         "window_end": "2026-11-16T04:59:59Z",
-        "observed_at": "2026-11-16T03:27:05Z",
-        "source_id": "github_graphql_default_contributions_collection"
+        "observed_at": "2026-11-16T04:10:41Z",
+        "source_id": "github_graphql_default_contributions_collection",
+        "source_content_digest": "sha256:deeaa5d57afb70cbb57d093316e5b6e39c780731357d512413e52c54942e13ae"
       },
       {
         "metric_id": "calendar.total",
-        "value": 13401,
-        "display_value": "13,401",
+        "value": 13595,
+        "display_value": "13,595",
         "label": "contributions",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC",
+        "window": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub",
         "quality": {
           "status": "exact",
           "reason": "calendar_observation",
@@ -8485,7 +9048,7 @@
         "label": "public repos",
         "unit": "count",
         "population_id": "public-owned-including-forks",
-        "window": "Observed 2026-11-16T03:27:33.985201Z",
+        "window": "Observed 2026-11-16T04:11:08.641365Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8499,7 +9062,7 @@
         "label": "public non-fork repos",
         "unit": "count",
         "population_id": "public-owned-nonfork-profile-included",
-        "window": "Observed 2026-11-16T03:27:33.985201Z",
+        "window": "Observed 2026-11-16T04:11:08.641365Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8513,7 +9076,7 @@
         "label": "private owned repos",
         "unit": "count",
         "population_id": "private-owned-including-forks",
-        "window": "Observed 2026-11-16T03:27:33.985201Z",
+        "window": "Observed 2026-11-16T04:11:08.641365Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8527,7 +9090,7 @@
         "label": "stargazers",
         "unit": "count",
         "population_id": "public-owned-nonfork",
-        "window": "Observed 2026-11-16T03:27:33.985201Z",
+        "window": "Observed 2026-11-16T04:11:08.641365Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8541,7 +9104,7 @@
         "label": "public forks",
         "unit": "count",
         "population_id": "public-owned-forks",
-        "window": "Observed 2026-11-16T03:27:33.985201Z",
+        "window": "Observed 2026-11-16T04:11:08.641365Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8564,12 +9127,12 @@
       },
       {
         "metric_id": "activity.merged_prs",
-        "value": 163,
-        "display_value": "163",
+        "value": 165,
+        "display_value": "165",
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "authored-pull-requests-visible-to-primary-pr-search",
-        "window": "2025-11-16T05:00:00Z \u2013 2026-11-16T03:27:03Z",
+        "window": "2025-11-16T05:00:00Z \u2013 2026-11-16T04:10:40Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -8583,7 +9146,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-10-17T04:00:00Z \u2013 2026-11-16T03:27:03Z",
+        "window": "2026-10-17T04:00:00Z \u2013 2026-11-16T04:10:40Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -8639,7 +9202,7 @@
         "label": "active days",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC",
+        "window": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
@@ -8658,7 +9221,7 @@
         "label": "current observed streak",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC",
+        "window": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
@@ -8677,7 +9240,7 @@
         "label": "longest observed streak",
         "unit": "count",
         "population_id": "github-contribution-calendar-visible-to-provider",
-        "window": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC",
+        "window": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub",
         "quality": {
           "status": "exact",
           "reason": "calendar_run",
@@ -8696,11 +9259,20 @@
         "unit": "contributions",
         "bucket": "iso_week",
         "week_start_day": "Monday",
-        "timezone": "UTC",
+        "timezone": "GitHub",
         "completeness": "known",
-        "window_start": "2026-08-31",
-        "window_end": "2026-11-16",
+        "window_start": "2026-08-24",
+        "window_end": "2026-11-15",
         "points": [
+          {
+            "week_start": "2026-08-24",
+            "week_end": "2026-08-30",
+            "observed_start": "2026-08-24",
+            "observed_end": "2026-08-30",
+            "days_observed": 7,
+            "contributions": 95,
+            "partial": false
+          },
           {
             "week_start": "2026-08-31",
             "week_end": "2026-09-06",
@@ -8797,16 +9369,7 @@
             "observed_start": "2026-11-09",
             "observed_end": "2026-11-15",
             "days_observed": 7,
-            "contributions": 435,
-            "partial": false
-          },
-          {
-            "week_start": "2026-11-16",
-            "week_end": "2026-11-22",
-            "observed_start": "2026-11-16",
-            "observed_end": "2026-11-16",
-            "days_observed": 1,
-            "contributions": 5,
+            "contributions": 446,
             "partial": true
           }
         ],
@@ -8816,6 +9379,7 @@
         "available": true,
         "title": "Weekly contributions",
         "values": [
+          95,
           74,
           125,
           41,
@@ -8826,13 +9390,12 @@
           237,
           229,
           351,
-          435,
-          5
+          446
         ],
         "peak": "Peak 577 contributions/week",
-        "window": "Aug 31 \u2013 Nov 16, 2026 \u00b7 12 weeks",
-        "qualification": "Mon\u2013Sun \u00b7 UTC \u00b7 partial weeks included",
-        "description": "UTC contribution calendar. 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 577 contributions (complete); 2026-10-19 to 2026-10-25: 237 contributions (complete); 2026-10-26 to 2026-11-01: 229 contributions (complete); 2026-11-02 to 2026-11-08: 351 contributions (complete); 2026-11-09 to 2026-11-15: 435 contributions (complete); 2026-11-16 to 2026-11-16: 5 contributions (partial)"
+        "window": "Aug 24 \u2013 Nov 15, 2026 \u00b7 12 weeks",
+        "qualification": "Mon\u2013Sun \u00b7 GitHub \u00b7 partial weeks included",
+        "description": "GitHub contribution calendar. 2026-08-24 to 2026-08-30: 95 contributions (complete); 2026-08-31 to 2026-09-06: 74 contributions (complete); 2026-09-07 to 2026-09-13: 125 contributions (complete); 2026-09-14 to 2026-09-20: 41 contributions (complete); 2026-09-21 to 2026-09-27: 25 contributions (complete); 2026-09-28 to 2026-10-04: 121 contributions (complete); 2026-10-05 to 2026-10-11: 311 contributions (complete); 2026-10-12 to 2026-10-18: 577 contributions (complete); 2026-10-19 to 2026-10-25: 237 contributions (complete); 2026-10-26 to 2026-11-01: 229 contributions (complete); 2026-11-02 to 2026-11-08: 351 contributions (complete); 2026-11-09 to 2026-11-15: 446 contributions (partial)"
       }
     },
     "rhythm": {
@@ -8841,17 +9404,17 @@
         "reason": "dated_calendar",
         "unit": "contributions",
         "bucket": "weekday",
-        "timezone": "UTC",
+        "timezone": "GitHub",
         "completeness": "known",
-        "window_start": "2025-11-17",
-        "window_end": "2026-11-16",
+        "window_start": "2025-11-16",
+        "window_end": "2026-11-15",
         "days_observed": 365,
-        "total": 13401,
+        "total": 13423,
         "weekdays": [
           {
             "weekday": "Mon",
-            "contributions": 1532,
-            "days_observed": 53
+            "contributions": 1527,
+            "days_observed": 52
           },
           {
             "weekday": "Tue",
@@ -8880,8 +9443,8 @@
           },
           {
             "weekday": "Sun",
-            "contributions": 1969,
-            "days_observed": 52
+            "contributions": 1996,
+            "days_observed": 53
           }
         ],
         "last_day_in_progress": true
@@ -8892,16 +9455,16 @@
         "subtitle": "Contributions by weekday",
         "scope": "Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred.",
         "explanation": "These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.",
-        "coverage_summary": "Observed dates \u2014 Mon: 53; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 52.",
-        "caption": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC calendar dates",
+        "coverage_summary": "Observed dates \u2014 Mon: 52; Tue: 52; Wed: 52; Thu: 52; Fri: 52; Sat: 52; Sun: 53.",
+        "caption": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub calendar dates",
         "qualification": "Last date may be in progress",
         "message": "",
         "rows": [
           {
             "weekday": "Mon",
-            "contributions": 1532,
-            "days_observed": 53,
-            "count_text": "1,532"
+            "contributions": 1527,
+            "days_observed": 52,
+            "count_text": "1,527"
           },
           {
             "weekday": "Tue",
@@ -8935,9 +9498,9 @@
           },
           {
             "weekday": "Sun",
-            "contributions": 1969,
-            "days_observed": 52,
-            "count_text": "1,969"
+            "contributions": 1996,
+            "days_observed": 53,
+            "count_text": "1,996"
           }
         ]
       }
@@ -8946,260 +9509,260 @@
       "rows": [
         {
           "name": "Python",
-          "bytes": 97033955,
-          "percent": 68.30215252115508,
+          "bytes": 97084794,
+          "percent": 68.31331289654929,
           "display_value": "68.3%"
         },
         {
           "name": "Rust",
           "bytes": 10904193,
-          "percent": 7.675456013372964,
+          "percent": 7.672690208245821,
           "display_value": "7.7%"
         },
         {
           "name": "C++",
           "bytes": 7922855,
-          "percent": 5.576893682350638,
+          "percent": 5.574884081733645,
           "display_value": "5.6%"
         },
         {
           "name": "Swift",
           "bytes": 6142050,
-          "percent": 4.323385931167709,
+          "percent": 4.321828024646688,
           "display_value": "4.3%"
         },
         {
           "name": "Makefile",
           "bytes": 5888079,
-          "percent": 4.144615870955794,
+          "percent": 4.1431223831674515,
           "display_value": "4.1%"
         },
         {
           "name": "HTML",
-          "bytes": 5349050,
-          "percent": 3.7651936267390584,
+          "bytes": 5349422,
+          "percent": 3.764098617767933,
           "display_value": "3.8%"
         },
         {
           "name": "Other",
           "bytes": 8825553,
-          "percent": 6.212302354258752,
+          "percent": 6.210063787889165,
           "display_value": "6.2%"
         }
       ],
       "all_rows": [
         {
           "name": "Python",
-          "bytes": 97033955,
-          "percent": 68.30215252115508,
+          "bytes": 97084794,
+          "percent": 68.31331289654929,
           "display_value": "68.3%"
         },
         {
           "name": "Rust",
           "bytes": 10904193,
-          "percent": 7.675456013372964,
+          "percent": 7.672690208245821,
           "display_value": "7.7%"
         },
         {
           "name": "C++",
           "bytes": 7922855,
-          "percent": 5.576893682350638,
+          "percent": 5.574884081733645,
           "display_value": "5.6%"
         },
         {
           "name": "Swift",
           "bytes": 6142050,
-          "percent": 4.323385931167709,
+          "percent": 4.321828024646688,
           "display_value": "4.3%"
         },
         {
           "name": "Makefile",
           "bytes": 5888079,
-          "percent": 4.144615870955794,
+          "percent": 4.1431223831674515,
           "display_value": "4.1%"
         },
         {
           "name": "HTML",
-          "bytes": 5349050,
-          "percent": 3.7651936267390584,
+          "bytes": 5349422,
+          "percent": 3.764098617767933,
           "display_value": "3.8%"
         },
         {
           "name": "Java",
           "bytes": 2135378,
-          "percent": 1.5030915090116557,
+          "percent": 1.5025498788863645,
           "display_value": "1.5%"
         },
         {
           "name": "JavaScript",
           "bytes": 1390601,
-          "percent": 0.9788433502279772,
+          "percent": 0.9784906298225688,
           "display_value": "1.0%"
         },
         {
           "name": "Shell",
           "bytes": 1255556,
-          "percent": 0.8837852420923313,
+          "percent": 0.8834667753133395,
           "display_value": "0.9%"
         },
         {
           "name": "GDScript",
           "bytes": 1129648,
-          "percent": 0.7951586636988855,
+          "percent": 0.7948721329826494,
           "display_value": "0.8%"
         },
         {
           "name": "Jupyter Notebook",
           "bytes": 899502,
-          "percent": 0.6331590091023709,
+          "percent": 0.6329308540024495,
           "display_value": "0.6%"
         },
         {
           "name": "TypeScript",
           "bytes": 460576,
-          "percent": 0.32419921665136214,
+          "percent": 0.3240823933832634,
           "display_value": "0.3%"
         },
         {
           "name": "C",
           "bytes": 443442,
-          "percent": 0.3121386025982972,
+          "percent": 0.31202612530106016,
           "display_value": "0.3%"
         },
         {
           "name": "CMake",
           "bytes": 392196,
-          "percent": 0.27606656876128505,
+          "percent": 0.27596708980785445,
           "display_value": "0.3%"
         },
         {
           "name": "CSS",
           "bytes": 242048,
-          "percent": 0.17037746645945273,
+          "percent": 0.17031607194823903,
           "display_value": "0.2%"
         },
         {
           "name": "GLSL",
           "bytes": 103431,
-          "percent": 0.07280502930562391,
+          "percent": 0.07277879444440075,
           "display_value": "0.1%"
         },
         {
           "name": "C#",
           "bytes": 83058,
-          "percent": 0.058464484768265906,
+          "percent": 0.058443417437354726,
           "display_value": "0.1%"
         },
         {
           "name": "Assembly",
           "bytes": 74798,
-          "percent": 0.052650274888592946,
+          "percent": 0.052631302673785296,
           "display_value": "0.1%"
         },
         {
           "name": "Rich Text Format",
           "bytes": 71946,
-          "percent": 0.05064275351125308,
+          "percent": 0.05062450469488698,
           "display_value": "0.1%"
         },
         {
           "name": "Kotlin",
           "bytes": 22961,
-          "percent": 0.01616223644638871,
+          "percent": 0.01615641248018375,
           "display_value": "0.0%"
         },
         {
           "name": "PowerShell",
           "bytes": 19687,
-          "percent": 0.013857669479554658,
+          "percent": 0.013852675950410585,
           "display_value": "0.0%"
         },
         {
           "name": "Dockerfile",
           "bytes": 19316,
-          "percent": 0.013596522764620195,
+          "percent": 0.013591623338148569,
           "display_value": "0.0%"
         },
         {
           "name": "TeX",
           "bytes": 13407,
-          "percent": 0.009437180612200401,
+          "percent": 0.009433779980045447,
           "display_value": "0.0%"
         },
         {
           "name": "Batchfile",
           "bytes": 11667,
-          "percent": 0.008212395480162758,
+          "percent": 0.008209436192078036,
           "display_value": "0.0%"
         },
         {
           "name": "SCSS",
           "bytes": 10916,
-          "percent": 0.0076837669547832905,
+          "percent": 0.007680998154857619,
           "display_value": "0.0%"
         },
         {
           "name": "Go Template",
           "bytes": 9490,
-          "percent": 0.006680006266113359,
+          "percent": 0.006677599165408467,
           "display_value": "0.0%"
         },
         {
           "name": "MATLAB",
           "bytes": 8516,
-          "percent": 0.0059944081519727474,
+          "percent": 0.0059922481024887765,
           "display_value": "0.0%"
         },
         {
           "name": "Open Policy Agent",
           "bytes": 7012,
-          "percent": 0.004935743302211473,
+          "percent": 0.004933964736337636,
           "display_value": "0.0%"
         },
         {
           "name": "Tcl",
           "bytes": 5344,
-          "percent": 0.0037616389342581442,
+          "percent": 0.00376028344994129,
           "display_value": "0.0%"
         },
         {
           "name": "Ruby",
           "bytes": 5192,
-          "percent": 0.0036546462100801435,
+          "percent": 0.00365332927995793,
           "display_value": "0.0%"
         },
         {
           "name": "GAP",
           "bytes": 4677,
-          "percent": 0.0032921379669770476,
+          "percent": 0.0032909516645537825,
           "display_value": "0.0%"
         },
         {
           "name": "Groovy",
           "bytes": 3613,
-          "percent": 0.0025431888977310397,
+          "percent": 0.0025422724746702622,
           "display_value": "0.0%"
         },
         {
           "name": "Objective-C",
           "bytes": 1096,
-          "percent": 0.0007714738532834818,
+          "percent": 0.0007711958572484382,
           "display_value": "0.0%"
         },
         {
           "name": "Handlebars",
           "bytes": 286,
-          "percent": 0.00020131525733492315,
+          "percent": 0.00020124271457395377,
           "display_value": "0.0%"
         },
         {
           "name": "Jinja",
           "bytes": 193,
-          "percent": 0.00013585260372601457,
+          "percent": 0.0001358036500446611,
           "display_value": "0.0%"
         }
       ],
-      "total_bytes": 142065735,
+      "total_bytes": 142116946,
       "quality": "exact",
       "scope": "Owned public + private non-fork repositories; profile included"
     },
@@ -9279,6 +9842,10 @@
     },
     "calendar": {
       "days": [
+        {
+          "date": "2025-11-16",
+          "count": 16
+        },
         {
           "date": "2025-11-17",
           "count": 34
@@ -10733,17 +11300,32 @@
         },
         {
           "date": "2026-11-15",
-          "count": 104
-        },
-        {
-          "date": "2026-11-16",
-          "count": 5
+          "count": 115
         }
       ],
-      "window": "2025-11-17 \u2013 2026-11-16 \u00b7 UTC",
+      "window": "2025-11-16 \u2013 2026-11-15 \u00b7 GitHub",
       "status": "exact"
     },
     "working": [
+      {
+        "name": "profile-private-continuation",
+        "language": "Python",
+        "pushed_at": "2026-11-16T03:34:25Z",
+        "last_commit_msg": "Record contribution repair and restore accepted continuation",
+        "is_private": true,
+        "url": "https://github.com/jguida941/profile-private-continuation",
+        "push_age": "pushed <1h ago"
+      },
+      {
+        "name": "jguida941",
+        "language": "Python",
+        "pushed_at": "2026-11-16T03:33:55Z",
+        "last_commit_msg": "Merge pull request #23 from jguida941/fix/overall-metric-scopes-20261115",
+        "is_private": false,
+        "activity_type": "pr_merge",
+        "url": "https://github.com/jguida941/jguida941",
+        "push_age": "updated <1h ago"
+      },
       {
         "name": "cs499-review",
         "language": "Python",
@@ -10752,25 +11334,6 @@
         "is_private": true,
         "url": "https://github.com/jguida941/cs499-review",
         "push_age": "pushed 3h ago"
-      },
-      {
-        "name": "profile-private-continuation",
-        "language": "Python",
-        "pushed_at": "2026-11-15T18:30:57Z",
-        "last_commit_msg": "Record contribution repair and restore accepted continuation",
-        "is_private": true,
-        "url": "https://github.com/jguida941/profile-private-continuation",
-        "push_age": "pushed 8h ago"
-      },
-      {
-        "name": "jguida941",
-        "language": "Python",
-        "pushed_at": "2026-11-15T18:17:49Z",
-        "last_commit_msg": "Merge pull request #18 from jguida941/fix/contribution-caption-development-20261115",
-        "is_private": false,
-        "activity_type": "pr_merge",
-        "url": "https://github.com/jguida941/jguida941",
-        "push_age": "updated 9h ago"
       },
       {
         "name": "cs320-orig-contact-service",
@@ -10809,15 +11372,15 @@
           "is_private": false
         },
         {
-          "title": "cs499-review",
-          "detail": "Python \u00b7 pushed 3 hours ago",
-          "url": "https://github.com/jguida941/cs499-review",
+          "title": "profile-private-continuation",
+          "detail": "Python \u00b7 pushed today",
+          "url": "https://github.com/jguida941/profile-private-continuation",
           "is_private": true
         },
         {
-          "title": "profile-private-continuation",
-          "detail": "Python \u00b7 pushed 8 hours ago",
-          "url": "https://github.com/jguida941/profile-private-continuation",
+          "title": "cs499-review",
+          "detail": "Python \u00b7 pushed 3 hours ago",
+          "url": "https://github.com/jguida941/cs499-review",
           "is_private": true
         }
       ],
@@ -10964,10 +11527,555 @@
         "visibility": "private"
       }
     ],
+    "ci_timeline": {
+      "schema": "profile-ci-timeline/v1",
+      "owner": "jguida941",
+      "observed_at": "2026-11-16T04:11:26Z",
+      "window_start": "2026-08-24T04:11:26Z",
+      "window_end": "2026-11-16T04:11:26Z",
+      "window_days": 84,
+      "sample_limit_per_repo": 20,
+      "scope": "Selected public, owned repositories with observed workflow configuration, plus profile; up to 20 most recent runs per repository, not complete history.",
+      "repositories": [
+        {
+          "repository": "jguida941/jguida941",
+          "status": "partial",
+          "truncated": true,
+          "outside_window": false,
+          "observed_runs": 20,
+          "runs": [
+            {
+              "run_id": 43801395497,
+              "workflow": "Generate Metrics",
+              "outcome": "in_progress",
+              "created_at": "2026-11-16T04:00:03Z",
+              "event": "workflow_dispatch",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43799643045,
+              "workflow": "Deploy Profile Site",
+              "outcome": "skipped",
+              "created_at": "2026-11-16T03:41:06Z",
+              "event": "workflow_run",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43799163853,
+              "workflow": "Deploy Profile Site",
+              "outcome": "success",
+              "created_at": "2026-11-16T03:36:10Z",
+              "event": "workflow_run",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43798935247,
+              "workflow": "Build Analytics & README",
+              "outcome": "success",
+              "created_at": "2026-11-16T03:33:58Z",
+              "event": "push",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43798935118,
+              "workflow": "Deploy Profile Site",
+              "outcome": "failure",
+              "created_at": "2026-11-16T03:33:58Z",
+              "event": "push",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43798935112,
+              "workflow": "Test Profile Pipeline",
+              "outcome": "success",
+              "created_at": "2026-11-16T03:33:58Z",
+              "event": "push",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43798793471,
+              "workflow": "Test Profile Pipeline",
+              "outcome": "success",
+              "created_at": "2026-11-16T03:32:30Z",
+              "event": "pull_request",
+              "head_branch": "fix/overall-metric-scopes-20261115"
+            },
+            {
+              "run_id": 43796841190,
+              "workflow": "Deploy Profile Site",
+              "outcome": "success",
+              "created_at": "2026-11-16T03:13:16Z",
+              "event": "workflow_run",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43796625095,
+              "workflow": "Generate Metrics",
+              "outcome": "failure",
+              "created_at": "2026-11-16T03:11:11Z",
+              "event": "schedule",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43795671434,
+              "workflow": "Deploy Profile Site",
+              "outcome": "success",
+              "created_at": "2026-11-16T03:01:59Z",
+              "event": "workflow_run",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43795468964,
+              "workflow": "Generate Metrics",
+              "outcome": "success",
+              "created_at": "2026-11-16T03:00:03Z",
+              "event": "workflow_dispatch",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43789705438,
+              "workflow": "Deploy Profile Site",
+              "outcome": "success",
+              "created_at": "2026-11-16T02:02:09Z",
+              "event": "workflow_run",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43789489312,
+              "workflow": "Generate Metrics",
+              "outcome": "success",
+              "created_at": "2026-11-16T02:00:06Z",
+              "event": "workflow_dispatch",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43783866499,
+              "workflow": "Deploy Profile Site",
+              "outcome": "success",
+              "created_at": "2026-11-16T01:02:18Z",
+              "event": "workflow_run",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43783639159,
+              "workflow": "Generate Metrics",
+              "outcome": "success",
+              "created_at": "2026-11-16T01:00:04Z",
+              "event": "workflow_dispatch",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43777978835,
+              "workflow": "Deploy Profile Site",
+              "outcome": "success",
+              "created_at": "2026-11-16T00:02:00Z",
+              "event": "workflow_run",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43777786925,
+              "workflow": "Generate Metrics",
+              "outcome": "success",
+              "created_at": "2026-11-16T00:00:03Z",
+              "event": "workflow_dispatch",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43773599279,
+              "workflow": "Deploy Profile Site",
+              "outcome": "success",
+              "created_at": "2026-11-15T23:13:07Z",
+              "event": "workflow_run",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43773421004,
+              "workflow": "Generate Metrics",
+              "outcome": "success",
+              "created_at": "2026-11-15T23:11:14Z",
+              "event": "schedule",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 43772582897,
+              "workflow": "Deploy Profile Site",
+              "outcome": "success",
+              "created_at": "2026-11-15T23:02:21Z",
+              "event": "workflow_run",
+              "head_branch": "main"
+            }
+          ]
+        },
+        {
+          "repository": "jguida941/voiceterm",
+          "status": "partial",
+          "truncated": true,
+          "outside_window": false,
+          "observed_runs": 20,
+          "runs": [
+            {
+              "run_id": 43715539809,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-15T12:46:25Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 43593783960,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-14T12:13:59Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 43431287090,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-13T13:09:56Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 43230874763,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-12T13:48:46Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 43023014779,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-11T12:44:56Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 42825067623,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-10T13:30:05Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 42666315971,
+              "workflow": "Security",
+              "outcome": "failure",
+              "created_at": "2026-11-09T17:36:44Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 42652970695,
+              "workflow": "scorecard",
+              "outcome": "success",
+              "created_at": "2026-11-09T16:15:49Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 42629957308,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-09T13:56:55Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 42478004967,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-08T11:57:36Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 42369513452,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-07T11:45:28Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 42221807980,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-06T12:58:55Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 42034126256,
+              "workflow": "Parser Fuzz Guard",
+              "outcome": "success",
+              "created_at": "2026-11-05T13:15:13Z",
+              "event": "schedule",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 41959226190,
+              "workflow": "Documentation",
+              "outcome": "success",
+              "created_at": "2026-11-05T03:04:07Z",
+              "event": "push",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 41959226188,
+              "workflow": "scorecard",
+              "outcome": "success",
+              "created_at": "2026-11-05T03:04:07Z",
+              "event": "push",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 41957876767,
+              "workflow": "Documentation",
+              "outcome": "success",
+              "created_at": "2026-11-05T02:51:23Z",
+              "event": "push",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 41957876725,
+              "workflow": "scorecard",
+              "outcome": "success",
+              "created_at": "2026-11-05T02:51:23Z",
+              "event": "push",
+              "head_branch": "master"
+            },
+            {
+              "run_id": 41957251898,
+              "workflow": "Publish Homebrew",
+              "outcome": "success",
+              "created_at": "2026-11-05T02:45:24Z",
+              "event": "release",
+              "head_branch": "v1.2.9"
+            },
+            {
+              "run_id": 41957251824,
+              "workflow": "Release provenance",
+              "outcome": "success",
+              "created_at": "2026-11-05T02:45:24Z",
+              "event": "release",
+              "head_branch": "v1.2.9"
+            },
+            {
+              "run_id": 41957251820,
+              "workflow": "Publish PyPI",
+              "outcome": "success",
+              "created_at": "2026-11-05T02:45:24Z",
+              "event": "release",
+              "head_branch": "v1.2.9"
+            }
+          ]
+        },
+        {
+          "repository": "jguida941/simple-scratchpad",
+          "status": "partial",
+          "truncated": true,
+          "outside_window": false,
+          "observed_runs": 20,
+          "runs": [
+            {
+              "run_id": 32887699570,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T19:06:41Z",
+              "event": "push",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 32883155885,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T18:20:15Z",
+              "event": "pull_request",
+              "head_branch": "privacy-contract-split-03d9"
+            },
+            {
+              "run_id": 32883129269,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T18:19:58Z",
+              "event": "push",
+              "head_branch": "privacy-contract-split-03d9"
+            },
+            {
+              "run_id": 32882641993,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T18:14:56Z",
+              "event": "push",
+              "head_branch": "privacy-contract-split-03d9"
+            },
+            {
+              "run_id": 32881993482,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T18:08:17Z",
+              "event": "push",
+              "head_branch": "privacy-withdrawal-060b"
+            },
+            {
+              "run_id": 32877448968,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T17:21:57Z",
+              "event": "push",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 32876201490,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T17:09:18Z",
+              "event": "pull_request",
+              "head_branch": "web-bootstrap-preservation-48ab"
+            },
+            {
+              "run_id": 32876196695,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T17:09:15Z",
+              "event": "push",
+              "head_branch": "web-bootstrap-preservation-48ab"
+            },
+            {
+              "run_id": 32874796734,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T16:55:05Z",
+              "event": "pull_request",
+              "head_branch": "web-bootstrap-preservation-48ab"
+            },
+            {
+              "run_id": 32874791830,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T16:55:02Z",
+              "event": "push",
+              "head_branch": "web-bootstrap-preservation-48ab"
+            },
+            {
+              "run_id": 32874062131,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T16:47:33Z",
+              "event": "pull_request",
+              "head_branch": "web-bootstrap-preservation-48ab"
+            },
+            {
+              "run_id": 32874056005,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T16:47:29Z",
+              "event": "push",
+              "head_branch": "web-bootstrap-preservation-48ab"
+            },
+            {
+              "run_id": 32872656508,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T16:33:19Z",
+              "event": "pull_request",
+              "head_branch": "web-bootstrap-preservation-48ab"
+            },
+            {
+              "run_id": 32872653155,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T16:33:17Z",
+              "event": "push",
+              "head_branch": "web-bootstrap-preservation-48ab"
+            },
+            {
+              "run_id": 32872325132,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T16:30:03Z",
+              "event": "pull_request",
+              "head_branch": "web-bootstrap-preservation-48ab"
+            },
+            {
+              "run_id": 32872271694,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T16:29:31Z",
+              "event": "push",
+              "head_branch": "web-bootstrap-preservation-48ab"
+            },
+            {
+              "run_id": 32865520331,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T15:23:48Z",
+              "event": "push",
+              "head_branch": "main"
+            },
+            {
+              "run_id": 32863523979,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T15:04:40Z",
+              "event": "pull_request",
+              "head_branch": "canary-receipt-integrity"
+            },
+            {
+              "run_id": 32863520563,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T15:04:38Z",
+              "event": "push",
+              "head_branch": "canary-receipt-integrity"
+            },
+            {
+              "run_id": 32852763143,
+              "workflow": "CI",
+              "outcome": "success",
+              "created_at": "2026-08-25T13:20:42Z",
+              "event": "pull_request",
+              "head_branch": "canary-receipt-integrity"
+            }
+          ]
+        },
+        {
+          "repository": "jguida941/dijkstra-dashboard",
+          "status": "partial",
+          "truncated": false,
+          "outside_window": true,
+          "observed_runs": 0,
+          "runs": []
+        },
+        {
+          "repository": "jguida941/gitui",
+          "status": "partial",
+          "truncated": true,
+          "outside_window": true,
+          "observed_runs": 0,
+          "runs": []
+        },
+        {
+          "repository": "jguida941/ci-cd-hub",
+          "status": "partial",
+          "truncated": true,
+          "outside_window": true,
+          "observed_runs": 0,
+          "runs": []
+        }
+      ],
+      "observed_runs": 60,
+      "status": "partial"
+    },
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
       "window_start": "2026-10-18T00:00:00Z",
-      "window_end": "2026-11-16T03:27:05.697061Z",
+      "window_end": "2026-11-16T04:10:41.764452Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 256,
@@ -10995,7 +12103,7 @@
           "status": "partial",
           "complete": false,
           "reason": "activity_incomplete",
-          "occurred_at": "2026-11-16T03:13:09Z"
+          "occurred_at": "2026-11-16T03:36:01Z"
         },
         "history": {
           "status": "ok",
@@ -11004,14 +12112,14 @@
         },
         "repository": "jguida941/jguida941",
         "ref": "refs/heads/main",
-        "head_sha": "4f69bd497c3ce1492983c7055e9974364a4912ac",
-        "commit_url": "https://github.com/jguida941/jguida941/commit/4f69bd497c3ce1492983c7055e9974364a4912ac",
-        "additions": 223916,
-        "deletions": 219520,
-        "commit_count": 830,
-        "observed_commits": 839,
-        "stats_observed": 830,
-        "excluded_merges": 9,
+        "head_sha": "af25f35322c084fe70b68c3baea158afdb2eef56",
+        "commit_url": "https://github.com/jguida941/jguida941/commit/af25f35322c084fe70b68c3baea158afdb2eef56",
+        "additions": 228728,
+        "deletions": 222393,
+        "commit_count": 836,
+        "observed_commits": 847,
+        "stats_observed": 836,
+        "excluded_merges": 11,
         "daily": [
           {
             "date": "2026-10-18",
@@ -11189,8 +12297,8 @@
           },
           {
             "date": "2026-11-16",
-            "additions": 1301,
-            "deletions": 2029,
+            "additions": 6113,
+            "deletions": 4902,
             "complete": false
           }
         ],
@@ -11202,20 +12310,20 @@
         "complete": false,
         "rows": [
           {
-            "id": "50465331651",
+            "id": "50467168737",
             "repository": "jguida941/jguida941",
-            "timestamp": "2026-11-16T03:13:09Z",
+            "timestamp": "2026-11-16T03:36:01Z",
             "activity_type": "push",
             "ref": "refs/heads/main",
-            "after": "4f69bd497c3ce1492983c7055e9974364a4912ac",
+            "after": "af25f35322c084fe70b68c3baea158afdb2eef56",
             "diff_status": "ok",
-            "additions": 148,
-            "deletions": 136,
+            "additions": 516,
+            "deletions": 486,
             "commits": [
-              "4f69bd497c3ce1492983c7055e9974364a4912ac"
+              "af25f35322c084fe70b68c3baea158afdb2eef56"
             ],
-            "compare_url": "https://github.com/jguida941/jguida941/compare/468d2a3bf0b88074349d34f1f504dff614ea79c4...4f69bd497c3ce1492983c7055e9974364a4912ac",
-            "head_url": "https://github.com/jguida941/jguida941/commit/4f69bd497c3ce1492983c7055e9974364a4912ac",
+            "compare_url": "https://github.com/jguida941/jguida941/compare/cf7af6d4ce6c132c2088284874d864ba9dd9fdd3...af25f35322c084fe70b68c3baea158afdb2eef56",
+            "head_url": "https://github.com/jguida941/jguida941/commit/af25f35322c084fe70b68c3baea158afdb2eef56",
             "is_private": false
           },
           {
@@ -11267,8 +12375,8 @@
         "status": "partial",
         "complete": false,
         "window_start": "2026-10-18T00:00:00Z",
-        "window_end": "2026-11-16T03:27:05.697061Z",
-        "observed_at": "2026-11-16T03:27:05.697061Z",
+        "window_end": "2026-11-16T04:10:41.764452Z",
+        "observed_at": "2026-11-16T04:10:41.764452Z",
         "timezone": "UTC",
         "current_day_partial": true,
         "default_days": 14,
@@ -11319,8 +12427,8 @@
             "reasons": [
               "incomplete_activity_coverage"
             ],
-            "latest_push": "2026-11-16T03:13:09Z",
-            "observed_pushes": 82,
+            "latest_push": "2026-11-16T03:36:01Z",
+            "observed_pushes": 80,
             "daily": [
               {
                 "date": "2026-10-18",
@@ -11486,9 +12594,9 @@
               },
               {
                 "date": "2026-11-14",
-                "count": 10,
+                "count": 6,
                 "complete": false,
-                "level": 4
+                "level": 2
               },
               {
                 "date": "2026-11-15",
@@ -11498,9 +12606,9 @@
               },
               {
                 "date": "2026-11-16",
-                "count": 5,
+                "count": 7,
                 "complete": false,
-                "level": 2
+                "level": 3
               }
             ],
             "branch_empty_daily": [
@@ -11741,7 +12849,7 @@
                     "date": "2026-11-15",
                     "count": 9,
                     "complete": false,
-                    "level": 3
+                    "level": 4
                   }
                 ],
                 "observed_pushes": 9
@@ -11759,13 +12867,25 @@
                 "observed_pushes": 10
               },
               {
+                "ref": "refs/heads/fix/overall-metric-scopes-20261115",
+                "daily": [
+                  {
+                    "date": "2026-11-16",
+                    "count": 1,
+                    "complete": false,
+                    "level": 1
+                  }
+                ],
+                "observed_pushes": 1
+              },
+              {
                 "ref": "refs/heads/main",
                 "daily": [
                   {
                     "date": "2026-11-14",
-                    "count": 10,
+                    "count": 6,
                     "complete": false,
-                    "level": 4
+                    "level": 2
                   },
                   {
                     "date": "2026-11-15",
@@ -11775,12 +12895,12 @@
                   },
                   {
                     "date": "2026-11-16",
-                    "count": 5,
+                    "count": 6,
                     "complete": false,
                     "level": 2
                   }
                 ],
-                "observed_pushes": 44
+                "observed_pushes": 41
               }
             ]
           },
@@ -11953,7 +13073,7 @@
                 "date": "2026-11-13",
                 "count": 9,
                 "complete": true,
-                "level": 3
+                "level": 4
               },
               {
                 "date": "2026-11-14",
@@ -12258,7 +13378,7 @@
               "incomplete_activity_coverage"
             ],
             "latest_push": "2026-11-15T18:29:22Z",
-            "observed_pushes": 70,
+            "observed_pushes": 68,
             "daily": [
               {
                 "date": "2026-10-18",
@@ -12304,7 +13424,7 @@
               },
               {
                 "date": "2026-10-25",
-                "count": 6,
+                "count": 4,
                 "complete": false,
                 "level": 2
               },
@@ -12665,7 +13785,7 @@
                 "daily": [
                   {
                     "date": "2026-10-25",
-                    "count": 6,
+                    "count": 4,
                     "complete": false,
                     "level": 2
                   },
@@ -12706,7 +13826,7 @@
                     "level": 2
                   }
                 ],
-                "observed_pushes": 49
+                "observed_pushes": 47
               },
               {
                 "ref": "refs/heads/fix/contribution-calendar-20261115",
@@ -15955,11 +17075,11 @@
             },
             {
               "lower": 7,
-              "upper": 9,
+              "upper": 8,
               "level": 3
             },
             {
-              "lower": 10,
+              "lower": 9,
               "upper": 67,
               "level": 4
             }
@@ -15981,17 +17101,17 @@
           "default_visible": 8,
           "reasons": []
         },
-        "observed_pushes": 220
+        "observed_pushes": 216
       }
     }
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-11-16T03:28:12.528011Z",
-    "generator_revision": "2dc4042f1542181c2676299bc7dca6d33e40bb6b",
-    "generator_source_digest": "0577a9a12d200f0ddeec6804db847dc5667832914cf1a18a158e0ba170158588",
-    "claim_input_digest": "4f5fb240bc79f78b6dc0bb59550530d26afd166b6975780ca23ce2477543b505",
-    "render_key": "128b4fb783cc8425b42c28a288626db2f39bb766daef9e086dd1955007646af4",
+    "generated_at": "2026-11-16T04:11:32.312438Z",
+    "generator_revision": "f59697f7e937b4864dfd7abe225da5678c382431",
+    "generator_source_digest": "7a456b09933b36b802d2c28b3ea2d89ea0f91337612673491e66e44ad72cefe2",
+    "claim_input_digest": "9412b42e186376cb82e0f44da50bb1c5f6f02aff156cab9fe8e31314005d7c6f",
+    "render_key": "ad18f76b987f1bae10a600d28f5ffd562c05030d1ba1f5f867e5bcf0c72538f5",
     "schema": "profile-artifact-generation/v1"
   }
 }
