@@ -147,7 +147,7 @@ class PublishedProfileContract(unittest.TestCase):
         partial = {
             "data_scope": {
                 "metric_scopes": {
-                    "ci_coverage_pct": "owned-public-private-nonfork-profile-excluded-partial-observation",
+                    "ci_coverage_pct": "owned-public-private-nonfork-profile-included-partial-observation",
                 },
             },
             "data_quality": {
@@ -751,7 +751,7 @@ class BuilderScorecardContract(unittest.TestCase):
         claim = metric_claim(
             "ci_coverage_pct",
             value=scorecard["ci_coverage_pct"],
-            scope="owned-public-private-nonfork-profile-excluded-exact",
+            scope="owned-public-private-nonfork-profile-included-exact",
             status="exact",
         )
         with tempfile.TemporaryDirectory() as d:
@@ -861,7 +861,7 @@ class LanguageBreakdownContract(unittest.TestCase):
 
 
 class ProfileMetricScopeContract(unittest.TestCase):
-    ALL_OWNED = "owned-public-private-nonfork-profile-excluded-exact"
+    ALL_OWNED = "owned-public-private-nonfork-profile-included-exact"
     PUSH_METRICS = ("active_repos_7d", "days_since_last_push")
     AUTOMATION_METRICS = ("automation_repos", "automation_workflows")
     AUTOMATION_SURFACE_METRICS = AUTOMATION_METRICS + (
@@ -1174,7 +1174,7 @@ class EngineeringCadenceContract(unittest.TestCase):
         claim = metric_claim(
             "ci_coverage_pct",
             value=data["automation_repos"] / eligible * 100.0,
-            scope="owned-public-private-nonfork-profile-excluded-exact",
+            scope="owned-public-private-nonfork-profile-included-exact",
             status="exact",
         )
         with tempfile.TemporaryDirectory() as d:
@@ -1397,6 +1397,41 @@ class WorkflowClaimValidationTests(unittest.TestCase):
                 ):
                     card.write_text(altered)
                     self.assertTrue(validator._ci_coverage_claim_errors(payload))
+
+
+class MetricPeriodDisplayContract(unittest.TestCase):
+    def test_general_release_caption_preserves_its_thirty_day_scope_and_values(self):
+        from datetime import datetime, timedelta, timezone
+        import xml.etree.ElementTree as ET
+        from scripts.pipeline.compute_metrics import _build_pr_and_release_stats, _build_snapshot_dict
+        from scripts.rendering.generate_metrics_general import generate
+
+        now = datetime(2026, 11, 16, 3, tzinfo=timezone.utc)
+        events = [{"type": "ReleaseEvent", "created_at": (now - timedelta(days=age)).isoformat()}
+                  for age in (17, 45)]
+        observed = _build_pr_and_release_stats(events, [], now, allow_network_calls=False)
+        self.assertEqual(1, observed["releases_30d"], "Monthly and annual release populations must differ")
+        for value, shown in ((0, "0"), (observed["releases_30d"], "1"), (7, "7"), (None, "n/a")):
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as directory:
+                snapshot = _build_snapshot_dict(None,
+                    {"public_owned_total": 6, "public_owned_nonfork": 5,
+                     "public_owned_forks": 1, "private_owned": 2},
+                    total_stars=13, lang_count=3, prs_merged=11, releases_30d=value,
+                    ci_count_effective=2, streak_days=4, public_scope_commits=101,
+                    last_year_contributions=907)
+                path = Path(directory) / "general.svg"
+                generate(username="jguida941", snapshot=snapshot, output_path=str(path))
+                texts = ["".join(node.itertext()) for node in ET.fromstring(path.read_text()).iter("{http://www.w3.org/2000/svg}text")]
+                lines = [line for line in texts if "Releases" in line and re.match(r"^\d+ Repositories\b", line)]
+                self.assertEqual(1, len(lines))
+                self.assertIn(f"{shown} Releases", lines[0])
+                self.assertIn("5 Repositories", lines[0])
+                self.assertIn("13 Stargazers", lines[0])
+                self.assertRegex(lines[0].split("Releases", 1)[1], r"\b30\s*days?\b")
+                self.assertNotRegex(lines[0].split("Releases", 1)[1], r"(?i)\b(?:12\s*months?|year)\b")
+                self.assertIn("907", texts)
+                self.assertIn("contributions", texts)
+                self.assertIn("last 12 months", texts)
 
 
 if __name__ == "__main__":

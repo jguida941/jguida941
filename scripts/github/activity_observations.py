@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlparse
 
 import requests
 from scripts.github import github_client as gh
-from scripts.pipeline.profile_helpers import contains_credential_material, is_self_repo
+from scripts.pipeline.profile_helpers import contains_credential_material
 from scripts.pipeline.push_activity import select_recent_pushes, interpret_fast_forward_comparison
 
 
@@ -275,6 +275,151 @@ def _code_history(selected, start, now, context):
     return result
 
 
+_PROFILE_REFRESH_HEADLINES = frozenset((
+    "update canonical profile artifacts",
+    "update analytics & readme",
+))
+
+
+def _profile_update_kind(event, payload, *, has_next_page=False):
+    """Recognize only the complete single-commit update made by our publishers."""
+    from scripts.contracts import PROFILE_ARTIFACT_PATHS
+    from scripts.pipeline.profile_helpers import safe_commit_headline
+    unknown = {"kind": "unknown", "headline": ""}
+    if type(payload) is not dict or payload.get("sha") != event["after"]:
+        return unknown
+    commit = payload.get("commit")
+    message = commit.get("message") if type(commit) is dict else None
+    headline = safe_commit_headline(message, suppress_automation=False)
+    committer = payload.get("committer")
+    login = committer.get("login") if type(committer) is dict else None
+    files, parents = payload.get("files"), payload.get("parents")
+    if (has_next_page or type(files) is not list or not 0 < len(files) < 300
+            or any(type(row) is not dict or type(row.get("filename")) is not str for row in files)):
+        return unknown
+    producer = (login == "github-actions[bot]" and type(message) is str
+                and message.split("\n", 1)[0] in _PROFILE_REFRESH_HEADLINES)
+    generated_only = all(
+        row["filename"] in PROFILE_ARTIFACT_PATHS
+        and ("previous_filename" not in row or row["previous_filename"] in PROFILE_ARTIFACT_PATHS)
+        for row in files)
+    if producer and generated_only:
+        # A final generated commit cannot certify all earlier changes in a push.
+        if (event["activity_type"] != "push" or type(parents) is not list or len(parents) != 1
+                or type(parents[0]) is not dict or parents[0].get("sha") != event["before"]):
+            return unknown
+        return {"kind": "refresh", "headline": ""}
+    return {"kind": "work", "headline": headline}
+
+
+def _profile_recent_work(repositories, histories, now, context):
+    """Choose a recent profile branch update without moving aggregate push facts."""
+    repository = f"{gh.USERNAME}/{gh.USERNAME}"
+    start = now - timedelta(days=7)
+    result = {"schema": "profile-recent-work/v1", "repository": repository,
+              "observed_at": iso(now), "window_start": iso(start), "window_end": iso(now),
+              "status": "unavailable", "complete": False, "outcome": "unknown",
+              "reason": "profile_not_observed", "skipped_refreshes": 0, "event": None}
+    matching = []
+    for raw in repositories:
+        if type(raw) is not dict:
+            continue
+        owner = raw.get("owner")
+        owner = owner.get("login") if type(owner) is dict else None
+        name = gh._branch_repository_name(owner, raw.get("name"))
+        if name and name.casefold() == repository.casefold():
+            matching.append(raw)
+    if not matching:
+        return result
+    history = histories.get(repository)
+    if history is None:
+        history = _rest_history(repository, now, start, context)
+    result["reason"] = history.get("reason", "activity_unavailable")
+    if history.get("selection_valid") is not True:
+        return result
+    # Conflicting IDs cannot establish which event happened.
+    unique = {}
+    for event in history.get("rows", []):
+        if event["id"] in unique and unique[event["id"]] != event:
+            result["reason"] = "conflicting_activity"
+            return result
+        unique[event["id"]] = event
+    events = sorted(
+        (row for row in unique.values()
+         if row["activity_type"] in gh._BRANCH_ACTIVITY_TYPES
+         and start <= timestamp(row["timestamp"]) <= now),
+        key=lambda row: (row["timestamp"], row["id"]), reverse=True)
+    for event in events:
+        response, reason = context.get(
+            f"{gh.API}/repos/{repository}/commits/{event['after']}", {"per_page": 100})
+        payload = None
+        if response is not None:
+            try:
+                payload = response.json()
+            except ValueError:
+                pass
+        classified = _profile_update_kind(
+            event, payload, has_next_page=bool(response is not None and
+                (getattr(response, "links", {}) or {}).get("next")))
+        if classified["kind"] == "refresh":
+            result["skipped_refreshes"] += 1
+            continue
+        complete = history.get("complete") is True and classified["kind"] == "work"
+        result.update(status="ok" if complete else "partial", complete=complete,
+                      outcome="selected", reason="observed_update" if complete else reason if response is None else "update_not_fully_classified",
+                      event={**event, "headline": classified["headline"],
+                             "classification": classified["kind"]})
+        return result
+    if history.get("complete") is True and result["skipped_refreshes"] > 0:
+        result.update(status="ok", complete=True, outcome="refreshes_only",
+                      reason="no_other_recent_update")
+    else:
+        result.update(status="partial", reason="activity_incomplete",
+                      outcome="observed_refreshes_only" if result["skipped_refreshes"] else "unknown")
+    return result
+
+
+def profile_recent_work_projection(observation, *, repository, now, repository_pushed_at=None):
+    """Admit only this collection window's profile selection to the working list."""
+    if type(observation) is not dict or observation.get("schema") != "profile-recent-work/v1":
+        return None
+    start, end, observed = (timestamp(observation.get(key)) for key in
+                            ("window_start", "window_end", "observed_at"))
+    latest_push = timestamp(repository_pushed_at)
+    if (type(observation.get("repository")) is not str
+            or observation["repository"].casefold() != repository.casefold()
+            or repository.casefold() != f"{gh.USERNAME}/{gh.USERNAME}".casefold()
+            or any(value is None for value in (start, end, observed))
+            or start != end - timedelta(days=7) or observed != end
+            or observed > now or observed < now - timedelta(days=7)
+            or (latest_push is not None and latest_push > observed)):
+        return None
+    if observation.get("outcome") == "refreshes_only":
+        if observation.get("status") == "ok" and observation.get("complete") is True:
+            return {"omit": True}
+        return None
+    if observation.get("outcome") == "observed_refreshes_only":
+        if (observation.get("status") == "partial" and observation.get("complete") is False
+                and type(observation.get("skipped_refreshes")) is int
+                and observation["skipped_refreshes"] > 0):
+            return {"omit": True}
+        return None
+    event = observation.get("event")
+    if (observation.get("outcome") != "selected" or type(event) is not dict
+            or observation.get("status") not in {"ok", "partial"}):
+        return None
+    checked = activity_row(event, observation["repository"], end)
+    if (not checked or checked["activity_type"] not in gh._BRANCH_ACTIVITY_TYPES
+            or timestamp(checked["timestamp"]) < start
+            or event.get("classification") not in {"work", "unknown"}):
+        return None
+    from scripts.pipeline.profile_helpers import safe_commit_headline
+    return {"omit": False, "pushed_at": checked["timestamp"],
+            "activity_type": checked["activity_type"],
+            "last_commit_msg": safe_commit_headline(event.get("headline"), suppress_automation=False),
+            "classification": event["classification"]}
+
+
 def collect_activity_observations(public_repos, private_repos, repo_counts, *, observed_at, inventory_fresh=True):
     """Observe at most twenty selected recently pushed owned repositories."""
     now = observed_at.astimezone(timezone.utc)
@@ -291,9 +436,6 @@ def collect_activity_observations(public_repos, private_repos, repo_counts, *, o
             continue
         if raw.get("fork") is True:
             excluded["fork"] += 1
-            continue
-        if is_self_repo(raw.get("name")):
-            excluded["profile"] += 1
             continue
         pushed = timestamp(raw.get("pushed_at"))
         if pushed is None or pushed > now:
@@ -355,7 +497,11 @@ def collect_activity_observations(public_repos, private_repos, repo_counts, *, o
         pushed["diff"] = interpret_fast_forward_comparison(
             comparison, before=pushed["before"], after=pushed["after"],
             has_next_page=bool((getattr(response, "links", {}) or {}).get("next")))
+    profile_work = _profile_recent_work(
+        list(public_repos) + list(private_repos),
+        {row["repository"]: row["activity"] for row in rows}, now, context)
     return {"schema": "profile-activity-observations/v1", "window_start": iso(start), "window_end": iso(now), "observed_at": iso(now),
             "cohort": cohort, "repositories": rows, "code_changes": code, "selection": selection,
             "recent_pushes": recent_pushes,
+            "profile_recent_work": profile_work,
             "requests": {"status": "partial" if context.stopped or context.failed else "ok", "rest_core": context.quota}}

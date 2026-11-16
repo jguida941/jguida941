@@ -24,11 +24,11 @@ FONT = '-apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif'
 # Semantic owners share the vendored Lucide system; numeric facts stay unchanged.
 SEMANTIC_ICONS = {
     "profile.contributions": "calendar",
-    "calendar.total": "calendar", "inventory.public_nonfork": "globe",
+    "calendar.total": "calendar", "inventory.public_total": "globe", "inventory.public_nonfork": "globe",
     "inventory.private_owned": "lock", "inventory.stargazers": "star",
     "inventory.public_forks": "fork", "activity.public_commits": "commit",
     "activity.merged_prs": "pr_merged", "activity.releases_30d": "release",
-    "activity.active_repos_7d": "commit", "language.count": "code",
+    "activity.active_repos_7d": "commit", "activity.working_repos_7d": "commit", "language.count": "code",
     "calendar.current_streak": "fire", "calendar.longest_streak": "fire",
     "calendar.active_days": "calendar", "Weekly contributions": "trend_up",
     "Contribution Rhythm": "calendar", "Language composition": "code",
@@ -41,7 +41,8 @@ SEMANTIC_ICONS = {
 CALENDAR_DISPLAY_LABELS = {"calendar.current_streak":"Current streak", "calendar.longest_streak":"Longest streak", "calendar.active_days":"Active days"}
 
 INVENTORY_DISPLAY_LABELS = {
-    "inventory.public_nonfork": "public repos",
+    "inventory.public_total": "public repos",
+    "inventory.public_nonfork": "non-fork repos",
     "inventory.private_owned": "private repos",
 }
 
@@ -616,7 +617,7 @@ def render_svg(summary, *, mobile=False, generation=None):
     y = c.fact(total,pad,146,content,size=46,fill="panel",framed=False,
                qualify=total["quality"].get("status") not in ("exact","ok"))+12
     c.parts.append('<title>'+escape("Snapshot "+timestamp+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
-    inventory = ("inventory.public_nonfork", "inventory.private_owned", "inventory.stargazers")
+    inventory = ("inventory.public_total", "inventory.private_owned", "inventory.stargazers")
     y = c.fact_grid([fact(key) for key in inventory],pad,y,content,
                     columns=2 if mobile else 3,fill="panel",framed=False,size=29)
     if any(fact(key)["quality"].get("status") not in ("exact", "ok") for key in inventory):
@@ -742,7 +743,7 @@ def render_svg(summary, *, mobile=False, generation=None):
     def working(x, yy, span):
         rows = summary.get("working") or []
         yy = c.wrap("Recently pushed repositories · last 7 days",x,yy,span,size=c.secondary,color="muted")+8
-        counter_bottom = c.fact(fact("activity.active_repos_7d"), x, yy, span if mobile else 126, size=30, qualify=True,framed=False,compact=True)
+        counter_bottom = c.fact(fact("activity.working_repos_7d"), x, yy, span if mobile else 126, size=30, qualify=True,framed=False,compact=True)
         row_x, row_w = (x,span) if mobile else (x+158,span-158)
         row_y = counter_bottom+12 if mobile else yy
         first_y = row_y

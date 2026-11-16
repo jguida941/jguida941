@@ -13,7 +13,7 @@ from scripts.rendering.svg_utils import xml_escape
 AUTOMATION_REPOS_LABEL = "Workflow repos"
 AUTOMATION_FILES_LABEL = "Workflow files"
 AUTOMATION_ADOPTION_LABEL = "Repo adoption"
-AUTOMATION_SCOPE = "Owned public + private nonfork repositories; profile excluded."
+AUTOMATION_SCOPE = "Owned public + private nonfork repositories; profile included."
 AUTOMATION_MEANING = (
     "GitHub workflow configuration at observed default-branch HEAD. "
     "Configuration does not imply successful runs."
@@ -309,6 +309,12 @@ SNAPSHOT_METRICS = [
         "key": "public_scope_commits",
         "label": "Public Repo Commits (Owned Non-Fork)",
         "dashboard_label": "Public Scope Commits",
+        "format": "int_or_na",
+    },
+    {
+        "key": "public_repos_total",
+        "label": "Public Repos (Including Forks)",
+        "dashboard_label": "Public Repos",
         "format": "int_or_na",
     },
     {

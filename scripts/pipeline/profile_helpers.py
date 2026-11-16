@@ -136,15 +136,15 @@ def contains_credential_material(value: str | None) -> bool:
 is_credential_bearing_text = contains_credential_material
 
 
-def safe_commit_headline(message: str | None) -> str:
-    """Return one publishable commit-headline line, or an empty redaction."""
+def safe_commit_headline(message: str | None, *, suppress_automation: bool = True) -> str:
+    """Sanitize one headline; a verified work event may retain producer-like text."""
     if not isinstance(message, str):
         return ""
     headline = message.split("\n", 1)[0].strip()
     contains_headline_credential = contains_credential_material(headline) or any(
         pattern.search(headline) for pattern in _HEADLINE_CREDENTIAL_PATTERNS
     )
-    if is_bot_commit_message(headline) or contains_headline_credential:
+    if (suppress_automation and is_bot_commit_message(headline)) or contains_headline_credential:
         return ""
     return headline
 

@@ -40,7 +40,7 @@ def generate(
     if automation is not None:
         ci_count = automation["combined"]["configured_repos"]
     workflow_lines = [
-        "Workflow: owned public + private nonfork; profile excluded",
+        "Workflow: owned public + private nonfork; profile included",
         display["combined"]["qualification"],
     ]
     width = SVG_WIDTH
@@ -56,7 +56,7 @@ def generate(
     )
 
     secondary = [
-        ("code", fmt_compact(public_nonfork_repos), "public repos"),
+        ("code", fmt_compact(public_nonfork_repos), "nonfork repos"),
         ("fork", fmt_compact(public_forks), "forks"),
         ("lock", fmt_compact(private_owned_repos), "private repos"),
         ("workflow", fmt_compact(ci_count), AUTOMATION_REPOS_LABEL),

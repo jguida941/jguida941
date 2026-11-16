@@ -281,8 +281,7 @@ def qualify_project_activity(rows: Any, *, window_start: str, window_end: str,
         if (type(repository) is not str or not _REPO.fullmatch(repository)
                 or repository.split("/")[1] in {".", ".."}
                 or contains_credential_material(repository)
-                or repository.split("/")[0].casefold() != owner.casefold()
-                or repository.split("/")[1].casefold() == profile_name.casefold()):
+                or repository.split("/")[0].casefold() != owner.casefold()):
             reasons.add("invalid_repository_identity")
             continue
         identity = repository.casefold()
