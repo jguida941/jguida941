@@ -725,7 +725,7 @@ def render_svg(summary, *, mobile=False, generation=None):
     y = c.wrap(f'{combined.get("workflow_files", "n/a")} workflow files',tx,y+6,tw)
     public, private = ad.get("public") or {}, ad.get("private") or {}
     y = c.wrap(f'{public.get("configured_repos","n/a")}/{public.get("eligible_repos","n/a")} public · {private.get("configured_repos","n/a")}/{private.get("eligible_repos","n/a")} private',tx,y+4,tw,size=c.secondary,color="muted")
-    y = c.wrap("Configuration, not run success. Profile repository excluded.",tx,y+3,tw,size=c.secondary,color="muted")
+    y = c.wrap("Configuration, not run success.",tx,y+3,tw,size=c.secondary,color="muted")
     if combined.get("status") not in ("Exact", "Ok"):
         y = c.wrap(combined.get("qualification", "Unavailable"),tx,y+3,tw,size=c.secondary,color="muted")
     y = max(y,inner+2*(radius+16)-5)
