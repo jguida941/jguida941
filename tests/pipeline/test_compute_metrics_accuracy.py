@@ -99,7 +99,8 @@ class ProfileRecentWorkTests(unittest.TestCase):
     """The profile's publishing commits do not outrank actual development."""
 
     def scenario(self, *, change="source", producer="update canonical profile artifacts",
-                 defect=None, profile_owner="jguida941", source_days=0, refresh=True):
+                 defect=None, profile_owner="jguida941", source_days=0, refresh=True,
+                 work_detail=None):
         from scripts.github import github_client as gh
         from scripts.github.activity_observations import collect_activity_observations
         now = datetime.now(timezone.utc).replace(microsecond=0)
@@ -129,7 +130,7 @@ class ProfileRecentWorkTests(unittest.TestCase):
                 headline = "Authorization: Bearer ghp_" + "A" * 36
             committer = "github-actions[bot]" if change == "same_headline" else "jguida941"
             files = ["site/data/profile_snapshot.json"] if change == "manual_artifacts" else ["scripts/pipeline/compute_metrics.py"]
-            events.append({"id": 9, "activity_type": "pr_merge" if change == "source" else "push",
+            events.append({"id": 9, "activity_type": "pr_merge" if change == "source" and work_detail != "empty_merge" else "push",
                            "ref": "refs/heads/development", "before": "d" * 40,
                            "after": "c" * 40, "timestamp": stamp})
             details["c" * 40] = {
@@ -138,6 +139,15 @@ class ProfileRecentWorkTests(unittest.TestCase):
                 "parents": [{"sha": "d" * 40}],
                 "files": [{"filename": path, "status": "modified"} for path in files],
             }
+        if change and work_detail:
+            work = details["c" * 40]
+            if work_detail == "empty_merge":
+                work["files"] = []
+                work["parents"].append({"sha": "e" * 40})
+            elif work_detail == "missing_files":
+                work.pop("files")
+            elif work_detail == "wrong_sha":
+                work["sha"] = "e" * 40
         if defect and refresh:
             damaged = details["a" * 40]
             if defect == "missing_files":
@@ -168,6 +178,8 @@ class ProfileRecentWorkTests(unittest.TestCase):
                 if defect == "request_failed" and oid == "a" * 40:
                     return Response({}, 403)
                 links = {"next": {"url": url + "?page=2"}} if defect == "truncated_files" and oid == "a" * 40 else {}
+                if work_detail == "paginated_files" and oid == "c" * 40:
+                    links = {"next": {"url": url + "?page=2"}}
                 return Response(details[oid], links=links)
             if "/compare/" in url:
                 return Response({}, 404)
@@ -191,6 +203,37 @@ class ProfileRecentWorkTests(unittest.TestCase):
         self.assertEqual(stamps[1], rows[1]["pushed_at"])
         self.assertEqual("Repair source aggregation", rows[1]["last_commit_msg"])
         self.assertEqual(stamps[0], profile["pushed_at"], "The aggregate repository timestamp must remain unchanged")
+
+    def test_empty_human_merge_preserves_commit_details(self):
+        model, profile, observed, _, stamps = self.scenario(work_detail="empty_merge")
+        row = next((row for row in model["dashboard_summary"]["working"]
+                    if row["name"] == "jguida941"), None)
+        self.assertIsNotNone(row, "[PROFILE-RECENT-COMMIT-DETAILS] Human work stays visible")
+        self.assertEqual("Repair source aggregation", row["last_commit_msg"],
+                         "[PROFILE-RECENT-COMMIT-DETAILS] Empty merge lost its commit headline")
+        self.assertEqual(stamps[1], row["pushed_at"],
+                         "[PROFILE-RECENT-COMMIT-DETAILS] Use the human event's time")
+        self.assertEqual("ok", observed["profile_recent_work"]["status"],
+                         "[PROFILE-RECENT-COMMIT-DETAILS] A complete empty diff is valid work")
+        self.assertEqual(stamps[0], profile["pushed_at"])
+
+    def test_incomplete_file_listing_preserves_bound_headline_without_claiming_complete(self):
+        for work_detail in ("missing_files", "paginated_files"):
+            with self.subTest(work_detail=work_detail):
+                model, _, observed, _, stamps = self.scenario(work_detail=work_detail)
+                row = next(row for row in model["dashboard_summary"]["working"]
+                           if row["name"] == "jguida941")
+                self.assertEqual("Repair source aggregation", row["last_commit_msg"],
+                                 "[PROFILE-RECENT-COMMIT-DETAILS] Bound metadata survives unknown classification")
+                self.assertEqual(stamps[1], row["pushed_at"])
+                self.assertEqual("partial", observed["profile_recent_work"]["status"])
+
+    def test_mismatched_commit_cannot_supply_a_headline(self):
+        model, _, observed, _, _ = self.scenario(work_detail="wrong_sha")
+        row = next(row for row in model["dashboard_summary"]["working"]
+                   if row["name"] == "jguida941")
+        self.assertEqual("recent push detected", row["last_commit_msg"])
+        self.assertEqual("unknown", observed["profile_recent_work"]["event"]["classification"])
 
     def test_ordinary_repository_control(self):
         model, _, _, _, stamps = self.scenario()
