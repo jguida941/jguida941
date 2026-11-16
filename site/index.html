@@ -516,8 +516,8 @@ footer a { color: var(--ink); text-decoration: none; }
         </div>
         <div class="stats">
           <div class="stat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg><div class="v num" data-calendar-fact="calendar.active_days">n/a</div><div class="l">Active days</div></div>
-          <div class="stat"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><div class="v num" data-bind="snapshot.total_repos">—</div><div class="l">Public repos</div></div>
-          <div class="stat"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">Stars</div></div>
+          <div class="stat"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg><div class="v num" data-inventory-fact="inventory.public_total">—</div><div class="l">Public repos</div></div>
+          <div class="stat"><svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">Stargazers</div></div>
         </div>
       </div>
     </div>
@@ -527,7 +527,7 @@ footer a { color: var(--ink); text-decoration: none; }
     </div>
   </header>
   <section class="panel" id="automation" tabindex="-1">
-    <div class="section-head"><div><p class="eyebrow">GitHub Signals · 12 Months</p><h2 class="title">Builder Scorecard</h2></div></div>
+    <div class="section-head"><div><p class="eyebrow">GitHub Signals</p><h2 class="title">Builder Scorecard</h2></div></div>
     <hr class="hairline">
     <div class="ring-row" style="margin-bottom:14px">
       <div class="ring" id="ci-ring"><span class="num" data-bind="automation_display.combined.adoption">—</span></div>
@@ -544,7 +544,7 @@ footer a { color: var(--ink); text-decoration: none; }
     <p class="ms" data-bind="automation_display.combined.qualification">Workflow observation unavailable</p>
     <details>
       <summary class="mt">Workflow configuration breakdown</summary>
-      <p class="ms">Owned public + private nonfork repositories; profile excluded. GitHub workflow configuration at observed default-branch HEAD. Configuration does not imply successful runs.</p>
+      <p class="ms">Owned public + private nonfork repositories; profile included. GitHub workflow configuration at observed default-branch HEAD. Configuration does not imply successful runs.</p>
       <h3 class="mt">Public</h3><div class="mgroup"><div class="mrow"><span class="ms">Configured repositories</span><span class="num" data-bind="automation_display.public.configured_repos">n/a</span></div><div class="mrow"><span class="ms">Eligible repositories</span><span class="num" data-bind="automation_display.public.eligible_repos">n/a</span></div><div class="mrow"><span class="ms">Workflow files</span><span class="num" data-bind="automation_display.public.workflow_files">n/a</span></div><div class="mrow"><span class="ms">Unknown workflow observations</span><span class="num" data-bind="automation_display.public.unknown_workflow_repos">n/a</span></div><div class="mrow"><span class="ms">Observation status</span><span class="num" data-bind="automation_display.public.status">n/a</span></div></div><p class="ms" data-bind="automation_display.public.qualification">Workflow observation unavailable</p><h3 class="mt">Private</h3><div class="mgroup"><div class="mrow"><span class="ms">Configured repositories</span><span class="num" data-bind="automation_display.private.configured_repos">n/a</span></div><div class="mrow"><span class="ms">Eligible repositories</span><span class="num" data-bind="automation_display.private.eligible_repos">n/a</span></div><div class="mrow"><span class="ms">Workflow files</span><span class="num" data-bind="automation_display.private.workflow_files">n/a</span></div><div class="mrow"><span class="ms">Unknown workflow observations</span><span class="num" data-bind="automation_display.private.unknown_workflow_repos">n/a</span></div><div class="mrow"><span class="ms">Observation status</span><span class="num" data-bind="automation_display.private.status">n/a</span></div></div><p class="ms" data-bind="automation_display.private.qualification">Workflow observation unavailable</p><h3 class="mt">Combined</h3><div class="mgroup"><div class="mrow"><span class="ms">Configured repositories</span><span class="num" data-bind="automation_display.combined.configured_repos">n/a</span></div><div class="mrow"><span class="ms">Eligible repositories</span><span class="num" data-bind="automation_display.combined.eligible_repos">n/a</span></div><div class="mrow"><span class="ms">Workflow files</span><span class="num" data-bind="automation_display.combined.workflow_files">n/a</span></div><div class="mrow"><span class="ms">Unknown workflow observations</span><span class="num" data-bind="automation_display.combined.unknown_workflow_repos">n/a</span></div><div class="mrow"><span class="ms">Observation status</span><span class="num" data-bind="automation_display.combined.status">n/a</span></div></div><p class="ms" data-bind="automation_display.combined.qualification">Workflow observation unavailable</p>
     </details>
   </section>
@@ -1079,8 +1079,8 @@ footer a { color: var(--ink); text-decoration: none; }
       return `<div class="lane"><h4>${label}</h4>${body}</div>`;
     }).join("");
     // snapshot tiles (deduped: contributions is the hero, not repeated here)
-    const TILE = {public_scope_commits:"Commits", total_repos:"Public Repos", private_owned_repos:"Private",
-      total_stars:"Stars", prs_merged:"PRs Merged", ci_repos:"Workflow repos"};
+    const TILE = {public_scope_commits:"Commits", public_repos_total:"Public Repos", private_owned_repos:"Private",
+      total_stars:"Stargazers", prs_merged:"PRs Merged", ci_repos:"Workflow repos"};
     const rows = (d.snapshot_rows || []).filter(r => TILE[r.key]);
     document.getElementById("snap-tiles").innerHTML = rows.slice(0, 6).map(r =>
       `<div class="mrow"><span class="ml"><span class="mt">${esc(TILE[r.key])}</span>${r.key==="ci_repos"?`<span class="ms">${esc(get(d,"automation_display.combined.qualification")||"Workflow observation unavailable")}</span>`:""}</span><span class="mv num">${esc(r.display_value)}</span></div>`).join("");
@@ -1098,6 +1098,11 @@ footer a { color: var(--ink); text-decoration: none; }
     const selectedCalendar = d.dashboard_summary;
     const cal = selectedCalendar?.calendar;
     const calendarFacts = Array.isArray(selectedCalendar?.facts) ? selectedCalendar.facts : [];
+    document.querySelectorAll("[data-inventory-fact]").forEach(el => {
+      const fact = calendarFacts.find(row => row.metric_id === el.getAttribute("data-inventory-fact"));
+      el.textContent = Number.isSafeInteger(fact?.value) && fact.value >= 0 && fact?.quality?.status !== "unavailable"
+        ? fact.value.toLocaleString("en-US") : "n/a";
+    });
     const totalFact = calendarFacts.find(row => row.metric_id === "calendar.total");
     const calendarAvailable = ["exact", "unknown"].includes(cal?.status) &&
       Array.isArray(cal?.days) && cal.days.length > 0 &&

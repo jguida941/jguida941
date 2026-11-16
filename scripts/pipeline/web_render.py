@@ -358,8 +358,8 @@ def _hero() -> str:
         </div>
         <div class="stats">
           <div class="stat">{_svg_icon(LUCIDE['calendar_check'])}<div class="v num" data-calendar-fact="calendar.active_days">n/a</div><div class="l">Active days</div></div>
-          <div class="stat">{_svg_icon(LUCIDE['globe'])}<div class="v num" data-bind="snapshot.total_repos">—</div><div class="l">Public repos</div></div>
-          <div class="stat">{_svg_icon(LUCIDE['star'])}<div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">Stars</div></div>
+          <div class="stat">{_svg_icon(LUCIDE['globe'])}<div class="v num" data-inventory-fact="inventory.public_total">—</div><div class="l">Public repos</div></div>
+          <div class="stat">{_svg_icon(LUCIDE['star'])}<div class="v num" data-bind="snapshot.total_stars">—</div><div class="l">Stargazers</div></div>
         </div>
       </div>
     </div>
@@ -391,7 +391,7 @@ def _workflow_breakdown() -> str:
 def _scorecard() -> str:
     return f"""
   <section class="panel" id="automation" tabindex="-1">
-    <div class="section-head"><div><p class="eyebrow">GitHub Signals · 12 Months</p><h2 class="title">Builder Scorecard</h2></div></div>
+    <div class="section-head"><div><p class="eyebrow">GitHub Signals</p><h2 class="title">Builder Scorecard</h2></div></div>
     <hr class="hairline">
     <div class="ring-row" style="margin-bottom:14px">
       <div class="ring" id="ci-ring"><span class="num" data-bind="automation_display.combined.adoption">—</span></div>
@@ -1035,8 +1035,8 @@ def _script() -> str:
       return `<div class="lane"><h4>${label}</h4>${body}</div>`;
     }).join("");
     // snapshot tiles (deduped: contributions is the hero, not repeated here)
-    const TILE = {public_scope_commits:"Commits", total_repos:"Public Repos", private_owned_repos:"Private",
-      total_stars:"Stars", prs_merged:"PRs Merged", ci_repos:"Workflow repos"};
+    const TILE = {public_scope_commits:"Commits", public_repos_total:"Public Repos", private_owned_repos:"Private",
+      total_stars:"Stargazers", prs_merged:"PRs Merged", ci_repos:"Workflow repos"};
     const rows = (d.snapshot_rows || []).filter(r => TILE[r.key]);
     document.getElementById("snap-tiles").innerHTML = rows.slice(0, 6).map(r =>
       `<div class="mrow"><span class="ml"><span class="mt">${esc(TILE[r.key])}</span>${r.key==="ci_repos"?`<span class="ms">${esc(get(d,"automation_display.combined.qualification")||"Workflow observation unavailable")}</span>`:""}</span><span class="mv num">${esc(r.display_value)}</span></div>`).join("");
@@ -1054,6 +1054,11 @@ def _script() -> str:
     const selectedCalendar = d.dashboard_summary;
     const cal = selectedCalendar?.calendar;
     const calendarFacts = Array.isArray(selectedCalendar?.facts) ? selectedCalendar.facts : [];
+    document.querySelectorAll("[data-inventory-fact]").forEach(el => {
+      const fact = calendarFacts.find(row => row.metric_id === el.getAttribute("data-inventory-fact"));
+      el.textContent = Number.isSafeInteger(fact?.value) && fact.value >= 0 && fact?.quality?.status !== "unavailable"
+        ? fact.value.toLocaleString("en-US") : "n/a";
+    });
     const totalFact = calendarFacts.find(row => row.metric_id === "calendar.total");
     const calendarAvailable = ["exact", "unknown"].includes(cal?.status) &&
       Array.isArray(cal?.days) && cal.days.length > 0 &&

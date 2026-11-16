@@ -178,15 +178,18 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
     activity_observed_at = datetime.now(timezone.utc)
     try:
         activity_repos = gh.get_repos(include_forks=False, fresh=True)
+        activity_all_public = gh.get_repos(include_forks=True, fresh=True)
         activity_private = gh.get_private_repos(fresh=True)
         activity_counts = gh.get_owned_repo_scope_counts(fresh=True)
         inventory_fresh = True
     except (RuntimeError, ValueError):
         activity_repos, activity_private, activity_counts = repos, private_repos, repo_counts
+        activity_all_public = all_repos
         inventory_fresh = False
     inventory_evidence = {
         "fresh": inventory_fresh, "observed_at": datetime.now(timezone.utc).isoformat(),
         "counts": dict(activity_counts), "public_repos": activity_repos,
+        "all_public_repos": activity_all_public,
         "personal_public_complete": True,
     }
     activity_observations = collect_activity_observations(

@@ -164,6 +164,8 @@ def generate_assets(
 ) -> None:
     public_rows = _public_dashboard_data({key: model[key]
                                           for key in ("recent_repos", "spotlight_data", "focus")})
+    public_rows["working_repos"] = _public_dashboard_data({
+        "rows": model.get("working_repos", model["recent_repos"])})["rows"]
     logger("\n[8/8] Generating SVGs...")
     primary_language = _primary_language(model)
     ci_claim = _ci_coverage_claim(model)
@@ -188,7 +190,7 @@ def generate_assets(
     )
     logger("  -> assets/lang_breakdown.svg")
 
-    gen_working(public_rows["recent_repos"])
+    gen_working(public_rows["working_repos"])
     logger("  -> assets/currently_working.svg")
 
     gen_heatmap(model.get("contribution_rhythm"))

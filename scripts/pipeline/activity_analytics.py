@@ -11,7 +11,7 @@ def _status(complete, observed):
 
 _PROJECT_MEANING = (
     "Observed branch pushes · UTC. Repository activity from all actors represented in the "
-    "received branch feed; owned public and private nonfork repositories, profile excluded. "
+    "received branch feed; owned public and private nonfork repositories. "
     "Counts are unique observed push events, not commits, contributions, or line changes."
 )
 

@@ -67,7 +67,7 @@ class WebDashboardContract(unittest.TestCase):
         """The web reads the SAME shared-snapshot keys the README SVG cards do."""
         required = (
             "profile.contributions", "calendar.total",  # independent native headline and calendar
-            "total_repos", "total_stars", "public_scope_commits",
+            "inventory.public_total", "total_stars", "public_scope_commits",
             "ci_coverage_pct", "primary_lang_share_pct", "calendar.active_days",
         )
         missing = [k for k in required if k not in self.html]
@@ -1050,7 +1050,7 @@ def _hydrate_profile_headline(summary):
             attributes = dict(attrs)
             within = attributes.get("id") == "overview" or any(row[2] for row in self.stack)
             self.stack.append((tag, attributes, within))
-            if attributes.get("id") or attributes.get("data-bind") or attributes.get("data-calendar-fact"):
+            if attributes.get("id") or attributes.get("data-bind") or attributes.get("data-calendar-fact") or attributes.get("data-inventory-fact"):
                 self.rows.append({"attrs": attributes, "within": within})
         def handle_endtag(self, tag):
             for i in range(len(self.stack)-1, -1, -1):
@@ -1085,6 +1085,7 @@ const ctx={document:doc,location:{hash:'',search:''},localStorage:{getItem(){ret
 vm.runInNewContext(input.script+'\nhydrate(sample);',ctx,{timeout:5000});
 const hero=elements.find(e=>(e.attrs.class||'').split(' ').includes('kpi-value'));
 process.stdout.write(JSON.stringify({value:hero.textContent,
+  public_repos:elements.find(e=>e.attrs['data-inventory-fact']==='inventory.public_total')?.textContent,
   painted:elements.filter(e=>e.within&&!e.hidden).map(e=>e.textContent+' '+e.innerHTML).join(' '),
   window:doc.getElementById('hero-contribution-window').textContent,
   updated:doc.getElementById('updated').textContent,
@@ -1101,6 +1102,19 @@ process.stdout.write(JSON.stringify({value:hero.textContent,
     return shown
 
 class GithubProfileHeadlineTests(unittest.TestCase):
+    def test_public_repository_headline_and_svg_use_the_same_including_forks_fact(self):
+        import xml.etree.ElementTree as ET
+        from tests.contracts.test_dashboard_summary import inventory_fixture_model
+        from scripts.rendering.generate_dashboard_summary import render_svg
+        for mode, expected in (("complete", "4"), ("fresh-change", "5"), ("fork-only", "1")):
+            with self.subTest(mode=mode):
+                summary = inventory_fixture_model(mode)["dashboard_summary"]
+                self.assertEqual(expected, _hydrate_profile_headline(summary)["public_repos"])
+                for mobile in (False, True):
+                    root = ET.fromstring(render_svg(summary, mobile=mobile))
+                    row = next(node for node in root.iter() if node.get("data-metric-id") == "inventory.public_total")
+                    self.assertEqual(expected, next(node.text for node in row.iter() if node.get("data-role") == "value"))
+
     def test_default_total_is_selected_separately_from_calendar_sum(self):
         model, rolling_total = _profile_headline_model()
         summary = model["dashboard_summary"]
@@ -1251,3 +1265,30 @@ class ActivityOverviewLayoutTests(unittest.TestCase):
         links=[row for row in parser.rows if row[0]=="a" and inside(row,"hero-footer")]
         self.assertEqual(["https://github.com/jguida941"],[row[1].get("href") for row in links])
         self.assertFalse(rows("contribution-details"))
+
+
+class ScorecardPeriodContract(unittest.TestCase):
+    def test_mixed_period_scorecard_preserves_specific_windows_without_a_universal_heading(self):
+        from html import unescape
+        from scripts.pipeline.web_render import render_dashboard
+        from scripts.rendering.design_tokens import THEMES
+
+        for theme in THEMES:
+            with self.subTest(theme=theme):
+                html = render_dashboard(default_theme=theme)
+                section = re.search(r'<section\b[^>]*\bid="automation"[^>]*>(.*?)</section>', html, re.S)
+                self.assertIsNotNone(section)
+                body = section.group(1)
+                heading = re.search(r'<p class="eyebrow">(.*?)</p>', body, re.S)
+                self.assertIsNotNone(heading)
+                text = " ".join(unescape(re.sub(r"<[^>]+>", " ", heading.group(1))).split())
+                self.assertTrue(text)
+                self.assertNotRegex(text, r"(?i)\b(?:\d+\s+(?:days?|weeks?|months?|years?)|(?:past|last)\s+year)\b",
+                                    "Mixed-period metrics cannot share a universal period claim")
+                rows = re.findall(r'<div class="mrow">(.*?)</div>', body.split("<details>", 1)[0], re.S)
+                for binding, period in (("scorecard.active_repos_7d", "last 7 days"),
+                                        ("scorecard.releases_30d", "last 30 days"),
+                                        ("automation_display.combined.workflow_files", "observed default-branch HEAD")):
+                    selected = [row for row in rows if f'data-bind="{binding}"' in row]
+                    self.assertEqual(1, len(selected))
+                    self.assertIn(period, selected[0])
