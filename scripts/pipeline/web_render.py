@@ -447,7 +447,7 @@ def _languages() -> str:
 def _calendar() -> str:
     return """
   <section class="panel" id="calendar-panel" tabindex="-1">
-    <div class="section-head"><div><p class="eyebrow">Observed UTC Dates</p><h2 class="title">Contribution Calendar</h2></div><span class="section-meta" id="cal-total">n/a</span></div>
+    <div class="section-head"><div><p class="eyebrow">GitHub Activity</p><h2 class="title">Contribution Calendar</h2></div><span class="section-meta" id="cal-total">n/a</span></div>
     <hr class="hairline">
     <p id="calendar-status" role="status">Loading contribution calendar…</p>
     <div class="cal-wrap"><div class="cal" id="cal"></div></div>
@@ -1117,7 +1117,7 @@ def _script() -> str:
       drawing += points.map((p,i)=>`<circle cx="${xy[i][0]}" cy="${xy[i][1]}" r="4" fill="var(--accent)"><title>${esc(p.observed_start)} to ${esc(p.observed_end)}: ${esc(p.contributions)} contributions${p.partial?" (partial)":""}</title></circle>`).join("");
       drawing += [...new Set([0,Math.floor(points.length/2),points.length-1])].map(i=>`<text x="${xy[i][0]}" y="224" text-anchor="${i===0?"start":i===points.length-1?"end":"middle"}">${esc(points[i].observed_start.slice(5))}</text>`).join("");
       document.getElementById("weekly-chart").innerHTML = `<svg viewBox="0 0 800 240" role="img" aria-label="Weekly contributions; exact values in the table below">${drawing}</svg>`;
-      document.getElementById("weekly-table").innerHTML = `<table><thead><tr><th>Observed UTC dates</th><th>Contributions</th><th>Week</th></tr></thead><tbody>${points.map(p=>`<tr><td>${esc(p.observed_start)} – ${esc(p.observed_end)}</td><td>${p.contributions.toLocaleString("en-US")}</td><td>${p.partial?"Partial":"Complete"}</td></tr>`).join("")}</tbody></table>`;
+      document.getElementById("weekly-table").innerHTML = `<table><thead><tr><th>GitHub calendar dates</th><th>Contributions</th><th>Week</th></tr></thead><tbody>${points.map(p=>`<tr><td>${esc(p.observed_start)} – ${esc(p.observed_end)}</td><td>${p.contributions.toLocaleString("en-US")}</td><td>${p.partial?"Partial":"Complete"}</td></tr>`).join("")}</tbody></table>`;
     } else {
       document.getElementById("weekly-chart").replaceChildren();
       document.getElementById("weekly-table").replaceChildren();
