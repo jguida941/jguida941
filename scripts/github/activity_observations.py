@@ -291,10 +291,12 @@ def _profile_update_kind(event, payload, *, has_next_page=False):
     commit = payload.get("commit")
     message = commit.get("message") if type(commit) is dict else None
     headline = safe_commit_headline(message, suppress_automation=False)
+    # Commit identity binds its headline independently of diff completeness.
+    unknown = {"kind": "unknown", "headline": headline}
     committer = payload.get("committer")
     login = committer.get("login") if type(committer) is dict else None
     files, parents = payload.get("files"), payload.get("parents")
-    if (has_next_page or type(files) is not list or not 0 < len(files) < 300
+    if (has_next_page or type(files) is not list or len(files) >= 300
             or any(type(row) is not dict or type(row.get("filename")) is not str for row in files)):
         return unknown
     producer = (login == "github-actions[bot]" and type(message) is str
@@ -304,8 +306,9 @@ def _profile_update_kind(event, payload, *, has_next_page=False):
         and ("previous_filename" not in row or row["previous_filename"] in PROFILE_ARTIFACT_PATHS)
         for row in files)
     if producer and generated_only:
-        # A final generated commit cannot certify all earlier changes in a push.
-        if (event["activity_type"] != "push" or type(parents) is not list or len(parents) != 1
+        # An empty diff proves no artifact refresh; a generated tip cannot
+        # certify all earlier changes in a multi-commit push.
+        if (not files or event["activity_type"] != "push" or type(parents) is not list or len(parents) != 1
                 or type(parents[0]) is not dict or parents[0].get("sha") != event["before"]):
             return unknown
         return {"kind": "refresh", "headline": ""}
