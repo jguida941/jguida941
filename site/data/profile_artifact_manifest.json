@@ -1,6 +1,6 @@
 {
-  "artifact_set_digest": "83e3977a7680ac1efb637729aa07b9bf175b2d4d7888b59b60c9a2dd2fd3235f",
-  "claim_input_digest": "71ccdc5014cb5453b13b1544c529b33165648c17c15def954a71f86cb361c846",
+  "artifact_set_digest": "387ee9167c31047200bca5627e8ae52bfa46dfa19d1bdad0415706bf1e339bb0",
+  "claim_input_digest": "9e95dd25d0773f5adccda7466e431303e949b3ea7eb59651d911245b7b881ef1",
   "execution_identity": {
     "packages": {
       "jinja2": "3.1.6",
@@ -12,14 +12,14 @@
   },
   "files": [
     {
-      "byte_length": 21825,
+      "byte_length": 21886,
       "path": "README.md",
-      "sha256": "c9a21621df7fcfafd414afebd3c7e3224134c9b4d0b4883e25c317a480ead725"
+      "sha256": "bc1fa1b80c82fbae741a39782faaf32d1b17641394d991c5fcfc6b6bd6c6bf24"
     },
     {
       "byte_length": 7616,
       "path": "assets/activity_heatmap.svg",
-      "sha256": "982c5b11a3c39ae2c06b245bf30e3c4b000b97b902ba4188d695b501cb02e44c"
+      "sha256": "e575a842bbfe84333682e66fe6241c0dfa4525ba380e8461dde599aaeccb4d88"
     },
     {
       "byte_length": 7755,
@@ -29,7 +29,7 @@
     {
       "byte_length": 10725,
       "path": "assets/builder_scorecard.svg",
-      "sha256": "b3c46fe4abf70777517d56119d0710b245f2c4ea6b33ecda10bf178f9e7bf72e"
+      "sha256": "852c65b73850b4d8db3675e754fcf15a7d0f0fae0130e088406da1e11c98bd51"
     },
     {
       "byte_length": 77973,
@@ -39,22 +39,22 @@
     {
       "byte_length": 12357,
       "path": "assets/currently_working.svg",
-      "sha256": "2f8f3aeeaa2983be2990296796ec66cb453a3a7ca76894ca1a176b17e152db3e"
+      "sha256": "fec744a5ef97a3f956ce96476e1912fada86b7e0a88ad6bbdf960a6a2aebacba"
     },
     {
-      "byte_length": 234403,
+      "byte_length": 232216,
       "path": "assets/dashboard_summary.svg",
-      "sha256": "5c25697cb6e65dd0fc3d87f5246098664ad307c4af7861b53c5f94079f76fe9f"
+      "sha256": "edef5bafad89cdc8cca7ebb40b0edd8c7e7c9e3add5fcade6b32401af02bc984"
     },
     {
-      "byte_length": 226760,
+      "byte_length": 225453,
       "path": "assets/dashboard_summary_mobile.svg",
-      "sha256": "6f94c8ec9d35d649106b1bcd2f9b7e1e09eb05bbbc50880035656499d0061df7"
+      "sha256": "1140688c4199e8e3e7e89ac2fb14519c77a795692ae05719e8ab26a428221053"
     },
     {
       "byte_length": 14439,
       "path": "assets/engineering_cadence.svg",
-      "sha256": "a027e7cca2c49d93faaed34b24b6a021fc04f705b1df1751338bb96815b3f8be"
+      "sha256": "6471f029c753941d9a6215dce6a031447cb454b58f1d9bf7c20187385b61fe77"
     },
     {
       "byte_length": 7573,
@@ -69,7 +69,7 @@
     {
       "byte_length": 13294,
       "path": "assets/raw_snapshot.svg",
-      "sha256": "ebbf61211d155c430be711884063f652b561819e5d89f9e02b3c2bdeee0f0deb"
+      "sha256": "568e2177323618a89b8482d8d28ad4d939ddb6b6fcadf961759c0206d6d4c8c5"
     },
     {
       "byte_length": 10081,
@@ -84,16 +84,16 @@
     {
       "byte_length": 10990,
       "path": "metrics.general.svg",
-      "sha256": "4c7a5ee8edae06a1a7e77502e9ecdfb9d8b062903dfbf9d0d694577cab370e1f"
+      "sha256": "e13d00fce86f34171464c756e2c387fb789f4fd97f9e9e73b3a63e341844d05a"
     },
     {
-      "byte_length": 374797,
+      "byte_length": 374802,
       "path": "site/data/profile_snapshot.json",
-      "sha256": "893fb5a4d043fd9e7c11d9329153a657061a0bda844a9de44a85d26ad0aab7b2"
+      "sha256": "3b364ed54c62708942f80ecb351fca7be06e12b2657922946213edf92601f009"
     }
   ],
-  "generated_at": "2026-11-18T18:03:05.923508Z",
-  "generator_revision": "c89af89938208f4c08487de67e7a0becd1e276ca",
+  "generated_at": "2026-11-18T19:03:03.752065Z",
+  "generator_revision": "555fd21122f3664ae8f7120960a2394db0c83996",
   "generator_source_digest": "bcd1d753dd9568acf67868d57181a42ffc5b78fe6221824efc996de85a90c6c5",
   "render_config": {
     "activity_timezone": "America/New_York",
@@ -101,7 +101,7 @@
     "source_kind": "github-api",
     "username": "jguida941"
   },
-  "render_key": "03ce30f5e526602e08cdd34a319544dd6aacdf3be049d8732a3abff875692bd0",
+  "render_key": "89150e3729fb040500dc8a420e9e85641efffae665c10fdba0e967a08bd4836e",
   "schema": "profile-artifact-manifest/v1",
   "source_kind": "github-api"
 }
