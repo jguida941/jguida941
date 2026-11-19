@@ -16,7 +16,7 @@ from scripts.contracts.dashboard_summary import summary_facts
 from scripts.contracts import profile_timezone_name
 from scripts.core.config import (CONTRIB_EMPTY, CONTRIB_RAMP, DASHBOARD_SUMMARY_COLORS,
                                  DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH, GREEN, RED, YELLOW,
-                                 PROJECT_ACTIVITY_COLORS)
+                                 PROJECT_ACTIVITY_COLORS, SPACE, TYPE_SCALE)
 from scripts.rendering.components import donut_gauge
 from scripts.rendering.icons import render as icon
 from scripts.rendering.svg_utils import lang_color, truncate
@@ -741,6 +741,11 @@ def _ci_empty_label(row):
 def _ci_timeline(c, x, y, span, data):
     """Repository lanes retain the existing time-axis/shape visual language."""
     sample = ci_weekly_projection(data)
+    caption_size, caption_weight = TYPE_SCALE["caption"]
+    marker_radius = SPACE["sm"]
+    # Each outcome keeps its fixed slot: filled mark, neutral caption, then clearance.
+    outcome_step = marker_radius * 2 + caption_size + SPACE["xs"] * 2
+    track_height = len(CI_WEEK_GROUPS) * outcome_step
     c.group(data_role="ci-timeline-chart", data_status=sample["status"])
     if not sample["weeks"]:
         y = c.wrap("Workflow history unavailable", x, y, span, size=c.secondary, color="muted")
@@ -792,8 +797,8 @@ def _ci_timeline(c, x, y, span, data):
                 c.parts.append(icon("lock", x, name_end-2, size=13, color=COLORS["muted"]))
                 c.text("private", x+19, name_end+9, size=12, color="muted")
                 name_end += 22
-            top = name_end + 7 if c.mobile else y
-            c.line(plot_x, top+41, plot_x+plot_width, top+41, stroke_opacity=.45)
+            top = name_end + SPACE["sm"] if c.mobile else y
+            c.line(plot_x, top+track_height/2, plot_x+plot_width, top+track_height/2, stroke_opacity=.45)
             for column, descriptor in enumerate(track):
                 week = row["weeks"][descriptor["index"]]
                 xx = plot_x + (column+.5) * plot_width/len(track)
@@ -807,18 +812,21 @@ def _ci_timeline(c, x, y, span, data):
                 for i, group in enumerate(CI_WEEK_GROUPS):
                     if not week[group]:
                         continue
-                    cy = top + 10 + i*21
-                    c.parts.append(_ci_status_symbol(states[group], xx, cy, 9, colors[group], role="ci-outcome-group", title=f'{title} · {labels[group]} {week[group]}', data_group=group, data_count=week[group]))
-                    c.text(week[group], xx, cy+3.5, size=9 if week[group] < 100 else 7, color="surface", anchor="middle", weight=700, data_role="ci-count")
+                    cy = top + marker_radius + i * outcome_step
+                    c.parts.append(_ci_status_symbol(states[group], xx, cy, marker_radius, colors[group], role="ci-outcome-group", title=f'{title} · {labels[group]} {week[group]}', data_group=group, data_count=week[group]))
+                    c.text(week[group], xx, cy+marker_radius+SPACE["xs"]+caption_size,
+                           size=caption_size, color="text", anchor="middle",
+                           weight=caption_weight, data_role="ci-count")
                 for run in week["runs"]:
                     c.group(data_role="ci-run-detail", data_repository=row["repository"], data_run_id=run["run_id"], data_created_at=run["created_at"], data_outcome=run["outcome"])
                     c.parts.append('<title>'+escape(f'{row["repository"]} · {run["workflow"]} · {run["created_at"]} · {run["outcome"]} · {run["url"]}')+'</title>')
                     c.end()
                 c.end()
             if not row["observed_runs"]:
-                c.text(_ci_empty_label(row), plot_x+4, top+29, size=12, color="muted", data_role="ci-empty-state")
-            y = max(top+91, name_end+15)
-            c.line(x, y-4, x+span, y-4, stroke_opacity=.24)
+                c.text(_ci_empty_label(row), plot_x+SPACE["xs"], top+track_height/2-SPACE["md"],
+                       size=caption_size, color="muted", data_role="ci-empty-state")
+            y = max(top+track_height+SPACE["sm"], name_end+SPACE["lg"])
+            c.line(x, y-SPACE["xs"], x+span, y-SPACE["xs"], stroke_opacity=.24)
             c.end()
     count = sample["observed_runs"]
     footer = f"{count} sampled runs" if count is not None else "Run count unavailable"

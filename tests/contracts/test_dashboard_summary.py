@@ -1236,6 +1236,59 @@ def _weekly_ci_fixture():
 
 
 class CIWeeklyProjectionTests(unittest.TestCase):
+    def test_weekly_count_captions_clear_shapes_at_both_sizes(self):
+        from scripts.core.config import DASHBOARD_SUMMARY_COLORS, SPACE, TYPE_SCALE
+        from tests.contracts.test_theme_system import _contrast
+        caption_size, caption_weight = TYPE_SCALE['caption']
+        sample = _weekly_ci_fixture()
+        sample['repositories'] = [{
+            'repository': 'example/count-legibility', 'status': 'available',
+            'runs': [
+                {'run_id': index + 1, 'created_at': sample['window_end'],
+                 'workflow': 'CI', 'outcome': outcome}
+                for index, outcome in enumerate(['success'] * 100 + ['failure', 'queued', 'cancelled'])
+            ],
+        }]
+        self.assertGreaterEqual(caption_size, 12)
+        self.assertGreaterEqual(_contrast(DASHBOARD_SUMMARY_COLORS['text'],
+                                         DASHBOARD_SUMMARY_COLORS['panel']), 4.5)
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root = ET.fromstring(render_svg({'ci_timeline': sample}, mobile=mobile))
+                week = next(n for n in root.iter()
+                            if n.get('data-role') == 'ci-week' and n.get('data-count') == '103')
+                marks = [n for n in week if n.get('data-role') == 'ci-outcome-group']
+                counts = [n for n in week if n.get('data-role') == 'ci-count']
+                self.assertEqual(['100', '1', '1', '1'], [n.text for n in counts])
+                self.assertEqual({'circle', 'square', 'triangle', 'diamond'},
+                                 {n.get('data-shape') for n in marks})
+                previous_caption_bottom = None
+                for mark, count in zip(marks, counts):
+                    self.assertEqual(caption_size, float(count.get('font-size')))
+                    self.assertEqual(caption_weight, int(count.get('font-weight')))
+                    self.assertEqual(DASHBOARD_SUMMARY_COLORS['text'], count.get('fill'))
+                    if mark.tag.endswith('circle'):
+                        top = float(mark.get('cy')) - float(mark.get('r'))
+                        bottom = float(mark.get('cy')) + float(mark.get('r'))
+                    elif mark.tag.endswith('rect'):
+                        top = float(mark.get('y'))
+                        bottom = top + float(mark.get('height'))
+                    else:
+                        positions = [float(point.split(',')[1]) for point in mark.get('points').split()]
+                        top, bottom = min(positions), max(positions)
+                    caption_top = float(count.get('y')) - caption_size
+                    self.assertGreaterEqual(caption_top - bottom, SPACE['xs'],
+                                            'caption begins below the filled status shape')
+                    if previous_caption_bottom is not None:
+                        self.assertGreaterEqual(top, previous_caption_bottom,
+                                                'four outcome slots reserve room for each caption')
+                    previous_caption_bottom = float(count.get('y')) + caption_size / 4
+                    self.assertAlmostEqual(float(count.get('x')), float(week.get('data-x')), places=2)
+                    # The 360px view reserves a complete 3-digit caption in each week.
+                    # Actual font bounds remain the populated browser acceptance gate.
+                    self.assertLessEqual(len(count.text) * caption_size * .62,
+                                         float(week.get('data-width')))
+
     def test_weekly_svg_retains_mixed_counts_private_and_all_repositories(self):
         for mobile in (False, True):
             root = ET.fromstring(render_svg({"ci_timeline": _weekly_ci_fixture()}, mobile=mobile))

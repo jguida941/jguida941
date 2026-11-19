@@ -75,7 +75,10 @@ def _uncontained_dom_offenders(data: dict) -> list[dict]:
             and scroll.get("class") == "cal-wrap"
         ) or (
             offender.get("contained_by_ci_plot_scroll") is True
-            and scroll.get("class") == "ci-plot-scroll"
+            and isinstance(scroll.get("class"), str)
+            and set(scroll["class"].split()) in (
+                {"ci-plot-scroll"}, {"ci-plot-scroll", "table-scroll"},
+            )
             and scroll.get("observatory_parent") is True
         )
         if (
@@ -169,6 +172,31 @@ class ZeroWidthContainmentGaming(unittest.TestCase):
         missing_claim = deepcopy(valid)
         missing_claim["offenders"][0]["contained_by_ci_plot_scroll"] = False
         self.assertEqual(1, len(_uncontained_dom_offenders(missing_claim)))
+
+
+    def test_current_combined_ci_scroller_keeps_the_same_measured_boundary(self):
+        from copy import deepcopy
+        for classes in ("ci-plot-scroll table-scroll", "table-scroll ci-plot-scroll"):
+            valid = {"client_width": 390, "offenders": [{
+                "contained_by_ci_plot_scroll": True,
+                "scroll_container": {
+                    "class": classes, "overflow_x": "auto", "in_viewport": True,
+                    "width": 308, "observatory_parent": True,
+                },
+            }]}
+            self.assertEqual([], _uncontained_dom_offenders(valid),
+                             "the actual combined class list is still the scoped CI scroller")
+            for field, wrong in (("class", "ci-plot-scroll arbitrary-scroll"),
+                                 ("class", "table-scroll"), ("width", 0),
+                                 ("overflow_x", "visible"), ("in_viewport", False),
+                                 ("observatory_parent", False)):
+                with self.subTest(classes=classes, field=field, wrong=wrong):
+                    bad = deepcopy(valid)
+                    bad["offenders"][0]["scroll_container"][field] = wrong
+                    self.assertEqual(1, len(_uncontained_dom_offenders(bad)))
+            bad = deepcopy(valid)
+            bad["offenders"][0]["contained_by_ci_plot_scroll"] = False
+            self.assertEqual(1, len(_uncontained_dom_offenders(bad)))
 
 
 class CodeBranchEllipsisProbeContract(unittest.TestCase):

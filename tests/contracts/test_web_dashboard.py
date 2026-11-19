@@ -1329,6 +1329,16 @@ const document={getElementById:id=>nodes[id]||null,createElement:tag=>new El(tag
 const context={document,sample:input.sample};vm.createContext(context);
 vm.runInContext(input.source+'\nhydrateCITimeline(sample);',context);
 assert.equal(nodes["ci-timeline-scroll"].scrollLeft,228,"latest dates are visible without first scrolling past empty history");
+for (const group of ['pass','fail','pending','other']) {
+  const mark=vm.runInContext(`ciOutcomeMark("${group}",100)`,context);
+  assert.equal(mark.tagName,'span','the count needs its own caption below the filled SVG');
+  assert.equal(mark.children[0].tagName,'svg');
+  assert.equal(mark.children[0].children.length,1,'filled status shape contains no overprinted number');
+  assert.equal(mark.children[1].tagName,'span');
+  assert.equal(mark.children[1].getAttribute('class'),'ci-mark-count');
+  assert.equal(mark.children[1].textContent,'100','three-digit counts stay exact');
+  assert.equal(mark.children[1].getAttribute('style'),null,'large counts cannot shrink below the caption floor');
+}
 const lanes=nodes['ci-timeline-rows'].children;
 assert.equal(lanes.length,7,'one lane per admitted identity; private and org rows included');
 assert.deepEqual(lanes.map(lane=>lane.dataset.observedRuns),['5','2','0',undefined,'1','1','1']);
@@ -1415,3 +1425,28 @@ assert.equal(nodes['ci-observatory-count'].textContent,'Run count unavailable ·
         self.assertEqual(ci_weekly_projection(fixture),value)
         self.assertEqual(2,len(value["weeks"]))
         self.assertEqual("🚀"*100,value["repositories"][0]["weeks"][-1]["runs"][0]["workflow"])
+
+    def test_ci_counts_use_shared_caption_type_and_neutral_ink(self):
+        from scripts.pipeline.web_render import _component_css
+        from scripts.rendering.design_tokens import THEMES, type_scale
+        from tests.contracts.test_theme_system import _contrast
+        css = _component_css()
+        ci = css[css.index('/* CI repository lanes'):css.index('/* --- language bar')]
+        rule = re.search(r'\.ci-observatory \.ci-mark-count\s*\{([^}]+)', ci)
+        self.assertIsNotNone(rule)
+        count_style = rule.group(1)
+        self.assertIn('color: var(--ink-strong)', count_style,
+                      "Counts use the text role on the panel, never the background role on status fills")
+        self.assertIn('font-size: var(--type-caption)', count_style)
+        self.assertIn('font-weight: var(--type-caption-weight)', count_style)
+        self.assertIn('line-height: var(--type-caption)', count_style)
+        self.assertIn('.ci-outcome-mark { display: flex; flex-direction: column;', ci)
+        self.assertNotRegex(ci, r'\[data-theme=', "One shared component must work for every theme")
+        self.assertIn('border-radius: var(--radius-tile)', ci)
+        self.assertIn('repeat(4,var(--ci-slot-height))', ci)
+        self.assertIn('--ci-slot-height: calc(var(--ci-mark-size) + var(--type-caption) + var(--space-xs))', ci)
+        for name, theme in THEMES.items():
+            self.assertGreaterEqual(type_scale(name)['caption'][0], 12, name)
+            for surface in ('surface', 'surface-raised'):
+                with self.subTest(theme=name, surface=surface):
+                    self.assertGreaterEqual(_contrast(theme['ink-strong'], theme[surface]), 4.5)

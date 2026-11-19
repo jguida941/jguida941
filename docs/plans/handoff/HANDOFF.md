@@ -14,6 +14,18 @@ The approved CI visual direction is the November 19 horizontal repository-lane t
 with a top date axis and outcome markers. Other stored CI designs remain unaccepted;
 a future agent must show and discuss their differences with the operator before adopting them.
 
+The receiving route is development first in both repositories. The existing
+`work/overview-publication-20261119` is the temporary integration branch; its source
+receives the history and useful collection, deployment, contract, browser and test
+changes from `development` and `work/overview-publication-20261119-development`.
+Verify the actual committed snapshot, website, SVGs and manifest together, merge to
+`development`, observe receiving CI, then promote the received state to `main`.
+Keep `development` aligned after publication. Retire the two task branches only after
+their history is received; older experimental branches remain explicitly deferred.
+Do not restart this work on another branch or replace private continuation with a
+separate product. The private candidate preserves the same current product behavior
+while its immutable historical source and private assurance remain private.
+
 The following earlier checkpoint is historical context, not the current selector.
 
 **UNIFIED PERSONAL + SEMVERITY LABS ACTIVITY (operator 2026-10-16; selected CI dependency, NOT IMPLEMENTED):** Current account-only collector excludes org-owned repos; user wants ONE Metrics/README/Current Focus/Project Activity/CI chronology that can show explicitly admitted personal + `semverity-labs` repos tagged with their organization. Do not create a duplicate Labs dashboard. Org context lens owns only system identity/approved project relationships, referencing the same metrics. Repository-level pushes/workflows by others are NOT user-authored contributions; actor attribution must be qualified. Canonical repo identity (GitHub ID when present), event dedupe, partial/unavailable windows, private names allowed vs code/logs forbidden are defined in `docs/plans/ACTIVE.md` P5-UNIFIED-ACCOUNT-ORG-01. Priority: private Actions collector/consumer repair → unified org-qualified inventory/event source → README + all visible panels with one data model → desktop/390 visual evidence against user references → private generator and output-only P3/P4 migration → bounded maintainability refactors → queued Apple HIG Showcase/Studio + invitation-only protection. No code/UI implementation or native SemLoop claim in this planning slice. Verify live `development` and active `JG-CI-VIS-001` private head before executing.

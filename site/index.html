@@ -273,60 +273,62 @@ body {
 
 
 /* CI repository lanes retain the horizontal time axis and outcome shapes. */
-.ci-observatory { min-width: 0; --ci-track-min: 528px; }
+.ci-observatory { min-width: 0; --ci-track-min: 528px; --ci-mark-size: calc(var(--space-lg) + var(--space-xs)); --ci-slot-height: calc(var(--ci-mark-size) + var(--type-caption) + var(--space-xs)); }
 .ci-observatory .section-meta { overflow-wrap: anywhere; }
-.ci-observatory .ci-legend { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 18px 0 12px; font-size: var(--type-caption); color: var(--ink-dim); }
-.ci-observatory .ci-legend > span { display: inline-flex; align-items: center; gap: 7px; }
-.ci-observatory .ci-mark { display: block; width: 24px; height: 24px; fill: currentColor; stroke: none; flex: none; }
+.ci-observatory .ci-legend { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); margin: var(--space-lg) 0 var(--space-md); font-size: var(--type-caption); color: var(--ink-dim); }
+.ci-observatory .ci-legend > span { display: inline-flex; align-items: center; gap: var(--space-sm); }
+.ci-observatory .ci-mark { display: block; width: var(--space-xl); height: var(--space-xl); fill: currentColor; stroke: none; flex: none; }
 .ci-observatory .ci-pass { color: var(--status-success); }
 .ci-observatory .ci-fail { color: var(--status-danger); }
 .ci-observatory .ci-pending { color: var(--status-warning); }
 .ci-observatory .ci-other { color: var(--ink-dim); }
-.ci-observatory .ci-mark-count { fill: var(--surface); font: 700 10px var(--font-sans); font-variant-numeric: tabular-nums; }
-.ci-observatory .ci-plot-scroll { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; padding: 4px 0 12px; container-type: inline-size; }
-.ci-observatory .ci-plot { min-width: calc(180px + 20px + var(--ci-track-min)); }
-.ci-observatory .ci-axis, .ci-observatory .ci-lane { display: grid; grid-template-columns: 180px minmax(0,1fr); column-gap: 20px; }
-.ci-observatory .ci-axis { margin-bottom: 12px; color: var(--ink-dim); font-size: var(--type-caption); }
-.ci-observatory .ci-axis-plot { position: relative; height: 25px; }
+.ci-observatory .ci-outcome-mark { display: flex; flex-direction: column; align-items: center; }
+.ci-observatory .ci-outcome-mark .ci-mark { width: var(--ci-mark-size); height: var(--ci-mark-size); }
+.ci-observatory .ci-mark-count { color: var(--ink-strong); font-family: var(--font-sans); font-size: var(--type-caption); font-weight: var(--type-caption-weight); line-height: var(--type-caption); font-variant-numeric: tabular-nums; }
+.ci-observatory .ci-plot-scroll { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; padding: var(--space-xs) 0 var(--space-md); container-type: inline-size; }
+.ci-observatory .ci-plot { min-width: calc(180px + var(--space-lg) + var(--space-xs) + var(--ci-track-min)); }
+.ci-observatory .ci-axis, .ci-observatory .ci-lane { display: grid; grid-template-columns: 180px minmax(0,1fr); column-gap: calc(var(--space-lg) + var(--space-xs)); }
+.ci-observatory .ci-axis { margin-bottom: var(--space-md); color: var(--ink-dim); font-size: var(--type-caption); }
+.ci-observatory .ci-axis-plot { position: relative; height: var(--space-xl); }
 .ci-observatory .ci-axis-plot > span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
 .ci-observatory .ci-axis-plot > span:first-child { transform: none; }
 .ci-observatory .ci-axis-plot > span:last-child { transform: translateX(-100%); }
-.ci-observatory .ci-lane { align-items: center; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb,var(--hairline) 15%,transparent); }
+.ci-observatory .ci-lane { align-items: center; padding: var(--space-md) 0; border-bottom: 1px solid color-mix(in srgb,var(--hairline) 15%,transparent); }
 .ci-observatory .ci-identity { min-width: 0; }
 .ci-observatory .ci-repo-name { display: flex; align-items: center; min-height: 44px; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; text-decoration: none; }
 .ci-observatory .ci-repo-name:hover { text-decoration: underline; }
 .ci-observatory .ci-lane-note, .ci-observatory .ci-private { display: block; font-size: var(--type-caption); color: var(--ink-dim); }
-.ci-observatory .ci-private { display: flex; align-items: center; gap: 6px; }
-.ci-observatory .ci-lock { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; }
-.ci-observatory .ci-track { position: relative; display: grid; grid-template-columns: repeat(var(--ci-week-count), minmax(44px,1fr)); min-height: 96px; background: linear-gradient(var(--hairline),var(--hairline)) center/100% 1px no-repeat; }
-.ci-observatory .ci-group { display: grid; grid-template-rows: repeat(4,24px); justify-items: center; width: 100%; min-width: 44px; min-height: 44px; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; border-radius: 6px; }
-.ci-observatory .ci-mark-slot { display: flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; }
+.ci-observatory .ci-private { display: flex; align-items: center; gap: var(--space-sm); }
+.ci-observatory .ci-lock { width: var(--type-body); height: var(--type-body); fill: none; stroke: currentColor; stroke-width: 1.6; }
+.ci-observatory .ci-track { position: relative; display: grid; grid-template-columns: repeat(var(--ci-week-count), minmax(44px,1fr)); min-height: calc(4 * var(--ci-slot-height)); background: linear-gradient(var(--hairline),var(--hairline)) center/100% 1px no-repeat; }
+.ci-observatory .ci-group { display: grid; grid-template-rows: repeat(4,var(--ci-slot-height)); justify-items: center; width: 100%; min-width: 44px; min-height: 44px; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; border-radius: var(--radius-tile); }
+.ci-observatory .ci-mark-slot { display: flex; align-items: flex-start; justify-content: center; min-width: var(--space-xl); height: var(--ci-slot-height); }
 .ci-observatory .ci-group:hover { background: color-mix(in srgb,var(--accent) 9%,transparent); }
 .ci-observatory .ci-group:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .ci-observatory .ci-group[aria-pressed="true"] { box-shadow: inset 0 -2px var(--accent); }
-.ci-observatory .ci-empty-state { position: absolute; top: 12px; left: 4px; color: var(--ink-dim); background: var(--surface); font-size: var(--type-caption); padding-right: 6px; }
-.ci-observatory .ci-scroll-help { color: var(--ink-dim); font-size: var(--type-caption); margin: 0 0 8px; }
-.ci-observatory .ci-inspector { margin-top: 18px; min-width: 0; padding-top: 16px; border-top: 1px solid var(--hairline); overflow-wrap: anywhere; }
-.ci-observatory .ci-inspector h3 { color: var(--ink-strong); font-size: var(--type-body); margin: 0 0 6px; }
-.ci-observatory .ci-inspector .section-meta { margin: 6px 0; }
+.ci-observatory .ci-empty-state { position: absolute; top: var(--space-md); left: var(--space-xs); color: var(--ink-dim); background: var(--surface); font-size: var(--type-caption); padding-right: var(--space-sm); }
+.ci-observatory .ci-scroll-help { color: var(--ink-dim); font-size: var(--type-caption); margin: 0 0 var(--space-sm); }
+.ci-observatory .ci-inspector { margin-top: var(--space-lg); min-width: 0; padding-top: var(--space-lg); border-top: 1px solid var(--hairline); overflow-wrap: anywhere; }
+.ci-observatory .ci-inspector h3 { color: var(--ink-strong); font-size: var(--type-body); margin: 0 0 var(--space-sm); }
+.ci-observatory .ci-inspector .section-meta { margin: var(--space-sm) 0; }
 .ci-observatory .ci-selected-count { font-size: var(--type-caption); color: var(--ink-dim); }
-.ci-observatory .ci-run-details { list-style: none; margin: 12px 0 0; padding: 0; }
-.ci-observatory .ci-run-detail { padding: 8px 0; border-top: 1px solid color-mix(in srgb,var(--hairline) 15%,transparent); }
+.ci-observatory .ci-run-details { list-style: none; margin: var(--space-md) 0 0; padding: 0; }
+.ci-observatory .ci-run-detail { padding: var(--space-sm) 0; border-top: 1px solid color-mix(in srgb,var(--hairline) 15%,transparent); }
 .ci-observatory .ci-run-link { display: flex; align-items: center; min-height: 44px; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; }
 .ci-observatory .ci-run-meta { display: block; font-size: var(--type-caption); color: var(--ink-dim); overflow-wrap: anywhere; }
-.ci-observatory .ci-sample-footer { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 24px; flex-wrap: wrap; margin-top: 12px; }
+.ci-observatory .ci-sample-footer { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm) var(--space-xl); flex-wrap: wrap; margin-top: var(--space-md); }
 .ci-observatory .ci-sample-footer > p { margin: 0; }
 .ci-observatory .ci-sample-details { min-width: 0; flex-basis: auto; }
 .ci-observatory .ci-sample-details[open] { flex-basis: 100%; }
 .ci-observatory .ci-sample-details > summary { display: flex; align-items: center; min-height: 44px; font-size: var(--type-caption); color: var(--ink-dim); cursor: pointer; }
-.ci-observatory .ci-sample-details > summary::before { content: "+"; margin-right: 8px; }
+.ci-observatory .ci-sample-details > summary::before { content: "+"; margin-right: var(--space-sm); }
 .ci-observatory .ci-sample-details[open] > summary::before { content: "−"; }
 @media (min-width: 761px) { .ci-observatory .ci-scroll-help { display: none; } }
 @media (max-width: 760px) {
   .ci-observatory .ci-plot { min-width: var(--ci-track-min); }
   .ci-observatory .ci-axis, .ci-observatory .ci-lane { grid-template-columns: minmax(0,1fr); }
   .ci-observatory .ci-axis-label { display: none; }
-  .ci-observatory .ci-identity { position: sticky; left: 0; width: 100cqw; margin-bottom: 12px; padding-right: 8px; }
+  .ci-observatory .ci-identity { position: sticky; left: 0; width: 100cqw; margin-bottom: var(--space-md); padding-right: var(--space-sm); }
   .ci-observatory .ci-repo-name { min-height: 44px; }
   .ci-observatory .ci-axis-plot > span:nth-child(2), .ci-observatory .ci-axis-plot > span:nth-child(4) { display: none; }
 }
@@ -1103,21 +1105,21 @@ SOFTWARE.
     return row.status==="unavailable"?"Unavailable":row.status==="empty"?"No runs returned":"No runs observed in window";
   }
   function ciOutcomeMark(group, count) {
+    const mark = document.createElement("span");
+    mark.setAttribute("class","ci-outcome-mark"); mark.setAttribute("aria-hidden","true");
     const ns = "http://www.w3.org/2000/svg", svg = document.createElementNS(ns,"svg");
     svg.setAttribute("viewBox","0 0 24 24"); svg.setAttribute("aria-hidden","true");
     svg.setAttribute("focusable","false"); svg.setAttribute("class","ci-mark ci-"+group);
     const shapes = {pass:["circle",{cx:12,cy:12,r:10}],fail:["rect",{x:2,y:2,width:20,height:20,rx:1}],pending:["path",{d:"M12 1 23 22H1Z"}],other:["path",{d:"M12 1 23 12 12 23 1 12Z"}]};
     const [name, attrs] = shapes[group], shape = document.createElementNS(ns,name);
     for (const [key, value] of Object.entries(attrs)) shape.setAttribute(key,String(value));
-    svg.appendChild(shape);
+    svg.appendChild(shape); mark.appendChild(svg);
     if (count!==null) {
-      const text = document.createElementNS(ns,"text");
-      text.setAttribute("x","12"); text.setAttribute("y",group==="pending"?"17":"15.5");
-      text.setAttribute("text-anchor","middle"); text.setAttribute("class","ci-mark-count");
-      if (count>=100) text.setAttribute("style","font-size:7px");
-      text.textContent = String(count); svg.appendChild(text);
+      const text = document.createElement("span");
+      text.setAttribute("class","ci-mark-count");
+      text.textContent = String(count); mark.appendChild(text);
     }
-    return svg;
+    return mark;
   }
   function hydrateCITimeline(sample) {
     const host = document.getElementById("ci-observatory"), axis = document.getElementById("ci-timeline-axis"), lanes = document.getElementById("ci-timeline-rows"), detail = document.getElementById("ci-selected-group"), note = document.getElementById("ci-observatory-note"), footer = document.getElementById("ci-observatory-count"), scope = document.getElementById("ci-observatory-scope");
