@@ -618,7 +618,7 @@ jobs:
                       bounds = ci.evaluate("""panel=>{
                         const p=panel.getBoundingClientRect();
                         const scrollers=[...panel.querySelectorAll('.ci-plot-scroll')].map(n=>{const b=n.getBoundingClientRect();return{left:b.left,right:b.right,width:b.width,scrollWidth:n.scrollWidth,clientWidth:n.clientWidth,overflow:getComputedStyle(n).overflowX}});
-                        const labels=[...panel.querySelectorAll('a, h2, p, summary')].filter(n=>!n.closest('.ci-plot-scroll')&&!n.closest('details:not([open])')).map(n=>{const b=n.getBoundingClientRect();return{text:n.textContent,left:b.left,right:b.right}});
+                        const labels=[...panel.querySelectorAll('a, h2, p, summary')].filter(n=>!n.closest('.ci-plot-scroll')&&!n.closest('details:not([open])')).map(n=>{const b=n.getBoundingClientRect();return{text:n.textContent,left:b.left,right:b.right,width:b.width,height:b.height}}).filter(r=>r.width>0&&r.height>0);
                         return{viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,panel:{left:p.left,right:p.right},scrollers,overflowing:labels.filter(r=>r.left<p.left-1||r.right>p.right+1)};
                       }""")
                       assert bounds['documentWidth']<=width+1 and not bounds['overflowing'],bounds
