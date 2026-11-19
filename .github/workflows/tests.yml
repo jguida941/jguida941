@@ -2,7 +2,7 @@ name: Test Profile Pipeline
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "development"]
     paths:
       - "scripts/**"
       - "tests/**"
@@ -14,7 +14,7 @@ on:
       - ".github/workflows/analytics.yml"
       - ".github/workflows/metrics.yml"
   pull_request:
-    branches: ["main"]
+    branches: ["main", "development"]
     paths:
       - "scripts/**"
       - "tests/**"
@@ -72,8 +72,8 @@ jobs:
       # genuine Google Chrome, not a new self-hosted/public publisher trust.
       # Run AFTER static tests but BEFORE the fixture smoke CLI, so no synthetic
       # profile snapshot can masquerade as a live observed screenshot.
-      - name: Capture real index Chrome receipts (development candidate only)
-        if: ${{ always() && github.event_name == 'pull_request' && github.head_ref == 'development' }}
+      - name: Capture real index Chrome receipts for the receiving candidate
+        if: ${{ always() && github.event_name == 'pull_request' }}
         env:
           PROFILE_TIMEZONE: America/New_York
         run: |
@@ -112,7 +112,7 @@ jobs:
           PY
 
       - name: Upload raw unaccepted browser evidence
-        if: ${{ always() && github.event_name == 'pull_request' && github.head_ref == 'development' }}
+        if: ${{ always() && github.event_name == 'pull_request' }}
         uses: actions/upload-artifact@v4
         with:
           name: index-chrome-candidate-${{ github.sha }}

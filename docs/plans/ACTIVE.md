@@ -1,3 +1,33 @@
+## Current continuation — November 19, 2026
+
+The active continuation is the private `jguida941/profile-private-continuation`
+repository. Run its `make work-orient` and `make enter`; its work register selects
+`JG-ORG-LAYOUT-001` and retains the issue-ledger, architecture and later quality/CI
+sequence. The current bounded public repair preserves normal commit activity, assigns
+generated artifact commits to the Actions bot, aligns the overview/date/profile link,
+and unifies the website and SVG CI timeline with authorized public/private run metadata.
+This supersedes older directions below that select CI or exclude public main.
+Private authoring, evidence and methods remain in the private continuation; the source
+here remains the currently active publication route until the existing migration is received.
+
+The approved CI visual direction is the November 19 horizontal repository-lane timeline,
+with a top date axis and outcome markers. Other stored CI designs remain unaccepted;
+a future agent must show and discuss their differences with the operator before adopting them.
+
+The receiving route is development first in both repositories. The existing
+`work/overview-publication-20261119` is the temporary integration branch; its source
+receives the history and useful collection, deployment, contract, browser and test
+changes from `development` and `work/overview-publication-20261119-development`.
+Verify the actual committed snapshot, website, SVGs and manifest together, merge to
+`development`, observe receiving CI, then promote the received state to `main`.
+Keep `development` aligned after publication. Retire the two task branches only after
+their history is received; older experimental branches remain explicitly deferred.
+Do not restart this work on another branch or replace private continuation with a
+separate product. The private candidate preserves the same current product behavior
+while its immutable historical source and private assurance remain private.
+
+The following earlier checkpoint is historical context, not the current selector.
+
 # ACTIVE PLAN — Phase 5: Organization-as-invariant + governed multi-theme design-language system
 
 > This is the durable, committed source of truth for the current plan and status. The

@@ -875,6 +875,20 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
                     self.assertNotEqual(_step_field(step, "continue-on-error"), "true")
                     self.assertNotIn("|| true", "\n".join(_step_run_lines(step)))
 
+    def test_generated_artifacts_use_bot_author_not_the_triggering_actor(self):
+        """Publication must not create a personal contribution after observing it."""
+        expected = "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+        for workflow in self._generation_workflows():
+            with self.subTest(workflow=workflow.name):
+                steps = _workflow_steps(workflow)
+                publishers = [step for step in steps if _step_field(step, "uses")
+                              == "stefanzweifel/git-auto-commit-action@v5"]
+                self.assertEqual(1, len(publishers), "one artifact publication step is required")
+                author = _step_field(publishers[0], "commit_author")
+                self.assertEqual(expected, _env_scalar(author or ""),
+                                 "generated artifacts need a bot AUTHOR; a bot committer alone still credits the actor")
+                self.assertEqual(1, len(_mapping_key_occurrences("\n".join(publishers[0]), "commit_author")))
+
     def test_generation_auto_commit_requires_success(self):
         expected_conditions = {
             "metrics.yml": METRICS_COMMIT_CONDITION,

@@ -27,20 +27,22 @@ def assert_projection(test, text):
 
 
 class SharedProfileRendererContract(unittest.TestCase):
-    """GitHub profile and Pages overview consume the same canonical SVG bytes."""
+    """GitHub's static card and the live website share canonical facts."""
 
-    def test_one_desktop_mobile_svg_pair_is_both_surfaces_overview(self):
+    def test_static_card_and_live_overview_share_the_snapshot_contract(self):
         from scripts.pipeline.web_render import render_dashboard
         page = render_dashboard()
         readme = (Path(__file__).resolve().parents[2] / "README.md").read_text()
         for filename in ("dashboard_summary.svg", "dashboard_summary_mobile.svg"):
             self.assertIn("assets/" + filename, readme)
-            self.assertIn("./assets/" + filename, page)
-        self.assertIn('id="overview"', page)
-        self.assertIn('src="./assets/dashboard_summary.svg"', page)
-        self.assertIn('srcset="./assets/dashboard_summary_mobile.svg"', page)
-        self.assertIn('data-renderer="scripts.rendering.generate_dashboard_summary.render_svg"', page)
-        self.assertIn('id="interactive-details"', page)
+        self.assertIn('<header class="panel hero" id="overview"', page)
+        self.assertNotIn('id="interactive-details"', page)
+        self.assertNotIn('class="canonical-profile"', page)
+        for fact in ("profile.contributions", "inventory.public_total", "calendar.active_days"):
+            self.assertIn(fact, page)
+        self.assertIn('hydrateCITimeline(d.ci_timeline)', page)
+        self.assertEqual(1, page.count('id="ci-observatory"'))
+        self.assertNotIn('id="ci-execution"', page)
 
     def test_pages_deploy_copies_exact_github_profile_card_bytes(self):
         root = Path(__file__).resolve().parents[2]

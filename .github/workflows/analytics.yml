@@ -161,6 +161,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          commit_author: "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
           commit_message: "update analytics & readme"
           branch: main
           file_pattern: "README.md assets/dashboard_summary.svg assets/dashboard_summary_mobile.svg assets/activity_heatmap.svg assets/badges.svg assets/builder_scorecard.svg assets/contribution_calendar.svg assets/currently_working.svg assets/engineering_cadence.svg assets/lang_breakdown.svg assets/now_next_shipped.svg assets/raw_snapshot.svg assets/repo_spotlight.svg assets/streak_summary.svg metrics.general.svg site/data/profile_snapshot.json site/data/profile_artifact_manifest.json"

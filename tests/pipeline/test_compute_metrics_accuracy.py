@@ -3736,6 +3736,40 @@ class ProfileRepositoryDetailTests(unittest.TestCase):
         bot = self.event("PushEvent", actor="github-actions[bot]")
         self.assertEqual([], _build_recent_activity([bot], [], [], "jguida941")[0])
 
+    @classmethod
+    def _resolved_profile_push_inputs(cls):
+        profile = dict(cls.row(), id=101, full_name="jguida941/jguida941")
+        ordinary = dict(cls.row(name="ordinary"), id=102, full_name="jguida941/ordinary")
+        events = []
+        for identity, repository, actor, stamp, headline in (
+            ("profile-human", profile, "jguida941", "2026-10-11T12:00:00Z", "Repair profile source"),
+            ("ordinary-human", ordinary, "jguida941", "2026-10-11T11:00:00Z", "Ship ordinary source"),
+            ("profile-bot", profile, "github-actions[bot]", "2026-10-11T13:00:00Z", "update canonical profile artifacts"),
+        ):
+            events.append({"id": identity, "type": "PushEvent", "evidence_status": "ok",
+                           "actor": {"login": actor},
+                           "repo": {"id": repository["id"], "name": repository["full_name"]},
+                           "created_at": stamp, "payload": {"commits": [{"message": headline}]}})
+        return [profile, ordinary], events
+
+
+    def test_resolved_profile_human_push_reaches_feed_with_observed_details(self):
+        from scripts.pipeline.compute_metrics import _build_activity_feed, _build_recent_activity
+
+        inventory, events = self._resolved_profile_push_inputs()
+        contributions = _build_recent_activity(events, [], inventory, "jguida941")[0]
+        expected = [
+            ("jguida941/jguida941", "2026-10-11T12:00:00Z", "Repair profile source", "event"),
+            ("jguida941/ordinary", "2026-10-11T11:00:00Z", "Ship ordinary source", "event"),
+        ]
+        self.assertCountEqual(expected, [(row["repo"], row["created_at"],
+                                         row.get("_push_identity_headline"), row["observation_source"])
+                                        for row in contributions])
+        feed = _build_activity_feed([], [], contributions, [], [], "jguida941")
+        self.assertCountEqual(expected, [(row["repo"], row["created_at"], row["title"],
+                                         row["observation_source"]) for row in feed])
+
+
     def test_profile_project_activity_preserves_coverage_and_public_summary_parity(self):
         from scripts.pipeline.render_outputs import _public_dashboard_data
 

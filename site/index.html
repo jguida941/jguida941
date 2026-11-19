@@ -211,17 +211,6 @@ body {
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .section-meta { font-size: var(--type-caption); color: var(--ink-dim); }
 
-/* The website and README consume the exact same responsive profile card bytes.
-   The interactive web-only details below are deliberately a separate view. */
-.canonical-profile { margin-bottom: var(--gap-grid,20px); }
-.canonical-profile picture, .canonical-profile img { display:block; width:100%; max-width:100%; height:auto; }
-.canonical-profile img { border-radius: var(--radius-panel); }
-.canonical-profile .section-meta { margin: 12px 4px 0; }
-.detail-explorer { margin-top:var(--gap-grid,20px); }
-.detail-explorer > summary { cursor:pointer; font-size:var(--type-body); font-weight:600;
-  padding:14px 18px; min-height:44px; border:1px solid var(--hairline);
-  border-radius:var(--radius-tile); color:var(--ink); }
-.detail-explorer[open] > summary { margin-bottom:var(--gap-grid,20px); }
 /* --- activity overview: DESIGN_SPEC, operator reference 2026-11-15 --- */
 .dashboard-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: var(--gap-grid, 20px); }
 .hero { padding: 0; overflow: hidden; }
@@ -240,8 +229,12 @@ body {
 .stat .v { font-size: var(--type-metric_lg); font-weight: 600; color: var(--ink-strong); line-height: 1.2; }
 .stat .l { font-size: var(--type-caption); color: var(--ink-dim); margin-top: 8px; }
 .hero-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 16px var(--pad-panel, 28px); border-top: 1px solid var(--hairline); background: color-mix(in srgb, var(--surface-raised) 35%, transparent); font-size: var(--type-caption); color: var(--ink-dim); }
-.hero-footer a { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-strong); text-decoration: none; }
-.hero-footer a:hover { text-decoration: underline; }
+.hero .github-profile-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 8px 12px; border: 1px solid var(--hairline); border-radius: var(--radius-tile);
+  background: var(--surface); color: var(--ink-strong); text-decoration: none; }
+.hero .github-profile-link svg { width: 20px; height: 20px; fill: currentColor; stroke: none; }
+.hero .github-profile-link:hover { border-color: var(--accent); background: var(--surface-raised); }
+.github-profile-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .hero .live { display: inline-flex; align-items: center; gap: 8px; }
 @media (max-width: 640px) {
   .hero .kpi { grid-template-columns: minmax(0, 1fr); gap: 24px; }
@@ -279,57 +272,65 @@ body {
 .mrow svg { width: 15px; height: 15px; stroke: var(--ink-dim); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
 
 
-/* CI observatory: time-axis lanes from the one qualified snapshot, not a status feed. */
-.ci-observatory { min-width: 0; }
-.ci-observatory .ci-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-lg); flex-wrap: wrap; }
-.ci-observatory .ci-legend { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-lg); margin: var(--space-lg) 0; font-size: var(--type-caption); }
-.ci-observatory .ci-legend span { display: inline-flex; align-items: center; gap: var(--space-xs); }
-.ci-observatory .ci-symbol { display: inline-flex; align-items: center; justify-content: center; font-weight: 700; width: 24px; height: 24px; }
-.ci-observatory .ci-symbol.pass { color: var(--status-success); border: 2px solid var(--status-success); border-radius: 50%; }
-.ci-observatory .ci-symbol.fail { color: var(--status-danger); border: 2px solid var(--status-danger); border-radius: 4px; }
-.ci-observatory .ci-symbol.queued { color: var(--status-warning); border: 2px solid var(--status-warning); border-radius: 6px; }
-.ci-observatory .ci-symbol.neutral { color: var(--ink-dim); border: 2px dashed var(--hairline); border-radius: 50%; }
-.ci-observatory .ci-plot-scroll { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; padding-bottom: var(--space-sm); }
-.ci-observatory .ci-plot { min-width: 770px; }
-.ci-observatory .ci-axis, .ci-observatory .ci-lane { display: grid; grid-template-columns: 155px minmax(0,1fr); gap: var(--space-md); align-items: center; }
-.ci-observatory .ci-axis { padding-bottom: var(--space-sm); border-bottom: 1px solid var(--hairline); color: var(--ink-dim); font-size: var(--type-caption); }
-.ci-observatory .ci-axis-plot { position: relative; height: 25px; }
-.ci-observatory .ci-axis-plot span { position: absolute; white-space: nowrap; transform: translateX(-50%); }
-.ci-observatory .ci-axis-plot span:first-child { transform: none; }
-.ci-observatory .ci-axis-plot span:last-child { transform: translateX(-100%); }
-.ci-observatory .ci-lane { min-height: 62px; border-bottom: 1px solid color-mix(in srgb,var(--hairline) 15%, transparent); }
-.ci-observatory .ci-repo-name { display: block; font-size: var(--type-body); font-weight: 600; color: var(--ink-strong); overflow-wrap: anywhere; }
-.ci-observatory .ci-repo-name a { color: inherit; }
-.ci-observatory .ci-lane-note { display: block; color: var(--ink-dim); font-size: var(--type-caption); }
-.ci-observatory .ci-track { position: relative; min-height: 56px; background: repeating-linear-gradient(to right, transparent 0%, transparent calc(25% - 1px), color-mix(in srgb,var(--hairline) 14%, transparent) 25%); }
-.ci-observatory .ci-dot { position: absolute; top: 50%; transform: translate(-50%,-50%); width: 28px; height: 28px; padding: 0; cursor: pointer; background: var(--surface-raised); font: inherit; font-size: var(--type-caption); transition: transform var(--motion-fast) var(--ease-standard); }
-.ci-observatory .ci-dot:hover { transform: translate(-50%,-50%) scale(1.08); }
-.ci-observatory .ci-dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; z-index: 2; }
-.ci-observatory .ci-dot[aria-pressed="true"] { outline: 2px solid var(--ink-strong); outline-offset: 2px; z-index: 1; }
-.ci-observatory .ci-inspector { margin-top: var(--space-lg); padding: var(--pad-tile); border: 1px solid color-mix(in srgb,var(--hairline) 20%, transparent); border-radius: var(--radius-tile); }
+/* CI repository lanes retain the horizontal time axis and outcome shapes. */
+.ci-observatory { min-width: 0; --ci-track-min: 528px; --ci-mark-size: calc(var(--space-lg) + var(--space-xs)); --ci-slot-height: calc(var(--ci-mark-size) + var(--type-caption) + var(--space-xs)); }
+.ci-observatory .section-meta { overflow-wrap: anywhere; }
+.ci-observatory .ci-legend { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); margin: var(--space-lg) 0 var(--space-md); font-size: var(--type-caption); color: var(--ink-dim); }
+.ci-observatory .ci-legend > span { display: inline-flex; align-items: center; gap: var(--space-sm); }
+.ci-observatory .ci-mark { display: block; width: var(--space-xl); height: var(--space-xl); fill: currentColor; stroke: none; flex: none; }
+.ci-observatory .ci-pass { color: var(--status-success); }
+.ci-observatory .ci-fail { color: var(--status-danger); }
+.ci-observatory .ci-pending { color: var(--status-warning); }
+.ci-observatory .ci-other { color: var(--ink-dim); }
+.ci-observatory .ci-outcome-mark { display: flex; flex-direction: column; align-items: center; }
+.ci-observatory .ci-outcome-mark .ci-mark { width: var(--ci-mark-size); height: var(--ci-mark-size); }
+.ci-observatory .ci-mark-count { color: var(--ink-strong); font-family: var(--font-sans); font-size: var(--type-caption); font-weight: var(--type-caption-weight); line-height: var(--type-caption); font-variant-numeric: tabular-nums; }
+.ci-observatory .ci-plot-scroll { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; padding: var(--space-xs) 0 var(--space-md); container-type: inline-size; }
+.ci-observatory .ci-plot { min-width: calc(180px + var(--space-lg) + var(--space-xs) + var(--ci-track-min)); }
+.ci-observatory .ci-axis, .ci-observatory .ci-lane { display: grid; grid-template-columns: 180px minmax(0,1fr); column-gap: calc(var(--space-lg) + var(--space-xs)); }
+.ci-observatory .ci-axis { margin-bottom: var(--space-md); color: var(--ink-dim); font-size: var(--type-caption); }
+.ci-observatory .ci-axis-plot { position: relative; height: var(--space-xl); }
+.ci-observatory .ci-axis-plot > span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.ci-observatory .ci-axis-plot > span:first-child { transform: none; }
+.ci-observatory .ci-axis-plot > span:last-child { transform: translateX(-100%); }
+.ci-observatory .ci-lane { align-items: center; padding: var(--space-md) 0; border-bottom: 1px solid color-mix(in srgb,var(--hairline) 15%,transparent); }
+.ci-observatory .ci-identity { min-width: 0; }
+.ci-observatory .ci-repo-name { display: flex; align-items: center; min-height: 44px; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; text-decoration: none; }
+.ci-observatory .ci-repo-name:hover { text-decoration: underline; }
+.ci-observatory .ci-lane-note, .ci-observatory .ci-private { display: block; font-size: var(--type-caption); color: var(--ink-dim); }
+.ci-observatory .ci-private { display: flex; align-items: center; gap: var(--space-sm); }
+.ci-observatory .ci-lock { width: var(--type-body); height: var(--type-body); fill: none; stroke: currentColor; stroke-width: 1.6; }
+.ci-observatory .ci-track { position: relative; display: grid; grid-template-columns: repeat(var(--ci-week-count), minmax(44px,1fr)); min-height: calc(4 * var(--ci-slot-height)); background: linear-gradient(var(--hairline),var(--hairline)) center/100% 1px no-repeat; }
+.ci-observatory .ci-group { display: grid; grid-template-rows: repeat(4,var(--ci-slot-height)); justify-items: center; width: 100%; min-width: 44px; min-height: 44px; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; border-radius: var(--radius-tile); }
+.ci-observatory .ci-mark-slot { display: flex; align-items: flex-start; justify-content: center; min-width: var(--space-xl); height: var(--ci-slot-height); }
+.ci-observatory .ci-group:hover { background: color-mix(in srgb,var(--accent) 9%,transparent); }
+.ci-observatory .ci-group:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.ci-observatory .ci-group[aria-pressed="true"] { box-shadow: inset 0 -2px var(--accent); }
+.ci-observatory .ci-empty-state { position: absolute; top: var(--space-md); left: var(--space-xs); color: var(--ink-dim); background: var(--surface); font-size: var(--type-caption); padding-right: var(--space-sm); }
+.ci-observatory .ci-scroll-help { color: var(--ink-dim); font-size: var(--type-caption); margin: 0 0 var(--space-sm); }
+.ci-observatory .ci-inspector { margin-top: var(--space-lg); min-width: 0; padding-top: var(--space-lg); border-top: 1px solid var(--hairline); overflow-wrap: anywhere; }
 .ci-observatory .ci-inspector h3 { color: var(--ink-strong); font-size: var(--type-body); margin: 0 0 var(--space-sm); }
-.ci-observatory .ci-inspector ul { margin: var(--space-sm) 0 0; padding-left: var(--space-xl); }
-.ci-observatory .ci-inspector li { font-size: var(--type-body); padding: var(--space-xs) 0; }
-.ci-observatory .ci-inspector a { color: var(--accent); }
-@media (prefers-reduced-motion: reduce) { .ci-observatory .ci-dot { transition: none; } }
-
-/* --- CI/CD execution: one public profile repo, not adoption across account --- */
-.ci-execution-panel .ci-link { color: var(--ink); font-size: var(--type-body);
-  min-height: 44px; display: inline-flex; align-items: center; }
-.ci-execution-panel .ci-run-list { margin-top: var(--gap-grid, 20px); }
-.ci-execution-panel .ci-run-list[hidden] { display: none; }
-.ci-execution-panel .ci-more[hidden] { display: none; }
-.ci-execution-panel .ci-more summary { cursor: pointer; display: flex; align-items: center; min-height: 44px; color: var(--ink); font-size: var(--type-body); }
-.ci-execution-panel .ci-run-list .mrow { grid-template-columns: minmax(0,1fr) auto; }
-.ci-execution-panel .ci-run-list .mt { overflow-wrap: anywhere; }
-.ci-execution-panel .ci-run-list .ms { overflow-wrap: anywhere; }
-.ci-execution-panel .ci-run-title { color: var(--ink-strong); display: inline-flex;
-  align-items: center; min-height: 44px; text-decoration: none; }
-.ci-execution-panel .ci-run-title:hover { text-decoration: underline; }
-.ci-execution-panel .ci-status { justify-self: end; white-space: nowrap; }
-@media (max-width: 480px) {
-  .ci-execution-panel .ci-run-list .mrow { grid-template-columns: minmax(0,1fr); gap: 4px; }
-  .ci-execution-panel .ci-status { justify-self: start; }
+.ci-observatory .ci-inspector .section-meta { margin: var(--space-sm) 0; }
+.ci-observatory .ci-selected-count { font-size: var(--type-caption); color: var(--ink-dim); }
+.ci-observatory .ci-run-details { list-style: none; margin: var(--space-md) 0 0; padding: 0; }
+.ci-observatory .ci-run-detail { padding: var(--space-sm) 0; border-top: 1px solid color-mix(in srgb,var(--hairline) 15%,transparent); }
+.ci-observatory .ci-run-link { display: flex; align-items: center; min-height: 44px; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; }
+.ci-observatory .ci-run-meta { display: block; font-size: var(--type-caption); color: var(--ink-dim); overflow-wrap: anywhere; }
+.ci-observatory .ci-sample-footer { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm) var(--space-xl); flex-wrap: wrap; margin-top: var(--space-md); }
+.ci-observatory .ci-sample-footer > p { margin: 0; }
+.ci-observatory .ci-sample-details { min-width: 0; flex-basis: auto; }
+.ci-observatory .ci-sample-details[open] { flex-basis: 100%; }
+.ci-observatory .ci-sample-details > summary { display: flex; align-items: center; min-height: 44px; font-size: var(--type-caption); color: var(--ink-dim); cursor: pointer; }
+.ci-observatory .ci-sample-details > summary::before { content: "+"; margin-right: var(--space-sm); }
+.ci-observatory .ci-sample-details[open] > summary::before { content: "−"; }
+@media (min-width: 761px) { .ci-observatory .ci-scroll-help { display: none; } }
+@media (max-width: 760px) {
+  .ci-observatory .ci-plot { min-width: var(--ci-track-min); }
+  .ci-observatory .ci-axis, .ci-observatory .ci-lane { grid-template-columns: minmax(0,1fr); }
+  .ci-observatory .ci-axis-label { display: none; }
+  .ci-observatory .ci-identity { position: sticky; left: 0; width: 100cqw; margin-bottom: var(--space-md); padding-right: var(--space-sm); }
+  .ci-observatory .ci-repo-name { min-height: 44px; }
+  .ci-observatory .ci-axis-plot > span:nth-child(2), .ci-observatory .ci-axis-plot > span:nth-child(4) { display: none; }
 }
 
 /* --- ring (CI coverage) --- */
@@ -541,45 +542,11 @@ footer a { color: var(--ink); text-decoration: none; }
 <body>
 <main class="wrap">
 
-  <section class="canonical-profile" id="overview" tabindex="-1"
-           data-renderer="scripts.rendering.generate_dashboard_summary.render_svg">
-    <picture>
-      <source media="(max-width: 767px)" srcset="./assets/dashboard_summary_mobile.svg">
-      <img src="./assets/dashboard_summary.svg" width="100%" loading="eager"
-           alt="Responsive GitHub profile analytics generated by the same renderer as the GitHub profile card.">
-    </picture>
-    <p class="section-meta">This overview is the same rendered card on GitHub. Expand details for interactive repository analytics.</p>
-  </section>
-  <section class="panel ci-observatory" id="ci-observatory" tabindex="-1">
-    <div class="ci-heading">
-      <div><p class="eyebrow">Engineering Observatory · GitHub Actions</p>
-        <h2 class="title">CI Workflow Timeline by Repository</h2></div>
-      <p class="section-meta" id="ci-observatory-count">Awaiting qualified Actions observations</p>
-    </div>
-    <p class="section-meta" id="ci-observatory-note" role="status">Timeline history unavailable in this snapshot. No run outcomes are inferred from workflow configuration.</p>
-    <div class="ci-legend" aria-label="Workflow outcomes">
-      <span><i class="ci-symbol pass" aria-hidden="true">✓</i> Passed</span>
-      <span><i class="ci-symbol fail" aria-hidden="true">×</i> Failed</span>
-      <span><i class="ci-symbol queued" aria-hidden="true">◆</i> Queued / running</span>
-      <span><i class="ci-symbol neutral" aria-hidden="true">⊘</i> Cancelled / other</span>
-    </div>
-    <div class="ci-plot-scroll" tabindex="0" aria-label="Scroll the observed repository workflow timeline">
-      <div class="ci-plot">
-        <div class="ci-axis" id="ci-timeline-axis"></div>
-        <div id="ci-timeline-rows" aria-label="Observed repository lanes"></div>
-      </div>
-    </div>
-    <section class="ci-inspector" aria-label="Selected UTC date">
-      <h3>Selected day · observed events</h3>
-      <div id="ci-selected-day" aria-live="polite">Select a dated run marker to inspect the observed workflows for that UTC day.</div>
-    </section>
-    <p class="section-meta" id="ci-observatory-scope">Observed run sampling only; missing history is not zero.</p>
-  </section><details class="detail-explorer" id="interactive-details"><summary>Explore live analytics and repository details</summary>
   <div class="dashboard-toolbar">
     <nav class="site-nav nav-liquid-glass" aria-label="Site"><a href="index.html" aria-current="page">home</a><a href="showcase.html">showcase</a><a href="studio.html">studio</a><a href="settings.html">settings</a></nav>
     <div class="switcher" role="group" aria-label="Theme"><button type="button" data-theme-set="liquid-glass" aria-pressed="true" title="Apple frosted glass · Tokyo Night">Liquid Glass</button><button type="button" data-theme-set="carbon" aria-pressed="false" title="IBM Carbon · flat structured UI">Carbon</button><button type="button" data-theme-set="apple-dark" aria-pressed="false" title="System dark · one vivid accent">Apple Dark</button></div>
   </div>
-  <header class="panel hero" id="legacy-overview" tabindex="-1">
+  <header class="panel hero" id="overview" tabindex="-1">
     <div class="hero-content">
       <div class="profile-heading">
         <img class="profile-avatar" src="data:image/jpeg;base64,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" width="64" height="64" alt="">
@@ -602,8 +569,31 @@ footer a { color: var(--ink); text-decoration: none; }
       </div>
     </div>
     <div class="hero-footer">
-      <div class="live"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Updated <span id="updated">—</span></span></div>
-      <a href="https://github.com/jguida941">View GitHub profile <span aria-hidden="true">↗</span></a>
+      <div class="live"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="updated">Update time unavailable</span></div>
+      <a class="github-profile-link" href="https://github.com/jguida941"><!--
+Octicons mark-github-16: https://github.com/primer/octicons/blob/main/icons/mark-github-16.svg
+Source blob: 0e55a8ef2db1913cb35f81ae09ffdb58b5422319
+MIT License
+Copyright (c) 2026 GitHub Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+--><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"/></svg><span>View GitHub profile</span></a>
     </div>
   </header>
   <section class="panel" id="automation" tabindex="-1">
@@ -628,19 +618,21 @@ footer a { color: var(--ink); text-decoration: none; }
       <h3 class="mt">Public</h3><div class="mgroup"><div class="mrow"><span class="ms">Configured repositories</span><span class="num" data-bind="automation_display.public.configured_repos">n/a</span></div><div class="mrow"><span class="ms">Eligible repositories</span><span class="num" data-bind="automation_display.public.eligible_repos">n/a</span></div><div class="mrow"><span class="ms">Workflow files</span><span class="num" data-bind="automation_display.public.workflow_files">n/a</span></div><div class="mrow"><span class="ms">Unknown workflow observations</span><span class="num" data-bind="automation_display.public.unknown_workflow_repos">n/a</span></div><div class="mrow"><span class="ms">Observation status</span><span class="num" data-bind="automation_display.public.status">n/a</span></div></div><p class="ms" data-bind="automation_display.public.qualification">Workflow observation unavailable</p><h3 class="mt">Private</h3><div class="mgroup"><div class="mrow"><span class="ms">Configured repositories</span><span class="num" data-bind="automation_display.private.configured_repos">n/a</span></div><div class="mrow"><span class="ms">Eligible repositories</span><span class="num" data-bind="automation_display.private.eligible_repos">n/a</span></div><div class="mrow"><span class="ms">Workflow files</span><span class="num" data-bind="automation_display.private.workflow_files">n/a</span></div><div class="mrow"><span class="ms">Unknown workflow observations</span><span class="num" data-bind="automation_display.private.unknown_workflow_repos">n/a</span></div><div class="mrow"><span class="ms">Observation status</span><span class="num" data-bind="automation_display.private.status">n/a</span></div></div><p class="ms" data-bind="automation_display.private.qualification">Workflow observation unavailable</p><h3 class="mt">Combined</h3><div class="mgroup"><div class="mrow"><span class="ms">Configured repositories</span><span class="num" data-bind="automation_display.combined.configured_repos">n/a</span></div><div class="mrow"><span class="ms">Eligible repositories</span><span class="num" data-bind="automation_display.combined.eligible_repos">n/a</span></div><div class="mrow"><span class="ms">Workflow files</span><span class="num" data-bind="automation_display.combined.workflow_files">n/a</span></div><div class="mrow"><span class="ms">Unknown workflow observations</span><span class="num" data-bind="automation_display.combined.unknown_workflow_repos">n/a</span></div><div class="mrow"><span class="ms">Observation status</span><span class="num" data-bind="automation_display.combined.status">n/a</span></div></div><p class="ms" data-bind="automation_display.combined.qualification">Workflow observation unavailable</p>
     </details>
   </section>
-  <section class="panel ci-execution-panel" id="ci-execution" tabindex="-1">
-    <div class="section-head">
-      <div><p class="eyebrow">GitHub Actions · Profile Repository</p><h2 class="title">CI/CD Execution</h2></div>
-      <a class="ci-link" href="https://github.com/jguida941/jguida941/actions">All runs</a>
+  <section class="panel ci-observatory" id="ci-observatory" tabindex="-1" aria-labelledby="ci-observatory-title">
+    <div class="section-head"><div><p class="eyebrow">GitHub Actions</p><h2 class="title" id="ci-observatory-title">CI Workflow Timeline</h2></div></div>
+    <p class="section-meta" id="ci-observatory-note" role="status">Workflow history unavailable</p>
+    <div class="ci-legend" aria-label="Workflow outcomes">
+      <span><svg class="ci-mark ci-pass" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/></svg>Passed</span>
+      <span><svg class="ci-mark ci-fail" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="1"/></svg>Failed</span>
+      <span><svg class="ci-mark ci-pending" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 23 22H1Z"/></svg>Pending</span>
+      <span><svg class="ci-mark ci-other" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 23 12 12 23 1 12Z"/></svg>Other</span>
     </div>
-    <hr class="hairline">
-    <p class="ms">Recent workflow runs in this public repository, across branches. Not an account-wide success rate or a workflow-configuration count.</p>
-    <p class="ms" id="ci-execution-note" role="status">Run observation unavailable</p>
-    <div class="mgroup ci-run-list" id="ci-execution-rows" hidden></div>
-    <details class="ci-more" id="ci-execution-more" hidden>
-      <summary id="ci-execution-more-label">More observed runs</summary>
-      <div class="mgroup ci-run-list" id="ci-execution-more-rows"></div>
-    </details>
+    <p class="ci-scroll-help">Scroll the timeline for more dates →</p>
+    <div class="ci-plot-scroll table-scroll" id="ci-timeline-scroll" tabindex="0" role="region" aria-label="Repository workflow timeline; scroll horizontally for more dates">
+      <div class="ci-plot"><div class="ci-axis" id="ci-timeline-axis"></div><div id="ci-timeline-rows" aria-label="Repository lanes"></div></div>
+    </div>
+    <section class="ci-inspector" aria-label="Selected weekly group"><div id="ci-selected-group" aria-live="polite">Select a weekly group to view its workflow runs.</div></section>
+    <div class="ci-sample-footer"><p class="section-meta" id="ci-observatory-count">Run count unavailable</p><details class="ci-sample-details"><summary>Sampling details</summary><p class="section-meta" id="ci-observatory-scope"></p></details></div>
   </section>
   <section class="panel" id="weekly-contributions" tabindex="-1">
     <div class="section-head"><div><p class="eyebrow">Contribution calendar</p><h2 class="title">Weekly contributions</h2></div></div>
@@ -695,13 +687,14 @@ footer a { color: var(--ink); text-decoration: none; }
     <div class="mgroup" id="snap-tiles"></div>
     <p class="eyebrow" style="margin:20px 0 0">Pipeline Status</p>
     <div class="chips" id="pipeline"></div>
-  </section></details>
+  </section>
   <footer>Generated from the GitHub API · <a href="https://github.com/jguida941">@jguida941</a></footer>
 </main>
 
   <script>
   const DATA_URL = "./data/profile_snapshot.json";
   const LANG_COLORS = {"Python": "#3572A5", "Java": "#b07219", "C++": "#f34b7d", "Rust": "#dea584", "Ruby": "#701516", "HTML": "#e34c26", "JavaScript": "#f1e05a", "TypeScript": "#3178c6", "Go": "#00ADD8", "Kotlin": "#A97BFF", "Swift": "#F05138", "C#": "#178600", "PHP": "#4F5D95", "Vue": "#41b883", "Shell": "#89e051", "C": "#555555", "Makefile": "#427819", "CSS": "#563d7c", "SCSS": "#c6538c", "CMake": "#DA3434", "Dockerfile": "#384d54", "GLSL": "#5686a5", "Batchfile": "#C1F12E", "Jupyter Notebook": "#DA5B0B"};
+  const PROFILE_TIMEZONE = "America/New_York";
   const fmt = (n) => {
     if (n == null || isNaN(n)) return "—";
     n = Number(n);
@@ -718,6 +711,31 @@ footer a { color: var(--ink); text-decoration: none; }
     warn: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 16.5v.01"/></svg>',
     bad: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   };
+
+
+  function formatUpdatedAt(value) {
+    const unavailable = "Update time unavailable";
+    if (typeof value !== "string") return unavailable;
+    // Accept an actual, explicitly zoned ISO instant; Date.parse alone normalizes
+    // impossible dates such as February 30 and guesses a zone for naive input.
+    const fields = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,6})?(Z|[+-]\d{2}:\d{2})$/.exec(value);
+    if (!fields) return unavailable;
+    const [, yearText, monthText, dayText, hourText, minuteText, secondText, offset] = fields;
+    const [year, month, day, hour, minute, second] = [yearText, monthText, dayText, hourText, minuteText, secondText].map(Number);
+    const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    const monthDays = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    if (year < 1 || month < 1 || month > 12 || day < 1 || day > monthDays[month - 1] ||
+        hour > 23 || minute > 59 || second > 59 ||
+        (offset !== "Z" && (+offset.slice(1, 3) > 23 || +offset.slice(4) > 59))) return unavailable;
+    const observed = new Date(value);
+    if (isNaN(observed)) return unavailable;
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: PROFILE_TIMEZONE, year: "numeric", month: "short", day: "numeric",
+      hour: "numeric", minute: "2-digit", timeZoneName: "short",
+    }).formatToParts(observed);
+    const label = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return `Updated ${label.month} ${label.day}, ${label.year}, ${label.hour}:${label.minute} ${label.dayPeriod} ${label.timeZoneName}`;
+  }
 
   function setTheme(name) {
     document.documentElement.dataset.theme = (name === "liquid-glass") ? "" : name;
@@ -748,8 +766,6 @@ footer a { color: var(--ink); text-decoration: none; }
     try { id = decodeURIComponent(selectedHash.slice(1)); } catch (_) { return; }
     const target = document.getElementById(id);
     if (!target) return;
-    const details = document.getElementById("interactive-details");
-    if (details && details.contains(target)) details.open = true;
     requestAnimationFrame(() => { if (!interruptedScroll && location.hash === selectedHash) target.scrollIntoView({block:"start"}); });
   }
 
@@ -1025,256 +1041,159 @@ footer a { color: var(--ink); text-decoration: none; }
   // Only the profile repository's published, bounded Actions sample.
   // Build links from verified positive numeric run IDs; provider strings
   // enter the DOM as text, never as HTML or untrusted URLs.
-  const CI_OUTCOME = {
-    success: ["Passed", "ok"],
-    failure: ["Failed", "bad"],
-    cancelled: ["Cancelled", "warn"],
-    skipped: ["Skipped", "warn"],
-    timed_out: ["Timed out", "bad"],
-    startup_failure: ["Startup failed", "bad"],
-    stale: ["Stale", "warn"],
-    action_required: ["Action required", "warn"],
-    neutral: ["Neutral", "warn"],
-    in_progress: ["Running", "warn"],
-    queued: ["Queued", "warn"],
-    unknown: ["Unknown", "warn"]
-  };
-
-  function hydrateCIExecution(sample) {
-    const host = document.getElementById("ci-execution-rows");
-    const note = document.getElementById("ci-execution-note");
-    const more = document.getElementById("ci-execution-more");
-    const extra = document.getElementById("ci-execution-more-rows");
-    const moreLabel = document.getElementById("ci-execution-more-label");
-    host.replaceChildren();
-    extra.replaceChildren();
-    host.hidden = true;
-    more.hidden = true;
-    more.open = false;
-    if (!sample || sample.schema !== "profile-ci-execution/v1" ||
-        sample.repository !== "jguida941/jguida941" ||
-        !["available", "partial", "empty", "unavailable"].includes(sample.status) ||
-        !Array.isArray(sample.runs)) {
-      note.textContent = "Run observation unavailable. Check GitHub Actions for current results.";
-      return;
-    }
-    if (sample.status === "unavailable") {
-      note.textContent = "GitHub Actions run history unavailable for this snapshot.";
-      return;
-    }
-    if (sample.status === "empty") {
-      note.textContent = "No workflow runs returned in the observed sample.";
-      return;
-    }
-    const rows = sample.runs.filter(r =>
-      r && Number.isSafeInteger(r.run_id) && r.run_id > 0 && typeof r.workflow === "string"
-    ).slice(0, 12);
-    if (!rows.length) {
-      note.textContent = "No verified run rows in this observation.";
-      return;
-    }
-    for (const [index, run] of rows.entries()) {
-      const item = document.createElement("div");
-      item.className = "mrow";
-      const left = document.createElement("span");
-      left.className = "ml";
-      const title = document.createElement("a");
-      title.className = "mt ci-run-title";
-      title.href = "https://github.com/jguida941/jguida941/actions/runs/" + run.run_id;
-      title.textContent = run.workflow;
-      const meta = document.createElement("span");
-      meta.className = "ms";
-      const when = new Date(run.created_at || "");
-      const stamp = Number.isNaN(when.getTime()) ? "Time unavailable" :
-        when.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit", timeZoneName:"short"});
-      meta.textContent = (run.head_branch ? run.head_branch + " · " : "") + stamp;
-      left.append(title, meta);
-      const [label, type] = Object.prototype.hasOwnProperty.call(CI_OUTCOME, run.outcome)
-        ? CI_OUTCOME[run.outcome] : CI_OUTCOME.unknown;
-      const status = document.createElement("span");
-      status.className = "chip ci-status " + type;
-      status.innerHTML = STATUS_ICON[type] + label;
-      item.append(left, status);
-      (index < 6 ? host : extra).append(item);
-    }
-    host.hidden = false;
-    if (rows.length > 6) {
-      moreLabel.textContent = (rows.length - 6) + " more observed runs";
-      more.hidden = false;
-    }
-    note.textContent = rows.length + " recent observed runs · " +
-      (sample.status === "partial" ? "Partial observation; some provider rows could not be verified." :
-        "Observed sample, not all runs or repositories.") +
-      (sample.observed_at ? " · Collected " + sample.observed_at : "");
+  const CI_WEEK_GROUPS = ["pass", "fail", "pending", "other"];
+  const CI_OUTCOME_GROUPS = Object.freeze({success:"pass",failure:"fail",timed_out:"fail",startup_failure:"fail",queued:"pending",in_progress:"pending",action_required:"pending",cancelled:"other",skipped:"other",neutral:"other",stale:"other",unknown:"other"});
+  function ciTimestamp(value) {
+    if (typeof value !== "string") return null;
+    const parts = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,3}))?Z$/.exec(value);
+    if (!parts || Number(parts[1]) < 1) return null;
+    const parsed = new Date(value);
+    if (!Number.isFinite(parsed.getTime()) || parsed.getUTCFullYear() !== Number(parts[1]) ||
+        parsed.getUTCMonth()+1 !== Number(parts[2]) || parsed.getUTCDate() !== Number(parts[3]) ||
+        parsed.getUTCHours() !== Number(parts[4]) || parsed.getUTCMinutes() !== Number(parts[5]) ||
+        parsed.getUTCSeconds() !== Number(parts[6])) return null;
+    return parsed.getTime();
   }
-
-
-  // Web-specific interaction over the SAME profile-ci-timeline/v1 carrier as
-  // README SVG. The client draws received run identities; it never judges CI
-  // success rates, invents missing days, or re-queries a provider.
-  const CI_TIMELINE_SIGNAL = Object.freeze({
-    success: ["Passed", "✓", "pass"], failure: ["Failed", "×", "fail"],
-    timed_out: ["Timed out", "×", "fail"], startup_failure: ["Startup failure", "×", "fail"],
-    queued: ["Queued", "◆", "queued"], in_progress: ["Running", "▶", "queued"],
-    cancelled: ["Cancelled", "⊘", "neutral"], skipped: ["Skipped", "–", "neutral"],
-    neutral: ["Neutral", "○", "neutral"], stale: ["Stale", "!", "neutral"],
-    action_required: ["Action required", "!", "queued"], unknown: ["Unknown", "?", "neutral"]
-  });
-
-  function hydrateCITimeline(sample) {
-    const root = document.getElementById("ci-observatory");
-    if (!root) return;
-    const axis = document.getElementById("ci-timeline-axis");
-    const lanes = document.getElementById("ci-timeline-rows");
-    const inspect = document.getElementById("ci-selected-day");
-    const note = document.getElementById("ci-observatory-note");
-    const count = document.getElementById("ci-observatory-count");
-    const scope = document.getElementById("ci-observatory-scope");
-    axis.replaceChildren();
-    lanes.replaceChildren();
-    inspect.textContent = "Select a dated run marker to inspect the observed workflows for that UTC day.";
-    count.textContent = "Run history unavailable";
-    scope.textContent = "Observed run sampling only; missing history is not zero.";
-    note.textContent = "Timeline history unavailable in this snapshot.";
-
-    const owner = sample && sample.owner;
-    if (!sample || sample.schema !== "profile-ci-timeline/v1" ||
-        !["available", "partial", "unavailable"].includes(sample.status) ||
-        typeof owner !== "string" || !/^[A-Za-z0-9-]+$/.test(owner) ||
-        !Array.isArray(sample.repositories)) return;
-    const start = new Date(sample.window_start);
-    const end = new Date(sample.window_end);
-    const span = end.getTime() - start.getTime();
-    if (!Number.isFinite(span) || span <= 0 || !Number.isFinite(start.getTime())) {
-      note.textContent = "Timeline window unavailable; no time-axis values inferred.";
-      return;
-    }
-    const dateText = when => when.toLocaleDateString("en-US",
-      {timeZone:"UTC", month:"short", day:"numeric"});
-    const axisTitle = document.createElement("strong");
-    axisTitle.textContent = "Repository / UTC";
-    axis.append(axisTitle);
-    const ticks = document.createElement("div");
-    ticks.className = "ci-axis-plot";
-    for (let i = 0; i <= 4; i++) {
-      const tick = document.createElement("span");
-      tick.style.left = (i * 25) + "%";
-      tick.textContent = dateText(new Date(start.getTime() + span * i / 4));
-      ticks.append(tick);
-    }
-    axis.append(ticks);
-
-    const allEvents = [], buttons = [];
-    const seenRepos = new Set();
-    let rejected = false;
-    const validName = name => typeof name === "string" && name.startsWith(owner + "/") &&
-      /^[A-Za-z0-9_.-]{1,100}$/.test(name.slice(owner.length + 1));
-    const received = sample.repositories.slice(0, 6);
-    for (const row of received) {
-      if (!row || !validName(row.repository) || seenRepos.has(row.repository)) {
-        rejected = true; continue;
-      }
-      seenRepos.add(row.repository);
-      const lane = document.createElement("div");
-      lane.className = "ci-lane";
-      lane.setAttribute("data-ci-repository", row.repository);
-      const label = document.createElement("div");
-      const repoLink = document.createElement("a");
-      repoLink.className = "ci-repo-name";
-      repoLink.href = "https://github.com/" + row.repository;
-      repoLink.textContent = row.repository.slice(owner.length + 1);
-      label.append(repoLink);
-      const details = document.createElement("span");
-      details.className = "ci-lane-note";
-      const rowState = ["available", "partial", "empty", "unavailable"].includes(row.status)
-        ? row.status : "unavailable";
-      details.textContent = rowState === "partial" ? "Partial observation" :
-        rowState === "unavailable" ? "Provider unavailable" :
-        rowState === "empty" ? "No runs returned" : "Sampled run signals";
-      label.append(details);
-      const track = document.createElement("div");
-      track.className = "ci-track";
-      track.setAttribute("aria-label", row.repository + " workflow runs");
-      lane.append(label, track);
-      lanes.append(lane);
+  function ciStamp(value) { return new Date(value).toISOString().replace(/\.000Z$/, "Z"); }
+  function ciWeeklyProjection(sample) {
+    const value = {status:"unavailable",observed_at:null,window_start:null,window_end:null,sample_limit_per_repo:null,observed_runs:null,weeks:[],repositories:[]};
+    if (!sample || sample.schema !== "profile-ci-timeline/v1") return value;
+    const start = ciTimestamp(sample.window_start), end = ciTimestamp(sample.window_end), weekMs = 7*86400000;
+    if (start === null || end === null || !(end > start) || end-start > 365*86400000) return value;
+    const count = Math.ceil((end-start)/weekMs);
+    const weeks = Array.from({length:count}, (_,index) => ({index,start:ciStamp(start+index*weekMs),end:ciStamp(Math.min(end,start+(index+1)*weekMs)),inclusive_end:index===count-1}));
+    const observed = ciTimestamp(sample.observed_at);
+    Object.assign(value,{status:["available","partial","unavailable"].includes(sample.status)?sample.status:"unavailable",observed_at:observed===null?null:ciStamp(observed),window_start:ciStamp(start),window_end:ciStamp(end),weeks,sample_limit_per_repo:Number.isSafeInteger(sample.sample_limit_per_repo)&&sample.sample_limit_per_repo>0?sample.sample_limit_per_repo:null});
+    const seenRepositories = new Set(), seenLocators = new Set();
+    for (const raw of Array.isArray(sample.repositories)?sample.repositories:[]) {
+      if (!raw || typeof raw !== "object") continue;
+      const repository = raw.repository;
+      if (typeof repository !== "string" || !/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})\/[A-Za-z0-9_.-]{1,100}$/.test(repository) || [".",".."].includes(repository.split("/")[1])) continue;
+      const repository_id = Number.isSafeInteger(raw.repository_id)&&raw.repository_id>0?raw.repository_id:null;
+      let key = repository_id?`github:${repository_id}`:raw.repository_key;
+      if (typeof key !== "string" || !/^github:[1-9][0-9]*$/.test(key)) key = repository.toLowerCase();
+      if (seenRepositories.has(key) || seenLocators.has(repository.toLowerCase())) continue;
+      seenRepositories.add(key); seenLocators.add(repository.toLowerCase());
+      const status = value.status!=="unavailable"&&["available","partial","empty","unavailable"].includes(raw.status)?raw.status:"unavailable";
+      const row = {repository,repository_id,repository_key:key,is_private:raw.is_private===true,status,truncated:raw.truncated===true,outside_window:raw.outside_window===true,observed_runs:status==="unavailable"?null:0,weeks:weeks.map(week=>({...week,count:0,pass:0,fail:0,pending:0,other:0,runs:[]}))};
       const seenRuns = new Set();
-      const runs = Array.isArray(row.runs) ? row.runs.slice(0, 60) : [];
-      for (const run of runs) {
-        if (!run || !Number.isSafeInteger(run.run_id) || run.run_id <= 0 ||
-            seenRuns.has(run.run_id) || typeof run.created_at !== "string") {
-          rejected = true; continue;
-        }
-        seenRuns.add(run.run_id);
-        const when = new Date(run.created_at);
-        const at = when.getTime();
-        if (!Number.isFinite(at) || at < start.getTime() || at > end.getTime()) {
-          rejected = true; continue;
-        }
-        const outcome = Object.prototype.hasOwnProperty.call(CI_TIMELINE_SIGNAL, run.outcome)
-          ? run.outcome : "unknown";
-        const signal = CI_TIMELINE_SIGNAL[outcome];
-        const day = when.toISOString().slice(0, 10);
-        const item = {repository:row.repository, run_id:run.run_id, date:day,
-                      workflow:typeof run.workflow === "string" ? run.workflow : "Workflow",
-                      outcome:outcome, label:signal[0], created_at:when.toISOString()};
-        allEvents.push(item);
-        const dot = document.createElement("button");
-        dot.type = "button";
-        dot.className = "ci-dot ci-symbol " + signal[2];
-        dot.style.left = ((at - start.getTime()) / span * 100).toFixed(3) + "%";
-        dot.textContent = signal[1];
-        dot.setAttribute("data-ci-run-id", String(run.run_id));
-        dot.setAttribute("data-ci-outcome", outcome);
-        dot.setAttribute("data-ci-date", day);
-        dot.setAttribute("aria-pressed", "false");
-        dot.setAttribute("aria-label", row.repository + " · " + signal[0] +
-          " · " + day + " UTC · " + item.workflow);
-        dot.title = dot.getAttribute("aria-label");
-        dot.addEventListener("click", function () { showDay(day); });
-        buttons.push(dot);
-        track.append(dot);
+      for (const run of Array.isArray(raw.runs)&&status!=="unavailable"?raw.runs:[]) {
+        if (!run || typeof run !== "object") continue;
+        const identity = run.run_id, when = ciTimestamp(run.created_at);
+        if (!Number.isSafeInteger(identity) || identity<=0 || seenRuns.has(identity) || when===null || when<start || when>end) continue;
+        seenRuns.add(identity);
+        const outcome = typeof run.outcome==="string"&&Object.hasOwn(CI_OUTCOME_GROUPS,run.outcome)?run.outcome:"unknown";
+        const workflow = typeof run.workflow==="string"?Array.from(run.workflow.replace(/[\x00-\x1f\x7f-\x9f]/g," ").trim()).slice(0,100).join(""):"";
+        const item = {run_id:identity,workflow:workflow||"Workflow",created_at:ciStamp(when),outcome,group:CI_OUTCOME_GROUPS[outcome],url:`https://github.com/${repository}/actions/runs/${identity}`};
+        const bucket = row.weeks[Math.min(count-1,Math.floor((when-start)/weekMs))];
+        bucket.runs.push(item); bucket.count+=1; bucket[item.group]+=1; row.observed_runs+=1;
       }
+      for (const week of row.weeks) week.runs.sort((a,b)=>ciTimestamp(a.created_at)-ciTimestamp(b.created_at)||a.run_id-b.run_id);
+      value.repositories.push(row);
     }
-
-    function showDay(day) {
-      const events = allEvents.filter(x => x.date === day)
-        .sort((a, b) => a.created_at.localeCompare(b.created_at));
-      inspect.replaceChildren();
-      const intro = document.createElement("p");
-      intro.textContent = day + " UTC · " + events.length + " observed runs in this sample";
-      inspect.append(intro);
-      const list = document.createElement("ul");
-      for (const event of events) {
-        const li = document.createElement("li");
-        const link = document.createElement("a");
-        link.href = "https://github.com/" + event.repository +
-          "/actions/runs/" + event.run_id;
-        link.textContent = event.repository + " · " + event.workflow;
-        const status = document.createElement("span");
-        status.textContent = " · " + event.label;
-        li.append(link, status);
-        list.append(li);
+    const known = value.repositories.map(row=>row.observed_runs).filter(count=>count!==null);
+    value.observed_runs = known.length?known.reduce((sum,count)=>sum+count,0):null;
+    return value;
+  }
+  function ciDateLabel(value) {
+    return new Intl.DateTimeFormat("en-US",{month:"short",day:"numeric",timeZone:"UTC"}).format(new Date(value));
+  }
+  function ciRunDate(value) {
+    return new Intl.DateTimeFormat("en-US",{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:"UTC"}).format(new Date(value))+" UTC";
+  }
+  function ciEmptyLabel(row) {
+    return row.status==="unavailable"?"Unavailable":row.status==="empty"?"No runs returned":"No runs observed in window";
+  }
+  function ciOutcomeMark(group, count) {
+    const mark = document.createElement("span");
+    mark.setAttribute("class","ci-outcome-mark"); mark.setAttribute("aria-hidden","true");
+    const ns = "http://www.w3.org/2000/svg", svg = document.createElementNS(ns,"svg");
+    svg.setAttribute("viewBox","0 0 24 24"); svg.setAttribute("aria-hidden","true");
+    svg.setAttribute("focusable","false"); svg.setAttribute("class","ci-mark ci-"+group);
+    const shapes = {pass:["circle",{cx:12,cy:12,r:10}],fail:["rect",{x:2,y:2,width:20,height:20,rx:1}],pending:["path",{d:"M12 1 23 22H1Z"}],other:["path",{d:"M12 1 23 12 12 23 1 12Z"}]};
+    const [name, attrs] = shapes[group], shape = document.createElementNS(ns,name);
+    for (const [key, value] of Object.entries(attrs)) shape.setAttribute(key,String(value));
+    svg.appendChild(shape); mark.appendChild(svg);
+    if (count!==null) {
+      const text = document.createElement("span");
+      text.setAttribute("class","ci-mark-count");
+      text.textContent = String(count); mark.appendChild(text);
+    }
+    return mark;
+  }
+  function hydrateCITimeline(sample) {
+    const host = document.getElementById("ci-observatory"), axis = document.getElementById("ci-timeline-axis"), lanes = document.getElementById("ci-timeline-rows"), detail = document.getElementById("ci-selected-group"), note = document.getElementById("ci-observatory-note"), footer = document.getElementById("ci-observatory-count"), scope = document.getElementById("ci-observatory-scope");
+    if (!host || !axis || !lanes || !detail || !note || !footer || !scope) return;
+    axis.replaceChildren(); lanes.replaceChildren(); detail.replaceChildren();
+    const projected = ciWeeklyProjection(sample);
+    host.dataset.status = projected.status;
+    const element = (tag, className, text) => {const el=document.createElement(tag); if(className)el.className=className; if(text!==undefined)el.textContent=text; return el;};
+    const selectPrompt = () => {detail.replaceChildren(element("p","section-meta","Select a weekly group to view its workflow runs."));};
+    selectPrompt();
+    if (!projected.weeks.length) {
+      note.textContent="Workflow history unavailable"; footer.textContent="Run count unavailable"; scope.textContent="No qualified repository observations in this refresh."; return;
+    }
+    note.textContent=ciDateLabel(projected.window_start)+" – "+ciDateLabel(projected.window_end)+", "+new Date(projected.window_end).getUTCFullYear()+" UTC · weekly groups";
+    footer.textContent=(projected.observed_runs===null?"Run count unavailable":projected.observed_runs+" sampled runs")+(projected.status==="available"?"":" · "+projected.status);
+    const limit=projected.sample_limit_per_repo;
+    scope.textContent=(limit?"Up to "+limit+" newest runs per repository. ":"Source sample limit unavailable. ")+"Blank intervals contain no sampled runs; this sample does not measure all workflow activity. "+(projected.observed_at?"Observed "+ciRunDate(projected.observed_at)+". ":"")+"Window "+projected.window_start+" through "+projected.window_end+". Private repository names and run metadata are included where supplied by the authorized snapshot.";
+    host.style.setProperty("--ci-track-min",String(projected.weeks.length*44)+"px");
+    const axisPlot=element("div","ci-axis-plot"); axis.appendChild(element("span","ci-axis-label","Repository")); axis.appendChild(axisPlot);
+    const start=ciTimestamp(projected.window_start), end=ciTimestamp(projected.window_end);
+    for (const portion of [0,.25,.5,.75,1]) {const tick=element("span","",ciDateLabel(ciStamp(start+(end-start)*portion)));tick.style.left=(portion*100)+"%";axisPlot.appendChild(tick);}
+    const labels={pass:"Passed",fail:"Failed",pending:"Pending",other:"Other"};
+    function selectWeek(row, week, button) {
+      for (const selected of lanes.querySelectorAll('[aria-pressed="true"]')) selected.setAttribute("aria-pressed","false");
+      button.setAttribute("aria-pressed","true"); detail.replaceChildren();
+      detail.appendChild(element("h3","",row.repository+(row.is_private?" · private":"")));
+      detail.appendChild(element("p","section-meta",week.start+" ≤ created_at "+(week.inclusive_end?"≤":"<")+" "+week.end));
+      detail.appendChild(element("p","ci-selected-count",week.count+" sampled runs · "+CI_WEEK_GROUPS.map(group=>labels[group]+" "+week[group]).join(" · ")));
+      const list=element("ul","ci-run-details");
+      for (const run of week.runs) {
+        const item=element("li","ci-run-detail"); Object.assign(item.dataset,{role:"ci-run-detail",repository:row.repository,runId:String(run.run_id),createdAt:run.created_at,outcome:run.outcome});
+        const link=element("a","ci-run-link",run.workflow); link.href=run.url; link.rel="noopener noreferrer"; link.target="_blank";
+        const meta=element("span","ci-run-meta",ciRunDate(run.created_at)+" · "+run.outcome.replaceAll("_"," ")+" · #"+run.run_id);
+        item.appendChild(link); item.appendChild(meta); list.appendChild(item);
       }
-      inspect.append(list);
-      for (const button of buttons)
-        button.setAttribute("aria-pressed", String(button.getAttribute("data-ci-date") === day));
+      detail.appendChild(list);
     }
-
-    count.textContent = allEvents.length + " observed Actions runs · " +
-      seenRepos.size + " repository lanes";
-    const limit = Number.isSafeInteger(sample.sample_limit_per_repo) &&
-      sample.sample_limit_per_repo > 0 ? sample.sample_limit_per_repo : null;
-    scope.textContent = "Newest " + (limit == null ? "bounded" : limit) +
-      " received runs per repository, within observed dates. No full-history or success-rate claim.";
-    note.textContent = (sample.status === "partial" || rejected
-      ? "Partial evidence; missing or rejected observations are not zero. "
-      : sample.status === "unavailable"
-      ? "Provider history unavailable. " : "Sampled provider observations. ") +
-      "UTC axis " + dateText(start) + " to " + dateText(end) + ".";
+    for (const row of projected.repositories) {
+      const lane=element("div","ci-lane"); Object.assign(lane.dataset,{role:"ci-repository-row",repository:row.repository,repositoryKey:row.repository_key,private:String(row.is_private),status:row.status});
+      if (row.observed_runs!==null) lane.dataset.observedRuns=String(row.observed_runs);
+      const identity=element("div","ci-identity"), name=element("a","ci-repo-name",row.repository); name.href="https://github.com/"+row.repository; identity.appendChild(name);
+      if (row.is_private) {
+        const label=element("span","ci-private");label.setAttribute("aria-label","Private repository");
+        const ns="http://www.w3.org/2000/svg", lock=document.createElementNS(ns,"svg");lock.setAttribute("class","ci-lock");lock.setAttribute("viewBox","0 0 24 24");lock.setAttribute("aria-hidden","true");
+        const shape=document.createElementNS(ns,"rect");for(const [key,value] of Object.entries({width:18,height:11,x:3,y:11,rx:2,ry:2}))shape.setAttribute(key,String(value));
+        const shackle=document.createElementNS(ns,"path");shackle.setAttribute("d","M7 11V7a5 5 0 0 1 10 0v4");lock.appendChild(shape);lock.appendChild(shackle);label.appendChild(lock);label.appendChild(element("span","","Private"));identity.appendChild(label);
+      }
+      if (row.truncated||row.outside_window||row.status==="partial") identity.appendChild(element("span","ci-lane-note","Partial sample"));
+      const track=element("div","ci-track"); track.style.setProperty("--ci-week-count",String(projected.weeks.length));
+      for (const week of row.weeks) {
+        if (!week.count) {const empty=element("span","ci-empty-week");empty.setAttribute("aria-hidden","true");track.appendChild(empty);continue;}
+        const button=element("button","ci-group"); button.type="button";button.setAttribute("aria-pressed","false");
+        Object.assign(button.dataset,{role:"ci-group",repository:row.repository,windowStart:week.start,windowEnd:week.end,weekIndex:String(week.index),runCount:String(week.count)});
+        const title=row.repository+" · "+week.start+" ≤ created_at "+(week.inclusive_end?"≤":"<")+" "+week.end+" · "+week.count+" sampled runs · "+CI_WEEK_GROUPS.map(group=>labels[group]+" "+week[group]).join(", ");
+        button.setAttribute("aria-label",title);button.title=title;
+        for (const group of CI_WEEK_GROUPS) {const slot=element("span","ci-mark-slot");slot.dataset.group=group;if(week[group])slot.appendChild(ciOutcomeMark(group,week[group]));button.appendChild(slot);}
+        button.addEventListener("click",()=>selectWeek(row,week,button));
+        button.addEventListener("focus",()=>button.scrollIntoView({block:"nearest",inline:"nearest"}));track.appendChild(button);
+      }
+      if (!row.observed_runs) {const empty=element("span","ci-empty-state",ciEmptyLabel(row));track.appendChild(empty);}
+      lane.appendChild(identity);lane.appendChild(track);lanes.appendChild(lane);
+    }
+    if (!projected.repositories.length) lanes.appendChild(element("p","section-meta","Repository observations unavailable"));
+    // Reveal the latest observed group without moving the page vertically.
+    const scroller = document.getElementById("ci-timeline-scroll");
+    const latestWeek = Math.max(-1, ...projected.repositories.flatMap(row => row.weeks.filter(week => week.count).map(week => week.index)));
+    if (scroller && latestWeek >= 0) {
+      const trackWidth = lanes.querySelector?.(".ci-track")?.clientWidth || scroller.scrollWidth;
+      const groupRight = scroller.scrollWidth - trackWidth + (latestWeek + 1) * trackWidth / projected.weeks.length;
+      scroller.scrollLeft = Math.max(0, groupRight - scroller.clientWidth);
+    }
   }
 
   function hydrate(d) {
-    hydrateCIExecution(d.ci_execution);
     hydrateCITimeline(d.ci_timeline);
     hydrateCodeChanges(d.activity_analytics);
     hydrateProjectActivity(d.activity_analytics);
@@ -1289,11 +1208,7 @@ footer a { color: var(--ink); text-decoration: none; }
     });
     // hero meta
     if (d.username) document.getElementById("hero-name").textContent = "@" + d.username;
-    if (d.generated_at) {
-      const dt = new Date(d.generated_at);
-      document.getElementById("updated").textContent = isNaN(dt) ? d.generated_at
-        : dt.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
-    }
+    document.getElementById("updated").textContent = formatUpdatedAt(d.generated_at);
     // CI ring fill
     const ci = get(d, "scorecard.ci_coverage_pct");
     if (ci != null) document.getElementById("ci-ring").style.setProperty("--p", Math.max(0, Math.min(100, ci)));

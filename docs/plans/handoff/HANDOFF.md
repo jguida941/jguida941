@@ -1,3 +1,33 @@
+## Current continuation — November 19, 2026
+
+The active continuation is the private `jguida941/profile-private-continuation`
+repository. Run its `make work-orient` and `make enter`; its work register selects
+`JG-ORG-LAYOUT-001` and retains the issue-ledger, architecture and later quality/CI
+sequence. The current bounded public repair preserves normal commit activity, assigns
+generated artifact commits to the Actions bot, aligns the overview/date/profile link,
+and unifies the website and SVG CI timeline with authorized public/private run metadata.
+This supersedes older directions below that select CI or exclude public main.
+Private authoring, evidence and methods remain in the private continuation; the source
+here remains the currently active publication route until the existing migration is received.
+
+The approved CI visual direction is the November 19 horizontal repository-lane timeline,
+with a top date axis and outcome markers. Other stored CI designs remain unaccepted;
+a future agent must show and discuss their differences with the operator before adopting them.
+
+The receiving route is development first in both repositories. The existing
+`work/overview-publication-20261119` is the temporary integration branch; its source
+receives the history and useful collection, deployment, contract, browser and test
+changes from `development` and `work/overview-publication-20261119-development`.
+Verify the actual committed snapshot, website, SVGs and manifest together, merge to
+`development`, observe receiving CI, then promote the received state to `main`.
+Keep `development` aligned after publication. Retire the two task branches only after
+their history is received; older experimental branches remain explicitly deferred.
+Do not restart this work on another branch or replace private continuation with a
+separate product. The private candidate preserves the same current product behavior
+while its immutable historical source and private assurance remain private.
+
+The following earlier checkpoint is historical context, not the current selector.
+
 **UNIFIED PERSONAL + SEMVERITY LABS ACTIVITY (operator 2026-10-16; selected CI dependency, NOT IMPLEMENTED):** Current account-only collector excludes org-owned repos; user wants ONE Metrics/README/Current Focus/Project Activity/CI chronology that can show explicitly admitted personal + `semverity-labs` repos tagged with their organization. Do not create a duplicate Labs dashboard. Org context lens owns only system identity/approved project relationships, referencing the same metrics. Repository-level pushes/workflows by others are NOT user-authored contributions; actor attribution must be qualified. Canonical repo identity (GitHub ID when present), event dedupe, partial/unavailable windows, private names allowed vs code/logs forbidden are defined in `docs/plans/ACTIVE.md` P5-UNIFIED-ACCOUNT-ORG-01. Priority: private Actions collector/consumer repair → unified org-qualified inventory/event source → README + all visible panels with one data model → desktop/390 visual evidence against user references → private generator and output-only P3/P4 migration → bounded maintainability refactors → queued Apple HIG Showcase/Studio + invitation-only protection. No code/UI implementation or native SemLoop claim in this planning slice. Verify live `development` and active `JG-CI-VIS-001` private head before executing.
 
 **Operator cross-page design clarification (QUEUED, 2026-10-16):** The conceptual three-theme Dashboard/Showcase/Studio mockups are approved for direction only. All four public pages are ONE linked product with shared semantic navigation, theme choice across reload/routes, shared source-qualified facts and separate Apple Dark, Liquid Glass, Carbon native component anatomy. Apple HIG Materials warns against blanket Liquid Glass behind data/content; use functional glass selectively, standard content surfaces, and real contrast/reduced-motion controls. Each button/chip/card variant and contract receipt must become visible and interactive in its owning profile, with an authentic live state transition, not invented pass numbers. `docs/plans/ACTIVE.md` P5-DESIGN-OBSERVATORY-01 now binds the concept and cross-page/Apple acceptance. Do not implement or claim Apple-compliant pixels until selected and subject to RED→GREEN→mutations/native/review and 1280/390 Chrome compared to actual Safari screenshots; active selected CI goal remains unchanged.\n\n## EXACT VERIFIED REENTRY — 2026-10-16 (last source-tested public 27faeeee)

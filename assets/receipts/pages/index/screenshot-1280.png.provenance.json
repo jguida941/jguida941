@@ -4,20 +4,20 @@
   "cannot_mark_done": true,
   "chrome_version": "Google Chrome 157.0.8103.78",
   "command": [
-    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/usr/bin/google-chrome",
     "--headless=new",
     "--no-first-run",
     "--no-default-browser-check",
     "--hide-scrollbars",
     "--window-size=1280,1536",
     "--allow-file-access-from-files",
-    "--screenshot=/Users/jguida941/Documents/Codex/2026-11-15/you-need-to-actually-fix-these/work/pr-scope/public/assets/receipts/pages/index/screenshot-1280.png",
-    "file:///Users/jguida941/Documents/Codex/2026-11-15/you-need-to-actually-fix-these/work/pr-scope/public/site/index.html"
+    "--screenshot=/home/runner/work/jguida941/jguida941/assets/receipts/pages/index/screenshot-1280.png",
+    "file:///home/runner/work/jguida941/jguida941/site/index.html"
   ],
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-screenshot",
   "page": "index",
-  "page_sha256": "7a42981242d5ce7195b6850afe7c0831526686c97598bb1d8e8ee7157a3f2d7d",
+  "page_sha256": "cae83aeb67ff924ff4490f653842593335d292dcb2cd588a7f986cc07e2d85e0",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/index.html",
   "viewport": {

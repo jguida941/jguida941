@@ -284,5 +284,172 @@ class PublicMultiRepositoryCITimelineTests(unittest.TestCase):
         self.assertEqual("unavailable", sample["repositories"][1]["status"])
 
 
+# Owner-authorized minimal public/private execution metadata shares one carrier.
+import json
+from scripts.github.actions_audit import (
+    collect_public_ci_timeline, normalize_public_ci_timeline, select_public_ci_repositories,
+)
+from scripts.pipeline.render_outputs import _public_dashboard_data
+
+
+class RepositoryCITimelineTests(unittest.TestCase):
+    owner = "jguida941"
+    observed = "2026-11-19T20:00:00Z"
+
+    @classmethod
+    def inventory(cls, *, complete=True):
+        def row(identity, name, pushed, *, private=False, owner=cls.owner, fork=False):
+            return {"id": identity, "name": name, "owner": {"login": owner},
+                    "full_name": f"{owner}/{name}", "private": private, "fork": fork,
+                    "pushed_at": pushed, "aliases": [f"{owner}/{name}"],
+                    "has_ci_workflows": False}
+        return {"schema": "profile-repository-inventory/v1",
+                "owners": [cls.owner, "semverity-labs"], "complete": complete,
+                "rows": [
+                    row(101, cls.owner, "2026-11-19T10:00:00Z"),
+                    row(102, "profile-private-continuation", "2026-11-19T19:55:00Z", private=True),
+                    row(103, "dijkstra-dashboard", "2026-11-19T17:38:34Z"),
+                    row(104, "engine", "2026-11-19T19:45:00Z", private=True, owner="semverity-labs"),
+                    row(105, "ordinary", "2026-11-19T19:40:00Z"),
+                    row(106, "sixth", "2026-11-19T18:00:00Z"),
+                    row(107, "older", "2026-11-18T18:00:00Z"),
+                    row(108, "fork", "2026-11-19T19:59:00Z", fork=True),
+                ]}
+
+    @staticmethod
+    def provider_run(identity=301, *, workflow="CI checks", created="2026-11-19T19:49:00Z",
+            status="completed", conclusion="success"):
+        return {"databaseId": identity, "workflowName": workflow, "status": status,
+                "conclusion": conclusion, "createdAt": created,
+                "event": "push", "headBranch": "private-feature",
+                "displayTitle": "Internal commit title", "logs": "private log body",
+                "source": "private source body", "token": "never publish"}
+
+    def normalize(self, observations, **kwargs):
+        return normalize_public_ci_timeline(
+            observations, self.owner, self.observed,
+            repository_inventory=self.inventory(), **kwargs)
+
+    def test_authorized_private_run_metadata_reaches_public_carrier(self):
+        sample = self.normalize([{
+            "repository": "jguida941/profile-private-continuation", "repository_id": 102,
+            "runs": [self.provider_run()],
+        }])
+        public = _public_dashboard_data({"ci_timeline": sample})["ci_timeline"]
+        row = public["repositories"][0]
+        self.assertEqual(1, row["observed_runs"])
+        self.assertEqual([{"run_id": 301, "workflow": "CI checks", "outcome": "success",
+                           "created_at": "2026-11-19T19:49:00Z"}], row["runs"])
+        self.assertEqual("jguida941/profile-private-continuation", row["repository"])
+        self.assertEqual(102, row["repository_id"])
+        self.assertEqual("github:102", row["repository_key"])
+        self.assertTrue(row["is_private"])
+        self.assertEqual([row["repository"]], row["aliases"])
+        self.assertEqual(sample, public)
+        for private_body in ("private-feature", "Internal commit title", "private log body",
+                             "private source body", "never publish"):
+            self.assertNotIn(private_body, json.dumps(public))
+
+    def test_recent_cohort_keeps_private_org_and_retained_workflow_history(self):
+        selected = select_public_ci_repositories([], self.owner,
+                                                 repository_inventory=self.inventory())
+        self.assertEqual([
+            "jguida941/jguida941", "jguida941/profile-private-continuation",
+            "semverity-labs/engine", "jguida941/ordinary", "jguida941/sixth",
+            "jguida941/dijkstra-dashboard",
+        ], selected)
+
+    def test_collector_requests_only_minimal_run_metadata_for_the_same_cohort(self):
+        with patch("scripts.github.actions_audit.run_json", return_value=[]) as provider:
+            sample = collect_public_ci_timeline([], self.owner,
+                                                repository_inventory=self.inventory())
+        selected = select_public_ci_repositories([], self.owner,
+                                                 repository_inventory=self.inventory())
+        self.assertEqual(selected, [row["repository"] for row in sample["repositories"]])
+        self.assertEqual(selected, [call.args[0][call.args[0].index("--repo") + 1]
+                                    for call in provider.call_args_list])
+        for call in provider.call_args_list:
+            command = call.args[0]
+            self.assertEqual("20", command[command.index("--limit") + 1])
+            self.assertEqual("databaseId,workflowName,status,conclusion,createdAt",
+                             command[command.index("--json") + 1])
+
+    def test_unknown_provider_is_distinct_from_observed_empty_and_clipped_history(self):
+        sample = self.normalize([
+            {"repository": "jguida941/jguida941", "runs": []},
+            {"repository": "jguida941/profile-private-continuation", "runs": None},
+            {"repository": "semverity-labs/engine", "runs": {}},
+            {"repository": "jguida941/dijkstra-dashboard",
+             "runs": [self.provider_run(created="2026-01-01T00:00:00Z")]},
+        ])
+        self.assertEqual("partial", sample["status"])
+        self.assertEqual(0, sample["observed_runs"])
+        self.assertEqual([("empty", 0, False), ("unavailable", None, False),
+                          ("unavailable", None, False), ("partial", 0, True)],
+                         [(row["status"], row["observed_runs"], row["outside_window"])
+                          for row in sample["repositories"]])
+        for raw in (None, {}):
+            unknown = self.normalize([{"repository": "jguida941/jguida941", "runs": raw}])
+            self.assertEqual("unavailable", unknown["status"])
+            self.assertIsNone(unknown["observed_runs"])
+            self.assertIsNone(unknown["repositories"][0]["observed_runs"])
+
+    def test_recent_dijkstra_runs_survive_older_clipped_history(self):
+        sample = self.normalize([{"repository": "jguida941/dijkstra-dashboard", "runs": [
+            self.provider_run(44579379689, created="2026-11-19T17:38:37Z"),
+            self.provider_run(44578962915, created="2026-11-19T17:36:16Z"),
+            self.provider_run(1, created="2026-07-22T12:00:00Z"),
+        ]}])
+        row = sample["repositories"][0]
+        self.assertEqual("partial", row["status"])
+        self.assertTrue(row["outside_window"])
+        self.assertEqual(2, row["observed_runs"])
+        self.assertEqual([44579379689, 44578962915], [run["run_id"] for run in row["runs"]])
+
+    def test_alias_identity_admission_rejects_forks_foreign_and_id_conflicts(self):
+        inventory = self.inventory()
+        inventory["rows"][3]["aliases"] = ["jguida941/legacy-engine", "semverity-labs/engine"]
+        sample = normalize_public_ci_timeline([
+            {"repository": "semverity-labs/engine", "repository_id": 104, "runs": [self.provider_run()]},
+            {"repository": "jguida941/fork", "runs": [self.provider_run(302)]},
+            {"repository": "outsider/engine", "runs": [self.provider_run(303)]},
+            {"repository": "jguida941/ordinary", "repository_id": 999, "runs": [self.provider_run(304)]},
+        ], self.owner, self.observed, repository_inventory=inventory)
+        self.assertEqual(["semverity-labs/engine"], [row["repository"] for row in sample["repositories"]])
+        self.assertEqual(1, sample["observed_runs"])
+        self.assertEqual("partial", sample["status"])
+        self.assertEqual("github:104", sample["repositories"][0]["repository_key"])
+        self.assertEqual(["jguida941/legacy-engine", "semverity-labs/engine"],
+                         sample["repositories"][0]["aliases"])
+
+    def test_provider_run_ids_dates_caps_and_duplicate_envelopes_stay_qualified(self):
+        runs = [self.provider_run(True), self.provider_run(301), self.provider_run(301),
+                self.provider_run(302, created="2026-11-20T00:00:00Z"),
+                self.provider_run(303, status="mystery", conclusion=None)]
+        observation = {"repository": "jguida941/profile-private-continuation", "runs": runs}
+        sample = self.normalize([observation, dict(observation)])
+        self.assertEqual(2, sample["observed_runs"])
+        self.assertEqual("partial", sample["status"])
+        self.assertEqual([303, 301], [run["run_id"] for run in sample["repositories"][0]["runs"]])
+        self.assertEqual(["unknown", "success"],
+                         [run["outcome"] for run in sample["repositories"][0]["runs"]])
+        self.assertTrue(sample["repositories"][0]["outside_window"])
+        capped = self.normalize([{"repository": "jguida941/jguida941",
+                                  "runs": [self.provider_run(i + 1) for i in range(21)]}], limit_per_repo=60)
+        self.assertEqual(20, capped["sample_limit_per_repo"])
+        self.assertEqual(20, capped["observed_runs"])
+        self.assertTrue(capped["repositories"][0]["truncated"])
+        self.assertEqual("partial", capped["status"])
+
+    def test_credential_shaped_workflow_names_are_omitted_before_public_projection(self):
+        credential = "ghp_" + "A" * 36
+        sample = self.normalize([{"repository": "jguida941/profile-private-continuation",
+                                  "runs": [self.provider_run(workflow=credential), self.provider_run(302)]}])
+        self.assertNotIn(credential, json.dumps(sample))
+        self.assertEqual([302], [run["run_id"] for run in sample["repositories"][0]["runs"]])
+        self.assertEqual(1, sample["observed_runs"])
+        self.assertEqual("partial", sample["status"])
+
+
 if __name__ == "__main__":
     unittest.main()
