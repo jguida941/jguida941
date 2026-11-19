@@ -86,8 +86,6 @@ jobs:
         target: [public, development]
     env:
       PROFILE_TIMEZONE: America/New_York
-      PREVIEW_OUTPUT: ${{ runner.temp }}/overview-preview
-      PREVIEW_SNAPSHOT: ${{ runner.temp }}/overview-snapshot.json
     steps:
       - uses: actions/checkout@v4
         with:
@@ -102,6 +100,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          export PREVIEW_OUTPUT="$RUNNER_TEMP/overview-preview"
+          export PREVIEW_SNAPSHOT="$RUNNER_TEMP/overview-snapshot.json"
           curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
             "https://raw.githubusercontent.com/jguida941/jguida941/3ca18ac16a2f718c7f551e4cb0f3774497938e79/site/data/profile_snapshot.json" --output "$PREVIEW_SNAPSHOT"
           python -B - <<'PY'
