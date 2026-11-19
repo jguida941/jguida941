@@ -3,28 +3,36 @@
 The active continuation is the private `jguida941/profile-private-continuation`
 repository. Run its `make work-orient` and `make enter`; its work register selects
 `JG-ORG-LAYOUT-001` and retains the issue-ledger, architecture and later quality/CI
-sequence. The current bounded public repair preserves normal commit activity, assigns
-generated artifact commits to the Actions bot, aligns the overview/date/profile link,
-and unifies the website and SVG CI timeline with authorized public/private run metadata.
+sequence. The received public overview/CI repair preserves normal commit activity,
+assigns generated artifact commits to the Actions bot, aligns the overview/date/profile
+link, and unifies the website and SVG CI timeline with authorized public/private run metadata.
 This supersedes older directions below that select CI or exclude public main.
 Private authoring, evidence and methods remain in the private continuation; the source
 here remains the currently active publication route until the existing migration is received.
 
-The approved CI visual direction is the November 19 horizontal repository-lane timeline,
-with a top date axis and outcome markers. Other stored CI designs remain unaccepted;
-a future agent must show and discuss their differences with the operator before adopting them.
+The received November 19 repository-lane timeline is now under operator-requested
+visual revision. The next bounded correction is compact two-week personal-repository
+horizontal stacked outcome bars shared by the README/SVG and website, a bottom legend
+matched to the existing themes, explicit outcome meanings, and run details on expansion. Keep SemVerity Labs out of the personal section while
+retaining its collected data for the separate future organization section. Complete this
+correction in the private selected case before resuming its parent issue-ledger sequence;
+the received timeline is a preserved checkpoint, not final visual acceptance.
 
-The receiving route is development first in both repositories. The existing
-`work/overview-publication-20261119` is the temporary integration branch; its source
-receives the history and useful collection, deployment, contract, browser and test
-changes from `development` and `work/overview-publication-20261119-development`.
-Verify the actual committed snapshot, website, SVGs and manifest together, merge to
-`development`, observe receiving CI, then promote the received state to `main`.
-Keep `development` aligned after publication. Retire the two task branches only after
-their history is received; older experimental branches remain explicitly deferred.
+The November 19 public integration was received on `development` through
+[PR #29](https://github.com/jguida941/jguida941/pull/29), preserving the actual history
+and useful collection, deployment, contract, browser and test changes from development
+and both temporary task branches. Use `development` for continued public integration
+and `main` for the published public source; reread their live heads before work.
+The paired integration, publication and branch-retirement result belongs to the private
+selected case at `records/cases/JG-ORG-LAYOUT-001/README.md`.
+Keep `development` aligned after publication. The temporary
+`work/overview-publication-20261119` and
+`work/overview-publication-20261119-development` identify the received integration
+history; retire them after both histories are received, and check live refs for their
+retirement state. Older experimental branches remain explicitly deferred.
 Do not restart this work on another branch or replace private continuation with a
-separate product. The private candidate preserves the same current product behavior
-while its immutable historical source and private assurance remain private.
+separate product. The private candidate preserves the shared overview/CI slice while
+retaining its additional private identity work, immutable historical source and assurance.
 
 The following earlier checkpoint is historical context, not the current selector.
 
