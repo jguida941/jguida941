@@ -17,9 +17,86 @@ class DashboardSummaryTests(unittest.TestCase):
             root=ET.fromstring(render_svg({},mobile=mobile))
             self.assertEqual(root.get("width"),width)
             sections=[node.get("data-section") for node in root.iter() if node.get("data-section")]
-            self.assertEqual(sections,["overview","weekly","rhythm","languages","automation","working","focus","project-activity","recent-pushes","projects","metrics","calendar"])
+            self.assertEqual(sections,["overview","weekly","rhythm","languages","automation","ci-timeline","working","focus","project-activity","recent-pushes","projects","metrics","calendar"])
             self.assertIn("Contribution calendar unavailable", " ".join(root.itertext()))
             self.assertFalse(any(node.tag.endswith("filter") for node in root.iter()))
+
+
+class CITimelineSVGContract(unittest.TestCase):
+    """The lane marks group collisions; every original observed run survives."""
+
+    def test_desktop_mobile_have_the_same_run_identities_and_unavailable_rows(self):
+        from scripts.github.actions_audit import normalize_public_ci_timeline
+        sample = normalize_public_ci_timeline([
+            {"repository": "jguida941/jguida941", "runs": [
+                {"databaseId": 111, "workflowName": "Tests", "status": "completed", "conclusion": "failure", "createdAt": "2026-10-14T00:00:00Z"},
+                {"databaseId": 112, "workflowName": "Build", "status": "completed", "conclusion": "success", "createdAt": "2026-10-14T08:00:00Z"}]},
+            {"repository": "jguida941/ci-cd-hub", "runs": None},
+        ], "jguida941", "2026-10-15T00:00:00Z")
+        for mobile in (False, True):
+            with self.subTest(mobile=mobile):
+                root = ET.fromstring(render_svg({"ci_timeline": sample}, mobile=mobile))
+                chart = next(n for n in root.iter() if n.get("data-role") == "ci-timeline-chart")
+                details = [n for n in chart.iter() if n.get("data-role") == "ci-run-detail"]
+                self.assertEqual({"111", "112"}, {n.get("data-run-id") for n in details})
+                self.assertEqual({"failure", "success"}, {n.get("data-outcome") for n in details})
+                unavailable = next(n for n in chart.iter() if n.get("data-repository") == "jguida941/ci-cd-hub")
+                self.assertEqual("unavailable", unavailable.get("data-status"))
+                self.assertFalse([n for n in unavailable.iter() if n.get("data-role") == "ci-run-detail"])
+                self.assertIn("newest 20 runs per repository", " ".join(chart.itertext()))
+
+    def test_outcome_shapes_group_collisions_without_losing_actual_states(self):
+        from scripts.rendering.generate_dashboard_summary import ci_weekly_projection
+        outcomes = ["success", "failure", "timed_out", "startup_failure", "queued", "in_progress", "action_required", "cancelled", "skipped", "neutral", "stale", "unknown"]
+        sample = _weekly_ci_fixture()
+        sample["repositories"] = [{"repository":"semverity-labs/private-ci", "repository_id":91, "is_private":True, "status":"available", "runs":[{"run_id":i+1,"workflow":"CI","outcome":outcome,"created_at":"2026-11-19T12:00:00Z"} for i,outcome in enumerate(outcomes)]}]
+        value = ci_weekly_projection(sample)
+        last = value["repositories"][0]["weeks"][-1]
+        self.assertEqual((1,3,3,5), tuple(last[group] for group in ("pass","fail","pending","other")))
+        self.assertEqual(outcomes, [run["outcome"] for run in last["runs"]])
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({"ci_timeline":sample},mobile=mobile))
+            marks = [n for n in root.iter() if n.get("data-role") == "ci-outcome-group"]
+            self.assertEqual({"circle","square","triangle","diamond"}, {n.get("data-shape") for n in marks})
+            self.assertEqual({"1","3","5"}, {n.get("data-count") for n in marks})
+            details = [n for n in root.iter() if n.get("data-role") == "ci-run-detail"]
+            self.assertEqual({str(i) for i in range(1,13)}, {n.get("data-run-id") for n in details})
+            self.assertTrue(all("https://github.com/semverity-labs/private-ci/actions/runs/" in " ".join(n.itertext()) for n in details))
+
+    def test_missing_timeline_does_not_invent_runs(self):
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({}, mobile=mobile))
+            chart = next(n for n in root.iter() if n.get("data-role") == "ci-timeline-chart")
+            self.assertFalse([n for n in chart.iter() if n.get("data-role") == "ci-run-detail"])
+            self.assertIn("Workflow history unavailable", " ".join(chart.itertext()))
+
+    def test_zero_known_window_and_unavailable_are_distinct(self):
+        sample = _weekly_ci_fixture()
+        sample["repositories"] = [
+            {"repository":"example/empty", "status":"empty", "runs":[]},
+            {"repository":"example/old", "status":"partial", "outside_window":True, "runs":[]},
+            {"repository":"example/unavailable", "status":"unavailable", "runs":[]},
+        ]
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({"ci_timeline":sample},mobile=mobile))
+            rows = [n for n in root.iter() if n.get("data-role")=="ci-repository-row"]
+            self.assertIn("No runs returned", " ".join(rows[0].itertext()))
+            self.assertIn("No runs observed in window", " ".join(rows[1].itertext()))
+            self.assertNotIn("Unavailable", " ".join(rows[1].itertext()))
+            self.assertIn("Unavailable", " ".join(rows[2].itertext()))
+
+
+class ProfileLocalClockTests(unittest.TestCase):
+    def test_timestamp_near_midnight_utc_stays_on_october_15_in_eastern(self):
+        from unittest.mock import patch
+        with patch.dict("os.environ", {"PROFILE_TIMEZONE": "America/New_York"}):
+            for mobile in (False, True):
+                root = ET.fromstring(render_svg({
+                    "generated_at": "2026-10-16T02:01:27Z",
+                }, mobile=mobile))
+                labels = " ".join(root.itertext())
+                self.assertIn("Updated Oct 15, 2026, 10:01 PM EDT", labels)
+                self.assertNotIn("Updated Oct 16, 2026", labels)
 
 
 class DashboardVisualTests(unittest.TestCase):
@@ -1131,3 +1208,82 @@ class OverviewSnapshotLayoutTests(unittest.TestCase):
                 group = next(n for n in root.iter() if n.get("data-metric-id") == "profile.contributions")
                 self.assertEqual(expected, next(n.text for n in group.iter() if n.get("data-role") == "value"))
                 self.assertEqual(before, summary)
+
+
+def _weekly_ci_fixture():
+    """Deliberately mixed observations, including the seventh repository."""
+    from datetime import datetime, timedelta, timezone
+    start = datetime(2026, 8, 27, 12, tzinfo=timezone.utc)
+    stamp = lambda moment: moment.isoformat().replace("+00:00", "Z")
+    run = lambda identity, outcome, moment, name="CI": {"run_id": identity, "workflow": name, "outcome": outcome, "created_at": stamp(moment)}
+    repositories = [
+        {"repository": "example/public", "status": "partial", "is_private": False, "observed_runs": 5, "runs": [
+            run(1, "success", start), run(2, "failure", start + timedelta(hours=1)),
+            run(3, "queued", start + timedelta(days=7)), run(4, "cancelled", start + timedelta(days=83)),
+            run(5, "constructor", start + timedelta(days=84), '<img onerror="bad()">'),
+            run(2, "failure", start + timedelta(hours=1)), run(6, "success", start + timedelta(days=85)),
+            {"run_id": "bad", "workflow": "CI", "outcome": "success", "created_at": stamp(start)}]},
+        {"repository": "example/profile-private-continuation-with-a-long-name", "status": "available", "is_private": True, "observed_runs": 2, "runs": [
+            run(11, "in_progress", start + timedelta(days=7)), run(12, "success", start + timedelta(days=84))]},
+        {"repository": "example/empty", "status": "empty", "is_private": False, "observed_runs": 0, "runs": []},
+        {"repository": "example/unavailable", "status": "unavailable", "is_private": True, "observed_runs": None, "runs": []},
+    ]
+    repositories.extend({"repository": "example/repo-" + str(i), "status": "available", "is_private": False, "observed_runs": 1, "runs": [run(20+i, "success", start + timedelta(days=i))]} for i in range(3))
+    repositories.append({"repository": "example/public", "status": "available", "runs": [run(99, "success", start)]})
+    repositories[6].update(repository="semverity-labs/renamed-project", repository_id=91234)
+    repositories.append({"repository":"example/old-project-name","repository_id":91234,"status":"available","runs":[run(100,"success",start)]})
+    return {"schema": "profile-ci-timeline/v1", "owner": "example", "status": "partial", "window_start": stamp(start), "window_end": stamp(start + timedelta(days=84)), "sample_limit_per_repo": 37, "observed_at": stamp(start + timedelta(days=84)), "observed_runs": 10, "repositories": repositories}
+
+
+class CIWeeklyProjectionTests(unittest.TestCase):
+    def test_weekly_svg_retains_mixed_counts_private_and_all_repositories(self):
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({"ci_timeline": _weekly_ci_fixture()}, mobile=mobile))
+            rows = [n for n in root.iter() if n.get("data-role") == "ci-repository-row"]
+            self.assertEqual(7, len(rows), "the renderer must not silently stop at six repositories")
+            cells = [n for n in rows[0].iter() if n.get("data-role") == "ci-week"]
+            self.assertEqual(12, len(cells), "group colliding runs without replacing the repository lane")
+            self.assertEqual(("2", "1", "1", "0", "0"), tuple(cells[0].get("data-" + key) for key in ("count", "pass", "fail", "pending", "other")))
+            self.assertEqual("1", cells[1].get("data-pending"))
+            self.assertEqual("2", cells[-1].get("data-other"))
+            self.assertEqual("true", rows[1].get("data-private"))
+            self.assertIn("private", " ".join(rows[1].itertext()).lower())
+            self.assertIn("No runs returned", " ".join(rows[2].itertext()))
+            self.assertIn("Unavailable", " ".join(rows[3].itertext()))
+            self.assertNotIn("This is not a success-rate measurement", " ".join(root.itertext()))
+            self.assertEqual(12, len({n.get("data-x") for n in cells}))
+            self.assertTrue(all(float(n.get("data-width")) >= 24 for n in cells))
+            self.assertFalse([n for n in cells if n.tag.endswith("rect")], "the accepted visualization uses lane markers, not boxed heatmap cells")
+            self.assertIn("weekly groups", " ".join(root.itertext()))
+            marks = [n for n in cells[0].iter() if n.get("data-role") == "ci-outcome-group"]
+            self.assertEqual({"circle", "square"}, {n.get("data-shape") for n in marks})
+            self.assertEqual({"1"}, {n.get("data-count") for n in marks})
+
+    def test_projection_bins_preserve_boundaries_and_every_observed_run(self):
+        from scripts.rendering import generate_dashboard_summary as renderer
+        project = getattr(renderer, "ci_weekly_projection", None)
+        self.assertTrue(callable(project), "weekly view must expose its pure projection for parity verification")
+        value = project(_weekly_ci_fixture())
+        self.assertEqual(12, len(value["weeks"]))
+        rows = value["repositories"]
+        self.assertEqual(7, len(rows))
+        self.assertEqual([1, 2], [r["run_id"] for r in rows[0]["weeks"][0]["runs"]])
+        self.assertEqual([3], [r["run_id"] for r in rows[0]["weeks"][1]["runs"]])
+        self.assertEqual([4, 5], [r["run_id"] for r in rows[0]["weeks"][-1]["runs"]])
+        self.assertEqual(10, value["observed_runs"])
+        self.assertEqual(37, value["sample_limit_per_repo"])
+        self.assertEqual("partial", value["status"])
+        self.assertEqual("other", rows[0]["weeks"][-1]["runs"][-1]["group"])
+        self.assertEqual("https://github.com/example/public/actions/runs/5", rows[0]["weeks"][-1]["runs"][-1]["url"])
+        self.assertEqual("unavailable", project(None)["status"])
+
+    def test_nonstandard_long_window_is_not_silently_truncated(self):
+        from scripts.rendering import generate_dashboard_summary as renderer
+        project = getattr(renderer, "ci_weekly_projection", None)
+        self.assertTrue(callable(project))
+        fixture = _weekly_ci_fixture()
+        fixture["window_start"] = "2025-11-19T12:00:00Z"
+        fixture["repositories"] = [{"repository":"example/year", "status":"available", "runs":[{"run_id":1,"workflow":"CI","outcome":"success","created_at":fixture["window_start"]},{"run_id":2,"workflow":"CI","outcome":"success","created_at":fixture["window_end"]}]}]
+        value = project(fixture)
+        self.assertEqual(53, len(value["weeks"]))
+        self.assertEqual(2, value["observed_runs"])

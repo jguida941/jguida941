@@ -81,81 +81,6 @@ class WebDashboardContract(unittest.TestCase):
                        "Contribution Calendar", "Contribution Rhythm"):
             self.assertIn(needle, self.html, f"web dashboard missing {needle!r}")
 
-    def test_ci_execution_is_a_separate_governed_dashboard_section(self):
-        """Configuration is not execution, and the new view reuses product chrome."""
-        html = self.html
-        self.assertLess(html.index('id="automation"'), html.index('id="ci-execution"'))
-        self.assertLess(html.index('id="ci-execution"'), html.index('id="weekly-contributions"'))
-        for fragment in (
-            'class="panel ci-execution-panel"',
-            'class="mgroup ci-run-list"',
-            'id="ci-execution-note" role="status"',
-            'hydrateCIExecution(d.ci_execution)',
-            "profile-ci-execution/v1",
-            "CI_OUTCOME",
-            "STATUS_ICON[type]",
-            'title.textContent = run.workflow',
-            'title.href = "https://github.com/jguida941/jguida941/actions/runs/" + run.run_id',
-            'Number.isSafeInteger(r.run_id)',
-        ):
-            self.assertIn(fragment, html, f"CI proof surface lost {fragment!r}")
-        self.assertIn("not an account-wide", html.lower())
-        self.assertNotIn("https://api.github.com/repos/jguida941/jguida941/actions/runs", html,
-                         "live browser API access would bypass the qualified snapshot")
-        self.assertIn(".ci-execution-panel .ci-run-list[hidden] { display: none; }", html)
-        self.assertIn(".ci-execution-panel .ci-status { justify-self: end;", html)
-        self.assertIn(".ci-execution-panel .ci-status { justify-self: start;", html)
-
-    def test_ci_run_hydration_rejects_inherited_status_and_markup(self):
-        """Execute emitted hydration, including a hostile run and branch label."""
-        import json
-        import shutil
-        import subprocess
-        if shutil.which("node") is None:
-            self.skipTest("Node required to exercise emitted CI hydration")
-        from scripts.pipeline.web_render import render_dashboard
-        scripts = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)
-        self.assertEqual(1, len(scripts))
-        harness = r'''
-const fs=require('node:fs'), vm=require('node:vm');
-const src=JSON.parse(fs.readFileSync(0,'utf8'));
-const element=(tag)=>({tag,children:[],hidden:false,textContent:'',innerHTML:'',
-  append(...children){this.children.push(...children)},replaceChildren(){this.children=[]}});
-const host=element('div'), note=element('p'), extra=element('div'), more=element('details'), moreLabel=element('summary');
-const idle={then(){return this},catch(){return this}};
-const doc={documentElement:{dataset:{}},querySelectorAll(){return []},
-  getElementById(id){return ({'ci-execution-rows':host,'ci-execution-note':note,'ci-execution-more':more,'ci-execution-more-rows':extra,'ci-execution-more-label':moreLabel})[id]},createElement:element};
-const ctx={document:doc,location:{hash:'',search:''},localStorage:{getItem(){return null},setItem(){}},
-  URLSearchParams,addEventListener(){},requestAnimationFrame(){},fetch(){return idle},sample:src.sample};
-vm.runInNewContext(src.script+'\nhydrateCIExecution(sample);',ctx,{timeout:5000});
-const item=host.children[0], title=item.children[0].children[0], meta=item.children[0].children[1], badge=item.children[1];
-process.stdout.write(JSON.stringify({count:host.children.length,extra_count:extra.children.length,
-  more_hidden:more.hidden,more_label:moreLabel.textContent,url:title.href,title:title.textContent,
-  meta:meta.textContent,badge:badge.innerHTML,notice:note.textContent}));
-'''
-        fixture = {
-            "schema": "profile-ci-execution/v1", "repository": "jguida941/jguida941",
-            "status": "available", "observed_at": "2026-10-15T12:03:00Z",
-            "runs": [{"run_id": 9, "workflow": '<img src=x onerror=alert(1)>',
-                      "outcome": "constructor", "head_branch": "<script>bad</script>",
-                      "created_at": "2026-10-15T12:02:00Z"}] + [
-                {"run_id": i, "workflow": "Test Profile Pipeline", "outcome": "success",
-                 "head_branch": "main", "created_at": "2026-10-15T12:00:00Z"}
-                for i in range(10, 21)
-            ],
-        }
-        result = subprocess.run(["node", "-e", harness],
-                                input=json.dumps({"script": scripts[0], "sample": fixture}),
-                                text=True, capture_output=True, timeout=10, check=True)
-        value = json.loads(result.stdout)
-        self.assertEqual(6, value["count"])
-        self.assertEqual(6, value["extra_count"])
-        self.assertIs(value["more_hidden"], False)
-        self.assertEqual("6 more observed runs", value["more_label"])
-        self.assertEqual("https://github.com/jguida941/jguida941/actions/runs/9", value["url"])
-        self.assertEqual('<img src=x onerror=alert(1)>', value["title"])
-        self.assertIn("<script>bad</script>", value["meta"])
-        self.assertIn("Unknown", value["badge"])
 
     def test_ci_index_receipt_is_pinned_and_no_overflow_at_true_390(self):
         """An actual 390px browser probe must agree with the committed index."""
@@ -1335,3 +1260,154 @@ class OverviewProfileLinkAndTimeTests(unittest.TestCase):
         with patch.dict(os.environ, {"PROFILE_TIMEZONE": "UTC"}):
             summary["generated_at"] = "2026-11-19T18:02:33Z"
             self.assertEqual("Updated Nov 19, 2026, 6:02 PM UTC", _hydrate_profile_headline(summary)["updated"])
+
+
+class CIWeeklyWebsiteTests(unittest.TestCase):
+    def test_one_cross_repository_panel_follows_visible_live_overview(self):
+        from scripts.pipeline.web_render import render_dashboard
+        html = render_dashboard()
+        self.assertTrue('<header class="panel hero" id="overview"' in html, "the live overview remains visible")
+        self.assertEqual(1, html.count('id="ci-observatory"'))
+        self.assertNotIn('id="ci-execution"', html)
+        self.assertNotIn('id="ci-actions"', html)
+        self.assertNotIn('id="interactive-details"', html)
+        self.assertNotIn('class="canonical-profile"', html)
+        self.assertLess(html.index('id="overview"'), html.index('id="ci-observatory"'))
+        self.assertIn('hydrateCITimeline(d.ci_timeline)', html)
+        self.assertIn('.ci-group:focus-visible', html)
+        self.assertIn('min-height: 44px', html)
+        self.assertIn('repeat(var(--ci-week-count), minmax(44px,1fr))', html)
+        self.assertIn('class="ci-plot-scroll table-scroll"', html)
+        self.assertLess(html.index('id="automation"'), html.index('id="ci-observatory"'))
+        self.assertLess(html.index('id="ci-observatory"'), html.index('id="weekly-contributions"'))
+        self.assertIn('<details class="ci-sample-details"', html)
+        self.assertNotIn("private run details are withheld", html.lower())
+
+    def test_javascript_and_svg_project_identical_qualified_weekly_facts(self):
+        from tests.contracts.test_dashboard_summary import _weekly_ci_fixture
+        from scripts.rendering import generate_dashboard_summary as renderer
+        from scripts.pipeline.web_render import render_dashboard
+        project = getattr(renderer, "ci_weekly_projection", None)
+        self.assertTrue(callable(project))
+        html = render_dashboard()
+        script = re.findall(r"<script>(.*?)</script>", html, re.S)[0]
+        self.assertIn("function ciWeeklyProjection(sample)", script)
+        part = script[script.index("  const CI_WEEK_GROUPS"):script.index("  function hydrateCITimeline(")]
+        harness = r"const fs=require('node:fs'),vm=require('node:vm');const x=JSON.parse(fs.readFileSync(0,'utf8'));process.stdout.write(JSON.stringify(vm.runInNewContext(x.script+'\nciWeeklyProjection(sample);',{sample:x.sample})));"
+        fixture = _weekly_ci_fixture()
+        completed = subprocess.run(["node","-e",harness], input=json.dumps({"script":part,"sample":fixture}),capture_output=True,text=True,check=True,timeout=15)
+        actual = json.loads(completed.stdout)
+        self.assertEqual(project(fixture), actual)
+        self.assertEqual(10, actual["observed_runs"])
+        private = actual["repositories"][1]
+        self.assertTrue(private["is_private"])
+        self.assertEqual([11,12], [run["run_id"] for week in private["weeks"] for run in week["runs"]])
+
+    def test_emitted_lane_controls_preserve_private_runs_and_clear_on_unavailable_refresh(self):
+        """Execute emitted DOM behavior; mutate the conservation and privacy laws."""
+        from tests.contracts.test_dashboard_summary import _weekly_ci_fixture
+        from scripts.pipeline.web_render import render_dashboard
+        script = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)[0]
+        source = script[script.index("  const CI_WEEK_GROUPS"):script.index("  function hydrate(d)")]
+        harness = r'''
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const input=JSON.parse(fs.readFileSync(0,'utf8'));
+class El {
+  constructor(tag='div'){this.tagName=tag;this.children=[];this.attrs={};this.dataset={};this.style={setProperty(k,v){this[k]=v}};this.handlers={};this.textContent='';}
+  appendChild(child){this.children.push(child);return child;}
+  replaceChildren(...children){this.children=children;this.textContent='';}
+  setAttribute(k,v){this.attrs[k]=String(v);}
+  getAttribute(k){return this.attrs[k]??null;}
+  addEventListener(k,fn){this.handlers[k]=fn;}
+  scrollIntoView(){this.scrolled=true;}
+  querySelectorAll(query){const all=[];for(const child of this.children){if(query==='[aria-pressed="true"]'&&child.attrs['aria-pressed']==='true')all.push(child);all.push(...child.querySelectorAll(query));}return all;}
+}
+const ids=['ci-observatory','ci-timeline-axis','ci-timeline-rows','ci-selected-group','ci-observatory-note','ci-observatory-count','ci-observatory-scope'];
+const nodes=Object.fromEntries(ids.map(id=>[id,new El()]));
+const document={getElementById:id=>nodes[id]||null,createElement:tag=>new El(tag),createElementNS:(_,tag)=>new El(tag)};
+const context={document,sample:input.sample};vm.createContext(context);
+vm.runInContext(input.source+'\nhydrateCITimeline(sample);',context);
+const lanes=nodes['ci-timeline-rows'].children;
+assert.equal(lanes.length,7,'one lane per admitted identity; private and org rows included');
+assert.deepEqual(lanes.map(lane=>lane.dataset.observedRuns),['5','2','0',undefined,'1','1','1']);
+const buttons=lanes.flatMap(lane=>lane.children[1].children.filter(node=>node.tagName==='button'));
+assert.equal(buttons.reduce((sum,button)=>sum+Number(button.dataset.runCount),0),10,'weekly grouping conserves every valid run exactly once');
+const publicGroups=buttons.filter(b=>b.dataset.repository==='example/public');
+assert.deepEqual(publicGroups.map(b=>Number(b.dataset.runCount)),[2,1,2]);
+const groupCounts=button=>Object.fromEntries(button.children.map(slot=>[slot.dataset.group,Number(slot.children[0]?.children[1]?.textContent||0)]));
+assert.deepEqual(groupCounts(publicGroups.at(-1)),{pass:0,fail:0,pending:0,other:2});
+const privateGroups=buttons.filter(b=>b.dataset.repository==='example/profile-private-continuation-with-a-long-name');
+assert.equal(privateGroups.length,2,'private runs have the same controls as public runs');
+assert(lanes[1].children[0].children.some(n=>n.className==='ci-private'),'private visibility is labeled');
+assert.equal(nodes['ci-observatory-count'].textContent,'10 sampled runs · partial');
+assert(nodes['ci-observatory-scope'].textContent.includes('37 newest'),'actual carrier limit survives');
+assert(nodes['ci-observatory-note'].textContent.includes('weekly groups'));
+function selectedRuns(){return nodes['ci-selected-group'].children.at(-1).children;}
+privateGroups.at(-1).handlers.click();
+assert.deepEqual(selectedRuns().map(run=>run.dataset.runId),['12']);
+assert.equal(selectedRuns()[0].children[0].href,'https://github.com/example/profile-private-continuation-with-a-long-name/actions/runs/12');
+assert.equal(selectedRuns()[0].dataset.createdAt,'2026-11-19T12:00:00Z');
+publicGroups[0].handlers.click();
+assert.deepEqual(selectedRuns().map(run=>run.dataset.outcome),['success','failure']);
+assert.equal(privateGroups.at(-1).getAttribute('aria-pressed'),'false');
+publicGroups.at(-1).handlers.click();
+assert.deepEqual(selectedRuns().map(run=>run.dataset.outcome),['cancelled','unknown']);
+assert.equal(selectedRuns()[1].children[0].textContent,'<img onerror="bad()">','hostile workflow markup is only text');
+assert.equal(selectedRuns()[1].children.length,2);
+assert(publicGroups.at(-1).getAttribute('aria-label').includes('2026-11-19T12:00:00Z'));
+privateGroups[0].handlers.focus();assert(privateGroups[0].scrolled,'keyboard focus is brought into the contained scroll view');
+vm.runInContext('hydrateCITimeline({...sample,status:"unavailable"});',context);
+assert.equal(nodes['ci-timeline-rows'].children.flatMap(lane=>lane.children[1].children.filter(node=>node.tagName==='button')).length,0,'an unavailable refresh cannot retain success controls');
+assert.equal(nodes['ci-selected-group'].children.length,1,'previous selected run detail is cleared');
+assert.equal(nodes['ci-selected-group'].children[0].textContent,'Select a weekly group to view its workflow runs.');
+assert.equal(nodes['ci-observatory-count'].textContent,'Run count unavailable · unavailable');
+'''
+        fixture = _weekly_ci_fixture()
+        def run(js):
+            return subprocess.run(["node","-e",harness],input=json.dumps({"source":js,"sample":fixture}),capture_output=True,text=True,timeout=15)
+        healthy=run(source)
+        self.assertEqual(0, healthy.returncode, healthy.stderr[-5000:])
+        for original, wrong in (
+            ('!Number.isSafeInteger(identity)', 'false'),
+            ('|| seenRuns.has(identity)', ''),
+            ('|| when>end', ''),
+            ('cancelled:"other"', 'cancelled:"pass"'),
+            ('value.status!=="unavailable"&&', ''),
+            ('for (const row of projected.repositories) {', 'for (const row of projected.repositories) { if (row.is_private) continue;'),
+        ):
+            with self.subTest(wrong_fix=original):
+                self.assertIn(original,source)
+                self.assertNotEqual(0,run(source.replace(original,wrong,1)).returncode,'wrong implementation must fail the observed DOM oracle')
+
+    def test_ci_marks_reuse_theme_roles_and_have_no_tiles_or_inline_html_data(self):
+        from scripts.pipeline.web_render import _component_css, _ci_observatory, render_dashboard
+        css = _component_css()
+        ci = css[css.index('/* CI repository lanes'):css.index('/* --- language bar')]
+        self.assertNotRegex(ci, r"#[0-9a-fA-F]{3,8}\b")
+        for token in ('var(--status-success)','var(--status-danger)','var(--status-warning)','var(--hairline)','var(--ink-dim)'):
+            self.assertIn(token,ci)
+        self.assertIn('background: transparent',ci)
+        self.assertIn('overflow-x: auto',ci)
+        self.assertIn('container-type: inline-size',ci)
+        markup = _ci_observatory()
+        self.assertEqual(1,markup.count('<h2'))
+        self.assertEqual(4,markup.count('class="ci-mark ci-'))
+        self.assertNotIn('<details class="ci-sample-details" open',markup)
+        script = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)[0]
+        ci_js = script[script.index('  const CI_WEEK_GROUPS'):script.index('  function hydrate(d)')]
+        self.assertNotIn('innerHTML',ci_js)
+        self.assertNotIn('https://api.github.com',ci_js)
+
+
+    def test_projection_parity_preserves_unicode_names_and_extreme_valid_dates(self):
+        from scripts.pipeline.web_render import render_dashboard
+        from scripts.rendering.generate_dashboard_summary import ci_weekly_projection
+        script = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)[0]
+        source = script[script.index("  const CI_WEEK_GROUPS"):script.index("  function hydrateCITimeline(")]
+        fixture = {"schema":"profile-ci-timeline/v1","status":"available","window_start":"9999-12-23T12:00:00Z","window_end":"9999-12-31T12:00:00Z","repositories":[{"repository":"example/workflows","status":"available","runs":[{"run_id":1,"created_at":"9999-12-31T12:00:00Z","workflow":"🚀"*100,"outcome":"success"}]}]}
+        harness = r"const fs=require('node:fs'),vm=require('node:vm');const x=JSON.parse(fs.readFileSync(0,'utf8'));process.stdout.write(JSON.stringify(vm.runInNewContext(x.source+'\nciWeeklyProjection(sample);',{sample:x.sample})));"
+        completed = subprocess.run(["node","-e",harness],input=json.dumps({"source":source,"sample":fixture}),capture_output=True,text=True,check=True,timeout=15)
+        value = json.loads(completed.stdout)
+        self.assertEqual(ci_weekly_projection(fixture),value)
+        self.assertEqual(2,len(value["weeks"]))
+        self.assertEqual("🚀"*100,value["repositories"][0]["weeks"][-1]["runs"][0]["workflow"])

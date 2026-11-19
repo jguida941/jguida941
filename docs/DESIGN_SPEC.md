@@ -408,3 +408,60 @@ descriptions remain in the website's closed details and the SVG descriptions/tit
 The static README panels show the same first eight repositories and fourteen dates
 with branches collapsed. An ordinary **Project activity details** link after the
 summary picture opens the website's Project activity section.
+
+### CI-REPO-TIMELINE-02: accepted repository lanes (2026-11-19)
+
+The user's current screenshot is the visual authority: retain horizontal repository
+lanes, a dated time axis, and outcome dots/shapes. The user explicitly deferred
+alternative CI designs; a boxed weekly heatmap or other redesign requires a future
+visual discussion. This revision supersedes the candidate public-only, one-dot-per-run
+layout and the historical private daily-grid/detail-suppression view.
+
+Both README SVG sizes and the visible website CI panel project `ci_timeline` from
+the same saved snapshot. The website keeps its live overview, Builder Scorecard,
+CI Workflow Timeline, then weekly contributions. The SVG timeline follows Workflow
+configuration and precedes Currently Working On. There is one website CI panel;
+the old profile-repository-only execution panel is not a second visible source.
+
+A repository lane retains its full owner/name and stable repository identity. Private
+lanes have a lock and text label. The user explicitly authorized public presentation
+of private repository names, workflow names, run dates, outcomes, IDs, and run links.
+No workflow content, logs, credentials, branch names, or run payloads enter this view.
+The presentation accepts all identities admitted by the carrier, including canonical
+organization and renamed/transferred repositories; it does not rediscover or filter
+repositories by the profile owner's name.
+
+Colliding runs are grouped into consecutive seven-day UTC intervals anchored at
+`window_start`. Each interval is start-inclusive/end-exclusive; only the final
+interval includes `window_end`. The current 84-day sample has twelve positions.
+The complete supported 7..365-day range derives its group count from the declared
+span; longer static timelines use continuation tracks of at most twelve positions.
+The web timeline scrolls inside its own bounded container with an explicit affordance.
+
+Each nonempty interval shows exact category counts in separate, vertically spaced
+outcome marks: Passed uses a circle; Failed a square; Pending a triangle; Other a
+diamond. Success is Passed; failure, timed_out and startup_failure are Failed;
+queued, in_progress and action_required are Pending; cancelled, skipped, neutral,
+stale and unknown are Other. Unknown never inherits success. Color supplements the
+shapes. A mixed passed/failed interval retains both counts. Empty intervals have no
+invented run or zero-total claim. Repository rows distinguish `Unavailable`,
+`No runs returned`, and `No runs observed in window` for a successful but clipped
+sample. Partial/truncated observations remain qualified.
+
+The SVG has three axis labels at phone width, wrapped repository labels above each
+track, exact UTC interval bounds and original run details in titles, and a short
+sample-count footer. The website has native controls of at least 44 by 44 pixels,
+visible keyboard focus, and a selected-group list containing each actual workflow,
+original timestamp, outcome, ID, and canonical GitHub run link for that repository
+and interval. Names and details wrap; only the timeline may scroll horizontally.
+The sample limit comes from `sample_limit_per_repo`; longer qualifications and the
+exact observed/window times stay in collapsed Sampling details. Neither view turns
+a bounded sample into a success rate or an account-wide completeness claim.
+
+Pure Python and JavaScript projections are checked against the same adversarial
+fixture. Current guards conserve IDs and category counts, include private and
+organization rows, deduplicate stable identities, retain boundary runs, reject
+out-of-window/malformed identities, preserve every outcome subtype in detail, and
+clear previous controls on unavailable refresh. Real populated Chrome screenshots
+at desktop and 390px, plus SVG 840/360 crops and element bounds, remain required;
+unit checks do not certify visual acceptance.

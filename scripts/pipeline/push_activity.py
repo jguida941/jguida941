@@ -18,6 +18,65 @@ _PUSH_TYPES = frozenset(("push", "force_push"))
 _MAX_COMPARE_COMMITS = 25
 
 
+def repository_fields(repository: str, repository_id=None, aliases=None) -> dict:
+    """Carry an admitted locator and provider ID without resolving another owner."""
+    identity = repository_id if type(repository_id) is int and repository_id > 0 else None
+    return {"repository_id": identity,
+            "repository_key": f"github:{identity}" if identity else repository.casefold().replace("/", ":"),
+            "full_name": repository, "owner_login": repository.split("/", 1)[0],
+            "aliases": [value for value in aliases if type(value) is str and _REPO.fullmatch(value)]
+                       if type(aliases) is list else []}
+
+
+def admitted_repository_rows(inventory: Any, owner: str) -> tuple[list[dict], bool]:
+    """Validate the existing inventory at a family boundary; never discover owners.
+
+    The caller must explicitly supply the canonical inventory. Its owner list
+    cannot authorize an arbitrary organization, and ambiguous identities are
+    omitted as incomplete rather than resolved by input order.
+    """
+    from scripts.pipeline.profile_helpers import contains_credential_material
+
+    allowed = {owner.casefold(), "semverity-labs"}
+    if (type(inventory) is not dict or inventory.get("schema") != "profile-repository-inventory/v1"
+            or type(inventory.get("rows")) is not list or type(inventory.get("owners")) is not list
+            or any(type(value) is not str or value.casefold() not in allowed for value in inventory["owners"])
+            or owner.casefold() not in {value.casefold() for value in inventory["owners"]}):
+        return [], False
+    owners = {value.casefold() for value in inventory["owners"]}
+    complete = inventory.get("complete") is True
+    received, identities, locators, conflicts = [], {}, {}, set()
+    for row in inventory["rows"]:
+        if type(row) is not dict:
+            complete = False
+            continue
+        repository = row.get("full_name")
+        raw_owner = row.get("owner")
+        login = raw_owner.get("login") if type(raw_owner) is dict else None
+        identity = row.get("id")
+        if (type(repository) is not str or not _REPO.fullmatch(repository)
+                or repository.split("/")[1] in {".", ".."} or contains_credential_material(repository)
+                or type(login) is not str or login.casefold() not in owners
+                or type(row.get("name")) is not str
+                or repository.casefold() != f"{login}/{row['name']}".casefold()
+                or type(row.get("private")) is not bool or type(row.get("fork")) is not bool
+                or identity is not None and (type(identity) is not int or identity <= 0)):
+            complete = False
+            continue
+        key = repository_fields(repository, identity)["repository_key"]
+        locator = repository.casefold()
+        if identity is None:
+            complete = False
+        if key in identities or locator in locators:
+            conflicts.add(key)
+            if locator in locators:
+                conflicts.add(locators[locator])
+            complete = False
+        identities[key], locators[locator] = row, key
+        received.append((key, row))
+    return [row for key, row in received if key not in conflicts], complete
+
+
 def _timestamp(value: Any) -> datetime | None:
     if type(value) is not str:
         return None

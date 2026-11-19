@@ -185,3 +185,175 @@ def collect_profile_ci_runs(repository: str, limit: int = 12) -> dict:
     except (RuntimeError, ValueError):
         rows = None
     return normalize_profile_ci_runs(rows, repository, observed_at, limit=limit)
+
+
+# CI-REPO-TIMELINE-01: bounded repository execution metadata sample.
+# The README and website share this carrier. It must never describe the
+# complete account or imply a sample is the population of successful runs.
+def select_public_ci_repositories(repositories: object, owner: str, *, limit: int = 6,
+                                  repository_inventory=None) -> list[str]:
+    """Pick a stable, recently pushed CI cohort, prioritizing profile self.
+
+    Explicit canonical inventory admits nonfork repositories for run sampling;
+    current workflow configuration cannot rule out retained run history.
+    Without that inventory, retain the public personal workflow cohort and
+    reject explicitly private, forked and foreign rows.
+    """
+    import re
+    if not re.fullmatch(r"[A-Za-z0-9-]+", owner):
+        return []
+    if repository_inventory is not None:
+        from scripts.pipeline.push_activity import admitted_repository_rows
+        members, _complete = admitted_repository_rows(repository_inventory, owner)
+        profile = f"{owner}/{owner}".casefold()
+        eligible = [row for row in members if row["fork"] is False]
+        eligible.sort(key=lambda row: (_utc_instant(row.get("pushed_at")) or "", row["full_name"].casefold()), reverse=True)
+        selected = [row for row in eligible if row["full_name"].casefold() == profile]
+        selected += [row for row in eligible if row["full_name"].casefold() != profile]
+        return [row["full_name"] for row in selected[:max(1, min(6, limit))]]
+    eligible = []
+    for repo in repositories if isinstance(repositories, list) else []:
+        if not isinstance(repo, dict) or repo.get("private") is not False or repo.get("fork") is True:
+            continue
+        name = repo.get("name")
+        identity = repo.get("owner")
+        if (not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_.-]{1,100}", name)
+                or not isinstance(identity, dict) or identity.get("login") != owner
+                or name == owner or repo.get("has_ci_workflows") is not True):
+            continue
+        timestamp = _utc_instant(repo.get("pushed_at")) or ""
+        eligible.append((timestamp, name))
+    eligible.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return [f"{owner}/{owner}"] + [f"{owner}/{name}" for _, name in eligible[:max(0, limit-1)]]
+
+
+def normalize_public_ci_timeline(
+    observations: object, owner: str, observed_at: str, *, window_days: int = 84,
+    limit_per_repo: int = 20, repository_inventory=None,
+) -> dict:
+    """A truthful time-axis view of sampled GitHub Actions executions.
+
+    One point is one valid provider run. A failed/unavailable query never adds
+    success or an observed zero. Reaching the source cap makes coverage partial.
+    The owner permits minimal public and private run metadata; code, log bodies,
+    commit titles, branches and credentials are not part of this carrier.
+    """
+    from datetime import timedelta
+    instant = _utc_instant(observed_at)
+    if not instant:
+        raise ValueError("observed_at must be an offset-aware timestamp")
+    end = datetime.fromisoformat(instant.replace("Z", "+00:00"))
+    window_days = max(7, min(365, int(window_days)))
+    lower = end - timedelta(days=window_days)
+    limit_per_repo = max(1, min(20, int(limit_per_repo)))
+    start = lower.isoformat(timespec="seconds").replace("+00:00", "Z")
+    result = {"schema":"profile-ci-timeline/v1", "owner":owner,
+              "observed_at":instant, "window_start":start, "window_end":instant,
+              "window_days":window_days, "sample_limit_per_repo":limit_per_repo,
+              "scope":"Selected public, owned repositories with observed workflow configuration, plus profile; up to 20 most recent runs per repository, not complete history.",
+              "repositories":[], "observed_runs":None, "status":"unavailable"}
+    admitted, inventory_complete = None, True
+    if repository_inventory is not None:
+        from scripts.pipeline.push_activity import admitted_repository_rows, repository_fields
+        members, inventory_complete = admitted_repository_rows(repository_inventory, owner)
+        admitted = {row["full_name"].casefold(): row for row in members if row["fork"] is False}
+        result["scope"] = ("Profile plus up to five most recently pushed nonfork repositories from the admitted "
+                           "personal and semverity-labs inventory, public and private; "
+                           f"up to {limit_per_repo} most recent runs per repository within {window_days} days. "
+                           "Repository executions across actors, not personal contributions or complete history. "
+                           "Private repository workflow names, run identifiers, dates and outcomes are included.")
+    if not isinstance(observations, list) or not observations:
+        return result
+    partial = not inventory_complete or (admitted is not None and len(observations) > 6)
+    seen_repositories: set[str] = set()
+    for observation in observations[:6]:
+        if not isinstance(observation, dict):
+            partial = True
+            continue
+        repo = observation.get("repository")
+        if (not isinstance(repo, str) or (admitted is None and not repo.startswith(owner + "/"))
+                or repo.count("/") != 1):
+            partial = True
+            continue
+        from re import fullmatch
+        if not fullmatch(r"[A-Za-z0-9_.-]{1,100}", repo.split("/", 1)[1]):
+            partial = True
+            continue
+        fields = {}
+        private = False
+        if admitted is not None:
+            member = admitted.get(repo.casefold())
+            if (member is None or ("repository_id" in observation
+                                  and observation["repository_id"] != member.get("id"))):
+                partial = True
+                continue
+            repo = member["full_name"]
+            fields = repository_fields(repo, member.get("id"), member.get("aliases"))
+            private = member["private"]
+            fields["is_private"] = private
+        identity = fields.get("repository_key", repo)
+        # A repeated envelope does not describe a second repository.
+        # Preserve its first qualified observation; disclose replay as partial,
+        # and do not multiply observed run totals.
+        if identity in seen_repositories:
+            partial = True
+            continue
+        seen_repositories.add(identity)
+        raw = observation.get("runs")
+        qualified = normalize_profile_ci_runs(raw, repo, instant, limit=limit_per_repo)
+        samples = []
+        outside_window = False
+        discarded_metadata = False
+        from scripts.pipeline.profile_helpers import contains_credential_material
+        for item in qualified["runs"]:
+            if contains_credential_material(item["workflow"]):
+                discarded_metadata = True
+                continue
+            moment = datetime.fromisoformat(item["created_at"].replace("Z", "+00:00"))
+            if lower <= moment <= end:
+                samples.append({key: item[key] for key in
+                                ("run_id", "workflow", "outcome", "created_at")})
+            else:
+                # A sampled older/future run is not evidence of *zero* runs inside
+                # the selected chart window. Preserve the clipped-history signal.
+                outside_window = True
+        truncated = isinstance(raw, list) and len(raw) >= limit_per_repo
+        completeness = qualified["status"]
+        if completeness == "available" and (truncated or outside_window or discarded_metadata):
+            completeness = "partial"
+        if admitted is not None and fields["repository_id"] is None and completeness in ("available", "empty"):
+            completeness = "partial"
+        if completeness in ("partial", "unavailable"):
+            partial = True
+        observed_runs = len(samples) if isinstance(raw, list) else None
+        result["repositories"].append({**fields, "repository":repo, "status":completeness,
+            "truncated":truncated, "outside_window":outside_window,
+            "observed_runs":observed_runs,
+            "runs": samples})
+        if observed_runs is not None:
+            result["observed_runs"] = (result["observed_runs"] or 0) + observed_runs
+    if not result["repositories"]:
+        return result
+    if all(row["status"] == "unavailable" for row in result["repositories"]):
+        return result
+    result["status"] = "partial" if partial else "available"
+    return result
+
+
+def collect_public_ci_timeline(public_repositories: list[dict], owner: str, *, repository_inventory=None) -> dict:
+    """Observe the shared bounded cohort with only authorized execution metadata.
+
+    Production callers supply the same canonical personal and organization
+    inventory. The legacy no-inventory call retains its public personal cohort.
+    """
+    observed = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    selected = select_public_ci_repositories(public_repositories, owner, repository_inventory=repository_inventory)
+    observations = []
+    for repo in selected:
+        try:
+            rows = run_json(["gh", "run", "list", "--repo", repo, "--limit", "20",
+                "--json", "databaseId,workflowName,status,conclusion,createdAt"])
+        except (RuntimeError, ValueError):
+            rows = None
+        observations.append({"repository":repo,"runs":rows})
+    return normalize_public_ci_timeline(observations, owner, observed, repository_inventory=repository_inventory)

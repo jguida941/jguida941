@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import base64
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 from html import escape
 import math
 import re
@@ -12,8 +13,9 @@ from zoneinfo import ZoneInfo
 
 from scripts.contracts import profile_timezone_name
 from scripts.contracts.dashboard_summary import summary_facts
+from scripts.contracts import profile_timezone_name
 from scripts.core.config import (CONTRIB_EMPTY, CONTRIB_RAMP, DASHBOARD_SUMMARY_COLORS,
-                                 DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH, GREEN, RED,
+                                 DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH, GREEN, RED, YELLOW,
                                  PROJECT_ACTIVITY_COLORS)
 from scripts.rendering.components import donut_gauge
 from scripts.rendering.icons import render as icon
@@ -587,6 +589,243 @@ def _project_activity(c, x, y, span, data):
     return _project_activity_legend(c, x, y+7, span, project.get("scale"))
 
 
+def _ci_status_symbol(state, cx, cy, radius, color, *, role, title="", **metadata):
+    """One status-by-shape glyph for both legend and provider-observed runs.
+
+    A fill color is supplemental: shape and accessible title also convey status.
+    Unknown status uses a cross, never the same filled dot as a successful run.
+    This is a renderer primitive, not another interpretation of provider data.
+    """
+    shapes = {
+        "success": "circle",
+        "failure": "square", "timed_out": "square", "startup_failure": "square",
+        "queued": "triangle", "action_required": "triangle", "stale": "triangle",
+        "cancelled": "diamond", "skipped": "diamond", "neutral": "diamond",
+        "in_progress": "ring", "unknown": "cross",
+    }
+    shape = shapes.get(state, "cross")
+    data = dict(data_role=role, data_status=state, data_shape=shape, **metadata)
+    if shape in ("circle", "ring"):
+        tag = "circle"
+        props = dict(cx=cx, cy=cy, r=radius,
+                     fill=color if shape == "circle" else "none",
+                     stroke=color if shape == "ring" else COLORS["surface"],
+                     stroke_width=2 if shape == "ring" else 1, **data)
+    elif shape == "square":
+        tag = "rect"
+        props = dict(x=cx-radius, y=cy-radius, width=radius*2,
+                     height=radius*2, fill=color, stroke=COLORS["surface"],
+                     stroke_width=1, **data)
+    elif shape in ("triangle", "diamond"):
+        tag = "polygon"
+        if shape == "triangle":
+            points = f"{cx},{cy-radius} {cx+radius},{cy+radius} {cx-radius},{cy+radius}"
+        else:
+            points = f"{cx},{cy-radius} {cx+radius},{cy} {cx},{cy+radius} {cx-radius},{cy}"
+        props = dict(points=points, fill=color, stroke=COLORS["surface"],
+                     stroke_width=1, **data)
+    else:
+        tag = "path"
+        props = dict(d=f"M{cx-radius},{cy-radius} L{cx+radius},{cy+radius} "
+                       f"M{cx+radius},{cy-radius} L{cx-radius},{cy+radius}",
+                     stroke=color, stroke_width=2, fill="none", **data)
+    return f"<{tag} {_attrs(props)}><title>{escape(str(title))}</title></{tag}>"
+
+
+CI_WEEK_GROUPS = ("pass", "fail", "pending", "other")
+CI_OUTCOME_GROUPS = {
+    "success": "pass", "failure": "fail", "timed_out": "fail", "startup_failure": "fail",
+    "queued": "pending", "in_progress": "pending", "action_required": "pending",
+    "cancelled": "other", "skipped": "other", "neutral": "other", "stale": "other", "unknown": "other",
+}
+
+
+def _ci_timestamp(value):
+    """Parse the carrier's UTC instants without permissive calendar rollover."""
+    if not isinstance(value, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z", value):
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except (ValueError, TypeError):
+        return None
+
+
+def _ci_stamp(value):
+    return value.isoformat(timespec="milliseconds").replace(".000+00:00", "Z").replace("+00:00", "Z")
+
+
+def ci_weekly_projection(sample):
+    """Conserve qualified runs in consecutive seven-day UTC display groups.
+
+    This is presentation only: the shared carrier still owns discovery, access,
+    and sample completeness. The final interval includes the carrier's end.
+    Keep this pure projection in parity with ciWeeklyProjection in web_render.
+    """
+    result = {"status": "unavailable", "observed_at": None, "window_start": None,
+              "window_end": None, "sample_limit_per_repo": None, "observed_runs": None,
+              "weeks": [], "repositories": []}
+    if not isinstance(sample, dict) or sample.get("schema") != "profile-ci-timeline/v1":
+        return result
+    start, end = (_ci_timestamp(sample.get(key)) for key in ("window_start", "window_end"))
+    if start is None or end is None or not 0 < (end-start).total_seconds() <= 365*86400:
+        return result
+    count = math.ceil((end-start).total_seconds() / (7*86400))
+    weeks = [{"index": i, "start": _ci_stamp(start + timedelta(days=7*i)),
+              "end": _ci_stamp(start + min(end-start, timedelta(days=7*(i+1)))),
+              "inclusive_end": i == count-1} for i in range(count)]
+    observed = _ci_timestamp(sample.get("observed_at"))
+    limit = sample.get("sample_limit_per_repo")
+    result.update(status=sample.get("status") if sample.get("status") in ("available", "partial", "unavailable") else "unavailable",
+                  observed_at=_ci_stamp(observed) if observed else None,
+                  window_start=_ci_stamp(start), window_end=_ci_stamp(end), weeks=weeks,
+                  sample_limit_per_repo=limit if type(limit) is int and 0 < limit <= 9007199254740991 else None)
+    seen_repositories, seen_locators = set(), set()
+    rows = sample.get("repositories")
+    for raw in rows if isinstance(rows, list) else []:
+        if not isinstance(raw, dict):
+            continue
+        repository = raw.get("repository")
+        if not isinstance(repository, str) or not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})/[A-Za-z0-9_.-]{1,100}", repository) or repository.split("/")[-1] in (".", ".."):
+            continue
+        repository_id = raw.get("repository_id")
+        repository_id = repository_id if type(repository_id) is int and 0 < repository_id <= 9007199254740991 else None
+        key = f"github:{repository_id}" if repository_id else raw.get("repository_key")
+        if not isinstance(key, str) or not re.fullmatch(r"github:[1-9][0-9]*", key):
+            key = repository.lower()
+        if key in seen_repositories or repository.lower() in seen_locators:
+            continue
+        seen_repositories.add(key)
+        seen_locators.add(repository.lower())
+        status = raw.get("status") if result["status"] != "unavailable" and raw.get("status") in ("available", "partial", "empty", "unavailable") else "unavailable"
+        row = {"repository": repository, "repository_id": repository_id, "repository_key": key,
+               "is_private": raw.get("is_private") is True, "status": status,
+               "truncated": raw.get("truncated") is True, "outside_window": raw.get("outside_window") is True,
+               "observed_runs": None if status == "unavailable" else 0,
+               "weeks": [{**week, "count": 0, "pass": 0, "fail": 0, "pending": 0, "other": 0, "runs": []} for week in weeks]}
+        seen_runs = set()
+        runs = raw.get("runs")
+        for run in runs if isinstance(runs, list) and status != "unavailable" else []:
+            if not isinstance(run, dict):
+                continue
+            identity, when = run.get("run_id"), _ci_timestamp(run.get("created_at"))
+            if type(identity) is not int or not 0 < identity <= 9007199254740991 or identity in seen_runs or when is None or not start <= when <= end:
+                continue
+            seen_runs.add(identity)
+            outcome = run.get("outcome")
+            outcome = outcome if isinstance(outcome, str) and outcome in CI_OUTCOME_GROUPS else "unknown"
+            workflow = run.get("workflow")
+            workflow = re.sub(r"[\x00-\x1f\x7f-\x9f]", " ", workflow).strip()[:100] if isinstance(workflow, str) else ""
+            item = {"run_id": identity, "workflow": workflow or "Workflow", "created_at": _ci_stamp(when),
+                    "outcome": outcome, "group": CI_OUTCOME_GROUPS[outcome],
+                    "url": f"https://github.com/{repository}/actions/runs/{identity}"}
+            index = min(count-1, int((when-start).total_seconds() // (7*86400)))
+            bucket = row["weeks"][index]
+            bucket["runs"].append(item)
+            bucket["count"] += 1
+            bucket[item["group"]] += 1
+            row["observed_runs"] += 1
+        for week in row["weeks"]:
+            week["runs"].sort(key=lambda run: (_ci_timestamp(run["created_at"]), run["run_id"]))
+        result["repositories"].append(row)
+    known = [row["observed_runs"] for row in result["repositories"] if row["observed_runs"] is not None]
+    result["observed_runs"] = sum(known) if known else None
+    return result
+
+
+def _ci_empty_label(row):
+    if row["status"] == "unavailable":
+        return "Unavailable"
+    return "No runs returned" if row["status"] == "empty" else "No runs observed in window"
+
+
+def _ci_timeline(c, x, y, span, data):
+    """Repository lanes retain the existing time-axis/shape visual language."""
+    sample = ci_weekly_projection(data)
+    c.group(data_role="ci-timeline-chart", data_status=sample["status"])
+    if not sample["weeks"]:
+        y = c.wrap("Workflow history unavailable", x, y, span, size=c.secondary, color="muted")
+        c.end()
+        return y + 16
+    start, end = (_ci_timestamp(sample[key]) for key in ("window_start", "window_end"))
+    y = c.wrap(f"{start:%b %-d} – {end:%b %-d, %Y} UTC · weekly groups", x, y, span, size=13, color="muted") + 8
+    colors = {"pass": GREEN, "fail": RED, "pending": YELLOW, "other": COLORS["muted"]}
+    states = {"pass": "success", "fail": "failure", "pending": "queued", "other": "cancelled"}
+    labels = {"pass": "Passed", "fail": "Failed", "pending": "Pending", "other": "Other"}
+    for i, group in enumerate(CI_WEEK_GROUPS):
+        columns = 2 if c.mobile else 4
+        xx, yy = x + (i % columns) * span / columns, y + (i // columns) * 23
+        c.parts.append(_ci_status_symbol(states[group], xx+6, yy, 5, colors[group], role="ci-key", title=labels[group]))
+        c.text(labels[group], xx+19, yy+5, size=13, color="muted")
+    y += 49 if c.mobile else 28
+    rows = sample["repositories"]
+    if not rows:
+        y = c.wrap("Repository observations unavailable", x, y+12, span, size=c.secondary, color="muted")
+    plot_x = x if c.mobile else x + 188
+    plot_width = span if c.mobile else span - 188
+    # Continuation tracks keep the full supported 7..365-day carrier legible.
+    tracks = [sample["weeks"][offset:offset+12] for offset in range(0, len(sample["weeks"]), 12)]
+    for track_index, track in enumerate(tracks):
+        if track_index:
+            y += 12
+            c.text("Timeline continued", x, y, size=13, color="muted")
+            y += 24
+        axis_y = y + 13
+        c.group(data_role="ci-axis", data_track=track_index)
+        track_start, track_end = _ci_timestamp(track[0]["start"]), _ci_timestamp(track[-1]["end"])
+        for index, portion in enumerate((0, .5, 1) if c.mobile else (0, .25, .5, .75, 1)):
+            when = track_start + (track_end-track_start) * portion
+            xx = plot_x + plot_width * portion
+            c.text(when.strftime("%b %-d"), xx, axis_y, size=12, color="muted", anchor="start" if portion == 0 else "end" if portion == 1 else "middle")
+        c.end()
+        y = axis_y + 23
+        for row in rows:
+            c.group(data_role="ci-repository-row", data_repository=row["repository"], data_repository_key=row["repository_key"],
+                    data_private=str(row["is_private"]).lower(), data_status=row["status"], data_observed_runs=row["observed_runs"], data_track=track_index)
+            name_y = y + 14
+            name_end = c.wrap(row["repository"], x, name_y, span if c.mobile else 174, size=13, weight=600)
+            if row["is_private"]:
+                c.parts.append(icon("lock", x, name_end-2, size=13, color=COLORS["muted"]))
+                c.text("private", x+19, name_end+9, size=12, color="muted")
+                name_end += 22
+            top = name_end + 7 if c.mobile else y
+            c.line(plot_x, top+41, plot_x+plot_width, top+41, stroke_opacity=.45)
+            for column, descriptor in enumerate(track):
+                week = row["weeks"][descriptor["index"]]
+                xx = plot_x + (column+.5) * plot_width/len(track)
+                bounds = f'{week["start"]} ≤ created_at {"≤" if week["inclusive_end"] else "<"} {week["end"]}'
+                title = f'{row["repository"]} · {bounds} · {week["count"]} sampled runs'
+                c.group(data_role="ci-week", data_repository=row["repository"], data_week_index=week["index"],
+                        data_window_start=week["start"], data_window_end=week["end"], data_count=week["count"],
+                        data_pass=week["pass"], data_fail=week["fail"], data_pending=week["pending"], data_other=week["other"],
+                        data_x=round(xx, 3), data_width=round(plot_width/len(track), 3))
+                c.parts.append('<title>'+escape(title)+'</title>')
+                for i, group in enumerate(CI_WEEK_GROUPS):
+                    if not week[group]:
+                        continue
+                    cy = top + 10 + i*21
+                    c.parts.append(_ci_status_symbol(states[group], xx, cy, 9, colors[group], role="ci-outcome-group", title=f'{title} · {labels[group]} {week[group]}', data_group=group, data_count=week[group]))
+                    c.text(week[group], xx, cy+3.5, size=9 if week[group] < 100 else 7, color="surface", anchor="middle", weight=700, data_role="ci-count")
+                for run in week["runs"]:
+                    c.group(data_role="ci-run-detail", data_repository=row["repository"], data_run_id=run["run_id"], data_created_at=run["created_at"], data_outcome=run["outcome"])
+                    c.parts.append('<title>'+escape(f'{row["repository"]} · {run["workflow"]} · {run["created_at"]} · {run["outcome"]} · {run["url"]}')+'</title>')
+                    c.end()
+                c.end()
+            if not row["observed_runs"]:
+                c.text(_ci_empty_label(row), plot_x+4, top+29, size=12, color="muted", data_role="ci-empty-state")
+            y = max(top+91, name_end+15)
+            c.line(x, y-4, x+span, y-4, stroke_opacity=.24)
+            c.end()
+    count = sample["observed_runs"]
+    footer = f"{count} sampled runs" if count is not None else "Run count unavailable"
+    if sample["status"] != "available":
+        footer += " · " + sample["status"]
+    y = c.wrap(footer, x, y+20, span, size=13, color="muted")
+    limit = sample["sample_limit_per_repo"]
+    c.parts.append('<desc>'+escape(f'Sampled provider history; newest {limit} runs per repository.' if limit else 'Sampled provider history; source limit unavailable.') + ' Blank intervals contain no sampled runs. Counts do not measure all workflow activity.</desc>')
+    c.end()
+    return y + 10
+
+
 def _snapshot_time(timestamp):
     """Date the saved observation in the profile zone; never substitute build time."""
     if not isinstance(timestamp, str) or not re.fullmatch(
@@ -794,6 +1033,9 @@ def render_svg(summary, *, mobile=False, generation=None):
     c.parts[idx] = '<rect ' + _attrs(dict(x=pad,y=inner,width=content,height=y-inner+5,rx=13,fill=COLORS["panel"],stroke=COLORS["line"])) + '/>'
     c.end()
     y += 25
+
+    y = c.panel("ci-timeline", "CI Workflow Timeline", y,
+                lambda x, yy, span: _ci_timeline(c, x, yy, span, summary.get("ci_timeline")))
 
     def working(x, yy, span):
         rows = summary.get("working") or []
