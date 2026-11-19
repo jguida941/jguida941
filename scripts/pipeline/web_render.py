@@ -501,7 +501,7 @@ def _ci_observatory() -> str:
       <span><svg class="ci-mark ci-other" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 23 12 12 23 1 12Z"/></svg>Other</span>
     </div>
     <p class="ci-scroll-help">Scroll the timeline for more dates →</p>
-    <div class="ci-plot-scroll table-scroll" tabindex="0" role="region" aria-label="Repository workflow timeline; scroll horizontally for more dates">
+    <div class="ci-plot-scroll table-scroll" id="ci-timeline-scroll" tabindex="0" role="region" aria-label="Repository workflow timeline; scroll horizontally for more dates">
       <div class="ci-plot"><div class="ci-axis" id="ci-timeline-axis"></div><div id="ci-timeline-rows" aria-label="Repository lanes"></div></div>
     </div>
     <section class="ci-inspector" aria-label="Selected weekly group"><div id="ci-selected-group" aria-live="polite">Select a weekly group to view its workflow runs.</div></section>
@@ -1144,6 +1144,14 @@ def _script() -> str:
       lane.appendChild(identity);lane.appendChild(track);lanes.appendChild(lane);
     }
     if (!projected.repositories.length) lanes.appendChild(element("p","section-meta","Repository observations unavailable"));
+    // Reveal the latest observed group without moving the page vertically.
+    const scroller = document.getElementById("ci-timeline-scroll");
+    const latestWeek = Math.max(-1, ...projected.repositories.flatMap(row => row.weeks.filter(week => week.count).map(week => week.index)));
+    if (scroller && latestWeek >= 0) {
+      const trackWidth = lanes.querySelector?.(".ci-track")?.clientWidth || scroller.scrollWidth;
+      const groupRight = scroller.scrollWidth - trackWidth + (latestWeek + 1) * trackWidth / projected.weeks.length;
+      scroller.scrollLeft = Math.max(0, groupRight - scroller.clientWidth);
+    }
   }
 
   function hydrate(d) {

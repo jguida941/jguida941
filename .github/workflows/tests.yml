@@ -591,6 +591,8 @@ jobs:
                       expected_rows = {r['repository']:len(r['runs']) for r in timeline['repositories']}
                       actual_counts = {name:sum(g['count'] for g in groups if g['repository'] == name) for name in expected_rows}
                       assert actual_counts == expected_rows, (actual_counts,expected_rows)
+                      initial_scroll = ci.locator('#ci-timeline-scroll').evaluate("n=>({left:n.scrollLeft,width:n.clientWidth,total:n.scrollWidth})")
+                      assert initial_scroll['left'] + initial_scroll['width'] >= initial_scroll['total'] - 1, initial_scroll
                       default_screenshot = OUT / f'ci-default-{theme}-{width}.png'
                       ci.screenshot(path=str(default_screenshot))
                       records.append({'kind':'ci-default','theme':theme,'width':width,'screenshot':default_screenshot.name})

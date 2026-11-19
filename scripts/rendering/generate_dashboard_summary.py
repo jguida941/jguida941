@@ -782,7 +782,12 @@ def _ci_timeline(c, x, y, span, data):
             c.group(data_role="ci-repository-row", data_repository=row["repository"], data_repository_key=row["repository_key"],
                     data_private=str(row["is_private"]).lower(), data_status=row["status"], data_observed_runs=row["observed_runs"], data_track=track_index)
             name_y = y + 14
-            name_end = c.wrap(row["repository"], x, name_y, span if c.mobile else 174, size=13, weight=600)
+            name_width = span if c.mobile else 174
+            name_lines = textwrap.wrap(row["repository"], max(1, int(name_width / (13 * .62))),
+                                       break_long_words=True, break_on_hyphens=True) or [""]
+            for line_index, name_line in enumerate(name_lines):
+                c.text(name_line, x, name_y + line_index * 13 * 1.4, size=13, weight=600)
+            name_end = name_y + len(name_lines) * 13 * 1.4
             if row["is_private"]:
                 c.parts.append(icon("lock", x, name_end-2, size=13, color=COLORS["muted"]))
                 c.text("private", x+19, name_end+9, size=12, color="muted")

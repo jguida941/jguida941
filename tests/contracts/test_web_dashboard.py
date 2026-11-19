@@ -1322,11 +1322,13 @@ class El {
   scrollIntoView(){this.scrolled=true;}
   querySelectorAll(query){const all=[];for(const child of this.children){if(query==='[aria-pressed="true"]'&&child.attrs['aria-pressed']==='true')all.push(child);all.push(...child.querySelectorAll(query));}return all;}
 }
-const ids=['ci-observatory','ci-timeline-axis','ci-timeline-rows','ci-selected-group','ci-observatory-note','ci-observatory-count','ci-observatory-scope'];
+const ids=['ci-observatory','ci-timeline-axis','ci-timeline-rows','ci-selected-group','ci-observatory-note','ci-observatory-count','ci-observatory-scope','ci-timeline-scroll'];
 const nodes=Object.fromEntries(ids.map(id=>[id,new El()]));
+nodes["ci-timeline-scroll"].scrollWidth=528;nodes["ci-timeline-scroll"].clientWidth=300;
 const document={getElementById:id=>nodes[id]||null,createElement:tag=>new El(tag),createElementNS:(_,tag)=>new El(tag)};
 const context={document,sample:input.sample};vm.createContext(context);
 vm.runInContext(input.source+'\nhydrateCITimeline(sample);',context);
+assert.equal(nodes["ci-timeline-scroll"].scrollLeft,228,"latest dates are visible without first scrolling past empty history");
 const lanes=nodes['ci-timeline-rows'].children;
 assert.equal(lanes.length,7,'one lane per admitted identity; private and org rows included');
 assert.deepEqual(lanes.map(lane=>lane.dataset.observedRuns),['5','2','0',undefined,'1','1','1']);
@@ -1356,6 +1358,8 @@ assert.equal(selectedRuns()[1].children[0].textContent,'<img onerror="bad()">','
 assert.equal(selectedRuns()[1].children.length,2);
 assert(publicGroups.at(-1).getAttribute('aria-label').includes('2026-11-19T12:00:00Z'));
 privateGroups[0].handlers.focus();assert(privateGroups[0].scrolled,'keyboard focus is brought into the contained scroll view');
+vm.runInContext('const early=JSON.parse(JSON.stringify(sample));for(const row of early.repositories){for(const run of row.runs||[])run.created_at=early.window_start;}hydrateCITimeline(early);',context);
+assert.equal(nodes["ci-timeline-scroll"].scrollLeft,0,"an older-only sample reveals its observed group rather than an empty final week");
 vm.runInContext('hydrateCITimeline({...sample,status:"unavailable"});',context);
 assert.equal(nodes['ci-timeline-rows'].children.flatMap(lane=>lane.children[1].children.filter(node=>node.tagName==='button')).length,0,'an unavailable refresh cannot retain success controls');
 assert.equal(nodes['ci-selected-group'].children.length,1,'previous selected run detail is cleared');
