@@ -1426,3 +1426,46 @@ class ScorecardPeriodContract(unittest.TestCase):
                     selected = [row for row in rows if f'data-bind="{binding}"' in row]
                     self.assertEqual(1, len(selected))
                     self.assertIn(period, selected[0])
+
+
+class OverviewProfileLinkAndTimeTests(unittest.TestCase):
+    def test_profile_link_has_decorative_mark_and_visible_accessible_name(self):
+        from scripts.pipeline.web_render import render_dashboard
+        from scripts.rendering.design_tokens import THEMES
+        for theme in THEMES:
+            html = render_dashboard(default_theme=theme)
+            footer = re.search(r'<div class="hero-footer">(.*?)</header>', html, re.S).group(1)
+            anchor = re.search(r'<a\b([^>]*)>(.*?)</a>', footer, re.S)
+            self.assertIsNotNone(anchor)
+            self.assertIn('href="https://github.com/jguida941"', anchor.group(1))
+            self.assertIn('class="github-profile-link"', anchor.group(1))
+            self.assertIn("View GitHub profile", anchor.group(2))
+            mark = re.search(r'<svg\b([^>]*)>(.*?)</svg>', anchor.group(2), re.S)
+            self.assertIsNotNone(mark, "a recognizable GitHub mark belongs inside the link")
+            self.assertIn('aria-hidden="true"', mark.group(1))
+            self.assertIn('focusable="false"', mark.group(1))
+            self.assertIn("<path", mark.group(2))
+            self.assertIn(".hero .github-profile-link", html)
+            self.assertIn(".github-profile-link:focus-visible", html)
+
+    def test_update_uses_configured_profile_zone_and_rejects_unknown_instants(self):
+        from unittest.mock import patch
+        model, _ = _profile_headline_model()
+        summary = model["dashboard_summary"]
+        cases = [
+            ("2026-11-19T18:02:33Z", "Updated Nov 19, 2026, 1:02 PM EST"),
+            ("2026-07-01T01:08:00Z", "Updated Jun 30, 2026, 9:08 PM EDT"),
+            ("2026-11-01T05:30:00Z", "Updated Nov 1, 2026, 1:30 AM EDT"),
+            ("2026-11-01T06:30:00Z", "Updated Nov 1, 2026, 1:30 AM EST"),
+            ("2026-11-19T13:02:33-05:00", "Updated Nov 19, 2026, 1:02 PM EST"),
+        ]
+        with patch.dict(os.environ, {"PROFILE_TIMEZONE": "America/New_York"}):
+            for timestamp, expected in cases:
+                summary["generated_at"] = timestamp
+                self.assertEqual(expected, _hydrate_profile_headline(summary)["updated"])
+            for timestamp in (None, "", "invalid", "2026-11-19", "2026-11-19T13:02:33", "2026-02-30T13:00:00Z", "2026-11-19T13:00:00+00:60", "2026-11-19T13:00:00+24:00"):
+                summary["generated_at"] = timestamp
+                self.assertEqual("Update time unavailable", _hydrate_profile_headline(summary)["updated"])
+        with patch.dict(os.environ, {"PROFILE_TIMEZONE": "UTC"}):
+            summary["generated_at"] = "2026-11-19T18:02:33Z"
+            self.assertEqual("Updated Nov 19, 2026, 6:02 PM UTC", _hydrate_profile_headline(summary)["updated"])

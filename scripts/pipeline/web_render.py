@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from html import escape
+from scripts.contracts import profile_timezone_name
 from scripts.contracts.profile_contract import (
     AUTOMATION_REPOS_LABEL, AUTOMATION_FILES_LABEL, AUTOMATION_ADOPTION_LABEL,
     AUTOMATION_SCOPE, AUTOMATION_MEANING,
@@ -29,6 +30,34 @@ from scripts.contracts.profile_contract import (
 from scripts.rendering.design_tokens import DEFAULT_THEME, THEME_META, THEMES, emit_css_root, emit_project_activity_css
 
 DATA_URL = "./data/profile_snapshot.json"
+
+# The filled brand mark is deliberately separate from the Lucide metric icons.
+# Preserve the upstream MIT notice with the mark in the generated HTML.
+_GITHUB_MARK = """<!--
+Octicons mark-github-16: https://github.com/primer/octicons/blob/main/icons/mark-github-16.svg
+Source blob: 0e55a8ef2db1913cb35f81ae09ffdb58b5422319
+MIT License
+Copyright (c) 2026 GitHub Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+--><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6.766 11.328c-2.063-.25-3.516-1.734-3.516-3.656 0-.781.281-1.625.75-2.188-.203-.515-.172-1.609.063-2.062.625-.078 1.468.25 1.968.703.594-.187 1.219-.281 1.985-.281.765 0 1.39.094 1.953.265.484-.437 1.344-.765 1.969-.687.218.422.25 1.515.046 2.047.5.593.766 1.39.766 2.203 0 1.922-1.453 3.375-3.547 3.64.531.344.89 1.094.89 1.954v1.625c0 .468.391.734.86.547C13.781 14.359 16 11.53 16 8.03 16 3.61 12.406 0 7.984 0 3.563 0 0 3.61 0 8.031a7.88 7.88 0 0 0 5.172 7.422c.422.156.828-.125.828-.547v-1.25c-.219.094-.5.156-.75.156-1.031 0-1.64-.562-2.078-1.609-.172-.422-.36-.672-.719-.719-.187-.015-.25-.093-.25-.187 0-.188.313-.328.625-.328.453 0 .844.281 1.25.86.313.452.64.655 1.031.655s.641-.14 1-.5c.266-.265.47-.5.657-.656"/></svg>"""
+
 
 
 def _component_css() -> str:
@@ -102,8 +131,12 @@ body {
 .stat .v { font-size: var(--type-metric_lg); font-weight: 600; color: var(--ink-strong); line-height: 1.2; }
 .stat .l { font-size: var(--type-caption); color: var(--ink-dim); margin-top: 8px; }
 .hero-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 16px var(--pad-panel, 28px); border-top: 1px solid var(--hairline); background: color-mix(in srgb, var(--surface-raised) 35%, transparent); font-size: var(--type-caption); color: var(--ink-dim); }
-.hero-footer a { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-strong); text-decoration: none; }
-.hero-footer a:hover { text-decoration: underline; }
+.hero .github-profile-link { display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 8px 12px; border: 1px solid var(--hairline); border-radius: var(--radius-tile);
+  background: var(--surface); color: var(--ink-strong); text-decoration: none; }
+.hero .github-profile-link svg { width: 20px; height: 20px; fill: currentColor; stroke: none; }
+.hero .github-profile-link:hover { border-color: var(--accent); background: var(--surface-raised); }
+.github-profile-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .hero .live { display: inline-flex; align-items: center; gap: 8px; }
 @media (max-width: 640px) {
   .hero .kpi { grid-template-columns: minmax(0, 1fr); gap: 24px; }
@@ -429,8 +462,8 @@ def _hero() -> str:
       </div>
     </div>
     <div class="hero-footer">
-      <div class="live">{_svg_icon(LUCIDE['clock'])}<span>Updated <span id="updated">—</span></span></div>
-      <a href="https://github.com/jguida941">View GitHub profile <span aria-hidden="true">↗</span></a>
+      <div class="live">{_svg_icon(LUCIDE['clock'])}<span id="updated">Update time unavailable</span></div>
+      <a class="github-profile-link" href="https://github.com/jguida941">{_GITHUB_MARK}<span>View GitHub profile</span></a>
     </div>
   </header>"""
 
@@ -677,6 +710,7 @@ def _script() -> str:
   <script>
   const DATA_URL = "__DATA_URL__";
   const LANG_COLORS = __LANG_COLORS__;
+  const PROFILE_TIMEZONE = __PROFILE_TIMEZONE__;
   const fmt = (n) => {
     if (n == null || isNaN(n)) return "—";
     n = Number(n);
@@ -693,6 +727,31 @@ def _script() -> str:
     warn: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 16.5v.01"/></svg>',
     bad: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   };
+
+
+  function formatUpdatedAt(value) {
+    const unavailable = "Update time unavailable";
+    if (typeof value !== "string") return unavailable;
+    // Accept an actual, explicitly zoned ISO instant; Date.parse alone normalizes
+    // impossible dates such as February 30 and guesses a zone for naive input.
+    const fields = /^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(?:\\.\\d{1,6})?(Z|[+-]\\d{2}:\\d{2})$/.exec(value);
+    if (!fields) return unavailable;
+    const [, yearText, monthText, dayText, hourText, minuteText, secondText, offset] = fields;
+    const [year, month, day, hour, minute, second] = [yearText, monthText, dayText, hourText, minuteText, secondText].map(Number);
+    const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    const monthDays = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    if (year < 1 || month < 1 || month > 12 || day < 1 || day > monthDays[month - 1] ||
+        hour > 23 || minute > 59 || second > 59 ||
+        (offset !== "Z" && (+offset.slice(1, 3) > 23 || +offset.slice(4) > 59))) return unavailable;
+    const observed = new Date(value);
+    if (isNaN(observed)) return unavailable;
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: PROFILE_TIMEZONE, year: "numeric", month: "short", day: "numeric",
+      hour: "numeric", minute: "2-digit", timeZoneName: "short",
+    }).formatToParts(observed);
+    const label = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return `Updated ${label.month} ${label.day}, ${label.year}, ${label.hour}:${label.minute} ${label.dayPeriod} ${label.timeZoneName}`;
+  }
 
   function setTheme(name) {
     document.documentElement.dataset.theme = (name === "__DEFAULT_THEME__") ? "" : name;
@@ -1264,11 +1323,7 @@ def _script() -> str:
     });
     // hero meta
     if (d.username) document.getElementById("hero-name").textContent = "@" + d.username;
-    if (d.generated_at) {
-      const dt = new Date(d.generated_at);
-      document.getElementById("updated").textContent = isNaN(dt) ? d.generated_at
-        : dt.toLocaleString("en-US", {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
-    }
+    document.getElementById("updated").textContent = formatUpdatedAt(d.generated_at);
     // CI ring fill
     const ci = get(d, "scorecard.ci_coverage_pct");
     if (ci != null) document.getElementById("ci-ring").style.setProperty("--p", Math.max(0, Math.min(100, ci)));
@@ -1435,6 +1490,7 @@ def render_dashboard(default_theme: str = DEFAULT_THEME) -> str:
         .replace("__DEFAULT_THEME__", DEFAULT_THEME)
         .replace("__LANG_COLORS__", _lang_colors_json())
         .replace("__THEME_NAMES__", json.dumps(list(THEMES)))
+        .replace("__PROFILE_TIMEZONE__", json.dumps(profile_timezone_name()))
     )
     # The summary is the same SVG pair on GitHub and Pages. Preserve richer
     # web-only sections behind an explicit, accessible drill-down surface.
