@@ -26,6 +26,12 @@ on:
       - ".github/workflows/analytics.yml"
       - ".github/workflows/metrics.yml"
   workflow_dispatch:
+    inputs:
+      candidate_preview:
+        description: Generate an unaccepted live preview from this non-main branch
+        type: boolean
+        required: false
+        default: false
 
 concurrency:
   group: profile-pipeline-tests-${{ github.ref }}
@@ -133,3 +139,291 @@ jobs:
           PERSONAL_GITHUB_TOKEN: ""
         run: |
           python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json
+
+  # Explicit candidate evidence only. Receiving and publication remain separate.
+  candidate-preview:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.candidate_preview && github.ref_type == 'branch' && github.ref_name != 'main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GITHUB_USERNAME: jguida941
+      PROFILE_TIMEZONE: America/New_York
+      CANDIDATE_HEAD: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.15'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install source-owned and browser dependencies
+        run: python -m pip install -r requirements.txt playwright==1.62.0
+      - name: Resolve the existing collection token
+        env:
+          CANDIDATE_PAT: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          DEFAULT_TOKEN: ${{ github.token }}
+        run: |
+          use_default() {
+            {
+              echo "PERSONAL_GITHUB_TOKEN="
+              echo "GITHUB_TOKEN=${DEFAULT_TOKEN}"
+              echo "GH_TOKEN=${DEFAULT_TOKEN}"
+              echo "PROFILE_TOKEN_MODE=github_token"
+            } >> "$GITHUB_ENV"
+          }
+          if [ -z "${CANDIDATE_PAT}" ]; then use_default; exit 0; fi
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "Authorization: Bearer ${CANDIDATE_PAT}" https://api.github.com/user || echo 000)
+          if [ "$code" = "200" ]; then
+            {
+              echo "PERSONAL_GITHUB_TOKEN=${CANDIDATE_PAT}"
+              echo "GITHUB_TOKEN=${DEFAULT_TOKEN}"
+              echo "GH_TOKEN=${CANDIDATE_PAT}"
+              echo "PROFILE_TOKEN_MODE=personal_github_token"
+            } >> "$GITHUB_ENV"
+          else
+            echo "::warning::Collection token returned HTTP ${code}; using github.token."
+            use_default
+          fi
+      - name: Generate a fresh candidate and capture its actual Chrome output
+        run: |
+          python -B - <<'PY_PREVIEW'
+          from pathlib import Path
+          import hashlib
+          import importlib.metadata
+          import json
+          import os
+          import shutil
+          import subprocess
+          import tempfile
+          from playwright.sync_api import sync_playwright
+          from scripts.contracts import PROFILE_ARTIFACT_PATHS
+          from scripts.pipeline.profile_pipeline import run_profile_pipeline
+          from scripts.pipeline.web_render import write_dashboard
+          from scripts.quality import headless_receipts as receipts
+          from scripts.quality.validate_generated_profile import validate_profile
+          from scripts.rendering.design_tokens import THEMES, DEFAULT_THEME
+          from scripts.rendering.generate_dashboard_summary import ci_weekly_projection
+
+          root = Path.cwd()
+          head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          assert head == os.environ['CANDIDATE_HEAD'], 'Candidate source moved'
+          tree = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}'], text=True).strip()
+          generated = run_profile_pipeline(logger=print)
+          decision = generated['publication_decision']
+          # Inspect the just-executed candidate, never the checkout's last accepted set.
+          if not (generated['artifact_set_written'] is True and decision.ready
+                  and decision.state == 'READY' and decision.subject == 'candidate_generation'
+                  and generated['generation']['source_kind'] == 'github-api'):
+              raise RuntimeError('Fresh candidate preview refused: ' + decision.describe())
+          write_dashboard()
+          for name in ('dashboard_summary.svg', 'dashboard_summary_mobile.svg'):
+              target = root / 'site/assets' / name
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(root / 'assets' / name, target)
+          validated = validate_profile()
+          assert validated.ok, validated.errors
+          out = Path(tempfile.mkdtemp(prefix='profile-candidate-preview-', dir=os.environ['RUNNER_TEMP']))
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write('CANDIDATE_PREVIEW_OUTPUT=' + str(out) + '\n')
+          def digest(path):
+              return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+          snapshot_path = root / 'site/data/profile_snapshot.json'
+          data = json.loads(snapshot_path.read_text())
+          projection = ci_weekly_projection(data.get('ci_timeline'))
+          expected_rows = {r['repository']: r for r in projection['repositories']}
+          assert any((r.get('observed_runs') or 0) > 0 for r in expected_rows.values()), 'Populated CI preview required'
+          chrome = receipts._chrome()
+          chrome_version = receipts._chrome_version(chrome)
+          canonical_receipts = [receipts.screenshot_page('index'),
+                                receipts.screenshot_page('index', target='ci-observatory'),
+                                receipts.dom_probe('index', 390)]
+          probe = json.loads(canonical_receipts[-1].read_text())
+          assert probe['client_width'] == 390 and not probe['horizontal_overflow']
+          assert probe['uncontained_offender_count'] == 0, probe
+          source_hashes = {p: digest(root / p) for p in (
+              '.github/workflows/tests.yml', 'scripts/pipeline/web_render.py',
+              'scripts/rendering/generate_dashboard_summary.py', 'scripts/pipeline/render_outputs.py',
+              'templates/README.md.tpl')}
+          identity = {
+              'authority_status': 'candidate_only', 'source_kind': 'github-api',
+              'publication_subject': decision.subject, 'publication_state': decision.state,
+              'artifact_set_written': True, 'head': head, 'tree': tree,
+              'run_id': os.environ['GITHUB_RUN_ID'], 'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'producer': '.github/workflows/tests.yml candidate-preview',
+              'source_sha256': source_hashes, 'snapshot_sha256': digest(snapshot_path),
+              'manifest_sha256': digest(root / 'site/data/profile_artifact_manifest.json'),
+              'generation': data['generation'], 'chrome': chrome_version,
+              'chrome_executable': str(chrome), 'chrome_executable_sha256': digest(chrome.resolve()),
+              'playwright': importlib.metadata.version('playwright'),
+              'launch_args': ['--allow-file-access-from-files'], 'records': [],
+          }
+          preview_files = []
+          def capture(page, locator, name, width, theme, source_path, observations):
+              path = out / name
+              if locator is None:
+                  page.screenshot(path=str(path), full_page=True)
+              else:
+                  locator.screenshot(path=str(path))
+              row = {'path': name, 'sha256': digest(path), 'bytes': path.stat().st_size,
+                     'viewport': {'width': width, 'height': 1000}, 'device_scale_factor': 1,
+                     'theme': theme, 'source_path': str(source_path.relative_to(root)),
+                     'source_sha256': digest(source_path), 'observations': observations}
+              identity['records'].append(row)
+              preview_files.append(path)
+
+          with sync_playwright() as driver:
+              browser = driver.chromium.launch(executable_path=str(chrome), headless=True,
+                                              args=identity['launch_args'])
+              for width in (1280, 390):
+                  for theme in THEMES:
+                      page = browser.new_page(viewport={'width': width, 'height': 1000}, device_scale_factor=1)
+                      errors = []
+                      page.on('pageerror', lambda error: errors.append(str(error)))
+                      page.goto((root / 'site/index.html').as_uri() + '?theme=' + theme, wait_until='load')
+                      page.wait_for_function("document.getElementById('updated').textContent.startsWith('Updated ')")
+                      page.evaluate('document.fonts.ready')
+                      assert page.evaluate('innerWidth') == width
+                      assert page.locator('html').get_attribute('data-theme') == ('' if theme == DEFAULT_THEME else theme)
+                      assert not errors, errors
+                      panel = page.locator('#ci-observatory')
+                      assert panel.is_visible() and panel.locator('details[open]').count() == 0
+                      groups = panel.locator('[data-role="ci-group"]')
+                      observed = groups.evaluate_all('''nodes => nodes.map(n => {
+                        const b=n.getBoundingClientRect(); return {repository:n.dataset.repository,
+                          count:Number(n.dataset.runCount),start:n.dataset.windowStart,end:n.dataset.windowEnd,
+                          width:b.width,height:b.height}; })''')
+                      expected_nonempty = {k:v for k,v in expected_rows.items() if (v.get('observed_runs') or 0)>0}
+                      assert {r['repository']:r['count'] for r in observed if r['count']>0} == {
+                          k:v['observed_runs'] for k,v in expected_nonempty.items()}, observed
+                      assert all(r['width']>=44 and r['height']>=44 for r in observed), observed
+                      assert all(r['start']==projection['window_start'] and r['end']==projection['window_end'] for r in observed), observed
+                      geometry = panel.evaluate('''panel => ({
+                        header:[...panel.querySelectorAll('#ci-header-metrics .ci-metric')].map(n=>({group:n.dataset.group,count:Number(n.querySelector('.num').textContent)})),
+                        rows:[...panel.querySelectorAll('[data-role="ci-group"]')].map(n=>{
+                          const track=n.querySelector('[data-role="ci-bar-track"]');
+                          if(!track)return {repository:n.dataset.repository,track:null,segments:[]};
+                          const t=track.getBoundingClientRect();
+                          return {repository:n.dataset.repository,track:{x:t.x,y:t.y,width:t.width,height:t.height},
+                            segments:[...track.querySelectorAll('[data-role="ci-bar-segment"]')].map(s=>{const b=s.getBoundingClientRect();
+                              return {group:s.dataset.group,count:Number(s.dataset.count),x:b.x,y:b.y,width:b.width,height:b.height};})};}),
+                        legendTop:panel.querySelector('#ci-legend').getBoundingClientRect().top,
+                        rowsBottom:panel.querySelector('#ci-timeline-rows').getBoundingClientRect().bottom,
+                        countFonts:[...panel.querySelectorAll('[data-role="ci-count"]')].map(n=>parseFloat(getComputedStyle(n).fontSize))})''')
+                      assert {r['group']:r['count'] for r in geometry['header']} == {
+                          k:v for k,v in projection['counts'].items() if k in ('pass','fail','pending') or v}, geometry
+                      assert geometry['legendTop'] >= geometry['rowsBottom'] and all(n>=11 for n in geometry['countFonts']), geometry
+                      for row in geometry['rows']:
+                          wanted=expected_rows[row['repository']]
+                          assert sum(s['count'] for s in row['segments'])==(wanted['observed_runs'] or 0), row
+                          if not row['track']:continue
+                          track=row['track']; cursor=track['x']
+                          for segment in row['segments']:
+                              assert abs(segment['x']-cursor)<=1 and abs(segment['y']-track['y'])<=1 and abs(segment['height']-track['height'])<=1, row
+                              assert abs(segment['width']-track['width']*segment['count']/projection['scale_max'])<=1, row
+                              cursor+=segment['width']
+                      bounds = panel.evaluate('''n => ({client:innerWidth,document:document.documentElement.scrollWidth,
+                        panel:{left:n.getBoundingClientRect().left,right:n.getBoundingClientRect().right},
+                        rails:[...n.querySelectorAll('.ci-plot-scroll')].map(x=>({width:x.clientWidth,scroll:x.scrollWidth}))})''')
+                      assert bounds['document'] <= width and bounds['panel']['left'] >= 0 and bounds['panel']['right'] <= width
+                      assert all(r['scroll']<=r['width'] for r in bounds['rails']), bounds
+                      capture(page, None, f'page-{theme}-{width}.png', width, theme, root/'site/index.html', bounds)
+                      capture(page, panel, f'ci-{theme}-{width}.png', width, theme, root/'site/index.html', {'rows':observed,'bounds':bounds,'geometry':geometry})
+                      for private in (False, True):
+                          names = [k for k,v in expected_nonempty.items() if v['is_private'] is private]
+                          if not names:
+                              continue
+                          name = names[0]
+                          selected = next(i for i,r in enumerate(observed) if r['repository']==name)
+                          summary = groups.nth(selected)
+                          summary.click()
+                          assert summary.evaluate('n=>n.closest("details").open')
+                          def selected_runs():
+                              return panel.locator('[data-role="ci-run-detail"]:visible').evaluate_all('''nodes=>nodes.map(n=>({
+                                repository:n.dataset.repository,id:Number(n.dataset.runId),at:n.dataset.createdAt,
+                                outcome:n.dataset.outcome,href:n.querySelector('a').href,text:n.textContent}))''')
+                          visible = selected_runs()
+                          expected = {run['run_id']:run for week in expected_rows[name]['weeks'] for run in week['runs']}
+                          assert {r['id'] for r in visible} == set(expected), visible
+                          for row in visible:
+                              wanted=expected[row['id']]
+                              assert row['repository']==name and row['at']==wanted['created_at'] and row['outcome']==wanted['outcome']
+                              assert row['href']==wanted['url'] and wanted['workflow'] in row['text']
+                          summary.click()
+                          assert not summary.evaluate('n=>n.closest("details").open')
+                          page.keyboard.press('Tab')
+                          page.keyboard.press('Shift+Tab')
+                          assert summary.evaluate('n=>document.activeElement===n && n.matches(":focus-visible")')
+                          page.keyboard.press('Enter')
+                          assert summary.evaluate('n=>n.closest("details").open') and selected_runs()==visible
+                          assert page.evaluate('document.documentElement.scrollWidth')<=width
+                          capture(page, panel, f'ci-{theme}-{width}-{"private" if private else "public"}.png',
+                                  width, theme, root/'site/index.html', {'selected':name,'runs':visible,'input':'native pointer and keyboard'})
+                          summary.click()
+                      assert not errors, errors
+                      page.close()
+              for width, filename in ((840,'dashboard_summary.svg'),(360,'dashboard_summary_mobile.svg')):
+                  source=root/'assets'/filename
+                  page=browser.new_page(viewport={'width':width,'height':1000},device_scale_factor=1)
+                  page.goto(source.as_uri(),wait_until='load')
+                  page.evaluate('document.fonts.ready')
+                  panel=page.locator('[data-section="ci-timeline"]')
+                  rows=panel.locator('[data-role="ci-repository-row"]').evaluate_all(
+                      'nodes=>nodes.map(n=>({repository:n.dataset.repository,count:n.hasAttribute("data-observed-runs")?Number(n.dataset.observedRuns):null}))')
+                  assert {r['repository']:r['count'] for r in rows}=={
+                      k:v['observed_runs'] for k,v in expected_rows.items()}, rows
+                  capture(page,None,f'svg-{width}.png',width,'canonical SVG',source,{'rows':rows})
+                  capture(page,panel,f'ci-svg-{width}.png',width,'canonical SVG',source,{'rows':rows})
+                  page.close()
+              browser.close()
+          identity['canonical_receipts']=[{'path':str(p.relative_to(root)),'sha256':digest(p),
+              'provenance_sha256':digest(receipts.provenance_path(p))} for p in canonical_receipts]
+          (out/'preview.json').write_text(json.dumps(identity,indent=2)+'\n')
+          print(json.dumps({'head':head,'chrome':chrome_version,'captures':len(identity['records']),
+                            'state':'UNACCEPTED_CANDIDATE_PREVIEW','output':str(out)}))
+          PY_PREVIEW
+      - name: Verify and package the closed candidate artifact set
+        env:
+          PERSONAL_GITHUB_TOKEN: ''
+          GITHUB_TOKEN: ''
+          GH_TOKEN: ''
+          PROFILE_TOKEN_MODE: none
+        run: |
+          python scripts/profile_cli.py validate
+          python scripts/profile_cli.py publication-status --require-ready
+          python -B - <<'PY_PACKAGE'
+          from pathlib import Path
+          import hashlib,json,os,shutil
+          from scripts.contracts import PROFILE_ARTIFACT_PATHS
+          from scripts.quality.headless_receipts import provenance_path
+          root=Path.cwd();out=Path(os.environ['CANDIDATE_PREVIEW_OUTPUT'])
+          canonical=[root/name for name in PROFILE_ARTIFACT_PATHS]
+          canonical += [root/'site/index.html',root/'site/assets/dashboard_summary.svg',root/'site/assets/dashboard_summary_mobile.svg']
+          receipts=[root/'assets/receipts/pages/index'/name for name in
+                    ('screenshot-1280.png','ci-observatory-1280.png','dom-probe-390.json')]
+          canonical += receipts+[provenance_path(p) for p in receipts]
+          rows=[]
+          for path in canonical:
+              relative=path.relative_to(root);target=out/'received-artifacts'/relative
+              target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(path,target)
+              rows.append({'path':str(relative),'bytes':target.stat().st_size,'sha256':hashlib.sha256(target.read_bytes()).hexdigest()})
+          (out/'received-artifact-identities.json').write_text(json.dumps(rows,indent=2)+'\n')
+          files=[p for p in out.rglob('*') if p.is_file()]
+          inventory=[{'path':str(p.relative_to(out)),'bytes':p.stat().st_size,'sha256':hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(files)]
+          (out/'artifact-inventory.json').write_text(json.dumps(inventory,indent=2)+'\n')
+          PY_PACKAGE
+      - name: Retain unaccepted candidate outputs and original browser evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: profile-candidate-preview-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.CANDIDATE_PREVIEW_OUTPUT }}
+          if-no-files-found: error
+          retention-days: 30
