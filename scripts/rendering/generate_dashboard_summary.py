@@ -8,7 +8,9 @@ import math
 import re
 from pathlib import Path
 import textwrap
+from zoneinfo import ZoneInfo
 
+from scripts.contracts import profile_timezone_name
 from scripts.contracts.dashboard_summary import summary_facts
 from scripts.core.config import (CONTRIB_EMPTY, CONTRIB_RAMP, DASHBOARD_SUMMARY_COLORS,
                                  DASHBOARD_AVATAR_OWNER, DASHBOARD_AVATAR_PATH, GREEN, RED,
@@ -585,6 +587,48 @@ def _project_activity(c, x, y, span, data):
     return _project_activity_legend(c, x, y+7, span, project.get("scale"))
 
 
+def _snapshot_time(timestamp):
+    """Date the saved observation in the profile zone; never substitute build time."""
+    if not isinstance(timestamp, str) or not re.fullmatch(
+            r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)", timestamp):
+        return "Update time unavailable"
+    try:
+        observed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        if observed.tzinfo is None:
+            return "Update time unavailable"
+        local = observed.astimezone(ZoneInfo(profile_timezone_name()))
+    except (ValueError, TypeError, OverflowError):
+        return "Update time unavailable"
+    return local.strftime("Updated %b %-d, %Y, %-I:%M %p %Z")
+
+
+def _overview_inventory(c, facts, x, y, width):
+    """Keep short labels intact; long exact values get fewer columns, not clipping."""
+    gap, size = 18, 29
+    needed = max(max(len(str(fact["display_value"])) * size * .64,
+                     len(INVENTORY_DISPLAY_LABELS.get(fact["metric_id"], fact["label"])) * 14 * .62)
+                 for fact in facts)
+    columns = max(1, min(3, int((width + gap) / (needed + gap))))
+    cell_width = (width - (columns - 1) * gap) / columns
+    for start in range(0, len(facts), columns):
+        row = facts[start:start + columns]
+        bottom = y
+        for i, fact in enumerate(row):
+            left = x + i * (cell_width + gap)
+            c.group(data_metric_id=fact["metric_id"])
+            c.parts.append('<title>' + escape(" · ".join(str(fact.get(key) or "")
+                for key in ("label", "population_id", "window"))) + '</title>')
+            c.parts.append(icon(SEMANTIC_ICONS[fact["metric_id"]], left, y, size=20, color=COLORS["muted"]))
+            value_size = min(size, cell_width / max(1, len(str(fact["display_value"])) * .64))
+            c.text(fact["display_value"], left, y + 56, size=value_size, weight=600, data_role="value")
+            label = INVENTORY_DISPLAY_LABELS.get(fact["metric_id"], fact["label"])
+            end = c.wrap(label, left, y + 81, cell_width, size=14, color="muted")
+            bottom = max(bottom, end)
+            c.end()
+        y = bottom + 14
+    return y - 14
+
+
 def render_svg(summary, *, mobile=False, generation=None):
     c = Canvas(mobile)
     facts = summary_facts(summary)
@@ -594,36 +638,47 @@ def render_svg(summary, *, mobile=False, generation=None):
     content = width - pad * 2
     c.group(data_section="overview")
     username = str(summary.get("username", ""))
-    timestamp = str(summary.get("generated_at", ""))
+    timestamp = summary.get("generated_at")
     calendar = summary.get("calendar") or {}
-    c.text("Developer Analytics · Backend", pad, 34, size=15, color="muted", weight=500)
-    c.text(username, pad, 69, size=26, weight=600)
-    try:
-        observed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-        snapshot_date = observed.strftime("%b %-d, %Y")
-    except ValueError:
-        snapshot_date = "date unavailable"
-    c.text("Snapshot " + snapshot_date, pad, 96, size=14 if mobile else 16, color="muted")
+    avatar_size = 64 if mobile else 104
+    heading_x = pad
     if username == DASHBOARD_AVATAR_OWNER:
         avatar_path = Path(__file__).resolve().parents[2] / DASHBOARD_AVATAR_PATH
         if not avatar_path.is_file():
             raise FileNotFoundError("Required owner avatar is missing: " + DASHBOARD_AVATAR_PATH)
         encoded = base64.b64encode(avatar_path.read_bytes()).decode("ascii")
-        avatar_size = 64 if mobile else 104
-        avatar_x, avatar_y = width-pad-avatar_size, 49 if mobile else 30
+        avatar_x, avatar_y = pad, 28
         c.parts.append('<defs><clipPath id="profile-avatar-clip"><circle '+_attrs(dict(cx=avatar_x+avatar_size/2,cy=avatar_y+avatar_size/2,r=avatar_size/2))+'/></clipPath></defs>')
         c.parts.append('<image '+_attrs(dict(x=avatar_x,y=avatar_y,width=avatar_size,height=avatar_size,href="data:image/jpeg;base64,"+encoded,clip_path="url(#profile-avatar-clip)",preserveAspectRatio="xMidYMid slice"))+'><title>'+escape(username+" profile artwork")+'</title></image>')
+        heading_x += avatar_size + 20
+    c.text("Developer Analytics · Backend", heading_x, 46 if mobile else 64, size=14, color="muted", weight=500)
+    c.text("@" + username, heading_x, 77 if mobile else 99, size=24 if mobile else 26, weight=600)
     total = fact("profile.contributions")
-    y = c.fact(total,pad,146,content,size=46,fill="panel",framed=False,
-               qualify=total["quality"].get("status") not in ("exact","ok"))+12
-    c.parts.append('<title>'+escape("Snapshot "+timestamp+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
-    inventory = ("inventory.public_total", "inventory.private_owned", "inventory.stargazers")
-    y = c.fact_grid([fact(key) for key in inventory],pad,y,content,
-                    columns=2 if mobile else 3,fill="panel",framed=False,size=29)
-    if any(fact(key)["quality"].get("status") not in ("exact", "ok") for key in inventory):
-        y = c.wrap("Inventory · unverified",pad,y+c.secondary,content,size=c.secondary,color="muted")
+    metric_top = 112 if mobile else 160
+    primary_width = content if mobile else 334
+    value_size = min(46, (primary_width - 28) / max(1, len(str(total["display_value"])) * .64))
+    primary_bottom = c.fact(total, pad, metric_top, primary_width, size=value_size, fill="panel", framed=False,
+                            qualify=total["quality"].get("status") not in ("exact", "ok"))
+    c.parts.append('<title>'+escape("Snapshot "+str(timestamp or "unavailable")+" · "+str(calendar.get("window", "Calendar unavailable"))+" · "+str((summary.get("rhythm") or {}).get("display",{}).get("qualification", "")))+'</title>')
+    inventory = [fact(key) for key in ("inventory.public_total", "inventory.private_owned", "inventory.stargazers")]
+    secondary_x = pad if mobile else pad + 390
+    secondary_top = primary_bottom + 24 if mobile else metric_top + 18
+    secondary_bottom = _overview_inventory(c, inventory, secondary_x, secondary_top, width - pad - secondary_x)
+    y = max(primary_bottom, secondary_bottom)
+    if not mobile:
+        c.line(pad + 362, metric_top + 10, pad + 362, y - 6)
+    if any(row["quality"].get("status") not in ("exact", "ok") for row in inventory):
+        y = c.wrap("Inventory · unverified", pad, y + c.secondary + 8, content, size=c.secondary, color="muted")
+    footer_top = y + 20
+    c.group(data_role="overview-footer")
+    c.rect(1, footer_top, width - 2, 56, fill="panel")
+    c.line(1, footer_top, width - 1, footer_top)
+    c.parts.append(icon("clock", pad, footer_top + 18, size=20, color=COLORS["muted"]))
+    c.text(_snapshot_time(timestamp), pad + 30, footer_top + 34, size=14 if mobile else 16,
+           color="muted", data_role="snapshot-time")
     c.end()
-    y += 12
+    c.end()
+    y = footer_top + 80
 
     c.group(data_section="weekly")
     c.line(pad, y, width-pad, y)

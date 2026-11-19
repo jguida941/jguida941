@@ -300,6 +300,27 @@ Rounded outer corners stay transparent; no shadow or filter paints outside the s
 Main's three website themes are unchanged. The weekly destination and section anchors
 are generated separately; SVG images provide native README links and text equivalents.
 
+### Overview snapshot and generated authorship — 2026-11-19
+
+The SVG overview groups avatar and identity together, keeps Contributions on the
+left and public repositories, private repositories and stargazers alongside it on
+desktop, and reflows those facts on phones. A separate footer shows the retained
+`generated_at` date, year, time and explicit profile timezone. The website uses the
+same instant and configured `PROFILE_TIMEZONE` (America/New_York by default).
+Absent, invalid or timezone-naive timestamps read “Update time unavailable”; neither
+projection substitutes the build clock. Exact values and quality meanings survive
+the layout change, including zero and unavailable values.
+
+The website footer uses a real GitHub link with a filled brand mark, visible label,
+44px target and visible keyboard focus. The static SVG has no imitation control.
+The mark inherits theme ink independently of the line-icon system.
+
+Only the generated-artifact commit steps in Analytics and Generate Metrics assign
+the Actions bot as both author and committer. Human commits and push collection
+retain their existing attribution and activity rules. Observed GitHub counts are
+never incremented to predict a future commit; publication no longer adds a personal
+contribution after collecting its own snapshot. Historical commits stay unchanged.
+
 ### Contribution observation and publication
 
 The headline and calendar use one default `contributionsCollection` response without a

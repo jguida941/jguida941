@@ -72,3 +72,179 @@ jobs:
           PERSONAL_GITHUB_TOKEN: ""
         run: |
           python scripts/profile_cli.py generate-profile --validate --fixture tests/fixtures/sample_collected_data.json
+
+  # Temporary task preview. Removed after its original receipts are received.
+  overview-preview:
+    if: github.event_name == 'pull_request'
+    runs-on: macos-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [public, development]
+    env:
+      PROFILE_TIMEZONE: America/New_York
+      PREVIEW_OUTPUT: ${{ runner.temp }}/overview-preview
+      PREVIEW_SNAPSHOT: ${{ runner.temp }}/overview-snapshot.json
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ matrix.target == 'development' && 'work/overview-publication-20261119-development' || github.event.pull_request.head.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.15'
+      - name: Install product and browser dependencies
+        run: python -m pip install -r requirements.txt playwright==1.62.0
+      - name: Inspect the exact overview in actual Chrome
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            "https://raw.githubusercontent.com/jguida941/jguida941/3ca18ac16a2f718c7f551e4cb0f3774497938e79/site/data/profile_snapshot.json" --output "$PREVIEW_SNAPSHOT"
+          python -B - <<'PY'
+          """One-shot review of the exact overview renderers using a retained public snapshot."""
+          from pathlib import Path
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          import copy
+          import hashlib
+          import json
+          import os
+          import shutil
+          import subprocess
+          import sys
+          from playwright.sync_api import sync_playwright
+
+          ROOT = Path.cwd()
+          sys.path.insert(0, str(ROOT))
+          from scripts.pipeline.web_render import render_dashboard
+          from scripts.rendering.generate_dashboard_summary import render_svg
+          from scripts.rendering.design_tokens import THEMES
+          from scripts.quality import headless_receipts
+
+          OUT = Path(os.environ['PREVIEW_OUTPUT'])
+          OUT.mkdir(parents=True, exist_ok=True)
+          raw = Path(os.environ['PREVIEW_SNAPSHOT']).read_bytes()
+          assert hashlib.sha256(raw).hexdigest() == '34f411fc6e203d0d4187915a234f4e5cc88f56af12254c52e95e4c8c47f22704'
+          data = json.loads(raw)
+          summary = data['dashboard_summary']
+          facts = {row['metric_id']: row for row in summary['facts']}
+          expected_time = datetime.fromisoformat(data['generated_at'].replace('Z', '+00:00')).astimezone(ZoneInfo('America/New_York')).strftime('Updated %b %-d, %Y, %-I:%M %p %Z')
+          (ROOT / 'site/data').mkdir(parents=True, exist_ok=True)
+          (ROOT / 'site/data/profile_snapshot.json').write_bytes(raw)
+          page_path = ROOT / 'site/index.html'
+          page_path.write_text(render_dashboard())
+          chrome = next((str(p) for p in (Path('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'),
+                         Path(shutil.which('google-chrome') or '/nonexistent'), Path(shutil.which('google-chrome-stable') or '/nonexistent')) if p.is_file()), None)
+          assert chrome, 'Actual Google Chrome is required'
+          version = subprocess.check_output([chrome, '--version'], text=True).strip()
+          # Use the existing producer with the actual installed browser path. The path is
+          # retained in its own command/version sidecars; no browser evidence is fabricated.
+          headless_receipts.CHROME = Path(chrome)
+          headless_receipts.screenshot_page('index', 1280)
+          probe_path = headless_receipts.dom_probe('index', 390)
+          probe = json.loads(probe_path.read_text())
+          assert probe['client_width'] == 390 and not probe['horizontal_overflow'], probe
+          shutil.copytree(ROOT / 'assets/receipts/pages/index', OUT / 'index-receipts', dirs_exist_ok=True)
+
+          records = []
+          with sync_playwright() as p:
+              browser = p.chromium.launch(executable_path=chrome, headless=True, args=['--allow-file-access-from-files'])
+              for width in (1280, 390):
+                  for theme in THEMES:
+                      page = browser.new_page(viewport={'width': width, 'height': 1000}, device_scale_factor=1, timezone_id='Pacific/Honolulu')
+                      errors = []
+                      page.on('pageerror', lambda error: errors.append(str(error)))
+                      page.goto(page_path.as_uri() + '?theme=' + theme, wait_until='load')
+                      page.wait_for_function("document.getElementById('updated').textContent.startsWith('Updated ')")
+                      assert page.locator('#updated').inner_text() == expected_time
+                      assert page.locator('#hero-contribution-total').inner_text() == facts['profile.contributions']['display_value']
+                      result = page.locator('.hero').evaluate('''hero => {
+                        const box = hero.getBoundingClientRect();
+                        const walker = document.createTreeWalker(hero, NodeFilter.SHOW_TEXT);
+                        const texts = []; let node;
+                        while (node = walker.nextNode()) {
+                          if (!node.textContent.trim()) continue;
+                          const range = document.createRange(); range.selectNodeContents(node);
+                          const r = range.getBoundingClientRect();
+                          if (r.width && r.height) texts.push({text:node.textContent.trim(), left:r.left, right:r.right, top:r.top, bottom:r.bottom});
+                        }
+                        const link = hero.querySelector('.github-profile-link');
+                        const mark = link.querySelector('svg'); const style = getComputedStyle(mark);
+                        const l = link.getBoundingClientRect();
+                        return {width:innerWidth, hero:{left:box.left,right:box.right,top:box.top,bottom:box.bottom}, texts,
+                          link:{href:link.href,width:l.width,height:l.height}, mark:{fill:style.fill,stroke:style.stroke},
+                          overflowing:texts.filter(r=>r.left < box.left || r.right > box.right || r.top < box.top || r.bottom > box.bottom)};
+                      }''')
+                      assert result['width'] == width and not result['overflowing'], result
+                      assert result['link']['height'] >= 44 and result['link']['href'] == 'https://github.com/jguida941'
+                      assert result['mark']['stroke'] == 'none' and result['mark']['fill'] != 'none'
+                      page.locator('.github-profile-link').focus()
+                      page.keyboard.press('Tab')
+                      page.keyboard.press('Shift+Tab')
+                      focus = page.locator('.github-profile-link').evaluate('(a)=>({active:document.activeElement===a,visible:a.matches(":focus-visible"),outline:getComputedStyle(a).outlineStyle})')
+                      assert focus['active'] and focus['visible'] and focus['outline'] != 'none', focus
+                      assert not errors, errors
+                      screenshot = OUT / f'home-{theme}-{width}.png'
+                      page.screenshot(path=str(screenshot))
+                      records.append({'kind':'website','theme':theme,'viewport':{'width':width,'height':1000},'probe':result,'focus':focus,'screenshot':screenshot.name,'screenshot_sha256':hashlib.sha256(screenshot.read_bytes()).hexdigest()})
+                      page.close()
+              for mobile in (False, True):
+                  width = 360 if mobile else 840
+                  for scenario in ('real', 'zero', 'unknown', 'long'):
+                      model = copy.deepcopy(summary)
+                      if scenario != 'real':
+                          for row in model['facts']:
+                              if row['metric_id'] in ('profile.contributions','inventory.public_total','inventory.private_owned','inventory.stargazers'):
+                                  row['value'] = {'zero':0,'unknown':None,'long':1234567890}[scenario]
+                                  row['display_value'] = {'zero':'0','unknown':'n/a','long':'1,234,567,890'}[scenario]
+                                  if scenario == 'unknown': row['quality'] = {'status':'unknown','qualification':'Unavailable'}
+                      svg = render_svg(model, mobile=mobile)
+                      path = OUT / f'overview-{width}-{scenario}.svg'
+                      path.write_text(svg)
+                      page = browser.new_page(viewport={'width':width,'height':1000}, device_scale_factor=1)
+                      page.goto(path.as_uri(), wait_until='load')
+                      result = page.locator('[data-section="overview"]').evaluate('''g=>{
+                        const svg=g.ownerSVGElement; const width=svg.viewBox.baseVal.width;
+                        const texts=[...g.querySelectorAll('text')].map(n=>{const b=n.getBBox();return{text:n.textContent,x:b.x,right:b.x+b.width,top:b.y,bottom:b.y+b.height,role:n.dataset.role}});
+                        const footer=g.querySelector('[data-role="overview-footer"]').getBBox();
+                        const weekly=svg.querySelector('[data-section="weekly"]').getBBox();
+                        return {width,texts,overflowing:texts.filter(t=>t.x<18||t.right>width-18),
+                          facts:[...g.querySelectorAll('[data-metric-id]')].map(n=>({id:n.dataset.metricId,value:n.querySelector('[data-role="value"]').textContent})),
+                          timestamp:g.querySelector('[data-role="snapshot-time"]').textContent,
+                          footer:{top:footer.y,bottom:footer.y+footer.height},weeklyTop:weekly.y,anchors:g.querySelectorAll('a').length};
+                      }''')
+                      assert not result['overflowing'], result
+                      assert result['timestamp'] == expected_time and result['anchors'] == 0
+                      expected = {row['metric_id']: row['display_value'] for row in model['facts'] if row['metric_id'] in ('profile.contributions','inventory.public_total','inventory.private_owned','inventory.stargazers')}
+                      assert {row['id']:row['value'] for row in result['facts']} == expected
+                      assert max(t['bottom'] for t in result['texts'] if t['role'] == 'value') < result['footer']['top']
+                      assert result['weeklyTop'] >= result['footer']['bottom']
+                      screenshot = OUT / f'overview-{width}-{scenario}.png'
+                      page.screenshot(path=str(screenshot), clip={'x':0,'y':0,'width':width,'height':min(1000,result['weeklyTop']+50)})
+                      records.append({'kind':'svg','mobile':mobile,'scenario':scenario,'svg_sha256':hashlib.sha256(svg.encode()).hexdigest(),'probe':result,'screenshot':screenshot.name})
+                      page.close()
+              browser.close()
+
+          receipt = {'purpose':'Product browser preview using an immutable public snapshot; not a fresh collection or full private Mac CI result',
+              'run_id':os.environ.get('GITHUB_RUN_ID'),'run_attempt':os.environ.get('GITHUB_RUN_ATTEMPT'),
+              'head':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'chrome':version,
+              'producer':'Temporary overview preview workflow, original inline Python',
+              'source_sha256':{name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in ('scripts/pipeline/web_render.py','scripts/rendering/generate_dashboard_summary.py')},
+              'snapshot_sha256':hashlib.sha256(raw).hexdigest(),'generated_at':data['generated_at'],
+              'index_sha256':hashlib.sha256(page_path.read_bytes()).hexdigest(),'expected_timestamp':expected_time,'records':records}
+          (OUT/'verification.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          print(json.dumps({'head':receipt['head'],'chrome':version,'screenshots':len(records),'index_sha256':receipt['index_sha256'],'expected_timestamp':expected_time}))
+          PY
+
+      - name: Retain original browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: overview-${{ matrix.target }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/overview-preview
+          if-no-files-found: error
+          retention-days: 30

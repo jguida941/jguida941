@@ -292,9 +292,10 @@ class DashboardShortInventoryLabelsTests(unittest.TestCase):
             root = ET.fromstring(render_svg(summary, mobile=mobile))
             for fact, label in zip(facts, ("public repos", "private repos")):
                 owner = next(n for n in root.iter() if n.get("data-metric-id") == fact["metric_id"])
-                painted = [n.text for n in owner.iter(ns+"text")]
-                self.assertEqual(" ".join(painted[:-1]), label)
-                self.assertEqual(painted[-1], fact["display_value"])
+                labels = [n.text for n in owner.iter(ns+"text") if n.get("data-role") != "value"]
+                values = [n.text for n in owner.iter(ns+"text") if n.get("data-role") == "value"]
+                self.assertEqual(" ".join(labels), label)
+                self.assertEqual(values, [fact["display_value"]])
                 context = " ".join(n.text or "" for n in owner.iter(ns+"title"))
                 self.assertIn(fact["label"], context)
                 self.assertIn(fact["population_id"], context)
@@ -1060,3 +1061,73 @@ class NativeCalendarParityTests(unittest.TestCase):
                 self.assertEqual(total, facts["calendar.total"]["value"])
                 self.assertEqual(days, model["dashboard_summary"]["calendar"]["days"])
                 self.assertTrue(_current_contribution_calendar(model["dashboard_data"]))
+
+
+class OverviewSnapshotLayoutTests(unittest.TestCase):
+    """The overview groups facts and dates the saved snapshot, at both sizes."""
+    @staticmethod
+    def summary(timestamp="2026-11-19T18:02:33Z", value=13583):
+        return {"username": "jguida941", "generated_at": timestamp, "facts": [
+            _fact("profile.contributions", value, "Contributions", "profile", status="exact"),
+            _fact("inventory.public_total", 57, "public repos", "public", status="exact"),
+            _fact("inventory.private_owned", 200, "private repos", "private", status="exact"),
+            _fact("inventory.stargazers", 60, "stargazers", "public", status="exact"),
+        ]}
+
+    def test_overview_places_secondary_facts_beside_primary_and_time_below(self):
+        from unittest.mock import patch
+        import os
+        with patch.dict(os.environ, {"PROFILE_TIMEZONE": "America/New_York"}):
+            for mobile in (False, True):
+                root = ET.fromstring(render_svg(self.summary(), mobile=mobile))
+                overview = next(n for n in root.iter() if n.get("data-section") == "overview")
+                groups = {n.get("data-metric-id"): n for n in overview.iter() if n.get("data-metric-id")}
+                self.assertEqual(set(groups), {"profile.contributions", "inventory.public_total",
+                                               "inventory.private_owned", "inventory.stargazers"})
+                values = {key: next(n for n in group.iter() if n.get("data-role") == "value")
+                          for key, group in groups.items()}
+                self.assertEqual([values[key].text for key in groups], ["13,583", "57", "200", "60"])
+                primary = values["profile.contributions"]
+                if not mobile:
+                    for key in ("inventory.public_total", "inventory.private_owned", "inventory.stargazers"):
+                        self.assertGreater(float(values[key].get("x")), float(primary.get("x")) + 250)
+                        self.assertLess(abs(float(values[key].get("y")) - float(primary.get("y"))), 60)
+                footers = [n for n in overview.iter() if n.get("data-role") == "overview-footer"]
+                self.assertEqual(1, len(footers))
+                timestamp = next(n for n in footers[0].iter() if n.get("data-role") == "snapshot-time")
+                self.assertEqual("Updated Nov 19, 2026, 1:02 PM EST", timestamp.text)
+                self.assertGreater(float(timestamp.get("y")), max(float(n.get("y")) for n in values.values()))
+                painted = [n.text or "" for n in overview.iter("{http://www.w3.org/2000/svg}text")]
+                self.assertEqual(1, sum(text.startswith("Updated ") for text in painted))
+                self.assertFalse(any(text.startswith("Snapshot ") for text in painted))
+                self.assertFalse(any(n.tag.endswith("}a") for n in overview.iter()))
+
+    def test_snapshot_time_keeps_offset_day_and_dst_meaning(self):
+        from unittest.mock import patch
+        import os
+        cases = [
+            ("2026-07-01T01:08:00Z", "Updated Jun 30, 2026, 9:08 PM EDT"),
+            ("2026-11-01T05:30:00Z", "Updated Nov 1, 2026, 1:30 AM EDT"),
+            ("2026-11-01T06:30:00Z", "Updated Nov 1, 2026, 1:30 AM EST"),
+            ("2026-11-19T13:02:33-05:00", "Updated Nov 19, 2026, 1:02 PM EST"),
+        ]
+        with patch.dict(os.environ, {"PROFILE_TIMEZONE": "America/New_York"}):
+            for timestamp, expected in cases:
+                for mobile in (False, True):
+                    root = ET.fromstring(render_svg(self.summary(timestamp), mobile=mobile))
+                    labels = [n.text for n in root.iter() if n.get("data-role") == "snapshot-time"]
+                    self.assertEqual([expected], labels)
+            for timestamp in (None, "", "invalid", "2026-11-19", "2026-11-19T13:02:33", "2026-02-30T13:00:00Z", "2026-11-19T13:00:00+00:60", "2026-11-19T13:00:00+24:00"):
+                root = ET.fromstring(render_svg(self.summary(timestamp)))
+                self.assertEqual(["Update time unavailable"], [n.text for n in root.iter() if n.get("data-role") == "snapshot-time"])
+
+    def test_zero_unknown_and_long_counts_are_not_replaced(self):
+        import copy
+        for mobile in (False, True):
+            for value, expected in ((0, "0"), (None, "n/a"), (1234567890, "1,234,567,890")):
+                summary = self.summary(value=value)
+                before = copy.deepcopy(summary)
+                root = ET.fromstring(render_svg(summary, mobile=mobile))
+                group = next(n for n in root.iter() if n.get("data-metric-id") == "profile.contributions")
+                self.assertEqual(expected, next(n.text for n in group.iter() if n.get("data-role") == "value"))
+                self.assertEqual(before, summary)
