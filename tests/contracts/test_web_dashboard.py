@@ -1311,7 +1311,7 @@ class El{
  setAttribute(k,v){this.attrs[k]=String(v);} getAttribute(k){return this.attrs[k]??null;}
  addEventListener(k,fn){this.handlers[k]=fn;}
 }
-const ids=['ci-observatory','ci-timeline-axis','ci-timeline-rows','ci-observatory-note','ci-observatory-count','ci-observatory-scope','ci-timeline-scroll','ci-legend','ci-header-metrics','ci-observatory-badge'];
+const ids=['ci-observatory','ci-timeline-axis','ci-timeline-rows','ci-observatory-note','ci-observatory-count','ci-observatory-scope','ci-timeline-scroll','ci-legend','ci-header-metrics'];
 const nodes=Object.fromEntries(ids.map(id=>[id,new El()]));
 const context={document:{getElementById:id=>nodes[id]||null,createElement:tag=>new El(tag)},sample:input.sample};vm.createContext(context);
 const all=node=>[node,...node.children.flatMap(all)];
@@ -1332,10 +1332,11 @@ assert.equal(details(publicRow).at(-1).children[0].children.length,0,'provider t
 const segments=all(publicRow).filter(n=>n.dataset.role==='ci-bar-segment');
 assert.deepEqual(segments.map(n=>[n.dataset.group,n.dataset.count]),[['pass','1'],['fail','1'],['pending','1'],['other','1'],['unknown','1']]);
 assert(segments.every(n=>Math.abs(parseFloat(n.style.width)-100/37)<1e-8),'narrow segments keep absolute scale');
-assert(nodes['ci-observatory-note'].textContent.includes('9 sampled runs · 6 personal repositories'));
-assert(nodes['ci-observatory-note'].textContent.includes('2026-11-06'));
+assert.equal(nodes['ci-observatory-note'].textContent,'2026-11-06 – 2026-11-19 UTC');
+assert.equal(nodes['ci-observatory-count'].textContent,'9 sampled runs · 6 personal repositories · partial sample');
 assert(nodes['ci-observatory-scope'].textContent.includes('Newest 37 runs'));
-assert.equal(nodes['ci-observatory-badge'].textContent,'Partial sample');
+assert(nodes['ci-observatory-scope'].textContent.includes('last UTC date is partial'));
+assert.equal(nodes['ci-observatory'].dataset.status,'partial');
 assert(!all(nodes['ci-legend']).some(n=>n.textContent==='Other'));
 assert(all(nodes['ci-legend']).some(n=>n.textContent==='Cancelled'));
 assert(all(nodes['ci-legend']).some(n=>n.textContent==='Unknown'));
@@ -1350,8 +1351,12 @@ assert.equal(publicRow.children[0].getAttribute('aria-expanded'),'false');
 vm.runInContext('hydrateCITimeline({...sample,status:"unavailable"});',context);
 assert.equal(all(nodes['ci-timeline-rows']).filter(n=>n.dataset.role==='ci-run-detail').length,0,'refresh clears stale details');
 assert.equal(all(nodes['ci-timeline-rows']).filter(n=>n.dataset.role==='ci-bar-segment').length,0,'unavailable cannot retain success');
-assert.equal(nodes['ci-observatory-badge'].textContent,'Sample unavailable');
-assert(nodes['ci-observatory-note'].textContent.startsWith('Run count unavailable'));
+assert.equal(nodes['ci-observatory'].dataset.status,'unavailable');
+assert.equal(nodes['ci-observatory-note'].textContent,'2026-11-06 – 2026-11-19 UTC');
+assert.equal(nodes['ci-observatory-count'].textContent,'Run count unavailable · 6 personal repositories · sample unavailable');
+vm.runInContext('hydrateCITimeline(null);',context);
+assert.equal(nodes['ci-observatory-note'].textContent,'Workflow history unavailable');
+assert.equal(nodes['ci-observatory-count'].textContent,'Run count unavailable');
 '''
         fixture=_weekly_ci_fixture()
         def execute(js):
@@ -1380,6 +1385,7 @@ assert(nodes['ci-observatory-note'].textContent.startsWith('Run count unavailabl
         self.assertNotIn('--ci-track-min',ci)
         self.assertNotIn('min-width: 44px',ci)
         markup=_ci_observatory();self.assertEqual(1,markup.count('<h2'))
+        self.assertNotIn('ci-observatory-badge',markup)
         self.assertIn(LUCIDE['workflow'],markup)
         self.assertIn('Workflow overview',markup);self.assertIn('CI activity',markup)
         self.assertNotIn('<details class="ci-sample-details" open',markup)

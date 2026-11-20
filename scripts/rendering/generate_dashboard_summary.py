@@ -775,10 +775,10 @@ def _ci_timeline(c, x, y, span, data):
         c.end()
         return y + 12
     total, rows = sample["observed_runs"], sample["repositories"]
-    qualification = "Partial sample" if sample["status"] == "partial" else "Unavailable" if sample["status"] == "unavailable" else "Sampled history"
+    qualification = "Partial sample" if sample["status"] == "partial" else "Sample unavailable" if sample["status"] == "unavailable" else "Sampled history"
     label = f"{total} sampled runs" if total is not None else "Run count unavailable"
-    y = c.wrap(f"{label} · {len(rows)} personal repositories · {qualification.lower()}", x, y, span, size=13, color="muted")
-    y = c.wrap(f"{sample['window_start'][:10]} – {sample['window_end'][:10]} UTC · last date partial", x, y, span, size=12, color="muted") + 6
+    sample_caption = label + (f" · {len(rows)} personal repositories" if rows else "") + f" · {qualification.lower()}"
+    y = c.wrap(f"{sample['window_start'][:10]} – {sample['window_end'][:10]} UTC", x, y, span, size=12, color="muted") + 6
     colors = {"pass": GREEN, "fail": RED, "pending": YELLOW, "other": COLORS["muted"], "unknown": COLORS["text"]}
     glyphs = {"pass": "ci_check", "fail": "cross", "pending": "clock", "other": "workflow", "unknown": "alert"}
     groups = [group for group in CI_WEEK_GROUPS if group in ("pass", "fail", "pending") or sample["counts"][group]]
@@ -887,9 +887,9 @@ def _ci_timeline(c, x, y, span, data):
         c.text(label, legend_x+21, y, size=11, color="muted")
         legend_x += width
     c.end()
-    y = c.wrap("Sampled runs · open the website for workflow details", x, y+25, span, size=11, color="muted")
+    y = c.wrap(sample_caption, x, y+25, span, size=11, color="muted")
     limit = sample["sample_limit_per_repo"]
-    c.parts.append('<desc>'+escape(f"Personal repositories only. Saved cutoff {sample['window_end']}. Source sample limit {limit if limit is not None else 'unavailable'} per repository. Counts do not measure all workflow activity. "+_ci_group_detail("other", sample["outcome_counts"]))+'</desc>')
+    c.parts.append('<desc>'+escape(f"Personal repositories only, from profile-first selection followed by repositories ordered by latest push; no recent-push age cutoff. Saved cutoff {sample['window_end']}; the last UTC date is partial. Source sample limit {limit if limit is not None else 'unavailable'} per repository. Counts include all actors and workflow triggers and do not measure all workflow activity. "+_ci_group_detail("other", sample["outcome_counts"]))+'</desc>')
     c.end()
     return y + 6
 

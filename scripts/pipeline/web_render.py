@@ -168,7 +168,6 @@ body {
 .ci-observatory .section-meta { overflow-wrap: anywhere; }
 .ci-observatory .ci-heading { display: flex; align-items: center; gap: var(--space-md); }
 .ci-observatory .ci-heading > svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; color: var(--ink-dim); }
-.ci-observatory .ci-badge { flex: none; border: 1px solid var(--hairline); border-radius: var(--radius-tile); padding: var(--space-xs) var(--space-sm); font-size: var(--type-caption); color: var(--ink-dim); }
 .ci-observatory .ci-header-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: var(--space-md); margin: var(--space-xl) 0; }
 .ci-observatory .ci-header-metrics[data-columns="5"] { grid-template-columns: repeat(5,minmax(0,1fr)); }
 .ci-observatory .ci-metric { min-width: 0; }
@@ -199,7 +198,7 @@ body {
 .ci-observatory .ci-bar-segment { flex: none; display: flex; align-items: center; justify-content: center; height: 100%; background: var(--ci-color); color: var(--ci-count-ink); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .ci-observatory .ci-bar-segment.ci-unknown { background: transparent; color: var(--ink-strong); box-shadow: inset 0 0 0 1.5px var(--ink-strong); }
 .ci-observatory .ci-outside-counts { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-md); margin-top: var(--space-xs); font-size: 11px; color: var(--ink-dim); }
-.ci-observatory .ci-outside-counts strong { color: var(--ci-color); font-weight: 600; }
+.ci-observatory .ci-outside-counts strong { color: var(--ink-strong); font-weight: 600; }
 .ci-observatory .ci-row-total { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-sm); font-size: var(--type-body); font-weight: 600; color: var(--ink-strong); font-variant-numeric: tabular-nums; }
 .ci-observatory .ci-caret { width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); margin: 0 var(--space-xs) var(--space-xs); }
 .ci-observatory .ci-lane[open] .ci-caret { transform: rotate(225deg); margin-bottom: 0; }
@@ -208,7 +207,7 @@ body {
 .ci-observatory .ci-run-detail { padding: var(--space-sm) 0; border-top: 1px solid color-mix(in srgb,var(--hairline) 15%,transparent); }
 .ci-observatory .ci-run-link { display: flex; align-items: center; min-height: 44px; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; }
 .ci-observatory .ci-run-meta { display: block; font-size: var(--type-caption); color: var(--ink-dim); overflow-wrap: anywhere; }
-.ci-observatory .ci-row-context { margin: 0 0 var(--space-md); font-size: var(--type-caption); color: var(--ink-dim); overflow-wrap: anywhere; }
+.ci-observatory .ci-row-context { margin: var(--space-md) 0; font-size: var(--type-caption); color: var(--ink-dim); overflow-wrap: anywhere; }
 .ci-observatory .ci-legend { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); margin: var(--space-xl) 0 var(--space-md); font-size: var(--type-caption); color: var(--ink-dim); }
 .ci-observatory .ci-legend > span { display: inline-flex; align-items: center; gap: var(--space-sm); }
 .ci-observatory .ci-legend .ci-icon { color: var(--ci-color); }
@@ -517,14 +516,14 @@ def _ci_observatory() -> str:
     from scripts.rendering.icons import LUCIDE
     return f"""
   <section class="panel ci-observatory" id="ci-observatory" tabindex="-1" aria-labelledby="ci-observatory-title">
-    <div class="section-head"><div><p class="eyebrow">Workflow overview</p><div class="ci-heading">{_svg_icon(LUCIDE['workflow'])}<h2 class="title" id="ci-observatory-title">CI activity</h2></div></div><span class="ci-badge" id="ci-observatory-badge">Sample unavailable</span></div>
-    <p class="section-meta" id="ci-observatory-note" role="status">Workflow history unavailable</p>
+    <div class="section-head"><div><p class="eyebrow">Workflow overview</p><div class="ci-heading">{_svg_icon(LUCIDE['workflow'])}<h2 class="title" id="ci-observatory-title">CI activity</h2></div></div></div>
+    <p class="section-meta" id="ci-observatory-note">Workflow history unavailable</p>
     <div class="ci-header-metrics" id="ci-header-metrics" data-role="ci-header-metrics" aria-label="Sampled workflow outcomes"></div>
     <div class="ci-plot-scroll" id="ci-timeline-scroll">
       <div class="ci-axis" id="ci-timeline-axis"></div><div id="ci-timeline-rows" aria-label="Personal repository workflow samples"></div>
     </div>
     <div class="ci-legend" id="ci-legend" data-role="ci-legend" aria-label="Workflow outcomes"></div>
-    <div class="ci-sample-footer"><p class="section-meta" id="ci-observatory-count">Run count unavailable</p><details class="ci-sample-details"><summary>Sampling details</summary><p class="section-meta" id="ci-observatory-scope"></p></details></div>
+    <div class="ci-sample-footer"><p class="section-meta" id="ci-observatory-count" role="status">Run count unavailable</p><details class="ci-sample-details"><summary>Sampling details</summary><p class="section-meta" id="ci-observatory-scope"></p></details></div>
   </section>"""
 
 
@@ -1111,18 +1110,19 @@ def _script() -> str:
     return span;
   }
   function hydrateCITimeline(sample) {
-    const host=document.getElementById("ci-observatory"),axis=document.getElementById("ci-timeline-axis"),lanes=document.getElementById("ci-timeline-rows"),note=document.getElementById("ci-observatory-note"),footer=document.getElementById("ci-observatory-count"),scope=document.getElementById("ci-observatory-scope"),legend=document.getElementById("ci-legend"),metrics=document.getElementById("ci-header-metrics"),badge=document.getElementById("ci-observatory-badge");
-    if(!host||!axis||!lanes||!note||!footer||!scope||!legend||!metrics||!badge) return;
+    const host=document.getElementById("ci-observatory"),axis=document.getElementById("ci-timeline-axis"),lanes=document.getElementById("ci-timeline-rows"),note=document.getElementById("ci-observatory-note"),footer=document.getElementById("ci-observatory-count"),scope=document.getElementById("ci-observatory-scope"),legend=document.getElementById("ci-legend"),metrics=document.getElementById("ci-header-metrics");
+    if(!host||!axis||!lanes||!note||!footer||!scope||!legend||!metrics) return;
     for(const node of [axis,lanes,legend,metrics]) node.replaceChildren();
     const projected=ciWeeklyProjection(sample),element=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;};
     host.dataset.status=projected.status;
     host.dataset.scaleMax=projected.scale_max===null?"":String(projected.scale_max);
-    badge.textContent=projected.status==="partial"?"Partial sample":projected.status==="unavailable"?"Sample unavailable":"Sampled history";
     const count=projected.observed_runs;
-    footer.textContent="Sampled runs; counts do not measure all workflow activity.";
+    footer.textContent="Run count unavailable";
     if(!projected.weeks.length){note.textContent="Workflow history unavailable";scope.textContent="Personal repository scope or saved source bounds unavailable.";return;}
-    note.textContent=(count===null?"Run count unavailable":count+" sampled runs")+" · "+projected.repositories.length+" personal repositories · "+projected.window_start.slice(0,10)+" – "+projected.window_end.slice(0,10)+" UTC · last date partial"+(projected.status==="partial"?" · partial sample":"");
-    scope.textContent="Personal repositories of "+projected.owner+". Saved display window "+projected.window_start+" ≤ created_at ≤ "+projected.window_end+". Source observed at "+(projected.observed_at||"unavailable")+". Newest "+(projected.sample_limit_per_repo===null?"an unspecified number of":projected.sample_limit_per_repo)+" runs per repository retained by the collector; displayed counts include only this window. Partial/truncated samples are lower bounds, unavailable is not zero. Empty rail is unused scale, not another outcome.";
+    note.textContent=projected.window_start.slice(0,10)+" – "+projected.window_end.slice(0,10)+" UTC";
+    const qualification=projected.status==="partial"?"partial sample":projected.status==="unavailable"?"sample unavailable":"sampled history";
+    footer.textContent=(count===null?"Run count unavailable":count+" sampled runs")+(projected.repositories.length?" · "+projected.repositories.length+" personal repositories":"")+" · "+qualification;
+    scope.textContent="Personal repositories of "+projected.owner+" from the collector's profile-first selection, followed by repositories ordered by latest push; there is no recent-push age cutoff. Saved display window "+projected.window_start+" ≤ created_at ≤ "+projected.window_end+"; the last UTC date is partial. Source observed at "+(projected.observed_at||"unavailable")+". Newest "+(projected.sample_limit_per_repo===null?"an unspecified number of":projected.sample_limit_per_repo)+" runs per repository retained by the collector; displayed counts include only this window and can include any actor or workflow trigger. Partial/truncated samples are lower bounds, unavailable is not zero. Empty rail is unused scale, not another outcome.";
     const groups=CI_WEEK_GROUPS.filter(group=>["pass","fail","pending"].includes(group)||projected.counts[group]);
     metrics.dataset.columns=String(groups.length);
     for(const group of groups){

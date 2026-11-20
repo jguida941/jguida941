@@ -444,12 +444,17 @@ without inflating its width. Theme foregrounds derive from existing semantic rol
 and keep readable contrast on every current status fill.
 
 A compact Workflow overview / CI activity header uses the existing canonical Lucide
-icon family, theme tokens, type hierarchy and metric spacing. Sample total,
-repository count, qualification, saved ISO date bounds and outcome readouts derive
-from the same personal projection as the bars. No all-owner total may appear over
-personal rows. The current saved sample has62 runs across4 personal repositories:
-33 passed,23 failed,2 pending,3 cancelled and1 skipped. These are observations, not
-constants. Current date partial and partial/truncated sample meaning stay visible.
+icon family, theme tokens, type hierarchy and metric spacing. The saved ISO date
+range and UTC appear beneath the title; sample total, personal repository count and
+sample qualification appear below the legend. All values and outcome readouts derive
+from the same personal projection as the bars and are observations, never constants.
+No all-owner total may appear over personal rows. Keep partial sample meaning in the
+footer and exact cutoff/final-date incompleteness in Sampling details and SVG
+descriptions. Do not repeat a navigation instruction or generic sample sentence in
+the chart footer. Repository selection is profile-first, followed by latest-push
+ordering from the collector's admitted inventory; it has no recent-push age cutoff.
+Small counts outside website bars use the shared primary text role. Expanded row
+context has spacing below the visible keyboard focus outline.
 
 The website uses native per-repository details/summary, closed initially, with
 visible keyboard focus and at least44px targets. Expansion exposes exact workflow,

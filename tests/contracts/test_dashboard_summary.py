@@ -1233,6 +1233,19 @@ def _weekly_ci_fixture():
 
 
 class CIWeeklyProjectionTests(unittest.TestCase):
+    def test_saved_dates_head_the_chart_and_sample_qualification_follows_the_key(self):
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({'ci_timeline': _weekly_ci_fixture()}, mobile=mobile))
+            chart = next(n for n in root.iter() if n.get('data-role') == 'ci-timeline-chart')
+            labels = [n for n in chart if n.tag.endswith('text')]
+            self.assertEqual('2026-11-06 – 2026-11-19 UTC', ''.join(labels[0].itertext()))
+            legend = next(n for n in chart if n.get('data-role') == 'ci-legend')
+            footer = [n for n in labels if float(n.get('y')) > max(float(t.get('y')) for t in legend if t.tag.endswith('text'))]
+            footer_text = ' '.join(''.join(n.itertext()) for n in footer)
+            self.assertEqual('9 sampled runs · 6 personal repositories · partial sample', footer_text)
+            self.assertNotIn('open the website', ' '.join(chart.itertext()))
+            self.assertIn('last UTC date is partial', ' '.join(chart.itertext()))
+
     def test_bar_counts_remain_readable_without_inflating_narrow_segments(self):
         from scripts.core.config import DASHBOARD_SUMMARY_COLORS
         from tests.contracts.test_theme_system import _contrast
