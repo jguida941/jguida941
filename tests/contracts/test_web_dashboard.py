@@ -1277,8 +1277,12 @@ class CIWeeklyWebsiteTests(unittest.TestCase):
         self.assertIn('min-height: 64px',html)
         self.assertIn('element("details","ci-lane")',html)
         self.assertIn('element("summary","ci-group")',html)
-        self.assertLess(html.index('id="ci-timeline-rows"'),html.index('id="ci-legend"'))
-        self.assertLess(html.index('id="ci-legend"'),html.index('class="ci-sample-footer"'))
+        self.assertLess(html.index('id="ci-observatory-title"'),html.index('id="ci-header-metrics"'))
+        self.assertLess(html.index('id="ci-header-metrics"'),html.index('id="ci-timeline-rows"'))
+        self.assertLess(html.index('id="ci-timeline-rows"'),html.index('id="ci-observatory-note"'))
+        self.assertLess(html.index('id="ci-observatory-note"'),html.index('id="ci-observatory-count"'))
+        self.assertLess(html.index('id="ci-observatory-count"'),html.index('id="ci-legend"'))
+        self.assertIn('Workflow runs and results',html)
 
     def test_javascript_and_svg_project_identical_qualified_personal_facts(self):
         from tests.contracts.test_dashboard_summary import _weekly_ci_fixture
@@ -1322,7 +1326,14 @@ assert.deepEqual(lanes.map(row=>row.dataset.observedRuns),['5','2','0',undefined
 assert(lanes.every(row=>row.children[0].tagName==='summary'&&row.children[0].getAttribute('aria-expanded')==='false'));
 assert.equal(all(nodes['ci-timeline-rows']).filter(node=>node.dataset.role==='ci-count').reduce((sum,n)=>sum+Number(n.textContent),0),9);
 const publicRow=lanes[0],privateRow=lanes[1];
-assert(all(privateRow).some(n=>n.textContent==='Private'));
+const privateLock=all(privateRow).find(n=>n.className==='ci-private');
+assert(privateLock && privateLock.getAttribute('aria-label')==='Private repository');
+assert.equal(privateLock.getAttribute('role'),'img');
+assert(privateRow.children[0].getAttribute('aria-label').includes('Private repository'));
+assert(!all(privateRow).some(n=>n.textContent==='Private'));
+assert(!all(privateRow).some(n=>n.className==='ci-owner'));
+const identity=all(privateRow).find(n=>n.className==='ci-identity');
+assert.equal(identity.children[0],privateLock,'lock precedes repository name');
 const details=row=>all(row).filter(node=>node.dataset.role==='ci-run-detail');
 assert.deepEqual(details(privateRow).map(n=>n.dataset.runId),['11','12']);
 assert.equal(details(privateRow)[1].children[0].href,'https://github.com/example/profile-private-continuation-with-a-long-name/actions/runs/12');
@@ -1340,6 +1351,9 @@ assert.equal(nodes['ci-observatory'].dataset.status,'partial');
 assert(!all(nodes['ci-legend']).some(n=>n.textContent==='Other'));
 assert(all(nodes['ci-legend']).some(n=>n.textContent==='Cancelled'));
 assert(all(nodes['ci-legend']).some(n=>n.textContent==='Unknown'));
+assert.equal(all(nodes['ci-legend']).filter(n=>(n.className||'').includes('ci-marker')).length,5);
+assert(!all(nodes['ci-legend']).some(n=>n.className==='ci-icon'));
+assert.equal(all(nodes['ci-header-metrics']).filter(n=>n.className==='ci-icon').length,5,'header keeps neutral outline icons');
 privateRow.open=true;privateRow.handlers.toggle();
 assert.equal(privateRow.children[0].getAttribute('aria-expanded'),'true');
 privateRow.open=false;privateRow.handlers.toggle();
@@ -1387,7 +1401,7 @@ assert.equal(nodes['ci-observatory-count'].textContent,'Run count unavailable');
         markup=_ci_observatory();self.assertEqual(1,markup.count('<h2'))
         self.assertNotIn('ci-observatory-badge',markup)
         self.assertIn(LUCIDE['workflow'],markup)
-        self.assertIn('Workflow overview',markup);self.assertIn('CI activity',markup)
+        self.assertIn('Workflow runs and results',markup);self.assertIn('CI activity',markup)
         self.assertNotIn('<details class="ci-sample-details" open',markup)
         script=re.findall(r'<script>(.*?)</script>',render_dashboard(),re.S)[0]
         ci_js=script[script.index('  const CI_WEEK_GROUPS'):script.index('  function hydrate(d)')]

@@ -426,27 +426,36 @@ repository/run deduplication, interval boundaries, safe canonical links and ever
 qualified outcome. Unavailable stays null; observed empty and an observed sample
 with no runs inside the display window remain distinct.
 
-One repository row contains its name and owner/private identity, a horizontal outcome
+One repository row contains its name and private identity, a horizontal outcome
 stack, and an exact total. All rows share the absolute extent
 `max(valid sample_limit_per_repo, largest observed row total)`; an unspecified limit
 uses the largest observed row. A two-run row uses 2/20 of a twenty-run scale. Do not
 normalize each row to full width, clip larger counts or invent a denominator when
-no positive scale exists. Empty rail is unused scale, not an outcome.
+no positive scale exists. Empty rail is transparent unused scale, not an outcome.
+Do not paint unused scale as a dark segment. The personal owner is not repeated
+visibly on each row; full canonical identity stays accessible and in data/link
+bindings. A lock precedes private repository names, without a redundant visible
+Private label.
 
 Passed means success. Failed includes failure, timed_out and startup_failure.
 Pending includes queued, in_progress and action_required. The known gray segment
 names its actual cancelled/skipped/neutral/stale subtypes in stable order and
 retains their exact breakdown. Unknown has its own labeled non-success segment;
-it never shares known gray or success. The bottom legend is the single chart key.
-Color supplements literal labels, accessible descriptions and canonical icons.
+it never shares known gray or success. The bottom legend is the single chart key,
+using filled color dots and literal labels; Unknown uses an outlined dot. Header
+totals retain the existing neutral outline icons, like the profile summary card.
+Color supplements literal labels and accessible descriptions.
 Numerals remain at least11px; if a segment is too narrow, put its exact count outside
 without inflating its width. Theme foregrounds derive from existing semantic roles
 and keep readable contrast on every current status fill.
 
-A compact Workflow overview / CI activity header uses the existing canonical Lucide
-icon family, theme tokens, type hierarchy and metric spacing. The saved ISO date
-range and UTC appear beneath the title; sample total, personal repository count and
-sample qualification appear below the legend. All values and outcome readouts derive
+A compact CI activity header uses the existing canonical Lucide icon family, theme
+tokens, type hierarchy and metric spacing. On desktop, the neutral workflow icon,
+title and Workflow runs and results subtitle sit left of a vertical divider; the
+neutral outcome icons, counts and labels sit to the right. On phones the title and
+summary stack, with two metric columns. The saved ISO date range and UTC, sample
+total, personal repository count, qualification and colored-dot legend form the
+wrapping bottom footer. All values and outcome readouts derive
 from the same personal projection as the bars and are observations, never constants.
 No all-owner total may appear over personal rows. Keep partial sample meaning in the
 footer and exact cutoff/final-date incompleteness in Sampling details and SVG

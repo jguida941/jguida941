@@ -1233,18 +1233,133 @@ def _weekly_ci_fixture():
 
 
 class CIWeeklyProjectionTests(unittest.TestCase):
-    def test_saved_dates_head_the_chart_and_sample_qualification_follows_the_key(self):
+    def test_reference_header_splits_on_desktop_and_stacks_without_tiny_metrics(self):
+        from scripts.core.config import DASHBOARD_SUMMARY_COLORS
+        from scripts.rendering.generate_dashboard_summary import ci_weekly_projection
+        sample = _weekly_ci_fixture()
+        expected = ci_weekly_projection(sample)
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({'ci_timeline': sample}, mobile=mobile))
+            chart = next(n for n in root.iter() if n.get('data-role') == 'ci-timeline-chart')
+            headers = [n for n in chart if n.get('data-role') == 'ci-header']
+            self.assertEqual(1, len(headers), 'CI needs one complete reference header')
+            header = headers[0]
+            title = next(n for n in header.iter() if n.get('data-role') == 'ci-title')
+            subtitle = next(n for n in header.iter() if n.get('data-role') == 'ci-subtitle')
+            self.assertEqual('CI activity', title.text)
+            self.assertEqual('Workflow runs and results', subtitle.text)
+            section = next(n for n in root.iter() if n.get('data-section') == 'ci-timeline')
+            self.assertEqual(1, sum(n.tag.endswith('text') and n.text == 'CI activity' for n in section.iter()))
+            metrics = [n for n in header.iter() if n.get('data-role') == 'ci-header-metric']
+            self.assertEqual(['pass', 'fail', 'pending', 'other', 'unknown'], [n.get('data-group') for n in metrics])
+            values = [next(n for n in metric if n.get('data-role') == 'ci-header-count') for metric in metrics]
+            self.assertEqual([str(expected['counts'][metric.get('data-group')]) for metric in metrics], [n.text for n in values])
+            self.assertTrue(all(float(n.get('font-size')) >= 24 and n.get('fill') == DASHBOARD_SUMMARY_COLORS['text'] for n in values))
+            for metric in metrics:
+                glyph = next(n for n in metric.iter() if n.get('stroke'))
+                self.assertEqual(DASHBOARD_SUMMARY_COLORS['muted'], glyph.get('stroke'))
+                self.assertEqual('none', glyph.get('fill'))
+                labels = [n for n in metric.iter() if n.tag.endswith('text') and n.get('data-role') != 'ci-header-count']
+                self.assertTrue(labels)
+                self.assertTrue(all(float(n.get('font-size')) >= 11 for n in labels))
+            dividers = [n for n in header if n.get('data-role') == 'ci-header-divider']
+            if mobile:
+                self.assertFalse(dividers)
+                self.assertGreater(min(float(n.get('y')) for n in values), float(subtitle.get('y')))
+                self.assertEqual(2, len({n.get('x') for n in values}))
+                self.assertGreater(float(values[-1].get('y')), float(values[2].get('y')))
+            else:
+                self.assertEqual(1, len(dividers))
+                divider_x = float(dividers[0].get('x1'))
+                self.assertLess(float(title.get('x')), divider_x)
+                self.assertTrue(all(float(n.get('x')) > divider_x for n in values))
+                self.assertGreater(float(values[-1].get('y')), float(values[0].get('y')))
+
+    def test_saved_dates_and_dynamic_coverage_follow_rows_with_labeled_dot_key(self):
+        from scripts.core.config import DASHBOARD_SUMMARY_COLORS, GREEN, RED, YELLOW
+        expected_colors = {'pass': GREEN, 'fail': RED, 'pending': YELLOW, 'other': DASHBOARD_SUMMARY_COLORS['muted']}
         for mobile in (False, True):
             root = ET.fromstring(render_svg({'ci_timeline': _weekly_ci_fixture()}, mobile=mobile))
             chart = next(n for n in root.iter() if n.get('data-role') == 'ci-timeline-chart')
-            labels = [n for n in chart if n.tag.endswith('text')]
-            self.assertEqual('2026-11-06 – 2026-11-19 UTC', ''.join(labels[0].itertext()))
+            rows = [n for n in chart if n.get('data-role') == 'ci-repository-row']
+            window = [n for n in chart if n.get('data-role') == 'ci-window']
+            self.assertEqual(1, len(window), 'Saved dates belong once in the chart footer')
+            self.assertEqual('2026-11-06 – 2026-11-19 UTC', ' '.join(window[0].itertext()))
+            caption = next(n for n in chart if n.get('data-role') == 'ci-sample-caption')
+            self.assertEqual('9 sampled runs · 6 personal repositories · partial sample', ' '.join(caption.itertext()))
             legend = next(n for n in chart if n.get('data-role') == 'ci-legend')
-            footer = [n for n in labels if float(n.get('y')) > max(float(t.get('y')) for t in legend if t.tag.endswith('text'))]
-            footer_text = ' '.join(''.join(n.itertext()) for n in footer)
-            self.assertEqual('9 sampled runs · 6 personal repositories · partial sample', footer_text)
+            for item in (window[0], caption, legend):
+                self.assertGreater(list(chart).index(item), max(list(chart).index(row) for row in rows))
+                footer_y = min(float(n.get('y')) for n in item.iter() if n.tag.endswith('text'))
+                row_bottom = max(float(n.get('y2')) for row in rows for n in row if n.tag.endswith('line'))
+                self.assertGreater(footer_y, row_bottom)
+            dots = [n for n in legend.iter() if n.get('data-role') == 'ci-legend-marker']
+            self.assertEqual(['pass', 'fail', 'pending', 'other', 'unknown'], [n.get('data-group') for n in dots])
+            self.assertTrue(all(n.tag.endswith('circle') for n in dots))
+            for dot in dots:
+                if dot.get('data-group') == 'unknown':
+                    self.assertEqual('none', dot.get('fill'))
+                    self.assertEqual(DASHBOARD_SUMMARY_COLORS['text'], dot.get('stroke'))
+                else:
+                    self.assertEqual(expected_colors[dot.get('data-group')], dot.get('fill'))
+            self.assertEqual('Passed Failed Pending Cancelled Unknown', ' '.join(legend.itertext()))
             self.assertNotIn('open the website', ' '.join(chart.itertext()))
             self.assertIn('last UTC date is partial', ' '.join(chart.itertext()))
+
+    def test_short_row_names_retain_accessible_identity_and_transparent_common_scale(self):
+        import re
+        from scripts.rendering.generate_dashboard_summary import ci_weekly_projection
+        sample = _weekly_ci_fixture()
+        expected = ci_weekly_projection(sample)
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({'ci_timeline': sample}, mobile=mobile))
+            rows = [n for n in root.iter() if n.get('data-role') == 'ci-repository-row']
+            for row, observation in zip(rows, expected['repositories']):
+                titles = [n.text for n in row if n.tag.endswith('title')]
+                identity = ('Private repository · ' if observation['is_private'] else 'Repository · ') + observation['repository']
+                self.assertIn(identity, titles)
+                visible = [n for n in row.iter() if n.tag.endswith('text')]
+                self.assertNotIn('example', [n.text for n in visible])
+                self.assertNotIn('Private', [n.text for n in visible])
+                names = [n for n in row if n.get('data-role') == 'ci-repository-name']
+                self.assertEqual(observation['repository'].split('/', 1)[1], ''.join(n.text for n in names))
+                locks = [n for n in row if n.get('data-role') == 'ci-private-lock']
+                self.assertEqual(int(observation['is_private']), len(locks))
+                if locks:
+                    transform = next(n.get('transform') for n in locks[0] if n.get('transform'))
+                    lock_x = float(re.search(r'translate\(([-.0-9]+),', transform).group(1))
+                    self.assertLess(lock_x, float(names[0].get('x')))
+                    self.assertEqual('true', locks[0].get('aria-hidden'))
+                rail = next(n for n in row if n.get('data-role') == 'ci-bar-track')
+                self.assertEqual('none', rail.get('fill'))
+                self.assertEqual('37', rail.get('data-scale-max'))
+                self.assertEqual(252 if mobile else 531, float(rail.get('width')))
+                self.assertEqual(34 if mobile else 225, float(rail.get('x')))
+                for segment in (n for n in row if n.get('data-role') == 'ci-bar-segment'):
+                    self.assertAlmostEqual(int(segment.get('data-count')) / 37,
+                        float(segment.get('width')) / float(rail.get('width')), places=4)
+
+    def test_zero_metrics_and_long_known_labels_remain_complete(self):
+        import copy
+        sample = _weekly_ci_fixture()
+        sample['status'] = 'available'
+        sample['repositories'] = [{'repository': 'example/empty', 'status': 'empty', 'runs': []}]
+        for mobile in (False, True):
+            root = ET.fromstring(render_svg({'ci_timeline': sample}, mobile=mobile))
+            metrics = [n for n in root.iter() if n.get('data-role') == 'ci-header-metric']
+            self.assertEqual(['pass', 'fail', 'pending'], [n.get('data-group') for n in metrics])
+            self.assertEqual(['0'] * 3, [next(n.text for n in metric if n.get('data-role') == 'ci-header-count') for metric in metrics])
+            long = copy.deepcopy(sample)
+            long['repositories'][0].update(status='available', runs=[
+                {'run_id': i + 1, 'workflow': 'CI', 'created_at': sample['window_end'], 'outcome': outcome}
+                for i, outcome in enumerate(['cancelled', 'skipped', 'neutral', 'stale', 'unknown'])])
+            root = ET.fromstring(render_svg({'ci_timeline': long}, mobile=mobile))
+            metric = next(n for n in root.iter() if n.get('data-role') == 'ci-header-metric' and n.get('data-group') == 'other')
+            labels = [n for n in metric.iter() if n.tag.endswith('text') and n.get('data-role') != 'ci-header-count']
+            self.assertEqual('Cancelled / Skipped / Neutral / Stale', ' '.join(n.text for n in labels))
+            legend = next(n for n in root.iter() if n.get('data-role') == 'ci-legend')
+            self.assertIn('Cancelled / Skipped / Neutral / Stale', ' '.join(legend.itertext()))
+            self.assertTrue(all(float(n.get('font-size')) >= 11 for n in labels))
 
     def test_bar_counts_remain_readable_without_inflating_narrow_segments(self):
         from scripts.core.config import DASHBOARD_SUMMARY_COLORS

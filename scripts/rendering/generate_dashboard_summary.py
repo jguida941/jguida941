@@ -766,37 +766,66 @@ def _ci_group_detail(group, counts):
                      if count and CI_OUTCOME_GROUPS[name] == group)
 
 
+def _ci_header(c, x, y, span, sample, groups):
+    """Match the overview's split hierarchy without coloring summary icons."""
+    c.group(data_role="ci-header")
+    c.parts.append(icon("workflow", x, y+4, size=20, color=COLORS["muted"]))
+    c.text("CI activity", x+28, y+22, size=22, weight=600, data_role="ci-title")
+    c.text("Workflow runs and results", x, y+48, size=13, color="muted", data_role="ci-subtitle")
+    metric_x, metric_span = (x, span) if c.mobile else (x+248, span-248)
+    metric_y = y+76 if c.mobile else y
+    columns = 2 if c.mobile else 4
+    cell_width = metric_span / columns
+    glyphs = {"pass": "ci_check", "fail": "cross", "pending": "clock", "other": "workflow", "unknown": "alert"}
+    for start in range(0, len(groups), columns):
+        bottom = metric_y+83
+        for i, group in enumerate(groups[start:start+columns]):
+            xx = metric_x+i*cell_width
+            c.group(data_role="ci-header-metric", data_group=group)
+            c.parts.append(icon(glyphs[group], xx, metric_y+2, size=19, color=COLORS["muted"]))
+            value = str(sample["counts"][group]) if sample["observed_runs"] is not None else "—"
+            c.text(value, xx, metric_y+47, size=28, weight=600, data_role="ci-header-count")
+            c.group(data_role="ci-header-label")
+            end = c.wrap(_ci_group_label(group, sample["outcome_counts"]), xx, metric_y+69,
+                         cell_width-12, size=11, color="muted")
+            c.end()
+            c.end()
+            bottom = max(bottom, end+6)
+        metric_y = bottom+10
+    if not c.mobile:
+        c.line(x+224, y, x+224, metric_y-16, data_role="ci-header-divider")
+    c.end()
+    return metric_y+14
+
+
+def _ci_panel(c, y, data):
+    """CI owns its split header; the generic panel must not add a second title."""
+    c.group(data_section="ci-timeline")
+    index = len(c.parts)
+    c.parts.append("")
+    bottom = _ci_timeline(c, c.pad+16, y+20, c.width-2*c.pad-32, data)
+    height = bottom-y+15
+    c.parts[index] = '<rect '+_attrs(dict(x=c.pad, y=y, width=c.width-2*c.pad, height=height,
+        rx=13, fill=COLORS["panel"], stroke=COLORS["line"], data_role="panel"))+'/>'
+    c.end()
+    return y+height+18
+
+
 def _ci_timeline(c, x, y, span, data):
-    """Compact absolute-scale personal bars, with one key beneath the rows."""
+    """Compact absolute-scale personal bars, with one qualified footer."""
     sample = ci_weekly_projection(data)
     c.group(data_role="ci-timeline-chart", data_status=sample["status"], data_scale_max=sample["scale_max"])
+    groups = [group for group in CI_WEEK_GROUPS if group in ("pass", "fail", "pending") or sample["counts"][group]]
+    y = _ci_header(c, x, y, span, sample, groups)
     if not sample["weeks"]:
         y = c.wrap("Workflow history unavailable", x, y, span, size=c.secondary, color="muted")
         c.end()
-        return y + 12
+        return y+12
     total, rows = sample["observed_runs"], sample["repositories"]
     qualification = "Partial sample" if sample["status"] == "partial" else "Sample unavailable" if sample["status"] == "unavailable" else "Sampled history"
     label = f"{total} sampled runs" if total is not None else "Run count unavailable"
     sample_caption = label + (f" · {len(rows)} personal repositories" if rows else "") + f" · {qualification.lower()}"
-    y = c.wrap(f"{sample['window_start'][:10]} – {sample['window_end'][:10]} UTC", x, y, span, size=12, color="muted") + 6
     colors = {"pass": GREEN, "fail": RED, "pending": YELLOW, "other": COLORS["muted"], "unknown": COLORS["text"]}
-    glyphs = {"pass": "ci_check", "fail": "cross", "pending": "clock", "other": "workflow", "unknown": "alert"}
-    groups = [group for group in CI_WEEK_GROUPS if group in ("pass", "fail", "pending") or sample["counts"][group]]
-    columns = 2 if c.mobile else len(groups)
-    cell_width = span / columns
-    for start in range(0, len(groups), columns):
-        bottom = y + 49
-        for i, group in enumerate(groups[start:start+columns]):
-            xx = x+i*cell_width
-            c.parts.append(icon(glyphs[group], xx, y+1, size=17, color=COLORS["muted"]))
-            c.text(sample["counts"][group] if total is not None else "—", xx+25, y+20, size=24, weight=600)
-            c.group(data_role="ci-header-label")
-            end = c.wrap(_ci_group_label(group, sample["outcome_counts"]), xx, y+39,
-                         cell_width-12, size=11, color="muted")
-            c.end()
-            bottom = max(bottom, end+1)
-        y = bottom
-    y += 10
     label_width = 181
     plot_x = x if c.mobile else x+label_width
     plot_width = span-40 if c.mobile else span-label_width-40
@@ -807,22 +836,23 @@ def _ci_timeline(c, x, y, span, data):
     for row_index, row in enumerate(rows):
         c.group(data_role="ci-repository-row", data_repository=row["repository"], data_repository_key=row["repository_key"],
                 data_private=str(row["is_private"]).lower(), data_status=row["status"], data_observed_runs=row["observed_runs"])
-        owner, name = row["repository"].split("/", 1)
-        name_width = span-40 if c.mobile else label_width-14
+        identity = ("Private repository · " if row["is_private"] else "Repository · ") + row["repository"]
+        c.parts.append('<title>'+escape(identity)+'</title>')
+        name = row["repository"].split("/", 1)[1]
+        name_x = x+19 if row["is_private"] else x
+        name_width = (span-40 if c.mobile else label_width-14)-(name_x-x)
         name_lines = textwrap.wrap(name, max(1, int(name_width/(13*.62))),
                                    break_long_words=True, break_on_hyphens=True) or [name]
-        for line_index, name_line in enumerate(name_lines):
-            c.text(name_line, x, y+15+line_index*18.2, size=13, weight=600)
-        name_end = y+15+len(name_lines)*18.2
-        sub_y = name_end+1
-        c.text(owner, x, sub_y, size=11, color="muted")
         if row["is_private"]:
-            lock_x = x+min(name_width-55, len(owner)*6.2+9)
-            c.parts.append(icon("lock", lock_x, sub_y-11, size=12, color=COLORS["muted"]))
-            c.text("Private", lock_x+16, sub_y, size=11, color="muted")
-        top = sub_y+14 if c.mobile else y+7
+            c.group(data_role="ci-private-lock", aria_hidden="true")
+            c.parts.append(icon("lock", x, y+3, size=13, color=COLORS["muted"]))
+            c.end()
+        for line_index, name_line in enumerate(name_lines):
+            c.text(name_line, name_x, y+15+line_index*18.2, size=13, weight=600, data_role="ci-repository-name")
+        name_end = y+15+(len(name_lines)-1)*18.2
+        top = name_end+14 if c.mobile else y+7
         height = 22
-        c.rect(plot_x, top, plot_width, height, fill="surface", radius=4, data_role="ci-bar-track", data_scale_max=sample["scale_max"])
+        c.rect(plot_x, top, plot_width, height, fill="none", radius=4, data_role="ci-bar-track", data_scale_max=sample["scale_max"])
         clip_id = f"ci-bar-contour-{row_index}"
         c.parts.append('<defs><clipPath id="'+clip_id+'"><rect '+_attrs(dict(x=plot_x, y=top,
             width=plot_width, height=height, rx=4))+'/></clipPath></defs>')
@@ -846,7 +876,7 @@ def _ci_timeline(c, x, y, span, data):
         else:
             c.text(_ci_empty_label(row), plot_x+4, top+15, size=11, color="muted", data_role="ci-empty-state")
             c.text("—" if row["observed_runs"] is None else "0", x+span, top+16, size=16, color="muted", anchor="end")
-        bottom = max(top+height+13, sub_y+14)
+        bottom = max(top+height+13, name_end+14)
         if outside:
             xx = plot_x
             for group, count in outside:
@@ -873,21 +903,34 @@ def _ci_timeline(c, x, y, span, data):
         c.end()
     if not rows:
         y = c.wrap("Personal repository observations unavailable", x, y+12, span, size=13, color="muted")
-    # The single chart key follows every row. Labels name actual gray subtypes.
+    # Dates, coverage and the single outcome key share the footer below all rows.
+    c.group(data_role="ci-window")
+    y = c.wrap(f"{sample['window_start'][:10]} – {sample['window_end'][:10]} UTC", x, y+18, span, size=12, color="muted")
+    c.end()
+    c.group(data_role="ci-sample-caption")
+    y = c.wrap(sample_caption, x, y+4, span, size=11, color="muted")
+    c.end()
     legend_x = x
-    y += 16
+    y += 12
+    row_bottom = y
     c.group(data_role="ci-legend")
     for group in groups:
         label = _ci_group_label(group, sample["outcome_counts"])
-        width = len(label)*6.2+29
+        width = min(span, len(label)*11*.62+28)
         if legend_x+width > x+span and legend_x > x:
             legend_x = x
-            y += 24
-        c.parts.append(icon(glyphs[group], legend_x, y-12, size=15, color=colors[group]))
-        c.text(label, legend_x+21, y, size=11, color="muted")
+            y = row_bottom+24
+        c.group(data_role="ci-legend-item", data_group=group)
+        c.parts.append('<circle '+_attrs(dict(cx=legend_x+4, cy=y-4, r=4,
+            fill="none" if group == "unknown" else colors[group],
+            stroke=colors[group] if group == "unknown" else "none", stroke_width=1.5 if group == "unknown" else 0,
+            data_role="ci-legend-marker", data_group=group))+'/>')
+        end = c.wrap(label, legend_x+16, y, width-16, size=11, color="muted")
+        row_bottom = max(row_bottom, end-15.4)
         legend_x += width
+        c.end()
     c.end()
-    y = c.wrap(sample_caption, x, y+25, span, size=11, color="muted")
+    y = row_bottom+10
     limit = sample["sample_limit_per_repo"]
     c.parts.append('<desc>'+escape(f"Personal repositories only, from profile-first selection followed by repositories ordered by latest push; no recent-push age cutoff. Saved cutoff {sample['window_end']}; the last UTC date is partial. Source sample limit {limit if limit is not None else 'unavailable'} per repository. Counts include all actors and workflow triggers and do not measure all workflow activity. "+_ci_group_detail("other", sample["outcome_counts"]))+'</desc>')
     c.end()
@@ -1102,8 +1145,7 @@ def render_svg(summary, *, mobile=False, generation=None):
     c.end()
     y += 25
 
-    y = c.panel("ci-timeline", "CI activity", y,
-                lambda x, yy, span: _ci_timeline(c, x, yy, span, summary.get("ci_timeline")))
+    y = _ci_panel(c, y, summary.get("ci_timeline"))
 
     def working(x, yy, span):
         rows = summary.get("working") or []

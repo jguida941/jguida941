@@ -166,12 +166,15 @@ body {
 /* CI repository lanes retain the horizontal time axis and outcome shapes. */
 .ci-observatory { min-width: 0; }
 .ci-observatory .section-meta { overflow-wrap: anywhere; }
+.ci-observatory .ci-summary-head { display: grid; grid-template-columns: minmax(190px,1fr) minmax(0,1.4fr); gap: var(--space-xl); align-items: center; padding-bottom: var(--space-xl); border-bottom: 1px solid var(--hairline); }
 .ci-observatory .ci-heading { display: flex; align-items: center; gap: var(--space-md); }
 .ci-observatory .ci-heading > svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; color: var(--ink-dim); }
-.ci-observatory .ci-header-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: var(--space-md); margin: var(--space-xl) 0; }
+.ci-observatory .ci-subtitle { margin: var(--space-xs) 0 0; color: var(--ink-dim); font-size: var(--type-caption); }
+.ci-observatory .ci-header-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: var(--space-md); padding-left: var(--space-xl); border-left: 1px solid var(--hairline); }
 .ci-observatory .ci-header-metrics[data-columns="5"] { grid-template-columns: repeat(5,minmax(0,1fr)); }
 .ci-observatory .ci-metric { min-width: 0; }
-.ci-observatory .ci-metric-value { display: flex; align-items: center; gap: var(--space-sm); color: var(--ink-strong); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.ci-observatory .ci-metric-value { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-sm); color: var(--ink-strong); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.ci-observatory .ci-metric-value .ci-icon { color: var(--ink-dim); }
 .ci-observatory .ci-metric-label { display: block; margin-top: var(--space-xs); color: var(--ink-dim); font-size: var(--type-caption); overflow-wrap: anywhere; }
 .ci-observatory .ci-icon { width: 17px; height: 17px; display: inline-flex; flex: none; }
 .ci-observatory .ci-icon svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
@@ -180,7 +183,7 @@ body {
 .ci-observatory .ci-pending { --ci-color: var(--status-warning); }
 .ci-observatory .ci-other { --ci-color: var(--ink-dim); }
 .ci-observatory .ci-unknown { --ci-color: var(--ink-strong); }
-.ci-observatory .ci-plot-scroll { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
+.ci-observatory .ci-plot-scroll { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; margin-top: var(--space-lg); }
 .ci-observatory .ci-axis { display: grid; grid-template-columns: 180px minmax(0,1fr) 54px; gap: var(--space-lg); color: var(--ink-dim); font-size: var(--type-caption); }
 .ci-observatory .ci-axis-plot { display: flex; justify-content: space-between; }
 .ci-observatory .ci-lane { min-width: 0; border-bottom: 1px solid color-mix(in srgb,var(--hairline) 24%,transparent); }
@@ -188,13 +191,12 @@ body {
 .ci-observatory .ci-group::-webkit-details-marker { display: none; }
 .ci-observatory .ci-group:hover { background: color-mix(in srgb,var(--accent) 5%,transparent); }
 .ci-observatory .ci-group:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.ci-observatory .ci-identity { min-width: 0; }
+.ci-observatory .ci-identity { display: flex; align-items: baseline; gap: var(--space-xs); min-width: 0; }
 .ci-observatory .ci-repo-name { display: block; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; }
-.ci-observatory .ci-owner { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); color: var(--ink-dim); font-size: var(--type-caption); overflow-wrap: anywhere; }
-.ci-observatory .ci-private { display: inline-flex; gap: var(--space-xs); align-items: center; }
+.ci-observatory .ci-private { display: inline-flex; flex: none; align-items: center; color: var(--ink-dim); }
 .ci-observatory .ci-private .ci-icon { width: 12px; height: 12px; }
 .ci-observatory .ci-bar-wrap { min-width: 0; }
-.ci-observatory .ci-bar-track { display: flex; height: 22px; width: 100%; background: color-mix(in srgb,var(--ink-dim) 13%,var(--surface)); border-radius: var(--radius-tile); overflow: hidden; }
+.ci-observatory .ci-bar-track { display: flex; height: 22px; width: 100%; background: transparent; border-radius: var(--radius-tile); overflow: hidden; }
 .ci-observatory .ci-bar-segment { flex: none; display: flex; align-items: center; justify-content: center; height: 100%; background: var(--ci-color); color: var(--ci-count-ink); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .ci-observatory .ci-bar-segment.ci-unknown { background: transparent; color: var(--ink-strong); box-shadow: inset 0 0 0 1.5px var(--ink-strong); }
 .ci-observatory .ci-outside-counts { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-md); margin-top: var(--space-xs); font-size: 11px; color: var(--ink-dim); }
@@ -208,19 +210,21 @@ body {
 .ci-observatory .ci-run-link { display: flex; align-items: center; min-height: 44px; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; }
 .ci-observatory .ci-run-meta { display: block; font-size: var(--type-caption); color: var(--ink-dim); overflow-wrap: anywhere; }
 .ci-observatory .ci-row-context { margin: var(--space-md) 0; font-size: var(--type-caption); color: var(--ink-dim); overflow-wrap: anywhere; }
-.ci-observatory .ci-legend { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); margin: var(--space-xl) 0 var(--space-md); font-size: var(--type-caption); color: var(--ink-dim); }
+.ci-observatory .ci-legend { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-md); margin: 0; font-size: var(--type-caption); color: var(--ink-dim); }
 .ci-observatory .ci-legend > span { display: inline-flex; align-items: center; gap: var(--space-sm); }
-.ci-observatory .ci-legend .ci-icon { color: var(--ci-color); }
-.ci-observatory .ci-sample-footer { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm) var(--space-xl); flex-wrap: wrap; margin-top: var(--space-md); }
-.ci-observatory .ci-sample-footer > p { margin: 0; }
+.ci-observatory .ci-marker { display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ci-color); }
+.ci-observatory .ci-unknown .ci-marker { background: transparent; border: 1.5px solid var(--ink-strong); }
+.ci-observatory .ci-sample-footer { display: flex; align-items: center; gap: var(--space-md) var(--space-xl); flex-wrap: wrap; margin-top: var(--space-lg); }
+.ci-observatory .ci-sample-footer > p { margin: 0; font-size: var(--type-caption); }
 .ci-observatory .ci-sample-details { min-width: 0; }
 .ci-observatory .ci-sample-details[open] { flex-basis: 100%; }
 .ci-observatory .ci-sample-details > summary { display: flex; align-items: center; min-height: 44px; font-size: var(--type-caption); color: var(--ink-dim); cursor: pointer; }
 .ci-observatory .ci-sample-details > summary::before { content: "+"; margin-right: var(--space-sm); }
 .ci-observatory .ci-sample-details[open] > summary::before { content: "−"; }
 @media (max-width: 760px) {
-  .ci-observatory .section-head { align-items: center; flex-wrap: wrap; }
-  .ci-observatory .ci-header-metrics, .ci-observatory .ci-header-metrics[data-columns="5"] { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ci-observatory .ci-summary-head { grid-template-columns: minmax(0,1fr); }
+  .ci-observatory .ci-header-metrics, .ci-observatory .ci-header-metrics[data-columns="5"] { grid-template-columns: repeat(2,minmax(0,1fr)); border-left: 0; padding-left: 0; }
+  .ci-observatory .ci-sample-footer > p, .ci-observatory .ci-legend { flex-basis: 100%; }
   .ci-observatory .ci-axis { grid-template-columns: minmax(0,1fr) 44px; gap: var(--space-md); }
   .ci-observatory .ci-axis-label { display: none; }
   .ci-observatory .ci-group { grid-template-columns: minmax(0,1fr) 44px; gap: var(--space-sm) var(--space-md); padding: var(--space-lg) 0; }
@@ -516,14 +520,19 @@ def _ci_observatory() -> str:
     from scripts.rendering.icons import LUCIDE
     return f"""
   <section class="panel ci-observatory" id="ci-observatory" tabindex="-1" aria-labelledby="ci-observatory-title">
-    <div class="section-head"><div><p class="eyebrow">Workflow overview</p><div class="ci-heading">{_svg_icon(LUCIDE['workflow'])}<h2 class="title" id="ci-observatory-title">CI activity</h2></div></div></div>
-    <p class="section-meta" id="ci-observatory-note">Workflow history unavailable</p>
-    <div class="ci-header-metrics" id="ci-header-metrics" data-role="ci-header-metrics" aria-label="Sampled workflow outcomes"></div>
+    <div class="ci-summary-head">
+      <div class="ci-heading">{_svg_icon(LUCIDE['workflow'])}<div><h2 class="title" id="ci-observatory-title">CI activity</h2><p class="ci-subtitle">Workflow runs and results</p></div></div>
+      <div class="ci-header-metrics" id="ci-header-metrics" data-role="ci-header-metrics" aria-label="Sampled workflow outcomes"></div>
+    </div>
     <div class="ci-plot-scroll" id="ci-timeline-scroll">
       <div class="ci-axis" id="ci-timeline-axis"></div><div id="ci-timeline-rows" aria-label="Personal repository workflow samples"></div>
     </div>
-    <div class="ci-legend" id="ci-legend" data-role="ci-legend" aria-label="Workflow outcomes"></div>
-    <div class="ci-sample-footer"><p class="section-meta" id="ci-observatory-count" role="status">Run count unavailable</p><details class="ci-sample-details"><summary>Sampling details</summary><p class="section-meta" id="ci-observatory-scope"></p></details></div>
+    <div class="ci-sample-footer">
+      <p class="section-meta" id="ci-observatory-note">Workflow history unavailable</p>
+      <p class="section-meta" id="ci-observatory-count" role="status">Run count unavailable</p>
+      <div class="ci-legend" id="ci-legend" data-role="ci-legend" aria-label="Workflow outcomes"></div>
+    </div>
+    <details class="ci-sample-details"><summary>Sampling details</summary><p class="section-meta" id="ci-observatory-scope"></p></details>
   </section>"""
 
 
@@ -1129,7 +1138,7 @@ def _script() -> str:
       const metric=element("div","ci-metric"),value=element("div","ci-metric-value"),label=ciGroupLabel(group,projected.outcome_counts);
       metric.dataset.group=group;value.appendChild(ciIcon(group));value.appendChild(element("span","num",count===null?"—":String(projected.counts[group])));
       metric.appendChild(value);metric.appendChild(element("span","ci-metric-label",label));metrics.appendChild(metric);
-      const key=element("span","ci-"+group);key.appendChild(ciIcon(group));key.appendChild(element("span","",label));key.title=ciGroupDetail(group,projected.outcome_counts);legend.appendChild(key);
+      const key=element("span","ci-"+group),marker=element("span","ci-marker");marker.setAttribute("aria-hidden","true");key.appendChild(marker);key.appendChild(element("span","",label));key.title=ciGroupDetail(group,projected.outcome_counts);legend.appendChild(key);
     }
     const ticks=element("div","ci-axis-plot");ticks.appendChild(element("span","","0"));ticks.appendChild(element("span","",projected.scale_max===null?"Scale unavailable":projected.scale_max+" runs"));
     axis.appendChild(element("span","ci-axis-label","Repository"));axis.appendChild(ticks);axis.appendChild(element("span","","Total"));
@@ -1141,12 +1150,10 @@ def _script() -> str:
       Object.assign(summary.dataset,{role:"ci-group",repository:row.repository,windowStart:projected.window_start,windowEnd:projected.window_end,weekIndex:"0",runCount:String(row.observed_runs||0)});
       summary.setAttribute("aria-expanded","false");
       const qualifier=(row.status==="partial"||row.truncated||row.outside_window)?" · partial sample":"";
-      summary.setAttribute("aria-label",row.repository+" · "+(row.observed_runs===null?"unavailable":row.observed_runs+" sampled runs")+qualifier+"; expand workflow details");
-      const identity=element("span","ci-identity"),[owner,name]=row.repository.split("/");
+      summary.setAttribute("aria-label",row.repository+(row.is_private?" · Private repository":"")+" · "+(row.observed_runs===null?"unavailable":row.observed_runs+" sampled runs")+qualifier+"; expand workflow details");
+      const identity=element("span","ci-identity"),name=row.repository.split("/")[1];
+      if(row.is_private){const lock=element("span","ci-private");lock.setAttribute("role","img");lock.setAttribute("aria-label","Private repository");lock.title="Private repository";lock.appendChild(ciIcon("lock"));identity.appendChild(lock);}
       identity.appendChild(element("span","ci-repo-name",name));
-      const ownerLine=element("span","ci-owner",owner);
-      if(row.is_private){const lock=element("span","ci-private");lock.appendChild(ciIcon("lock"));lock.appendChild(element("span","","Private"));ownerLine.appendChild(lock);}
-      identity.appendChild(ownerLine);
       const barWrap=element("span","ci-bar-wrap"),track=element("span","ci-bar-track");
       Object.assign(track.dataset,{role:"ci-bar-track",scaleMax:projected.scale_max===null?"":String(projected.scale_max)});
       const outside=element("span","ci-outside-counts");
