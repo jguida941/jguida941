@@ -1,4 +1,23 @@
-## Current continuation — November 19, 2026
+## Current work navigation
+
+Current work is selected in the access-controlled
+[profile continuation repository](https://github.com/jguida941/profile-private-continuation).
+Resolve the [existing continuation PR](https://github.com/jguida941/profile-private-continuation/pulls)
+to its current implementation branch and head, then use that complete checkout.
+Use the received default branch only after that work has been integrated.
+Read `AGENTS.md`, then run `make work-orient`, `make enter` and `make brief`.
+The selected case owns the current action, implementation source, acceptance,
+return and results. Preserve unpublished work.
+
+This public file is a navigation pointer, not a copy of the current assignment.
+Public source remains the active publication route until the existing migration
+is received. Preserve the received website, README and SVG behavior; private
+implementation, authoring instructions, methods and evidence stay private.
+
+The dated material below is historical context. It does not select work or
+authorize replacing currently received behavior.
+
+## Historical continuation — November 19, 2026
 
 The active continuation is the private `jguida941/profile-private-continuation`
 repository. Run its `make work-orient` and `make enter`; its work register selects

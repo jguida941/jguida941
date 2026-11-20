@@ -53,6 +53,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/contracts/metrics.py", "scripts/contracts/profile_contract.py", "contracts", "metric definitions and formatting rules"),
     ModuleHome("scripts/contracts/design_predicates.py", "scripts/contracts/design_predicates.py", "contracts", "pure design-conformance predicates (button radius/anatomy/material/mechanic/focus)"),
     ModuleHome("scripts/contracts/page_manifest.py", "scripts/contracts/page_manifest.py", "contracts", "page manifest render_source parser and committed-route producer check"),
+    ModuleHome("scripts/contracts/dashboard_summary.py", "scripts/contracts/dashboard_summary.py", "contracts", "shared public dashboard presentation facts"),
     # --- github: API facade, transports and repo auditing ----------------------
     ModuleHome("scripts/github/activity_observations.py", "scripts/github/activity_observations.py", "github", "bounded branch and commit observations"),
     ModuleHome("scripts/github/client.py", "scripts/github/github_client.py", "github", "GitHub API facade"),
@@ -68,6 +69,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/analytics/model.py", "scripts/pipeline/compute_metrics.py", "pipeline", "profile model computation"),
     ModuleHome("scripts/analytics/helpers.py", "scripts/pipeline/profile_helpers.py", "pipeline", "profile pipeline helpers"),
     ModuleHome("scripts/profile_pipeline.py", "scripts/pipeline/profile_pipeline.py", "pipeline", "profile pipeline orchestration"),
+    ModuleHome("scripts/pipeline/push_activity.py", "scripts/pipeline/push_activity.py", "pipeline", "verified bounded recent-push facts for README and website"),
     ModuleHome("scripts/render/outputs.py", "scripts/pipeline/render_outputs.py", "pipeline", "output rendering orchestration"),
     ModuleHome("scripts/pipeline/web_render.py", "scripts/pipeline/web_render.py", "pipeline", "web dashboard generator (token-driven, themed)"),
     # --- rendering: SVG theme helpers and card renderers -----------------------
@@ -89,6 +91,7 @@ MODULE_HOMES: tuple[ModuleHome, ...] = (
     ModuleHome("scripts/render/cards/generate_badges.py", "scripts/rendering/generate_badges.py", "rendering", "badge renderer"),
     ModuleHome("scripts/render/cards/generate_builder_scorecard.py", "scripts/rendering/generate_builder_scorecard.py", "rendering", "builder scorecard renderer"),
     ModuleHome("scripts/render/cards/generate_contribution_panel.py", "scripts/rendering/generate_contribution_panel.py", "rendering", "contribution panel renderer"),
+    ModuleHome("scripts/rendering/generate_dashboard_summary.py", "scripts/rendering/generate_dashboard_summary.py", "rendering", "static SVG projection of the public dashboard presentation"),
     ModuleHome("scripts/render/cards/generate_currently_working.py", "scripts/rendering/generate_currently_working.py", "rendering", "currently working renderer"),
     ModuleHome("scripts/render/cards/generate_engineering_cadence.py", "scripts/rendering/generate_engineering_cadence.py", "rendering", "engineering cadence renderer"),
     ModuleHome("scripts/render/cards/generate_focus_board.py", "scripts/rendering/generate_focus_board.py", "rendering", "focus board renderer"),

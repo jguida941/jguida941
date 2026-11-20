@@ -71,6 +71,11 @@ jobs:
             tests.contracts.test_readme_projection \
             tests.contracts.test_visual_receipt_provenance \
             tests.contracts.test_skill_structure \
+            tests.contracts.test_structural_layout \
+            tests.contracts.test_scripts_layout_contract \
+            tests.contracts.test_tests_layout_contract \
+            tests.pipeline.test_push_activity \
+            tests.contracts.test_dashboard_destinations \
             tests.contracts.test_design_nav \
             tests.contracts.test_label_legibility
 

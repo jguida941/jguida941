@@ -2354,18 +2354,18 @@ class AccuracyTests(unittest.TestCase):
             ),
         }
         collected = _with_metric_observations(self.collected, observations)
+        # Exact aggregate facts are supplied by the typed observations above.
+        # This model fixture must not fetch unrelated recent-repository detail.
         with patch(
-            "scripts.pipeline.compute_metrics.gh.get_merged_prs_last_n_days",
-            return_value=42,
-        ), patch(
-            "scripts.pipeline.compute_metrics.gh.get_releases_last_n_days",
-            return_value=7,
-        ):
+            "requests.sessions.Session.request",
+            side_effect=AssertionError("the aggregate fixture must stay offline"),
+        ) as outbound:
             model = compute_profile_model(
                 collected,
                 logger=_noop,
-                allow_network_calls=True,
+                allow_network_calls=False,
             )
+        self.assertEqual(0, outbound.call_count, "the aggregate fixture attempted HTTP")
 
         self.assertEqual(500, model["snapshot"]["public_scope_commits"])
         self.assertEqual(42, model["snapshot"]["prs_merged"])
