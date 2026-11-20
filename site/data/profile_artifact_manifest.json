@@ -1,6 +1,6 @@
 {
-  "artifact_set_digest": "73489186e61c5e51566d8a27eda5b2607cbdb892fb045a26c666423606377c2c",
-  "claim_input_digest": "6f9496979ac746b7145e4e77b478c4f97efda9299042105502652ac46cd3eb24",
+  "artifact_set_digest": "e641c7fb4f42d49cb834771d0ebc9cd439db1681fe357968ea5bd3ca19281192",
+  "claim_input_digest": "0a93e21eb8ed0ae91a91379a8425a98e0a1d76489e7d36e7db3649ab8f403989",
   "execution_identity": {
     "packages": {
       "jinja2": "3.1.6",
@@ -12,9 +12,9 @@
   },
   "files": [
     {
-      "byte_length": 23111,
+      "byte_length": 22822,
       "path": "README.md",
-      "sha256": "698a8f07e82df111dc5c2b660eb557655d27f72826783193cabb0da9b2727186"
+      "sha256": "0dafb35ab7ea8f6217a6889308de92870bb8c01911a85401db503cf552831b89"
     },
     {
       "byte_length": 7616,
@@ -29,7 +29,7 @@
     {
       "byte_length": 10725,
       "path": "assets/builder_scorecard.svg",
-      "sha256": "a2680c8ab655934cd3a5fafd4cb0a2f95d4495f5ef6f655ad278b28e0e564d39"
+      "sha256": "a4a6f5f6fc814d71920000edb9cbe730b1098b6fd3c2943448ffabe8872376ab"
     },
     {
       "byte_length": 78258,
@@ -37,19 +37,19 @@
       "sha256": "5760a99607a7f6a295a98811f2c7fed20efdcb3372bfff3473ec33858511b84c"
     },
     {
-      "byte_length": 13656,
+      "byte_length": 13652,
       "path": "assets/currently_working.svg",
-      "sha256": "17a9be4393a14e56eda649491731d972000d8833eaf50b6d3865774ef8536456"
+      "sha256": "6f08cf2ee8c31b5251a10472de74ade323286589eed0592ed6756aa92f4237a9"
     },
     {
-      "byte_length": 258782,
+      "byte_length": 269227,
       "path": "assets/dashboard_summary.svg",
-      "sha256": "8ff471ba53dedbfdc30d913e13d62c9baf3f2f7c74bfb1c2f4587056139a3ef8"
+      "sha256": "6f2187c73682948d528d671b5c15e30302cddea19c4520c24b23f947c8b0b5a8"
     },
     {
-      "byte_length": 254322,
+      "byte_length": 265193,
       "path": "assets/dashboard_summary_mobile.svg",
-      "sha256": "c1f87670755b0c32f08da8e6e413320935e4057a5ca894e91f5548156170b7e7"
+      "sha256": "ff60fa1db5ec5b2a2ec7b97a696a280d031174f128a827dede66d4050b5d933c"
     },
     {
       "byte_length": 14441,
@@ -57,14 +57,14 @@
       "sha256": "d8e1b96819a2628e706759964a83a28ac40b23d1a68a119baaa15d3d29beaac3"
     },
     {
-      "byte_length": 7570,
+      "byte_length": 7573,
       "path": "assets/lang_breakdown.svg",
-      "sha256": "7a99f6f4bbc680a4c09c827164495ef54488c013c787847735472492b89d86a1"
+      "sha256": "834a07a85f62912f4ceaddd94268356b5a9fae5c0635b7772642ad835702c751"
     },
     {
       "byte_length": 8707,
       "path": "assets/now_next_shipped.svg",
-      "sha256": "20494760cb8384da1f3ac6ce18ea4472d42e791de2b667ebec1ee33797e86146"
+      "sha256": "f4a1f3339f8a645ceb7983efcd35b2658954a97df5766d6be1586eeaa97fdad1"
     },
     {
       "byte_length": 13294,
@@ -84,16 +84,16 @@
     {
       "byte_length": 10989,
       "path": "metrics.general.svg",
-      "sha256": "c433380219487f83dca6ac4a957cac565e62668da218d98cd297a09cae7f5c2a"
+      "sha256": "e6c5a7a6056c731189ab75d296e74749b079a74e9242383fd65cbbc19c6d543d"
     },
     {
-      "byte_length": 442718,
+      "byte_length": 442583,
       "path": "site/data/profile_snapshot.json",
-      "sha256": "c81ffdb82ad06ac966c676f7167a573172d2fcb6b32ea5e5091d65e278fab2ff"
+      "sha256": "7b8fb4a6930f772d83bf6b6d528641af1b78137c42c8c16fb9d2bb99db00a482"
     }
   ],
-  "generated_at": "2026-11-20T05:02:45.148019Z",
-  "generator_revision": "c9a07f4ccacaefccc4aebf7c9cabbe63e0dd4967",
+  "generated_at": "2026-11-20T06:03:43.968482Z",
+  "generator_revision": "f42dc300eefa44390b97a51bfb7e65df8e57df92",
   "generator_source_digest": "b0e75a36ec65d853a00b48c7b52c0272d3ae146a9e6deccd8766a241eeabe643",
   "render_config": {
     "activity_timezone": "America/New_York",
@@ -101,7 +101,7 @@
     "source_kind": "github-api",
     "username": "jguida941"
   },
-  "render_key": "a8ddeb08c16aafa0217224699c3dde970f2cacd46e51f1fa77e063b0eefe7051",
+  "render_key": "d194564df57eb4f0f90ea64c3172a6cd1ffdcb36c720cdc3a012ba1de52be852",
   "schema": "profile-artifact-manifest/v1",
   "source_kind": "github-api"
 }
