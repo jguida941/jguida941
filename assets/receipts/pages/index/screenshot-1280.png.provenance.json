@@ -2,7 +2,7 @@
   "artifact": "assets/receipts/pages/index/screenshot-1280.png",
   "authority_status": "candidate_only",
   "cannot_mark_done": true,
-  "chrome_version": "Google Chrome 157.0.8103.78",
+  "chrome_version": "Google Chrome 157.0.8103.50",
   "command": [
     "/usr/bin/google-chrome",
     "--headless=new",
@@ -17,7 +17,7 @@
   "contract_id": "PageHeadlessReceiptProvenance",
   "kind": "chrome-headless-screenshot",
   "page": "index",
-  "page_sha256": "cae83aeb67ff924ff4490f653842593335d292dcb2cd588a7f986cc07e2d85e0",
+  "page_sha256": "477ff2af0649fef7f2a4f7daab6158c8947fce8d7a021e7d2f7bfb8fb80aa7a9",
   "producer": "scripts/quality/headless_receipts.py",
   "route": "site/index.html",
   "viewport": {
