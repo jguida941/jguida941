@@ -62,7 +62,7 @@ SOFTWARE.
 
 def _component_css() -> str:
     """Component styles — every value resolves from a token var (no raw hex here)."""
-    return """
+    css = """
 *,*::before,*::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
@@ -164,64 +164,70 @@ body {
 
 
 /* CI repository lanes retain the horizontal time axis and outcome shapes. */
-.ci-observatory { min-width: 0; --ci-track-min: 528px; --ci-mark-size: calc(var(--space-lg) + var(--space-xs)); --ci-slot-height: calc(var(--ci-mark-size) + var(--type-caption) + var(--space-xs)); }
+.ci-observatory { min-width: 0; }
 .ci-observatory .section-meta { overflow-wrap: anywhere; }
-.ci-observatory .ci-legend { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); margin: var(--space-lg) 0 var(--space-md); font-size: var(--type-caption); color: var(--ink-dim); }
-.ci-observatory .ci-legend > span { display: inline-flex; align-items: center; gap: var(--space-sm); }
-.ci-observatory .ci-mark { display: block; width: var(--space-xl); height: var(--space-xl); fill: currentColor; stroke: none; flex: none; }
-.ci-observatory .ci-pass { color: var(--status-success); }
-.ci-observatory .ci-fail { color: var(--status-danger); }
-.ci-observatory .ci-pending { color: var(--status-warning); }
-.ci-observatory .ci-other { color: var(--ink-dim); }
-.ci-observatory .ci-outcome-mark { display: flex; flex-direction: column; align-items: center; }
-.ci-observatory .ci-outcome-mark .ci-mark { width: var(--ci-mark-size); height: var(--ci-mark-size); }
-.ci-observatory .ci-mark-count { color: var(--ink-strong); font-family: var(--font-sans); font-size: var(--type-caption); font-weight: var(--type-caption-weight); line-height: var(--type-caption); font-variant-numeric: tabular-nums; }
-.ci-observatory .ci-plot-scroll { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; padding: var(--space-xs) 0 var(--space-md); container-type: inline-size; }
-.ci-observatory .ci-plot { min-width: calc(180px + var(--space-lg) + var(--space-xs) + var(--ci-track-min)); }
-.ci-observatory .ci-axis, .ci-observatory .ci-lane { display: grid; grid-template-columns: 180px minmax(0,1fr); column-gap: calc(var(--space-lg) + var(--space-xs)); }
-.ci-observatory .ci-axis { margin-bottom: var(--space-md); color: var(--ink-dim); font-size: var(--type-caption); }
-.ci-observatory .ci-axis-plot { position: relative; height: var(--space-xl); }
-.ci-observatory .ci-axis-plot > span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
-.ci-observatory .ci-axis-plot > span:first-child { transform: none; }
-.ci-observatory .ci-axis-plot > span:last-child { transform: translateX(-100%); }
-.ci-observatory .ci-lane { align-items: center; padding: var(--space-md) 0; border-bottom: 1px solid color-mix(in srgb,var(--hairline) 15%,transparent); }
+.ci-observatory .ci-heading { display: flex; align-items: center; gap: var(--space-md); }
+.ci-observatory .ci-heading > svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; color: var(--ink-dim); }
+.ci-observatory .ci-badge { flex: none; border: 1px solid var(--hairline); border-radius: var(--radius-tile); padding: var(--space-xs) var(--space-sm); font-size: var(--type-caption); color: var(--ink-dim); }
+.ci-observatory .ci-header-metrics { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: var(--space-md); margin: var(--space-xl) 0; }
+.ci-observatory .ci-header-metrics[data-columns="5"] { grid-template-columns: repeat(5,minmax(0,1fr)); }
+.ci-observatory .ci-metric { min-width: 0; }
+.ci-observatory .ci-metric-value { display: flex; align-items: center; gap: var(--space-sm); color: var(--ink-strong); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.ci-observatory .ci-metric-label { display: block; margin-top: var(--space-xs); color: var(--ink-dim); font-size: var(--type-caption); overflow-wrap: anywhere; }
+.ci-observatory .ci-icon { width: 17px; height: 17px; display: inline-flex; flex: none; }
+.ci-observatory .ci-icon svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.ci-observatory .ci-pass { --ci-color: var(--status-success); }
+.ci-observatory .ci-fail { --ci-color: var(--status-danger); }
+.ci-observatory .ci-pending { --ci-color: var(--status-warning); }
+.ci-observatory .ci-other { --ci-color: var(--ink-dim); }
+.ci-observatory .ci-unknown { --ci-color: var(--ink-strong); }
+.ci-observatory .ci-plot-scroll { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; }
+.ci-observatory .ci-axis { display: grid; grid-template-columns: 180px minmax(0,1fr) 54px; gap: var(--space-lg); color: var(--ink-dim); font-size: var(--type-caption); }
+.ci-observatory .ci-axis-plot { display: flex; justify-content: space-between; }
+.ci-observatory .ci-lane { min-width: 0; border-bottom: 1px solid color-mix(in srgb,var(--hairline) 24%,transparent); }
+.ci-observatory .ci-group { list-style: none; display: grid; grid-template-columns: 180px minmax(0,1fr) 54px; align-items: center; gap: var(--space-lg); min-height: 64px; padding: var(--space-md) 0; border-radius: var(--radius-tile); cursor: pointer; }
+.ci-observatory .ci-group::-webkit-details-marker { display: none; }
+.ci-observatory .ci-group:hover { background: color-mix(in srgb,var(--accent) 5%,transparent); }
+.ci-observatory .ci-group:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .ci-observatory .ci-identity { min-width: 0; }
-.ci-observatory .ci-repo-name { display: flex; align-items: center; min-height: 44px; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; text-decoration: none; }
-.ci-observatory .ci-repo-name:hover { text-decoration: underline; }
-.ci-observatory .ci-lane-note, .ci-observatory .ci-private { display: block; font-size: var(--type-caption); color: var(--ink-dim); }
-.ci-observatory .ci-private { display: flex; align-items: center; gap: var(--space-sm); }
-.ci-observatory .ci-lock { width: var(--type-body); height: var(--type-body); fill: none; stroke: currentColor; stroke-width: 1.6; }
-.ci-observatory .ci-track { position: relative; display: grid; grid-template-columns: repeat(var(--ci-week-count), minmax(44px,1fr)); min-height: calc(4 * var(--ci-slot-height)); background: linear-gradient(var(--hairline),var(--hairline)) center/100% 1px no-repeat; }
-.ci-observatory .ci-group { display: grid; grid-template-rows: repeat(4,var(--ci-slot-height)); justify-items: center; width: 100%; min-width: 44px; min-height: 44px; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; border-radius: var(--radius-tile); }
-.ci-observatory .ci-mark-slot { display: flex; align-items: flex-start; justify-content: center; min-width: var(--space-xl); height: var(--ci-slot-height); }
-.ci-observatory .ci-group:hover { background: color-mix(in srgb,var(--accent) 9%,transparent); }
-.ci-observatory .ci-group:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.ci-observatory .ci-group[aria-pressed="true"] { box-shadow: inset 0 -2px var(--accent); }
-.ci-observatory .ci-empty-state { position: absolute; top: var(--space-md); left: var(--space-xs); color: var(--ink-dim); background: var(--surface); font-size: var(--type-caption); padding-right: var(--space-sm); }
-.ci-observatory .ci-scroll-help { color: var(--ink-dim); font-size: var(--type-caption); margin: 0 0 var(--space-sm); }
-.ci-observatory .ci-inspector { margin-top: var(--space-lg); min-width: 0; padding-top: var(--space-lg); border-top: 1px solid var(--hairline); overflow-wrap: anywhere; }
-.ci-observatory .ci-inspector h3 { color: var(--ink-strong); font-size: var(--type-body); margin: 0 0 var(--space-sm); }
-.ci-observatory .ci-inspector .section-meta { margin: var(--space-sm) 0; }
-.ci-observatory .ci-selected-count { font-size: var(--type-caption); color: var(--ink-dim); }
-.ci-observatory .ci-run-details { list-style: none; margin: var(--space-md) 0 0; padding: 0; }
+.ci-observatory .ci-repo-name { display: block; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; }
+.ci-observatory .ci-owner { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); color: var(--ink-dim); font-size: var(--type-caption); overflow-wrap: anywhere; }
+.ci-observatory .ci-private { display: inline-flex; gap: var(--space-xs); align-items: center; }
+.ci-observatory .ci-private .ci-icon { width: 12px; height: 12px; }
+.ci-observatory .ci-bar-wrap { min-width: 0; }
+.ci-observatory .ci-bar-track { display: flex; height: 22px; width: 100%; background: color-mix(in srgb,var(--ink-dim) 13%,var(--surface)); border-radius: var(--radius-tile); overflow: hidden; }
+.ci-observatory .ci-bar-segment { flex: none; display: flex; align-items: center; justify-content: center; height: 100%; background: var(--ci-color); color: var(--ci-count-ink); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ci-observatory .ci-bar-segment.ci-unknown { background: transparent; color: var(--ink-strong); box-shadow: inset 0 0 0 1.5px var(--ink-strong); }
+.ci-observatory .ci-outside-counts { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-md); margin-top: var(--space-xs); font-size: 11px; color: var(--ink-dim); }
+.ci-observatory .ci-outside-counts strong { color: var(--ci-color); font-weight: 600; }
+.ci-observatory .ci-row-total { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-sm); font-size: var(--type-body); font-weight: 600; color: var(--ink-strong); font-variant-numeric: tabular-nums; }
+.ci-observatory .ci-caret { width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); margin: 0 var(--space-xs) var(--space-xs); }
+.ci-observatory .ci-lane[open] .ci-caret { transform: rotate(225deg); margin-bottom: 0; }
+.ci-observatory .ci-empty-state { display: block; font-size: var(--type-caption); color: var(--ink-dim); padding: var(--space-xs) 0; }
+.ci-observatory .ci-run-details { list-style: none; margin: 0 0 var(--space-lg); padding: 0; }
 .ci-observatory .ci-run-detail { padding: var(--space-sm) 0; border-top: 1px solid color-mix(in srgb,var(--hairline) 15%,transparent); }
 .ci-observatory .ci-run-link { display: flex; align-items: center; min-height: 44px; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; }
 .ci-observatory .ci-run-meta { display: block; font-size: var(--type-caption); color: var(--ink-dim); overflow-wrap: anywhere; }
+.ci-observatory .ci-row-context { margin: 0 0 var(--space-md); font-size: var(--type-caption); color: var(--ink-dim); overflow-wrap: anywhere; }
+.ci-observatory .ci-legend { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); margin: var(--space-xl) 0 var(--space-md); font-size: var(--type-caption); color: var(--ink-dim); }
+.ci-observatory .ci-legend > span { display: inline-flex; align-items: center; gap: var(--space-sm); }
+.ci-observatory .ci-legend .ci-icon { color: var(--ci-color); }
 .ci-observatory .ci-sample-footer { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm) var(--space-xl); flex-wrap: wrap; margin-top: var(--space-md); }
 .ci-observatory .ci-sample-footer > p { margin: 0; }
-.ci-observatory .ci-sample-details { min-width: 0; flex-basis: auto; }
+.ci-observatory .ci-sample-details { min-width: 0; }
 .ci-observatory .ci-sample-details[open] { flex-basis: 100%; }
 .ci-observatory .ci-sample-details > summary { display: flex; align-items: center; min-height: 44px; font-size: var(--type-caption); color: var(--ink-dim); cursor: pointer; }
 .ci-observatory .ci-sample-details > summary::before { content: "+"; margin-right: var(--space-sm); }
 .ci-observatory .ci-sample-details[open] > summary::before { content: "−"; }
-@media (min-width: 761px) { .ci-observatory .ci-scroll-help { display: none; } }
 @media (max-width: 760px) {
-  .ci-observatory .ci-plot { min-width: var(--ci-track-min); }
-  .ci-observatory .ci-axis, .ci-observatory .ci-lane { grid-template-columns: minmax(0,1fr); }
+  .ci-observatory .section-head { align-items: center; flex-wrap: wrap; }
+  .ci-observatory .ci-header-metrics, .ci-observatory .ci-header-metrics[data-columns="5"] { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .ci-observatory .ci-axis { grid-template-columns: minmax(0,1fr) 44px; gap: var(--space-md); }
   .ci-observatory .ci-axis-label { display: none; }
-  .ci-observatory .ci-identity { position: sticky; left: 0; width: 100cqw; margin-bottom: var(--space-md); padding-right: var(--space-sm); }
-  .ci-observatory .ci-repo-name { min-height: 44px; }
-  .ci-observatory .ci-axis-plot > span:nth-child(2), .ci-observatory .ci-axis-plot > span:nth-child(4) { display: none; }
+  .ci-observatory .ci-group { grid-template-columns: minmax(0,1fr) 44px; gap: var(--space-sm) var(--space-md); padding: var(--space-lg) 0; }
+  .ci-observatory .ci-identity { grid-column: 1; grid-row: 1; }
+  .ci-observatory .ci-row-total { grid-column: 2; grid-row: 1; }
+  .ci-observatory .ci-bar-wrap { grid-column: 1 / -1; grid-row: 2; }
 }
 
 /* --- ring (CI coverage) --- */
@@ -369,6 +375,22 @@ footer a { color: var(--ink); text-decoration: none; }
     background: var(--surface); }
 }
 """
+    # Choose between existing theme text/background roles for filled-bar labels.
+    # Every active theme keeps the same component and its own semantic palette.
+    def luminance(color):
+        channels = [int(color[i:i+2], 16) / 255 for i in (1, 3, 5)]
+        linear = [v / 12.92 if v <= .04045 else ((v + .055) / 1.055) ** 2.4 for v in channels]
+        return sum(v * weight for v, weight in zip(linear, (.2126, .7152, .0722)))
+    def contrast(first, second):
+        a, b = sorted((luminance(first), luminance(second)))
+        return (b + .05) / (a + .05)
+    for name, theme in THEMES.items():
+        for group, role in (("pass", "status-success"), ("fail", "status-danger"),
+                            ("pending", "status-warning"), ("other", "ink-dim")):
+            ink = max(("backdrop", "ink-strong"), key=lambda candidate: contrast(theme[candidate], theme[role]))
+            selector = "" if name == DEFAULT_THEME else name
+            css += f'[data-theme="{selector}"] .ci-bar-segment.ci-{group} {{ --ci-count-ink: var(--{ink}); }}\n'
+    return css
 
 
 def _svg_icon(paths: str) -> str:
@@ -491,22 +513,17 @@ def _scorecard() -> str:
 
 
 def _ci_observatory() -> str:
-    """One repository timeline, shared with the README's qualified run sample."""
-    return """
+    """One personal CI activity view, shared with the README's saved projection."""
+    from scripts.rendering.icons import LUCIDE
+    return f"""
   <section class="panel ci-observatory" id="ci-observatory" tabindex="-1" aria-labelledby="ci-observatory-title">
-    <div class="section-head"><div><p class="eyebrow">GitHub Actions</p><h2 class="title" id="ci-observatory-title">CI Workflow Timeline</h2></div></div>
+    <div class="section-head"><div><p class="eyebrow">Workflow overview</p><div class="ci-heading">{_svg_icon(LUCIDE['workflow'])}<h2 class="title" id="ci-observatory-title">CI activity</h2></div></div><span class="ci-badge" id="ci-observatory-badge">Sample unavailable</span></div>
     <p class="section-meta" id="ci-observatory-note" role="status">Workflow history unavailable</p>
-    <div class="ci-legend" aria-label="Workflow outcomes">
-      <span><svg class="ci-mark ci-pass" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/></svg>Passed</span>
-      <span><svg class="ci-mark ci-fail" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="1"/></svg>Failed</span>
-      <span><svg class="ci-mark ci-pending" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 23 22H1Z"/></svg>Pending</span>
-      <span><svg class="ci-mark ci-other" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 23 12 12 23 1 12Z"/></svg>Other</span>
+    <div class="ci-header-metrics" id="ci-header-metrics" data-role="ci-header-metrics" aria-label="Sampled workflow outcomes"></div>
+    <div class="ci-plot-scroll" id="ci-timeline-scroll">
+      <div class="ci-axis" id="ci-timeline-axis"></div><div id="ci-timeline-rows" aria-label="Personal repository workflow samples"></div>
     </div>
-    <p class="ci-scroll-help">Scroll the timeline for more dates →</p>
-    <div class="ci-plot-scroll table-scroll" id="ci-timeline-scroll" tabindex="0" role="region" aria-label="Repository workflow timeline; scroll horizontally for more dates">
-      <div class="ci-plot"><div class="ci-axis" id="ci-timeline-axis"></div><div id="ci-timeline-rows" aria-label="Repository lanes"></div></div>
-    </div>
-    <section class="ci-inspector" aria-label="Selected weekly group"><div id="ci-selected-group" aria-live="polite">Select a weekly group to view its workflow runs.</div></section>
+    <div class="ci-legend" id="ci-legend" data-role="ci-legend" aria-label="Workflow outcomes"></div>
     <div class="ci-sample-footer"><p class="section-meta" id="ci-observatory-count">Run count unavailable</p><details class="ci-sample-details"><summary>Sampling details</summary><p class="section-meta" id="ci-observatory-scope"></p></details></div>
   </section>"""
 
@@ -652,6 +669,8 @@ def _project_activity_css() -> str:
 
 
 def _script() -> str:
+    import json
+    from scripts.rendering.icons import LUCIDE
     # Client-side hydration + theme switch. Reads ONLY public fields (no token_mode).
     return """
   <script>
@@ -1004,12 +1023,14 @@ def _script() -> str:
   // Only the profile repository's published, bounded Actions sample.
   // Build links from verified positive numeric run IDs; provider strings
   // enter the DOM as text, never as HTML or untrusted URLs.
-  const CI_WEEK_GROUPS = ["pass", "fail", "pending", "other"];
-  const CI_OUTCOME_GROUPS = Object.freeze({success:"pass",failure:"fail",timed_out:"fail",startup_failure:"fail",queued:"pending",in_progress:"pending",action_required:"pending",cancelled:"other",skipped:"other",neutral:"other",stale:"other",unknown:"other"});
+  const CI_WEEK_GROUPS = ["pass", "fail", "pending", "other", "unknown"];
+  const CI_OUTCOME_GROUPS = Object.freeze({success:"pass",failure:"fail",timed_out:"fail",startup_failure:"fail",queued:"pending",in_progress:"pending",action_required:"pending",cancelled:"other",skipped:"other",neutral:"other",stale:"other",unknown:"unknown"});
+  const CI_KNOWN_GRAY = ["cancelled", "skipped", "neutral", "stale"];
+  const CI_ICON_PATHS = __CI_ICONS__;
   function ciTimestamp(value) {
     if (typeof value !== "string") return null;
     const parts = /^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(?:\\.(\\d{1,3}))?Z$/.exec(value);
-    if (!parts || Number(parts[1]) < 1) return null;
+    if (!parts || parts[0] !== value || Number(parts[1]) < 1) return null;
     const parsed = new Date(value);
     if (!Number.isFinite(parsed.getTime()) || parsed.getUTCFullYear() !== Number(parts[1]) ||
         parsed.getUTCMonth()+1 !== Number(parts[2]) || parsed.getUTCDate() !== Number(parts[3]) ||
@@ -1019,26 +1040,32 @@ def _script() -> str:
   }
   function ciStamp(value) { return new Date(value).toISOString().replace(/\\.000Z$/, "Z"); }
   function ciWeeklyProjection(sample) {
-    const value = {status:"unavailable",observed_at:null,window_start:null,window_end:null,sample_limit_per_repo:null,observed_runs:null,weeks:[],repositories:[]};
+    const zeroOutcomes = () => Object.fromEntries(Object.keys(CI_OUTCOME_GROUPS).map(key=>[key,0]));
+    const zeroGroups = () => Object.fromEntries(CI_WEEK_GROUPS.map(key=>[key,0]));
+    const value = {status:"unavailable",owner:null,observed_at:null,window_start:null,window_end:null,sample_limit_per_repo:null,observed_runs:null,scale_max:null,weeks:[],repositories:[],outcome_counts:zeroOutcomes(),counts:zeroGroups()};
     if (!sample || sample.schema !== "profile-ci-timeline/v1") return value;
-    const start = ciTimestamp(sample.window_start), end = ciTimestamp(sample.window_end), weekMs = 7*86400000;
-    if (start === null || end === null || !(end > start) || end-start > 365*86400000) return value;
-    const count = Math.ceil((end-start)/weekMs);
-    const weeks = Array.from({length:count}, (_,index) => ({index,start:ciStamp(start+index*weekMs),end:ciStamp(Math.min(end,start+(index+1)*weekMs)),inclusive_end:index===count-1}));
+    const owner = sample.owner;
+    if (typeof owner !== "string" || owner !== owner.trim() || !/^[A-Za-z0-9][A-Za-z0-9-]{0,38}$/.test(owner)) return value;
+    const sourceStart = ciTimestamp(sample.window_start), end = ciTimestamp(sample.window_end);
+    if (sourceStart === null || end === null || !(end > sourceStart) || end-sourceStart > 365*86400000) return value;
+    const midnight = new Date(end); midnight.setUTCHours(0,0,0,0);
+    const start = Math.max(sourceStart,midnight.getTime()-13*86400000);
+    const interval = {index:0,start:ciStamp(start),end:ciStamp(end),inclusive_end:true};
     const observed = ciTimestamp(sample.observed_at);
-    Object.assign(value,{status:["available","partial","unavailable"].includes(sample.status)?sample.status:"unavailable",observed_at:observed===null?null:ciStamp(observed),window_start:ciStamp(start),window_end:ciStamp(end),weeks,sample_limit_per_repo:Number.isSafeInteger(sample.sample_limit_per_repo)&&sample.sample_limit_per_repo>0?sample.sample_limit_per_repo:null});
+    Object.assign(value,{status:["available","partial","unavailable"].includes(sample.status)?sample.status:"unavailable",owner,observed_at:observed===null?null:ciStamp(observed),window_start:ciStamp(start),window_end:ciStamp(end),weeks:[interval],sample_limit_per_repo:Number.isSafeInteger(sample.sample_limit_per_repo)&&sample.sample_limit_per_repo>0?sample.sample_limit_per_repo:null});
     const seenRepositories = new Set(), seenLocators = new Set();
     for (const raw of Array.isArray(sample.repositories)?sample.repositories:[]) {
       if (!raw || typeof raw !== "object") continue;
       const repository = raw.repository;
-      if (typeof repository !== "string" || !/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})\\/[A-Za-z0-9_.-]{1,100}$/.test(repository) || [".",".."].includes(repository.split("/")[1])) continue;
+      if (typeof repository !== "string" || repository !== repository.trim() || !/^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})\\/[A-Za-z0-9_.-]{1,100}$/.test(repository) || [".",".."].includes(repository.split("/")[1])) continue;
       const repository_id = Number.isSafeInteger(raw.repository_id)&&raw.repository_id>0?raw.repository_id:null;
       let key = repository_id?`github:${repository_id}`:raw.repository_key;
-      if (typeof key !== "string" || !/^github:[1-9][0-9]*$/.test(key)) key = repository.toLowerCase();
+      if (typeof key !== "string" || key !== key.trim() || !/^github:[1-9][0-9]*$/.test(key)) key = repository.toLowerCase();
       if (seenRepositories.has(key) || seenLocators.has(repository.toLowerCase())) continue;
       seenRepositories.add(key); seenLocators.add(repository.toLowerCase());
+      if (repository.split("/")[0].toLowerCase() !== owner.toLowerCase()) continue;
       const status = value.status!=="unavailable"&&["available","partial","empty","unavailable"].includes(raw.status)?raw.status:"unavailable";
-      const row = {repository,repository_id,repository_key:key,is_private:raw.is_private===true,status,truncated:raw.truncated===true,outside_window:raw.outside_window===true,observed_runs:status==="unavailable"?null:0,weeks:weeks.map(week=>({...week,count:0,pass:0,fail:0,pending:0,other:0,runs:[]}))};
+      const row = {repository,repository_id,repository_key:key,is_private:raw.is_private===true,status,truncated:raw.truncated===true,outside_window:raw.outside_window===true,observed_runs:status==="unavailable"?null:0,runs:[],outcome_counts:zeroOutcomes(),counts:zeroGroups()};
       const seenRuns = new Set();
       for (const run of Array.isArray(raw.runs)&&status!=="unavailable"?raw.runs:[]) {
         if (!run || typeof run !== "object") continue;
@@ -1048,14 +1075,18 @@ def _script() -> str:
         const outcome = typeof run.outcome==="string"&&Object.hasOwn(CI_OUTCOME_GROUPS,run.outcome)?run.outcome:"unknown";
         const workflow = typeof run.workflow==="string"?Array.from(run.workflow.replace(/[\\x00-\\x1f\\x7f-\\x9f]/g," ").trim()).slice(0,100).join(""):"";
         const item = {run_id:identity,workflow:workflow||"Workflow",created_at:ciStamp(when),outcome,group:CI_OUTCOME_GROUPS[outcome],url:`https://github.com/${repository}/actions/runs/${identity}`};
-        const bucket = row.weeks[Math.min(count-1,Math.floor((when-start)/weekMs))];
-        bucket.runs.push(item); bucket.count+=1; bucket[item.group]+=1; row.observed_runs+=1;
+        row.runs.push(item); row.outcome_counts[outcome]+=1; row.counts[item.group]+=1; row.observed_runs+=1;
       }
-      for (const week of row.weeks) week.runs.sort((a,b)=>ciTimestamp(a.created_at)-ciTimestamp(b.created_at)||a.run_id-b.run_id);
+      row.runs.sort((a,b)=>ciTimestamp(a.created_at)-ciTimestamp(b.created_at)||a.run_id-b.run_id);
+      row.weeks=[{...interval,count:row.observed_runs||0,...row.counts,runs:row.runs}];
+      for (const [outcome,count] of Object.entries(row.outcome_counts)) value.outcome_counts[outcome]+=count;
+      for (const [group,count] of Object.entries(row.counts)) value.counts[group]+=count;
       value.repositories.push(row);
     }
     const known = value.repositories.map(row=>row.observed_runs).filter(count=>count!==null);
     value.observed_runs = known.length?known.reduce((sum,count)=>sum+count,0):null;
+    const extent=Math.max(value.sample_limit_per_repo||0,...known);
+    value.scale_max=extent>0?extent:null;
     return value;
   }
   function ciDateLabel(value) {
@@ -1067,93 +1098,89 @@ def _script() -> str:
   function ciEmptyLabel(row) {
     return row.status==="unavailable"?"Unavailable":row.status==="empty"?"No runs returned":"No runs observed in window";
   }
-  function ciOutcomeMark(group, count) {
-    const mark = document.createElement("span");
-    mark.setAttribute("class","ci-outcome-mark"); mark.setAttribute("aria-hidden","true");
-    const ns = "http://www.w3.org/2000/svg", svg = document.createElementNS(ns,"svg");
-    svg.setAttribute("viewBox","0 0 24 24"); svg.setAttribute("aria-hidden","true");
-    svg.setAttribute("focusable","false"); svg.setAttribute("class","ci-mark ci-"+group);
-    const shapes = {pass:["circle",{cx:12,cy:12,r:10}],fail:["rect",{x:2,y:2,width:20,height:20,rx:1}],pending:["path",{d:"M12 1 23 22H1Z"}],other:["path",{d:"M12 1 23 12 12 23 1 12Z"}]};
-    const [name, attrs] = shapes[group], shape = document.createElementNS(ns,name);
-    for (const [key, value] of Object.entries(attrs)) shape.setAttribute(key,String(value));
-    svg.appendChild(shape); mark.appendChild(svg);
-    if (count!==null) {
-      const text = document.createElement("span");
-      text.setAttribute("class","ci-mark-count");
-      text.textContent = String(count); mark.appendChild(text);
-    }
-    return mark;
+  function ciGroupLabel(group,counts) {
+    if(group==="other") return CI_KNOWN_GRAY.filter(name=>counts[name]).map(name=>name[0].toUpperCase()+name.slice(1)).join(" / ")||"Other observed outcomes";
+    return {pass:"Passed",fail:"Failed",pending:"Pending",unknown:"Unknown"}[group];
+  }
+  function ciGroupDetail(group,counts) {
+    return Object.entries(counts).filter(([outcome,count])=>count&&CI_OUTCOME_GROUPS[outcome]===group).map(([outcome,count])=>outcome.replaceAll("_"," ")+" "+count).join(", ");
+  }
+  function ciIcon(group) {
+    const span=document.createElement("span"); span.className="ci-icon";
+    span.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+CI_ICON_PATHS[group]+'</svg>';
+    return span;
   }
   function hydrateCITimeline(sample) {
-    const host = document.getElementById("ci-observatory"), axis = document.getElementById("ci-timeline-axis"), lanes = document.getElementById("ci-timeline-rows"), detail = document.getElementById("ci-selected-group"), note = document.getElementById("ci-observatory-note"), footer = document.getElementById("ci-observatory-count"), scope = document.getElementById("ci-observatory-scope");
-    if (!host || !axis || !lanes || !detail || !note || !footer || !scope) return;
-    axis.replaceChildren(); lanes.replaceChildren(); detail.replaceChildren();
-    const projected = ciWeeklyProjection(sample);
-    host.dataset.status = projected.status;
-    const element = (tag, className, text) => {const el=document.createElement(tag); if(className)el.className=className; if(text!==undefined)el.textContent=text; return el;};
-    const selectPrompt = () => {detail.replaceChildren(element("p","section-meta","Select a weekly group to view its workflow runs."));};
-    selectPrompt();
-    if (!projected.weeks.length) {
-      note.textContent="Workflow history unavailable"; footer.textContent="Run count unavailable"; scope.textContent="No qualified repository observations in this refresh."; return;
+    const host=document.getElementById("ci-observatory"),axis=document.getElementById("ci-timeline-axis"),lanes=document.getElementById("ci-timeline-rows"),note=document.getElementById("ci-observatory-note"),footer=document.getElementById("ci-observatory-count"),scope=document.getElementById("ci-observatory-scope"),legend=document.getElementById("ci-legend"),metrics=document.getElementById("ci-header-metrics"),badge=document.getElementById("ci-observatory-badge");
+    if(!host||!axis||!lanes||!note||!footer||!scope||!legend||!metrics||!badge) return;
+    for(const node of [axis,lanes,legend,metrics]) node.replaceChildren();
+    const projected=ciWeeklyProjection(sample),element=(tag,className,text)=>{const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;};
+    host.dataset.status=projected.status;
+    host.dataset.scaleMax=projected.scale_max===null?"":String(projected.scale_max);
+    badge.textContent=projected.status==="partial"?"Partial sample":projected.status==="unavailable"?"Sample unavailable":"Sampled history";
+    const count=projected.observed_runs;
+    footer.textContent="Sampled runs; counts do not measure all workflow activity.";
+    if(!projected.weeks.length){note.textContent="Workflow history unavailable";scope.textContent="Personal repository scope or saved source bounds unavailable.";return;}
+    note.textContent=(count===null?"Run count unavailable":count+" sampled runs")+" · "+projected.repositories.length+" personal repositories · "+projected.window_start.slice(0,10)+" – "+projected.window_end.slice(0,10)+" UTC · last date partial"+(projected.status==="partial"?" · partial sample":"");
+    scope.textContent="Personal repositories of "+projected.owner+". Saved display window "+projected.window_start+" ≤ created_at ≤ "+projected.window_end+". Source observed at "+(projected.observed_at||"unavailable")+". Newest "+(projected.sample_limit_per_repo===null?"an unspecified number of":projected.sample_limit_per_repo)+" runs per repository retained by the collector; displayed counts include only this window. Partial/truncated samples are lower bounds, unavailable is not zero. Empty rail is unused scale, not another outcome.";
+    const groups=CI_WEEK_GROUPS.filter(group=>["pass","fail","pending"].includes(group)||projected.counts[group]);
+    metrics.dataset.columns=String(groups.length);
+    for(const group of groups){
+      const metric=element("div","ci-metric"),value=element("div","ci-metric-value"),label=ciGroupLabel(group,projected.outcome_counts);
+      metric.dataset.group=group;value.appendChild(ciIcon(group));value.appendChild(element("span","num",count===null?"—":String(projected.counts[group])));
+      metric.appendChild(value);metric.appendChild(element("span","ci-metric-label",label));metrics.appendChild(metric);
+      const key=element("span","ci-"+group);key.appendChild(ciIcon(group));key.appendChild(element("span","",label));key.title=ciGroupDetail(group,projected.outcome_counts);legend.appendChild(key);
     }
-    note.textContent=ciDateLabel(projected.window_start)+" – "+ciDateLabel(projected.window_end)+", "+new Date(projected.window_end).getUTCFullYear()+" UTC · weekly groups";
-    footer.textContent=(projected.observed_runs===null?"Run count unavailable":projected.observed_runs+" sampled runs")+(projected.status==="available"?"":" · "+projected.status);
-    const limit=projected.sample_limit_per_repo;
-    scope.textContent=(limit?"Up to "+limit+" newest runs per repository. ":"Source sample limit unavailable. ")+"Blank intervals contain no sampled runs; this sample does not measure all workflow activity. "+(projected.observed_at?"Observed "+ciRunDate(projected.observed_at)+". ":"")+"Window "+projected.window_start+" through "+projected.window_end+". Private repository names and run metadata are included where supplied by the authorized snapshot.";
-    host.style.setProperty("--ci-track-min",String(projected.weeks.length*44)+"px");
-    const axisPlot=element("div","ci-axis-plot"); axis.appendChild(element("span","ci-axis-label","Repository")); axis.appendChild(axisPlot);
-    const start=ciTimestamp(projected.window_start), end=ciTimestamp(projected.window_end);
-    for (const portion of [0,.25,.5,.75,1]) {const tick=element("span","",ciDateLabel(ciStamp(start+(end-start)*portion)));tick.style.left=(portion*100)+"%";axisPlot.appendChild(tick);}
-    const labels={pass:"Passed",fail:"Failed",pending:"Pending",other:"Other"};
-    function selectWeek(row, week, button) {
-      for (const selected of lanes.querySelectorAll('[aria-pressed="true"]')) selected.setAttribute("aria-pressed","false");
-      button.setAttribute("aria-pressed","true"); detail.replaceChildren();
-      detail.appendChild(element("h3","",row.repository+(row.is_private?" · private":"")));
-      detail.appendChild(element("p","section-meta",week.start+" ≤ created_at "+(week.inclusive_end?"≤":"<")+" "+week.end));
-      detail.appendChild(element("p","ci-selected-count",week.count+" sampled runs · "+CI_WEEK_GROUPS.map(group=>labels[group]+" "+week[group]).join(" · ")));
+    const ticks=element("div","ci-axis-plot");ticks.appendChild(element("span","","0"));ticks.appendChild(element("span","",projected.scale_max===null?"Scale unavailable":projected.scale_max+" runs"));
+    axis.appendChild(element("span","ci-axis-label","Repository"));axis.appendChild(ticks);axis.appendChild(element("span","","Total"));
+    const accordions=[];
+    for(const row of projected.repositories){
+      const lane=element("details","ci-lane"),summary=element("summary","ci-group");lane.name="ci-repository";
+      Object.assign(lane.dataset,{role:"ci-repository-row",repository:row.repository,repositoryKey:row.repository_key,private:String(row.is_private),status:row.status});
+      if(row.observed_runs!==null)lane.dataset.observedRuns=String(row.observed_runs);
+      Object.assign(summary.dataset,{role:"ci-group",repository:row.repository,windowStart:projected.window_start,windowEnd:projected.window_end,weekIndex:"0",runCount:String(row.observed_runs||0)});
+      summary.setAttribute("aria-expanded","false");
+      const qualifier=(row.status==="partial"||row.truncated||row.outside_window)?" · partial sample":"";
+      summary.setAttribute("aria-label",row.repository+" · "+(row.observed_runs===null?"unavailable":row.observed_runs+" sampled runs")+qualifier+"; expand workflow details");
+      const identity=element("span","ci-identity"),[owner,name]=row.repository.split("/");
+      identity.appendChild(element("span","ci-repo-name",name));
+      const ownerLine=element("span","ci-owner",owner);
+      if(row.is_private){const lock=element("span","ci-private");lock.appendChild(ciIcon("lock"));lock.appendChild(element("span","","Private"));ownerLine.appendChild(lock);}
+      identity.appendChild(ownerLine);
+      const barWrap=element("span","ci-bar-wrap"),track=element("span","ci-bar-track");
+      Object.assign(track.dataset,{role:"ci-bar-track",scaleMax:projected.scale_max===null?"":String(projected.scale_max)});
+      const outside=element("span","ci-outside-counts");
+      for(const group of CI_WEEK_GROUPS){
+        const number=row.counts[group];if(!number)continue;
+        const segment=element("span","ci-bar-segment ci-"+group),portion=number/projected.scale_max;
+        Object.assign(segment.dataset,{role:"ci-bar-segment",group,count:String(number)});segment.style.width=(portion*100)+"%";
+        const meaning=ciGroupDetail(group,row.outcome_counts);segment.title=meaning;segment.setAttribute("aria-label",meaning);
+        const numeral=element(portion>=0.07?"span":"strong","",String(number));numeral.dataset.role="ci-count";
+        if(portion>=0.07)segment.appendChild(numeral);
+        else{const key=element("span","ci-"+group);key.appendChild(numeral);key.appendChild(element("span",""," "+ciGroupLabel(group,row.outcome_counts)));outside.appendChild(key);}
+        track.appendChild(segment);
+      }
+      if(!row.observed_runs){barWrap.appendChild(element("span","ci-empty-state",ciEmptyLabel(row)));track.setAttribute("aria-hidden","true");}
+      else barWrap.appendChild(track);
+      if(outside.children.length)barWrap.appendChild(outside);
+      const total=element("span","ci-row-total");total.dataset.role="ci-row-total";total.appendChild(element("span","",row.observed_runs===null?"—":String(row.observed_runs)));const caret=element("span","ci-caret");caret.setAttribute("aria-hidden","true");total.appendChild(caret);
+      summary.appendChild(identity);summary.appendChild(barWrap);summary.appendChild(total);lane.appendChild(summary);
+      const context=element("p","ci-row-context",row.repository+" · "+projected.window_start+" ≤ created_at ≤ "+projected.window_end+qualifier);lane.appendChild(context);
       const list=element("ul","ci-run-details");
-      for (const run of week.runs) {
-        const item=element("li","ci-run-detail"); Object.assign(item.dataset,{role:"ci-run-detail",repository:row.repository,runId:String(run.run_id),createdAt:run.created_at,outcome:run.outcome});
-        const link=element("a","ci-run-link",run.workflow); link.href=run.url; link.rel="noopener noreferrer"; link.target="_blank";
-        const meta=element("span","ci-run-meta",ciRunDate(run.created_at)+" · "+run.outcome.replaceAll("_"," ")+" · #"+run.run_id);
-        item.appendChild(link); item.appendChild(meta); list.appendChild(item);
+      for(const run of row.runs){
+        const item=element("li","ci-run-detail");Object.assign(item.dataset,{role:"ci-run-detail",repository:row.repository,runId:String(run.run_id),createdAt:run.created_at,outcome:run.outcome});
+        const link=element("a","ci-run-link",run.workflow);link.href=run.url;link.rel="noopener noreferrer";link.target="_blank";
+        item.appendChild(link);item.appendChild(element("span","ci-run-meta",ciRunDate(run.created_at)+" · "+run.outcome.replaceAll("_"," ")+" · #"+run.run_id));list.appendChild(item);
       }
-      detail.appendChild(list);
+      if(!row.runs.length)list.appendChild(element("li","ci-empty-state",ciEmptyLabel(row)));
+      lane.appendChild(list);accordions.push({lane,summary});
+      lane.addEventListener("toggle",()=>{
+        summary.setAttribute("aria-expanded",String(lane.open));
+        if(lane.open)for(const other of accordions)if(other.lane!==lane){other.lane.open=false;other.summary.setAttribute("aria-expanded","false");}
+      });
+      lanes.appendChild(lane);
     }
-    for (const row of projected.repositories) {
-      const lane=element("div","ci-lane"); Object.assign(lane.dataset,{role:"ci-repository-row",repository:row.repository,repositoryKey:row.repository_key,private:String(row.is_private),status:row.status});
-      if (row.observed_runs!==null) lane.dataset.observedRuns=String(row.observed_runs);
-      const identity=element("div","ci-identity"), name=element("a","ci-repo-name",row.repository); name.href="https://github.com/"+row.repository; identity.appendChild(name);
-      if (row.is_private) {
-        const label=element("span","ci-private");label.setAttribute("aria-label","Private repository");
-        const ns="http://www.w3.org/2000/svg", lock=document.createElementNS(ns,"svg");lock.setAttribute("class","ci-lock");lock.setAttribute("viewBox","0 0 24 24");lock.setAttribute("aria-hidden","true");
-        const shape=document.createElementNS(ns,"rect");for(const [key,value] of Object.entries({width:18,height:11,x:3,y:11,rx:2,ry:2}))shape.setAttribute(key,String(value));
-        const shackle=document.createElementNS(ns,"path");shackle.setAttribute("d","M7 11V7a5 5 0 0 1 10 0v4");lock.appendChild(shape);lock.appendChild(shackle);label.appendChild(lock);label.appendChild(element("span","","Private"));identity.appendChild(label);
-      }
-      if (row.truncated||row.outside_window||row.status==="partial") identity.appendChild(element("span","ci-lane-note","Partial sample"));
-      const track=element("div","ci-track"); track.style.setProperty("--ci-week-count",String(projected.weeks.length));
-      for (const week of row.weeks) {
-        if (!week.count) {const empty=element("span","ci-empty-week");empty.setAttribute("aria-hidden","true");track.appendChild(empty);continue;}
-        const button=element("button","ci-group"); button.type="button";button.setAttribute("aria-pressed","false");
-        Object.assign(button.dataset,{role:"ci-group",repository:row.repository,windowStart:week.start,windowEnd:week.end,weekIndex:String(week.index),runCount:String(week.count)});
-        const title=row.repository+" · "+week.start+" ≤ created_at "+(week.inclusive_end?"≤":"<")+" "+week.end+" · "+week.count+" sampled runs · "+CI_WEEK_GROUPS.map(group=>labels[group]+" "+week[group]).join(", ");
-        button.setAttribute("aria-label",title);button.title=title;
-        for (const group of CI_WEEK_GROUPS) {const slot=element("span","ci-mark-slot");slot.dataset.group=group;if(week[group])slot.appendChild(ciOutcomeMark(group,week[group]));button.appendChild(slot);}
-        button.addEventListener("click",()=>selectWeek(row,week,button));
-        button.addEventListener("focus",()=>button.scrollIntoView({block:"nearest",inline:"nearest"}));track.appendChild(button);
-      }
-      if (!row.observed_runs) {const empty=element("span","ci-empty-state",ciEmptyLabel(row));track.appendChild(empty);}
-      lane.appendChild(identity);lane.appendChild(track);lanes.appendChild(lane);
-    }
-    if (!projected.repositories.length) lanes.appendChild(element("p","section-meta","Repository observations unavailable"));
-    // Reveal the latest observed group without moving the page vertically.
-    const scroller = document.getElementById("ci-timeline-scroll");
-    const latestWeek = Math.max(-1, ...projected.repositories.flatMap(row => row.weeks.filter(week => week.count).map(week => week.index)));
-    if (scroller && latestWeek >= 0) {
-      const trackWidth = lanes.querySelector?.(".ci-track")?.clientWidth || scroller.scrollWidth;
-      const groupRight = scroller.scrollWidth - trackWidth + (latestWeek + 1) * trackWidth / projected.weeks.length;
-      scroller.scrollLeft = Math.max(0, groupRight - scroller.clientWidth);
-    }
+    if(!projected.repositories.length)lanes.appendChild(element("p","section-meta","Personal repository observations unavailable"));
   }
 
   function hydrate(d) {
@@ -1320,7 +1347,8 @@ def _script() -> str:
     document.getElementById("calendar-status").textContent = "Contribution calendar unavailable";
     realignSelectedHash();
   });
-  </script>"""
+  </script>""".replace("__CI_ICONS__", json.dumps({group:LUCIDE[name] for group,name in
+        {"pass":"ci_check","fail":"cross","pending":"clock","other":"workflow","unknown":"alert","lock":"lock"}.items()}))
 
 
 def _lang_colors_json() -> str:

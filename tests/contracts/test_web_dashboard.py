@@ -1263,190 +1263,155 @@ class OverviewProfileLinkAndTimeTests(unittest.TestCase):
 
 
 class CIWeeklyWebsiteTests(unittest.TestCase):
-    def test_one_cross_repository_panel_follows_visible_live_overview(self):
+    def test_one_personal_panel_preserves_page_order_and_native_disclosure(self):
         from scripts.pipeline.web_render import render_dashboard
-        html = render_dashboard()
-        self.assertTrue('<header class="panel hero" id="overview"' in html, "the live overview remains visible")
-        self.assertEqual(1, html.count('id="ci-observatory"'))
-        self.assertNotIn('id="ci-execution"', html)
-        self.assertNotIn('id="ci-actions"', html)
-        self.assertNotIn('id="interactive-details"', html)
-        self.assertNotIn('class="canonical-profile"', html)
-        self.assertLess(html.index('id="overview"'), html.index('id="ci-observatory"'))
-        self.assertIn('hydrateCITimeline(d.ci_timeline)', html)
-        self.assertIn('.ci-group:focus-visible', html)
-        self.assertIn('min-height: 44px', html)
-        self.assertIn('repeat(var(--ci-week-count), minmax(44px,1fr))', html)
-        self.assertIn('class="ci-plot-scroll table-scroll"', html)
-        self.assertLess(html.index('id="automation"'), html.index('id="ci-observatory"'))
-        self.assertLess(html.index('id="ci-observatory"'), html.index('id="weekly-contributions"'))
-        self.assertIn('<details class="ci-sample-details"', html)
-        self.assertNotIn("private run details are withheld", html.lower())
+        html=render_dashboard()
+        self.assertIn('<header class="panel hero" id="overview"',html)
+        self.assertEqual(1,html.count('id="ci-observatory"'))
+        for obsolete in ('id="ci-execution"','id="ci-actions"','id="interactive-details"','class="canonical-profile"','Select a weekly group','--ci-week-count'):
+            self.assertNotIn(obsolete,html)
+        self.assertLess(html.index('id="automation"'),html.index('id="ci-observatory"'))
+        self.assertLess(html.index('id="ci-observatory"'),html.index('id="weekly-contributions"'))
+        self.assertIn('hydrateCITimeline(d.ci_timeline)',html)
+        self.assertIn('.ci-group:focus-visible',html)
+        self.assertIn('min-height: 64px',html)
+        self.assertIn('element("details","ci-lane")',html)
+        self.assertIn('element("summary","ci-group")',html)
+        self.assertLess(html.index('id="ci-timeline-rows"'),html.index('id="ci-legend"'))
+        self.assertLess(html.index('id="ci-legend"'),html.index('class="ci-sample-footer"'))
 
-    def test_javascript_and_svg_project_identical_qualified_weekly_facts(self):
+    def test_javascript_and_svg_project_identical_qualified_personal_facts(self):
         from tests.contracts.test_dashboard_summary import _weekly_ci_fixture
-        from scripts.rendering import generate_dashboard_summary as renderer
+        from scripts.rendering.generate_dashboard_summary import ci_weekly_projection
         from scripts.pipeline.web_render import render_dashboard
-        project = getattr(renderer, "ci_weekly_projection", None)
-        self.assertTrue(callable(project))
-        html = render_dashboard()
-        script = re.findall(r"<script>(.*?)</script>", html, re.S)[0]
-        self.assertIn("function ciWeeklyProjection(sample)", script)
-        part = script[script.index("  const CI_WEEK_GROUPS"):script.index("  function hydrateCITimeline(")]
-        harness = r"const fs=require('node:fs'),vm=require('node:vm');const x=JSON.parse(fs.readFileSync(0,'utf8'));process.stdout.write(JSON.stringify(vm.runInNewContext(x.script+'\nciWeeklyProjection(sample);',{sample:x.sample})));"
-        fixture = _weekly_ci_fixture()
-        completed = subprocess.run(["node","-e",harness], input=json.dumps({"script":part,"sample":fixture}),capture_output=True,text=True,check=True,timeout=15)
-        actual = json.loads(completed.stdout)
-        self.assertEqual(project(fixture), actual)
-        self.assertEqual(10, actual["observed_runs"])
-        private = actual["repositories"][1]
-        self.assertTrue(private["is_private"])
-        self.assertEqual([11,12], [run["run_id"] for week in private["weeks"] for run in week["runs"]])
+        script=re.findall(r'<script>(.*?)</script>',render_dashboard(),re.S)[0]
+        part=script[script.index('  const CI_WEEK_GROUPS'):script.index('  function hydrateCITimeline(')]
+        harness=r"const fs=require('node:fs'),vm=require('node:vm');const x=JSON.parse(fs.readFileSync(0,'utf8'));process.stdout.write(JSON.stringify(vm.runInNewContext(x.script+'\nciWeeklyProjection(sample);',{sample:x.sample})));"
+        sample=_weekly_ci_fixture()
+        result=subprocess.run(['node','-e',harness],input=json.dumps({'script':part,'sample':sample}),capture_output=True,text=True,check=True,timeout=15)
+        value=json.loads(result.stdout)
+        self.assertEqual(ci_weekly_projection(sample),value)
+        self.assertEqual(9,value['observed_runs']);self.assertEqual(37,value['scale_max'])
+        self.assertTrue(value['repositories'][1]['is_private'])
+        self.assertEqual([11,12],[run['run_id'] for run in value['repositories'][1]['runs']])
 
-    def test_emitted_lane_controls_preserve_private_runs_and_clear_on_unavailable_refresh(self):
-        """Execute emitted DOM behavior; mutate the conservation and privacy laws."""
+    def test_emitted_disclosures_preserve_private_runs_counts_and_refresh(self):
+        """Execute emitted DOM behavior; actual trusted input remains a browser gate."""
         from tests.contracts.test_dashboard_summary import _weekly_ci_fixture
         from scripts.pipeline.web_render import render_dashboard
-        script = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)[0]
-        source = script[script.index("  const CI_WEEK_GROUPS"):script.index("  function hydrate(d)")]
-        harness = r'''
+        script=re.findall(r'<script>(.*?)</script>',render_dashboard(),re.S)[0]
+        source=script[script.index('  const CI_WEEK_GROUPS'):script.index('  function hydrate(d)')]
+        harness=r'''
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const input=JSON.parse(fs.readFileSync(0,'utf8'));
-class El {
-  constructor(tag='div'){this.tagName=tag;this.children=[];this.attrs={};this.dataset={};this.style={setProperty(k,v){this[k]=v}};this.handlers={};this.textContent='';}
-  appendChild(child){this.children.push(child);return child;}
-  replaceChildren(...children){this.children=children;this.textContent='';}
-  setAttribute(k,v){this.attrs[k]=String(v);}
-  getAttribute(k){return this.attrs[k]??null;}
-  addEventListener(k,fn){this.handlers[k]=fn;}
-  scrollIntoView(){this.scrolled=true;}
-  querySelectorAll(query){const all=[];for(const child of this.children){if(query==='[aria-pressed="true"]'&&child.attrs['aria-pressed']==='true')all.push(child);all.push(...child.querySelectorAll(query));}return all;}
+class El{
+ constructor(tag='div'){this.tagName=tag;this.children=[];this.attrs={};this.dataset={};this.style={};this.handlers={};this.textContent='';this.open=false;}
+ appendChild(child){this.children.push(child);return child;}
+ replaceChildren(...children){this.children=children;this.textContent='';}
+ setAttribute(k,v){this.attrs[k]=String(v);} getAttribute(k){return this.attrs[k]??null;}
+ addEventListener(k,fn){this.handlers[k]=fn;}
 }
-const ids=['ci-observatory','ci-timeline-axis','ci-timeline-rows','ci-selected-group','ci-observatory-note','ci-observatory-count','ci-observatory-scope','ci-timeline-scroll'];
+const ids=['ci-observatory','ci-timeline-axis','ci-timeline-rows','ci-observatory-note','ci-observatory-count','ci-observatory-scope','ci-timeline-scroll','ci-legend','ci-header-metrics','ci-observatory-badge'];
 const nodes=Object.fromEntries(ids.map(id=>[id,new El()]));
-nodes["ci-timeline-scroll"].scrollWidth=528;nodes["ci-timeline-scroll"].clientWidth=300;
-const document={getElementById:id=>nodes[id]||null,createElement:tag=>new El(tag),createElementNS:(_,tag)=>new El(tag)};
-const context={document,sample:input.sample};vm.createContext(context);
+const context={document:{getElementById:id=>nodes[id]||null,createElement:tag=>new El(tag)},sample:input.sample};vm.createContext(context);
+const all=node=>[node,...node.children.flatMap(all)];
 vm.runInContext(input.source+'\nhydrateCITimeline(sample);',context);
-assert.equal(nodes["ci-timeline-scroll"].scrollLeft,228,"latest dates are visible without first scrolling past empty history");
-for (const group of ['pass','fail','pending','other']) {
-  const mark=vm.runInContext(`ciOutcomeMark("${group}",100)`,context);
-  assert.equal(mark.tagName,'span','the count needs its own caption below the filled SVG');
-  assert.equal(mark.children[0].tagName,'svg');
-  assert.equal(mark.children[0].children.length,1,'filled status shape contains no overprinted number');
-  assert.equal(mark.children[1].tagName,'span');
-  assert.equal(mark.children[1].getAttribute('class'),'ci-mark-count');
-  assert.equal(mark.children[1].textContent,'100','three-digit counts stay exact');
-  assert.equal(mark.children[1].getAttribute('style'),null,'large counts cannot shrink below the caption floor');
-}
 const lanes=nodes['ci-timeline-rows'].children;
-assert.equal(lanes.length,7,'one lane per admitted identity; private and org rows included');
-assert.deepEqual(lanes.map(lane=>lane.dataset.observedRuns),['5','2','0',undefined,'1','1','1']);
-const buttons=lanes.flatMap(lane=>lane.children[1].children.filter(node=>node.tagName==='button'));
-assert.equal(buttons.reduce((sum,button)=>sum+Number(button.dataset.runCount),0),10,'weekly grouping conserves every valid run exactly once');
-const publicGroups=buttons.filter(b=>b.dataset.repository==='example/public');
-assert.deepEqual(publicGroups.map(b=>Number(b.dataset.runCount)),[2,1,2]);
-const groupCounts=button=>Object.fromEntries(button.children.map(slot=>[slot.dataset.group,Number(slot.children[0]?.children[1]?.textContent||0)]));
-assert.deepEqual(groupCounts(publicGroups.at(-1)),{pass:0,fail:0,pending:0,other:2});
-const privateGroups=buttons.filter(b=>b.dataset.repository==='example/profile-private-continuation-with-a-long-name');
-assert.equal(privateGroups.length,2,'private runs have the same controls as public runs');
-assert(lanes[1].children[0].children.some(n=>n.className==='ci-private'),'private visibility is labeled');
-assert.equal(nodes['ci-observatory-count'].textContent,'10 sampled runs · partial');
-assert(nodes['ci-observatory-scope'].textContent.includes('37 newest'),'actual carrier limit survives');
-assert(nodes['ci-observatory-note'].textContent.includes('weekly groups'));
-function selectedRuns(){return nodes['ci-selected-group'].children.at(-1).children;}
-privateGroups.at(-1).handlers.click();
-assert.deepEqual(selectedRuns().map(run=>run.dataset.runId),['12']);
-assert.equal(selectedRuns()[0].children[0].href,'https://github.com/example/profile-private-continuation-with-a-long-name/actions/runs/12');
-assert.equal(selectedRuns()[0].dataset.createdAt,'2026-11-19T12:00:00Z');
-publicGroups[0].handlers.click();
-assert.deepEqual(selectedRuns().map(run=>run.dataset.outcome),['success','failure']);
-assert.equal(privateGroups.at(-1).getAttribute('aria-pressed'),'false');
-publicGroups.at(-1).handlers.click();
-assert.deepEqual(selectedRuns().map(run=>run.dataset.outcome),['cancelled','unknown']);
-assert.equal(selectedRuns()[1].children[0].textContent,'<img onerror="bad()">','hostile workflow markup is only text');
-assert.equal(selectedRuns()[1].children.length,2);
-assert(publicGroups.at(-1).getAttribute('aria-label').includes('2026-11-19T12:00:00Z'));
-privateGroups[0].handlers.focus();assert(privateGroups[0].scrolled,'keyboard focus is brought into the contained scroll view');
-vm.runInContext('const early=JSON.parse(JSON.stringify(sample));for(const row of early.repositories){for(const run of row.runs||[])run.created_at=early.window_start;}hydrateCITimeline(early);',context);
-assert.equal(nodes["ci-timeline-scroll"].scrollLeft,0,"an older-only sample reveals its observed group rather than an empty final week");
+assert.equal(lanes.length,6);assert(lanes.every(lane=>lane.tagName==='details'&&!lane.open));
+assert.deepEqual(lanes.map(row=>row.dataset.observedRuns),['5','2','0',undefined,'1','1']);
+assert(lanes.every(row=>row.children[0].tagName==='summary'&&row.children[0].getAttribute('aria-expanded')==='false'));
+assert.equal(all(nodes['ci-timeline-rows']).filter(node=>node.dataset.role==='ci-count').reduce((sum,n)=>sum+Number(n.textContent),0),9);
+const publicRow=lanes[0],privateRow=lanes[1];
+assert(all(privateRow).some(n=>n.textContent==='Private'));
+const details=row=>all(row).filter(node=>node.dataset.role==='ci-run-detail');
+assert.deepEqual(details(privateRow).map(n=>n.dataset.runId),['11','12']);
+assert.equal(details(privateRow)[1].children[0].href,'https://github.com/example/profile-private-continuation-with-a-long-name/actions/runs/12');
+assert.deepEqual(details(publicRow).map(n=>n.dataset.outcome),['success','failure','queued','cancelled','unknown']);
+assert.equal(details(publicRow).at(-1).children[0].textContent,'<img onerror="bad()">');
+assert.equal(details(publicRow).at(-1).children[0].children.length,0,'provider title is text, not markup');
+const segments=all(publicRow).filter(n=>n.dataset.role==='ci-bar-segment');
+assert.deepEqual(segments.map(n=>[n.dataset.group,n.dataset.count]),[['pass','1'],['fail','1'],['pending','1'],['other','1'],['unknown','1']]);
+assert(segments.every(n=>Math.abs(parseFloat(n.style.width)-100/37)<1e-8),'narrow segments keep absolute scale');
+assert(nodes['ci-observatory-note'].textContent.includes('9 sampled runs · 6 personal repositories'));
+assert(nodes['ci-observatory-note'].textContent.includes('2026-11-06'));
+assert(nodes['ci-observatory-scope'].textContent.includes('Newest 37 runs'));
+assert.equal(nodes['ci-observatory-badge'].textContent,'Partial sample');
+assert(!all(nodes['ci-legend']).some(n=>n.textContent==='Other'));
+assert(all(nodes['ci-legend']).some(n=>n.textContent==='Cancelled'));
+assert(all(nodes['ci-legend']).some(n=>n.textContent==='Unknown'));
+privateRow.open=true;privateRow.handlers.toggle();
+assert.equal(privateRow.children[0].getAttribute('aria-expanded'),'true');
+privateRow.open=false;privateRow.handlers.toggle();
+assert.equal(privateRow.children[0].getAttribute('aria-expanded'),'false');
+publicRow.open=true;publicRow.handlers.toggle();
+privateRow.open=true;privateRow.handlers.toggle();
+assert.equal(publicRow.open,false,'only the current repository details stay open');
+assert.equal(publicRow.children[0].getAttribute('aria-expanded'),'false');
 vm.runInContext('hydrateCITimeline({...sample,status:"unavailable"});',context);
-assert.equal(nodes['ci-timeline-rows'].children.flatMap(lane=>lane.children[1].children.filter(node=>node.tagName==='button')).length,0,'an unavailable refresh cannot retain success controls');
-assert.equal(nodes['ci-selected-group'].children.length,1,'previous selected run detail is cleared');
-assert.equal(nodes['ci-selected-group'].children[0].textContent,'Select a weekly group to view its workflow runs.');
-assert.equal(nodes['ci-observatory-count'].textContent,'Run count unavailable · unavailable');
+assert.equal(all(nodes['ci-timeline-rows']).filter(n=>n.dataset.role==='ci-run-detail').length,0,'refresh clears stale details');
+assert.equal(all(nodes['ci-timeline-rows']).filter(n=>n.dataset.role==='ci-bar-segment').length,0,'unavailable cannot retain success');
+assert.equal(nodes['ci-observatory-badge'].textContent,'Sample unavailable');
+assert(nodes['ci-observatory-note'].textContent.startsWith('Run count unavailable'));
 '''
-        fixture = _weekly_ci_fixture()
-        def run(js):
-            return subprocess.run(["node","-e",harness],input=json.dumps({"source":js,"sample":fixture}),capture_output=True,text=True,timeout=15)
-        healthy=run(source)
-        self.assertEqual(0, healthy.returncode, healthy.stderr[-5000:])
-        for original, wrong in (
-            ('!Number.isSafeInteger(identity)', 'false'),
-            ('|| seenRuns.has(identity)', ''),
-            ('|| when>end', ''),
-            ('cancelled:"other"', 'cancelled:"pass"'),
-            ('value.status!=="unavailable"&&', ''),
-            ('for (const row of projected.repositories) {', 'for (const row of projected.repositories) { if (row.is_private) continue;'),
+        fixture=_weekly_ci_fixture()
+        def execute(js):
+            return subprocess.run(['node','-e',harness],input=json.dumps({'source':js,'sample':fixture}),capture_output=True,text=True,timeout=15)
+        healthy=execute(source)
+        self.assertEqual(0,healthy.returncode,healthy.stderr[-6000:])
+        for anchor,wrong in (
+            ('!Number.isSafeInteger(identity)','false'),
+            ('|| seenRuns.has(identity)',''),
+            ('|| when>end',''),
+            ('cancelled:"other"','cancelled:"pass"'),
+            ('value.status!=="unavailable"&&',''),
+            ('for(const row of projected.repositories){','for(const row of projected.repositories){if(row.is_private)continue;'),
         ):
-            with self.subTest(wrong_fix=original):
-                self.assertIn(original,source)
-                self.assertNotEqual(0,run(source.replace(original,wrong,1)).returncode,'wrong implementation must fail the observed DOM oracle')
+            with self.subTest(wrong_fix=anchor):
+                self.assertIn(anchor,source)
+                self.assertNotEqual(0,execute(source.replace(anchor,wrong,1)).returncode)
 
-    def test_ci_marks_reuse_theme_roles_and_have_no_tiles_or_inline_html_data(self):
-        from scripts.pipeline.web_render import _component_css, _ci_observatory, render_dashboard
-        css = _component_css()
-        ci = css[css.index('/* CI repository lanes'):css.index('/* --- language bar')]
-        self.assertNotRegex(ci, r"#[0-9a-fA-F]{3,8}\b")
+    def test_component_uses_canonical_icons_tokens_and_safe_provider_text(self):
+        from scripts.pipeline.web_render import _component_css,_ci_observatory,render_dashboard
+        from scripts.rendering.icons import LUCIDE
+        css=_component_css();ci=css[css.index('/* CI repository lanes'):css.index('/* --- language bar')]
+        self.assertNotRegex(ci,r'#[0-9a-fA-F]{3,8}\b')
         for token in ('var(--status-success)','var(--status-danger)','var(--status-warning)','var(--hairline)','var(--ink-dim)'):
             self.assertIn(token,ci)
-        self.assertIn('background: transparent',ci)
-        self.assertIn('overflow-x: auto',ci)
-        self.assertIn('container-type: inline-size',ci)
-        markup = _ci_observatory()
-        self.assertEqual(1,markup.count('<h2'))
-        self.assertEqual(4,markup.count('class="ci-mark ci-'))
+        self.assertNotIn('--ci-track-min',ci)
+        self.assertNotIn('min-width: 44px',ci)
+        markup=_ci_observatory();self.assertEqual(1,markup.count('<h2'))
+        self.assertIn(LUCIDE['workflow'],markup)
+        self.assertIn('Workflow overview',markup);self.assertIn('CI activity',markup)
         self.assertNotIn('<details class="ci-sample-details" open',markup)
-        script = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)[0]
-        ci_js = script[script.index('  const CI_WEEK_GROUPS'):script.index('  function hydrate(d)')]
-        self.assertNotIn('innerHTML',ci_js)
+        script=re.findall(r'<script>(.*?)</script>',render_dashboard(),re.S)[0]
+        ci_js=script[script.index('  const CI_WEEK_GROUPS'):script.index('  function hydrate(d)')]
+        self.assertEqual(1,ci_js.count('innerHTML'),'only trusted canonical icon paths use markup')
+        self.assertIn("CI_ICON_PATHS[group]",ci_js)
         self.assertNotIn('https://api.github.com',ci_js)
-
 
     def test_projection_parity_preserves_unicode_names_and_extreme_valid_dates(self):
         from scripts.pipeline.web_render import render_dashboard
         from scripts.rendering.generate_dashboard_summary import ci_weekly_projection
-        script = re.findall(r"<script>(.*?)</script>", render_dashboard(), re.S)[0]
-        source = script[script.index("  const CI_WEEK_GROUPS"):script.index("  function hydrateCITimeline(")]
-        fixture = {"schema":"profile-ci-timeline/v1","status":"available","window_start":"9999-12-23T12:00:00Z","window_end":"9999-12-31T12:00:00Z","repositories":[{"repository":"example/workflows","status":"available","runs":[{"run_id":1,"created_at":"9999-12-31T12:00:00Z","workflow":"🚀"*100,"outcome":"success"}]}]}
-        harness = r"const fs=require('node:fs'),vm=require('node:vm');const x=JSON.parse(fs.readFileSync(0,'utf8'));process.stdout.write(JSON.stringify(vm.runInNewContext(x.source+'\nciWeeklyProjection(sample);',{sample:x.sample})));"
-        completed = subprocess.run(["node","-e",harness],input=json.dumps({"source":source,"sample":fixture}),capture_output=True,text=True,check=True,timeout=15)
-        value = json.loads(completed.stdout)
-        self.assertEqual(ci_weekly_projection(fixture),value)
-        self.assertEqual(2,len(value["weeks"]))
-        self.assertEqual("🚀"*100,value["repositories"][0]["weeks"][-1]["runs"][0]["workflow"])
+        script=re.findall(r'<script>(.*?)</script>',render_dashboard(),re.S)[0]
+        source=script[script.index('  const CI_WEEK_GROUPS'):script.index('  function hydrateCITimeline(')]
+        sample={'schema':'profile-ci-timeline/v1','owner':'example','status':'available','window_start':'9999-12-23T12:00:00Z','window_end':'9999-12-31T12:00:00Z','repositories':[{'repository':'example/workflows','status':'available','runs':[{'run_id':1,'created_at':'9999-12-31T12:00:00Z','workflow':'🚀'*100,'outcome':'success'}]}]}
+        harness=r"const fs=require('node:fs'),vm=require('node:vm');const x=JSON.parse(fs.readFileSync(0,'utf8'));process.stdout.write(JSON.stringify(vm.runInNewContext(x.source+'\nciWeeklyProjection(sample);',{sample:x.sample})));"
+        completed=subprocess.run(['node','-e',harness],input=json.dumps({'source':source,'sample':sample}),capture_output=True,text=True,check=True,timeout=15)
+        value=json.loads(completed.stdout);self.assertEqual(ci_weekly_projection(sample),value)
+        self.assertEqual(sample['window_start'],value['window_start'])
+        self.assertEqual('🚀'*100,value['repositories'][0]['runs'][0]['workflow'])
 
-    def test_ci_counts_use_shared_caption_type_and_neutral_ink(self):
+    def test_count_foregrounds_stay_legible_in_every_existing_theme(self):
         from scripts.pipeline.web_render import _component_css
-        from scripts.rendering.design_tokens import THEMES, type_scale
+        from scripts.rendering.design_tokens import DEFAULT_THEME,THEMES,type_scale
         from tests.contracts.test_theme_system import _contrast
-        css = _component_css()
-        ci = css[css.index('/* CI repository lanes'):css.index('/* --- language bar')]
-        rule = re.search(r'\.ci-observatory \.ci-mark-count\s*\{([^}]+)', ci)
-        self.assertIsNotNone(rule)
-        count_style = rule.group(1)
-        self.assertIn('color: var(--ink-strong)', count_style,
-                      "Counts use the text role on the panel, never the background role on status fills")
-        self.assertIn('font-size: var(--type-caption)', count_style)
-        self.assertIn('font-weight: var(--type-caption-weight)', count_style)
-        self.assertIn('line-height: var(--type-caption)', count_style)
-        self.assertIn('.ci-outcome-mark { display: flex; flex-direction: column;', ci)
-        self.assertNotRegex(ci, r'\[data-theme=', "One shared component must work for every theme")
-        self.assertIn('border-radius: var(--radius-tile)', ci)
-        self.assertIn('repeat(4,var(--ci-slot-height))', ci)
-        self.assertIn('--ci-slot-height: calc(var(--ci-mark-size) + var(--type-caption) + var(--space-xs))', ci)
-        for name, theme in THEMES.items():
-            self.assertGreaterEqual(type_scale(name)['caption'][0], 12, name)
-            for surface in ('surface', 'surface-raised'):
-                with self.subTest(theme=name, surface=surface):
-                    self.assertGreaterEqual(_contrast(theme['ink-strong'], theme[surface]), 4.5)
+        css=_component_css()
+        for name,theme in THEMES.items():
+            # The default theme is emitted on html as an empty data-theme.
+            selector = '' if name == DEFAULT_THEME else name
+            self.assertGreaterEqual(type_scale(name)['caption'][0],12)
+            for group,background in (('pass','status-success'),('fail','status-danger'),('pending','status-warning'),('other','ink-dim')):
+                match=re.search(r'\[data-theme="'+re.escape(selector)+r'"\] \.ci-bar-segment\.ci-'+group+r' \{ --ci-count-ink: var\(--([^)]*)\)',css)
+                self.assertIsNotNone(match)
+                self.assertGreaterEqual(_contrast(theme[match.group(1)],theme[background]),4.5,(name,group))
+            self.assertGreaterEqual(_contrast(theme['ink-strong'],theme['surface']),4.5)
