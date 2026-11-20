@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -296,10 +296,10 @@ body {
 .ci-observatory .ci-axis { display: grid; grid-template-columns: 180px minmax(0,1fr) 54px; gap: var(--space-lg); color: var(--ink-dim); font-size: var(--type-caption); }
 .ci-observatory .ci-axis-plot { display: flex; justify-content: space-between; }
 .ci-observatory .ci-lane { min-width: 0; border-bottom: 1px solid color-mix(in srgb,var(--hairline) 24%,transparent); }
-.ci-observatory .ci-group { list-style: none; display: grid; grid-template-columns: 180px minmax(0,1fr) 54px; align-items: center; gap: var(--space-lg); min-height: 64px; padding: var(--space-md) 0; border-radius: var(--radius-tile); cursor: pointer; }
+.ci-observatory .ci-group { list-style: none; display: grid; grid-template-columns: 180px minmax(0,1fr) 54px; align-items: center; gap: var(--space-lg); min-height: 64px; padding: var(--space-md) 0; border-radius: var(--radius-tile); cursor: pointer; scroll-margin-block: var(--space-md); }
 .ci-observatory .ci-group::-webkit-details-marker { display: none; }
 .ci-observatory .ci-group:hover { background: color-mix(in srgb,var(--accent) 5%,transparent); }
-.ci-observatory .ci-group:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.ci-observatory .ci-group:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .ci-observatory .ci-identity { display: flex; align-items: baseline; gap: var(--space-xs); min-width: 0; }
 .ci-observatory .ci-repo-name { display: block; color: var(--ink-strong); font-size: var(--type-body); font-weight: 600; overflow-wrap: anywhere; }
 .ci-observatory .ci-private { display: inline-flex; flex: none; align-items: center; color: var(--ink-dim); }

@@ -2,6 +2,90 @@
   "authority_status": "candidate_only",
   "body_scroll_width": 390,
   "cannot_mark_done": true,
+  "ci_count_contrast": {
+    "applicable": true,
+    "document_search": "",
+    "excluded_outside_labels": 2,
+    "excluded_unknown_labels": 0,
+    "inline_label_count": 7,
+    "panel_status": "partial",
+    "reason": "opaque-inline-labels",
+    "samples": [
+      {
+        "background": "rgb(158, 206, 106)",
+        "foreground": "rgb(12, 14, 24)",
+        "group": "pass",
+        "height": 15.9375,
+        "painted": true,
+        "repository": "jguida941/jguida941",
+        "text": "11",
+        "width": 11.640625
+      },
+      {
+        "background": "rgb(247, 118, 142)",
+        "foreground": "rgb(12, 14, 24)",
+        "group": "fail",
+        "height": 15.9375,
+        "painted": true,
+        "repository": "jguida941/jguida941",
+        "text": "7",
+        "width": 6.125
+      },
+      {
+        "background": "rgb(158, 206, 106)",
+        "foreground": "rgb(12, 14, 24)",
+        "group": "pass",
+        "height": 15.9375,
+        "painted": true,
+        "repository": "jguida941/profile-private-continuation",
+        "text": "3",
+        "width": 6.125
+      },
+      {
+        "background": "rgb(247, 118, 142)",
+        "foreground": "rgb(12, 14, 24)",
+        "group": "fail",
+        "height": 15.9375,
+        "painted": true,
+        "repository": "jguida941/profile-private-continuation",
+        "text": "15",
+        "width": 12.25
+      },
+      {
+        "background": "rgb(138, 148, 189)",
+        "foreground": "rgb(12, 14, 24)",
+        "group": "other",
+        "height": 15.9375,
+        "painted": true,
+        "repository": "jguida941/profile-private-continuation",
+        "text": "2",
+        "width": 6.125
+      },
+      {
+        "background": "rgb(158, 206, 106)",
+        "foreground": "rgb(12, 14, 24)",
+        "group": "pass",
+        "height": 15.9375,
+        "painted": true,
+        "repository": "jguida941/dijkstra-dashboard",
+        "text": "2",
+        "width": 6.125
+      },
+      {
+        "background": "rgb(158, 206, 106)",
+        "foreground": "rgb(12, 14, 24)",
+        "group": "pass",
+        "height": 15.9375,
+        "painted": true,
+        "repository": "jguida941/cs499-review",
+        "text": "20",
+        "width": 12.25
+      }
+    ],
+    "storage_status": "read",
+    "stored_theme": null,
+    "theme_attribute": ""
+  },
   "client_width": 390,
   "contract_id": "PageHeadlessDomProbe",
   "horizontal_overflow": false,
@@ -36,12 +120,12 @@
       "contained_by_table_scroll": false,
       "id": "",
       "left": 708.39,
-      "overflow_px": 375.33,
+      "overflow_px": 379.78,
       "position": "static",
-      "right": 765.33,
+      "right": 769.78,
       "scroll_container": null,
       "tag": "a",
-      "width": 56.94
+      "width": 61.39
     },
     {
       "class": "cal",
