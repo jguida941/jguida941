@@ -1401,6 +1401,23 @@ assert(nodes['ci-observatory-note'].textContent.startsWith('Run count unavailabl
         self.assertEqual(sample['window_start'],value['window_start'])
         self.assertEqual('🚀'*100,value['repositories'][0]['runs'][0]['workflow'])
 
+    def test_readme_without_projected_ci_context_stays_unavailable(self):
+        from jinja2 import Environment
+        from tests.contracts.test_dashboard_summary import _weekly_ci_fixture
+        from scripts.rendering.generate_dashboard_summary import ci_weekly_projection
+        model, _ = _profile_headline_model()
+        summary = model["dashboard_summary"]
+        # The valid nonempty carrier must not become an implicit second CI view.
+        summary["ci_timeline"] = _weekly_ci_fixture()
+        self.assertGreater(ci_weekly_projection(summary["ci_timeline"])["observed_runs"], 0)
+        rendered = Environment().from_string((ROOT / "templates/README.md.tpl").read_text()).render(
+            dashboard_summary=summary, legacy_visuals=[])
+        section = rendered.split("### Repository CI sample", 1)[1].split("Recently created:", 1)[0]
+        self.assertIn("unavailable – unavailable UTC", section)
+        self.assertIn("sampled runs · unavailable", section)
+        self.assertNotIn("example/", section)
+        self.assertEqual(2, sum(line.startswith("|") for line in section.splitlines()))
+
     def test_count_foregrounds_stay_legible_in_every_existing_theme(self):
         from scripts.pipeline.web_render import _component_css
         from scripts.rendering.design_tokens import DEFAULT_THEME,THEMES,type_scale

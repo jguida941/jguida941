@@ -234,6 +234,11 @@ jobs:
           out = Path(tempfile.mkdtemp(prefix='profile-candidate-preview-', dir=os.environ['RUNNER_TEMP']))
           with open(os.environ['GITHUB_ENV'], 'a') as env:
               env.write('CANDIDATE_PREVIEW_OUTPUT=' + str(out) + '\n')
+          (out/'attempt.json').write_text(json.dumps({
+              'authority_status': 'candidate_only', 'capture_status': 'incomplete',
+              'head': head, 'tree': tree, 'run_id': os.environ['GITHUB_RUN_ID'],
+              'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+          }, indent=2) + '\n')
           def digest(path):
               return hashlib.sha256(Path(path).read_bytes()).hexdigest()
           snapshot_path = root / 'site/data/profile_snapshot.json'
@@ -255,6 +260,7 @@ jobs:
               'templates/README.md.tpl')}
           identity = {
               'authority_status': 'candidate_only', 'source_kind': 'github-api',
+              'capture_status': 'incomplete',
               'publication_subject': decision.subject, 'publication_state': decision.state,
               'artifact_set_written': True, 'head': head, 'tree': tree,
               'run_id': os.environ['GITHUB_RUN_ID'], 'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
@@ -266,19 +272,24 @@ jobs:
               'playwright': importlib.metadata.version('playwright'),
               'launch_args': ['--allow-file-access-from-files'], 'records': [],
           }
+          (out/'preview.json').write_text(json.dumps(identity,indent=2)+'\n')
           preview_files = []
-          def capture(page, locator, name, width, theme, source_path, observations):
+          def capture(page, locator, name, width, theme, source_path, observations, *, clip=None):
               path = out / name
-              if locator is None:
+              if clip is not None:
+                  page.screenshot(path=str(path), clip=clip)
+              elif locator is None:
                   page.screenshot(path=str(path), full_page=True)
               else:
                   locator.screenshot(path=str(path))
               row = {'path': name, 'sha256': digest(path), 'bytes': path.stat().st_size,
                      'viewport': {'width': width, 'height': 1000}, 'device_scale_factor': 1,
                      'theme': theme, 'source_path': str(source_path.relative_to(root)),
-                     'source_sha256': digest(source_path), 'observations': observations}
+                     'source_sha256': digest(source_path), 'observations': observations,
+                     'clip': clip}
               identity['records'].append(row)
               preview_files.append(path)
+              (out/'preview.json').write_text(json.dumps(identity,indent=2)+'\n')
 
           with sync_playwright() as driver:
               browser = driver.chromium.launch(executable_path=str(chrome), headless=True,
@@ -380,12 +391,19 @@ jobs:
                       'nodes=>nodes.map(n=>({repository:n.dataset.repository,count:n.hasAttribute("data-observed-runs")?Number(n.dataset.observedRuns):null}))')
                   assert {r['repository']:r['count'] for r in rows}=={
                       k:v['observed_runs'] for k,v in expected_rows.items()}, rows
-                  capture(page,None,f'svg-{width}.png',width,'canonical SVG',source,{'rows':rows})
+                  # A direct SVG document timed out in Chrome's full-page capture.
+                  # Capture its measured bounds with the existing explicit-clip route.
+                  svg_box=page.locator('svg').evaluate('''n=>{const b=n.getBoundingClientRect();
+                    return {x:b.x,y:b.y,width:b.width,height:b.height};}''')
+                  assert svg_box['x']>=0 and svg_box['y']>=0 and svg_box['height']>0
+                  assert abs(svg_box['width']-width)<=1, svg_box
+                  capture(page,None,f'svg-{width}.png',width,'canonical SVG',source,{'rows':rows},clip=svg_box)
                   capture(page,panel,f'ci-svg-{width}.png',width,'canonical SVG',source,{'rows':rows})
                   page.close()
               browser.close()
           identity['canonical_receipts']=[{'path':str(p.relative_to(root)),'sha256':digest(p),
               'provenance_sha256':digest(receipts.provenance_path(p))} for p in canonical_receipts]
+          identity['capture_status']='complete'
           (out/'preview.json').write_text(json.dumps(identity,indent=2)+'\n')
           print(json.dumps({'head':head,'chrome':chrome_version,'captures':len(identity['records']),
                             'state':'UNACCEPTED_CANDIDATE_PREVIEW','output':str(out)}))
@@ -405,6 +423,7 @@ jobs:
           from scripts.contracts import PROFILE_ARTIFACT_PATHS
           from scripts.quality.headless_receipts import provenance_path
           root=Path.cwd();out=Path(os.environ['CANDIDATE_PREVIEW_OUTPUT'])
+          assert json.loads((out/'preview.json').read_text())['capture_status']=='complete'
           canonical=[root/name for name in PROFILE_ARTIFACT_PATHS]
           canonical += [root/'site/index.html',root/'site/assets/dashboard_summary.svg',root/'site/assets/dashboard_summary_mobile.svg']
           receipts=[root/'assets/receipts/pages/index'/name for name in
@@ -421,6 +440,7 @@ jobs:
           (out/'artifact-inventory.json').write_text(json.dumps(inventory,indent=2)+'\n')
           PY_PACKAGE
       - name: Retain unaccepted candidate outputs and original browser evidence
+        if: ${{ always() && env.CANDIDATE_PREVIEW_OUTPUT != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: profile-candidate-preview-${{ github.run_id }}-${{ github.run_attempt }}

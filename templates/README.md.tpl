@@ -97,8 +97,8 @@ Selection: {{ code.get('selection', {}).get('status', 'unavailable') }} · {{ co
 
 ### Repository CI sample
 
-{% set ci = ci_activity %}
-{{ (ci.get('window_start') or 'unavailable')[:10] }} – {{ (ci.get('window_end') or 'unavailable')[:10] }} UTC · sampled runs · {{ ci.get('status', 'unavailable') | e }}. Personal repositories only; the last UTC date is partial. Counts reflect this saved display window, not complete workflow history. [CI activity details]({{ dashboard_url }}#ci-observatory).
+{% set ci = ci_activity | default({}) %}
+{{ ci.get('window_start')[:10] if ci.get('window_start') else 'unavailable' }} – {{ ci.get('window_end')[:10] if ci.get('window_end') else 'unavailable' }} UTC · sampled runs · {{ ci.get('status', 'unavailable') | e }}. Personal repositories only; the last UTC date is partial. Counts reflect this saved display window, not complete workflow history. [CI activity details]({{ dashboard_url }}#ci-observatory).
 
 | Repository | Observed runs | Qualification |
 | --- | ---: | --- |
