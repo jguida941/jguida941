@@ -95,6 +95,16 @@ Last 30 days · {{ (analytics.get('window_start') or 'unavailable')[:10] }} – 
 
 Selection: {{ code.get('selection', {}).get('status', 'unavailable') }} · {{ code.get('selection', {}).get('reason', 'coverage unknown') | e }}. History: {{ code.get('history', {}).get('status', 'unavailable') }}. Missing history is not zero.
 
+### Repository CI sample
+
+{% set ci = ci_activity | default({}) %}
+{{ ci.get('window_start')[:10] if ci.get('window_start') else 'unavailable' }} – {{ ci.get('window_end')[:10] if ci.get('window_end') else 'unavailable' }} UTC · sampled runs · {{ ci.get('status', 'unavailable') | e }}. Personal repositories only; the last UTC date is partial. Counts reflect this saved display window, not complete workflow history. [CI activity details]({{ dashboard_url }}#ci-observatory).
+
+| Repository | Observed runs | Qualification |
+| --- | ---: | --- |
+{% for row in ci.get('repositories', []) %}| [{{ row.repository | e }}](https://github.com/{{ row.repository | e }}) | {{ row.observed_runs if row.observed_runs is not none else 'unavailable' }} | {{ row.status | e }} |
+{% endfor %}
+
 Recently created:
 {% for row in dashboard_summary.recent_created %}- {{ row.name | e }} — {{ row.created_at | default('Date unavailable') | e }}
 {% else %}- No recent creations observed.

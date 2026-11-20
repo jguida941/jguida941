@@ -403,7 +403,10 @@ def render_readme(model: dict, logger=print, *, generation: dict | None = None) 
         ("Languages", "assets/lang_breakdown.svg"), ("Rhythm", "assets/activity_heatmap.svg"),
         ("Projects", "assets/repo_spotlight.svg"), ("Snapshot", "assets/raw_snapshot.svg"),
     ]
+    from scripts.rendering.generate_dashboard_summary import ci_weekly_projection
+    ci_activity = ci_weekly_projection(public_summary.get("ci_timeline"))
     readme = template.render(
+        ci_activity=ci_activity,
         dashboard_summary=public_summary,
         legacy_visuals=legacy_visuals,
         username=model["dashboard_data"]["username"],

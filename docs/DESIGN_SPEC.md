@@ -409,59 +409,94 @@ The static README panels show the same first eight repositories and fourteen dat
 with branches collapsed. An ordinary **Project activity details** link after the
 summary picture opens the website's Project activity section.
 
-### CI-REPO-TIMELINE-02: accepted repository lanes (2026-11-19)
+### CI-REPO-TIMELINE-02: personal two-week CI activity (2026-11-19)
 
-The user's current screenshot is the visual authority: retain horizontal repository
-lanes, a dated time axis, and outcome dots/shapes. The user explicitly deferred
-alternative CI designs; a boxed weekly heatmap or other redesign requires a future
-visual discussion. This revision supersedes the candidate public-only, one-dot-per-run
-layout and the historical private daily-grid/detail-suppression view.
+The latest operator direction replaces the earlier dated weekly lanes with compact
+horizontal stacked bars. Website and README SVG share one personal-repository view
+of the saved `ci_timeline` carrier. The underlying collector retains its admitted
+personal and organization data; organization presentation is a separate future
+section. This change does not alter collection, privacy, other cards or themes.
 
-Both README SVG sizes and the visible website CI panel project `ci_timeline` from
-the same saved snapshot. The website keeps its live overview, Builder Scorecard,
-CI Workflow Timeline, then weekly contributions. The SVG timeline follows Workflow
-configuration and precedes Currently Working On. There is one website CI panel;
-the old profile-repository-only execution panel is not a second visible source.
+The display covers fourteen UTC calendar dates, including the partial final date,
+ending at the saved carrier cutoff. Its start is the later of carrier start and
+UTC midnight thirteen dates before that cutoff. A shorter carrier stays qualified.
+Never substitute the build clock. Require a valid carrier owner and match the exact
+case-insensitive owner component after canonical identity admission. Preserve stable
+repository/run deduplication, interval boundaries, safe canonical links and every
+qualified outcome. Unavailable stays null; observed empty and an observed sample
+with no runs inside the display window remain distinct.
 
-A repository lane retains its full owner/name and stable repository identity. Private
-lanes have a lock and text label. The user explicitly authorized public presentation
-of private repository names, workflow names, run dates, outcomes, IDs, and run links.
-No workflow content, logs, credentials, branch names, or run payloads enter this view.
-The presentation accepts all identities admitted by the carrier, including canonical
-organization and renamed/transferred repositories; it does not rediscover or filter
-repositories by the profile owner's name.
+One repository row contains its name and private identity, a horizontal outcome
+stack, and an exact total. All rows share the absolute extent
+`max(valid sample_limit_per_repo, largest observed row total)`; an unspecified limit
+uses the largest observed row. A two-run row uses 2/20 of a twenty-run scale. Do not
+normalize each row to full width, clip larger counts or invent a denominator when
+no positive scale exists. Empty rail is transparent unused scale, not an outcome.
+Do not paint unused scale as a dark segment. The personal owner is not repeated
+visibly on each row; full canonical identity stays accessible and in data/link
+bindings. A lock precedes private repository names, without a redundant visible
+Private label.
 
-Colliding runs are grouped into consecutive seven-day UTC intervals anchored at
-`window_start`. Each interval is start-inclusive/end-exclusive; only the final
-interval includes `window_end`. The current 84-day sample has twelve positions.
-The complete supported 7..365-day range derives its group count from the declared
-span; longer static timelines use continuation tracks of at most twelve positions.
-The web timeline scrolls inside its own bounded container with an explicit affordance.
+Passed means success. Failed includes failure, timed_out and startup_failure.
+Pending includes queued, in_progress and action_required. The known gray segment
+names its actual cancelled/skipped/neutral/stale subtypes in stable order and
+retains their exact breakdown. Unknown has its own labeled non-success segment;
+it never shares known gray or success. The bottom legend is the single chart key,
+using filled color dots and literal labels; Unknown uses an outlined dot. Header
+totals retain the existing neutral outline icons, like the profile summary card.
+Color supplements literal labels and accessible descriptions.
+Numerals remain at least11px; if a segment is too narrow, put its exact count outside
+without inflating its width. Theme foregrounds derive from existing semantic roles
+and keep readable contrast on every current status fill.
 
-Each nonempty interval shows exact category counts in separate, vertically spaced
-outcome marks: Passed uses a circle; Failed a square; Pending a triangle; Other a
-diamond. Success is Passed; failure, timed_out and startup_failure are Failed;
-queued, in_progress and action_required are Pending; cancelled, skipped, neutral,
-stale and unknown are Other. Unknown never inherits success. Color supplements the
-shapes. A mixed passed/failed interval retains both counts. Empty intervals have no
-invented run or zero-total claim. Repository rows distinguish `Unavailable`,
-`No runs returned`, and `No runs observed in window` for a successful but clipped
-sample. Partial/truncated observations remain qualified.
+The same 4.5:1 floor applies on the initial document without a theme query or saved
+preference. The generated root initializes the existing empty default-theme
+attribute before scripts run. The actual index Chrome probe records raw computed
+ink and opaque fill colors, rendered label identities, count coverage, initial
+theme/search/storage context and finite painted bounds. Its receiving predicate
+recomputes the ratio and refuses missing, malformed, duplicate, hidden or
+low-contrast measurements. Unknown transparent fills and outside labels are
+explicit exclusions from this narrow opaque-inline-count check; zero applicable
+labels is recorded as non-applicable, never a contrast pass. These current page
+receipts do not promote deferred profile-engine color/chart conformance.
 
-The SVG has three axis labels at phone width, wrapped repository labels above each
-track, exact UTC interval bounds and original run details in titles, and a short
-sample-count footer. The website has native controls of at least 44 by 44 pixels,
-visible keyboard focus, and a selected-group list containing each actual workflow,
-original timestamp, outcome, ID, and canonical GitHub run link for that repository
-and interval. Names and details wrap; only the timeline may scroll horizontally.
-The sample limit comes from `sample_limit_per_repo`; longer qualifications and the
-exact observed/window times stay in collapsed Sampling details. Neither view turns
-a bounded sample into a success rate or an account-wide completeness claim.
+A compact CI activity header uses the existing canonical Lucide icon family, theme
+tokens, type hierarchy and metric spacing. On desktop, the neutral workflow icon,
+title and Workflow runs and results subtitle sit left of a vertical divider; the
+neutral outcome icons, counts and labels sit to the right. On phones the title and
+summary stack, with two metric columns. The saved ISO date range and UTC, sample
+total, personal repository count, qualification and colored-dot legend form the
+wrapping bottom footer. All values and outcome readouts derive
+from the same personal projection as the bars and are observations, never constants.
+No all-owner total may appear over personal rows. Keep partial sample meaning in the
+footer and exact cutoff/final-date incompleteness in Sampling details and SVG
+descriptions. Do not repeat a navigation instruction or generic sample sentence in
+the chart footer. Repository selection is profile-first, followed by latest-push
+ordering from the collector's admitted inventory; it has no recent-push age cutoff.
+Small counts outside website bars use the shared primary text role. Expanded row
+context has spacing below the visible keyboard focus outline.
 
-Pure Python and JavaScript projections are checked against the same adversarial
-fixture. Current guards conserve IDs and category counts, include private and
-organization rows, deduplicate stable identities, retain boundary runs, reject
-out-of-window/malformed identities, preserve every outcome subtype in detail, and
-clear previous controls on unavailable refresh. Real populated Chrome screenshots
-at desktop and 390px, plus SVG 840/360 crops and element bounds, remain required;
-unit checks do not certify visual acceptance.
+The website uses native per-repository details/summary, closed initially, with
+visible keyboard focus and at least44px targets. Expansion exposes exact workflow,
+UTC timestamp, raw outcome, run ID and canonical run link. Opening another repository
+closes the previous one; unavailable refresh clears old details. Static SVG has no
+fake interactive caret. An ordinary README CI activity details link opens the website.
+The README textual Repository CI sample table consumes the same `ci_activity`
+projection argument instead of interpreting the raw carrier again.
+
+Phone identity labels move above the bar, with total/caret aligned right. Bars and
+labels fit the actual360px SVG /390px page without body overflow. Desktop rows are
+about64px unless names require wrapping. Round only the shared outer rail contour;
+segment widths still express exact counts. Preserve page section order and all
+unrelated source facts.
+
+Current tests retain Python/JavaScript parity, nonzero and unknown controls,
+canonical identity, privacy and wrong-fix discrimination. Named personal-projection
+and shared-composition native successors retain the immutable earlier witnesses.
+The current browser route measures native open → close → keyboard reopen, exact run
+membership, true1280/390 viewport, labels, clipping, all theme views and full parent
+plus CI screenshots. A nonoverflowing compact rail may remain at scrollLeft0;
+actual overflowing rails still owe scoped motion while body scroll remains0.
+Actual populated Chrome/Safari observations, canonical generated output receipts,
+SVG840/360 pixel review, independent review and operator visual acceptance remain
+required. Ordinary tests and provisional pixels do not establish those outcomes.

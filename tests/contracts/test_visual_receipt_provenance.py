@@ -231,10 +231,10 @@ function measure(change) {
     getBoundingClientRect() { return {left:740.91,right:798.75,width:57.84,height:23.1875}; },
     style:{display:"inline",visibility:"visible",position:c.position}};
   const output = {textContent:""}, listeners = {};
-  const doc = {body:{scrollWidth:390},documentElement:{clientWidth:390,scrollWidth:390},
-    fonts:{status:"loaded"},getElementById() { return {textContent:""}; },
-    querySelectorAll(selector) { return selector === "#cal i" ? Array(365).fill({}) : [parent,child]; }};
-  const frame = {contentDocument:doc,contentWindow:{getComputedStyle(el) { return el.style; }},
+  const doc = {body:{scrollWidth:390},documentElement:{clientWidth:390,scrollWidth:390,getAttribute() {return null;}},
+    fonts:{status:"loaded"},getElementById(id) { return id === "calendar-status" ? {textContent:""} : null; },
+    querySelectorAll(selector) { return selector === "#cal i" ? Array(365).fill({}) : selector === "*" ? [parent,child] : []; }};
+  const frame = {contentDocument:doc,contentWindow:{getComputedStyle(el) { return el.style; },location:{search:""}},
     addEventListener(name, callback) { listeners[name] = callback; }};
   const outer = {documentElement:{innerHTML:""},
     getElementById(id) { return id === "target" ? frame : output; }};
@@ -306,10 +306,10 @@ const fs = require("node:fs"), vm = require("node:vm");
 const script = JSON.parse(fs.readFileSync(0, "utf8"));
 const pending = [], listeners = {}, output = {textContent: ""};
 const status = {textContent: "Loading contribution calendar…"}, fonts = {status: "loaded"};
-const doc = {body: {scrollWidth: 390}, documentElement: {clientWidth: 390, scrollWidth: 390},
+const doc = {body: {scrollWidth: 390}, documentElement: {clientWidth: 390, scrollWidth: 390, getAttribute() {return null;}},
   fonts, getElementById(id) { return id === "calendar-status" ? status : null; },
   querySelectorAll(selector) { return selector === "#cal i" ? Array(365).fill({}) : []; }};
-const frame = {contentDocument: doc, contentWindow: {getComputedStyle() { return {}; }},
+const frame = {contentDocument: doc, contentWindow: {getComputedStyle() { return {}; }, location: {search: ""}},
   addEventListener(name, callback) { listeners[name] = callback; }};
 const outer = {documentElement: {innerHTML: ""},
   getElementById(id) { return id === "target" ? frame : output; }};
@@ -338,6 +338,62 @@ process.stdout.write(JSON.stringify({whileLoading, whileFontsLoad,
             "calendar_status": "", "calendar_cell_count": 365, "fonts_status": "loaded",
         }, observed["result"]["index_hydration"])
         self.assertEqual(390, observed["result"]["client_width"])
+
+
+class InitialCIContrastReceiptContract(unittest.TestCase):
+    """DESIGN_SPEC Part 2/CI-REPO-TIMELINE-02: consume measured count colors."""
+
+    def facts(self):
+        return {"ci_count_contrast": {
+            "theme_attribute": "", "document_search": "", "stored_theme": None,
+            "storage_status": "read", "panel_status": "partial", "inline_label_count": 1,
+            "excluded_unknown_labels": 0, "excluded_outside_labels": 0,
+            "applicable": True, "reason": "opaque-inline-labels", "samples": [{
+                "repository": "example/project", "group": "pass", "text": "11",
+                "foreground": "rgb(12, 14, 24)", "background": "rgb(158, 206, 106)",
+                "painted": True, "width": 12, "height": 14,
+            }],
+        }}
+
+    def test_recomputes_contrast_and_rejects_original_inherited_ink(self):
+        from scripts.quality.headless_receipts import validate_ci_count_contrast
+        data = self.facts()
+        self.assertGreater(validate_ci_count_contrast(data)[0], 10)
+        data["ci_count_contrast"]["theme_attribute"] = None
+        data["ci_count_contrast"]["samples"][0]["foreground"] = "rgb(192, 202, 245)"
+        data["ci_count_contrast"]["samples"][0]["claimed_ratio"] = 21
+        with self.assertRaisesRegex(ValueError, "below 4.5:1"):
+            validate_ci_count_contrast(data)
+
+    def test_missing_malformed_hidden_and_incomplete_facts_refuse(self):
+        from copy import deepcopy
+        from scripts.quality.headless_receipts import validate_ci_count_contrast
+        with self.assertRaises(ValueError):
+            validate_ci_count_contrast({})
+        for field, value in (("foreground", "rgb(NaN,0,0)"), ("background", "rgba(1,2,3,0.5)"),
+                             ("foreground", "rgb(256,0,0)"), ("painted", False),
+                             ("width", 0), ("height", float("nan"))):
+            data = self.facts(); data["ci_count_contrast"]["samples"][0][field] = value
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                validate_ci_count_contrast(data)
+        for field, value in (("samples", []), ("inline_label_count", 0),
+                             ("document_search", "?theme=liquid-glass"), ("stored_theme", "carbon")):
+            data = self.facts(); data["ci_count_contrast"][field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                validate_ci_count_contrast(data)
+        data = self.facts()
+        data["ci_count_contrast"]["samples"] *= 2
+        data["ci_count_contrast"]["inline_label_count"] = 2
+        with self.assertRaisesRegex(ValueError, "duplicate"):
+            validate_ci_count_contrast(data)
+
+    def test_empty_unavailable_and_unknown_only_are_not_contrast_passes(self):
+        from scripts.quality.headless_receipts import validate_ci_count_contrast
+        for state, unknown in (("empty", 0), ("unavailable", 0), ("available", 2)):
+            data = self.facts()
+            data["ci_count_contrast"].update(panel_status=state, inline_label_count=0,
+                samples=[], applicable=False, reason="no-opaque-inline-labels", excluded_unknown_labels=unknown)
+            self.assertEqual([], validate_ci_count_contrast(data))
 
 class ReceiptProvenanceContract(unittest.TestCase):
     def test_obligation_kinds_name_their_actual_producer(self):
@@ -465,6 +521,8 @@ class ReceiptProvenanceContract(unittest.TestCase):
             self.assertEqual(data["client_width"], 390,
                              f"{page}: the probe must MEASURE 390, not merely claim it")
             if page == "index":
+                from scripts.quality.headless_receipts import validate_ci_count_contrast
+                validate_ci_count_contrast(data)
                 hydration = data.get("index_hydration", {})
                 self.assertIsInstance(hydration.get("calendar_status"), str)
                 self.assertFalse(hydration["calendar_status"].startswith("Loading contribution calendar"))
@@ -472,6 +530,10 @@ class ReceiptProvenanceContract(unittest.TestCase):
                 self.assertIsInstance(hydration.get("calendar_cell_count"), int)
                 self.assertGreaterEqual(hydration["calendar_cell_count"], 0)
             probe_sidecar = json.loads(provenance_path(probe).read_text(encoding="utf-8"))
+            if page == "index":
+                self.assertEqual(probe_sidecar.get("producer_sha256"), hashlib.sha256(
+                    (ROOT / "scripts/quality/headless_receipts.py").read_bytes()).hexdigest(),
+                    "Current CI color facts must come from the current genuine-browser producer")
             self.assertEqual(probe_sidecar["kind"], DOM_PROBE_KIND)
             self.assertIn("--headless=new", probe_sidecar["command"])
             self.assertEqual(probe_sidecar["page_sha256"], page_sha,

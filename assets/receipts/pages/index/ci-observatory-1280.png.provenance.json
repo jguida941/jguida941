@@ -1,0 +1,29 @@
+{
+  "artifact": "assets/receipts/pages/index/ci-observatory-1280.png",
+  "authority_status": "candidate_only",
+  "cannot_mark_done": true,
+  "chrome_version": "Google Chrome 157.0.8103.78",
+  "command": [
+    "/usr/bin/google-chrome",
+    "--headless=new",
+    "--no-first-run",
+    "--no-default-browser-check",
+    "--hide-scrollbars",
+    "--window-size=1280,1536",
+    "--allow-file-access-from-files",
+    "--virtual-time-budget=3500",
+    "--screenshot=/home/runner/work/jguida941/jguida941/assets/receipts/pages/index/ci-observatory-1280.png",
+    "file:///tmp/ci-focus-knp0bk3k/focus.html"
+  ],
+  "contract_id": "PageHeadlessReceiptProvenance",
+  "kind": "chrome-headless-screenshot",
+  "page": "index",
+  "page_sha256": "75a97ec9e3f95b166c52e0e22844dba6ca72a2e9fb17a2920ad4098380994f99",
+  "producer": "scripts/quality/headless_receipts.py",
+  "producer_sha256": "e55b3d21fd82233fc8a0b9b45434a888627fac886bb9a50ad19450fcad3dc713",
+  "route": "site/index.html",
+  "viewport": {
+    "height": 1536,
+    "width": 1280
+  }
+}
