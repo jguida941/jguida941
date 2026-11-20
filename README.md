@@ -5,34 +5,34 @@
 
 </div>
 
-<a href="https://jguida941.github.io/jguida941/?from_snapshot=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e#overview">
+<a href="https://jguida941.github.io/jguida941/?from_snapshot=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d#overview">
 <picture>
-  <source media="(max-width: 767px)" srcset="assets/dashboard_summary_mobile.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e">
-  <img src="assets/dashboard_summary.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e" width="100%" alt="GitHub profile analytics: contributions, workflow configuration, code changes, project activity by repository and UTC day, recent repository pushes, language composition and projects. Exact values and definitions below.">
+  <source media="(max-width: 767px)" srcset="assets/dashboard_summary_mobile.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d">
+  <img src="assets/dashboard_summary.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d" width="100%" alt="GitHub profile analytics: contributions, workflow configuration, code changes, project activity by repository and UTC day, recent repository pushes, language composition and projects. Exact values and definitions below.">
 </picture>
 </a>
 
-[Weekly trend](https://jguida941.github.io/jguida941/?from_snapshot=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e#weekly-contributions) · [Calendar](https://jguida941.github.io/jguida941/?from_snapshot=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e#calendar-panel) · [Weekday totals](https://jguida941.github.io/jguida941/?from_snapshot=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e#rhythm-panel) · [Languages](https://jguida941.github.io/jguida941/?from_snapshot=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e#languages) · [Workflow configuration](https://jguida941.github.io/jguida941/?from_snapshot=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e#automation) · [Project activity details](https://jguida941.github.io/jguida941/?from_snapshot=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e#project-activity)
+[Weekly trend](https://jguida941.github.io/jguida941/?from_snapshot=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d#weekly-contributions) · [Calendar](https://jguida941.github.io/jguida941/?from_snapshot=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d#calendar-panel) · [Weekday totals](https://jguida941.github.io/jguida941/?from_snapshot=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d#rhythm-panel) · [Languages](https://jguida941.github.io/jguida941/?from_snapshot=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d#languages) · [Workflow configuration](https://jguida941.github.io/jguida941/?from_snapshot=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d#automation) · [Project activity details](https://jguida941.github.io/jguida941/?from_snapshot=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d#project-activity)
 
 <details>
 <summary>Read the numbers and definitions</summary>
 
-Reported inventory means its completeness and freshness are unverified. Repository push dates and reported headlines are independent observations, with no inferred branch or delivery status. Snapshot 2026-11-20T03:47:19.642831Z.
+Reported inventory means its completeness and freshness are unverified. Repository push dates and reported headlines are independent observations, with no inferred branch or delivery status. Snapshot 2026-11-20T04:24:34.816950Z.
 
 Contributions and calendar use one unfiltered GitHub profile response, including eligible private and organization activity. The total is GitHub's reported total; weekly and weekday charts sum the returned day counts. Values reflect the update time.
 
 | Metric | Value | Population / period | Qualification |
 | --- | ---: | --- | --- |
-| Contributions | 13,725 | github user contributions visible to provider; 2025-11-16T05:00:00Z – 2026-11-20T04:59:59Z |  |
-| contributions | 13,725 | github contribution calendar visible to provider; 2025-11-16 – 2026-11-19 · GitHub | Last date may be in progress |
-| public repos | 57 | public owned including forks; Observed 2026-11-20T03:45:04.641806Z |  |
-| public non-fork repos | 56 | public owned nonfork profile included; Observed 2026-11-20T03:45:04.641806Z |  |
-| private owned repos | 200 | private owned including forks; Observed 2026-11-20T03:45:04.641806Z |  |
-| stargazers | 60 | public owned nonfork; Observed 2026-11-20T03:45:04.641806Z |  |
-| public forks | 1 | public owned forks; Observed 2026-11-20T03:45:04.641806Z |  |
+| Contributions | 13,738 | github user contributions visible to provider; 2025-11-16T05:00:00Z – 2026-11-20T04:59:59Z |  |
+| contributions | 13,738 | github contribution calendar visible to provider; 2025-11-16 – 2026-11-19 · GitHub | Last date may be in progress |
+| public repos | 57 | public owned including forks; Observed 2026-11-20T04:22:25.521718Z |  |
+| public non-fork repos | 56 | public owned nonfork profile included; Observed 2026-11-20T04:22:25.521718Z |  |
+| private owned repos | 200 | private owned including forks; Observed 2026-11-20T04:22:25.521718Z |  |
+| stargazers | 60 | public owned nonfork; Observed 2026-11-20T04:22:25.521718Z |  |
+| public forks | 1 | public owned forks; Observed 2026-11-20T04:22:25.521718Z |  |
 | Public commits | 8,747 | owned public nonfork repositories; returned repository history |  |
-| Merged PRs | 187 | authored pull requests visible to primary pr search; 2025-11-20T05:00:00Z – 2026-11-20T03:44:13Z |  |
-| Releases · 30 days | 3 | owned public nonfork repositories; 2026-10-21T04:00:00Z – 2026-11-20T03:44:10Z |  |
+| Merged PRs | 189 | authored pull requests visible to primary pr search; 2025-11-20T05:00:00Z – 2026-11-20T04:21:32Z |  |
+| Releases · 30 days | 3 | owned public nonfork repositories; 2026-10-21T04:00:00Z – 2026-11-20T04:21:30Z |  |
 | active repos | 7 | owned public private nonfork profile included; last 7 days |  |
 | active repos | 7 | observed recent repositories with verified profile refreshes removed; last 7 days | Partial |
 | languages | 35 | owned public private nonfork profile included; observed repository HEADs |  |
@@ -63,7 +63,7 @@ Owned public + private nonfork repositories; profile included. GitHub workflow c
 | 2026-10-26 – 2026-11-01 | 229 | Complete |
 | 2026-11-02 – 2026-11-08 | 351 | Complete |
 | 2026-11-09 – 2026-11-15 | 495 | Complete |
-| 2026-11-16 – 2026-11-19 | 179 | Partial |
+| 2026-11-16 – 2026-11-19 | 192 | Partial |
 
 
 Counts reported by the GitHub contribution calendar. Private contributions are included only when returned; no public/private split or coding hours are inferred. These bars show contribution totals, not daily averages. Weekdays may occur a different number of times in this date window.
@@ -73,7 +73,7 @@ Counts reported by the GitHub contribution calendar. Private contributions are i
 | Mon | 1,595 | 53 |
 | Tue | 1,757 | 53 |
 | Wed | 1,955 | 53 |
-| Thu | 2,375 | 53 |
+| Thu | 2,388 | 53 |
 | Fri | 1,944 | 52 |
 | Sat | 2,034 | 52 |
 | Sun | 2,065 | 53 |
@@ -490,7 +490,7 @@ Counts reported by the GitHub contribution calendar. Private contributions are i
 | 2026-11-16 | 63 |
 | 2026-11-17 | 37 |
 | 2026-11-18 | 24 |
-| 2026-11-19 | 55 |
+| 2026-11-19 | 68 |
 
 
 </details>
@@ -499,8 +499,8 @@ Counts reported by the GitHub contribution calendar. Private contributions are i
 <details>
 <summary>Repository details and project links</summary>
 
-- [jguida941](https://github.com/jguida941/jguida941) — Python; public; repository pushed 2026-11-20T03:42:53Z. Reported headline: Enforce the initial theme and measured CI count contrast.
-- [profile-private-continuation](https://github.com/jguida941/profile-private-continuation) — Python; private; repository pushed 2026-11-20T02:44:17Z. Reported headline: Check canonical Mac subject paths without relaxing provider identity.
+- [jguida941](https://github.com/jguida941/jguida941) — Python; public; repository pushed 2026-11-20T04:20:50Z. Reported headline: Receive compact CI presentation and enforce the fresh default theme.
+- [profile-private-continuation](https://github.com/jguida941/profile-private-continuation) — Python; private; repository pushed 2026-11-20T04:04:03Z. Reported headline: Check canonical Mac subject paths without relaxing provider identity.
 - [dijkstra-dashboard](https://github.com/jguida941/dijkstra-dashboard) — Python; public; repository pushed 2026-11-19T17:38:34Z. Reported headline: Merge pull request #5 from jguida941/feat/classroom-theme-and-launcher.
 - [cs499-review](https://github.com/jguida941/cs499-review) — Python; private; repository pushed 2026-11-16T00:26:30Z. Reported headline: Merge PR #19: record received dashboard baseline and next work.
 - [cs320-orig-contact-service](https://github.com/jguida941/cs320-orig-contact-service) — Java; private; repository pushed 2026-11-13T18:45:45Z. Reported headline: Merge pull request #15 from jguida941/cs499/issue-13-pit-fallback.
@@ -533,9 +533,9 @@ Recent Updates:
 Last 30 days · 2026-10-22 – 2026-11-20 UTC; today is partial. Inspected 10 of 10 eligible recently pushed repositories.
 
 
-Latest observed pushed branch: jguida941/jguida941 · refs/heads/work/overview-publication-20261119 · [ec214b04498ff68f36ab53ff0c20993438b44118](https://github.com/jguida941/jguida941/commit/ec214b04498ff68f36ab53ff0c20993438b44118).
+Latest observed pushed branch: jguida941/jguida941 · refs/heads/main · [d4d1f0fbf03c25ca1c48a7ebbd649781007067a2](https://github.com/jguida941/jguida941/commit/d4d1f0fbf03c25ca1c48a7ebbd649781007067a2).
 
-274375 additions · 261448 deletions · observed / partial. 849 of 849 observed non-merge commits have line stats; 31 merges excluded. Summed non-merge commit line changes reachable from the selected head, not net tree size or all branches.
+276676 additions · 263712 deletions · observed / partial. 852 of 852 observed non-merge commits have line stats; 33 merges excluded. Summed non-merge commit line changes reachable from the selected head, not net tree size or all branches.
 
 | UTC date | Additions | Deletions |
 | --- | ---: | ---: |
@@ -568,7 +568,7 @@ Latest observed pushed branch: jguida941/jguida941 · refs/heads/work/overview-p
 | 2026-11-17 | 9881 | 11468 |
 | 2026-11-18 | 4832 | 4871 |
 | 2026-11-19 | 15451 | 10185 |
-| 2026-11-20 | 5043 | 4450 |
+| 2026-11-20 | 7344 | 6714 |
 
 
 Selection: partial · activity_incomplete. History: ok. Missing history is not zero.
@@ -606,27 +606,27 @@ Recently created:
 
 These compatibility images retain their existing presentation.
 
-<img src="assets/raw_snapshot.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e" width="100%" alt="Raw Snapshot: the generated profile metric values and their qualifications.">
+<img src="assets/raw_snapshot.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d" width="100%" alt="Raw Snapshot: the generated profile metric values and their qualifications.">
 
-- [Overview](metrics.general.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Streaks](assets/streak_summary.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Badges](assets/badges.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Scorecard](assets/builder_scorecard.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Cadence](assets/engineering_cadence.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Calendar](assets/contribution_calendar.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Focus](assets/now_next_shipped.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Recent work](assets/currently_working.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Languages](assets/lang_breakdown.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Rhythm](assets/activity_heatmap.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Projects](assets/repo_spotlight.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
-- [Snapshot](assets/raw_snapshot.svg?v=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e)
+- [Overview](metrics.general.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Streaks](assets/streak_summary.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Badges](assets/badges.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Scorecard](assets/builder_scorecard.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Cadence](assets/engineering_cadence.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Calendar](assets/contribution_calendar.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Focus](assets/now_next_shipped.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Recent work](assets/currently_working.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Languages](assets/lang_breakdown.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Rhythm](assets/activity_heatmap.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Projects](assets/repo_spotlight.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
+- [Snapshot](assets/raw_snapshot.svg?v=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d)
 
 
 </details>
 
 ### Deep Dive Data
 
-- [Open the full dashboard](https://jguida941.github.io/jguida941/?from_snapshot=9dd795cba88fc85ff803249e0c0cbb99a6147dc79d62bbf5aa98ee71240ce41e#overview)
+- [Open the full dashboard](https://jguida941.github.io/jguida941/?from_snapshot=da200be8e4c03467e8dc2496152bfb76945e0bb6eae1de2af89244d8d8e48f2d#overview)
 - [Open raw profile snapshot JSON](site/data/profile_snapshot.json)
 - Generated by `python scripts/profile_cli.py generate-profile --validate` from GitHub repository metadata.
 - A curated project matrix, recent delivery feed, top-language summary, and recent repository list are available in the dashboard + JSON.
