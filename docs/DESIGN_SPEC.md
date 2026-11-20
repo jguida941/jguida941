@@ -449,6 +449,17 @@ Numerals remain at least11px; if a segment is too narrow, put its exact count ou
 without inflating its width. Theme foregrounds derive from existing semantic roles
 and keep readable contrast on every current status fill.
 
+The same 4.5:1 floor applies on the initial document without a theme query or saved
+preference. The generated root initializes the existing empty default-theme
+attribute before scripts run. The actual index Chrome probe records raw computed
+ink and opaque fill colors, rendered label identities, count coverage, initial
+theme/search/storage context and finite painted bounds. Its receiving predicate
+recomputes the ratio and refuses missing, malformed, duplicate, hidden or
+low-contrast measurements. Unknown transparent fills and outside labels are
+explicit exclusions from this narrow opaque-inline-count check; zero applicable
+labels is recorded as non-applicable, never a contrast pass. These current page
+receipts do not promote deferred profile-engine color/chart conformance.
+
 A compact CI activity header uses the existing canonical Lucide icon family, theme
 tokens, type hierarchy and metric spacing. On desktop, the neutral workflow icon,
 title and Workflow runs and results subtitle sit left of a vertical divider; the

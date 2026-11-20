@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import html
 import json
+import math
 import re
 import shutil
 import subprocess
@@ -116,6 +117,7 @@ def _write_provenance(
         "artifact": _rel(artifact),
         "kind": kind,
         "producer": "scripts/quality/headless_receipts.py",
+        "producer_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "command": command,
         "chrome_version": chrome_version,
         "viewport": viewport,
@@ -378,6 +380,39 @@ def _probe_html(page: str, route: Path, viewport: int, height: int) -> str:
       "cannot_mark_done": true
     }};
     if (hydration) result.index_hydration = hydration;
+    if ("{page}" === "index") {{
+      var panel = doc.getElementById("ci-observatory");
+      var inline = Array.from(doc.querySelectorAll('.ci-bar-segment:not(.ci-unknown) > [data-role="ci-count"]'));
+      var saved = null, storage = "unavailable";
+      try {{ saved = frame.contentWindow.localStorage.getItem("dash-theme"); storage = "read"; }} catch (e) {{}}
+      result.ci_count_contrast = {{
+        "theme_attribute": root.getAttribute("data-theme"),
+        "document_search": frame.contentWindow.location.search,
+        "stored_theme": saved,
+        "storage_status": storage,
+        "panel_status": panel ? panel.dataset.status || "unavailable" : "absent",
+        "inline_label_count": inline.length,
+        "excluded_unknown_labels": doc.querySelectorAll('.ci-bar-segment.ci-unknown > [data-role="ci-count"]').length,
+        "excluded_outside_labels": doc.querySelectorAll('.ci-outside-counts [data-role="ci-count"]').length,
+        "applicable": inline.length > 0,
+        "reason": inline.length ? "opaque-inline-labels" : "no-opaque-inline-labels",
+        "samples": inline.map(function (label) {{
+          var segment = label.parentElement;
+          var ink = frame.contentWindow.getComputedStyle(label);
+          var fill = frame.contentWindow.getComputedStyle(segment);
+          var rect = label.getBoundingClientRect();
+          var painted = rect.width > 0 && rect.height > 0;
+          for (var node = label; node && node !== doc; node = node.parentElement) {{
+            var style = frame.contentWindow.getComputedStyle(node);
+            if (style.display === "none" || style.visibility !== "visible" || Number(style.opacity) !== 1) painted = false;
+          }}
+          return {{"repository": segment.closest('[data-role="ci-group"]').dataset.repository,
+            "group": segment.dataset.group, "text": label.textContent,
+            "foreground": ink.color, "background": fill.backgroundColor,
+            "painted": painted, "width": rect.width, "height": rect.height}};
+        }})
+      }};
+    }}
     document.documentElement.innerHTML = "<head><title>probe</title></head><body><pre id=\\"headless-probe-json\\"></pre></body>";
     document.getElementById("headless-probe-json").textContent = JSON.stringify(result);
   }}
@@ -397,6 +432,72 @@ def _parse_probe_dump(dump: str) -> dict:
     if not match:
         raise RuntimeError("Chrome DOM dump did not contain the headless probe payload")
     return json.loads(html.unescape(match.group("payload")))
+
+
+def validate_ci_count_contrast(payload: dict) -> list[float]:
+    """Recompute the spec's 4.5:1 floor from actual first-visit opaque-fill facts.
+
+    This covers rendered inline CI numerals, including those below the fold. It
+    does not qualify transparent Unknown fills, outside labels or other design
+    aspects. An empty result means observed non-applicability, not conformance.
+    """
+    facts = payload.get("ci_count_contrast")
+    if not isinstance(facts, dict):
+        raise ValueError("CI count contrast facts missing")
+    if ("theme_attribute" not in facts or facts["theme_attribute"] not in (None, "")
+            or facts.get("document_search") != "" or "stored_theme" not in facts
+            or facts.get("stored_theme") is not None
+            or facts.get("storage_status") not in ("read", "unavailable")):
+        raise ValueError("CI count contrast requires the initial default document")
+    if facts.get("panel_status") not in ("available", "partial", "empty", "unavailable", "absent"):
+        raise ValueError("CI count contrast panel state missing")
+    samples = facts.get("samples")
+    count = facts.get("inline_label_count")
+    if (type(count) is not int or count < 0 or not isinstance(samples, list)
+            or count != len(samples) or facts.get("applicable") is not (count > 0)
+            or facts.get("reason") != ("opaque-inline-labels" if count else "no-opaque-inline-labels")):
+        raise ValueError("CI count contrast coverage mismatch")
+    for key in ("excluded_unknown_labels", "excluded_outside_labels"):
+        if type(facts.get(key)) is not int or facts[key] < 0:
+            raise ValueError("CI count contrast exclusions missing")
+
+    def luminance(value: str) -> float:
+        if not isinstance(value, str):
+            raise ValueError("CI count contrast color missing")
+        match = re.fullmatch(r"(rgb|rgba)\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)", value)
+        if not match:
+            raise ValueError("CI count contrast requires measured sRGB colors")
+        if (match[1] == "rgba") != (match[5] is not None):
+            raise ValueError("CI count contrast color syntax is malformed")
+        rgb = [float(match[i]) for i in (2, 3, 4)]
+        alpha = 1.0 if match[5] is None else float(match[5])
+        if alpha != 1.0 or any(not math.isfinite(c) or c < 0 or c > 255 for c in rgb):
+            raise ValueError("CI count contrast requires finite opaque colors")
+        channels = [c / 255 for c in rgb]
+        linear = [c / 12.92 if c <= .04045 else ((c + .055) / 1.055) ** 2.4 for c in channels]
+        return sum(c * weight for c, weight in zip(linear, (.2126, .7152, .0722)))
+
+    ratios, identities = [], set()
+    for sample in samples:
+        if (not isinstance(sample, dict) or sample.get("group") not in ("pass", "fail", "pending", "other")
+                or not isinstance(sample.get("repository"), str) or not sample["repository"]
+                or sample.get("painted") is not True or not isinstance(sample.get("text"), str)
+                or not re.fullmatch(r"[1-9]\d*", sample["text"])):
+            raise ValueError("CI count contrast label is not a painted observed count")
+        identity = (sample["repository"], sample["group"])
+        if identity in identities:
+            raise ValueError("CI count contrast duplicate label identity")
+        identities.add(identity)
+        for key in ("width", "height"):
+            value = sample.get(key)
+            if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
+                raise ValueError("CI count contrast label has no finite painted bounds")
+        low, high = sorted((luminance(sample.get("foreground")), luminance(sample.get("background"))))
+        ratio = (high + .05) / (low + .05)
+        if ratio < 4.5:
+            raise ValueError(f"CI count contrast below 4.5:1 for {sample['group']}: {ratio:.3f}:1")
+        ratios.append(ratio)
+    return ratios
 
 
 def dom_probe(page: str, viewport: int = 390) -> Path:
@@ -436,6 +537,8 @@ def dom_probe(page: str, viewport: int = 390) -> Path:
         chrome_version=chrome_version,
         viewport={"width": viewport, "height": height},
     )
+    if page == "index":
+        validate_ci_count_contrast(payload)
     return artifact
 
 

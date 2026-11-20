@@ -1377,7 +1377,7 @@ def render_dashboard(default_theme: str = DEFAULT_THEME) -> str:
     )
     body = "".join([_hero(), _scorecard(), _ci_observatory(), _weekly(), _calendar(), _languages(), _rhythm(), _repos_focus(), _snapshot()])
     return f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

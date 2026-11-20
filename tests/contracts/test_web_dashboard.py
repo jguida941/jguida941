@@ -1439,9 +1439,18 @@ assert.equal(nodes['ci-observatory-count'].textContent,'Run count unavailable');
         self.assertEqual(2, sum(line.startswith("|") for line in section.splitlines()))
 
     def test_count_foregrounds_stay_legible_in_every_existing_theme(self):
-        from scripts.pipeline.web_render import _component_css
+        from scripts.pipeline.web_render import _component_css, render_dashboard
         from scripts.rendering.design_tokens import DEFAULT_THEME,THEMES,type_scale
         from tests.contracts.test_theme_system import _contrast
+        class RootTheme(HTMLParser):
+            theme = None
+            def handle_starttag(self, tag, attrs):
+                if tag == 'html':
+                    self.theme = dict(attrs).get('data-theme')
+        initial = RootTheme()
+        initial.feed(render_dashboard())
+        self.assertEqual('', initial.theme,
+                         'A fresh document must select the default theme before saved preferences or JavaScript')
         css=_component_css()
         for name,theme in THEMES.items():
             # The default theme is emitted on html as an empty data-theme.

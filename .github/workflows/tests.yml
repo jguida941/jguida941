@@ -248,12 +248,44 @@ jobs:
           assert any((r.get('observed_runs') or 0) > 0 for r in expected_rows.values()), 'Populated CI preview required'
           chrome = receipts._chrome()
           chrome_version = receipts._chrome_version(chrome)
+          def initial_probe(width):
+              measured = receipts.dom_probe_artifact('index', width)
+              sidecar = receipts.provenance_path(measured)
+              # Only fresh measurements from this attempt enter the evidence envelope.
+              measured.unlink(missing_ok=True)
+              sidecar.unlink(missing_ok=True)
+              try:
+                  return receipts.dom_probe('index', width)
+              finally:
+                  for source, name in ((measured, f'initial-default-{width}.json'),
+                                       (sidecar, f'initial-default-{width}.provenance.json')):
+                      if source.is_file():
+                          shutil.copyfile(source, out / name)
           canonical_receipts = [receipts.screenshot_page('index'),
                                 receipts.screenshot_page('index', target='ci-observatory'),
-                                receipts.dom_probe('index', 390)]
+                                initial_probe(390)]
           probe = json.loads(canonical_receipts[-1].read_text())
           assert probe['client_width'] == 390 and not probe['horizontal_overflow']
           assert probe['uncontained_offender_count'] == 0, probe
+          # The unselected first visit must satisfy the same contract as explicit
+          # theme views. Retain the actual measurements at both supported widths.
+          initial_default_receipts = []
+          for width in (1280, 390):
+              measured = initial_probe(width) if width == 1280 else canonical_receipts[-1]
+              facts = json.loads(measured.read_text())
+              assert facts['client_width'] == width and not facts['horizontal_overflow']
+              assert facts['uncontained_offender_count'] == 0, facts
+              ratios = receipts.validate_ci_count_contrast(facts)
+              applicability = facts['ci_count_contrast']
+              original = out / f'initial-default-{width}.json'
+              shutil.copyfile(measured, original)
+              sidecar = out / f'initial-default-{width}.provenance.json'
+              shutil.copyfile(receipts.provenance_path(measured), sidecar)
+              initial_default_receipts.append({'width': width, 'path': original.name,
+                  'sha256': digest(original), 'provenance': sidecar.name,
+                  'provenance_sha256': digest(sidecar), 'measured_labels': len(ratios),
+                  'applicable': applicability['applicable'], 'reason': applicability['reason'],
+                  'minimum_contrast': min(ratios) if ratios else None})
           source_hashes = {p: digest(root / p) for p in (
               '.github/workflows/tests.yml', 'scripts/pipeline/web_render.py',
               'scripts/rendering/generate_dashboard_summary.py', 'scripts/pipeline/render_outputs.py',
@@ -270,6 +302,7 @@ jobs:
               'generation': data['generation'], 'chrome': chrome_version,
               'chrome_executable': str(chrome), 'chrome_executable_sha256': digest(chrome.resolve()),
               'playwright': importlib.metadata.version('playwright'),
+              'initial_default_receipts': initial_default_receipts,
               'launch_args': ['--allow-file-access-from-files'], 'records': [],
           }
           (out/'preview.json').write_text(json.dumps(identity,indent=2)+'\n')
