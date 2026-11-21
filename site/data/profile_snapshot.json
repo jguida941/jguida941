@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-21T15:54:45.091222Z",
+  "generated_at": "2026-11-21T16:02:42.397082Z",
   "username": "jguida941",
   "dashboard_url": "https://jguida941.github.io/jguida941/",
   "theme": {
@@ -229,7 +229,7 @@
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-11-21T15:51:57Z",
+        "observed_at": "2026-11-21T16:00:28Z",
         "source_id": "github_rest_repo_commits",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -245,7 +245,7 @@
         "population_signature": null,
         "window_start": "2025-11-16T05:00:00Z",
         "window_end": "2026-11-22T04:59:59Z",
-        "observed_at": "2026-11-21T15:52:04Z",
+        "observed_at": "2026-11-21T16:00:33Z",
         "source_id": "github_graphql_default_contributions_collection",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -261,7 +261,7 @@
         "population_signature": null,
         "window_start": "2025-11-16T05:00:00Z",
         "window_end": "2026-11-22T04:59:59Z",
-        "observed_at": "2026-11-21T15:52:04Z",
+        "observed_at": "2026-11-21T16:00:33Z",
         "source_id": "github_graphql_default_contributions_collection",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -275,8 +275,8 @@
         "population_id": "owned-public-nonfork-repositories",
         "population_signature": "9641fe1ba0bc4c3c1ed5",
         "window_start": "2026-10-23T04:00:00Z",
-        "window_end": "2026-11-21T15:52:01Z",
-        "observed_at": "2026-11-21T15:52:03Z",
+        "window_end": "2026-11-21T16:00:31Z",
+        "observed_at": "2026-11-21T16:00:32Z",
         "source_id": "github_rest_repo_releases",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -290,8 +290,8 @@
         "population_id": "authored-pull-requests-visible-to-primary-pr-search",
         "population_signature": null,
         "window_start": "2025-11-22T05:00:00Z",
-        "window_end": "2026-11-21T15:52:03Z",
-        "observed_at": "2026-11-21T15:52:03Z",
+        "window_end": "2026-11-21T16:00:32Z",
+        "observed_at": "2026-11-21T16:00:33Z",
         "source_id": "github_rest_merged_pr_search_primary",
         "source_mode": "live",
         "completion_reason": "all_components_observed"
@@ -306,7 +306,7 @@
         "population_signature": "jguida941:100:3:300",
         "window_start": null,
         "window_end": null,
-        "observed_at": "2026-11-21T15:51:55Z",
+        "observed_at": "2026-11-21T16:00:26Z",
         "source_id": "github_rest_public_events",
         "source_mode": "live",
         "completion_reason": "terminal_page"
@@ -585,10 +585,10 @@
       "forks": 0,
       "ci": "yes",
       "pushed_at": "2026-11-21",
-      "pushed_at_raw": "2026-11-21T15:51:26Z",
+      "pushed_at_raw": "2026-11-21T15:57:05Z",
       "pushed_ago": "today",
       "created_at": "2026-02-20",
-      "last_commit_msg": "Preserve live CI diagnostics when no queries ran",
+      "last_commit_msg": "recent push detected",
       "is_private": false,
       "featured": false
     },
@@ -1130,13 +1130,13 @@
   "activity_feed": [
     {
       "kind": "activity",
-      "title": "Preserve live CI diagnostics when no queries ran",
+      "title": "recent push detected",
       "url": "https://github.com/jguida941/jguida941",
       "repo": "jguida941/jguida941",
       "repo_url": "https://github.com/jguida941/jguida941",
       "state": "PUSH",
       "time_ago": "today",
-      "created_at": "2026-11-21T15:51:26Z",
+      "created_at": "2026-11-21T15:57:05Z",
       "is_private": false,
       "observation_source": "repository push metadata"
     },
@@ -1528,7 +1528,7 @@
     "population_signature": null,
     "window_start": "2025-11-16T05:00:00Z",
     "window_end": "2026-11-22T04:59:59Z",
-    "observed_at": "2026-11-21T15:52:04Z",
+    "observed_at": "2026-11-21T16:00:33Z",
     "source_id": "github_graphql_default_contributions_collection",
     "source_mode": "live",
     "completion_reason": "all_components_observed"
@@ -1538,7 +1538,7 @@
     "source_id": "github_personal_owned_repository_census",
     "population_id": "personal-owned-repositories",
     "source_mode": "live",
-    "observed_at": "2026-11-21T15:52:50.974271Z",
+    "observed_at": "2026-11-21T16:01:14.784984Z",
     "metrics": {
       "public_repos_total": {
         "value": 57,
@@ -1561,9 +1561,9 @@
         "complete": true
       }
     },
-    "snapshot_generated_at": "2026-11-21T15:54:45.091222Z"
+    "snapshot_generated_at": "2026-11-21T16:02:42.397082Z"
   },
-  "collection_started_at": "2026-11-21T15:51:47.646483+00:00",
+  "collection_started_at": "2026-11-21T16:00:18.500114+00:00",
   "automation": {
     "public": {
       "observed_eligible_repos": 56,
@@ -1639,12 +1639,36 @@
   "ci_execution": {
     "schema": "profile-ci-execution/v1",
     "repository": "jguida941/jguida941",
-    "observed_at": "2026-11-21T15:53:21Z",
+    "observed_at": "2026-11-21T16:01:34Z",
     "sample_limit": 12,
     "scope": "Latest observed GitHub Actions runs in the public profile repository, across branches; not account-wide.",
     "status": "available",
     "observed_runs": 12,
     "runs": [
+      {
+        "run_id": 44922117658,
+        "workflow": "Generate Metrics",
+        "outcome": "in_progress",
+        "created_at": "2026-11-21T16:00:02Z",
+        "event": "workflow_dispatch",
+        "head_branch": "main"
+      },
+      {
+        "run_id": 44921879558,
+        "workflow": "Test Profile Pipeline",
+        "outcome": "success",
+        "created_at": "2026-11-21T15:57:07Z",
+        "event": "push",
+        "head_branch": "development"
+      },
+      {
+        "run_id": 44921728103,
+        "workflow": "Deploy Profile Site",
+        "outcome": "success",
+        "created_at": "2026-11-21T15:55:20Z",
+        "event": "workflow_run",
+        "head_branch": "main"
+      },
       {
         "run_id": 44921397791,
         "workflow": "Test Profile Pipeline",
@@ -1656,7 +1680,7 @@
       {
         "run_id": 44921397773,
         "workflow": "Build Analytics & README",
-        "outcome": "in_progress",
+        "outcome": "success",
         "created_at": "2026-11-21T15:51:28Z",
         "event": "push",
         "head_branch": "main"
@@ -1716,39 +1740,15 @@
         "created_at": "2026-11-21T15:14:09Z",
         "event": "push",
         "head_branch": "main"
-      },
-      {
-        "run_id": 44917886313,
-        "workflow": "Test Profile Pipeline",
-        "outcome": "success",
-        "created_at": "2026-11-21T15:11:50Z",
-        "event": "push",
-        "head_branch": "development"
-      },
-      {
-        "run_id": 44917379419,
-        "workflow": "Test Profile Pipeline",
-        "outcome": "success",
-        "created_at": "2026-11-21T15:06:15Z",
-        "event": "pull_request",
-        "head_branch": "fix/ci-collection-accountability-20261121"
-      },
-      {
-        "run_id": 44917312048,
-        "workflow": "Test Profile Pipeline",
-        "outcome": "success",
-        "created_at": "2026-11-21T15:05:30Z",
-        "event": "push",
-        "head_branch": "development"
       }
     ]
   },
   "ci_timeline": {
     "schema": "profile-ci-timeline/v1",
     "owner": "jguida941",
-    "observed_at": "2026-11-21T15:54:40Z",
-    "window_start": "2026-08-29T15:54:40Z",
-    "window_end": "2026-11-21T15:54:40Z",
+    "observed_at": "2026-11-21T16:02:38Z",
+    "window_start": "2026-08-29T16:02:38Z",
+    "window_end": "2026-11-21T16:02:38Z",
     "window_days": 84,
     "sample_limit_per_repo": 20,
     "scope": "Profile plus up to five most recently pushed nonfork repositories from the admitted personal and semverity-labs inventory, public and private; up to 20 most recent runs per repository within 84 days. Repository executions across actors, not personal contributions or complete history. Private repository workflow names, run identifiers, dates and outcomes are included.",
@@ -1769,6 +1769,24 @@
         "observed_runs": 20,
         "runs": [
           {
+            "run_id": 44922117658,
+            "workflow": "Generate Metrics",
+            "outcome": "in_progress",
+            "created_at": "2026-11-21T16:00:02Z"
+          },
+          {
+            "run_id": 44921879558,
+            "workflow": "Test Profile Pipeline",
+            "outcome": "success",
+            "created_at": "2026-11-21T15:57:07Z"
+          },
+          {
+            "run_id": 44921728103,
+            "workflow": "Deploy Profile Site",
+            "outcome": "success",
+            "created_at": "2026-11-21T15:55:20Z"
+          },
+          {
             "run_id": 44921397791,
             "workflow": "Test Profile Pipeline",
             "outcome": "success",
@@ -1777,7 +1795,7 @@
           {
             "run_id": 44921397773,
             "workflow": "Build Analytics & README",
-            "outcome": "in_progress",
+            "outcome": "success",
             "created_at": "2026-11-21T15:51:28Z"
           },
           {
@@ -1869,24 +1887,6 @@
             "workflow": "Generate Metrics",
             "outcome": "success",
             "created_at": "2026-11-21T13:00:06Z"
-          },
-          {
-            "run_id": 44903692077,
-            "workflow": "Deploy Profile Site",
-            "outcome": "success",
-            "created_at": "2026-11-21T12:23:52Z"
-          },
-          {
-            "run_id": 44903367441,
-            "workflow": "Generate Metrics",
-            "outcome": "success",
-            "created_at": "2026-11-21T12:20:03Z"
-          },
-          {
-            "run_id": 44902276372,
-            "workflow": "Deploy Profile Site",
-            "outcome": "failure",
-            "created_at": "2026-11-21T12:06:45Z"
           }
         ]
       },
@@ -4179,7 +4179,7 @@
   "activity_analytics": {
     "schema": "profile-activity-analytics/v1",
     "window_start": "2026-10-23T00:00:00Z",
-    "window_end": "2026-11-21T15:52:23.545844Z",
+    "window_end": "2026-11-21T16:00:48.935919Z",
     "current_day_partial": true,
     "cohort": {
       "inventory": 256,
@@ -4207,7 +4207,7 @@
         "status": "partial",
         "complete": false,
         "reason": "activity_incomplete",
-        "occurred_at": "2026-11-21T15:51:26Z"
+        "occurred_at": "2026-11-21T15:57:05Z"
       },
       "history": {
         "status": "ok",
@@ -4215,14 +4215,14 @@
         "reason": "end_of_connection"
       },
       "repository": "jguida941/jguida941",
-      "ref": "refs/heads/main",
-      "head_sha": "041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
-      "commit_url": "https://github.com/jguida941/jguida941/commit/041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
-      "additions": 287758,
-      "deletions": 273223,
-      "commit_count": 863,
-      "observed_commits": 898,
-      "stats_observed": 863,
+      "ref": "refs/heads/development",
+      "head_sha": "2b618a54f849e84010babad8695c9c4cbff86d3f",
+      "commit_url": "https://github.com/jguida941/jguida941/commit/2b618a54f849e84010babad8695c9c4cbff86d3f",
+      "additions": 288094,
+      "deletions": 273559,
+      "commit_count": 864,
+      "observed_commits": 899,
+      "stats_observed": 864,
       "excluded_merges": 35,
       "daily": [
         {
@@ -4401,8 +4401,8 @@
         },
         {
           "date": "2026-11-21",
-          "additions": 10900,
-          "deletions": 10115,
+          "additions": 11236,
+          "deletions": 10451,
           "complete": false
         }
       ],
@@ -4414,21 +4414,20 @@
       "complete": false,
       "rows": [
         {
-          "id": "51285230241",
+          "id": "51285693006",
           "repository": "jguida941/jguida941",
-          "timestamp": "2026-11-21T15:51:26Z",
+          "timestamp": "2026-11-21T15:57:05Z",
           "activity_type": "push",
-          "ref": "refs/heads/main",
-          "after": "041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
+          "ref": "refs/heads/development",
+          "after": "2b618a54f849e84010babad8695c9c4cbff86d3f",
           "diff_status": "ok",
-          "additions": 68,
-          "deletions": 12,
+          "additions": 336,
+          "deletions": 336,
           "commits": [
-            "a837781012831153f739622524f1079f64912946",
-            "041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a"
+            "2b618a54f849e84010babad8695c9c4cbff86d3f"
           ],
-          "compare_url": "https://github.com/jguida941/jguida941/compare/eb091ace38d6bcfe1df897c1e5ff5f824fc2c937...041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
-          "head_url": "https://github.com/jguida941/jguida941/commit/041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
+          "compare_url": "https://github.com/jguida941/jguida941/compare/041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a...2b618a54f849e84010babad8695c9c4cbff86d3f",
+          "head_url": "https://github.com/jguida941/jguida941/commit/2b618a54f849e84010babad8695c9c4cbff86d3f",
           "is_private": false
         },
         {
@@ -4473,8 +4472,8 @@
       "status": "partial",
       "complete": false,
       "window_start": "2026-10-23T00:00:00Z",
-      "window_end": "2026-11-21T15:52:23.545844Z",
-      "observed_at": "2026-11-21T15:52:23.545844Z",
+      "window_end": "2026-11-21T16:00:48.935919Z",
+      "observed_at": "2026-11-21T16:00:48.935919Z",
       "timezone": "UTC",
       "current_day_partial": true,
       "default_days": 14,
@@ -4525,7 +4524,7 @@
           "reasons": [
             "incomplete_activity_coverage"
           ],
-          "latest_push": "2026-11-21T15:51:26Z",
+          "latest_push": "2026-11-21T15:57:05Z",
           "observed_pushes": 89,
           "daily": [
             {
@@ -4692,7 +4691,7 @@
             },
             {
               "date": "2026-11-19",
-              "count": 28,
+              "count": 26,
               "complete": false,
               "level": 4
             },
@@ -4704,7 +4703,7 @@
             },
             {
               "date": "2026-11-21",
-              "count": 25,
+              "count": 27,
               "complete": false,
               "level": 4
             }
@@ -4909,19 +4908,19 @@
                 },
                 {
                   "date": "2026-11-21",
-                  "count": 4,
+                  "count": 5,
                   "complete": false,
-                  "level": 1
+                  "level": 2
                 }
               ],
-              "observed_pushes": 10
+              "observed_pushes": 11
             },
             {
               "ref": "refs/heads/main",
               "daily": [
                 {
                   "date": "2026-11-19",
-                  "count": 15,
+                  "count": 13,
                   "complete": false,
                   "level": 3
                 },
@@ -4933,12 +4932,12 @@
                 },
                 {
                   "date": "2026-11-21",
-                  "count": 21,
+                  "count": 22,
                   "complete": false,
                   "level": 4
                 }
               ],
-              "observed_pushes": 59
+              "observed_pushes": 58
             },
             {
               "ref": "refs/heads/work/overview-publication-20261119",
@@ -8752,7 +8751,7 @@
   "dashboard_summary": {
     "schema": "profile-dashboard-summary/v1",
     "username": "jguida941",
-    "generated_at": "2026-11-21T15:54:45.091222Z",
+    "generated_at": "2026-11-21T16:02:42.397082Z",
     "facts": [
       {
         "metric_id": "profile.contributions",
@@ -8769,7 +8768,7 @@
         },
         "window_start": "2025-11-16T05:00:00Z",
         "window_end": "2026-11-22T04:59:59Z",
-        "observed_at": "2026-11-21T15:52:04Z",
+        "observed_at": "2026-11-21T16:00:33Z",
         "source_id": "github_graphql_default_contributions_collection",
         "source_content_digest": "sha256:aba1e2bf0bda8a542a805dec5180a14ef30a214c4778274f084572742c0218fa"
       },
@@ -8794,7 +8793,7 @@
         "label": "public repos",
         "unit": "count",
         "population_id": "public-owned-including-forks",
-        "window": "Observed 2026-11-21T15:52:50.974271Z",
+        "window": "Observed 2026-11-21T16:01:14.784984Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8808,7 +8807,7 @@
         "label": "public non-fork repos",
         "unit": "count",
         "population_id": "public-owned-nonfork-profile-included",
-        "window": "Observed 2026-11-21T15:52:50.974271Z",
+        "window": "Observed 2026-11-21T16:01:14.784984Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8822,7 +8821,7 @@
         "label": "private owned repos",
         "unit": "count",
         "population_id": "private-owned-including-forks",
-        "window": "Observed 2026-11-21T15:52:50.974271Z",
+        "window": "Observed 2026-11-21T16:01:14.784984Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8836,7 +8835,7 @@
         "label": "stargazers",
         "unit": "count",
         "population_id": "public-owned-nonfork",
-        "window": "Observed 2026-11-21T15:52:50.974271Z",
+        "window": "Observed 2026-11-21T16:01:14.784984Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8850,7 +8849,7 @@
         "label": "public forks",
         "unit": "count",
         "population_id": "public-owned-forks",
-        "window": "Observed 2026-11-21T15:52:50.974271Z",
+        "window": "Observed 2026-11-21T16:01:14.784984Z",
         "quality": {
           "status": "exact",
           "reason": "fresh_personal_census",
@@ -8878,7 +8877,7 @@
         "label": "Merged PRs",
         "unit": "count",
         "population_id": "authored-pull-requests-visible-to-primary-pr-search",
-        "window": "2025-11-22T05:00:00Z \u2013 2026-11-21T15:52:03Z",
+        "window": "2025-11-22T05:00:00Z \u2013 2026-11-21T16:00:32Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -8892,7 +8891,7 @@
         "label": "Releases \u00b7 30 days",
         "unit": "count",
         "population_id": "owned-public-nonfork-repositories",
-        "window": "2026-10-23T04:00:00Z \u2013 2026-11-21T15:52:01Z",
+        "window": "2026-10-23T04:00:00Z \u2013 2026-11-21T16:00:31Z",
         "quality": {
           "status": "exact",
           "reason": "provider_observation",
@@ -11282,9 +11281,9 @@
     "ci_timeline": {
       "schema": "profile-ci-timeline/v1",
       "owner": "jguida941",
-      "observed_at": "2026-11-21T15:54:40Z",
-      "window_start": "2026-08-29T15:54:40Z",
-      "window_end": "2026-11-21T15:54:40Z",
+      "observed_at": "2026-11-21T16:02:38Z",
+      "window_start": "2026-08-29T16:02:38Z",
+      "window_end": "2026-11-21T16:02:38Z",
       "window_days": 84,
       "sample_limit_per_repo": 20,
       "scope": "Profile plus up to five most recently pushed nonfork repositories from the admitted personal and semverity-labs inventory, public and private; up to 20 most recent runs per repository within 84 days. Repository executions across actors, not personal contributions or complete history. Private repository workflow names, run identifiers, dates and outcomes are included.",
@@ -11305,6 +11304,24 @@
           "observed_runs": 20,
           "runs": [
             {
+              "run_id": 44922117658,
+              "workflow": "Generate Metrics",
+              "outcome": "in_progress",
+              "created_at": "2026-11-21T16:00:02Z"
+            },
+            {
+              "run_id": 44921879558,
+              "workflow": "Test Profile Pipeline",
+              "outcome": "success",
+              "created_at": "2026-11-21T15:57:07Z"
+            },
+            {
+              "run_id": 44921728103,
+              "workflow": "Deploy Profile Site",
+              "outcome": "success",
+              "created_at": "2026-11-21T15:55:20Z"
+            },
+            {
               "run_id": 44921397791,
               "workflow": "Test Profile Pipeline",
               "outcome": "success",
@@ -11313,7 +11330,7 @@
             {
               "run_id": 44921397773,
               "workflow": "Build Analytics & README",
-              "outcome": "in_progress",
+              "outcome": "success",
               "created_at": "2026-11-21T15:51:28Z"
             },
             {
@@ -11405,24 +11422,6 @@
               "workflow": "Generate Metrics",
               "outcome": "success",
               "created_at": "2026-11-21T13:00:06Z"
-            },
-            {
-              "run_id": 44903692077,
-              "workflow": "Deploy Profile Site",
-              "outcome": "success",
-              "created_at": "2026-11-21T12:23:52Z"
-            },
-            {
-              "run_id": 44903367441,
-              "workflow": "Generate Metrics",
-              "outcome": "success",
-              "created_at": "2026-11-21T12:20:03Z"
-            },
-            {
-              "run_id": 44902276372,
-              "workflow": "Deploy Profile Site",
-              "outcome": "failure",
-              "created_at": "2026-11-21T12:06:45Z"
             }
           ]
         },
@@ -12010,7 +12009,7 @@
     "activity_analytics": {
       "schema": "profile-activity-analytics/v1",
       "window_start": "2026-10-23T00:00:00Z",
-      "window_end": "2026-11-21T15:52:23.545844Z",
+      "window_end": "2026-11-21T16:00:48.935919Z",
       "current_day_partial": true,
       "cohort": {
         "inventory": 256,
@@ -12038,7 +12037,7 @@
           "status": "partial",
           "complete": false,
           "reason": "activity_incomplete",
-          "occurred_at": "2026-11-21T15:51:26Z"
+          "occurred_at": "2026-11-21T15:57:05Z"
         },
         "history": {
           "status": "ok",
@@ -12046,14 +12045,14 @@
           "reason": "end_of_connection"
         },
         "repository": "jguida941/jguida941",
-        "ref": "refs/heads/main",
-        "head_sha": "041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
-        "commit_url": "https://github.com/jguida941/jguida941/commit/041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
-        "additions": 287758,
-        "deletions": 273223,
-        "commit_count": 863,
-        "observed_commits": 898,
-        "stats_observed": 863,
+        "ref": "refs/heads/development",
+        "head_sha": "2b618a54f849e84010babad8695c9c4cbff86d3f",
+        "commit_url": "https://github.com/jguida941/jguida941/commit/2b618a54f849e84010babad8695c9c4cbff86d3f",
+        "additions": 288094,
+        "deletions": 273559,
+        "commit_count": 864,
+        "observed_commits": 899,
+        "stats_observed": 864,
         "excluded_merges": 35,
         "daily": [
           {
@@ -12232,8 +12231,8 @@
           },
           {
             "date": "2026-11-21",
-            "additions": 10900,
-            "deletions": 10115,
+            "additions": 11236,
+            "deletions": 10451,
             "complete": false
           }
         ],
@@ -12245,21 +12244,20 @@
         "complete": false,
         "rows": [
           {
-            "id": "51285230241",
+            "id": "51285693006",
             "repository": "jguida941/jguida941",
-            "timestamp": "2026-11-21T15:51:26Z",
+            "timestamp": "2026-11-21T15:57:05Z",
             "activity_type": "push",
-            "ref": "refs/heads/main",
-            "after": "041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
+            "ref": "refs/heads/development",
+            "after": "2b618a54f849e84010babad8695c9c4cbff86d3f",
             "diff_status": "ok",
-            "additions": 68,
-            "deletions": 12,
+            "additions": 336,
+            "deletions": 336,
             "commits": [
-              "a837781012831153f739622524f1079f64912946",
-              "041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a"
+              "2b618a54f849e84010babad8695c9c4cbff86d3f"
             ],
-            "compare_url": "https://github.com/jguida941/jguida941/compare/eb091ace38d6bcfe1df897c1e5ff5f824fc2c937...041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
-            "head_url": "https://github.com/jguida941/jguida941/commit/041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
+            "compare_url": "https://github.com/jguida941/jguida941/compare/041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a...2b618a54f849e84010babad8695c9c4cbff86d3f",
+            "head_url": "https://github.com/jguida941/jguida941/commit/2b618a54f849e84010babad8695c9c4cbff86d3f",
             "is_private": false
           },
           {
@@ -12304,8 +12302,8 @@
         "status": "partial",
         "complete": false,
         "window_start": "2026-10-23T00:00:00Z",
-        "window_end": "2026-11-21T15:52:23.545844Z",
-        "observed_at": "2026-11-21T15:52:23.545844Z",
+        "window_end": "2026-11-21T16:00:48.935919Z",
+        "observed_at": "2026-11-21T16:00:48.935919Z",
         "timezone": "UTC",
         "current_day_partial": true,
         "default_days": 14,
@@ -12356,7 +12354,7 @@
             "reasons": [
               "incomplete_activity_coverage"
             ],
-            "latest_push": "2026-11-21T15:51:26Z",
+            "latest_push": "2026-11-21T15:57:05Z",
             "observed_pushes": 89,
             "daily": [
               {
@@ -12523,7 +12521,7 @@
               },
               {
                 "date": "2026-11-19",
-                "count": 28,
+                "count": 26,
                 "complete": false,
                 "level": 4
               },
@@ -12535,7 +12533,7 @@
               },
               {
                 "date": "2026-11-21",
-                "count": 25,
+                "count": 27,
                 "complete": false,
                 "level": 4
               }
@@ -12740,19 +12738,19 @@
                   },
                   {
                     "date": "2026-11-21",
-                    "count": 4,
+                    "count": 5,
                     "complete": false,
-                    "level": 1
+                    "level": 2
                   }
                 ],
-                "observed_pushes": 10
+                "observed_pushes": 11
               },
               {
                 "ref": "refs/heads/main",
                 "daily": [
                   {
                     "date": "2026-11-19",
-                    "count": 15,
+                    "count": 13,
                     "complete": false,
                     "level": 3
                   },
@@ -12764,12 +12762,12 @@
                   },
                   {
                     "date": "2026-11-21",
-                    "count": 21,
+                    "count": 22,
                     "complete": false,
                     "level": 4
                   }
                 ],
-                "observed_pushes": 59
+                "observed_pushes": 58
               },
               {
                 "ref": "refs/heads/work/overview-publication-20261119",
@@ -16583,11 +16581,11 @@
   },
   "generation": {
     "source_kind": "github-api",
-    "generated_at": "2026-11-21T15:54:45.091222Z",
-    "generator_revision": "041bef5ed2a7ae55c21d5944fb1c02ade58cdc9a",
+    "generated_at": "2026-11-21T16:02:42.397082Z",
+    "generator_revision": "2b618a54f849e84010babad8695c9c4cbff86d3f",
     "generator_source_digest": "74ae2a2fba056ee6af8234c0054a2fe7bd346a2f99163fa00e3af33324e75c26",
-    "claim_input_digest": "74920a4e50962fd4f7b8f8b32ddf8aab92d1296d7e7c8e1f3e29da91d2019029",
-    "render_key": "056fb21f8357dadd21736ad978405c74cce6f9c81fb5131d37826cb2d143de72",
+    "claim_input_digest": "fa384bde3aae0dd1f74b0404aed0c71070aa210cbe5341ad904519cecdf85c7b",
+    "render_key": "006a2bfb1f84e2efcf1257e4f15db7b148b1492b61d028658a434e7f3185ea4e",
     "schema": "profile-artifact-generation/v1"
   }
 }
