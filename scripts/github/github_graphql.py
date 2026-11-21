@@ -7,7 +7,11 @@ from contextvars import ContextVar
 import requests
 
 from scripts.core.settings import Settings
-from scripts.github.github_transport import _auth_headers_for_token, candidate_tokens
+from scripts.github.github_transport import (
+    REQUEST_TIMEOUT,
+    _auth_headers_for_token,
+    candidate_tokens,
+)
 
 GRAPHQL_ENDPOINT = "https://api.github.com/graphql"
 _LAST_SUCCESSFUL_TOKEN_INDEX: ContextVar[int | None] = ContextVar(
@@ -77,6 +81,7 @@ def graphql_query(
                 GRAPHQL_ENDPOINT,
                 headers=_auth_headers_for_token(token),
                 json={"query": query, "variables": variables},
+                timeout=REQUEST_TIMEOUT,
             )
         except requests.RequestException:
             return None

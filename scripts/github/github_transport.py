@@ -29,6 +29,9 @@ def candidate_tokens(settings: Settings) -> tuple[str, ...]:
     return (settings.token,) if settings.token else ("",)
 
 
+# Connect and read-inactivity limits in seconds, not a total request deadline.
+# Timeout exceptions retain the existing retry and caller error dispositions.
+REQUEST_TIMEOUT: tuple[float, float] = (10.0, 30.0)
 _PUBLIC_HEADERS: dict[str, str] = {"Accept": "application/vnd.github+json"}
 
 
@@ -43,7 +46,7 @@ def _request_once(
     resp: requests.Response | None = None
     for attempt in range(max_retries):
         try:
-            resp = requests.get(url, headers=hdrs, params=params)
+            resp = requests.get(url, headers=hdrs, params=params, timeout=REQUEST_TIMEOUT)
         except requests.RequestException as exc:
             last_error = exc
             if attempt == max_retries - 1:
@@ -104,7 +107,7 @@ def request_public_with_retry(
     resp: requests.Response | None = None
     for attempt in range(max_retries):
         try:
-            resp = requests.get(url, headers=_PUBLIC_HEADERS, params=params)
+            resp = requests.get(url, headers=_PUBLIC_HEADERS, params=params, timeout=REQUEST_TIMEOUT)
         except requests.RequestException as exc:
             last_error = exc
             if attempt == max_retries - 1:
