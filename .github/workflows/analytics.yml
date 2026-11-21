@@ -123,6 +123,7 @@ jobs:
       # Diagnostics carry no canonical README/SVG/JSON bytes, so a held run may
       # still publish them for inspection.
       - name: Upload diagnostics artifacts
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: profile-diagnostics

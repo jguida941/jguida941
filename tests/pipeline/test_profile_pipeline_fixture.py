@@ -91,13 +91,17 @@ def _requirement_map(entries):
     return dependencies
 
 
-def _workflow_steps(path):
+def _workflow_steps(path, *, job_name=None):
     lines = path.read_text(encoding="utf-8").splitlines()
     steps = []
     steps_indent = None
     current = []
+    in_job = job_name is None
 
     for line in lines:
+        if not in_job:
+            in_job = re.fullmatch(rf"  {re.escape(job_name)}:\s*", line) is not None
+            continue
         stripped = line.strip()
         indent = len(line) - len(line.lstrip())
         if steps_indent is None:
@@ -686,6 +690,61 @@ class ProfilePipelineFixtureTests(unittest.TestCase):
             ROOT / ".github/workflows/metrics.yml",
             ROOT / ".github/workflows/analytics.yml",
         )
+
+    def test_collection_diagnostics_upload_after_failed_generation_without_canonical_payloads(self):
+        required = {"site/data/run_diagnostics.json", "site/data/run_diagnostics_history.jsonl"}
+        routes = [(path, None, "python scripts/profile_cli.py generate-profile")
+                  for path in self._generation_workflows()]
+        routes.append((ROOT / ".github/workflows/tests.yml", "candidate-preview",
+                       "generated = run_profile_pipeline(logger=print)"))
+        for workflow, job_name, generation_command in routes:
+            with self.subTest(workflow=workflow.name, job=job_name):
+                steps = _workflow_steps(workflow, job_name=job_name)
+                generation = _step_index(steps, lambda step: _step_runs(step, generation_command))
+                diagnostics = [(index, step) for index, step in enumerate(steps)
+                    if _step_field(step, "uses") == "actions/upload-artifact@v4"
+                    and "site/data/run_diagnostics.json" in "\n".join(step)]
+                self.assertEqual(1, len(diagnostics),
+                                 "each live generation route must deliver its original collection diagnostics")
+                index, step = diagnostics[0]
+                self.assertIsNotNone(generation)
+                self.assertGreater(index, generation, "upload must receive this run's collection result")
+                self.assertTrue(_condition_matches(_step_field(step, "if") or "", "always()"),
+                                "a failed generation must not skip diagnostic delivery")
+                self.assertIsNone(_step_field(step, "continue-on-error"))
+                paths = []
+                path_indent = None
+                for line in step:
+                    if path_indent is None:
+                        match = re.fullmatch(r"(\s+)path:\s*\|\s*", line)
+                        if match:
+                            path_indent = len(match.group(1))
+                    elif line.strip():
+                        if len(line) - len(line.lstrip()) <= path_indent:
+                            break
+                        if not line.lstrip().startswith("#"):
+                            paths.append(line.strip())
+                allowed = required | ({"site/data/triage_report.json", "site/data/doctor_report.json"}
+                                      if workflow.name == "analytics.yml" else set())
+                self.assertEqual(allowed, set(paths),
+                                 "failure delivery must be the existing closed diagnostics paths, not canonical or arbitrary files")
+                self.assertEqual(len(paths), len(set(paths)))
+                if job_name is None:
+                    canonical = [candidate for candidate in steps
+                        if _step_field(candidate, "uses") == "actions/upload-artifact@v4"
+                        and any(line.strip() == "README.md" for line in candidate)]
+                    self.assertEqual(1, len(canonical))
+                    self.assertTrue(_condition_matches(_step_field(canonical[0], "if") or "",
+                                                       METRICS_COMMIT_CONDITION),
+                                    "failed generation cannot publish canonical artifacts with its diagnostics")
+                else:
+                    preview = [candidate for candidate in steps
+                        if _step_field(candidate, "uses") == "actions/upload-artifact@v4"
+                        and _step_field(candidate, "path") == "${{ env.CANDIDATE_PREVIEW_OUTPUT }}"]
+                    self.assertEqual(1, len(preview))
+                    self.assertTrue(_condition_matches(_step_field(preview[0], "if") or "",
+                        "always() && env.CANDIDATE_PREVIEW_OUTPUT != ''"),
+                        "collection diagnostics must not broaden the existing candidate-output upload gate")
 
     def _assert_bounded_product_test_step(self, step):
         self.assertIsNone(

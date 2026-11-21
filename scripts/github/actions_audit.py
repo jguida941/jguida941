@@ -103,7 +103,10 @@ def _utc_instant(value: object) -> str | None:
         return None
     if moment.tzinfo is None:
         return None
-    return moment.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    try:
+        return moment.astimezone(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    except (OverflowError, ValueError):
+        return None
 
 
 def _limited_label(value: object, maximum: int = 100) -> str:
@@ -340,20 +343,80 @@ def normalize_public_ci_timeline(
     return result
 
 
-def collect_public_ci_timeline(public_repositories: list[dict], owner: str, *, repository_inventory=None) -> dict:
+def _ci_query_diagnostic(repository: str, observed_at: str, rows: object,
+                         error: Exception | None) -> dict:
+    """Retain a closed query outcome without serializing provider error text.
+
+    Usability is measured before timeline clipping. Old/capped history and an
+    actually empty response are evidence; malformed or wholly redacted rows are
+    not. A reported HTTP status is a provider fact, not an authentication or
+    rate-limit diagnosis.
+    """
+    import json
+    import re
+    import subprocess
+
+    from scripts.pipeline.profile_helpers import contains_credential_material
+
+    reason = "ok"
+    returncode = None
+    reported_http_status = None
+    returned_runs = len(rows) if isinstance(rows, list) else None
+    usable_runs = None
+    if error is not None:
+        cause = error.__cause__ or error
+        if isinstance(cause, FileNotFoundError):
+            reason = "cli_unavailable"
+        elif isinstance(cause, subprocess.CalledProcessError):
+            reason = "command_failed"
+            returncode = cause.returncode if type(cause.returncode) is int else None
+            # Never copy even a truncated message: it can contain credentials,
+            # private response bodies or an arbitrary command environment.
+            stderr = cause.stderr if isinstance(cause.stderr, str) else ""
+            statuses = set(re.findall(r"\bHTTP ([1-5][0-9]{2})\b", stderr[:8192]))
+            if len(statuses) == 1:
+                reported_http_status = int(statuses.pop())
+        elif isinstance(cause, json.JSONDecodeError):
+            reason = "invalid_json"
+        else:
+            reason = "provider_error"
+    elif not isinstance(rows, list):
+        reason = "invalid_payload"
+    else:
+        qualified = normalize_profile_ci_runs(rows, repository, observed_at, limit=20)
+        usable_runs = sum(not contains_credential_material(row["workflow"])
+                          for row in qualified["runs"])
+        if rows and not usable_runs:
+            reason = "unusable_runs"
+    return {
+        "repository": repository, "observed_at": observed_at,
+        "outcome": "success" if reason == "ok" else "failure", "reason": reason,
+        "returned_runs": returned_runs, "usable_runs": usable_runs,
+        "returncode": returncode, "reported_http_status": reported_http_status,
+    }
+
+
+def collect_public_ci_timeline(public_repositories: list[dict], owner: str, *, repository_inventory=None,
+                               diagnostics: list[dict] | None = None) -> dict:
     """Observe the shared bounded cohort with only authorized execution metadata.
 
     Production callers supply the same canonical personal and organization
     inventory. The legacy no-inventory call retains its public personal cohort.
+    The optional diagnostic sink is separate from the unchanged public carrier;
+    live collection uses it to distinguish failed queries from observed zero.
     """
     observed = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     selected = select_public_ci_repositories(public_repositories, owner, repository_inventory=repository_inventory)
     observations = []
     for repo in selected:
+        query_error = None
         try:
             rows = run_json(["gh", "run", "list", "--repo", repo, "--limit", "20",
                 "--json", "databaseId,workflowName,status,conclusion,createdAt"])
-        except (RuntimeError, ValueError):
+        except (RuntimeError, ValueError) as exc:
             rows = None
+            query_error = exc
+        if diagnostics is not None:
+            diagnostics.append(_ci_query_diagnostic(repo, observed, rows, query_error))
         observations.append({"repository":repo,"runs":rows})
     return normalize_public_ci_timeline(observations, owner, observed, repository_inventory=repository_inventory)
