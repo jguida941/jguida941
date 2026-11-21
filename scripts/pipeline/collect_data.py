@@ -343,8 +343,37 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
     # the private source. This CI-only inventory does not change other metrics.
     ci_repository_inventory = _collect_repository_inventory(
         activity_all_public, activity_private, activity_counts)
+    ci_query_diagnostics: list[dict] = []
     ci_timeline_observation = collect_public_ci_timeline(
-        repos, USERNAME, repository_inventory=ci_repository_inventory)
+        repos, USERNAME, repository_inventory=ci_repository_inventory,
+        diagnostics=ci_query_diagnostics)
+    successful_queries = sum(row["outcome"] == "success" for row in ci_query_diagnostics)
+    failed_queries = len(ci_query_diagnostics) - successful_queries
+    all_failed = bool(ci_query_diagnostics) and successful_queries == 0
+    failure_message = (
+        "CI timeline collection failed for every selected repository; "
+        "profile generation stopped before canonical writes. "
+        "See site/data/run_diagnostics_history.jsonl."
+    )
+    # The CLI's normal report is written only after generation returns. Record
+    # this outcome here, so a refusal is retained and later reports cannot erase
+    # mixed-query diagnostics from the existing append-only run history.
+    from scripts.quality.diagnostics import write_run_diagnostics
+    write_run_diagnostics(
+        command="collect-ci-timeline", exit_code=1 if all_failed else 0,
+        warnings=[f"CI timeline: {failed_queries} selected queries failed."]
+                 if failed_queries and not all_failed else [],
+        errors=[failure_message] if all_failed else [],
+        extra={"ci_collection": {
+            "selected_repositories": len(ci_query_diagnostics),
+            "successful_queries": successful_queries, "failed_queries": failed_queries,
+            "observations": ci_query_diagnostics,
+        }},
+    )
+    logger(f"  CI timeline: {successful_queries}/{len(ci_query_diagnostics)} queries usable; "
+           f"{failed_queries} failed.")
+    if all_failed:
+        raise RuntimeError(failure_message) from None
 
     return CollectedProfileData(
         inventory_evidence=inventory_evidence,

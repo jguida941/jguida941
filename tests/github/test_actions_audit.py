@@ -1,3 +1,8 @@
+import os
+from pathlib import Path
+import subprocess
+import tempfile
+from contextlib import ExitStack, contextmanager
 import unittest
 from unittest.mock import Mock, patch
 
@@ -449,6 +454,267 @@ class RepositoryCITimelineTests(unittest.TestCase):
         self.assertEqual([302], [run["run_id"] for run in sample["repositories"][0]["runs"]])
         self.assertEqual(1, sample["observed_runs"])
         self.assertEqual("partial", sample["status"])
+
+
+
+class CICollectionAccountabilityTests(unittest.TestCase):
+    """An unusable live cohort cannot be published as a healthy refresh."""
+
+    @contextmanager
+    def _live_collection(self, timeline_response):
+        from datetime import datetime, timezone
+        from scripts.github import actions_audit
+        from scripts.pipeline import collect_data
+        from scripts.core import config
+
+        inventory = RepositoryCITimelineTests.inventory()
+        inventory["personal_public_complete"] = True
+        personal = [row for row in inventory["rows"] if row["owner"]["login"] == "jguida941"]
+        public = [row for row in personal if row["private"] is False]
+        private = [row for row in personal if row["private"] is True]
+        selected = select_public_ci_repositories([], "jguida941", repository_inventory=inventory)
+        self.assertEqual(6, len(selected), "the fixture must exercise the entire bounded cohort")
+        counts = {"public_owned_nonfork": 5, "public_owned_forks": 1,
+                  "public_owned_total": 6, "private_owned": 1, "private_owned_nonfork": 1}
+        exact_zero = {"status": "ok", "value": 0, "complete": True}
+        canary = RepositoryCITimelineTests.provider_run(9001)
+        calls = []
+
+        class Clock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return datetime(2026, 11, 19, 20, tzinfo=timezone.utc)
+
+        def command_result(command, **_kwargs):
+            self.assertEqual(["gh", "run", "list"], command[:3])
+            repository = command[command.index("--repo") + 1]
+            limit = command[command.index("--limit") + 1]
+            calls.append((repository, limit))
+            if limit == "12":
+                value = [canary]
+            else:
+                self.assertEqual("20", limit)
+                value = timeline_response(repository, command)
+            if isinstance(value, BaseException):
+                raise value
+            if isinstance(value, subprocess.CompletedProcess):
+                return value
+            return subprocess.CompletedProcess(command, 0, stdout=json.dumps(value), stderr="")
+
+        with tempfile.TemporaryDirectory() as temporary, ExitStack() as stack:
+            directory = Path(temporary).resolve()
+            previous = Path.cwd()
+            os.chdir(directory)
+            stack.callback(os.chdir, previous)
+            replacements = {
+                "get_owned_repo_scope_counts": counts,
+                "get_repos": public,
+                "get_private_repos": private,
+                "get_all_languages": {},
+                "get_events_observation": {"status": "ok", "value": []},
+                "get_total_commits_observation": exact_zero,
+                "get_releases_last_n_days_observation": exact_zero,
+                "get_merged_prs_last_n_days_observation": exact_zero,
+                "get_repos_with_ci": 0,
+                "get_default_contribution_calendar_observation":
+                    {"status": "ok", "value": {"total": 0, "days": []}},
+                "profile_contributions_from_calendar": {},
+            }
+            for name, value in replacements.items():
+                stack.enter_context(patch.object(collect_data.gh, name, return_value=value))
+            stack.enter_context(patch.object(collect_data.gh, "USERNAME", "jguida941"))
+            stack.enter_context(patch.object(config, "USERNAME", "jguida941"))
+            stack.enter_context(patch.object(collect_data, "_collect_repository_inventory", return_value=inventory))
+            stack.enter_context(patch.object(collect_data, "_read_previous_snapshot", return_value=None))
+            stack.enter_context(patch.object(collect_data, "collect_activity_observations", return_value={}))
+            stack.enter_context(patch.object(actions_audit, "datetime", Clock))
+            stack.enter_context(patch("scripts.quality.diagnostics.platform.platform", return_value="test-platform"))
+            stack.enter_context(patch("scripts.github.gh_cli.subprocess.run", side_effect=command_result))
+            yield directory, calls, selected
+
+    def _diagnostics(self, directory):
+        path = directory / "site/data/run_diagnostics.json"
+        self.assertTrue(path.is_file(), "the original live collection outcome must be retained")
+        report = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual("collect-ci-timeline", report["command"])
+        history_path = directory / "site/data/run_diagnostics_history.jsonl"
+        self.assertTrue(history_path.is_file(), "a later CLI report must not erase this collection result")
+        history = [json.loads(line) for line in history_path.read_text(encoding="utf-8").splitlines()]
+        self.assertIn(report, history)
+        collection = report["extra"]["ci_collection"]
+        self.assertEqual(6, collection["selected_repositories"])
+        self.assertEqual(6, len(collection["observations"]))
+        permitted = {"repository", "observed_at", "outcome", "reason",
+                     "returned_runs", "usable_runs", "returncode", "reported_http_status"}
+        for observation in collection["observations"]:
+            self.assertEqual(permitted, set(observation), "collection diagnostics are a closed public-safe projection")
+        return report, collection
+
+    def test_all_failed_timeline_cannot_be_masked_by_healthy_profile_canary(self):
+        from scripts.pipeline import profile_pipeline
+        secret = "ghp_" + "A" * 36
+        failure = subprocess.CalledProcessError(
+            1, ["gh", "run", "list"], output="private source body " + secret,
+            stderr="HTTP 403: provider refused " + secret)
+        with self._live_collection(lambda *_: failure) as (directory, calls, selected):
+            originals = {}
+            for relative in ("README.md", "assets/dashboard_summary.svg", "site/data/profile_snapshot.json"):
+                path = directory / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"previous accepted bytes\n")
+                originals[path] = path.read_bytes()
+            with patch.object(profile_pipeline, "refuse_dirty_generator_source"), patch.object(
+                profile_pipeline, "run_profile_pipeline_with_collected", return_value={}
+            ) as write_candidate, patch.object(
+                profile_pipeline, "_seal_artifact_set", return_value={}
+            ) as seal_candidate:
+                with self.assertRaisesRegex(RuntimeError, "CI timeline collection failed",
+                                            msg="[PROFILE-CI-TIMELINE-COLLECTION]") as failure_result:
+                    profile_pipeline.run_profile_pipeline(logger=lambda *_: None)
+            self.assertEqual([("jguida941/jguida941", "12")] + [(repo, "20") for repo in selected], calls)
+            write_candidate.assert_not_called()
+            seal_candidate.assert_not_called()
+            for path, original in originals.items():
+                self.assertEqual(original, path.read_bytes())
+            report, collection = self._diagnostics(directory)
+            self.assertNotEqual(0, report["exit_code"])
+            self.assertEqual("error", report["status"])
+            self.assertEqual((0, 6), (collection["successful_queries"], collection["failed_queries"]))
+            self.assertEqual(selected, [row["repository"] for row in collection["observations"]])
+            for row in collection["observations"]:
+                self.assertEqual(("failure", "command_failed", 1, 403),
+                                 (row["outcome"], row["reason"], row["returncode"], row["reported_http_status"]))
+            self.assertNotIn(secret, json.dumps(report))
+            self.assertNotIn("private source body", json.dumps(report))
+            self.assertNotIn(secret, str(failure_result.exception))
+
+    def test_valid_empty_queries_remain_observed_zero_and_successful(self):
+        from scripts.pipeline.collect_data import collect_profile_data
+        with self._live_collection(lambda *_: []) as (directory, calls, selected):
+            collected = collect_profile_data(logger=lambda *_: None)
+            self.assertEqual("available", collected.ci_execution_observation["status"])
+            timeline = collected.ci_timeline_observation
+            self.assertEqual("available", timeline["status"])
+            self.assertEqual(0, timeline["observed_runs"])
+            self.assertEqual([("empty", 0)] * 6,
+                             [(row["status"], row["observed_runs"]) for row in timeline["repositories"]])
+
+    def test_one_failed_query_preserves_other_samples_as_partial(self):
+        from scripts.pipeline.collect_data import collect_profile_data
+        failed_repository = "jguida941/profile-private-continuation"
+        def response(repository, _command):
+            if repository == failed_repository:
+                return RuntimeError("unclassified provider error")
+            return [RepositoryCITimelineTests.provider_run()]
+        with self._live_collection(response) as (directory, _calls, _selected):
+            collected = collect_profile_data(logger=lambda *_: None)
+            timeline = collected.ci_timeline_observation
+            self.assertEqual(("partial", 5), (timeline["status"], timeline["observed_runs"]))
+            failed = next(row for row in timeline["repositories"] if row["repository"] == failed_repository)
+            self.assertEqual("unavailable", failed["status"])
+            self.assertIsNone(failed["observed_runs"])
+
+    def test_clipped_capped_history_is_usable_evidence_without_an_exact_zero_claim(self):
+        from scripts.pipeline.collect_data import collect_profile_data
+        old_runs = [RepositoryCITimelineTests.provider_run(i + 1, created="2026-01-01T00:00:00Z")
+                    for i in range(20)]
+        with self._live_collection(lambda *_: old_runs) as (directory, _calls, _selected):
+            collected = collect_profile_data(logger=lambda *_: None)
+            timeline = collected.ci_timeline_observation
+            self.assertEqual(("partial", 0), (timeline["status"], timeline["observed_runs"]))
+            self.assertTrue(all(row["outside_window"] and row["truncated"] for row in timeline["repositories"]))
+
+    def test_partial_failure_diagnostic_survives_a_later_cli_report(self):
+        from scripts.pipeline.collect_data import collect_profile_data
+        from scripts.quality.diagnostics import write_run_diagnostics
+        failed_repository = "jguida941/profile-private-continuation"
+        def response(repository, _command):
+            return RuntimeError("unclassified provider error") if repository == failed_repository else []
+        with self._live_collection(response) as (directory, _calls, _selected):
+            collect_profile_data(logger=lambda *_: None)
+            report, collection = self._diagnostics(directory)
+            self.assertEqual(0, report["exit_code"])
+            self.assertEqual((5, 1), (collection["successful_queries"], collection["failed_queries"]))
+            diagnostic = next(row for row in collection["observations"] if row["repository"] == failed_repository)
+            self.assertEqual(("failure", "provider_error"), (diagnostic["outcome"], diagnostic["reason"]))
+            write_run_diagnostics(command="validate", exit_code=0)
+            current = json.loads((directory / "site/data/run_diagnostics.json").read_text(encoding="utf-8"))
+            self.assertEqual("validate", current["command"])
+            history = [json.loads(line) for line in
+                       (directory / "site/data/run_diagnostics_history.jsonl").read_text(encoding="utf-8").splitlines()]
+            self.assertIn(report, history, "the successful later CLI command cannot erase the failed query")
+
+    def test_nonlist_malformed_and_command_failures_are_not_empty_samples(self):
+        from scripts.pipeline.collect_data import collect_profile_data
+        secret = "ghp_" + "B" * 36
+        cases = (
+            ("cli_unavailable", FileNotFoundError(secret)),
+            ("invalid_json", subprocess.CompletedProcess(["gh", "run"], 0, stdout=secret, stderr="")),
+            ("invalid_payload", {}),
+            ("unusable_runs", [{"databaseId": True, "workflowName": "bad", "createdAt": "invalid"}]),
+            ("unusable_runs", [RepositoryCITimelineTests.provider_run(workflow=secret)]),
+        )
+        for reason, response in cases:
+            with self.subTest(reason=reason, response_kind=type(response).__name__):
+                with self._live_collection(lambda *_: response) as (directory, calls, selected):
+                    with self.assertRaisesRegex(RuntimeError, "CI timeline collection failed"):
+                        collect_profile_data(logger=lambda *_: None)
+                    self.assertEqual(7, len(calls))
+                    report, collection = self._diagnostics(directory)
+                    self.assertNotEqual(0, report["exit_code"])
+                    self.assertEqual((0, 6), (collection["successful_queries"], collection["failed_queries"]))
+                    self.assertTrue(all(row["outcome"] == "failure" and row["reason"] == reason
+                                        for row in collection["observations"]))
+                    self.assertNotIn(secret, json.dumps(report))
+                    self.assertEqual(selected, [row["repository"] for row in collection["observations"]])
+
+
+    def test_unrepresentable_utc_timestamp_retains_all_failed_query_outcomes(self):
+        from scripts.pipeline.collect_data import collect_profile_data
+        # Both are valid JSON strings accepted by fromisoformat, but converting
+        # the parsed instant to UTC exceeds datetime's supported year range.
+        for timestamp in ("0001-01-01T00:00:00+01:00", "9999-12-31T23:59:59-01:00"):
+            with self.subTest(timestamp=timestamp):
+                rows = [RepositoryCITimelineTests.provider_run(created=timestamp)]
+                with self._live_collection(lambda *_: rows) as (directory, calls, selected):
+                    failure = None
+                    try:
+                        collect_profile_data(logger=lambda *_: None)
+                    except Exception as exc:
+                        failure = exc
+                    self.assertIsNotNone(failure, "a wholly unusable cohort must refuse generation")
+                    report, collection = self._diagnostics(directory)
+                    self.assertNotEqual(0, report["exit_code"])
+                    self.assertEqual((0, 6),
+                                     (collection["successful_queries"], collection["failed_queries"]))
+                    self.assertEqual(7, len(calls), "every selected request keeps its original outcome")
+                    self.assertEqual(selected, [row["repository"] for row in collection["observations"]])
+                    self.assertTrue(all(row["outcome"] == "failure" and row["reason"] == "unusable_runs"
+                                        for row in collection["observations"]))
+
+    def test_unrepresentable_utc_timestamp_preserves_other_repository_samples(self):
+        from scripts.pipeline.collect_data import collect_profile_data
+        failed_repository = "jguida941/profile-private-continuation"
+        def response(repository, _command):
+            timestamp = ("0001-01-01T00:00:00+01:00" if repository == failed_repository
+                         else "2026-11-19T19:49:00Z")
+            return [RepositoryCITimelineTests.provider_run(created=timestamp)]
+        with self._live_collection(response) as (directory, calls, selected):
+            try:
+                collected = collect_profile_data(logger=lambda *_: None)
+            except Exception as exc:
+                self.fail("one unusable timestamp must not discard the other selected samples: "
+                          + type(exc).__name__)
+            timeline = collected.ci_timeline_observation
+            self.assertEqual(("partial", 5), (timeline["status"], timeline["observed_runs"]))
+            self.assertEqual(7, len(calls))
+            report, collection = self._diagnostics(directory)
+            self.assertEqual(0, report["exit_code"])
+            self.assertEqual((5, 1), (collection["successful_queries"], collection["failed_queries"]))
+            diagnostic = next(row for row in collection["observations"]
+                              if row["repository"] == failed_repository)
+            self.assertEqual(("failure", "unusable_runs"), (diagnostic["outcome"], diagnostic["reason"]))
+            self.assertEqual(selected, [row["repository"] for row in collection["observations"]])
 
 
 if __name__ == "__main__":

@@ -485,3 +485,12 @@ jobs:
           path: ${{ env.CANDIDATE_PREVIEW_OUTPUT }}
           if-no-files-found: error
           retention-days: 30
+      - name: Retain candidate collection diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: profile-candidate-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            site/data/run_diagnostics.json
+            site/data/run_diagnostics_history.jsonl
+          retention-days: 30

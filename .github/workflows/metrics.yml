@@ -110,8 +110,8 @@ jobs:
 
       # One typed product decision governs every canonical publish effect below.
       # Readiness is evidence about the artifact set, never a rendered repository
-      # count: a degraded run keeps the last accepted artifacts and stays green,
-      # and an invalid set fails the run.
+      # count: held evidence keeps the last accepted artifacts. An unusable
+      # selected CI cohort fails generation before reaching this stored-set gate.
       - name: Decide whether to publish
         id: gate
         env:
@@ -142,6 +142,17 @@ jobs:
             metrics.general.svg
             site/data/profile_snapshot.json
             site/data/profile_artifact_manifest.json
+
+      # These existing diagnostics retain collection failures even when no new
+      # canonical artifacts were written. Provider response bodies are excluded.
+      - name: Upload diagnostics artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: profile-diagnostics
+          path: |
+            site/data/run_diagnostics.json
+            site/data/run_diagnostics_history.jsonl
 
       - uses: stefanzweifel/git-auto-commit-action@v5
         if: ${{ success() && steps.gate.outputs.publish == 'true' }}
