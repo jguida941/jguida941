@@ -358,18 +358,21 @@ def collect_profile_data(logger=print) -> CollectedProfileData:
     # The CLI's normal report is written only after generation returns. Record
     # this outcome here, so a refusal is retained and later reports cannot erase
     # mixed-query diagnostics from the existing append-only run history.
-    from scripts.quality.diagnostics import write_run_diagnostics
-    write_run_diagnostics(
-        command="collect-ci-timeline", exit_code=1 if all_failed else 0,
-        warnings=[f"CI timeline: {failed_queries} selected queries failed."]
-                 if failed_queries and not all_failed else [],
-        errors=[failure_message] if all_failed else [],
-        extra={"ci_collection": {
-            "selected_repositories": len(ci_query_diagnostics),
-            "successful_queries": successful_queries, "failed_queries": failed_queries,
-            "observations": ci_query_diagnostics,
-        }},
-    )
+    # No selected requests means no query outcome to report. Preserve any
+    # existing live diagnostics when a caller supplies no collection evidence.
+    if ci_query_diagnostics:
+        from scripts.quality.diagnostics import write_run_diagnostics
+        write_run_diagnostics(
+            command="collect-ci-timeline", exit_code=1 if all_failed else 0,
+            warnings=[f"CI timeline: {failed_queries} selected queries failed."]
+                     if failed_queries and not all_failed else [],
+            errors=[failure_message] if all_failed else [],
+            extra={"ci_collection": {
+                "selected_repositories": len(ci_query_diagnostics),
+                "successful_queries": successful_queries, "failed_queries": failed_queries,
+                "observations": ci_query_diagnostics,
+            }},
+        )
     logger(f"  CI timeline: {successful_queries}/{len(ci_query_diagnostics)} queries usable; "
            f"{failed_queries} failed.")
     if all_failed:
