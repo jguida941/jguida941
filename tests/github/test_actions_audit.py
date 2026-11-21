@@ -669,6 +669,59 @@ class CICollectionAccountabilityTests(unittest.TestCase):
                     self.assertEqual(selected, [row["repository"] for row in collection["observations"]])
 
 
+    def test_empty_responses_from_six_selected_queries_retain_success_diagnostics(self):
+        from scripts.pipeline.collect_data import collect_profile_data
+
+        with self._live_collection(lambda *_: []) as (directory, calls, selected):
+            collect_profile_data(logger=lambda *_: None)
+            report, collection = self._diagnostics(directory)
+            self.assertEqual(7, len(calls))
+            self.assertEqual(0, report["exit_code"])
+            self.assertEqual((6, 0), (collection["successful_queries"], collection["failed_queries"]))
+            self.assertEqual(selected, [row["repository"] for row in collection["observations"]])
+            for row in collection["observations"]:
+                self.assertEqual(("success", "ok", 0, 0),
+                    (row["outcome"], row["reason"], row["returned_runs"], row["usable_runs"]))
+
+    def test_no_query_fixture_preserves_prior_diagnostics_when_a_later_test_fails(self):
+        from scripts.quality.diagnostics import write_run_diagnostics
+        from tests.contracts.test_dashboard_summary import inventory_fixture_model
+
+        selected = select_public_ci_repositories([], "jguida941",
+            repository_inventory=RepositoryCITimelineTests.inventory())
+        observations = [{"repository": repository, "observed_at": "2026-11-19T20:00:00Z",
+                         "outcome": "failure", "reason": "command_failed",
+                         "returned_runs": None, "usable_runs": None,
+                         "returncode": 1, "reported_http_status": 403}
+                        for repository in selected]
+        with tempfile.TemporaryDirectory() as temporary, ExitStack() as stack:
+            directory = Path(temporary).resolve()
+            previous = Path.cwd()
+            os.chdir(directory)
+            stack.callback(os.chdir, previous)
+            write_run_diagnostics(command="collect-ci-timeline", exit_code=1,
+                errors=["Original live collection failure"], extra={"ci_collection": {
+                    "selected_repositories": len(selected), "successful_queries": 0,
+                    "failed_queries": len(selected), "observations": observations}})
+            self._diagnostics(directory)
+            paths = (directory / "site/data/run_diagnostics.json",
+                     directory / "site/data/run_diagnostics_history.jsonl")
+            originals = {path: path.read_bytes() for path in paths}
+
+            # This is the existing ordinary product-test helper that mocks the
+            # timeline query itself. No provider request populates its sink.
+            # If a later test fails, the workflow skips publication-status and
+            # its always-upload must still receive the original diagnostics.
+            with self.assertRaisesRegex(AssertionError, "later product test failed"):
+                inventory_fixture_model()
+                raise AssertionError("later product test failed")
+
+            for path, original in originals.items():
+                with self.subTest(diagnostic=path.name):
+                    self.assertEqual(original, path.read_bytes(),
+                        "[PROFILE-CI-COLLECTION-DIAGNOSTIC-PRESERVATION] "
+                        "a no-query fixture must not replace or append to live diagnostics")
+
     def test_unrepresentable_utc_timestamp_retains_all_failed_query_outcomes(self):
         from scripts.pipeline.collect_data import collect_profile_data
         # Both are valid JSON strings accepted by fromisoformat, but converting
