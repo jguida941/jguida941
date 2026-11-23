@@ -547,8 +547,150 @@ class CICollectionAccountabilityTests(unittest.TestCase):
         permitted = {"repository", "observed_at", "outcome", "reason",
                      "returned_runs", "usable_runs", "returncode", "reported_http_status"}
         for observation in collection["observations"]:
-            self.assertEqual(permitted, set(observation), "collection diagnostics are a closed public-safe projection")
+            # Historical records and genuine pre-repair subjects have no category.
+            # The new retention target below explicitly requires it on fresh output.
+            self.assertIn(set(observation), (permitted, permitted | {"reported_provider_category"}),
+                          "collection diagnostics are a closed public-safe projection")
+            if "reported_provider_category" in observation:
+                self.assertIn(observation["reported_provider_category"],
+                              {"primary_rate_limit", "secondary_rate_limit", "access_denied", "unknown"})
         return report, collection
+
+    def test_reported_provider_categories_reach_current_and_history(self):
+        from scripts.pipeline.collect_data import collect_profile_data
+        from scripts.quality.diagnostics import write_run_diagnostics
+
+        secret = "ghp_" + "C" * 36
+        private_body = "private provider response body"
+        request_url = "https://api.example.test/private-fixture/actions/runs?token=" + secret
+
+        def command_failure(stderr):
+            return subprocess.CalledProcessError(1, ["gh", "run", "list"],
+                output=private_body + " " + secret, stderr=stderr)
+
+        # The exact prospective vocabulary comes from GitHub's REST docs and
+        # cli/go-gh HTTPError / cli/cli run-list formatters, not English sentiment.
+        messages = (
+            ("primary_rate_limit", 403, "HTTP 403: API rate limit exceeded"),
+            ("primary_rate_limit", 429, "HTTP 429: API rate limit exceeded."),
+            ("primary_rate_limit", 403, "HTTP 403: API rate limit exceeded for user ID 1."),
+            ("primary_rate_limit", 429, "HTTP 429: API rate limit exceeded for user ID 007."),
+            ("secondary_rate_limit", 403, "HTTP 403: You have exceeded a secondary rate limit."),
+            ("secondary_rate_limit", 429, "HTTP 429: You have exceeded a secondary rate limit."),
+            ("secondary_rate_limit", 403,
+             "HTTP 403: You have exceeded a secondary rate limit. Please wait a few minutes."),
+            ("secondary_rate_limit", 429,
+             "HTTP 429: You have exceeded a secondary rate limit. Please wait a few minutes."),
+            ("access_denied", 403, "HTTP 403: Resource not accessible by integration"),
+            ("access_denied", 403, "HTTP 403: Resource not accessible by integration."),
+            ("access_denied", 403, "HTTP 403: Resource not accessible by personal access token"),
+            ("access_denied", 403, "HTTP 403: Resource not accessible by personal access token."),
+            ("primary_rate_limit", 403,
+             "failed to get runs: HTTP 403: API rate limit exceeded (" + request_url + ")"),
+            ("access_denied", 403,
+             "HTTP 403: Resource not accessible by integration (http://example.test/runs)"),
+            ("secondary_rate_limit", 429,
+             " \t\r\n\f\vHTTP 429: You have exceeded a secondary rate limit.\v\f\n\r\t "),
+            ("primary_rate_limit", 403, "HTTP 403: API rate limit exceeded".ljust(8192)),
+            ("unknown", 403, "HTTP 403: Forbidden"),
+        )
+        cases = [(category, "command_failed", status, command_failure(message))
+                 for category, status, message in messages]
+        cases.extend((
+            ("unknown", "command_failed", None, command_failure(b"HTTP 403: API rate limit exceeded")),
+            ("unknown", "command_failed", None, command_failure(None)),
+            ("unknown", "provider_error", None, RuntimeError("HTTP 403: API rate limit exceeded " + secret)),
+            ("unknown", "cli_unavailable", None, FileNotFoundError(secret)),
+            ("unknown", "invalid_json", None, subprocess.CompletedProcess(
+                ["gh", "run"], 0, stdout=secret, stderr="HTTP 403: API rate limit exceeded")),
+            ("unknown", "invalid_payload", None, {}),
+            ("unknown", "unusable_runs", None, [{"databaseId": True, "createdAt": "invalid"}]),
+            ("unknown", "ok", None, []),
+            ("unknown", "ok", None, [RepositoryCITimelineTests.provider_run()]),
+        ))
+        for category, reason, status, response in cases:
+            with self._live_collection(lambda *_: response) as (directory, calls, selected):
+                if reason == "ok":
+                    collect_profile_data(logger=lambda *_: None)
+                else:
+                    with self.assertRaisesRegex(RuntimeError, "CI timeline collection failed") as failure:
+                        collect_profile_data(logger=lambda *_: None)
+                    self.assertNotIn(secret, str(failure.exception))
+                    self.assertNotIn(private_body, str(failure.exception))
+                report, collection = self._diagnostics(directory)
+                self.assertEqual(7, len(calls))
+                self.assertEqual(selected, [row["repository"] for row in collection["observations"]])
+                for row in collection["observations"]:
+                    self.assertEqual(category, row.get("reported_provider_category"),
+                        "[PROFILE-CI-REPORTED-PROVIDER-CATEGORY] fresh query output must retain "
+                        "the literal reported category, including explicit unknown")
+                    self.assertEqual(reason, row["reason"])
+                    self.assertEqual(status, row["reported_http_status"])
+                    self.assertEqual(1 if reason == "command_failed" else None, row["returncode"])
+                for relative in ("site/data/run_diagnostics.json", "site/data/run_diagnostics_history.jsonl"):
+                    retained = (directory / relative).read_text(encoding="utf-8")
+                    for forbidden in (secret, private_body, request_url, "API rate limit exceeded"):
+                        self.assertNotIn(forbidden, retained)
+                write_run_diagnostics(command="validate", exit_code=0)
+                current = json.loads((directory / "site/data/run_diagnostics.json").read_text(encoding="utf-8"))
+                self.assertEqual("validate", current["command"])
+                history = [json.loads(line) for line in
+                    (directory / "site/data/run_diagnostics_history.jsonl").read_text(encoding="utf-8").splitlines()]
+                self.assertIn(report, history, "the later report must retain the exact categorized collection record")
+
+    def test_ambiguous_provider_text_remains_unclassified(self):
+        from scripts.pipeline.collect_data import collect_profile_data
+
+        secret = "ghp_" + "D" * 36
+        private_body = "private provider response body"
+        messages = (
+            "HTTP 403", "HTTP 401", "HTTP 404", "HTTP 429",
+            "HTTP 401: Bad credentials", "HTTP 404: Not Found", "HTTP 429: Too Many Requests",
+            "HTTP 401: API rate limit exceeded", "HTTP 500: You have exceeded a secondary rate limit.",
+            "HTTP 429: Resource not accessible by integration",
+            "HTTP 403: API rate limit exceeded\nHTTP 429: You have exceeded a secondary rate limit.",
+            "HTTP 403: API rate limit exceeded; HTTP 403: You have exceeded a secondary rate limit.",
+            "HTTP 403: API rate limit exceeded; Resource not accessible by integration",
+            "HTTP 403: provider refused (https://example.test/?message=API rate limit exceeded)",
+            'HTTP 403: "API rate limit exceeded"',
+            "HTTP 403: Retry if API rate limit exceeded",
+            "HTTP 403: API rate limit exceeded " + secret,
+            "HTTP 403: Resource not accessible by integration (private provider response body)",
+            "HTTP 403: API rate limit exceeded (https://example.test/runs) extra",
+            "HTTP 403: API rate limit exceeded (https://example.test/one) (https://example.test/two)",
+            "HTTP 403: API rate limit exceeded\n" + private_body,
+            "failed to get runs: failed to get runs: HTTP 403: API rate limit exceeded",
+            "HTTP 403: api rate limit exceeded", "HTTP  403: API rate limit exceeded",
+            "HTTP 403:  API rate limit exceeded",
+            "\N{NO-BREAK SPACE}HTTP 403: API rate limit exceeded",
+            "HTTP 403: API rate limit exceeded for user ID \N{ARABIC-INDIC DIGIT ONE}.",
+            "HTTP 403: API rate limit exceeded for user ID alice.",
+            "HTTP 403: secondary rate limit",
+            "\x1b[31mHTTP 403: API rate limit exceeded\x1b[0m",
+            "HTTP 403: API rate limit exceeded".ljust(8193),
+            "HTTP 403: API rate limit exceeded" + " " * 8192 + "HTTP 429: access denied",
+            b"HTTP 403: API rate limit exceeded", None,
+        )
+        for message in messages:
+            with self.subTest(stderr_kind=type(message).__name__, example=repr(message)[:90]):
+                error = subprocess.CalledProcessError(1, ["gh", "run", "list"],
+                    output="HTTP 403: API rate limit exceeded " + private_body + " " + secret,
+                    stderr=message)
+                with self._live_collection(lambda *_: error) as (directory, calls, _selected):
+                    with self.assertRaisesRegex(RuntimeError, "CI timeline collection failed") as failure:
+                        collect_profile_data(logger=lambda *_: None)
+                    self.assertEqual(7, len(calls))
+                    report, collection = self._diagnostics(directory)
+                    for row in collection["observations"]:
+                        # This control admits the genuine old observation as
+                        # unclassified; the separate marked target requires presence.
+                        self.assertEqual("unknown", row.get("reported_provider_category", "unknown"))
+                        self.assertEqual("command_failed", row["reason"])
+                    retained = json.dumps(report) + (directory /
+                        "site/data/run_diagnostics_history.jsonl").read_text(encoding="utf-8")
+                    for forbidden in (secret, private_body, "API rate limit exceeded", "https://example.test/"):
+                        self.assertNotIn(forbidden, retained)
+                        self.assertNotIn(forbidden, str(failure.exception))
 
     def test_all_failed_timeline_cannot_be_masked_by_healthy_profile_canary(self):
         from scripts.pipeline import profile_pipeline
