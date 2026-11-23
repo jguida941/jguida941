@@ -2620,6 +2620,140 @@ class ProfilePublicationSourceTests(unittest.TestCase):
 
 
 
+def _pages_mapping(lines, indent, key):
+    """Read one existing plain scalar mapping; unsupported syntax is apparatus."""
+    opener = re.compile(rf"^ {{{indent}}}{re.escape(key)}:\s*$")
+    starts = [index for index, line in enumerate(lines) if opener.fullmatch(line)]
+    if not starts:
+        return {}
+    if len(starts) != 1:
+        raise ValueError(f"ambiguous {key} mapping")
+    values = {}
+    for line in lines[starts[0] + 1:]:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        if len(line) - len(line.lstrip()) <= indent:
+            break
+        match = re.fullmatch(rf" {{{indent + 2}}}([A-Za-z_][A-Za-z0-9_-]*):\s*(.+)", line)
+        if not match or match[1] in values:
+            raise ValueError(f"unsupported or duplicate {key} member: {line!r}")
+        values[match[1]] = _env_scalar(match[2].strip())
+    return values
+
+
+def _pages_scalar(value, context, environment, seen=()):
+    pattern = re.compile(r"\$\{\{\s*(github\.run_id|github\.run_attempt|env\.[A-Za-z_][A-Za-z0-9_]*)\s*\}\}")
+
+    def replace(match):
+        name = match[1]
+        if name.startswith("github."):
+            return str(context[name])
+        key = name[4:]
+        if key in seen or key not in environment:
+            raise ValueError("missing or cyclic Pages name input: " + key)
+        return _pages_scalar(environment[key], context, environment, (*seen, key))
+
+    resolved = pattern.sub(replace, value)
+    if "${{" in resolved:
+        raise ValueError("unsupported Pages name expression: " + value)
+    return resolved
+
+
+def pages_artifact_names(workflow_text, *, run_id, attempt):
+    """Resolve only the two actual configured action inputs, including defaults."""
+    class WorkflowText:
+        def read_text(self, **_kwargs):
+            return workflow_text
+
+    lines = workflow_text.splitlines()
+    start = [i for i, line in enumerate(lines) if line == "  deploy:"]
+    if len(start) != 1:
+        raise ValueError("expected the existing single deploy job")
+    job_lines = []
+    for line in lines[start[0] + 1:]:
+        if line.strip() and len(line) - len(line.lstrip()) <= 2:
+            break
+        job_lines.append(line)
+    job_environment = {**_pages_mapping(lines, 0, "env"), **_pages_mapping(job_lines, 4, "env")}
+    steps = _workflow_steps(WorkflowText(), job_name="deploy")
+    context = {"github.run_id": str(run_id), "github.run_attempt": str(attempt)}
+    result = []
+    for action, input_name in (("actions/upload-pages-artifact@v3", "name"),
+                               ("actions/deploy-pages@v4", "artifact_name")):
+        matches = [step for step in steps if _step_field(step, "uses") == action]
+        if len(matches) != 1:
+            raise ValueError("expected one existing action: " + action)
+        step = matches[0]
+        environment = {**job_environment, **_pages_mapping(step, 8, "env")}
+        configured = _pages_mapping(step, 8, "with").get(input_name, "github-pages")
+        result.append(_pages_scalar(configured, context, environment))
+    return tuple(result)
+
+
+def pages_metadata_observation(artifacts, artifact_name):
+    """The inspected action's exact-name/one-result contract, not a latest picker.
+
+    Pinned dependency: actions/deploy-pages d6db9016, src/internal/api-client.js.
+    An actual execution of that dependency separately corroborates this adapter.
+    """
+    matches = [artifact for artifact in artifacts if artifact["name"] == artifact_name]
+    if not matches:
+        return ("missing", None)
+    if len(matches) != 1:
+        return ("ambiguous", None)
+    return ("selected", matches[0]["id"])
+
+
+class PagesPublicationAttemptContract(unittest.TestCase):
+    workflow_path = Path(__file__).resolve().parents[2] / ".github/workflows/deploy-site.yml"
+
+    def names(self, *, attempt, run_id=45155220417):
+        return pages_artifact_names(self.workflow_path.read_text(encoding="utf-8"),
+                                    run_id=run_id, attempt=attempt)
+
+    def retry_observation(self):
+        first_upload, _ = self.names(attempt=1)
+        second_upload, second_deploy = self.names(attempt=2)
+        prior = {"id": 14807917811, "name": first_upload}
+        current = {"id": 14808579915, "name": second_upload}
+        retained = [prior, current]
+        return {
+            "retry": pages_metadata_observation(retained, second_deploy),
+            "missing_current": pages_metadata_observation([prior], second_deploy),
+            "retained_ids": [artifact["id"] for artifact in retained],
+        }
+
+    def test_retry_selects_current_upload_and_cannot_borrow_prior_attempt(self):
+        observed = self.retry_observation()
+        self.assertEqual({"retry": ("selected", 14808579915),
+                          "missing_current": ("missing", None),
+                          "retained_ids": [14807917811, 14808579915]}, observed)
+
+    def test_first_attempt_still_selects_its_single_upload(self):
+        uploaded, deployed = self.names(attempt=1)
+        self.assertEqual(("selected", 41),
+                         pages_metadata_observation([{"id": 41, "name": uploaded}], deployed))
+
+    def test_no_artifact_is_still_a_refusal(self):
+        _, deployed = self.names(attempt=2)
+        self.assertEqual(("missing", None), pages_metadata_observation([], deployed))
+
+    def test_same_attempt_duplicate_is_still_a_refusal(self):
+        uploaded, deployed = self.names(attempt=2)
+        artifacts = [{"id": 41, "name": uploaded}, {"id": 42, "name": uploaded}]
+        self.assertEqual(("ambiguous", None), pages_metadata_observation(artifacts, deployed))
+
+    def test_unrelated_artifact_names_do_not_displace_current_upload(self):
+        uploaded, deployed = self.names(attempt=2)
+        artifacts = [{"id": 40, "name": "profile-diagnostics"}, {"id": 41, "name": uploaded}]
+        self.assertEqual(("selected", 41), pages_metadata_observation(artifacts, deployed))
+
+    def test_later_attempt_context_remains_usable(self):
+        uploaded, deployed = self.names(attempt=12, run_id=45157897463)
+        self.assertEqual(("selected", 41),
+                         pages_metadata_observation([{"id": 41, "name": uploaded}], deployed))
+
+
 if __name__ == "__main__":
     unittest.main()
 
