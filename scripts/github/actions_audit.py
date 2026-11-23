@@ -343,6 +343,40 @@ def normalize_public_ci_timeline(
     return result
 
 
+def _reported_provider_category(stderr: object, reported_http_status: int | None) -> str:
+    """Recognize a bounded CLI message family without retaining its text.
+
+    This is a reported-message category, not authenticated cause or retry policy.
+    Unknown covers unfamiliar wording and incomplete or ambiguous input.
+    """
+    import re
+
+    if not isinstance(stderr, str) or len(stderr) > 8192:
+        return "unknown"
+    # CLI formatting: cli/go-gh pkg/api/errors.go; cli/cli pkg/cmd/run/list/list.go.
+    # Match the whole message so URL, quoted text and advice cannot supply a reason.
+    line = stderr.strip(" \t\r\n\f\v")
+    error = re.fullmatch(r"(?:failed to get runs: )?HTTP ([0-9]{3}): ([^\r\n]+)", line)
+    if error is None or int(error[1]) != reported_http_status:
+        return "unknown"
+    message = re.sub(r" \(https?://[^\s()]+\)$", "", error[2])
+    # https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api
+    # Exact examples: github/docs src/workflows/tests/secondary-ratelimit-retry.ts
+    # and cli/cli pkg/cmd/skills/search/search_test.go.
+    if reported_http_status in (403, 429):
+        if re.fullmatch(r"API rate limit exceeded(?:\.| for user ID [0-9]+\.)?", message):
+            return "primary_rate_limit"
+        if message in ("You have exceeded a secondary rate limit.",
+                       "You have exceeded a secondary rate limit. Please wait a few minutes."):
+            return "secondary_rate_limit"
+    # https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api#resource-not-accessible
+    if reported_http_status == 403 and re.fullmatch(
+        r"Resource not accessible by (?:integration|personal access token)\.?", message
+    ):
+        return "access_denied"
+    return "unknown"
+
+
 def _ci_query_diagnostic(repository: str, observed_at: str, rows: object,
                          error: Exception | None) -> dict:
     """Retain a closed query outcome without serializing provider error text.
@@ -361,6 +395,7 @@ def _ci_query_diagnostic(repository: str, observed_at: str, rows: object,
     reason = "ok"
     returncode = None
     reported_http_status = None
+    reported_provider_category = "unknown"
     returned_runs = len(rows) if isinstance(rows, list) else None
     usable_runs = None
     if error is not None:
@@ -376,6 +411,7 @@ def _ci_query_diagnostic(repository: str, observed_at: str, rows: object,
             statuses = set(re.findall(r"\bHTTP ([1-5][0-9]{2})\b", stderr[:8192]))
             if len(statuses) == 1:
                 reported_http_status = int(statuses.pop())
+            reported_provider_category = _reported_provider_category(cause.stderr, reported_http_status)
         elif isinstance(cause, json.JSONDecodeError):
             reason = "invalid_json"
         else:
@@ -393,6 +429,7 @@ def _ci_query_diagnostic(repository: str, observed_at: str, rows: object,
         "outcome": "success" if reason == "ok" else "failure", "reason": reason,
         "returned_runs": returned_runs, "usable_runs": usable_runs,
         "returncode": returncode, "reported_http_status": reported_http_status,
+        "reported_provider_category": reported_provider_category,
     }
 
 
