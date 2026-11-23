@@ -2328,6 +2328,298 @@ class ProfilePublicationAcceptanceTests(unittest.TestCase):
         self.assertLess(readiness_index, upload_index)
 
 
+class ProfilePublicationSourceTests(unittest.TestCase):
+    """Exercise publisher source selection and ordinary Git refusal locally.
+
+    Execute the workflow's actual source-selection shell, then use the observed
+    checkout action's ref/default behavior with real Git. This does not execute
+    GitHub's expression engine, Node action, or arbitrary other workflow steps.
+    Fixture outputs are nonlive; existing tests own readiness and generation.
+    """
+
+    def _git(self, root, *args, check=True):
+        environment = dict(os.environ)
+        environment.update(GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL=os.devnull)
+        return subprocess.run(
+            ["git", "-c", "protocol.allow=never", "-c", "protocol.file.allow=always", *args],
+            cwd=root,
+            env=environment,
+            check=check,
+            text=True,
+            capture_output=True,
+            timeout=30,
+        )
+
+    def _initialize(self, parent):
+        from scripts import contracts
+
+        remote = parent / "remote.git"
+        producer = parent / "producer"
+        self._git(parent, "init", "--bare", "--initial-branch=main", str(remote))
+        self._git(parent, "init", "--initial-branch=main", str(producer))
+        self._git(producer, "config", "user.name", "Profile publication test")
+        self._git(producer, "config", "user.email", "profile-test@example.invalid")
+        for relative in contracts.GENERATOR_SOURCE_ROOTS:
+            shutil.copytree(
+                ROOT / relative, producer / relative,
+                ignore=shutil.ignore_patterns("__pycache__"),
+            )
+        for relative in (*contracts.GENERATOR_SOURCE_FILES, contracts.GENERATOR_TEMPLATE_PATH):
+            destination = producer / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(ROOT / relative, destination)
+        for relative in contracts.PROFILE_PAYLOAD_PATHS:
+            destination = producer / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text("local fixture A\n", encoding="utf-8")
+        self._git(producer, "add", "--all")
+        self._git(producer, "commit", "-qm", "fixture A")
+        self._git(producer, "remote", "add", "origin", remote.as_uri())
+        self._git(producer, "push", "-q", "origin", "HEAD:main")
+        return remote, producer, self._git(producer, "rev-parse", "HEAD").stdout.strip()
+
+    def _advance_main(self, producer, label):
+        (producer / "README.md").write_text(f"accepted fixture {label}\n", encoding="utf-8")
+        self._git(producer, "add", "README.md")
+        self._git(producer, "commit", "-qm", f"fixture {label}")
+        self._git(producer, "push", "-q", "origin", "HEAD:main")
+        return self._git(producer, "rev-parse", "HEAD").stdout.strip()
+
+    def _publisher(self, name):
+        steps = _workflow_steps(ROOT / ".github/workflows" / name)
+        checkout = [s for s in steps if _step_field(s, "uses") == "actions/checkout@v4"]
+        publish = [s for s in steps if _step_field(s, "uses") == "stefanzweifel/git-auto-commit-action@v5"]
+        self.assertEqual(1, len(checkout), "update fixture when checkout provider changes")
+        self.assertEqual(1, len(publish), "update fixture when publisher provider changes")
+        return {"step": checkout[0], "before": steps[:steps.index(checkout[0])]}, publish[0]
+
+    def _input(self, parent, checkout, event):
+        """Consume literal input or execute the actual referenced output producer."""
+        value = _env_scalar(_step_field(checkout["step"], "ref") or "")
+        if not value.startswith("${{"):
+            return value
+        if re.fullmatch(r"\$\{\{\s*github\.sha\s*\}\}", value):
+            return event["sha"]
+        output = re.fullmatch(
+            r"\$\{\{\s*steps\.([A-Za-z0-9_-]+)\.outputs\.([A-Za-z0-9_-]+)\s*\}\}", value
+        )
+        self.assertIsNotNone(output, "unsupported checkout expression needs provider review")
+        step_id, field = output.groups()
+        producers = [s for s in checkout["before"] if _step_field(s, "id") == step_id]
+        self.assertEqual(1, len(producers), "source output must be produced before checkout")
+        step = producers[0]
+        self.assertIsNone(_step_field(step, "if"), "source selector must execute unconditionally")
+        self.assertIsNone(_step_field(step, "shell"), "retain default Ubuntu Bash invocation")
+        script = "\n".join(_step_run_lines(step))
+        self.assertTrue(script)
+        with tempfile.TemporaryDirectory(dir=parent) as directory:
+            output_path = Path(directory) / "step-output"
+            environment = dict(os.environ, GITHUB_REF=event["ref"], GITHUB_SHA=event["sha"],
+                               GITHUB_EVENT_NAME=event["event_name"], GITHUB_OUTPUT=str(output_path))
+            subprocess.run(["bash", "--noprofile", "--norc", "-e", "-c", script],
+                           cwd=directory, env=environment, check=True, capture_output=True,
+                           text=True, timeout=30)
+            values = [line.split("=", 1)[1] for line in output_path.read_text().splitlines()
+                      if line.startswith(field + "=")]
+        self.assertEqual(1, len(values), "selector must produce one explicit source output")
+        return values[0]
+
+    def _checkout(self, parent, remote, checkout, event):
+        requested = self._input(parent, checkout, event)
+        # Empty input takes the action's context.ref + context.sha fallback;
+        # an explicit 40-hex input instead checks out a detached commit.
+        detached = bool(re.fullmatch(r"[0-9a-fA-F]{40}", requested))
+        if not requested:
+            detached = event["ref"].startswith("refs/tags/")
+            branch = None if detached else event["ref"].removeprefix("refs/heads/")
+            source = event["sha"]
+        elif detached:
+            branch, source = None, requested
+        else:
+            branch = requested.removeprefix("refs/heads/")
+            source = requested
+        job = parent / "job"
+        self._git(parent, "init", str(job))
+        self._git(job, "config", "user.name", "Profile publication test")
+        self._git(job, "config", "user.email", "profile-test@example.invalid")
+        self._git(job, "remote", "add", "origin", remote.as_uri())
+        depth = int(_env_scalar(_step_field(checkout["step"], "fetch-depth") or "1"))
+        depth_args = (f"--depth={depth}",) if depth else ()
+        refspec = source if detached else f"+{source}:refs/remotes/origin/{branch}"
+        self._git(job, "fetch", "--no-tags", *depth_args, "origin", refspec)
+        if detached:
+            self._git(job, "checkout", "--detach", "FETCH_HEAD")
+        else:
+            self._git(job, "checkout", "-B", branch, f"refs/remotes/origin/{branch}")
+        return job
+
+    def _generate_manifest(self, job, event):
+        from scripts import contracts
+
+        original_cwd = Path.cwd()
+        os.chdir(job)
+        try:
+            with patch.object(contracts, "SOURCE_ROOT", job), patch.dict(
+                os.environ, {"GITHUB_SHA": event["sha"]}
+            ):
+                identity = contracts.build_generation_identity(
+                    source_kind="fixture", generated_at="2026-01-01T00:00:00Z",
+                    claim_input_digest=contracts.canonical_digest({"fixture": "publication-source"}),
+                )
+                for relative in contracts.PROFILE_PAYLOAD_PATHS:
+                    (job / relative).write_text(
+                        json.dumps({"fixture": True, "generation": contracts.public_generation_record(identity)}),
+                        encoding="utf-8",
+                    )
+                manifest = contracts.build_artifact_manifest(identity, root=job)
+                (job / contracts.PROFILE_ARTIFACT_MANIFEST_PATH).write_text(
+                    json.dumps(manifest), encoding="utf-8",
+                )
+                self.assertEqual([], contracts.artifact_manifest_errors(manifest, root=job))
+                return manifest
+        finally:
+            os.chdir(original_cwd)
+
+    def _publish(self, job, publish):
+        import shlex
+
+        target = _env_scalar(_step_field(publish, "branch") or "")
+        self.assertEqual("main", target)
+        # This is the pinned action's ordinary fetch / checkout / commit / push
+        # transport seam, not its complete runtime. Consume configured options
+        # so force-pushing cannot pass the late-movement refusal control.
+        self._git(job, "fetch", "--depth=1", "origin")
+        self._git(job, "checkout", target, "--")
+        paths = shlex.split(_env_scalar(_step_field(publish, "file_pattern") or ""))
+        self.assertTrue(paths)
+        self._git(job, "add", "--", *paths)
+        self._git(job, "commit", "-qm", "fixture generated outputs")
+        push_options = shlex.split(_env_scalar(_step_field(publish, "push_options") or ""))
+        return self._git(job, "push", "--set-upstream", "origin", f"HEAD:{target}",
+                         "--follow-tags", "--atomic", *push_options, check=False)
+
+    def _observe_queued_main(self, workflow, event_name):
+        with tempfile.TemporaryDirectory() as directory:
+            parent = Path(directory)
+            remote, producer, event_sha = self._initialize(parent)
+            current = self._advance_main(producer, "B before queued checkout")
+            event = {"ref": "refs/heads/main", "sha": event_sha, "event_name": event_name}
+            checkout, publish = self._publisher(workflow)
+            job = self._checkout(parent, remote, checkout, event)
+            manifest = self._generate_manifest(job, event)
+            pushed = self._publish(job, publish)
+            observed = {
+                "event_sha": event_sha,
+                "main_before_checkout": current,
+                "generator_revision": manifest["generator_revision"],
+                "push_succeeded": pushed.returncode == 0,
+                "push_stderr": pushed.stderr,
+                "published_head": self._git(remote, "rev-parse", "refs/heads/main").stdout.strip(),
+                "generated_head": self._git(job, "rev-parse", "HEAD").stdout.strip(),
+                "generated_parent": self._git(job, "rev-parse", "HEAD^").stdout.strip(),
+            }
+            self.assertNotEqual(event_sha, current)
+            return observed
+
+    def _assert_current_main_publication(self, workflow, observed):
+        current = observed["main_before_checkout"]
+        self.assertEqual(current, observed["generator_revision"],
+                         f"{workflow}: queued run generated from event SHA instead of current main; {observed}")
+        self.assertTrue(observed["push_succeeded"], observed["push_stderr"])
+        self.assertEqual(current, observed["generated_parent"])
+        self.assertEqual(observed["generated_head"], observed["published_head"])
+
+    def test_metrics_queued_main_uses_current_published_source(self):
+        for event_name in ("schedule", "workflow_dispatch"):
+            with self.subTest(event=event_name):
+                observed = self._observe_queued_main("metrics.yml", event_name)
+                self._assert_current_main_publication("metrics.yml", observed)
+
+    def test_analytics_current_main_selection_remains_healthy(self):
+        observed = self._observe_queued_main("analytics.yml", "workflow_dispatch")
+        self._assert_current_main_publication("analytics.yml", observed)
+
+    def test_no_main_movement_preserves_ordinary_publication(self):
+        for workflow in ("metrics.yml", "analytics.yml"):
+            with self.subTest(workflow=workflow), tempfile.TemporaryDirectory() as directory:
+                parent = Path(directory)
+                remote, _producer, source = self._initialize(parent)
+                checkout, publish = self._publisher(workflow)
+                event = {"ref": "refs/heads/main", "sha": source, "event_name": "workflow_dispatch"}
+                job = self._checkout(parent, remote, checkout, event)
+                manifest = self._generate_manifest(job, event)
+                pushed = self._publish(job, publish)
+                self.assertEqual(source, manifest["generator_revision"])
+                self.assertEqual(0, pushed.returncode, pushed.stderr)
+                self.assertEqual(source, self._git(job, "rev-parse", "HEAD^").stdout.strip())
+                self.assertEqual(self._git(job, "rev-parse", "HEAD").stdout,
+                                 self._git(remote, "rev-parse", "refs/heads/main").stdout)
+
+    def test_main_movement_after_generation_still_refuses_publication(self):
+        for workflow in ("metrics.yml", "analytics.yml"):
+            with self.subTest(workflow=workflow), tempfile.TemporaryDirectory() as directory:
+                parent = Path(directory)
+                remote, producer, source = self._initialize(parent)
+                checkout, publish = self._publisher(workflow)
+                event = {"ref": "refs/heads/main", "sha": source, "event_name": "workflow_dispatch"}
+                job = self._checkout(parent, remote, checkout, event)
+                manifest = self._generate_manifest(job, event)
+                protected = self._advance_main(producer, "C after generation")
+                pushed = self._publish(job, publish)
+                self.assertEqual(source, manifest["generator_revision"])
+                self.assertNotEqual(0, pushed.returncode)
+                self.assertIn("non-fast-forward", pushed.stderr)
+                self.assertEqual(protected, self._git(remote, "rev-parse", "refs/heads/main").stdout.strip())
+                self.assertEqual(manifest, json.loads((job / "site/data/profile_artifact_manifest.json").read_text()))
+
+    def test_metrics_nonmain_dispatch_preserves_event_source_and_mode(self):
+        for ref in ("refs/heads/candidate",):
+            with self.subTest(ref=ref), tempfile.TemporaryDirectory() as directory:
+                parent = Path(directory)
+                remote, producer, initial = self._initialize(parent)
+                branch = ref.removeprefix("refs/heads/") if ref.startswith("refs/heads/") else "candidate"
+                self._git(producer, "checkout", "-b", branch)
+                (producer / "README.md").write_text("manual candidate fixture\n", encoding="utf-8")
+                self._git(producer, "commit", "-qam", "candidate fixture")
+                candidate = self._git(producer, "rev-parse", "HEAD").stdout.strip()
+                if ref.startswith("refs/tags/"):
+                    self._git(producer, "tag", "main")
+                    self._git(producer, "push", "origin", "refs/tags/main")
+                self._git(producer, "push", "origin", f"HEAD:{branch}")
+                (producer / "README.md").write_text("later candidate fixture\n", encoding="utf-8")
+                self._git(producer, "commit", "-qam", "candidate moved after request")
+                self._git(producer, "push", "origin", f"HEAD:{branch}")
+                self._git(producer, "checkout", "main")
+                current_main = self._advance_main(producer, "B before manual candidate starts")
+                checkout, _publish = self._publisher("metrics.yml")
+                event = {"ref": ref, "sha": candidate, "event_name": "workflow_dispatch"}
+                job = self._checkout(parent, remote, checkout, event)
+                manifest = self._generate_manifest(job, event)
+                self.assertNotEqual(initial, candidate)
+                self.assertNotEqual(current_main, candidate)
+                self.assertEqual(candidate, manifest["generator_revision"])
+                mode = self._git(job, "symbolic-ref", "--short", "HEAD", check=False)
+                if ref.startswith("refs/heads/"):
+                    self.assertEqual(0, mode.returncode)
+                    self.assertEqual(branch, mode.stdout.strip())
+                else:
+                    self.assertNotEqual(0, mode.returncode)
+                self.assertEqual(current_main, self._git(remote, "rev-parse", "refs/heads/main").stdout.strip())
+                # This proves preserved checkout behavior only. It does not declare
+                # this branch's generated artifacts eligible for main publication.
+
+    def test_main_lookalikes_keep_the_existing_checkout_fallback(self):
+        # Execute the real selector without creating case-only Git branches on
+        # a Mac filesystem that may be case-insensitive. The candidate Git
+        # scenario above independently proves the empty fallback's source/mode.
+        checkout, _publish = self._publisher("metrics.yml")
+        for ref in ("refs/heads/Main", "refs/tags/main"):
+            with self.subTest(ref=ref), tempfile.TemporaryDirectory() as directory:
+                event = {"ref": ref, "sha": "f" * 40, "event_name": "workflow_dispatch"}
+                self.assertEqual("", self._input(Path(directory), checkout, event))
+
+
+
 if __name__ == "__main__":
     unittest.main()
 

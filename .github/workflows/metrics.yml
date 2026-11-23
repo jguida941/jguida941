@@ -18,7 +18,26 @@ jobs:
       actions: read
 
     steps:
+      - name: Select publication source
+        id: source
+        run: |
+          # A queued main event may predate the preceding publisher's commit.
+          # Empty input preserves checkout's event ref and SHA for other refs.
+          source_ref=''
+          if [ "$GITHUB_REF" = 'refs/heads/main' ]; then
+            source_ref=main
+          fi
+          printf 'ref=%s\n' "$source_ref" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.source.outputs.ref }}
+
+      - name: Report generation source
+        run: |
+          generation_source=$(git rev-parse HEAD)
+          printf 'Workflow event SHA: %s\n' "$GITHUB_SHA"
+          printf 'Checked-out generation SHA: %s\n' "$generation_source"
 
       - name: Set up Python
         uses: actions/setup-python@v5
