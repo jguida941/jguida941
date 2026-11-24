@@ -245,11 +245,12 @@ class MetricsApiBudgetContract(unittest.TestCase):
                 self.assertIn("API budget unreadable", result.stdout)
 
     def test_fallback_limit_below_need_is_the_target(self):
-        result, calls, sleeps = self.run_wait([f"1000 1000 {self.NOW + 300}"])
+        low = self.need() // 2
+        result, calls, sleeps = self.run_wait([f"{low} {low} {self.NOW + 300}"])
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertEqual([], sleeps)
-        self.assertIn("generation needs about 1000", result.stdout)
-        result, calls, sleeps = self.run_wait([f"999 1000 {self.NOW + 300}", f"1000 1000 {self.NOW + 3900}"])
+        self.assertIn(f"generation needs about {low}", result.stdout)
+        result, calls, sleeps = self.run_wait([f"{low - 1} {low} {self.NOW + 300}", f"{low} {low} {self.NOW + 3900}"])
         self.assertEqual(["305"], sleeps)
 
     def test_wait_bound_is_inclusive_and_a_due_reset_does_not_wait(self):
