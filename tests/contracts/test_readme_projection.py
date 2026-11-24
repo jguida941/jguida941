@@ -153,3 +153,117 @@ class PagesArtifactListingContract(unittest.TestCase):
         self.assertNotEqual(0, result.returncode)
         self.assertEqual(20, len(calls))
         self.assertIn('Last API response: {"message":"Server Error","status":"500"}', result.stdout)
+
+
+class MetricsApiBudgetContract(unittest.TestCase):
+    """Generation starts on a budget it can finish with, or waits briefly for the reset."""
+
+    STEP = "      - name: Wait for the generation token's API budget\n"
+    NOW = 1795557600
+
+    def workflow(self):
+        return (Path(__file__).resolve().parents[2] / ".github/workflows/metrics.yml").read_text()
+
+    def step(self):
+        return self.workflow().split(self.STEP, 1)[1].split("\n\n", 1)[0]
+
+    def script(self):
+        import textwrap
+        return textwrap.dedent(self.step().split("        run: |\n", 1)[1]) + "\n"
+
+    def need(self):
+        return int(re.search(r'PROFILE_API_BUDGET_NEED: "(\d+)"', self.step()).group(1))
+
+    def run_wait(self, responses):
+        import os
+        import subprocess
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "responses").write_text("".join(line + "\n" for line in responses))
+            for name in ("calls", "sleeps"):
+                (root / name).write_text("")
+            stubs = {
+                "gh": ('#!/bin/bash\nprintf "%s\\n" "$*" >> "$STUB_CALLS"\n'
+                       'n=$(wc -l < "$STUB_CALLS" | tr -d " ")\nline=$(sed -n "${n}p" "$STUB_RESPONSES")\n'
+                       'if [ "$line" = FAIL ]; then echo \'{"message":"Bad credentials"}\'; exit 1; fi\n'
+                       'printf "%s\\n" "$line"\n'),
+                "sleep": '#!/bin/bash\nprintf "%s\\n" "$1" >> "$STUB_SLEEPS"\n',
+                "date": f'#!/bin/bash\necho {self.NOW}\n',
+            }
+            for name, text in stubs.items():
+                (root / name).write_text(text)
+                (root / name).chmod(0o755)
+            env = {"PATH": f"{root}:{os.environ.get('PATH', '')}", "STUB_CALLS": str(root / "calls"),
+                   "STUB_SLEEPS": str(root / "sleeps"), "STUB_RESPONSES": str(root / "responses"),
+                   "PROFILE_API_BUDGET_NEED": str(self.need()), "PROFILE_API_BUDGET_MAX_WAIT": "900",
+                   "GH_TOKEN": "test-token"}
+            result = subprocess.run(["bash", "-e", "-c", self.script()], env=env,
+                                    capture_output=True, text=True, timeout=60)
+            return (result, (root / "calls").read_text().splitlines(),
+                    (root / "sleeps").read_text().splitlines())
+
+    def test_budget_wait_sits_between_token_resolution_and_generation(self):
+        workflow = self.workflow()
+        resolve = workflow.index("      - name: Resolve GitHub token\n")
+        wait = workflow.index(self.STEP)
+        generate = workflow.index("python scripts/profile_cli.py generate-profile")
+        self.assertLess(resolve, wait)
+        self.assertLess(wait, generate)
+        self.assertNotIn("\n        if:", self.step())
+        self.assertNotIn("continue-on-error", self.step())
+        self.assertTrue(0 < self.need() <= 5000)
+
+    def test_sufficient_budget_generates_at_once(self):
+        result, calls, sleeps = self.run_wait([f"{self.need()} 5000 {self.NOW + 300}"])
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(["api rate_limit --jq .resources.core | \"\\(.remaining) \\(.limit) \\(.reset)\""], calls)
+        self.assertEqual([], sleeps)
+        self.assertIn(f"API budget: {self.need()} of 5000 remaining", result.stdout)
+
+    def test_short_budget_waits_for_a_near_reset_then_generates(self):
+        result, calls, sleeps = self.run_wait([f"{self.need() - 1} 5000 {self.NOW + 300}", f"5000 5000 {self.NOW + 3900}"])
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(["305"], sleeps)
+        self.assertEqual(2, len(calls))
+        self.assertIn(f"API budget after waiting: 5000 5000 {self.NOW + 3900}", result.stdout)
+
+    def test_short_budget_with_a_distant_or_past_reset_warns_without_waiting(self):
+        for reset in (self.NOW + 3000, self.NOW - 60):
+            with self.subTest(reset=reset):
+                result, calls, sleeps = self.run_wait([f"12 5000 {reset}"])
+                self.assertEqual(0, result.returncode, result.stderr)
+                self.assertEqual([], sleeps)
+                self.assertIn("collection may fail with HTTP 403", result.stdout)
+
+    def test_unreadable_budget_never_blocks_generation(self):
+        for response in ("FAIL", "", "not a budget"):
+            with self.subTest(response=response):
+                result, calls, sleeps = self.run_wait([response])
+                self.assertEqual(0, result.returncode, result.stderr)
+                self.assertEqual([], sleeps)
+                self.assertIn("API budget unreadable", result.stdout)
+
+    def test_fallback_limit_below_need_is_the_target(self):
+        low = self.need() // 2
+        result, calls, sleeps = self.run_wait([f"{low} {low} {self.NOW + 300}"])
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual([], sleeps)
+        self.assertIn(f"generation needs about {low}", result.stdout)
+        result, calls, sleeps = self.run_wait([f"{low - 1} {low} {self.NOW + 300}", f"{low} {low} {self.NOW + 3900}"])
+        self.assertEqual(["305"], sleeps)
+
+    def test_wait_bound_is_inclusive_and_a_due_reset_does_not_wait(self):
+        result, calls, sleeps = self.run_wait([f"0 5000 {self.NOW + 895}", f"5000 5000 {self.NOW + 4495}"])
+        self.assertEqual(["900"], sleeps)
+        for reset in (self.NOW + 896, self.NOW - 5):
+            with self.subTest(reset=reset):
+                result, calls, sleeps = self.run_wait([f"0 5000 {reset}"])
+                self.assertEqual([], sleeps)
+                self.assertIn("collection may fail with HTTP 403", result.stdout)
+
+    def test_budget_still_short_after_waiting_is_logged_and_generation_continues(self):
+        result, calls, sleeps = self.run_wait([f"3 5000 {self.NOW + 120}", f"4 5000 {self.NOW + 120}"])
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(["125"], sleeps)
+        self.assertIn(f"API budget after waiting: 4 5000 {self.NOW + 120}", result.stdout)

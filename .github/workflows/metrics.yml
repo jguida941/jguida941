@@ -87,6 +87,40 @@ jobs:
             use_default
           fi
 
+      # The generation token shares one hourly API budget with every other client of
+      # its account, and generation re-reads every repository. Starting it near an
+      # exhausted window fails all collection with HTTP 403. Reading the budget is
+      # free: when it is short and resets soon, wait for the reset. The log keeps the
+      # budget either way, so a later collection failure can be read against it.
+      # One generation measured 414 REST requests on 2026-11-24; the need adds margin.
+      - name: Wait for the generation token's API budget
+        env:
+          PROFILE_API_BUDGET_NEED: "600"
+          PROFILE_API_BUDGET_MAX_WAIT: "900"
+        run: |
+          read_budget() { gh api rate_limit --jq '.resources.core | "\(.remaining) \(.limit) \(.reset)"' || true; }
+          budget="$(read_budget)"
+          if ! printf '%s' "${budget}" | grep -Eq '^[0-9]+ [0-9]+ [0-9]+$'; then
+            echo "::notice::API budget unreadable; generating without waiting."
+            exit 0
+          fi
+          read -r remaining limit reset <<< "${budget}"
+          # A github.token fallback has a smaller per-repository limit; never wait for more than it holds.
+          need="${PROFILE_API_BUDGET_NEED}"
+          if [ "${limit}" -lt "${need}" ]; then need="${limit}"; fi
+          wait_seconds=$(( reset - $(date +%s) + 5 ))
+          echo "API budget: ${remaining} of ${limit} remaining; resets in ${wait_seconds}s; generation needs about ${need}."
+          if [ "${remaining}" -ge "${need}" ]; then
+            exit 0
+          fi
+          if [ "${wait_seconds}" -gt 0 ] && [ "${wait_seconds}" -le "${PROFILE_API_BUDGET_MAX_WAIT}" ]; then
+            echo "::notice::Waiting ${wait_seconds}s for the API budget to reset."
+            sleep "${wait_seconds}"
+            echo "API budget after waiting: $(read_budget)"
+          else
+            echo "::warning::API budget is short (${remaining}) and does not reset within ${PROFILE_API_BUDGET_MAX_WAIT}s; collection may fail with HTTP 403."
+          fi
+
       - name: Generate and validate canonical profile artifacts
         env:
           GITHUB_USERNAME: jguida941
