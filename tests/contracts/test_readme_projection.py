@@ -101,7 +101,9 @@ class PagesArtifactListingContract(unittest.TestCase):
             calls.write_text("")
             stub = ('#!/bin/bash\nprintf "%s\\n" "$*" >> "$STUB_CALLS"\n'
                     'n=$(wc -l < "$STUB_CALLS" | tr -d " ")\nline=$(sed -n "${n}p" "$STUB_RESPONSES")\n'
-                    'if [ "$line" = FAIL ]; then echo "HTTP 502" >&2; exit 1; fi\nprintf "%s\\n" "$line"\n')
+                    'if [ "$line" = FAIL ]; then echo "gh: HTTP 502" >&2; exit 1; fi\n'
+                    'if [ "$line" = FAILBODY ]; then echo \'{"message":"Server Error","status":"500"}\'; '
+                    'echo "gh: HTTP 500" >&2; exit 1; fi\nprintf "%s\\n" "$line"\n')
             for name, text in (("gh", stub), ("sleep", "#!/bin/bash\nexit 0\n")):
                 (root / name).write_text(text)
                 (root / name).chmod(0o755)
@@ -125,13 +127,14 @@ class PagesArtifactListingContract(unittest.TestCase):
         self.assertIn("artifacts?name=${PAGES_ARTIFACT_NAME}", self.script())
 
     def test_listed_artifact_continues_after_the_check_that_sees_it(self):
-        for responses, checks in ((["1"], 1), (["0", "0", "1"], 3), (["FAIL", "", "1"], 3)):
+        for responses, checks in ((["1"], 1), (["0", "0", "1"], 3), (["FAIL", "", "1"], 3),
+                                  (["FAILBODY", "FAILBODY", "1"], 3)):
             with self.subTest(responses=responses):
                 result, calls = self.run_wait(responses)
                 self.assertEqual(0, result.returncode, result.stderr)
                 self.assertEqual(checks, len(calls))
-                self.assertTrue(all("actions/runs/45481354867/artifacts?name=github-pages-45481354867-1"
-                                    in call for call in calls))
+                self.assertTrue(all(call == "api repos/owner/profile/actions/runs/45481354867/artifacts"
+                                    "?name=github-pages-45481354867-1 --jq .total_count" for call in calls), calls)
 
     def test_unlisted_artifact_fails_by_name_after_twenty_checks(self):
         result, calls = self.run_wait(["0"] * 25)
@@ -144,3 +147,9 @@ class PagesArtifactListingContract(unittest.TestCase):
         self.assertNotEqual(0, result.returncode)
         self.assertEqual(2, len(calls))
         self.assertIn("refusing an ambiguous deployment", result.stdout)
+
+    def test_unlisted_artifact_reports_the_last_api_error(self):
+        result, calls = self.run_wait(["FAILBODY"] * 25)
+        self.assertNotEqual(0, result.returncode)
+        self.assertEqual(20, len(calls))
+        self.assertIn('Last API response: {"message":"Server Error","status":"500"}', result.stdout)
