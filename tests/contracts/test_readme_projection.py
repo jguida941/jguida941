@@ -75,3 +75,72 @@ class CodeChangeReadmeTests(unittest.TestCase):
         self.assertIn('refs/heads/dev/feature',rendered)
         self.assertIn('https://github.com/owner/project/commit/'+'a'*40,rendered)
         self.assertIn('| 2026-10-10 | 20 | 7 |',rendered)
+
+
+class PagesArtifactListingContract(unittest.TestCase):
+    """deploy-pages looks once; the workflow waits, bounded, until its artifact is listed."""
+
+    STEP = "      - name: Wait until this attempt's Pages artifact is listed\n"
+
+    def workflow(self):
+        return (Path(__file__).resolve().parents[2] / ".github/workflows/deploy-site.yml").read_text()
+
+    def script(self):
+        import textwrap
+        body = self.workflow().split(self.STEP, 1)[1].split("        run: |\n", 1)[1]
+        return textwrap.dedent(body.split("\n\n", 1)[0]) + "\n"
+
+    def run_wait(self, responses):
+        import os
+        import subprocess
+        import tempfile
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "responses").write_text("".join(line + "\n" for line in responses))
+            calls = root / "calls"
+            calls.write_text("")
+            stub = ('#!/bin/bash\nprintf "%s\\n" "$*" >> "$STUB_CALLS"\n'
+                    'n=$(wc -l < "$STUB_CALLS" | tr -d " ")\nline=$(sed -n "${n}p" "$STUB_RESPONSES")\n'
+                    'if [ "$line" = FAIL ]; then echo "HTTP 502" >&2; exit 1; fi\nprintf "%s\\n" "$line"\n')
+            for name, text in (("gh", stub), ("sleep", "#!/bin/bash\nexit 0\n")):
+                (root / name).write_text(text)
+                (root / name).chmod(0o755)
+            env = {"PATH": f"{root}:{os.environ.get('PATH', '')}", "STUB_CALLS": str(calls),
+                   "STUB_RESPONSES": str(root / "responses"), "GITHUB_REPOSITORY": "owner/profile",
+                   "GITHUB_RUN_ID": "45481354867", "PAGES_ARTIFACT_NAME": "github-pages-45481354867-1",
+                   "GH_TOKEN": "test-token"}
+            result = subprocess.run(["bash", "-e", "-c", self.script()], env=env,
+                                    capture_output=True, text=True, timeout=60)
+            return result, calls.read_text().splitlines()
+
+    def test_wait_sits_between_upload_and_deploy_and_reads_this_attempts_name(self):
+        workflow = self.workflow()
+        upload = workflow.index("uses: actions/upload-pages-artifact@v3")
+        wait = workflow.index(self.STEP)
+        deploy = workflow.index("uses: actions/deploy-pages@v4")
+        self.assertLess(upload, wait)
+        self.assertLess(wait, deploy)
+        self.assertIn("\npermissions:\n  actions: read\n", workflow)
+        self.assertIn("GH_TOKEN: ${{ github.token }}", workflow[wait:deploy])
+        self.assertIn("artifacts?name=${PAGES_ARTIFACT_NAME}", self.script())
+
+    def test_listed_artifact_continues_after_the_check_that_sees_it(self):
+        for responses, checks in ((["1"], 1), (["0", "0", "1"], 3), (["FAIL", "", "1"], 3)):
+            with self.subTest(responses=responses):
+                result, calls = self.run_wait(responses)
+                self.assertEqual(0, result.returncode, result.stderr)
+                self.assertEqual(checks, len(calls))
+                self.assertTrue(all("actions/runs/45481354867/artifacts?name=github-pages-45481354867-1"
+                                    in call for call in calls))
+
+    def test_unlisted_artifact_fails_by_name_after_twenty_checks(self):
+        result, calls = self.run_wait(["0"] * 25)
+        self.assertNotEqual(0, result.returncode)
+        self.assertEqual(20, len(calls))
+        self.assertIn("was not listed after 20 checks", result.stdout)
+
+    def test_duplicate_listing_refuses_without_choosing(self):
+        result, calls = self.run_wait(["0", "2"])
+        self.assertNotEqual(0, result.returncode)
+        self.assertEqual(2, len(calls))
+        self.assertIn("refusing an ambiguous deployment", result.stdout)
