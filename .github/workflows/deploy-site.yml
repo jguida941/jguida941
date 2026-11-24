@@ -15,6 +15,7 @@ on:
       - completed
 
 permissions:
+  actions: read
   contents: read
   pages: write
   id-token: write
@@ -99,6 +100,27 @@ jobs:
         with:
           name: ${{ env.PAGES_ARTIFACT_NAME }}
           path: site
+
+      # The run-artifacts list is eventually consistent, and deploy-pages looks
+      # once, about a second after upload. Wait, bounded, until exactly this
+      # attempt's artifact is listed; deployment keeps its exact-name selection.
+      - name: Wait until this attempt's Pages artifact is listed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last=""
+          for check in $(seq 1 20); do
+            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=${PAGES_ARTIFACT_NAME}" --jq '.total_count' || true)"
+            case "${count}" in
+              1) echo "${PAGES_ARTIFACT_NAME} is listed after ${check} check(s)."; exit 0 ;;
+              ''|0) ;;
+              *[!0-9]*) last="${count}" ;;
+              *) echo "::error::${count} artifacts are named ${PAGES_ARTIFACT_NAME}; refusing an ambiguous deployment."; exit 1 ;;
+            esac
+            sleep 3
+          done
+          echo "::error::${PAGES_ARTIFACT_NAME} was not listed after 20 checks; deployment would find no artifact.${last:+ Last API response: ${last:0:200}}"
+          exit 1
 
       - id: deployment
         uses: actions/deploy-pages@v4
