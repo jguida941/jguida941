@@ -1,6 +1,6 @@
 {
-  "artifact_set_digest": "834d7175c67c435dc44a26f2a8bdc3a98c070ef5b28e305b5b3df308042356cb",
-  "claim_input_digest": "555f86cd92210e1db6f4f6a23f664e5beed00f64869bb9d6b1e8041815d5b130",
+  "artifact_set_digest": "1cbb1834e3183af9f3070b2dfd5d5394ad3e868071bca0e15444eb29c744ff42",
+  "claim_input_digest": "95b59a06050196c4d36d95073cc9b6f8d0b93e513a6397690ab66a13bbb61f58",
   "execution_identity": {
     "packages": {
       "jinja2": "3.1.6",
@@ -12,9 +12,9 @@
   },
   "files": [
     {
-      "byte_length": 20730,
+      "byte_length": 22653,
       "path": "README.md",
-      "sha256": "e948601fd901907bb92310c28d44e870c6f690c6092f744a496bfddff818d02e"
+      "sha256": "d141bad2f691c6eff2a8caee572278a9225ff2c07fa777ec15d74af0a5d9cd1e"
     },
     {
       "byte_length": 7616,
@@ -27,9 +27,9 @@
       "sha256": "8c5bccea18b27498430220db367e9356334fb43ea9849c20e4939efc14cbd2ea"
     },
     {
-      "byte_length": 10727,
+      "byte_length": 10725,
       "path": "assets/builder_scorecard.svg",
-      "sha256": "c60518806054b1b6c88eb9956fff3ffe2dce0fc69f01c2823d0cfbe36db88a8f"
+      "sha256": "11daee53321650e8efb755b3966aaf2429df98c7cce13b863f51abf10f3605f0"
     },
     {
       "byte_length": 77777,
@@ -37,19 +37,19 @@
       "sha256": "1aa94f56580e61fabf77089ea17d46f71864c515c79fe8988b206e8fd1ca1a10"
     },
     {
-      "byte_length": 12280,
+      "byte_length": 12303,
       "path": "assets/currently_working.svg",
-      "sha256": "5f7d69401a52698a680a6ba3b60d860374ccffd08859252659783ee715c7d8ac"
+      "sha256": "e993cbeb15de71b29063baac20f750b5658a9f7a654866a90185947205492a4e"
     },
     {
-      "byte_length": 220198,
+      "byte_length": 268048,
       "path": "assets/dashboard_summary.svg",
-      "sha256": "02216e88cd84968a70bef211743d0bc50c4be818ddb8b270d5f1c930e2f948cf"
+      "sha256": "0065a9649b89776a36d1732afad9f9f6d388a27676477b277a7bd395a9a282ad"
     },
     {
-      "byte_length": 220190,
+      "byte_length": 265944,
       "path": "assets/dashboard_summary_mobile.svg",
-      "sha256": "c1be1766a291f6b69b46190dec7222bd4f943d2d2aefc56e07b999d8afbdf6ab"
+      "sha256": "2683d2cfc36bfbb87bae2127bbf2fd3544586910d7c75a56e86ef850d8286e4d"
     },
     {
       "byte_length": 14441,
@@ -67,9 +67,9 @@
       "sha256": "29e08eacc88c4c15179cb7ae1a21193de35dcbe57601ff10320e48a810925262"
     },
     {
-      "byte_length": 13407,
+      "byte_length": 13294,
       "path": "assets/raw_snapshot.svg",
-      "sha256": "dfe1d4e32b41dd3b5b4ff7b328c9e31989cab22f861a045398a89a1cb4c59446"
+      "sha256": "e78823b17e526fba5ff748aa4b9f10397b55bfaf2dfc9b3f27a2b5bcd7f0953f"
     },
     {
       "byte_length": 10081,
@@ -82,18 +82,18 @@
       "sha256": "f1244be4d14b4f2d7fb18b0f3d942ca6e462b1cfac2cad1f456b42ff4fe6ac31"
     },
     {
-      "byte_length": 10992,
+      "byte_length": 10990,
       "path": "metrics.general.svg",
-      "sha256": "0baf1c867466799d6c4623137c4f13ca29b2d9cd0a5260851a2e9d4c75b4fd41"
+      "sha256": "096d1ccc7f6747cc432a459a42d7cdd6e9f1b6e02a98001676c379a26812b48e"
     },
     {
-      "byte_length": 358401,
+      "byte_length": 453938,
       "path": "site/data/profile_snapshot.json",
-      "sha256": "8f9cadf0ff29bbeab0920ed2092bbb5bf3cd93e617a7fb0d47469deb60dc8c46"
+      "sha256": "79d18dfc06166f2b5b9a17eee0d523ec8f81464570274526e5c9ae8076fd1142"
     }
   ],
-  "generated_at": "2026-11-24T17:03:20.238753Z",
-  "generator_revision": "1bdf41cfd34adbad352d177cf911bab7f96e39fe",
+  "generated_at": "2026-11-24T18:04:08.181245Z",
+  "generator_revision": "425c78ae70ff441ff06cc500ede6af4ce907b010",
   "generator_source_digest": "ae45e2e5870c2ffee583f140026565c302867227e1942e9c3ea7b0e5351ae31e",
   "render_config": {
     "activity_timezone": "America/New_York",
@@ -101,7 +101,7 @@
     "source_kind": "github-api",
     "username": "jguida941"
   },
-  "render_key": "f13bcee02263a1a156c5de7701585aeb47e80685650324f63a4a60ba4e97fae2",
+  "render_key": "f0421edf019ce5027ad9384dd2f9c6ff58de4ffa405e66d0488c21ff79eb33b2",
   "schema": "profile-artifact-manifest/v1",
   "source_kind": "github-api"
 }
